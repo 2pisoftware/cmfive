@@ -1,0 +1,20 @@
+<?php
+
+function deletetask_ALL(Web &$w) {
+	$p = $w->pathMatch("id");
+
+	// task is to get updated so gather relevant data
+	$task = $w->Task->getTask($p['id']);
+
+	// if task exists, continue
+	if ($task) {
+		$arr['is_closed'] = 1;
+		$arr['is_deleted'] = 1;
+		$task->fill($arr);
+		$task->update();
+		$w->msg("Task: " . $task->title . " has been deleted.","/task/tasklist/");
+	}
+	else {
+		$w->msg("Task: " . $task->title . " could not be found.","/task/tasklist/");
+	}
+}
