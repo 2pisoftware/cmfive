@@ -15,7 +15,7 @@
 				foreach($hist as $ph) {
 					$table[]=array(
 					$ph->getDateTime("dt_created","d/m/Y H:i"),
-					$w->auth->getUser($ph->creator_id)->getFullName(),
+					$w->Auth->getUser($ph->creator_id)->getFullName(),
 					Html::box(WEBROOT."/wiki/pageversion/".$wiki->name."/".$ph->id,"View",true),
 					);
 				}

@@ -46,7 +46,7 @@ class Wiki extends DbObject{
 			throw new WikiException("This wiki needs a title.");
 		}
 		$this->name = $this->getName();
-		$this->owner_id = $this->w->auth->user()->id;
+		$this->owner_id = $this->w->Auth->user()->id;
 
 		// check if wiki of the same name exists!
 		$ow = $this->Wiki->getWikiByName($this->getName());
@@ -55,7 +55,7 @@ class Wiki extends DbObject{
 		}
 		parent::insert();
 		$this->addPage("HomePage", "= This is the HomePage =");
-		$this->addUser($this->w->auth->user(),"editor");
+		$this->addUser($this->w->Auth->user(),"editor");
 	}
 
 	function & updatePage($name,$body) {

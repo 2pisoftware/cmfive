@@ -7,7 +7,7 @@
 	<?
 	print $w->menuButton("inbox/"/*.$row['status']*/,"Back");
 
-	if ($w->auth->user()->allowed($w,"/inbox/send")) {
+	if ($w->Auth->user()->allowed($w,"/inbox/send")) {
 		print $w->menuButton("inbox/send/"."$message->id","Reply");
 	}
 	print $w->menuButton("inbox/archive/".$type."/".$message->id,"Archive");

@@ -10,7 +10,7 @@ class Sms extends DbObject {
 	}
 	
 	function send() {
-		sendSMS(array($this->phone),$this->message,$this->w->auth->user()->login);
+		sendSMS(array($this->phone),$this->message,$this->w->Auth->user()->login);
 		
 		// always store a fresh line item
 		$this->dt_created = null;

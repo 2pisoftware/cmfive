@@ -23,7 +23,7 @@ function viewtask_GET(Web &$w) {
 		// if I can assign tasks, provide dropdown of group members else display current assignee.
 		// my role in group Vs group can_assign value
 		if ($task->getCanIAssign()) {
-			$members = ($task) ? $w->Task->getMembersBeAssigned($task->task_group_id) : $w->auth->getUsers();
+			$members = ($task) ? $w->Task->getMembersBeAssigned($task->task_group_id) : $w->Auth->getUsers();
 			sort($members);
 			$assign = array("Assigned To","select","assignee_id",$task->assignee_id,$members);
 		}
@@ -121,7 +121,7 @@ function viewtask_GET(Web &$w) {
 		$form = Html::form($f,$w->localUrl("/task/updatetask/".$task->id),"POST"," Update ");
 
 		// create 'start time log' button
-		if ($task->assignee_id == $w->auth->user()->id) {
+		if ($task->assignee_id == $w->Auth->user()->id) {
 			$btntimelog = "<button class=\"startTime\" href=\"/task/starttimelog/".$task->id."\"> Start Time Log </button>";
 		}
 
@@ -205,7 +205,7 @@ function viewtask_GET(Web &$w) {
 
 		// tab: time log
 		// provide button to add time entry
-		if ($task->assignee_id == $w->auth->user()->id) {		
+		if ($task->assignee_id == $w->Auth->user()->id) {		
 			$addtime = Html::box($webroot."/task/addtime/".$task->id," Add Time Log entry ",true);
 		}
 		$w->ctx("addtime",$addtime);

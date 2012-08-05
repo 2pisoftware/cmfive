@@ -33,7 +33,7 @@ if ($messageid){
 	//	print_r($message);
 	$lines =  array(
 	array("","section"),
-	array("To","autocomplete","receiver_id",$message->user_id,$w->auth->getUsers()),
+	array("To","autocomplete","receiver_id",$message->user_id,$w->Auth->getUsers()),
 	array("Subject","text","subject",$message->subject),
 	array("","section"),
 	array("","textarea","message",null,120,10),
@@ -48,7 +48,7 @@ if ($messageid){
 } else {
 	$lines =  array(
 	array("Send a Message","section"),
-	array("To","autocomplete","receiver_id",null,$w->auth->getUsers()),
+	array("To","autocomplete","receiver_id",null,$w->Auth->getUsers()),
 	array("Subject","text","subject"),
 	array("","textarea","message",null,120,10),
 	);

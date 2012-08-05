@@ -1,6 +1,6 @@
 <?php
 function edit_GET(Web &$w){
-	wiki_navigation($w,$wiki,$page);
+	WikiLib::wiki_navigation($w,$wiki,$page);
 	$pm = $w->pathMatch("wikiname","pagename");
 	try {
 		$wiki = $w->Wiki->getWikiByName($pm['wikiname']);

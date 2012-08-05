@@ -4,7 +4,7 @@ function inbox_navigation(Web &$w,$title = null,$nav=null) {
 		$w->ctx("title",$title);
 	}
 	$nav = $nav ? $nav : array();
-	if ($w->auth->loggedIn()) {
+	if ($w->Auth->loggedIn()) {
 		$w->menuLink("inbox","New Messages",$nav);
 		$w->menuLink("inbox/read","Read Messages",$nav);
 		$w->menuLink("inbox/showarchive","Archive",$nav);

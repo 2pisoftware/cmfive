@@ -158,7 +158,7 @@ class TaskType_ProgrammingTicket extends TaskType {
 	
 	private function getModules(Task $task) {
 		$taskgroup = $task->getTaskGroup();
-		return $this->w->auth->lookupArray($taskgroup->title.' Modules');
+		return $this->w->Auth->lookupArray($taskgroup->title.' Modules');
 	}
 	
 }

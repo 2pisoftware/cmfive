@@ -414,7 +414,7 @@ class TaskService extends DbService {
     
 	// return a task comment by the COMMENT ID
 	function & getComment($id) {
-		return $this->w->auth->getObject("TaskComment",array("obj_table"=>Task::getDbTableName(),"id"=>$id));
+		return $this->w->Auth->getObject("TaskComment",array("obj_table"=>Task::getDbTableName(),"id"=>$id));
 	}
 	
 	// return a time log entry by log entry ID
@@ -488,7 +488,7 @@ class TaskService extends DbService {
 
 	// return a users full name given their user ID
 	function & getUserById($id) {
-		$u = $this->w->auth->getUser($id);
+		$u = $this->w->Auth->getUser($id);
 		return $u ? $u->getFullName() : "";
 	}
 

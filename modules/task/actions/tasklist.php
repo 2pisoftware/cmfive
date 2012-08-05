@@ -112,7 +112,7 @@ function tasklist_ALL(Web $w) {
 			$task->getTaskCreatorName(),
 			$taskstatus,
 			$task->isTaskLate(),
-			$task->assignee_id == $w->auth->user()->id ? 
+			$task->assignee_id == $w->Auth->user()->id ? 
 			Html::a($webroot."/task/starttimelog/".$task->id,"Start Log","Start Log","startTime") :
 			"",
 			);

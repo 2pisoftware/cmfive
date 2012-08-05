@@ -151,7 +151,7 @@ class ReportService extends DbService {
 
 	// return a users full name given their user ID
 	function & getUserById($id) {
-		$u = $this->w->auth->getUser($id);
+		$u = $this->w->Auth->getUser($id);
 		return $u ? $u->getFullName() : "";
 	}
 

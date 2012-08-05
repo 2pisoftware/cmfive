@@ -53,7 +53,7 @@ function viewtaskgrouptypes_ALL(Web &$w) {
 	array("Active","select","is_active",null,$is_active),
 	array("","hidden","is_deleted","0"),
 	array("Description","textarea","description",null,"26","6"),
-	array("Default Assignee","select","default_assignee_id",null,$w->auth->getUsers()),
+	array("Default Assignee","select","default_assignee_id",null,$w->Auth->getUsers()),
 	),$w->localUrl("/task-group/createtaskgroup"),"POST","Save");
 
 	// display form
@@ -412,7 +412,7 @@ function addgroupmembers_GET(Web &$w) {
 	$p = $w->pathMatch("task_group_id");
 
 	// get all users
-	$users = $w->auth->getUsers();
+	$users = $w->Auth->getUsers();
 	
 	// not interested in users who are really groups
 	foreach ($users as $user) {

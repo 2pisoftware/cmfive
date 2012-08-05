@@ -58,7 +58,7 @@ class TaskGroup extends DbObject {
 	
 	// get fullname of default assignee for this task group
 	function getDefaultAssigneeName() {
-		$assign = $this->w->auth->getUser($this->default_assignee_id);
+		$assign = $this->w->Auth->getUser($this->default_assignee_id);
 		return $assign ? $assign->getFullName() : "";
 	}
 }

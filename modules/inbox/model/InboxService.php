@@ -196,7 +196,7 @@ class InboxService extends DbService {
 		$users = $this->auth->getUsersForRole($role);
 
 		// no notification for current user:
-		$logged_uid = $this->w->auth->user()->id;
+		$logged_uid = $this->w->Auth->user()->id;
 
 		while (!is_null($key = key($users) ) ) {
 				

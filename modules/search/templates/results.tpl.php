@@ -20,9 +20,9 @@
                 <?
                 $object = $w->service('Search')->getObjectForIndex($allidx[$x][1],$id);
                 ?>
-                <?if ($object && $object->canList($w->auth->user())):?>
+                <?if ($object && $object->canList($w->Auth->user())):?>
                     <div class="search-result">
-                        <?if ($object->canView($w->auth->user())):?>
+                        <?if ($object->canView($w->Auth->user())):?>
                             <a class="search-title" href="<?=$webroot?>/<?=$object->printSearchUrl()?>">
                                 <?=$object->printSearchTitle()?>
                             </a>

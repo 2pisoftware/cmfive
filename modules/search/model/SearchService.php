@@ -3,7 +3,7 @@ class SearchService extends DbService {
 	function getSearchIndexes() {
 		$idx = array();
 		foreach ($this->w->moduleConf("search", "index") as $title => $conf) {
-			if ($this->w->auth->allowed($conf['permission'])) {
+			if ($this->w->Auth->allowed($conf['permission'])) {
 				$idx[]=array($title, $conf['index']);
 			}
 		}

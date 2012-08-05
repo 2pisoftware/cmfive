@@ -16,7 +16,7 @@
 					$table[]=array(
 					$wh['day']."/".$wh['month']."/".$wh['year'],
 					Html::a(WEBROOT."/wiki/view/".$wiki->name."/".$wh['name'],"<b>".$wh['name']."</b>"),
-					$w->auth->getUser($wh['creator_id'])->getFullName()
+					$w->Auth->getUser($wh['creator_id'])->getFullName()
 					);
 				}
 				echo Html::table($table,"history","tablesorter",true);

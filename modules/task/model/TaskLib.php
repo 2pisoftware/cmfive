@@ -8,7 +8,7 @@ class TaskLib {
 	
 		$nav = $nav ? $nav : array();
 	
-		if ($w->auth->loggedIn()) {
+		if ($w->Auth->loggedIn()) {
 			$w->menuLink("task/createtask","New Task",$nav);
 			$w->menuLink("task/index","Task Dashboard",$nav);
 			$w->menuLink("task/tasklist","Task List",$nav);

@@ -39,4 +39,8 @@ $modules['forms'] = array(
     'topmenu' => true,
 );
 
+$modules['wiki'] = array(
+    'topmenu' => true,
+);
+
 

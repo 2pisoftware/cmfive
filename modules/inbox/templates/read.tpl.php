@@ -97,7 +97,7 @@ thead {
 
 </style>
 <?php
-if ($w->auth->user()->allowed($w,"/inbox/send")) {
+if ($w->Auth->user()->allowed($w,"/inbox/send")) {
 	print Html::b($webroot."/inbox/send","Create Message");
 }
 print "<button onclick='sendArch()'>Archive</button>";//Html::b($webroot."/inbox/archive","Archive",null,'archive');

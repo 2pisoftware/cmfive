@@ -3,10 +3,10 @@
         <a href="#" class="active" >View</a>
         <a href="<?=WEBROOT."/wiki/wikichanges/".$wiki->id."/".$page->name?>" >Wiki History</a>
         <a href="<?=WEBROOT."/wiki/pagechanges/".$wiki->id."/".$page->name?>" >Page History</a>
-        <?if ($wiki->canEdit($w->auth->user())):?>
+        <?if ($wiki->canEdit($w->Auth->user())):?>
         <a href="<?=WEBROOT."/wiki/edit/".$wiki->name."/".$page->name?>" >Edit</a>
         <?endif;?>
-        <? if ($wiki->isOwner($w->auth->user()) && $page->name == "HomePage"):?>
+        <? if ($wiki->isOwner($w->Auth->user()) && $page->name == "HomePage"):?>
         <a href="<?=WEBROOT."/wiki/members/".$wiki->id?>" >Members</a>
         <? endif;?>        
         

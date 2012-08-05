@@ -132,7 +132,7 @@ class Task extends DbObject {
 	// return the name for display of the task creator given a task ID
 	function getTaskCreatorName() {
 		$c = $this->Task->getObject("ObjectModification",array("object_id"=>$this->id,"table_name"=>$this->getDbTableName()));
-		$creator = $this->w->auth->getUser($c->creator_id);
+		$creator = $this->w->Auth->getUser($c->creator_id);
 		return $creator ? $creator->getFullName() : "";
 		}
 
@@ -189,7 +189,7 @@ class Task extends DbObject {
 
 	// helper funtion: return all task comments given a task ID
 	function & getComments($id) {
-		return $this->w->auth->getObjects("AComment",array("obj_table"=>Task::getDbTableName(),"obj_id"=>$id));
+		return $this->w->Auth->getObjects("AComment",array("obj_table"=>Task::getDbTableName(),"obj_id"=>$id));
 	}
 
 	// return the number of comments for a task given a task ID

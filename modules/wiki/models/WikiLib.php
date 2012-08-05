@@ -10,7 +10,7 @@ class WikiLib {
 	
 		$nav = $nav ? $nav : array();
 	
-		if ($w->auth->loggedIn()) {
+		if ($w->Auth->loggedIn()) {
 			$w->menuLink("wiki/index","Wiki List",$nav);
 			$w->menuBox("wiki/createwiki","New Wiki",$nav);
 		}

@@ -749,8 +749,8 @@ class DbObject extends DbService {
 	        if (property_exists($this, "dt_modified")) {
 	            $this->dt_modified = time();
 	        }
-	        if (property_exists($this, "modifier_id") && $this->w->auth->user()) {
-	            $this->modifier_id = $this->w->auth->user()->id;
+	        if (property_exists($this, "modifier_id") && $this->w->Auth->user()) {
+	            $this->modifier_id = $this->w->Auth->user()->id;
 	        }
         }
         $data = array();
@@ -997,7 +997,7 @@ class AspectModifiable {
 			$mo->table_name = $this->object->getDbTableName();
 			$mo->object_id = $this->object->id;
 			$mo->dt_created = time();
-			$mo->creator_id = $mo->w->auth->user()->id;
+			$mo->creator_id = $mo->w->Auth->user()->id;
 			$mo->insert();
 		}
 	}
@@ -1008,7 +1008,7 @@ class AspectModifiable {
 	function update() {
 		if ($this->getMo()) {
 			$this->_mo->dt_modified = time();
-			$this->_mo->modifier_id = $this->_mo->w->auth->user()->id;
+			$this->_mo->modifier_id = $this->_mo->w->Auth->user()->id;
 			$this->_mo->update();
 		}
 	}

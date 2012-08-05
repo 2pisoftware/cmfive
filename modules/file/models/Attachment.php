@@ -21,7 +21,7 @@ class Attachment extends DbObject {
 	function insert() {
 		$this->dt_modified = time();
 		$this->mimetype = $this->w->getMimetype(FILE_ROOT."/".$this->fullpath);
-		$this->modifier_user_id = $this->w->auth->user()->id;
+		$this->modifier_user_id = $this->w->Auth->user()->id;
 		$this->fullpath = str_replace(FILE_ROOT, "", $this->fullpath);
 		$this->is_deleted = 0;
 		parent::insert();
@@ -79,7 +79,7 @@ class Attachment extends DbObject {
 
 	function getCodeTypeTitle()
 	{
-		$t = $this->w->auth->getObject('AttachmentType', array('code'=>$this->type_code,'table_name'=>$this->parent_table));
+		$t = $this->w->Auth->getObject('AttachmentType', array('code'=>$this->type_code,'table_name'=>$this->parent_table));
 		 
 		if($t)
 		{

@@ -1,9 +1,9 @@
 <?php
 function editmember_GET(Web &$w) {
-	wiki_navigation($w,$wiki,$page);
+	WikiLib::wiki_navigation($w,$wiki,$page);
 	$pm = $w->pathMatch("wid","mid");
 	$wiki = $w->Wiki->getWikiById($pm['wid']);
-	if (!$wiki || !$wiki->isOwner($w->auth->user()) ) {
+	if (!$wiki || !$wiki->isOwner($w->Auth->user()) ) {
 		$w->error("No access to this wiki.");
 	}
 	$mem = $wiki->getUserById($pm['mid']);
@@ -18,7 +18,7 @@ function editmember_GET(Web &$w) {
 function editmember_POST(&$w) {
 	$pm = $w->pathMatch("wid","mid");
 	$wiki = $w->Wiki->getWikiById($pm['wid']);
-	if (!$wiki || !$wiki->isOwner($w->auth->user()) ) {
+	if (!$wiki || !$wiki->isOwner($w->Auth->user()) ) {
 		$w->error("No access to this wiki.");
 	}
 	$mem = $wiki->getUserById($pm['mid']);
