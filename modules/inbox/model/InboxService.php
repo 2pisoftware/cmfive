@@ -193,7 +193,7 @@ class InboxService extends DbService {
 	}
 
 	function notifyRoleUsers($role,$subject,$message,$sender_id=null) {
-		$users = $this->auth->getUsersForRole($role);
+		$users = $this->Auth->getUsersForRole($role);
 
 		// no notification for current user:
 		$logged_uid = $this->w->Auth->user()->id;

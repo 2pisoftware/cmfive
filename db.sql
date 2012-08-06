@@ -649,3 +649,24 @@ CREATE TABLE IF NOT EXISTS `wiki_user` (
   `role` varchar(20) NOT NULL DEFAULT 'reader',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `comment`
+--
+
+CREATE TABLE IF NOT EXISTS `comment` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `obj_table` varchar(200) NOT NULL,
+  `obj_id` bigint(20) NOT NULL,
+  `comment` text NOT NULL,
+  `is_internal` tinyint(4) NOT NULL DEFAULT '0',
+  `is_system` tinyint(4) NOT NULL DEFAULT '0',
+  `creator_id` bigint(20) NOT NULL,
+  `dt_created` datetime NOT NULL,
+  `modifier_id` bigint(20) NOT NULL,
+  `dt_modified` datetime NOT NULL,
+  `is_deleted` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;

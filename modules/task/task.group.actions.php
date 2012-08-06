@@ -7,8 +7,9 @@
 function viewtaskgrouptypes_ALL(Web &$w) {
 	TaskLib::task_navigation($w, "Manage Task Groups");
     $task_groups = $w->Task->getTaskGroups();
-    usort($task_groups, array("TaskService","sortbyGroup"));
-    
+    if ($task_groups) {
+    	usort($task_groups, array("TaskService","sortbyGroup"));
+    }
     // prepare column headings for display
 	$line = array(array("Title","Type", "Description", "Default Assignee", "Actions"));
 

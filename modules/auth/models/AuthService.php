@@ -69,6 +69,11 @@ class AuthService extends DbService {
 		return false;
 	}
 
+	/**
+	 * Return an array of role names for all available roles
+	 *
+	 * @return array of strings
+	 */
 	function getAllRoles() {
 		$this->_loadRoles();
 		if (!$this->_roles) {

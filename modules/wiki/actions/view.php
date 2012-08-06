@@ -15,7 +15,7 @@ function view_GET(Web &$w) {
 	} else {
 		$_SESSION['wikicrumbs'][$pm['wikiname']][$pm['pagename']] = 1;
 	}
-	$w->ctx("body",wiki_format_creole($wiki,$wp));
+	$w->ctx("body",WikiLib::wiki_format_creole($wiki,$wp));
 	$w->ctx("wiki",$wiki);
 	$w->ctx("page",$wp);
 	$w->ctx("attachments",$w->service("File")->getAttachments($wp));

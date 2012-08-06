@@ -499,9 +499,9 @@ class TaskService extends DbService {
         if ($this->_tasks_loaded)
             return;
 
-        $handlers = $this->w->handlers();
+        $handlers = $this->w->modules();
         foreach ($handlers as $model) {
-            $file = $this->w->getHandlerDir($model).$model.".tasks.php";
+            $file = $this->w->getModuleDir($model).$model.".tasks.php";
             if (file_exists($file)) {
                 require_once $file;
             }

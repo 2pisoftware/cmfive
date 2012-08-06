@@ -5,7 +5,7 @@ class WikiUser extends DbObject {
 	var $role;
 	
 	function & getUser() {
-		return $this->auth->getUser($this->user_id);
+		return $this->Auth->getUser($this->user_id);
 	}
 	
 	function getFullName() {

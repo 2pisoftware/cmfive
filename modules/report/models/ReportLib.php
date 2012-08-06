@@ -20,7 +20,7 @@ class ReportLib {
 		$w->ctx("navigation", $nav);
 	}
 	
-	static function report_viewMemberstab(Web &$w, $id) {
+	static function viewMemberstab(Web &$w, $id) {
 		// return list of members of given report
 		$members = $w->Report->getReportMembers($id);
 		// get report details

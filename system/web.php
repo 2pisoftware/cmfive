@@ -169,8 +169,14 @@ class Web {
         // try to load the action file
         if (!$this->_submodule) {
         	$reqpath = $this->getModuleDir($this->_module).'/actions/'.$this->_action.'.php';
+            if (!file_exists($reqpath)) {
+            	$reqpath = $this->getModuleDir($this->_module).'/'.$this->_module.".actions.php";
+        	}
         } else {
         	$reqpath = $this->getModuleDir($this->_module).'/actions/'.$this->_submodule.'/'.$this->_action.'.php';
+            if (!file_exists($reqpath)) {
+            	$reqpath = $this->getModuleDir($this->_module).'/'.$this->_module.'.'.$this->_submodule.".actions.php";
+        	}
         }
                
         //

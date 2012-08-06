@@ -1,8 +1,8 @@
 <?php
 
-function task_listener_POST_ACTION(&$w) {
+function task_listener_POST_ACTION($w) {
 	// listening to Task module for adding comments
-	if ($w->currentHandler() == "task" && $w->ctx("TaskComment") && $w->ctx("TaskEvent")) {
+	if ($w->currentModule() == "task" && $w->ctx("TaskComment") && $w->ctx("TaskEvent")) {
 		// the task event type
 		$event = $w->ctx("TaskEvent");
 		// the task comment
@@ -96,6 +96,7 @@ function task_listener_POST_ACTION(&$w) {
 		}
 
 		// if we have a list of user_id's to send to ...
+		/*
 		if ($notifyusers) {
 			// use the task event as a title. want some formatting
 			$cap = array();
@@ -114,10 +115,13 @@ function task_listener_POST_ACTION(&$w) {
 			$message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT."/task/tasklist/?tab=2","Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
 
 			// send it to the inbox of the user's on our send list
+
 			foreach ($notifyusers as $user) {
 	        	$w->Inbox->addMessage($subject,$message, $user);
 			}
+			
 		}
+		*/
     }
 }
 

@@ -42,5 +42,7 @@ $modules['forms'] = array(
 $modules['wiki'] = array(
     'topmenu' => true,
 );
-
+$modules['task'] = array(
+    'topmenu' => true,
+);
 

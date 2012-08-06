@@ -102,6 +102,9 @@ class User extends DbObject {
 	}
 
 	function getRoles($force = false) {
+		if ($this->is_admin) {
+			return $this->Auth->getAllRoles();
+		}
 		if (!$this->_roles || $force) {
 			$this->_roles = array();
 
