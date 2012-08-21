@@ -56,8 +56,6 @@ if ($_REQUEST['tab'] && (!empty($_REQUEST['tab']))) {
 }
 ?>
 
-	function flow_acp_page() {}
-
 	$(".startTime").click(function(e){
     	var url = $(this).attr("href");
     	var screenW = screen.width;

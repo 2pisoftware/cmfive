@@ -596,7 +596,8 @@ EOT;
                         minLength:'.$minLength.', 
                         source: '.$source.',
                         select: function(event,ui){
-                            $("#'.$name.'").val(ui.item.id);acp_'.$name.'(event,ui);}
+                            $("#'.$name.'").val(ui.item.id); //acp_'.$name.'(event,ui);
+                        }
                     });
                 });';
         $buf.="</script>";

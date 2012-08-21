@@ -5,6 +5,3 @@
 
 	echo Html::form($lines,$w->localUrl("/wiki/editmember/".$wiki->id."/".$mem->id),"POST","Save");
 ?>
-<script type="text/javascript">
-function flow_acp_user_id() {};
-</script>

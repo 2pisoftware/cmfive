@@ -57,7 +57,6 @@ if ($messageid){
 
 ?>
 <script type='text/javascript'>
-    function flow_acp_receiver_id() {}
     
     CKEDITOR.replace( 'message' ,
     {

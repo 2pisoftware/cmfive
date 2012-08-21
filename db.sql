@@ -349,6 +349,7 @@ CREATE TABLE IF NOT EXISTS forms_form (
 
 CREATE TABLE IF NOT EXISTS `forms_form_field` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `form_id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `slug` varchar(255) NOT NULL,
   `description` text,

@@ -32,8 +32,6 @@ echo "</div>";
 
 <script type="text/javascript">
 
-function flow_acp_driver() {};
-
 $("#saveGroup").submit(function(){
         $.fn.colorbox.resize();
         return validateCreateTaskGroup();
