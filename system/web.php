@@ -535,7 +535,8 @@ class Web {
      * @return Ambigous <NULL, string>
      */
     function getModuleDir($module) {
-    	$path =  $this->_modulePath."/".$module."/";
+    	$basepath = $this->moduleConf($module, 'path');
+    	$path =  $basepath ? $basepath.'/' : $this->_modulePath."/".$module."/";
         return file_exists($path) ? $path : null;
     }
 

@@ -46,3 +46,13 @@ $modules['task'] = array(
     'topmenu' => true,
 );
 
+/**
+ * This is how an external module would be defined
+ */
+/*
+$modules['externaltest'] = array(
+	'topmenu' => true,
+	'path' => dirname(__FILE__).'/../cmfive_modules/externaltest',
+);
+*/
+
