@@ -96,7 +96,7 @@ function task_listener_POST_ACTION($w) {
 		}
 
 		// if we have a list of user_id's to send to ...
-		/*
+		
 		if ($notifyusers) {
 			// use the task event as a title. want some formatting
 			$cap = array();
@@ -121,7 +121,7 @@ function task_listener_POST_ACTION($w) {
 			}
 			
 		}
-		*/
+		
     }
 }
 

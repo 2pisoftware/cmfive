@@ -19,6 +19,9 @@ $modules['main'] = array(
 $modules['report'] = array(
     'topmenu' => true,
 );
+$modules['inbox'] = array(
+    'topmenu' => true,
+);
 $modules['admin'] = array(
     'topmenu' => true,
 	'audit_ignore' => array("index"),

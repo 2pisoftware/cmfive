@@ -1,6 +1,6 @@
 <?php
 function index_GET(Web &$w) {
-	inbox_navigation($w,"");
+	InboxLib::inbox_navigation($w,"");
 	$p = $w->pathMatch('num');
 	$num = $p['num'];
 	$num ? $num : $num = 1;

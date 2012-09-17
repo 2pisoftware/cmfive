@@ -1,6 +1,6 @@
 <?php
 function showarchive_ALL(Web $w){
-	inbox_navigation($w,"Archive");
+	InboxLib::inbox_navigation($w,"Archive");
 
 	$p = $w->pathMatch('num');
 	$num = $p['num'];

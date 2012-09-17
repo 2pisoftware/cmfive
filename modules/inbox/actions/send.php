@@ -1,6 +1,6 @@
 <?php
 function send_GET(Web $w) {
-	inbox_navigation($w,"Create Message");
+	InboxLib::inbox_navigation($w,"Create Message");
 }
 function send_POST(Web &$w) {
 	$p = $w->pathMatch('id');
