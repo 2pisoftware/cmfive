@@ -1,9 +1,9 @@
 cmfive
 ======
 
-cmfive is a php framework for creating business applications quick and easy.
+cmfive is a php framework for creating robust and extensible business applications.
 
-it is a port from the Flow framework at https://github.com/PyramidPower/flow
+it is a port with many improvements from the Flow framework at https://github.com/PyramidPower/flow
 
 License
 =======
