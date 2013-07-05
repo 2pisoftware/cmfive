@@ -79,7 +79,6 @@ class Web {
         $this->_headers = null;
         $this->_module = null;
         $this->_submodule = null;
-        $this->_modulePath = "modules";
         $this->_webroot = "/";
         $this->_actionMethod = null;
         spl_autoload_register(array($this, 'modelLoader'));
@@ -535,21 +534,14 @@ class Web {
      * @return Ambigous <NULL, string>
      */
     function getModuleDir($module) {
+    	// check for explicit module path first
     	$basepath = $this->moduleConf($module, 'path');
-    	$path =  $basepath ? $basepath.'/' : $this->_modulePath."/".$module."/";
-        return file_exists($path) ? $path : null;
-    }
+    	if (!empty($basepath)) {
+    		$path = $basepath.'/'.$module.'/';
+    		return file_exists($path) ? $path : null;
+    	}
 
-    /**
-     * Return all actions for a particular module
-     *
-     * @param <type> $module
-     * @return <type>
-     */
-    function actions($module) {
-        $actions = array();
-        sort($actions);
-        return $actions;
+    	return null;
     }
 
 
@@ -576,11 +568,6 @@ class Web {
         }
         return $this->_services[$name];
     }
-
-    function getModulePath() {
-        return $this->_modulePath;
-    }
-    
     
     /////////////////////////////////// Template stuff /////////////////////////
 
