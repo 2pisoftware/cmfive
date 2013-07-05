@@ -8,30 +8,23 @@
         <link rel="stylesheet" type="text/css" href="<?=$webroot?>/css/style.css" />
         <link rel="stylesheet" type="text/css" href="<?=$webroot?>/css/tablesorter.css" />
         <link rel="stylesheet" type="text/css" href="<?=$webroot?>/css/datePicker.css" />
-        
-
-        <!-- link rel="stylesheet" type="text/css" href="<?=$webroot?>/js/jquery-ui-1.8.1/css/ui-lightness/jquery-ui-1.8.1.custom.css" / -->
-
-        
-        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/js/jquery-ui-new/css/custom-theme/jquery-ui-1.8.13.custom.css" />
-        
+        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/system/js/jquery-ui-new/css/custom-theme/jquery-ui-1.8.13.custom.css" />
         <link rel="stylesheet" type="text/css" href="<?=$webroot?>/css/liveValidation.css" />
         <link rel="stylesheet" type="text/css" media="screen" href="<?=$webroot?>/css/colorbox.css" />
         <link rel="stylesheet" type="text/css" href="<?=$webroot?>/css/jquery.asmselect.css" />
-        <script type="text/javascript" src="<?=$webroot?>/js/jquery-1.4.2.min.js" ></script>
-        <script type="text/javascript" src="<?=$webroot?>/js/tablesorter/jquery.tablesorter.js"></script>
-        <script type="text/javascript" src="<?=$webroot?>/js/tablesorter/addons/pager/jquery.tablesorter.pager.js"></script>
-        <script type="text/javascript" src="<?=$webroot?>/js/colorbox/colorbox/jquery.colorbox-min.js"></script>
-        
-        <!-- script type="text/javascript" src="<?=$webroot?>/js/jquery-ui-1.8.1/js/jquery-ui-1.8.1.custom.min.js"></script -->
-        
-        <script type="text/javascript" src="<?=$webroot?>/js/jquery-ui-new/js/jquery-ui-1.8.13.custom.min.js"></script>
-		<script type="text/javascript" src="<?=$webroot?>/js/jquery-ui-timepicker-addon.js"></script>
-        <script type="text/javascript" src="<?=$webroot?>/js/livevalidation.js"></script>
-        <script type="text/javascript" src="<?=$webroot?>/js/main.js"></script>
-        <script type="text/javascript" src="<?=$webroot?>/js/jquery.asmselect.js"></script>
-        <script type="text/javascript" src="<?=$webroot?>/js/ckeditor/ckeditor.js"></script>
-        <script type="text/javascript" src="<?=$webroot?>/js/boxover.js"></script>
+
+        <script type="text/javascript" src="<?=$webroot?>/system/js/jquery-1.4.2.min.js" ></script>
+        <script type="text/javascript" src="<?=$webroot?>/system/js/tablesorter/jquery.tablesorter.js"></script>
+        <script type="text/javascript" src="<?=$webroot?>/system/js/tablesorter/addons/pager/jquery.tablesorter.pager.js"></script>
+        <script type="text/javascript" src="<?=$webroot?>/system/js/colorbox/colorbox/jquery.colorbox-min.js"></script>        
+        <script type="text/javascript" src="<?=$webroot?>/system/js/jquery-ui-new/js/jquery-ui-1.8.13.custom.min.js"></script>
+		<script type="text/javascript" src="<?=$webroot?>/system/js/jquery-ui-timepicker-addon.js"></script>
+        <script type="text/javascript" src="<?=$webroot?>/system/js/livevalidation.js"></script>
+        <script type="text/javascript" src="<?=$webroot?>/system/js/main.js"></script>
+        <script type="text/javascript" src="<?=$webroot?>/system/js/jquery.asmselect.js"></script>
+        <script type="text/javascript" src="<?=$webroot?>/system/js/ckeditor/ckeditor.js"></script>
+        <script type="text/javascript" src="<?=$webroot?>/system/js/boxover.js"></script>
+
         <script type="text/javascript">
             $(document).ready(function() {
                 $(".msg").fadeOut(3000);

@@ -3,6 +3,7 @@
 //========== Application Modules Configuration ===============
 
 $modules['main'] = array(
+		'active' => true,
 		'path' => 'modules',
 		'topmenu' => false,
 		'application_name' => 'cmfive',
@@ -24,5 +25,3 @@ $MYSQL_DB_NAME = 'cmfive';
 //========= Application Log Level ===========================
 
 $LOG_LEVEL = 'debug';
-
-
