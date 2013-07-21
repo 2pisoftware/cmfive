@@ -5,13 +5,13 @@
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
         <title><?=ucfirst($w->currentModule())?><?=$title?' - '.$title:''?></title>
         <link rel="icon" href="<?=$webroot?>/img/favicon.png" type="image/png"/>
-        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/css/style.css" />
-        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/css/tablesorter.css" />
-        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/css/datePicker.css" />
-        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/system/js/jquery-ui-new/css/custom-theme/jquery-ui-1.8.13.custom.css" />
-        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/css/liveValidation.css" />
-        <link rel="stylesheet" type="text/css" media="screen" href="<?=$webroot?>/css/colorbox.css" />
-        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/css/jquery.asmselect.css" />
+        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/templates/css/style.css" />
+        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/templates/css/tablesorter.css" />
+        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/templates/css/datePicker.css" />
+        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/templates/system/js/jquery-ui-new/css/custom-theme/jquery-ui-1.8.13.custom.css" />
+        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/templates/css/liveValidation.css" />
+        <link rel="stylesheet" type="text/css" media="screen" href="<?=$webroot?>/templates/css/colorbox.css" />
+        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/templates/css/jquery.asmselect.css" />
 
         <script type="text/javascript" src="<?=$webroot?>/system/js/jquery-1.4.2.min.js" ></script>
         <script type="text/javascript" src="<?=$webroot?>/system/js/tablesorter/jquery.tablesorter.js"></script>
