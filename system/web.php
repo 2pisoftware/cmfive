@@ -544,7 +544,10 @@ class Web {
     	return null;
     }
 
-
+    function moduleUrl($module) {
+    	return $this->webroot().'/'.$this->getModuleDir($module);
+    }
+    
     /**
      * Return a preloaded Service as
      * defined in a model.php inside

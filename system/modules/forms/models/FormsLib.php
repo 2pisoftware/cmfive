@@ -5,6 +5,6 @@ class FormsLib {
 		if (file_exists($path)) {
 			return str_replace(ROOT,"",$path);
 		}
-		return "/modules/forms/assets/images/folder_data.png";
+		return $app->w->moduleUrl("forms")."/assets/images/folder_data.png";
 	}
 }
