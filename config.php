@@ -2,14 +2,7 @@
 
 //========== Application Modules Configuration ===============
 
-$modules['main'] = array(
-		'active' => true,
-		'path' => 'modules',
-		'topmenu' => false,
-		'application_name' => 'cmfive',
-		'company_name' => 'cmfive',
-		'company_url' => 'http://github.com/careck/cmfive',
-);
+
 
 //=============== Timezone ==================================
 

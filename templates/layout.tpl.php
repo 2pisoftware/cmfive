@@ -4,11 +4,11 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
         <title><?=ucfirst($w->currentModule())?><?=$title?' - '.$title:''?></title>
-        <link rel="icon" href="<?=$webroot?>/img/favicon.png" type="image/png"/>
+        <link rel="icon" href="<?=$webroot?>/templates/img/favicon.png" type="image/png"/>
         <link rel="stylesheet" type="text/css" href="<?=$webroot?>/templates/css/style.css" />
         <link rel="stylesheet" type="text/css" href="<?=$webroot?>/templates/css/tablesorter.css" />
         <link rel="stylesheet" type="text/css" href="<?=$webroot?>/templates/css/datePicker.css" />
-        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/templates/system/js/jquery-ui-new/css/custom-theme/jquery-ui-1.8.13.custom.css" />
+        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/system/js/jquery-ui-new/css/custom-theme/jquery-ui-1.8.13.custom.css" />
         <link rel="stylesheet" type="text/css" href="<?=$webroot?>/templates/css/liveValidation.css" />
         <link rel="stylesheet" type="text/css" media="screen" href="<?=$webroot?>/templates/css/colorbox.css" />
         <link rel="stylesheet" type="text/css" href="<?=$webroot?>/templates/css/jquery.asmselect.css" />

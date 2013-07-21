@@ -7,8 +7,8 @@ function index_ALL(Web &$w) {
 	ReportLib::navigation($w, "Reports");
 
 	// report approval flag: display appropriate image
-	$app[0] = "<img alt=\"No\" src=\"/img/report/no.gif\" style=\"display: block; margin-left: auto; margin-right: auto;\">";
-	$app[1] = "<img alt=\"Yes\" src=\"/img/report/yes.gif\" style=\"display: block; margin-left: auto; margin-right: auto;\">";
+	$app[0] = "<img alt=\"No\" src=\"/templates/img/no.gif\" style=\"display: block; margin-left: auto; margin-right: auto;\">";
+	$app[1] = "<img alt=\"Yes\" src=\"/templates/img/yes.gif\" style=\"display: block; margin-left: auto; margin-right: auto;\">";
 
 	// organise criteria
 	$who = $w->session('user_id');

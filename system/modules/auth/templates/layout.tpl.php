@@ -4,12 +4,12 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
         <title><?=ucfirst($w->currentModule())?><?=$title?' - '.$title:''?></title>
-        <link rel="icon" href="<?=$webroot?>/img/favicon.png" type="image/png"/>
-        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/css/style.css" />
-        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/css/liveValidation.css" />
-        <script type="text/javascript" src="<?=$webroot?>/js/jquery-1.4.2.min.js" ></script>
-        <script type="text/javascript" src="<?=$webroot?>/js/livevalidation.js"></script>
-        <script type="text/javascript" src="<?=$webroot?>/js/main.js"></script>
+        <link rel="icon" href="<?=$webroot?>/templates/img/favicon.png" type="image/png"/>
+        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/templates/css/style.css" />
+        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/templates/css/liveValidation.css" />
+        <script type="text/javascript" src="<?=$webroot?>/system/js/jquery-1.4.2.min.js" ></script>
+        <script type="text/javascript" src="<?=$webroot?>/system/js/livevalidation.js"></script>
+        <script type="text/javascript" src="<?=$webroot?>/system/js/main.js"></script>
         <?=$htmlheader?>
     </head>
     <body>

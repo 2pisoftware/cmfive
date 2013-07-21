@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
         <title><?=$title?></title>
-        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/css/style.css" />
+        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/templates/css/style.css" />
     </head>
     <body>
         <div id="body">

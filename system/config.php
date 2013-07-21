@@ -1,6 +1,30 @@
 <?php 
 
+//========== Constants =====================================
+
+define("LIBPATH", str_replace("\\", "/", dirname(__FILE__).'/lib'));
+define("SYSTEM_LIBPATH", str_replace("\\", "/", dirname(__FILE__).'/system/lib'));
+define("FILE_ROOT", str_replace("\\", "/", dirname(__FILE__)."/uploads/"));
+define("MEDIA_ROOT", str_replace("\\", "/", dirname(__FILE__)."/media/"));
+define("ROOT", str_replace("\\", "/", dirname(__FILE__)));
+define("SESSION_NAME","CM5_SID");
+
+set_include_path(get_include_path() . PATH_SEPARATOR . LIBPATH);
+set_include_path(get_include_path() . PATH_SEPARATOR . SYSTEM_LIBPATH);
+
+require_once "system/db.php";
+require_once "system/web.php";
+
 //========== System Modules Configuration ===============
+
+$modules['main'] = array(
+		'active' => true,
+		'path' => 'system/modules',
+		'topmenu' => false,
+		'application_name' => 'cmfive',
+		'company_name' => 'cmfive',
+		'company_url' => 'http://github.com/careck/cmfive',
+);
 
 $modules['report'] = array(
 	'active' => true,
