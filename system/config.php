@@ -74,12 +74,14 @@ $modules['wiki'] = array(
 	'active' => true,
 	'path' => 'system/modules',
 	'topmenu' => true,
+	'search' => array('Wiki'),
 );
 
 $modules['task'] = array(
 	'active' => true,
 	'path' => 'system/modules',
 	'topmenu' => true,
+	'search' => array('Task'),
 );
 
 /**
