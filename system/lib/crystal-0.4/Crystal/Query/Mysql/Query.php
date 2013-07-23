@@ -92,11 +92,11 @@ class Crystal_Query_Mysql_Query
     public function execute($delete_sql = null)
 	{
 		$connection_object = get_object_vars($this->conn);
-		$this->query = mysql_query($this->sql, $connection_object['conn']->db);		
+		$this->query = mysqli_query($connection_object['conn']->db,$this->sql);		
 
 		if (!$this->query)
 		{
-			throw new Crystal_Query_Mysql_Exception("Mysql Error:" . mysql_error());
+			throw new Crystal_Query_Mysql_Exception("Mysql Error:" . mysqli_error());
 			return;
 		}
 		else
@@ -117,7 +117,7 @@ class Crystal_Query_Mysql_Query
 
         $this->execute();
 
-	 	 while($row = mysql_fetch_assoc($this->query))
+	 	 while($row = mysqli_fetch_assoc($this->query))
          {
          	
 			$result[] = Crystal_Helper_Mysql::clean_db_result($row);
@@ -146,7 +146,7 @@ class Crystal_Query_Mysql_Query
         $this->execute();
 		
 		
-		$row =  mysql_fetch_assoc($this->query);
+		$row =  mysqli_fetch_assoc($this->query);
 		
 		if(isset($row) && !empty($row))
 		{
@@ -172,7 +172,7 @@ class Crystal_Query_Mysql_Query
         $this->execute();
 		
 		
-		$result = mysql_fetch_object($this->query);
+		$result = mysqli_fetch_object($this->query);
 		
 		/** RESET SQL **/
 		$this->sql = NULL;
@@ -199,7 +199,7 @@ class Crystal_Query_Mysql_Query
        if(is_string($element))
        {
 		
-          $query = mysql_fetch_assoc($this->query);
+          $query = mysqli_fetch_assoc($this->query);
 		 
 		  if(isset($query[$element]))
 		  {	
@@ -230,14 +230,14 @@ class Crystal_Query_Mysql_Query
 	function last_insert_id()
 	{
 
-		return mysql_insert_id();
+		return mysqli_insert_id($connection_object['conn']->db);
 
 	}
 
 
 	function affected_rows()
 	{
-		return mysql_affected_rows();
+		return mysqli_affected_rows($connection_object['conn']->db);
 	}
     
     
@@ -262,7 +262,7 @@ class Crystal_Query_Mysql_Query
 		$this->execute('true');
 		
 		
-		while($row = mysql_fetch_assoc($this->query))
+		while($row = mysqli_fetch_assoc($this->query))
 		{
          	
 			$result[] = Crystal_Helper_Mysql::clean_db_result($row);

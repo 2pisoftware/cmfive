@@ -142,13 +142,13 @@ class Crystal_Manipulation_Mysql_Builder
 			
 		}
 		
-        $this->query = mysql_query($this->sql);
+        $this->query = mysqli_query($this->sql);
 	
 		
 
 	    if (!$this->query)
 		{
-	            throw new Crystal_Exception("Mysql Error:" . mysql_error());
+	            throw new Crystal_Exception("Mysql Error:" . mysqli_error());
 	            return;
 		}
 		else

@@ -25,7 +25,7 @@ class Crystal_Connection_Adapter_Mysql
 			$hostname = (isset($database_config['hostname'])?$database_config['hostname']:'localhost');
 			$charset = (isset($database_config['char_set'])?$database_config['char_set']:'utf8');
 			
-            $this->db = mysql_connect($hostname. ':'. $port, $database_config['username'], $database_config['password'], true);
+            $this->db = mysqli_connect($hostname, $database_config['username'], $database_config['password'],null,$port);
              /** SETS DATABASE COLLATION **/
              $this->_set_charset($charset);
           
@@ -43,21 +43,21 @@ class Crystal_Connection_Adapter_Mysql
 				if(array_key_exists('database', $params))
 				{
 					
-				$this->dbselect = mysql_select_db($params['database']);
+				$this->dbselect = mysqli_select_db($this->db,$params['database']);
 				
 				}
 				
 			}
 			else
 			{	
-				$this->dbselect = mysql_select_db($database_config['database'], $this->db);
+				$this->dbselect = mysqli_select_db($this->db,$database_config['database']);
 			}
 			
             
 
             if(!$this->dbselect)
             {
-                throw new Crystal_Connection_Adapter_Exception("Cannot select database: " . mysql_error() );
+                throw new Crystal_Connection_Adapter_Exception("Cannot select database: " . mysqli_error() );
             }
 
 
@@ -72,11 +72,11 @@ class Crystal_Connection_Adapter_Mysql
     	
     	if(isset($charset) && !empty($charset))
     	{
-    		 mysql_query("SET NAMES " . $charset);
+    		 mysqli_query($this->db,"SET NAMES " . $charset);
     	}
     	else
     	{
-    		mysql_query("SET NAMES utf8");
+    		mysqli_query($this->db,"SET NAMES utf8");
     	}
        
     }
