@@ -22,8 +22,8 @@ class Task extends DbObject {
 	var $longitude;
 	var $is_deleted;		// is_deleted flag
 	var $_modifiable;		// Modifiable Aspect
-//	var $_versionable;		// Versionable Aspect
-
+	var $_searchable;
+	
 	// actual table name
 	function getDbTableName() {
 		return "task";

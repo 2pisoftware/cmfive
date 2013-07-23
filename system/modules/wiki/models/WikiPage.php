@@ -1,5 +1,9 @@
 <?php
 class WikiPage extends DbObject {
+	
+	var $_searchable;
+	var $_exclude_index = array("is_deleted");
+	
 	var $name;
 	var $wiki_id;
 	var $dt_created;

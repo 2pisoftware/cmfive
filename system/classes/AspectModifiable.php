@@ -67,13 +67,13 @@ class AspectModifiable {
 
 	function getCreatedDate() {
 		if ($this->getMo()) {
-			return $this->_mo->getCreatedDate();
+			return $this->_mo->dt_created;
 		}
 	}
 
 	function getModifiedDate() {
 		if ($this->getMo()) {
-			return $this->_mo->getModifiedDate();
+			return $this->_mo->dt_modified;
 		}
 	}
 
@@ -123,14 +123,6 @@ class ObjectModification extends DbObject {
 		if ($this->modifier_id) {
 			return $this->w->Auth->getUser($this->modifier_id);
 		}
-	}
-
-	function getCreatedDate() {
-		return $this->dt_created;
-	}
-
-	function getModifiedDate() {
-		return $this->dt_modified;
 	}
 
 	function getDbTableName() {

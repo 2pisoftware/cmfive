@@ -1,6 +1,12 @@
 <?php
 class Contact extends DbObject {
 
+	// this object will be automatically indexed for fulltext search
+	var $_searchable;
+	
+	// these parameters will be excluded from indexing
+	var $_exclude_index = array("is_deleted","private_to_user_id");
+	
 	var $firstname;
 	var $lastname;
 	var $othername;
@@ -12,8 +18,8 @@ class Contact extends DbObject {
 	var $fax;
 	var $email;
 	var $is_deleted;
-	var $dt_created;
-	var $dt_modified;
+	var $dt_created; // this is automatically excluded from indexing
+	var $dt_modified;  // this is automatically excluded from indexing
 	var $private_to_user_id;
 
 	function getFullName() {
@@ -60,7 +66,7 @@ class Contact extends DbObject {
 	}
 	function printSearchListing() {
 		if ($this->private_to_user_id) {
-			$buf .= "<img src='".$this->w->localUrl("/img/Lock-icon.png")."' border='0'/>";
+			$buf .= "<img src='".$this->w->localUrl("/templates/img/Lock-icon.png")."' border='0'/>";
 		}
 		$first = true;
 		if ($this->workphone) {

@@ -57,7 +57,26 @@
  *
  *    Also all version objects have the modifiable aspect (see above).
  *
- * 3. Auditing of inserts and updates happens automatically to an audit table.
+ * 3. SearchableAspect -> var $_searchable;
+ *    This Aspect does not add any public functions to the object, but extends
+ *    the insert/update/delete behaviour so that an index record is created (or updated)
+ *    in the table object_index which contains the object_id reference and a sanitised 
+ *    string of the content of the source object's fields for fulltext retrieval.
+ *    
+ *    Per default all properties (except thos in the $_exclude_index array) are concatenated
+ *    and included in the index. In order to add custom content (eg. from dependent tables)
+ *    create the following:
+ *    
+ *    function addToIndex() {}
+ *    
+ *    Which should return a string to be added to the indexable content. All sanitising and
+ *    word de-duplication is performed on this.
+ *    
+ * 4. Aspects can be removed in the case of class inheritance. If the parent class has 
+ *    var $_searchable; defined then this can be removed by a child class using:
+ *    var $_remove_searchable. However further childclasses can no longer add this aspect!
+ *    
+ * 5. Auditing of inserts and updates happens automatically to an audit table.
  *    However this can be turned off by setting
  *    var $__use_auditing = false;
  *
@@ -80,12 +99,26 @@ class DbObject extends DbService {
 
 	//Define this property if you want to use the
 	//ModifiableAspect
-	//var $_modifiable;
+	//  var $_modifiable;
+	//
+	//To remove this from child classes:
+	//  var $_remove_modifiable;
 
 	//Define this property if you want to use the
 	//VersionableAspect
-	//var $_versionable;
-
+	//  var $_versionable;
+	//
+	//To remove this from child classes:
+	//  var $_remove_versionable;
+	
+	//Define this property if you want to use the
+	//SearchableAspect
+	//  var $_searchable;
+	//
+	//To remove this from child classes:
+	//  var $_remove_searchable;
+	
+	
 	/**
 	 * Constructor
 	 *
@@ -95,11 +128,14 @@ class DbObject extends DbService {
 		parent::__construct($w);
 		 
 		// add standard aspects
-		if (property_exists($this,"_modifiable")) {
+		if (property_exists($this,"_modifiable") && !property_exists($this,"_remove_modifiable")) {
 			$this->_modifiable = new AspectModifiable($this);
 		}
-		if (property_exists($this,"_versionable")) {
+		if (property_exists($this,"_versionable") && !property_exists($this,"_remove_versionable")) {
 			$this->_versionable = new AspectVersionable($this);
+		}
+		if (property_exists($this,"_searchable") && !property_exists($this,"_remove_searchable")) {
+			$this->_searchable = new AspectSearchable($this);
 		}
 	}
 
@@ -238,27 +274,6 @@ class DbObject extends DbService {
 	function canDelete(User $user) {
 		return true;
 	}
-
-	/**
-	 * returns an array of fields that should be searched for
-	 * a term.
-	 *
-	 * default is searching in 'title' or 'name' properties.
-	 *
-	 * child classes override this function.
-	 *
-	 * @return NULL
-	 */
-	function getIndexedFields() {
-		$fields = array();
-		if (property_exists(get_class($this), "title")) {
-			$fields[]="title";
-		} else if (property_exists(get_class($this), "name")) {
-			$fields[]="name";
-		}
-		return $fields;
-	}
-
 
 	/**
 	 * fill this object from an array where the keys correspond to the
@@ -453,7 +468,10 @@ class DbObject extends DbService {
 		if ($this->_versionable) {
 			$this->_versionable->insert();
 		}
-
+		if ($this->_searchable) {
+			$this->_searchable->insert();
+		}
+		
 		// store this id in the context for listeners
 		$inserts = $this->w->ctx('db_inserts');
 		if (!$inserts) {
@@ -541,7 +559,10 @@ class DbObject extends DbService {
 		if ($this->_versionable) {
 			$this->_versionable->update();
 		}
-
+		if ($this->_searchable) {
+			$this->_searchable->update();
+		}
+		
 		// store this id in the context for listeners
 		$updates = $this->w->ctx('db_updates');
 		if (!$updates) {
@@ -581,6 +602,11 @@ class DbObject extends DbService {
 		$deletes[get_class($this)][]=$this->id;
 		$this->w->ctx('db_deletes',$deletes);
 
+		// delete from search index
+		if ($this->_searchable) {
+			$this->_searchable->delete();
+		}
+		
 		// TODO remove dependency to user code!
 		$this->w->Admin->addDbAuditLogEntry("delete",get_class($this),$this->id);
 	}
@@ -616,6 +642,8 @@ class DbObject extends DbService {
 	/**
 	 * get Creator user object if creator_id
 	 * property exists
+	 * 
+	 * @return User
 	 */
 	function & getCreator() {
 		if ($this->_modifiable) {
@@ -629,6 +657,8 @@ class DbObject extends DbService {
 	/**
 	 * get Modifier user object if creator_id
 	 * property exists
+	 * 
+	 * @return User
 	 */
 	function & getModifier() {
 		if ($this->_modifiable) {
@@ -639,4 +669,12 @@ class DbObject extends DbService {
 			return null;
 		}
 	}
+	
+	/**
+	 * Override this function if you want to add custom content
+	 * to the search index for this object
+	 * 
+	 * @return String
+	 */
+	function addToIndex() {}
 }
