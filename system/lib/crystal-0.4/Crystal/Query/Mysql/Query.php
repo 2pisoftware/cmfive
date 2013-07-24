@@ -229,7 +229,7 @@ class Crystal_Query_Mysql_Query
 	
 	function last_insert_id()
 	{
-
+		$connection_object = get_object_vars($this->conn);
 		return mysqli_insert_id($connection_object['conn']->db);
 
 	}
@@ -237,6 +237,7 @@ class Crystal_Query_Mysql_Query
 
 	function affected_rows()
 	{
+		$connection_object = get_object_vars($this->conn);		
 		return mysqli_affected_rows($connection_object['conn']->db);
 	}
     
