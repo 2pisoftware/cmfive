@@ -11,5 +11,4 @@ function results_GET(Web $w) {
 	} else {
 		$w->out("Please enter at least 3 characters for searching.");
 	}
-
 }

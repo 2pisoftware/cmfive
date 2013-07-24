@@ -1,5 +1,10 @@
 <?php
 class Attachment extends DbObject {
+	
+	// make it searchable
+	var $_searchable;
+	var $_exclude_index = array("parent_table","parent_id","mimetype","fullpath","is_deleted");
+	
 	var $parent_table;
 	var $parent_id;
 

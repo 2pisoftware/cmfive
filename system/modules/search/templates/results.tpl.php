@@ -1,26 +1,16 @@
-<?if ($results):?>
-    <?for($i = 0; $i < sizeof($results); $i++):?>
-        <?
-        if ($_REQUEST['idx']) {
-            $x = recursiveArraySearch($allidx,$_REQUEST['idx']);
-        } else {
-            $x = $i;
-        }
-        ?>
-        <?if ($results[$i]['matches']):?>
+<?
+$currentIndex = "";
+if ($results):
+?>
+    <?foreach ($results as $res):?>
 
-            <div class="search-index"><?=$allidx[$x][0]?></div>
-            <?if (!$_REQUEST['idx'] && $results[$i]['total'] < $results[$i]['total_found']):?>
-            <div class="search-result">
-                ... <?=$results[$i]['total']?> of <?=$results[$i]['total_found']?> records displayed ...
-                <?=Html::a($webroot."/search/results?q=".$_REQUEST['q']."&idx=".$allidx[$x][1],"Display all search results.")?>
-            </div>
+    		<?if ($res['class_name'] != $currentIndex):
+    			$currentIndex = $res['class_name'];?>
+            <div class="search-index"><?=$currentIndex?></div>
             <?endif;?>
-            <?foreach($results[$i]['matches'] as $id => $match):?>
                 <?
-                $object = $w->service('Search')->getObjectForIndex($allidx[$x][1],$id);
-                ?>
-                <?if ($object && $object->canList($w->Auth->user())):?>
+                $object = $w->Search->getObject($res['class_name'],$res['object_id']);
+                if ($object && $object->canList($w->Auth->user())):?>
                     <div class="search-result">
                         <?if ($object->canView($w->Auth->user())):?>
                             <a class="search-title" href="<?=$webroot?>/<?=$object->printSearchUrl()?>">
@@ -35,15 +25,10 @@
                         <?endif;?>
                     </div>
                 <?endif;?>
-            <?endforeach;?>
-            <?if ($results[$i]['total'] === 0):?>
-            <div class="search-result">
-                No documents found in this index.
-            </div>
-            <?endif;?>
+
             <hr/>
-        <?endif;?>
-    <?endfor;?>
+      
+    <?endforeach;?>
 <?else:?>
     <div class="search-result">
         No documents found.

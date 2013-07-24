@@ -59,7 +59,7 @@
                         <div class="menubg flt">
                             <form action="<?=$webroot?>/search/results" method="get">
                                 <input style="width: 182px; margin-top: 10px; margin-left:8px;margin-bottom: 5px;" type="text" name="q" id="q" value="<?=$_REQUEST['q']?>"/>
-                                    <span style="margin-left:8px;"><?=Html::select("idx",$w->service('Search')->getSearchIndexes(),$_REQUEST['idx'],null,null,"Search All")?></span>
+                                    <span style="margin-left:8px;"><?=Html::select("idx",$w->service('Search')->getIndexes(),$_REQUEST['idx'],null,null,"Search All")?></span>
                                 <input style="padding-left:15px;padding-right:15px;margin-right:10px;margin-bottom:10px;" type="submit" value="Search"/>
                             </form>
                         </div>

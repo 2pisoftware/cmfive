@@ -55,6 +55,7 @@ $modules['auth'] = array(
 	'active' => true,
 	'path' => 'system/modules',
 	'topmenu' => false,
+	'search' => array("Contacts" => "Contact"),
 );
 
 $modules['file'] = array(
@@ -62,6 +63,7 @@ $modules['file'] = array(
 	'path' => 'system/modules',
 	'fileroot' => dirname(__FILE__).'/uploads',
     'topmenu' => false,
+	'search' => array("File Attachments" => "Attachment"),
 );
 
 $modules['forms'] = array(
@@ -70,18 +72,24 @@ $modules['forms'] = array(
 	'topmenu' => true,
 );
 
+$modules['search'] = array(
+		'active' => true,
+		'path' => 'system/modules',
+		'topmenu' => false,
+);
+
 $modules['wiki'] = array(
 	'active' => true,
 	'path' => 'system/modules',
 	'topmenu' => true,
-	'search' => array("WikiPage" => "Wiki Pages")
+	'search' => array("Wiki Pages" => "WikiPage")
 );
 
 $modules['task'] = array(
 	'active' => true,
 	'path' => 'system/modules',
 	'topmenu' => true,
-	'search' => array('Task' => "Tasks")
+	'search' => array('Tasks' => "Task")
 );
 
 /**
