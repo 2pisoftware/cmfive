@@ -174,8 +174,15 @@ class Crystal_Helper_Mysql
 }
 
 
+	/**
+	 * TODO: Find a better way to include mysqli_real_escape_string!
+	 * 
+	 * @param unknown $string
+	 * @return string
+	 */
 	static public function escape_string($string)
 	{
+		/*
 	
 		if (function_exists('mysql_real_escape_string'))
 		{
@@ -190,7 +197,8 @@ class Crystal_Helper_Mysql
 		{
 			$string = addslashes($string);
 		}
-		
+		*/
+		$string = addslashes($string);
 		return $string;
 	
 	

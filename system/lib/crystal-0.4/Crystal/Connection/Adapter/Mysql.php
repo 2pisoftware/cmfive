@@ -25,7 +25,7 @@ class Crystal_Connection_Adapter_Mysql
 			$hostname = (isset($database_config['hostname'])?$database_config['hostname']:'localhost');
 			$charset = (isset($database_config['char_set'])?$database_config['char_set']:'utf8');
 			
-            $this->db = mysqli_connect($hostname, $database_config['username'], $database_config['password'],null,$port);
+            $this->db = mysqli_connect($hostname, $database_config['username'], $database_config['password'],$database_config['database'],$port);
              /** SETS DATABASE COLLATION **/
              $this->_set_charset($charset);
           
@@ -34,32 +34,7 @@ class Crystal_Connection_Adapter_Mysql
             {
                throw new Crystal_Connection_Exception("Cannot connect to database");
             }
-			
-			
-			
-			/** CHECKS FOR database in params **/
-			if(isset($params) && !empty($params))
-			{
-				if(array_key_exists('database', $params))
-				{
-					
-				$this->dbselect = mysqli_select_db($this->db,$params['database']);
-				
-				}
-				
-			}
-			else
-			{	
-				$this->dbselect = mysqli_select_db($this->db,$database_config['database']);
-			}
-			
-            
-
-            if(!$this->dbselect)
-            {
-                throw new Crystal_Connection_Adapter_Exception("Cannot select database: " . mysqli_error() );
-            }
-
+			  
 
             return $this->db;
 

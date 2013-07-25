@@ -2,13 +2,13 @@
 $currentIndex = "";
 if ($results):
 ?>
-    <?foreach ($results as $res):?>
-
-    		<?if ($res['class_name'] != $currentIndex):
-    			$currentIndex = $res['class_name'];?>
-            <div class="search-index"><?=$currentIndex?></div>
-            <?endif;?>
-                <?
+    <?foreach ($results as $res):
+    			if ($res['class_name'] != $currentIndex):
+    				$currentIndex = $res['class_name']; ?>
+    				<hr/>
+            		<div class="search-index"><?=$currentIndex?></div>
+            <? $count = 0; 
+            	endif;
                 $object = $w->Search->getObject($res['class_name'],$res['object_id']);
                 if ($object && $object->canList($w->Auth->user())):?>
                     <div class="search-result">
@@ -25,10 +25,8 @@ if ($results):
                         <?endif;?>
                     </div>
                 <?endif;?>
-
-            <hr/>
       
-    <?endforeach;?>
+    <? $count++; endforeach;?>
 <?else:?>
     <div class="search-result">
         No documents found.
