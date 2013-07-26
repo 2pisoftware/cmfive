@@ -1,7 +1,7 @@
 --
 -- Database: `cmfive`
 --
--- 24/07/2013, carsten@tripleacs.com
+-- 26/07/2013, carsten@tripleacs.com
 
 -- --------------------------------------------------------
 
@@ -172,13 +172,6 @@ CREATE TABLE IF NOT EXISTS `object_modification` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=3 ;
 
---
--- Dumping data for table `object_modification`
---
-
-INSERT INTO `object_modification` (`id`, `table_name`, `object_id`, `dt_created`, `dt_modified`, `creator_id`, `modifier_id`) VALUES
-(1, 'report', 1, '2012-04-27 16:56:08', '2012-04-27 16:58:36', 1, 1),
-(2, 'report', 2, '2012-04-27 16:59:42', '2012-04-27 16:59:42', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -245,8 +238,8 @@ CREATE TABLE IF NOT EXISTS `report_member` (
 --
 
 INSERT INTO `report_member` (`id`, `report_id`, `user_id`, `role`, `is_deleted`) VALUES
-(1, 35, 1, NULL, 0),
-(2, 36, 1, NULL, 0);
+(1, 1, 1, 'OWNER', 0),
+(2, 2, 1, 'OWNER', 0);
 
 -- --------------------------------------------------------
 
@@ -691,4 +684,19 @@ CREATE TABLE IF NOT EXISTS `object_index` (
   PRIMARY KEY (`id`),
   FULLTEXT KEY `object_index_content` (`content`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `rest_session`
+--
+
+CREATE TABLE IF NOT EXISTS `rest_session` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `token` varchar(256) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `dt_created` datetime NOT NULL,
+  `dt_modified` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
