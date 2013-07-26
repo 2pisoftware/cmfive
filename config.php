@@ -2,6 +2,12 @@
 
 //========== Application Modules Configuration ===============
 
+// $modules['<module_name>'] = array(
+// 		'active' 	=> <true|false>,
+// 		'path' 		=> '<file_path_to_folder>', // eg. 'modules' or '/opt/applications/cmfive-external-modules'
+// 		'topmenu' 	=> <true|false>,
+//		'search' 	=> array('<index_title>' => '<class_name>')
+// );
 
 
 //=============== Timezone ==================================
@@ -18,3 +24,42 @@ $MYSQL_DB_NAME = 'cmfive';
 //========= Application Log Level ===========================
 
 $LOG_LEVEL = 'debug';
+
+//========= Security settings ===============================
+
+// change this for more secure password storage
+$PASSWORD_SALT = "";
+
+//========= Anonymous Access ================================
+
+// bypass authentication if sent from the following IP addresses
+$ALLOW_FROM_IP = array();
+
+// or bypass authentication for the following modules
+$ALLOW_MODULE = array(
+	"rest", // uncomment this to switch on REST access to the database objects. Tread with CAUTION!
+);
+
+// or bypass authentication only for the following actions
+$ALLOW_ACTION = array(
+		"auth/login",
+        "auth/forgotpassword",
+);
+
+//========= REST Configuration ==============================
+// check the following configuration carefully to secure
+// access to the REST ifnrastructure.
+
+// use the API_KEY to authenticate with username and password
+// 
+$REST_API_KEY = "abcdefghijklmnopqrstuvwxyz1234567890";
+
+// exclude any objects that you do NOT want available via REST
+// note: only DbObjects which have the $_rest; property are 
+// accessible via REST anyway!
+//
+$REST_EXCLUDE = array(
+	"User",
+	"Contact",
+);
+

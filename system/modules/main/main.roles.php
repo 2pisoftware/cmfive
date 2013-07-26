@@ -16,33 +16,33 @@ function role_user_allowed(&$w,$path) {
 /**
  * This role is called when no user is logged in!
  * 
+ * Control access by IP, Module or Action in the
+ * global /config.php using the global parameters provided.
+ * 
+ * $ALLOW_FROM_IP
+ * 
+ * $ALLOW_ACTION
+ * 
+ * $ALLOW_MODULE
+ * 
  * @param <type> $w
- * @return <type>
+ * @return boolean
  */
 function anonymous_allowed(&$w,$path) {
-    // First check by specific IP addresses!
-    // this is useful for scripts to be executed via cron jobs
     
-    $ips = array(
-    );
-    if( in_array($w->requestIpAddress(),$ips)) {
+	global $ALLOW_FROM_IP;
+    if( in_array($w->requestIpAddress(),$ALLOW_FROM_IP)) {
         return true;
     }
+ 
+    global $ALLOW_ACTION;
+    $in_path = in_array($path,$ALLOW_ACTION);
 
-    // check include paths for people
-    $include = array(
-        "auth/login",
-        "auth/forgotpassword"
-    );    
-    $in_path = in_array($path,$include);
-
-    // check complete modules
-    $modules = array(
-    );
+	global $ALLOW_MODULE;
     $path_explode = explode("/", $path);
     $module = $path_explode[0];
     $action = $path_explode[1];
-    $allowed = in_array($module,$modules);
+    $allowed = in_array($module,$ALLOW_MODULE);
     
     return $allowed || $in_path || $has_ip;
 }

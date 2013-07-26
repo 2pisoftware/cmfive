@@ -1,4 +1,10 @@
 <?php
+/**
+ * User object
+ * 
+ * @author admin
+ *
+ */
 class User extends DbObject {
 
 	var $login;
@@ -206,8 +212,15 @@ class User extends DbObject {
 		return false;
 	}
 
+	/**
+	 * encrypt the password using sha1 and a global salt.
+	 * 
+	 * @param unknown $password
+	 * @return string
+	 */
 	function encryptPassword($password) {
-		return sha1($password);
+		global $PASSWORD_SALT;
+		return sha1($PASSWORD_SALT.$password);
 	}
 
 	function setPassword($password) {

@@ -92,12 +92,8 @@ $modules['task'] = array(
 	'search' => array('Tasks' => "Task")
 );
 
-/**
- * This is how an external module would be defined
- */
-/*
-$modules['externaltest'] = array(
-	'topmenu' => true,
-	'path' => dirname(__FILE__).'/../cmfive_modules',
+$modules['rest'] = array(
+		'active' => true,
+		'path' => 'system/modules',
+		'topmenu' => false,
 );
-*/

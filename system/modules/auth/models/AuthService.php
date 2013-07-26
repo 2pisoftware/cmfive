@@ -4,16 +4,19 @@ class AuthService extends DbService {
 	var $_roles;
 	var $_roles_loaded = false;
 	var $_user = null;
+	var $_rest_user = null;
 
-	function login($login, $password, $client_timezone) {
+	function login($login, $password, $client_timezone,$skip_session=false) {
 		$password = User::encryptPassword($password);
 		$user_data = $this->_db->get("user")->where("login",$login)->and("password",$password)->and("is_active","1")->and("is_deleted","0")->fetch_row();
 		if ($user_data != null) {
 			$user = new User($this->w);
 			$user->fill($user_data);
 			$user->updateLastLogin();
-			$this->w->session('user_id',$user->id);
-			$this->w->session('timezone',$client_timezone);
+			if (!$skip_session) {
+				$this->w->session('user_id',$user->id);
+				$this->w->session('timezone',$client_timezone);
+			}
 			return $user;
 		} else {
 			return null;
@@ -36,7 +39,16 @@ class AuthService extends DbService {
 		return $this->getObject("User", array("login",$login));
 	}
 	
+	function setRestUser($user) {
+		$this->_rest_user = $user;
+	}
+	
 	function & user() {
+		// special case where RestService handles authentication
+		if ($this->_rest_user) {
+			return $this->_rest_user;
+		}
+		// normal session based authentication
 		if (!$this->_user && $this->loggedIn()) {
 			$this->_user = $this->getObject("User", $this->w->session('user_id'));
 		}
