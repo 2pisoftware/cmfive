@@ -3,7 +3,12 @@ cmfive
 
 cmfive is a php framework for creating robust and extensible business applications.
 
-it is a port with many improvements from the Flow framework at https://github.com/PyramidPower/flow
+It started as a micro framework which was developed by Carsten Eckelmann in 2007 in Sydney on the bus to work, 
+lay dormant for years until it re-emerged as the foundation to the Flow Business System (https://github.com/PyramidPower/flow),
+which was developed in house to run a 70 people Solar Installation company.
+
+cmFive grew from the codebase of Flow, but has since then been shaped to be more modern, slimmer and ready to take
+on other business applications.
 
 License
 =======
