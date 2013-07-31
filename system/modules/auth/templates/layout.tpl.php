@@ -20,10 +20,6 @@
         <? if ($msg): ?><div class="msg"><?=$msg?></div><? endif;?>
         <?=$body?>
 		</td></tr>
-</form>
-</table>
-</div>
-<center>
-            		
-</body>
+		</table>
+	</body>
 </html>
