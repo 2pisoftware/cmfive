@@ -24,6 +24,10 @@ class Task extends DbObject {
 	var $_modifiable;		// Modifiable Aspect
 	var $_searchable;
 	
+	// TODO add TaskData and TaskComments
+	function addToIndex() {
+		
+	}
 	// actual table name
 	function getDbTableName() {
 		return "task";

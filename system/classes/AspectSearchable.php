@@ -137,7 +137,7 @@ class AspectSearchable {
 		// Remove all characters except A-Z, a-z, 0-9, dots, commas, hyphens, spaces and forward slashes (for dates) 
 		// Note that the hyphen must go last not to be confused with a range (A-Z) 
 		// and the dot, being special, is escaped with backslash
-		$str = preg_replace("/[^A-Za-z0-9 \.,\-\/@']/", '', $str);  
+		$str = preg_replace("/[^A-Za-z0-9 \.,\-\/@':]/", '', $str);  
 		
 		// Replace sequences of spaces with one space 
 		$str = preg_replace('/  +/', ' ', $str);
