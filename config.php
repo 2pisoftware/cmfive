@@ -9,16 +9,15 @@
 //		'search' 	=> array('<index_title>' => '<class_name>')
 // );
 
-
+//ini_set('display_errors', 0);
 //=============== Timezone ==================================
-
 date_default_timezone_set('Australia/Sydney');
 
 //========== Database Configuration ==========================
 
 $MYSQL_DB_HOST = 'localhost';
-$MYSQL_USERNAME = 'root';
-$MYSQL_PASSWORD = '';
+$MYSQL_USERNAME = 'cmfive';
+$MYSQL_PASSWORD = 'cmfive';
 $MYSQL_DB_NAME = 'cmfive';
 
 //========= Application Log Level ===========================

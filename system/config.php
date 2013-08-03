@@ -1,5 +1,8 @@
 <?php 
 
+// ========= Session ========================
+ini_set('gc_maxlifetime', 60*60*6);
+
 //========== Constants =====================================
 
 define("LIBPATH", str_replace("\\", "/", dirname(__FILE__).'/lib'));

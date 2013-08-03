@@ -50,7 +50,7 @@ class Html {
     /**
      * creates a html link
      */
-    function a($href,$title,$alt=null,$class=null,$confirm=null,$target=null) {
+    public static function a($href,$title,$alt=null,$class=null,$confirm=null,$target=null) {
         if ($confirm) {
             $confirm = " onclick=\"javascript:return confirm('".$confirm."');\" ";
         }
@@ -60,7 +60,7 @@ class Html {
         return '<a href="'.$href.'" alt="'.$alt.'" class="'.$class.'"'.$confirm.$target.'><span>'.$title.'</span></a>';
     }
 
-    function b($href,$title,$confirm=null,$id=null) {
+    public static function b($href,$title,$confirm=null,$id=null) {
         if ($confirm) {
             $js = "if(confirm('".$confirm."'))";
         }        
@@ -76,7 +76,7 @@ class Html {
      * @param <type> $button (O) if true create a buttin instead of a link
      * @param <type> $iframe (O) whether to use an iframe to display the html contents (default: false)
      */
-    function box($href,$title,$button=false,$iframe=false,$width=null,$height=null,$param="isbox") {
+    public static function box($href,$title,$button=false,$iframe=false,$width=null,$height=null,$param="isbox") {
         $onclick = Html::boxOnClick($href,$iframe,$width,$height,$param);
         $tag = "a";
         if ($button) {
@@ -85,7 +85,7 @@ class Html {
         return "<".$tag.$onclick."><span>".$title."</span></".$tag.">";
     }
 
-    function boxOnClick($href,$iframe=false,$width=null,$height=null,$param="isbox") {
+    public static function boxOnClick($href,$iframe=false,$width=null,$height=null,$param="isbox") {
         if ($iframe) {
             $width = ", innerWidth:".$width;
             $height = ", innerHeight:".$height;
@@ -100,7 +100,7 @@ class Html {
      * creates a ul from an array structure:
      * ("1","2", array("2.1","2.2"),"3")
      */
-    function ul(& $array, $id=null, $class=null, $subclass=null, $type="ul") {
+    public static function ul(& $array, $id=null, $class=null, $subclass=null, $type="ul") {
         if (!$array || sizeof($array) < 1) return "";
 
         $id = $id ? ' id="'.$id.'"' : null;
@@ -123,7 +123,7 @@ class Html {
      * creates a ol from an array structure:
      * ("1","2", array("2.1","2.2"),"3")
      */
-    function ol(& $array, $id=null, $class=null, $subclass=null) {
+    public static function ol(& $array, $id=null, $class=null, $subclass=null) {
         return ul($array, $id, $class, $subclass, "ol");
     }
     /**
@@ -139,7 +139,7 @@ class Html {
      *
      * when prefixing a fieldname with a minus sign '-' this field will be read-only
      */
-    function form($data, $action=null, $method="POST", $submitTitle="Save", $id=null, $class=null, $target="_self", $enctype = null) {
+    public static function form($data, $action=null, $method="POST", $submitTitle="Save", $id=null, $class=null, $target="_self", $enctype = null) {
         if (!$data) return;
         $hidden = "";
         $id = $id ? ' id="'.$id.'"' : null;
@@ -272,19 +272,19 @@ class Html {
         return $buf;
     }
 
-    function datePicker($name,$value=null,$size=null) {
+    public static function datePicker($name,$value=null,$size=null) {
         $buf = '<input class="date_picker" type="text" name="'.$name.'" value="'.$value.'" size="'.$size.'" id="'.$name.'"/>';
         $buf.= "<script>$('#$name').datepicker({dateFormat: 'dd/mm/yy'});$('#$name').keyup( function(event) { $(this).val('');}); </script>";
         return $buf;
     }
 
-    function datetimePicker($name,$value=null,$size=null) {
+    public static function datetimePicker($name,$value=null,$size=null) {
         $buf = '<input class="date_picker" type="text" name="'.$name.'" value="'.$value.'" size="'.$size.'" id="'.$name.'"/>';
         $buf.= "<script>$('#$name').datetimepicker({ampm: true, dateFormat: 'dd/mm/yy'});$('#$name').keyup( function(event) { $(this).val('');}); </script>";
         return $buf;
     }
     
-    function timePicker($name,$value,$size) {
+    public static function timePicker($name,$value,$size) {
         $buf = '<input class="date_picker" type="text" name="'.$name.'" value="'.$value.'" size="'.$size.'" id="'.$name.'"/>';
         $buf.= "<script>$('#$name').timepicker({ampm: true, dateFormat: 'dd/mm/yy'});$('#$name').keyup( function(event) { $(this).val('');}); </script>";
         return $buf;
@@ -311,7 +311,7 @@ class Html {
      * @param <type> $extrabuttons
      * @return <type>
      */
-    function multiColForm($data, $action=null, $method="POST", $submitTitle="Save", $id=null, $class=null,$extrabuttons=null, $target="_self", $enctype = null) {
+    public static function multiColForm($data, $action=null, $method="POST", $submitTitle="Save", $id=null, $class=null,$extrabuttons=null, $target="_self", $enctype = null) {
         if (!$data) return;
         $hidden = "";
         $id = $id ? ' id="'.$id.'"' : null;
@@ -432,7 +432,7 @@ class Html {
      * @param <type> $value
      * @return <type>
      */
-    function checkbox($name,$value,$default_value = '1',$class=null) {
+    public static function checkbox($name,$value,$default_value = '1',$class=null) {
     	$default_value = $default_value === null ? '1' : $default_value;
         $checked = $value == $default_value ? 'checked = "checked"' : "";
         $buf= "<input type=\"checkbox\" name=\"".$name."\" value=\"".$default_value."\" $checked  id=\"".$name."\" class=\"".$class."\">";
@@ -447,7 +447,7 @@ class Html {
      * @param <type> $value
      * @return <type>
      */
-    function radio($name,$group,$value,$default_value = '1',$class=null) {
+    public static function radio($name,$group,$value,$default_value = '1',$class=null) {
     	$default_value = $default_value === null ? '1' : $default_value;
         $checked = $value == $default_value ? 'checked = "checked"' : "";
         $buf= "<input type=\"radio\" name=\"".$group."\" value=\"".$default_value."\" $checked  id=\"".$name."\" class=\"".$class."\">";
@@ -462,7 +462,7 @@ class Html {
      * @param <type> $value
      * @param <type> $class
      */
-    function select($name, $items, $value=null, $class=null, $style=null, $allmsg = "-- Select --") {
+    public static function select($name, $items, $value=null, $class=null, $style=null, $allmsg = "-- Select --") {
         $buf ='<select id="'.$name.'"  name="'.$name.'" class="'.$class.'" style="'.$style.'">';
         if ($items) {
             $buf.= $allmsg ? "<option value=''>".$allmsg."</option>" : '';
@@ -492,7 +492,7 @@ class Html {
      * @param <type> $value: current value of option item;
      * @param <type> $groupvalue: current group value of optgroup item;
      */
-    function groupSelect($name, $items, $value=null, $groupvalue=null, $class=null, $style=null, $allmsg = "-- Select --") {
+    public static function groupSelect($name, $items, $value=null, $groupvalue=null, $class=null, $style=null, $allmsg = "-- Select --") {
         $buf ='<select id="'.$name.'"  name="'.$name.'" class="'.$class.'" style="'.$style.'">';
         if ($items) {
             $buf.= $allmsg ? "<option value=''>".$allmsg."</option>" : '';
@@ -531,7 +531,7 @@ class Html {
      * @param <type> $allmsg
      * @return <type>
      */
-    function multiSelect($name,$items,$values=null,$class=null,$style=null, $allmsg = null) {
+    public static function multiSelect($name,$items,$values=null,$class=null,$style=null, $allmsg = null) {
         $buf ='<select  multiple="multiple" id="'.$name.'"  name="'.$name.'[]" class="'.$class.'" style="'.$style.'">';
         if ($items) {
         	foreach ($items as $item) {
@@ -565,7 +565,7 @@ EOT;
      * @param <type> $value
      * @param <type> $class
      */
-    function autocomplete($name, $options, $value=null, $class=null, $style=null, $minLength=1) {
+    public static function autocomplete($name, $options, $value=null, $class=null, $style=null, $minLength=1) {
         $acp_value = $value;
         if (is_array($options)) {
             $source = "[";
@@ -605,7 +605,7 @@ EOT;
     }
 
 
-    function img($src,$alt="") {
+    public static function img($src,$alt="") {
         $buf='<img border="0" src="'.$src.'" alt="'.$alt.'"/>';
         return $buf;
     }
