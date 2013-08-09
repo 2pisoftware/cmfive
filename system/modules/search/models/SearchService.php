@@ -69,18 +69,24 @@ class SearchService extends DbService {
         
 		$select_count = "select count(*) as MAX_RESULT ".$from;
 		$max_result = 0;
+		
+		// Setup limit and offset string
+		$limitBy = '';
+		if (!empty($page) && !empty($pageSize)){
+			if (is_numeric($page) && is_numeric($pageSize)){
+				// Set page and pagesize to within valid constraints
+				$page = ($page <= 0 ? 1 : $page);
+				$pageSize = ($pageSize <= 0 ? 20 : $pageSize);
+				$limitBy .= " LIMIT " . (($page-1)*$pageSize) . ", $pageSize ";
+			}
+		}
+		
 		// check if search is constrained to an index
 		if ($index && in_array($index, array_values($this->getIndexes()))) {
 			
-			$select .= " AND class_name = '".$index."' ";
-		
-			// check pagination
-			// only if searching for a particular index does pagination matter
-			if ($page && is_numeric($page) && $pageSize && is_numeric($pageSize)) {
-				// todo adam
-				$select .= " LIMIT $page, $pageSize ";
-			}
-			
+			// $limitBy will just be an empty string if page and pageSize are invalid
+			$select .= " AND class_name = '".$index."' " . $limitBy;
+					
 			$max_result = $this->_db->sql($select_count)->fetch_element('MAX_RESULT');
 			
 		} else {
