@@ -5,6 +5,7 @@ function results_GET(Web $w) {
 	$idx = $w->request('idx'); // index
 	$p = $w->request('p'); // page
 	$ps = $w->request('ps'); // pageSize
+	$tr = $w->request('tr'); // total results
 	
 	if ($q && strlen($q) >= 3) {
 		$results = $w->Search->getResults($q, $idx,$p,$ps);
