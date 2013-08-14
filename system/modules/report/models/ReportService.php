@@ -311,7 +311,6 @@ class ReportService extends DbService {
 		$filename = str_replace(" ","_",$title) . "_" . date("Y.m.d-H.i") . ".pdf";
 
 		// using TCPDF so grab includes
-		require_once('tcpdf/config/lang/eng.php');
 		require_once('tcpdf/tcpdf.php');
 
 		// instantiate and set parameters
