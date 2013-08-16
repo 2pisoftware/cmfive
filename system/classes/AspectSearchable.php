@@ -99,7 +99,7 @@ class AspectSearchable {
 	 * Consolidate all object fields into one big search friendly string.
 	 * 
 	 */
-	private function getIndexContent() {
+	function getIndexContent() {
 		
 		// -------------- concatenate all object fields ---------------------
 		
