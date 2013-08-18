@@ -111,7 +111,7 @@ class AdminService extends DbService {
 	}
 
 	function getLookupItemsbyType($type) {
-		$lookup = $this->getObjects("Lookup",array("type"=>$type,"is_deleted"=>0));
+		$lookup = $this->getObjects("Lookup",array("type"=>$type,"is_deleted"=>0),true);
 		if($lookup)
 		{
 			foreach ($lookup as $l) {

@@ -145,12 +145,14 @@ class DbService {
 
 	/**
 	 *
-	 * @param <type> $table
-	 * @param <type> $id
+	 * @param String $class
+	 * @param Mixed $where
+	 * @param Boolean $useCache
+	 * 
 	 * @return <type>
 	 */
 	function & getObjects($class,$where=null,$useCache = false) {
-		if (!$class) return null;// !$where || will return null as developers is assume ommiting the where clause will give them everything
+		if (!$class) return null;
 
 		// create a cache key just in case
 		if (is_array($where)) {
@@ -174,8 +176,10 @@ class DbService {
 			}
 			$this->_db->where($dbwhere);
 		} else if ($where && is_scalar($where)) {
-			$this->_db->where($where,false);			//if no $where, only $this->_db->get($get)->fetch_all() will be called
+			$this->_db->where($where,false);
 		}
+		//echo $this->_db->print_sql();
+		
 		$result = $this->_db->fetch_all();
 		if ($result) {
 			$objects = $this->fillObjects($class, $result);

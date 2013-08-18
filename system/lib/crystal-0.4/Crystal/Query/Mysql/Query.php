@@ -96,7 +96,7 @@ class Crystal_Query_Mysql_Query
 
 		if (!$this->query)
 		{
-			throw new Crystal_Query_Mysql_Exception("Mysql Error:" . mysqli_error());
+			throw new Crystal_Query_Mysql_Exception("Mysql Error:" . mysqli_error($connection_object['conn']->db));
 			return;
 		}
 		else

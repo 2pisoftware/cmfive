@@ -136,6 +136,8 @@ class Html {
      * valid field types are:
      *  text, password, autocomplete, static, date, textarea, section,
      *  select, multiselect, checkbox, hidden
+     *  
+     * Field type auto uses ui hints from a DbObject.
      *
      * when prefixing a fieldname with a minus sign '-' this field will be read-only
      */

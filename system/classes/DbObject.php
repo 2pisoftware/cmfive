@@ -32,12 +32,15 @@
  * 7. name when exists and title doesn't exist then will be used
  *    for object::getSelectOptionTitle() method
  *
- * 8. Automagic Select Field Hints, see getSelectOptions() for more info.
- *    $_<fieldname>_hint_select_string = array("option1","option2",...);
- *    $_<fieldname>_hint_select_lookup_code = "states";
- *    $_<fieldname>_hint_select_objects_class = "Contact";
- *    $_<fieldname>_hint_select_objects_filter = array("is_deleted"=>0);
-
+ * 8. Automagic Select UI Field Hints, see getSelectOptions() for more info.
+ *    static $_<fieldname>_ui_select_string = array("option1","option2",...);
+ *    static $_<fieldname>_ui_select_lookup_code = "states";
+ *    static $_<fieldname>_ui_select_objects_class = "Contact";
+ *    static $_<fieldname>_ui_select_objects_filter = array("is_deleted"=>0);
+ *
+ * 9. Define the Database Table Name (optional, see DbObject::getDbTableName()):
+ *    var $_db_table = "<table name>";
+ *
  * DbObject supports the use of the following 'Aspects' which can be
  * added to any object using a magic '$_<aspect>' property:
  *
@@ -460,10 +463,14 @@ class DbObject extends DbService {
 				}
 			}
 		}
+		
 		$this->_db->insert($t,$data);
 		if ($t != "audit") {
 			$this->w->logAudit("".$this->_db->sql);
 		}
+		
+		// echo $this->_db->print_sql();
+		
 		$this->_db->execute();
 		$this->id = $this->_db->last_insert_id();
 
@@ -620,10 +627,20 @@ class DbObject extends DbService {
 	/**
 	 * Returns the table name where this object is
 	 * stored
+	 * 
+	 * Uses either:
+	 * 
+	 * 1) the value of the property $_db_table (if it exists)
+	 * 2) the name of the class (lowercase)
+	 * 
+	 * You can also override this function completely.
 	 *
-	 * @return <type>
+	 * @return String
 	 */
 	function getDbTableName() {
+		if (property_exists($this, "_db_table") && $this->_db_table) {
+			return $this->_db_table;
+		}
 		return strtolower(get_class($this));
 	}
 
@@ -722,23 +739,42 @@ class DbObject extends DbService {
 	 * b) array(array("Title","Value"), array("Title","Value), ..)
 	 * c) array($dbobject1, $dbobject2, ..)
 	 * 
-	 * Automagic Field Hints
+	 * Automagic UI Field Hints
 	 * 
-	 * $_<fieldname>_hint_select_string = array("option1","option2",...);
+	 * static $_<fieldname>_ui_select_string = array("option1","option2",...);
 	 * --> create a select dropdown using those strings explicitly
 	 *
-	 * $_<fieldname>_hint_select_lookup_code = "states";
+	 * static $_<fieldname>_ui_select_lookup_code = "states";
 	 * --> create a select dropdown and filling it with Lookup items from the database
 	 *     for the given code
 	 *
-	 * $_<fieldname>_hint_select_objects_class = "Contact";
-	 * $_<fieldname>_hint_select_objects_filter = array("is_deleted"=>0);
+	 * static $_<fieldname>_ui_select_objects_class = "Contact";
+	 * static $_<fieldname>_ui_select_objects_filter = array("is_deleted"=>0);
 	 * --> create a select filling it with the objects for the _class filtered by the _filter criteria
 	 * 
 	 * @param String $field
 	 * @return array
 	 */
 	function getSelectOptions($field) {
+
+		// check whether this field has hints
+		$prop_string = "_".$field."_ui_select_string";
+		$prop_lookup = "_".$field."_ui_select_lookup_code";
+		$prop_class = "_".$field."_ui_select_objects_class";
+		$prop_filter = "_".$field."_ui_select_objects_filter";
 		
+		if (property_exists($this, $prop_string) && is_array($this->$prop_string)) {
+			return $this->$prop_string;
+		} 
+		else if (property_exists($this, $prop_lookup) && $this->$prop_lookup) {
+			return $this->Admin->getLookupItemsbyType($this->$prop_lookup);
+		} 
+		else if (property_exists($this, $prop_class) && $this->$prop_class) {
+			if (property_exists($this, $prop_filter) && $this->$prop_filter) {
+				return $this->getObjects($this->$prop_class, $this->$prop_filter, true);
+			} else {
+				return $this->getObjects($this->$prop_class, null, true);
+			}
+		}
 	}
 }
