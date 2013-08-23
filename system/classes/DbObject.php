@@ -416,6 +416,7 @@ class DbObject extends DbService {
 	 * @param <type> $table
 	 */
 	function insert() {
+		$this->validate();
 		$t = $this->getDbTableName();
 
 		// set some default attributes
@@ -505,6 +506,7 @@ class DbObject extends DbService {
 	 * @param $force if true set null values in db, if false, null values in object will be ignored
 	 */
 	function update($force=false) {
+		$this->validate();
 		$t = $this->getDbTableName();
 
 		// check delete attribute
@@ -763,9 +765,16 @@ class DbObject extends DbService {
 		$prop_class = "_".$field."_ui_select_objects_class";
 		$prop_filter = "_".$field."_ui_select_objects_filter";
 		
-		if (property_exists($this, $prop_string) && is_array($this->$prop_string)) {
-			return $this->$prop_string;
-		} 
+		// prop string may be declared as static or (dynamic?) so we need to cater for both
+		if (property_exists($this, $prop_string)) {
+			$prop_detail = new ReflectionProperty($this, $prop_string);
+			if ($prop_detail->isStatic()){
+				// Is this to "hacky"?
+				return $this::$$prop_string;
+			} else {
+				return $this->$prop_string;
+			} 
+		}
 		else if (property_exists($this, $prop_lookup) && $this->$prop_lookup) {
 			return $this->Admin->getLookupItemsbyType($this->$prop_lookup);
 		} 
@@ -775,6 +784,102 @@ class DbObject extends DbService {
 			} else {
 				return $this->getObjects($this->$prop_class, null, true);
 			}
+		}
+	}
+	
+	function validate(){
+		if (!property_exists($this, "_validation"))
+			return;
+		
+		// Get table columns
+		$table_columns = get_object_vars($this);
+		$response = array(
+			"valid" => array(),
+			"invalid" => array(),
+			"success" => false,
+		);
+		
+		// Get validation rules that may be declared static
+		$validation_rules = null;
+		$prop_detail = new ReflectionProperty($this, "_validation");
+		if ($prop_detail->isStatic()){
+			$validation_rules = $this::$_validation;
+		} else {
+			$validation_rules = $this->_validation;
+		}
+
+		// Loop through defined validation rules
+		foreach($validation_rules as $vr_key => $arr_rules){
+			// Check that what the user has provided is in our object
+			if (!array_key_exists($vr_key, $table_columns)){
+				continue;
+			}
+			
+			// Switch the rules... maybe theres a better way to do this :)
+			foreach($arr_rules as $rule => $rule_array){
+				if (is_string($rule_array))
+					$rule = $rule_array;
+				switch($rule){
+					case "number":
+						if (!filter_var($this->$$vr_key, FILTER_VALIDATE_FLOAT)){
+							$response["invalid"]["$vr_key"][] = "Invalid Number";
+						} else {
+							$response["valid"][] = $vr_key;
+						}
+						break;
+					case "url":
+						if (!filter_var($this->$$vr_key, FILTER_VALIDATE_URL)){
+							$response["invalid"]["$vr_key"][] = "Invalid URL";
+						} else {
+							$response["valid"][] = $vr_key;
+						}
+						break;
+					case "email":
+						if (!filter_var($this->$$vr_key, FILTER_VALIDATE_EMAIL)){
+							$response["invalid"]["$vr_key"][] = "Invalid Email";
+						} else {
+							$response["valid"][] = $vr_key;
+						}
+						break;
+					case "in":
+						// Case insensitive field check against an array of predefined values
+						if (is_array($rule_array)){
+							if (!in_array(ucfirst(strtolower($this->$$vr_key)),	$rule_array)){
+								$response["invalid"]["$vr_key"][] = "Invalid value, allowed are [".substr(explode(",", $rule_array), 0, -1) . "]";
+							} else {
+								$response["valid"][] = $vr_key;
+							}
+						}
+						break;
+					case "unique":
+					
+						break;
+					case "custom":
+					case "regex":
+						if ($rule[0] !== '/') $rule = '/' . $rule;
+						if ($rule[strlen($rule)-1] !== '/') $rule = $rule . '/';
+						
+						if (!filter_var($this->$$vr_key, FILTER_VALIDATE_REGEXP, array('regexp' => $rule))){
+							$response["invalid"]["$vr_key"][] = "Invalid";
+						} else {
+							$response["valid"][] = $vr_key;
+						}
+						break;
+				}	
+			}
+			
+			// else do nothing and let execution proceed as usual
+			// Set response value to if the validation was succesful
+			
+			// if (count($response["invalid"]) == 0) $response["success"] = true;
+			// return $response;
+		}
+		die();
+		// if validation fails return to invoked page with errors... how to transport them though?
+		if (count($response["invalid"]) > 0){
+			$_SESSION["errors"] = $response["invalid"]; // <-- GENIUS!... hopefully that works
+
+			$this->w->redirect($this->w->localUrl($_SERVER["REDIRECT_URL"]));
 		}
 	}
 }
