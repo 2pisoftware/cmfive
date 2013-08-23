@@ -3,9 +3,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/css/style.css" />
-        <script type="text/javascript" src="<?=$webroot?>/js/jquery-1.4.2.min.js" ></script>
-		<script src="<?=WEBROOT?>/js/flowplayer/flowplayer-3.2.4.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/templates/css/style.css" />
+        <script type="text/javascript" src="<?=$webroot?>/system/js/jquery-1.4.2.min.js" ></script>
+		<script src="<?=WEBROOT?>/system/js/flowplayer/flowplayer-3.2.4.min.js"></script>
     </head>
     <body>
     <table height="600" width="100%">

@@ -758,7 +758,7 @@ class DbObject extends DbService {
 	function getSelectOptions($field) {
 
 		// check whether this field has hints
-		$prop_string = "_".$field."_ui_select_string";
+		$prop_string = "_".$field."_ui_select_strings";
 		$prop_lookup = "_".$field."_ui_select_lookup_code";
 		$prop_class = "_".$field."_ui_select_objects_class";
 		$prop_filter = "_".$field."_ui_select_objects_filter";
