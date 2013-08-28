@@ -671,7 +671,7 @@ class Web {
             $this->logError("No Template found.");
             return null;
         }
-        $tpl = new Template();
+        $tpl = new WebTemplate();
         $tpl->set_vars($this->_context);
         return $tpl->fetch($this->getTemplateRealFilename($template));
     }
@@ -1016,7 +1016,7 @@ class Web {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-class Template {
+class WebTemplate {
     var $vars; /// Holds all the template variables
 
     /**
@@ -1026,7 +1026,7 @@ class Template {
      *
      * @return void
      */
-    function Template() {
+    function WebTemplate() {
         $this->vars = array();
     }
 
@@ -1080,7 +1080,7 @@ class Template {
  * An extension to Template that provides automatic caching of
  * template contents.
  */
-class CachedTemplate extends Template {
+class CachedTemplate extends WebTemplate {
     var $cache_id;
     var $expire;
     var $cached;
@@ -1095,7 +1095,7 @@ class CachedTemplate extends Template {
      * @return void
      */
     function CachedTemplate($path, $cache_id = null, $expire = 900) {
-        $this->Template($path);
+        $this->WebTemplate($path);
         $this->cache_id = $cache_id ? 'cache/' . md5($cache_id) : $cache_id;
         $this->expire   = $expire;
     }
