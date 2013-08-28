@@ -12,9 +12,24 @@ class TemplateService extends DbService {
 		return $this->getObject("Template", $id);
 	}
 	
-	function getTemplates($includeInactive = false, $includeDeleted = false) {
+	/**
+	 * Get a list of Template objects for module and category.
+	 * 
+	 * @param string $module default null
+	 * @param string $category default null
+	 * @param string $includeInactive default false
+	 * @param string $includeDeleted default false
+	 * @return array(<<Template>>)
+	 */
+	function findTemplates($module = null, $category = null, $includeInactive = false, $includeDeleted = false) {
+		if ($module) {
+			$where['module']=$module;
+		}
+		if ($category) {
+			$where['category']=$category;
+		}
 		if (!$includeInactive) {
-			$where['is_active']=1; 
+			$where['is_active']=1;
 		}
 		if (!$includeDeleted) {
 			$where['is_deleted']=0;

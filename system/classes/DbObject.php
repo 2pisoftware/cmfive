@@ -95,7 +95,7 @@
 class DbObject extends DbService {
 	var $id;
 
-	var $__password = 'j09aBcDeFFh24122'; // for encrypted fields change this!!
+	var $__password = 'CHANGEME'; // for encrypted fields change this!!
 
 	/**
 	 * Overrride this variable to false to turn off
@@ -403,11 +403,11 @@ class DbObject extends DbService {
 	 * whether to insert or update
 	 * an object in the database.
 	 */
-	function insertOrUpdate() {
+	function insertOrUpdate($force_null_values = false, $force_validation = false) {
 		if ($this->id != null) {
-			$this->update();
+			$this->update($force_null_values, $force_validation);
 		} else {
-			$this->insert();
+			$this->insert($force_validation);
 		}
 	}
 	/**
@@ -415,8 +415,13 @@ class DbObject extends DbService {
 	 *
 	 * @param <type> $table
 	 */
-	function insert() {
-		$this->validate();
+	function insert($force_validation = false) {
+		if ($force_validation) {
+			$valid_response = $this->validate();
+			if (!$valid_response['success']) {
+				return $valid_response;
+			}
+		}
 		$t = $this->getDbTableName();
 
 		// set some default attributes
@@ -503,10 +508,18 @@ class DbObject extends DbService {
 	/**
 	 * Update an object
 	 *
-	 * @param $force if true set null values in db, if false, null values in object will be ignored
+	 * @param $force_null_values if true set null values in db, if false, null values in object will be ignored
+	 * @param $force_validation default false
+	 * @return true or array("success"=>false,"invalid"=>array()) if validation failed
 	 */
-	function update($force=false) {
-		$this->validate();
+	function update($force_null_values=false, $force_validation=false) {
+		if ($force_validation) {
+			$valid_response = $this->validate();
+			if (!$valid_response['success']) {
+				return $valid_response;
+			}
+		}
+		
 		$t = $this->getDbTableName();
 
 		// check delete attribute
@@ -553,9 +566,9 @@ class DbObject extends DbService {
 						$data[$dbk]=$v;
 					}
 				}
-				// if $force is TRUE and $v is NULL, then set fields in DB to NULL
+				// if $force_null_values is TRUE and $v is NULL, then set fields in DB to NULL
 				// otherwise ignore NULL values
-				if ($v === null && $force == true) {
+				if ($v === null && $force_null_values == true) {
 					$data[$dbk]=null;
 				}
 			}
@@ -590,6 +603,8 @@ class DbObject extends DbService {
 			// TODO remove dependency to modules code!
 			$this->w->Admin->addDbAuditLogEntry("update",get_class($this),$this->id);
 		}
+		
+		return true;
 	}
 
 	/**
@@ -706,22 +721,66 @@ class DbObject extends DbService {
 	 */
 	function addToIndex() {}
 	
+	// a list of english words that need not be searched against
+	// and thus do not need to be stored in an index
+	static $_stopwords = "about above across after again against all almost alone along already also although always among and any anybody anyone anything anywhere are area areas around ask asked asking asks away back backed backing backs became because become becomes been before began behind being beings best better between big both but came can cannot case cases certain certainly clear clearly come could did differ different differently does done down downed downing downs during each early either end ended ending ends enough even evenly ever every everybody everyone everything everywhere face faces fact facts far felt few find finds first for four from full fully further furthered furthering furthers gave general generally get gets give given gives going good goods got great greater greatest group grouped grouping groups had has have having her here herself high higher highest him himself his how however important interest interested interesting interests into its itself just keep keeps kind knew know known knows large largely last later latest least less let lets like likely long longer longest made make making man many may member members men might more most mostly mrs much must myself necessary need needed needing needs never new newer newest next nobody non noone not nothing now nowhere number numbers off often old older oldest once one only open opened opening opens order ordered ordering orders other others our out over part parted parting parts per perhaps place places point pointed pointing points possible present presented presenting presents problem problems put puts quite rather really right room rooms said same saw say says second seconds see seem seemed seeming seems sees several shall she should show showed showing shows side sides since small smaller smallest some somebody someone something somewhere state states still such sure take taken than that the their them then there therefore these they thing things think thinks this those though thought thoughts three through thus today together too took toward turn turned turning turns two under until upon use used uses very want wanted wanting wants was way ways well wells went were what when where whether which while who whole whose why will with within without work worked working works would year years yet you young younger youngest your yours";
+	
 	/**
-	 * If this object is searchable then this function returns
-	 * the string that is generated by the AspectSearchable::getIndexContent()
-	 * function.
+	 * Consolidate all object fields into one big search friendly string.
 	 * 
-	 * You can use this function for adding joined objects together in one index, e.g.
-	 * CrmContact and its associated Contact.
-	 * 
-	 * @return String
+	 * @return string
 	 */
 	function getIndexContent() {
-		if (property_exists($this,"_searchable") && $this->_searchable) {
-			return $this->_searchable->getIndexContent();
+		
+		// -------------- concatenate all object fields ---------------------		
+		$str = "";
+		$exclude = array("dt_created", "dt_modified", "id", "w");
+		
+		foreach (get_object_vars($this) as $k => $v) {
+			if ($k{0} != "_" // ignore volatile vars
+				&& (! property_exists($this,"_exclude_index") // ignore properties that should be excluded
+					|| !in_array($k, $this->_exclude_index))
+				&& stripos($k, "_id") === false
+				&& !in_array($k, $exclude)
+			) 
+			{
+				$str .= $v ." ";
+			}
 		}
+				
+		// add custom content to the index
+		$str .= $this->addToIndex();
+
+		
+		// ------------ sanitise string ----------------------------------
+		
+		// Remove all xml/html tags
+		$str = strip_tags($str);
+		
+		// Remove case
+		$str = strtolower($str);
+		
+		// Remove line breaks
+		$str = str_replace("\n", " ", $str);
+		
+		// Remove all characters except A-Z, a-z, 0-9, dots, commas, hyphens, spaces and forward slashes (for dates) 
+		// Note that the hyphen must go last not to be confused with a range (A-Z) 
+		// and the dot, being special, is escaped with backslash
+		$str = preg_replace("/[^A-Za-z0-9 \.,\-\/@':]/", '', $str);  
+		
+		// Replace sequences of spaces with one space 
+		$str = preg_replace('/  +/', ' ', $str);
+			
+		// de-duplicate string and remove any word shorter than 3 characters
+		$temparr = array_filter(array_unique(explode(" ", $str)),function ($item) { return strlen($item) >= 3; });
+		
+		// remove stop words
+		$temparr = array_diff($temparr,explode(" ",$this::_stopwords));
+		$str = implode(" ", $temparr);
+		
+		return $str;
 	}
-	
+		
 	
 	/**
 	 * Return an array of options for a field of this object.
@@ -769,7 +828,7 @@ class DbObject extends DbService {
 		if (property_exists($this, $prop_string)) {
 			$prop_detail = new ReflectionProperty($this, $prop_string);
 			if ($prop_detail->isStatic()){
-				// Is this to "hacky"?
+				// Is this to "hacky"? No, it's cool!
 				return $this::$$prop_string;
 			} else {
 				return $this->$prop_string;
@@ -787,6 +846,12 @@ class DbObject extends DbService {
 		}
 	}
 	
+	/**
+	 * Validate the object's properties according to the rules
+	 * defined in $_validation array.
+	 * 
+	 * @return void|multitype:multitype: boolean
+	 */
 	function validate(){
 		if (!property_exists($this, "_validation"))
 			return;
@@ -815,10 +880,11 @@ class DbObject extends DbService {
 				continue;
 			}
 			
-			// Switch the rules... maybe theres a better way to do this :)
+			// Switch the rules... maybe there's a better way to do this :)
 			foreach($arr_rules as $rule => $rule_array){
-				if (is_string($rule_array))
+				if (is_string($rule_array)) {
 					$rule = $rule_array;
+				}
 				switch($rule){
 					case "number":
 						if (!filter_var($this->$$vr_key, FILTER_VALIDATE_FLOAT)){
@@ -828,6 +894,8 @@ class DbObject extends DbService {
 						}
 						break;
 					case "url":
+						// please be aware that this may accept invalid urls
+						// see http://www.php.net/manual/en/function.filter-var.php
 						if (!filter_var($this->$$vr_key, FILTER_VALIDATE_URL)){
 							$response["invalid"]["$vr_key"][] = "Invalid URL";
 						} else {
@@ -835,6 +903,8 @@ class DbObject extends DbService {
 						}
 						break;
 					case "email":
+						// please be aware that this may accept invalid emails
+						// see http://www.php.net/manual/en/function.filter-var.php
 						if (!filter_var($this->$$vr_key, FILTER_VALIDATE_EMAIL)){
 							$response["invalid"]["$vr_key"][] = "Invalid Email";
 						} else {
@@ -868,18 +938,31 @@ class DbObject extends DbService {
 				}	
 			}
 			
-			// else do nothing and let execution proceed as usual
-			// Set response value to if the validation was succesful
-			
-			// if (count($response["invalid"]) == 0) $response["success"] = true;
-			// return $response;
 		}
-		die();
-		// if validation fails return to invoked page with errors... how to transport them though?
-		if (count($response["invalid"]) > 0){
-			$_SESSION["errors"] = $response["invalid"]; // <-- GENIUS!... hopefully that works
 
-			$this->w->redirect($this->w->localUrl($_SERVER["REDIRECT_URL"]));
+		// else do nothing and let execution proceed as usual
+		// Set response value to if the validation was succesful
+		
+		if (count($response["invalid"]) == 0) {
+			$response["success"] = true;
 		}
+		
+		return $response;
+
+		// die(); // debugging only
+		
+		// if validation fails return to invoked page with errors... how to transport them though?
+		
+		// this function is called deep in code so the initiator of the update or insert function may not know what's
+		// going on ... redirecting away to another page from here is ... rude.
+		// better to do the following:
+		// - update or insert just fail but send an exception containing the invalid messages
+		// - caller should call validate BEFORE update / insert to react to messages in a UI fashion (eg. redisplay form with message, etc)
+		
+// 		if (count($response["invalid"]) > 0){
+// 			$_SESSION["errors"] = $response["invalid"]; // <-- GENIUS!... hopefully that works
+
+// 			$this->w->redirect($this->w->localUrl($_SERVER["REDIRECT_URL"]));
+// 		}
 	}
 }

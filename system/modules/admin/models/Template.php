@@ -18,6 +18,8 @@ class Template extends DbObject {
 	public $creator_id;
 	public $modifier_id;
 	
+	protected $_db_table = "template";
+	
 	public function renderTitle($data) {
 		return $this->Template->render($this->title,$data);
 	}

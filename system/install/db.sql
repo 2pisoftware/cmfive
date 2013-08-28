@@ -700,3 +700,26 @@ CREATE TABLE IF NOT EXISTS `rest_session` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `template`
+--
+
+CREATE TABLE IF NOT EXISTS `template` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `description` varchar(255) NULL,
+  `category` varchar(255) NULL,
+  `module` varchar(255) NULL,
+  `template_title` text COLLATE utf8_unicode_ci NULL,
+  `template_body` longtext COLLATE utf8_unicode_ci NULL,
+  `is_active` tinyint(4) NOT NULL DEFAULT '0',
+  `is_deleted` tinyint(4) NOT NULL DEFAULT '0',
+  `dt_created` datetime DEFAULT NULL,
+  `dt_modified` datetime DEFAULT NULL,
+  `creator_id` bigint(20) DEFAULT NULL,
+  `modifier_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
