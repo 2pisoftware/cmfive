@@ -25,15 +25,6 @@ class DbService {
 	*/
 	private static $_active_trx = false;
 
-	/**
-	 * set this variable to false if you don't want
-	 * the getObject, getObjects, etc. to use the
-	 * cache.
-	 *
-	 * @var <type>
-	 */
-	private $__use_cache = true;
-
 	public function __get($name) {
 		return $this->w->$name;
 	}
@@ -98,7 +89,7 @@ class DbService {
 	 * @param <type> $idOrWhere
 	 * @return <type>
 	 */
-	function & getObject($class,$idOrWhere) {
+	function & getObject($class,$idOrWhere,$use_cache = true) {
 		if (!$idOrWhere || !$class) return null;
 
 		$key = $idOrWhere;
@@ -108,7 +99,7 @@ class DbService {
 				$key.=$k."::".$v."::";
 			}
 		}
-		$usecache = $this->__use_cache && is_scalar($key);
+		$usecache = $use_cache && is_scalar($key);
 		// check if we should use the cache
 		// this will eliminate 80% of SQL calls per page view!
 		if ($usecache) {
@@ -151,22 +142,24 @@ class DbService {
 	 * 
 	 * @return <type>
 	 */
-	function & getObjects($class,$where=null,$useCache = false) {
+	function & getObjects($class,$where=null,$cache_list = false, $use_cache = true) {
 		if (!$class) return null;
 
-		// create a cache key just in case
-		if (is_array($where)) {
-			foreach ($where as $k=>$v) {
-				$key.=$k."::".$v."::";
+		// if using the list cache
+		if ($cache_list) {
+			if (is_array($where)) {
+				foreach ($where as $k=>$v) {
+					$key.=$k."::".$v."::";
+				}
+			} else {
+				$key = $where;
 			}
-		} else {
-			$key = $where;
+	
+			if (isset(self::$_cache2[$class][$key])) {
+				return self::$_cache2[$class][$key];
+			}
 		}
-
-		if ($useCache && self::$_cache2[$class][$key]) {
-			return self::$_cache2[$class][$key];
-		}
-
+		
 		$o = new $class($this->w);
 		$table = $o->getDbTableName();
 		$this->_db->get($table);
@@ -183,20 +176,19 @@ class DbService {
 		$result = $this->_db->fetch_all();
 		if ($result) {
 			$objects = $this->fillObjects($class, $result);
-			if ($objects && $this->__use_cache) {
+			if ($objects) {
 				 
-				// only store the full list if requested
-				if ($useCache) {
-
-					if (!self::$_cache2[$class][$key]) {
-						self::$_cache2[$class][$key] = $objects;
-					}
+				// store the complete list
+				if ($cache_list && !isset(self::$_cache2[$class][$key])) {
+					self::$_cache2[$class][$key] = $objects;
 				}
-				 
-				// always store individual objects in cache
-				foreach ($objects as $ob) {
-					if (!self::$_cache[$class][$ob->id]) {
-						self::$_cache[$class][$ob->id] = $ob;
+
+				// also store each individual object
+				if ($use_cache) {
+					foreach ($objects as $ob) {
+						if (!isset(self::$_cache[$class][$ob->id])) {
+							self::$_cache[$class][$ob->id] = $ob;
+						}
 					}
 				}
 			}
