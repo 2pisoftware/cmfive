@@ -4,7 +4,7 @@ class Template extends DbObject {
 	public $description;
 	
 	public $category; // eg. Invoice, Quote, Form Letter, Contract, etc.
-	public $module; // which module to use this for
+	public $module; // which module to use this for, eg. crm
 	
 	public $is_active;
 	
