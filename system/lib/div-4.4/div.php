@@ -518,7 +518,7 @@ class div{
 				}
 
 				if ($exists === true || $decode === true) $items = self::jsonDecode($items);
-				if ($exists === true) break;
+				//if ($exists === true) break;
 			}
 		}
 

@@ -2,26 +2,28 @@
 <br/><br/>
 <div class="tabs">
 	<div class="tab-head">
-		<a id="tab-link-1" href="#" class="active" onclick="switchTab(1);">Template</a>
-		<a id="tab-link-2" href="#"	onclick="switchTab(2);">Test Data</a>
-		<a id="tab-link-3" href="#"	onclick="switchTab(3);">Test Output</a>
-		<a id="tab-link-3" href="#"	onclick="switchTab(4);">Manual</a>
+		<a id="tab-link-1" href="#" class="active" onclick="switchTab(1);">Details</a>
+		<a id="tab-link-2" href="#"	onclick="switchTab(2);">Template</a>
+		<a id="tab-link-3" href="#"	onclick="switchTab(3);">Test Data</a>
+		<a id="tab-link-4" href="#"	onclick="switchTab(4);">Test Output</a>
+		<a id="tab-link-5" href="#"	onclick="switchTab(5);">Manual</a>
 	</div>
 	<div class="tab-body">
 		<div id="tab-1">
-		<?php if (!empty($template)) : ?>
-			<?php echo $editform;?>
-		<?php else : ?>
-			<p>Template not found.</p>
-		<?php endif; ?>
+			<?php echo $editdetailsform;?>
 		</div>
 		<div id="tab-2" style="display: none;">
-			<?php echo $testdataform;?>
+			<?php echo $templateform;?>
 		</div>
 		<div id="tab-3" style="display: none;">
-			<?php echo $testoutput;?>
+			<?php echo $testdataform;?>
+		</div>
+		<div id="tab-4" style="display: none;">	
+			<p><?php echo $testtitle;?></p>
+			<hr>
+			<p><?php echo $testbody;?></p>
         </div>
-        <div id="tab-4" style="display: none;">
+        <div id="tab-5" style="display: none;">
 			this is the template manual
         </div>
 	</div>

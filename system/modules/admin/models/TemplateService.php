@@ -1,7 +1,7 @@
 <?php
 class TemplateService extends DbService {
 	
-	static private $div_lib = "div-4.4";
+	private $div_lib = "div-4.4/div.php";
 	
 	/**
 	 * 
@@ -52,7 +52,7 @@ class TemplateService extends DbService {
 	 * @return string
 	 */
 	function render($template, $data) {
-		if ($template === null) return;
+		if (empty($template)) return;
 		
 		// falling through the options:
 		
@@ -68,7 +68,7 @@ class TemplateService extends DbService {
 		
 		// if passing a file path or string template
 		if (is_string($template)) {
-			include_once $self::div_lib;
+			include_once $this->div_lib;
 			return new div($template,$data);
 		}
 		
