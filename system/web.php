@@ -889,11 +889,26 @@ class Web {
         return implode("/",$this->_paths);
     }
 
-    function ctx($key, $value=null) {
-            if ($value == null) {
+    /**
+     * Get or Set a value in the current context.
+     * 
+     * If $append is true, append the value to the existing value.
+     * 
+     * If $value is null, the current value will be returned.
+     * 
+     * @param string $key
+     * @param string $value
+     * @param boolean $append
+     */
+    function ctx($key, $value=null,$append = false) {
+        if ($value == null) {
             return $this->_context[$key];
         } else {
-            $this->_context[$key] = $value;
+        	if ($append) {
+        		$this->_context[$key] .= $value;
+        	} else {
+            	$this->_context[$key] = $value;
+        	}
         }
     }
 
