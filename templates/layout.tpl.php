@@ -2,7 +2,7 @@
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <title><?=ucfirst($w->currentModule())?><?=$title?' - '.$title:''?></title>
         <link rel="icon" href="<?=$webroot?>/templates/img/favicon.png" type="image/png"/>
         <link rel="stylesheet" type="text/css" href="<?=$webroot?>/templates/css/style.css" />

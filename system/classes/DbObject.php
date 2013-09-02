@@ -775,7 +775,7 @@ class DbObject extends DbService {
 		$temparr = array_filter(array_unique(explode(" ", $str)),function ($item) { return strlen($item) >= 3; });
 		
 		// remove stop words
-		$temparr = array_diff($temparr,explode(" ",$this::_stopwords));
+		$temparr = array_diff($temparr,explode(" ",self::$_stopwords));
 		$str = implode(" ", $temparr);
 		
 		return $str;
