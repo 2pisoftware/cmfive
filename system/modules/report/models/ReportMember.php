@@ -6,8 +6,9 @@ class ReportMember extends DbObject {
 	var $role;			// user role: user, editor
 	var $is_deleted; 	// deleted flag
 
+	public static $_db_table = "report_member";
 	// actual table name
-	function getDbTableName() {
+	public function getDbTableName() {
 		return "report_member";
 	}
 }

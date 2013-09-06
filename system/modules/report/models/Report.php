@@ -10,7 +10,7 @@ class Report extends DbObject {
 	var $is_deleted;	// is report deleted
 
 	var $_modifiable;	// employ the modifiable aspect
-
+	public static $_db_table = "report";
 	// actual table name
 	function getDbTableName() {
 		return "report";
@@ -19,7 +19,11 @@ class Report extends DbObject {
 	// return a category title using lookup with type: ReportCategory
 	function getCategoryTitle() {
 		$c = $this->Report->getObject("Lookup",array("type"=>"ReportCategory","code"=>$this->category));
-		return $c->title;
+		if (!empty($c)){
+			return property_exists($c, "title") ? $c->title : null;
+		} else {
+			return null;
+		}
 	}
 
 	// build form of parameters for generating report

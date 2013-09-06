@@ -12,9 +12,19 @@ function index_ALL(Web &$w) {
 
 	// organise criteria
 	$who = $w->session('user_id');
-	$where = ($_REQUEST['module'] != "") ? " and r.module = '" . $_REQUEST['module'] . "'" : "";
-	$where .= ($_REQUEST['category'] != "") ? " and r.category = '" . $_REQUEST['category'] . "'" : "";
-	$where .= ($_REQUEST['type'] != "") ? " and r.sqltype like '%" . $_REQUEST['type'] . "%'" : "";
+	$where = '';
+	if (!empty($_REQUEST['module'])){
+		$where .= ($_REQUEST['module'] != "") ? " and r.module = '" . $_REQUEST['module'] . "'" : "";
+		$w->ctx("reqModule",$_REQUEST['module']);	
+	}
+	if (!empty($_REQUEST['category'])){
+		$where .= ($_REQUEST['category'] != "") ? " and r.category = '" . $_REQUEST['category'] . "'" : "";
+		$w->ctx("reqCategory",$_REQUEST['category']);	
+	}
+	if (!empty($_REQUEST['type'])){
+		$where .= ($_REQUEST['type'] != "") ? " and r.sqltype like '%" . $_REQUEST['type'] . "%'" : "";
+		$w->ctx("reqType",$_REQUEST['type']);	
+	}
 
 	// get report categories from available report list
 	$reports = $w->Report->getReportsbyUserWhere($who, $where);
@@ -32,7 +42,7 @@ function index_ALL(Web &$w) {
 			// editor & admin get EDIT button
 			//			if (($w->Auth->user()->hasRole("report_editor")) || ($w->Auth->user()->hasRole("report_admin"))) {
 			if (($member->role == "EDITOR") || ($w->Auth->user()->hasRole("report_admin"))) {
-				$btnedit = Html::b($webroot."/report/viewreport/".$rep->id," Edit ");
+				$btnedit = Html::b(!empty($webroot) ? $webroot : ''."/report/viewreport/".$rep->id," Edit ");
 			}
 			else {
 				$btnedit = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
@@ -40,7 +50,7 @@ function index_ALL(Web &$w) {
 				
 			// admin also gets DELETE button
 			if ($w->Auth->user()->hasRole("report_admin")) {
-				$btndelete = Html::b($webroot."/report/deletereport/".$rep->id," Delete ", "Are you sure you want to delete this Report?");
+				$btndelete = Html::b(!empty($webroot) ? $webroot : ''."/report/deletereport/".$rep->id," Delete ", "Are you sure you want to delete this Report?");
 			}
 			else {
 				$btndelete = "";
@@ -56,7 +66,7 @@ function index_ALL(Web &$w) {
 					$rep->description,
 					$btnedit .
 								"&nbsp;&nbsp;&nbsp;" . 
-					Html::b($webroot."/report/runreport/".$rep->id," Execute ")
+					Html::b(!empty($webroot) ? $webroot : ''."/report/runreport/".$rep->id," Execute ")
 					);
 				}
 			}
@@ -70,7 +80,7 @@ function index_ALL(Web &$w) {
 				$rep->description,
 				$btnedit .
 							"&nbsp;&nbsp;&nbsp;" . 
-				Html::b($webroot."/report/runreport/".$rep->id," Execute ") .
+				Html::b(!empty($webroot) ? $webroot : ''."/report/runreport/".$rep->id," Execute ") .
 							"&nbsp;&nbsp;&nbsp;" .
 				$btndelete,
 				);
@@ -88,11 +98,6 @@ function index_ALL(Web &$w) {
 	$w->ctx("category",Html::select("category",$category));
 	$type = array();
 	$w->ctx("type",Html::select("type",$type));
-
-	// ser filter dropdown defaults
-	$w->ctx("reqModule",$_REQUEST['module']);
-	$w->ctx("reqCategory",$_REQUEST['category']);
-	$w->ctx("reqType",$_REQUEST['type']);
 
 	// display list of reports, if any
 	$w->ctx("viewreports",Html::table($line,null,"tablesorter",true));

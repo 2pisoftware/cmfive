@@ -88,7 +88,9 @@ class Contact extends DbObject {
 		return "contact/view/".$this->id;
 	}
 
-	function canList(&$user) {
+	function canList(User $user = null) {
+		if (null === $user)
+			return false;
 		if ($this->private_to_user_id &&
 		$this->private_to_user_id != $user->id &&
 		!$user->hasRole("administrator")) {
@@ -97,8 +99,8 @@ class Contact extends DbObject {
 		return true;
 	}
 
-	function canView(&$user = null) {
-		if (!$user) {
+	function canView(User $user = null) {
+		if (null === $user) {
 			$user = $this->w->Auth->user();
 		}
 		// only owners or admin can see private contacts
@@ -114,11 +116,15 @@ class Contact extends DbObject {
 		}
 		return true;
 	}
-	function canEdit(&$user) {
+	function canEdit(User $user = null) {
+		if (null === $user)
+			return false;
 		return ($user->hasRole("contact_editor")||$this->private_to_user_id == $user->id);
 	}
 
-	function canDelete(&$user) {
+	function canDelete(User $user = null) {
+		if (null === $user)
+			return false;
 		$is_admin = $user->hasRole("contact_editor");
 		$is_private = $this->private_to_user_id == $user->id;
 		return $is_private || $is_admin;

@@ -89,7 +89,7 @@ class DbService {
 	 * @param <type> $idOrWhere
 	 * @return <type>
 	 */
-	function & getObject($class,$idOrWhere,$use_cache = true) {
+	function getObject($class,$idOrWhere,$use_cache = true) {
 		if (!$idOrWhere || !$class) return null;
 
 		$key = $idOrWhere;
@@ -103,7 +103,7 @@ class DbService {
 		// check if we should use the cache
 		// this will eliminate 80% of SQL calls per page view!
 		if ($usecache) {
-			$obj = self::$_cache[$class][$key];
+			$obj = !empty(self::$_cache[$class][$key]) ? self::$_cache[$class][$key] : null;
 			if ($obj) {
 				//$this->w->logDebug("cached object:".$class.", ".$idOrWhere);
 				return $obj;
@@ -124,7 +124,7 @@ class DbService {
 			$obj = $this->getObjectFromRow($class, $result);
 			if ($usecache) {
 				self::$_cache[$class][$key]=$obj;
-				if ($obj->id != $key && !self::$_cache[$class][$obj->id]) {
+				if ($obj->id != $key && !empty(self::$_cache[$class][$obj->id])) {
 					self::$_cache[$class][$obj->id]=$obj;
 				}
 			}

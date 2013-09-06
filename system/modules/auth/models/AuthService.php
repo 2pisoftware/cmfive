@@ -145,7 +145,7 @@ class AuthService extends DbService {
 		return $roleUsers;
 	}
 
-	function & getGroups()
+	function getGroups()
 	{
 		$rows = $this->_db->get("user")->where(array('is_active'=>1,'is_deleted'=>0,'is_group'=>1))->fetch_all();
 		 

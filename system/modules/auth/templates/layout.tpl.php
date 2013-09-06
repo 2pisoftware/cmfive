@@ -10,15 +10,15 @@
         <script type="text/javascript" src="<?=$webroot?>/system/js/jquery-1.4.2.min.js" ></script>
         <script type="text/javascript" src="<?=$webroot?>/system/js/livevalidation.js"></script>
         <script type="text/javascript" src="<?=$webroot?>/system/js/main.js"></script>
-        <?=$htmlheader?>
+        <?php echo !empty($htmlheader) ? $htmlheader : '';?>
     </head>
     <body>
         <table height="100%" align="center" cellpadding="0" cellspacing="0">
-        <tr><td align="center" valign="middle" height="100"><h1><?=$w->moduleConf('main','application_name')?></h1></td>
+        <tr><td align="center" valign="middle" height="100"><h1><?php echo $w->moduleConf('main','application_name'); ?></h1></td>
         <tr><td height="100%" align="center" valign="middle">
-        <? if ($error):?><div class="error"><?=$error?></div><? endif;?>
-        <? if ($msg): ?><div class="msg"><?=$msg?></div><? endif;?>
-        <?=$body?>
+        <?php if (!empty($error)): ?><div class="error"><?php echo $error; ?></div><?php endif;?>
+        <?php if (!empty($msg)): ?><div class="msg"><?php echo $msg; ?></div><?php endif;?>
+        <?php echo !empty($body) ? $body : ''; ?>
 		</td></tr>
 		</table>
 	</body>
