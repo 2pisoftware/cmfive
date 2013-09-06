@@ -1,15 +1,15 @@
 <?php
 class FormsFormMember extends DbObject {
 
-	var $form_id;
-	var $user_id;
-	var $role;
+	public $form_id;
+	public $user_id;
+	public $role;
 	
 	// Metadata
-	var $dt_created;
-	var $creator_id;
-	var $dt_modified;
-	var $modifier_id;
+	public $dt_created;
+	public $creator_id;
+	public $dt_modified;
+	public $modifier_id;
 	
 	static function getRoles() {
 		return explode(',',"Designer,Editor,Reader");

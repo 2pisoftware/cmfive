@@ -2,17 +2,17 @@
 
 class FormsForm extends DbObject {
 	
-	var $title;
-	var $slug;	
-	var $description;
-	var $application_id;
+	public $title;
+	public $slug;	
+	public $description;
+	public $application_id;
 	
 	// Meta Data
-	var $is_deleted;
-	var $dt_created;
-	var $dt_modified;
-	var $creator_id;
-	var $modifier_id;
+	public $is_deleted;
+	public $dt_created;
+	public $dt_modified;
+	public $creator_id;
+	public $modifier_id;
 
 	/**
 	 * 

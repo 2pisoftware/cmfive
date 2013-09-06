@@ -1,9 +1,9 @@
 <?php
 class RestSession extends DbObject {
-	var $user_id;
-	var $token;
-	var $dt_created;
-	var $dt_modified;
+	public $user_id;
+	public $token;
+	public $dt_created;
+	public $dt_modified;
 	
 	function setUser(User $user) {
 		if ($user) {

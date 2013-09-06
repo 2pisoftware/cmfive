@@ -2,26 +2,26 @@
 class Attachment extends DbObject {
 	
 	// make it searchable
-	var $_searchable;
-	var $_exclude_index = array("parent_table","parent_id","mimetype","fullpath","is_deleted");
+	public $_searchable;
+	public $_exclude_index = array("parent_table","parent_id","mimetype","fullpath","is_deleted");
 	
-	var $parent_table;
-	var $parent_id;
+	public $parent_table;
+	public $parent_id;
 
-	var $dt_created; // datetime
-	var $dt_modified; // datetime
-	var $modifier_user_id; // bigint
+	public $dt_created; // datetime
+	public $dt_modified; // datetime
+	public $modifier_user_id; // bigint
 
-	var $filename; // varchar(255)
-	var $mimetype; // varchar(255)
+	public $filename; // publicchar(255)
+	public $mimetype; // publicchar(255)
 
-	var $title; // varchar(255)
-	var $description; // text
+	public $title; // publicchar(255)
+	public $description; // text
 
-	var $fullpath; // varchar(255)
-	var $is_deleted; // tinyint 0/1
+	public $fullpath; // publicchar(255)
+	public $is_deleted; // tinyint 0/1
 
-	var $type_code; // this is a type of attachment, eg. Receipt of Deposit, PO Variation, Sitephoto, etc.
+	public $type_code; // this is a type of attachment, eg. Receipt of Deposit, PO Variation, Sitephoto, etc.
 
 	function insert() {
 		$this->dt_modified = time();

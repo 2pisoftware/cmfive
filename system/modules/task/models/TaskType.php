@@ -5,7 +5,7 @@
  *
  */
 abstract class TaskType {
-	var $w;
+	public $w;
 	
 	function __construct(Web $w) {
 		$this->w = $w;

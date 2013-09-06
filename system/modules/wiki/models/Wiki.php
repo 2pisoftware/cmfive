@@ -1,16 +1,16 @@
 <?php
 class Wiki extends DbObject{
-	var $title;
-	var $name;
-	var $dt_created;
-	var $creator_id;
-	var $dt_modified;
-	var $modifier_id;
+	public $title;
+	public $name;
+	public $dt_created;
+	public $creator_id;
+	public $dt_modified;
+	public $modifier_id;
 
-	var $is_deleted;
-	var $owner_id;
-	var $is_public;
-	var $last_modified_page_id;
+	public $is_deleted;
+	public $owner_id;
+	public $is_public;
+	public $last_modified_page_id;
 
 	function getHistory() {
 		$sql="

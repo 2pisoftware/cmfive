@@ -1,10 +1,10 @@
 <?php
 class AttachmentType extends DbObject {
-	var $id;
-	var $table_name;
-	var $code;
-	var $title;
-	var $is_active;
+	public $id;
+	public $table_name;
+	public $code;
+	public $title;
+	public $is_active;
 
 	function getDbTableName() {
 		return "attachment_type";

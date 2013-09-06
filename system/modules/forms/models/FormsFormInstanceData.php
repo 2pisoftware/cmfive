@@ -3,22 +3,22 @@
 class FormsFormInstanceData extends DbObject {
 
 	// belongs to
-	var $form_field_id;
-	var $form_instance_id;
+	public $form_field_id;
+	public $form_instance_id;
 	
 	// data
-	var $text_data;
-	var $integer_data;
-	var $float_data;
-	var $date_data;
-	var $time_data;
-	var $file_data;
+	public $text_data;
+	public $integer_data;
+	public $float_data;
+	public $date_data;
+	public $time_data;
+	public $file_data;
 	
 	// Meta Data
-	var $dt_created;
-	var $dt_modified;
-	var $creator_id;
-	var $modifier_id;
+	public $dt_created;
+	public $dt_modified;
+	public $creator_id;
+	public $modifier_id;
 	
 	function getFormInstance() {
 		return $this->getObject("FormsFormInstance", $this->form_instance_id);

@@ -75,14 +75,14 @@ class AspectVersionable {
  * Stores data about updates to any object
  */
 class ObjectHistory extends DbObject {
-	var $class_name;
-	var $object_id;
+	public $class_name;
+	public $object_id;
 
 	// has ModifiableAspect!!
-	var $__is_modifiable;
+	public $__is_modifiable;
 
 	// do not audit this table!
-	var $__use_auditing = false;
+	public $__use_auditing = false;
 
 	function getDbTableName() {
 		return "object_history";
@@ -105,12 +105,12 @@ class ObjectHistory extends DbObject {
  * stores single field values for a historic object
  */
 class ObjectHistoryEntry extends DbObject {
-	var $history_id;
-	var $attr_name;
-	var $attr_value;
+	public $history_id;
+	public $attr_name;
+	public $attr_value;
 
 	// do not audit this table!
-	var $__use_auditing = false;
+	public $__use_auditing = false;
 
 	function getDbTableName() {
 		return "object_history_entry";

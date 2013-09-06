@@ -6,8 +6,8 @@
  *
  */
 class DbService {
-	var $_db;
-	var $w;
+	public $_db;
+	public $w;
 
 	/**
 	 * array for automatic caching of objects for the duration of this

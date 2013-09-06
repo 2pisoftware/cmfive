@@ -1,6 +1,6 @@
 <?php
 class TaskService extends DbService {
-	var $_tasks_loaded;
+	public $_tasks_loaded;
 	
 	// function to sort lists by date created
 	static function sortByCreated($a, $b) {

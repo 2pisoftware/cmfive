@@ -16,41 +16,41 @@ class PermissionDeniedException extends Exception {}
  */
 class Web {
 
-    var $_buffer;
-    var $_logLevel;
-    var $_logHandlers;
-    var $_template;
-    var $_templatePath;
-    var $_templateExtension;
-    var $_url;
-    var $_context;
-    var $_logMethod;
-    var $_logParam;
-    var $_logFolder = "log";
-    var $_logFile = "web";
-    var $_logExt = ".log";
-    var $_logLevelArray;
-    var $_action;
-    var $_defaultHandler;
-    var $_defaultAction;
-    var $_layoutContentMarker;
-    var $_notFoundTemplate;
-    var $_layout;
-    var $_headers;
-    var $_module = null;
-    var $_submodule = null;
-    var $_modulePath;
-    var $_moduleExtension;
-    var $_modules;
-    var $_requestMethod;
-    var $_action_executed = false;
-    var $_action_redirected = false;
-    var $_services;
-    var $_moduleConfig;
-    var $_paths;
-    var $_loginpath = 'auth/login';
+    public $_buffer;
+    public $_logLevel;
+    public $_logHandlers;
+    public $_template;
+    public $_templatePath;
+    public $_templateExtension;
+    public $_url;
+    public $_context;
+    public $_logMethod;
+    public $_logParam;
+    public $_logFolder = "log";
+    public $_logFile = "web";
+    public $_logExt = ".log";
+    public $_logLevelArray;
+    public $_action;
+    public $_defaultHandler;
+    public $_defaultAction;
+    public $_layoutContentMarker;
+    public $_notFoundTemplate;
+    public $_layout;
+    public $_headers;
+    public $_module = null;
+    public $_submodule = null;
+    public $_modulePath;
+    public $_moduleExtension;
+    public $_modules;
+    public $_requestMethod;
+    public $_action_executed = false;
+    public $_action_redirected = false;
+    public $_services;
+    public $_moduleConfig;
+    public $_paths;
+    public $_loginpath = 'auth/login';
 
-    var $db;
+    public $db;
     
     /**
      * Constructor
@@ -1032,7 +1032,7 @@ class Web {
 
 
 class WebTemplate {
-    var $vars; /// Holds all the template variables
+    public $vars; /// Holds all the template variables
 
     /**
      * Constructor
@@ -1096,9 +1096,9 @@ class WebTemplate {
  * template contents.
  */
 class CachedTemplate extends WebTemplate {
-    var $cache_id;
-    var $expire;
-    var $cached;
+    public $cache_id;
+    public $expire;
+    public $cached;
 
     /**
      * Constructor.

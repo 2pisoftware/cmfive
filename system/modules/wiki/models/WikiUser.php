@@ -1,8 +1,8 @@
 <?php
 class WikiUser extends DbObject {
-	var $wiki_id;
-	var $user_id;
-	var $role;
+	public $wiki_id;
+	public $user_id;
+	public $role;
 	
 	function & getUser() {
 		return $this->Auth->getUser($this->user_id);

@@ -1,13 +1,13 @@
 <?php
 class Audit extends DbObject {
-	var $dt_created;
-	var $creator_id;
-	var $module;
-	var $action;
-	var $path;
-	var $ip;
-	var $db_action;
-	var $db_class;
-	var $db_id;
+	public $dt_created;
+	public $creator_id;
+	public $module;
+	public $action;
+	public $path;
+	public $ip;
+	public $db_action;
+	public $db_class;
+	public $db_id;
 
 }

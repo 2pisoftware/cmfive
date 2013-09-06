@@ -39,12 +39,12 @@
  *    static $_<fieldname>_ui_select_objects_filter = array("is_deleted"=>0);
  *
  * 9. Define the Database Table Name (optional, see DbObject::getDbTableName()):
- *    var $_db_table = "<table name>";
+ *    public $_db_table = "<table name>";
  *
  * DbObject supports the use of the following 'Aspects' which can be
  * added to any object using a magic '$_<aspect>' property:
  *
- * 1. ModifiableAspect -> var $_modifiable;
+ * 1. ModifiableAspect -> public $_modifiable;
  *    This Aspect adds the following functions to a DbObject:
  *    a) $this->_modifiable->getCreator(), returns the user object of the creator
  *    b) $this->_modifiable->getModifier(), returns user object for last modifier
@@ -54,7 +54,7 @@
  *    using this aspect all insert() and update() calls will set these
  *    above properties automatically.
  *
- * 2. VersionableAspect -> var $_versionable;
+ * 2. VersionableAspect -> public $_versionable;
  *    This Aspect addes the following function to a DbObject:
  *    a) $this->_versionable->getAllVersions(), returns all previous versions for this object
  *    b) $this->_versionable->getVersion($id), returns a specific version
@@ -66,7 +66,7 @@
  *
  *    Also all version objects have the modifiable aspect (see above).
  *
- * 3. SearchableAspect -> var $_searchable;
+ * 3. SearchableAspect -> public $_searchable;
  *    This Aspect does not add any public functions to the object, but extends
  *    the insert/update/delete behaviour so that an index record is created (or updated)
  *    in the table object_index which contains the object_id reference and a sanitised 
@@ -82,20 +82,20 @@
  *    word de-duplication is performed on this.
  *    
  * 4. Aspects can be removed in the case of class inheritance. If the parent class has 
- *    var $_searchable; defined then this can be removed by a child class using:
- *    var $_remove_searchable. However further childclasses can no longer add this aspect!
+ *    public $_searchable; defined then this can be removed by a child class using:
+ *    public $_remove_searchable. However further childclasses can no longer add this aspect!
  *    
  * 5. Auditing of inserts and updates happens automatically to an audit table.
  *    However this can be turned off by setting
- *    var $__use_auditing = false;
+ *    public $__use_auditing = false;
  *
  * @author carsten
  *
  */
 class DbObject extends DbService {
-	var $id;
+	public $id;
 
-	var $__password = 'CHANGEME'; // for encrypted fields change this!!
+	public $__password = 'CHANGEME'; // for encrypted fields change this!!
 
 	/**
 	 * Overrride this variable to false to turn off
@@ -103,29 +103,29 @@ class DbObject extends DbService {
 	 *
 	 * @var unknown_type
 	 */
-	var $__use_auditing = true;
+	public $__use_auditing = true;
 
 
 	//Define this property if you want to use the
 	//ModifiableAspect
-	//  var $_modifiable;
+	//  public $_modifiable;
 	//
 	//To remove this from child classes:
-	//  var $_remove_modifiable;
+	//  public $_remove_modifiable;
 
 	//Define this property if you want to use the
 	//VersionableAspect
-	//  var $_versionable;
+	//  public $_versionable;
 	//
 	//To remove this from child classes:
-	//  var $_remove_versionable;
+	//  public $_remove_versionable;
 	
 	//Define this property if you want to use the
 	//SearchableAspect
-	//  var $_searchable;
+	//  public $_searchable;
 	//
 	//To remove this from child classes:
-	//  var $_remove_searchable;
+	//  public $_remove_searchable;
 	
 	
 	/**

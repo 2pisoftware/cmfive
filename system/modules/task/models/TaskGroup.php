@@ -9,17 +9,17 @@
  *
  */
 class TaskGroup extends DbObject {
-	var $title;			// not null
-	var $can_assign; 	// ALL, GUEST, MEMBER, OWNER
-	var $can_view; 		// ALL, GUEST, MEMBER, OWNER
-	var $can_create;	// ALL, GUEST, MEMBER, OWNER
-	var $is_active; 	// 0 / 1
-	var $is_deleted; 	// 0 / 1
-	var $description;
-	var $default_assignee_id; // can be null
-	var $task_group_type; // php class name of concrete TaskGroupType implementation
+	public $title;			// not null
+	public $can_assign; 	// ALL, GUEST, MEMBER, OWNER
+	public $can_view; 		// ALL, GUEST, MEMBER, OWNER
+	public $can_create;	// ALL, GUEST, MEMBER, OWNER
+	public $is_active; 	// 0 / 1
+	public $is_deleted; 	// 0 / 1
+	public $description;
+	public $default_assignee_id; // can be null
+	public $task_group_type; // php class name of concrete TaskGroupType implementation
 	
-	var $_modifiable;
+	public $_modifiable;
 	
 	// actual table name
 	function getDbTableName() {

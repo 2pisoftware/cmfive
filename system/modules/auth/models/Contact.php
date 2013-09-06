@@ -2,25 +2,25 @@
 class Contact extends DbObject {
 
 	// this object will be automatically indexed for fulltext search
-	var $_searchable;
+	public $_searchable;
 	
 	// these parameters will be excluded from indexing
-	var $_exclude_index = array("is_deleted","private_to_user_id");
+	public $_exclude_index = array("is_deleted","private_to_user_id");
 	
-	var $firstname;
-	var $lastname;
-	var $othername;
-	var $title;
-	var $homephone;
-	var $workphone;
-	var $mobile;
-	var $priv_mobile;
-	var $fax;
-	var $email;
-	var $is_deleted;
-	var $dt_created; // this is automatically excluded from indexing
-	var $dt_modified;  // this is automatically excluded from indexing
-	var $private_to_user_id;
+	public $firstname;
+	public $lastname;
+	public $othername;
+	public $title;
+	public $homephone;
+	public $workphone;
+	public $mobile;
+	public $priv_mobile;
+	public $fax;
+	public $email;
+	public $is_deleted;
+	public $dt_created; // this is automatically excluded from indexing
+	public $dt_modified;  // this is automatically excluded from indexing
+	public $private_to_user_id;
 
 	function getFullName() {
 		if ($this->firstname && $this->lastname) {

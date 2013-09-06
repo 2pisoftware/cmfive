@@ -5,9 +5,9 @@
  *
  */
 class TaskData extends DbObject {
-	var $task_id;
-	var $key;
-	var $value;	
+	public $task_id;
+	public $key;
+	public $value;	
 	
 	function getDbTableName() {
 		return "task_data";

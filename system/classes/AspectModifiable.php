@@ -88,16 +88,16 @@ class AspectModifiable {
  * Store creation and modification data of any object
  */
 class ObjectModification extends DbObject {
-	var $table_name;
-	var $object_id;
+	public $table_name;
+	public $object_id;
 
-	var $dt_created;
-	var $dt_modified;
-	var $creator_id;
-	var $modifier_id;
+	public $dt_created;
+	public $dt_modified;
+	public $creator_id;
+	public $modifier_id;
 
 	// do not audit this table!
-	var $__use_auditing = false;
+	public $__use_auditing = false;
 
 	/**
 	 * returns the creator of the

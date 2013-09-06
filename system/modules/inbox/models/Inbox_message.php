@@ -1,7 +1,7 @@
 <?php
 class Inbox_message extends DbObject {
-	var $digest;
-	var $message;
+	public $digest;
+	public $message;
 
 	function insert() {
 		$this->digest = sha1($this->message);

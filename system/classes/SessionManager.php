@@ -6,7 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 class SessionManager extends DbService {
 
-	var $life_time;
+	public $life_time;
 
 	function __construct(Web $w) {
 		parent::__construct($w);

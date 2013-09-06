@@ -7,7 +7,7 @@
  *
  */
 abstract class TaskGroupType {
-	var $w;
+	public $w;
 	
 	function __construct(Web $w){
 		$this->w = $w;	

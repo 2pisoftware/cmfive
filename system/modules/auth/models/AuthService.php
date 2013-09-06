@@ -1,10 +1,10 @@
 <?php
 class AuthService extends DbService {
 
-	var $_roles;
-	var $_roles_loaded = false;
-	var $_user = null;
-	var $_rest_user = null;
+	public $_roles;
+	public $_roles_loaded = false;
+	public $_user = null;
+	public $_rest_user = null;
 
 	function login($login, $password, $client_timezone,$skip_session=false) {
 		$password = User::encryptPassword($password);

@@ -1,17 +1,17 @@
 <?php
 class WikiPage extends DbObject {
 	
-	var $_searchable;
-	var $_exclude_index = array("is_deleted");
+	public $_searchable;
+	public $_exclude_index = array("is_deleted");
 	
-	var $name;
-	var $wiki_id;
-	var $dt_created;
-	var $dt_modified;
-	var $creator_id;
-	var $modifier_id;
-	var $is_deleted;
-	var $body;
+	public $name;
+	public $wiki_id;
+	public $dt_created;
+	public $dt_modified;
+	public $creator_id;
+	public $modifier_id;
+	public $is_deleted;
+	public $body;
 
 	function & getWiki() {
 		return $this->Wiki->getWikiById($this->wiki_id);			

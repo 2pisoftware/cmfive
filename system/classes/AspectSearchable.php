@@ -5,11 +5,11 @@
  * 
  * Switch this on by creating a property called
  * 
- *    var $_searchable;
+ *    public $_searchable;
  * 
  * To exclude certain properties from being indexed:
  * 
- *    var $_exclude_index = array("prop1","prop2");
+ *    public $_exclude_index = array("prop1","prop2");
  * 
  * The old style modification properties will be automatically ignored:
  * 
@@ -95,17 +95,17 @@ class AspectSearchable {
 }
 
 class ObjectIndex extends DbObject {
-	var $class_name;
-	var $object_id;
-	var $content;
+	public $class_name;
+	public $object_id;
+	public $content;
 	
-	var $dt_created;
-	var $dt_modified;
-	var $creator_id;
-	var $modifier_id;
+	public $dt_created;
+	public $dt_modified;
+	public $creator_id;
+	public $modifier_id;
 	
 	// do not audit this table!
-	var $__use_auditing = false;
+	public $__use_auditing = false;
 	
 	function getDbTableName() {
 		return "object_index";

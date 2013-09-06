@@ -7,18 +7,18 @@
  */
 class User extends DbObject {
 
-	var $login;
-	var $is_admin;
-	var $password;
-	var $is_active;
-	var $dt_lastlogin;
-	var $dt_created;
-	var $contact_id;
-	var $is_deleted;
-	var $is_group;
+	public $login;
+	public $is_admin;
+	public $password;
+	public $is_active;
+	public $dt_lastlogin;
+	public $dt_created;
+	public $contact_id;
+	public $is_deleted;
+	public $is_group;
 
-	var $_roles;
-	var $_contact;
+	public $_roles;
+	public $_contact;
 
 	function delete($force = false) {
 		$contact = $this->getContact();

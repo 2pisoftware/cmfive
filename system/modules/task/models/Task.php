@@ -2,27 +2,27 @@
 // defines tasks. tasks are associated with a task group and have various attributes
 // such as status, priority and current assignee, etc
 class Task extends DbObject {
-	var $parent_id;			// Parent Task ID.
-	var $title;				// not null
-	var $task_group_id; 	// can be null!
-	var $status;			// text
-	var $priority;			// text
-	var $task_type;			// text
-	var $assignee_id;		// who is currently assigned
-	var $dt_assigned;		// date & time of current (last) assignment
-	var $dt_first_assigned;	// date & time when first assigned
-	var $first_assignee_id;	// who it was assigned to first
-	var $dt_completed;		// date & time when completed
-	var $is_closed;			// is 1 if this task is closed
-	var $dt_planned;		// date & time planned
-	var $dt_due;			// date & time due
-	var $estimate_hours;	// number of hours estimated
-	var $description;
-	var $latitude;			
-	var $longitude;
-	var $is_deleted;		// is_deleted flag
-	var $_modifiable;		// Modifiable Aspect
-	var $_searchable;
+	public $parent_id;			// Parent Task ID.
+	public $title;				// not null
+	public $task_group_id; 	// can be null!
+	public $status;			// text
+	public $priority;			// text
+	public $task_type;			// text
+	public $assignee_id;		// who is currently assigned
+	public $dt_assigned;		// date & time of current (last) assignment
+	public $dt_first_assigned;	// date & time when first assigned
+	public $first_assignee_id;	// who it was assigned to first
+	public $dt_completed;		// date & time when completed
+	public $is_closed;			// is 1 if this task is closed
+	public $dt_planned;		// date & time planned
+	public $dt_due;			// date & time due
+	public $estimate_hours;	// number of hours estimated
+	public $description;
+	public $latitude;			
+	public $longitude;
+	public $is_deleted;		// is_deleted flag
+	public $_modifiable;		// Modifiable Aspect
+	public $_searchable;
 	
 	// TODO add TaskData and TaskComments
 	function addToIndex() {

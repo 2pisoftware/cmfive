@@ -1,12 +1,12 @@
 <?php
 class ReportFeed extends DBObject {
-	var $report_id;		// source report id
-	var $title;			// feed title
-	var $description;	// feed description
-	var $key;			// special feed key
-	var $url;			// url to access feed
-	var $dt_created;	// date created
-	var $is_deleted;	// is deleted flag
+	public $report_id;		// source report id
+	public $title;			// feed title
+	public $description;	// feed description
+	public $key;			// special feed key
+	public $url;			// url to access feed
+	public $dt_created;	// date created
+	public $is_deleted;	// is deleted flag
 
 	// actual table name
 	function getDbTableName() {

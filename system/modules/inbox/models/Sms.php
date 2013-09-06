@@ -1,9 +1,9 @@
 <?php
 class Sms extends DbObject {
-	var $phone;
-	var $message;
-	var $dt_created;
-	var $creator_id;
+	public $phone;
+	public $message;
+	public $dt_created;
+	public $creator_id;
 	
 	function getDbTableName() {
 		return "sms";

@@ -1,10 +1,10 @@
 <?php
 class Lookup extends DbObject {
-	var $weight;
-	var $type;
-	var $code;
-	var $title;
-	var $is_deleted;
+	public $weight;
+	public $type;
+	public $code;
+	public $title;
+	public $is_deleted;
 
 	function getDbTableName() {
 		return "lookup";

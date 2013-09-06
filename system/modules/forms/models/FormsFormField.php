@@ -2,40 +2,40 @@
 
 class FormsFormField extends DbObject {
 	
-	var $title;
-	var $slug;
-	var $description;
-	var $position;
+	public $title;
+	public $slug;
+	public $description;
+	public $position;
 	
-	var $field_type; // section, input, textarea, select, checkbox, date, time, upload
+	public $field_type; // section, input, textarea, select, checkbox, date, time, upload
 	
-	var $data_type; // text, integer, float, date, time, file, url, money
+	public $data_type; // text, integer, float, date, time, file, url, money
 	
 	// specific to input/text fields
-	var $width;
-	var $height;
+	public $width;
+	public $height;
 	
 	// specific to date/time
-	var $date_format;
-	var $time_format;
+	public $date_format;
+	public $time_format;
 	
 	// specific to select fields
-	var $select_values; // comma separated list of values for select
-	var $select_form_id; // OR select data from another form
-	var $select_form_field_ids; // display the following fields in select box
+	public $select_values; // comma separated list of values for select
+	public $select_form_id; // OR select data from another form
+	public $select_form_field_ids; // display the following fields in select box
 	
 	// specific to uploads
-	var $file_types; // if set allow only those, eg. "jpg,gif,png"
-	var $file_max_size; // if set allow only files of this size
+	public $file_types; // if set allow only those, eg. "jpg,gif,png"
+	public $file_max_size; // if set allow only files of this size
 	
 	// set a default value
-	var $default_value;
+	public $default_value;
 	
 	// Metadata
-	var $dt_created;
-	var $creator_id;
-	var $dt_modified;
-	var $modifier_id;
+	public $dt_created;
+	public $creator_id;
+	public $dt_modified;
+	public $modifier_id;
 	
 	static function getFieldTypes() {
 		return explode(',',"section,input,textarea,select,checkbox,date,time,upload");

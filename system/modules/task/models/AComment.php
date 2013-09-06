@@ -17,20 +17,20 @@
 * */
 class AComment extends DbObject{
 
-	var $id;
-	var $obj_table;   // varchar      
-	var $obj_id;
-	var $comment;     // text
+	public $id;
+	public $obj_table;   // varchar      
+	public $obj_id;
+	public $comment;     // text
 	
-	var $is_internal; // 1 - is_internal - will be displayed only for PP roles ; Default is 0.
-	var $is_system;   // 1 - is system generated comment (on attachment Upload/Delete); Default is 0.
+	public $is_internal; // 1 - is_internal - will be displayed only for PP roles ; Default is 0.
+	public $is_system;   // 1 - is system generated comment (on attachment Upload/Delete); Default is 0.
 	
-	var $creator_id;
-	var $dt_created;
-	var $modifier_id;
-	var $dt_modified;
+	public $creator_id;
+	public $dt_created;
+	public $modifier_id;
+	public $dt_modified;
 	
-	var $is_deleted;
+	public $is_deleted;
 	
 	
 	function getDbTableName() {

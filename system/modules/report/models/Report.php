@@ -1,15 +1,15 @@
 <?php
 class Report extends DbObject {
-	var $title;			// report title
-	var $module;	// module report pertains to
-	var $category; 		// category of report given by Lookup
-	var $description;	// description of report
-	var $report_code; 	// the 'code' describing the report
-	var $sqltype;		// determine type of statement: select/update/insert/delete
-	var $is_approved;	// has the Report Admin approved this report
-	var $is_deleted;	// is report deleted
+	public $title;			// report title
+	public $module;	// module report pertains to
+	public $category; 		// category of report given by Lookup
+	public $description;	// description of report
+	public $report_code; 	// the 'code' describing the report
+	public $sqltype;		// determine type of statement: select/update/insert/delete
+	public $is_approved;	// has the Report Admin approved this report
+	public $is_deleted;	// is report deleted
 
-	var $_modifiable;	// employ the modifiable aspect
+	public $_modifiable;	// employ the modifiable aspect
 	public static $_db_table = "report";
 	// actual table name
 	function getDbTableName() {

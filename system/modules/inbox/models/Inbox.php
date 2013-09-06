@@ -1,19 +1,19 @@
 <?php
 class Inbox extends DbObject {
-	var $subject;
-	var $user_id;
-	var $parent_message_id;
-	var $message_id;
-	var $dt_created;
-	var $dt_read;
-	var $is_new;
-	var $dt_archived;
-	var $is_archived;
-	var $has_parent;
-	var $sender_id;
-	var $del_forever;
+	public $subject;
+	public $user_id;
+	public $parent_message_id;
+	public $message_id;
+	public $dt_created;
+	public $dt_read;
+	public $is_new;
+	public $dt_archived;
+	public $is_archived;
+	public $has_parent;
+	public $sender_id;
+	public $del_forever;
 
-	var $_message;
+	public $_message;
 
 	function & getMessage() {
 		if ($this->message_id !== null && !$this->_message) {

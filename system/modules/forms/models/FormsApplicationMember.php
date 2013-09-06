@@ -2,15 +2,15 @@
 
 class FormsApplicationMember extends DbObject {
 	
-	var $application_id;
-	var $user_id;
-	var $role; // admin, creator, user
+	public $application_id;
+	public $user_id;
+	public $role; // admin, creator, user
 	
 	// Metadata
-	var $dt_created;
-	var $creator_id;
-	var $dt_modified;
-	var $modifier_id;
+	public $dt_created;
+	public $creator_id;
+	public $dt_modified;
+	public $modifier_id;
 	
 	static function getRoles() {
 		return explode(',',"Administrator,Creator,User");
