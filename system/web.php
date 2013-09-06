@@ -102,7 +102,7 @@ class Web {
      * Thanks to:
      * http://www.phpaddiction.com/tags/axial/url-routing-with-php-part-one/
      */
-    private function & _getCommandPath() {
+    private function _getCommandPath() {
     	$this->logDebug("REQUEST_URI: ".$_SERVER['REQUEST_URI']);
         $uri = explode('?',$_SERVER['REQUEST_URI']);// get rid of parameters
         $uri = $uri[0];
@@ -902,7 +902,7 @@ class Web {
      */
     function ctx($key, $value=null,$append = false) {
         if ($value == null) {
-            return $this->_context[$key];
+            return !empty($this->_context[$key]) ? $this->_context[$key] : null;
         } else {
         	if ($append) {
         		$this->_context[$key] .= $value;
@@ -917,7 +917,7 @@ class Web {
      */
     function session($key,$value=null) {
         if ($value == null) {
-            return $_SESSION[$key];
+            return !empty($_SESSION[$key]) ? $_SESSION[$key] : null;
         } else {
             $_SESSION[$key] = $value;
         }

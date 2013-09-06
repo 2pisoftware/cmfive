@@ -20,7 +20,7 @@ class User extends DbObject {
 	var $_roles;
 	var $_contact;
 
-	function delete() {
+	function delete($force = false) {
 		$contact = $this->getContact();
 		if ($contact) {
 			$contact->delete();

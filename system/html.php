@@ -61,6 +61,7 @@ class Html {
     }
 
     public static function b($href,$title,$confirm=null,$id=null) {
+    	$js = '';
         if ($confirm) {
             $js = "if(confirm('".$confirm."'))";
         }        
@@ -150,10 +151,10 @@ class Html {
         $buf = '<form'.$id.$class.$enctype.' action="'.$action.'" method="'.$method.'" target="'.$target.'">'."<table cellspacing=\"0\" class='form'>\n";
         $valign = ' valign="top" ';
         foreach ($data as $row) {
-            $title = $row[0];
-            $type = $row[1];
-            $name = $row[2];
-            $value = $row[3];
+            $title = !empty($row[0]) ? $row[0] : null;
+            $type = !empty($row[1]) ? $row[1] : null;
+            $name = !empty($row[2]) ? $row[2] : null;
+            $value = !empty($row[3]) ? $row[3] : null;
             $readonly = "";
             // handle disabled fields
             if ($name[0]=='-') {
@@ -167,7 +168,7 @@ class Html {
                 $colspan=1;
             }
             if ($type == "text" || $type == "password") {
-                $size = $row[4];
+                $size = !empty($row[4]) ? $row[4] : null;
                 if ($title){
                     $buf .= "<tr><td $valign class='fieldtitle'>".htmlentities($title)."</td>";
                 }
@@ -175,7 +176,7 @@ class Html {
                 $buf .= '<input'.$readonly.' style="width:100%;"  type="'.$type.'" name="'.$name.'" value="'.htmlspecialchars($value).'" size="'.$size.'" id="'.$name.'"/>';
                 $buf .= "</td></tr>\n";
             } else if ($type == "autocomplete") {
-                $options = $row[4];
+                $options = !empty($row[4]) ? $row[4] : null;
                 if ($title){
                     $buf .= "<tr><td $valign class='fieldtitle'>".htmlentities($title)."</td>";
                 }
@@ -183,7 +184,7 @@ class Html {
                 $buf.= Html::autocomplete($name,$options,$value,null,"width: 100%;");
                 $buf .= "</td></tr>\n";
             } else if ($type == "date") {
-                $size = $row[4];
+                $size = !empty($row[4]) ? $row[4] : null;
                 if ($title){
                     $buf .= "<tr><td $valign class='fieldtitle'>".htmlentities($title)."</td>";
                 }
@@ -191,7 +192,7 @@ class Html {
                 $buf .= Html::datePicker($name,$value,$size);
                 $buf .= "</td></tr>\n";
             } else if ($type == "datetime") {
-                $size = $row[4];
+                $size = !empty($row[4]) ? $row[4] : null;
                 if ($title){
                     $buf .= "<tr><td $valign class='fieldtitle'>".htmlentities($title)."</td>";
                 }
@@ -199,7 +200,7 @@ class Html {
                 $buf .= Html::datetimePicker($name,$value,$size);
                 $buf .= "</td></tr>\n";
             } else if ($type == "time") {
-                $size = $row[4];
+                $size = !empty($row[4]) ? $row[4] : null;
                 if ($title){
                     $buf .= "<tr><td $valign class='fieldtitle'>".htmlentities($title)."</td>";
                 }
@@ -207,7 +208,7 @@ class Html {
                 $buf .= Html::timePicker($name,$value,$size);
                 $buf .= "</td></tr>\n";
             } else if ($type == "static") {
-                $size = $row[4];
+                $size = !empty($row[4]) ? $row[4] : null;
                 if ($title){
                     $buf .= "<tr><td $valign class='fieldtitle'>".htmlentities($title)."</td>";
                 }
@@ -219,15 +220,15 @@ class Html {
                     $buf .= "<tr><td $valign class='fieldtitle'>".htmlentities($title)."</td>";
                 }
                 $buf .= "<td colspan=\"$colspan\">";
-                $cols = $row[4];
-                $rows = $row[5];
+                $cols = !empty($row[4]) ? $row[4] : null;
+                $rows = !empty($row[5]) ? $row[5] : null;
                 $buf .= '<textarea name="'.$name.'" rows="'.$rows.'" cols="'.$cols.'" id="'.$name.'">'.$value.'</textarea>';
                 $buf .= "</td></tr>\n";
             } else if ($type == "section") {
                 $buf .= '<tr><td colspan="2" class="section" >'.htmlentities($title);
                 $buf .= "</td></tr>\n";
             } else if ($type == "select") {
-                $items = $row[4];
+                $items = !empty($row[4]) ? $row[4] : null;
                 if ($title){
                     $buf .= "<tr><td $valign class='fieldtitle'>".htmlentities($title)."</td>";
                 }
@@ -238,7 +239,7 @@ class Html {
                 }
                 $buf .= "</td></tr>\n";
             } else if ($type == "multiSelect") {
-                $items = $field[4];
+                $items = !empty($field[4]) ? $field[4] : null;
                 if ($title){
                     $buf .= "<tr><td $valign class='fieldtitle'>".htmlentities($title)."</td>";
                 }
@@ -257,7 +258,7 @@ class Html {
             } else if ($type == "hidden") {
                 $hidden .= '<input type="hidden" name="'.$name.'" value="'.htmlspecialchars($value).'"/>'."\n";
             } else if ($type == "file") {
-                $size = $row[4];
+                $size = !empty($row[4]) ? $row[4] : null;
                 if ($title){
                     $buf .= "<tr><td $valign class='fieldtitle'>".htmlentities($title)."</td>";
                 }

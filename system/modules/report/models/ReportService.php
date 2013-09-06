@@ -10,7 +10,7 @@ class ReportService extends DbService {
 	}
 
 	// get list of modules for Html::select
-	function & getModules() {
+	function getModules() {
 		$modules = $this->w->modules();
 		if ($modules) {
 			foreach ($modules as $f) {
@@ -21,38 +21,38 @@ class ReportService extends DbService {
 	}
 
 	// static list of group permissions
-	function & getReportPermissions() {
+	function getReportPermissions() {
 		return array("USER","EDITOR");
 	}
 
 
 	// return a report given its ID
-	function & getReportInfo($id) {
+	function getReportInfo($id) {
 		return $this->getObject("Report",array("id"=>$id));
 	}
 
 	// return list of feeds
-	function & getFeeds() {
+	function getFeeds() {
 		return $this->getObjects("ReportFeed",array("is_deleted"=>0));
 	}
 
 	// return a feed given its id
-	function & getFeedInfobyId($id) {
+	function getFeedInfobyId($id) {
 		return $this->getObject("ReportFeed",array("id"=>$id,"is_deleted"=>0));
 	}
 
 	// return a feed given its report id
-	function & getFeedInfobyReportId($id) {
+	function getFeedInfobyReportId($id) {
 		return $this->getObject("ReportFeed",array("report_id"=>$id,"is_deleted"=>0));
 	}
 
 	// return a feed given its key
-	function & getFeedInfobyKey($key) {
+	function getFeedInfobyKey($key) {
 		return $this->getObject("ReportFeed",array("key"=>$key,"is_deleted"=>0));
 	}
 
 	// return list of APPROVED and NOT DELETED report IDs for a given a user ID and a where clause
-	function & getReportsbyUserWhere($id,$where) {
+	function getReportsbyUserWhere($id,$where) {
 		// need to get reports for me and my groups
 		// me
 		$myid[] = $id;
@@ -72,13 +72,13 @@ class ReportService extends DbService {
 
 		$where .= " and r.is_deleted = 0 and m.is_deleted = 0";
 
-		$rows = $this->_db->sql("SELECT distinct r.* from ".ReportMember::getDbTableName()." as m inner join ".Report::getDbTableName()." as r on m.report_id = r.id where m.user_id in (" . $id . ") " . $where . " order by r.is_approved desc,r.title")->fetch_all();
+		$rows = $this->_db->sql("SELECT distinct r.* from ".ReportMember::$_db_table." as m inner join ".Report::$_db_table." as r on m.report_id = r.id where m.user_id in (" . $id . ") " . $where . " order by r.is_approved desc,r.title")->fetch_all();
 		$rows = $this->fillObjects("Report",$rows);
 		return $rows;
 	}
 
 	// return list of APPROVED and NOT DELETED report IDs for a given a user ID as member
-	function & getReportsbyUserId($id) {
+	function getReportsbyUserId($id) {
 		// need to get reports for me and my groups
 		// me
 		$myid[] = $id;
@@ -96,13 +96,13 @@ class ReportService extends DbService {
 		// list of IDs to check for report membership, my ID and my group IDs
 		$id = implode(",",$myid);
 
-		$rows = $this->_db->sql("SELECT distinct m.report_id from ".ReportMember::getDbTableName()." as m inner join ".Report::getDbTableName()." as r on m.report_id = r.id where m.user_id in (" . $id . ") and r.is_deleted = 0 and m.is_deleted = 0 order by r.is_approved desc,r.title")->fetch_all();
+		$rows = $this->_db->sql("SELECT distinct m.report_id from ". ReportMember::$_db_table ." as m inner join ".Report::$_db_table." as r on m.report_id = r.id where m.user_id in (" . $id . ") and r.is_deleted = 0 and m.is_deleted = 0 order by r.is_approved desc,r.title")->fetch_all();
 		$rows = $this->fillObjects("ReportMember",$rows);
 		return $rows;
 	}
 
 	// return list of APPROVED and NOT DELETED report IDs for a given a user ID and Module
-	function & getReportsbyModulenId() {
+	function getReportsbyModulenId() {
 		// need to get reports for me and my groups
 		// me
 		$myid[] = $this->w->session('user_id');
@@ -121,13 +121,13 @@ class ReportService extends DbService {
 		$id = implode(",",$myid);
 		$module = $this->w->currentModule();
 
-		$rows = $this->_db->sql("SELECT distinct r.id,r.title from ".ReportMember::getDbTableName()." as m inner join ".Report::getDbTableName()." as r on m.report_id = r.id where m.user_id in (" . $id . ") and r.module = '" . $module . "' and r.is_deleted = 0 and m.is_deleted = 0 order by r.is_approved desc,r.title")->fetch_all();
+		$rows = $this->_db->sql("SELECT distinct r.id,r.title from ".ReportMember::$_db_table." as m inner join ".Report::$_db_table." as r on m.report_id = r.id where m.user_id in (" . $id . ") and r.module = '" . $module . "' and r.is_deleted = 0 and m.is_deleted = 0 order by r.is_approved desc,r.title")->fetch_all();
 		$rows = $this->fillObjects("Report",$rows);
 		return $rows;
 	}
 
 	// return menu links of APPROVED and NOT DELETED report IDs for a given a user ID as member
-	function & getReportsforNav() {
+	function getReportsforNav() {
 		$repts = array();
 		$reports = $this->getReportsbyModulenId();
 
@@ -140,23 +140,23 @@ class ReportService extends DbService {
 	}
 
 	// return list of members attached to a report for given report ID
-	function & getReportMembers($id) {
+	function getReportMembers($id) {
 		return $this->getObjects("ReportMember",array("report_id"=>$id,"is_deleted"=>0));
 	}
 
 	// return member for given report ID and user id
-	function & getReportMember($id, $uid) {
+	function getReportMember($id, $uid) {
 		return $this->getObject("ReportMember",array("report_id"=>$id,"user_id"=>$uid));
 	}
 
 	// return a users full name given their user ID
-	function & getUserById($id) {
+	function getUserById($id) {
 		$u = $this->w->Auth->getUser($id);
 		return $u ? $u->getFullName() : "";
 	}
 
 	// for parameter dropdowns, run SQL statement and return an array(value,title) for display
-	function & getFormDatafromSQL($sql) {
+	function getFormDatafromSQL($sql) {
 		$rows = $this->_db->sql($sql)->fetch_all();
 		if ($rows) {
 			foreach ($rows as $row) {
@@ -167,17 +167,17 @@ class ReportService extends DbService {
 	}
 
 	// given a report SQL statement, return recordset
-	function & getRowsfromSQL($sql) {
+	function getRowsfromSQL($sql) {
 		return $this->_db->sql($sql)->fetch_all();
 	}
 
 	// given a report SQL statement, return recordset
-	function & getExefromSQL($sql) {
+	function getExefromSQL($sql) {
 		return $this->_db->sql($sql)->execute();
 	}
 
 	// convert dd/mm/yyyy date to yyy-mm-dd for SQL statements
-	function & date2db($date) {
+	function date2db($date) {
 		if ($date) {
 			list($d,$m,$y) = preg_split("/\/|-|\./", $date);
 			return $y."-".$m."-".$d;
@@ -185,7 +185,7 @@ class ReportService extends DbService {
 	}
 
 	// return all tables in the DB for display
-	function & getAllDBTables() {
+	function getAllDBTables() {
 		global $db_config;
 		$dbtbl = array();
 		$sql = "show tables in ".$db_config['database'];
@@ -200,7 +200,7 @@ class ReportService extends DbService {
 	}
 
 	// return array of fields/type in a given table
-	function & getFieldsinTable($tbl) {
+	function getFieldsinTable($tbl) {
 		$dbflds = "";
 
 		if ($tbl != "") {
@@ -219,7 +219,7 @@ class ReportService extends DbService {
 		return $dbflds;
 	}
 
-	function & getSQLStatementType($report_code) {
+	function getSQLStatementType($report_code) {
 		// return our list of SQL statements
 		//		preg_match_all("/@@[a-zA-Z0-9_\s\|,;\(\)\{\}<>\/\-='\.@:%\+\*\$]*?@@/",preg_replace("/\n/"," ",$report_code), $arrsql);
 		preg_match_all("/@@.*?@@/",preg_replace("/\n/"," ",$report_code), $arrsql);
@@ -248,7 +248,7 @@ class ReportService extends DbService {
 	}
 
 	// create an array of available report output formats for inclusion in the parameters form
-	function & selectReportFormat() {
+	function selectReportFormat() {
 		$arr = array();
 		$arr[] = array("Web Page","html");
 		$arr[] = array("Comma Delimited File","csv");
@@ -437,7 +437,7 @@ class ReportService extends DbService {
 	}
 
 	// function to check syntax of report SQL statememnt
-	function & getcheckSQL($sql) {
+	function getcheckSQL($sql) {
 		// checking for rows will return false if no data is returned, even if SQL is ok
 		// so let's just run the statement and try to catch any exceptions otherwise SQL runs ok
 		try {
