@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-        <title><?=ucfirst($w->currentModule())?><?=$title?' - '.$title:''?></title>
-        <link rel="icon" href="<?=$webroot?>/templates/img/favicon.png" type="image/png"/>
-        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/templates/css/style.css" />
-        <link rel="stylesheet" type="text/css" href="<?=$webroot?>/templates/css/liveValidation.css" />
-        <script type="text/javascript" src="<?=$webroot?>/system/js/jquery-1.4.2.min.js" ></script>
-        <script type="text/javascript" src="<?=$webroot?>/system/js/livevalidation.js"></script>
-        <script type="text/javascript" src="<?=$webroot?>/system/js/main.js"></script>
+        <title><?php echo ucfirst($w->currentModule()); ?><?php echo !empty($title) ? ' - ' . $title : ''; ?></title>
+        <link rel="icon" href="<?php echo $webroot; ?>/templates/img/favicon.png" type="image/png"/>
+        <link rel="stylesheet" type="text/css" href="<?php echo $webroot; ?>/templates/css/style.css" />
+        <link rel="stylesheet" type="text/css" href="<?php echo $webroot; ?>/templates/css/liveValidation.css" />
+        <script type="text/javascript" src="<?php echo $webroot; ?>/system/js/jquery-1.4.2.min.js" ></script>
+        <script type="text/javascript" src="<?php echo $webroot; ?>/system/js/livevalidation.js"></script>
+        <script type="text/javascript" src="<?php echo $webroot; ?>/system/js/main.js"></script>
         <?php echo !empty($htmlheader) ? $htmlheader : '';?>
     </head>
     <body>

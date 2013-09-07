@@ -10,11 +10,15 @@ function forgotpassword_GET(Web $w) {
 function forgotpassword_POST(Web $w) {
 	$login = $w->request("login");
 	$user = $w->Auth->getUserForLogin($login);
+	$responseString = "If this account exists then a password reset email has been just to the associated email address.";
+	
+	// For someone trying to gain access to a system, this is one of the
+	// easiest ways to find a valid login, using the security through obscurity
+	// principle, we dont tell them if it was a valid user or not, and we can log if they get it wrong
 	if (!$user) {
-		$w->error("Wrong login.","/auth/login");
+		$w->msg($responseString,"/auth/login");
 	}
-	// do something
 	
 	// explain
-	$w->msg("Please check you email for instructions how to reset your password.","/auth/login");
+	$w->msg($responseString,"/auth/login");
 }
