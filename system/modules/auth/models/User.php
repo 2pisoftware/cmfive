@@ -16,10 +16,13 @@ class User extends DbObject {
 	public $contact_id;
 	public $is_deleted;
 	public $is_group;
+	public $password_reset_token;
 
 	public $_roles;
 	public $_contact;
 
+	public $_modifiable;
+	
 	function delete($force = false) {
 		$contact = $this->getContact();
 		if ($contact) {

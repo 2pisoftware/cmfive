@@ -540,7 +540,6 @@ class DbObject extends DbService {
 		foreach (get_object_vars($this) as $k => $v) {
 			if ($k{0} != "_" && $k != "w") { // ignore volatile vars
 				$dbk = $this->getDbColumnName($k);
-
 				if (strpos($k,"dt_") === 0 ) {
 					if ($v) {
 						$v = $this->time2Dt($v);

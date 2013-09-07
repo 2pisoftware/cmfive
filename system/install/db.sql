@@ -275,6 +275,9 @@ CREATE TABLE IF NOT EXISTS `user` (
   UNIQUE KEY `login` (`login`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+-- Change to add password reset token
+ALTER TABLE  `user` ADD  `password_reset_token` VARCHAR( 32 ) NULL AFTER  `contact_id` ;
+
 --
 -- Dumping data for table `user`
 --
