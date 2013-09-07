@@ -28,7 +28,7 @@
 		});
 
 	var task_url = "/task/taskAjaxSelectbyTaskGroup?id="; 
-	$("select[id='task_group_id'] option").click(function() {
+	$("select[id='task_group_id']").live("change",function() {
 		$.getJSON(
 			task_url + $(this).val(),
 			function(result) {
