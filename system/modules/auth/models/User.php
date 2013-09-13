@@ -221,12 +221,12 @@ class User extends DbObject {
 	 * @param unknown $password
 	 * @return string
 	 */
-	function encryptPassword($password) {
+	public static function encryptPassword($password) {
 		global $PASSWORD_SALT;
 		return sha1($PASSWORD_SALT.$password);
 	}
 
-	function setPassword($password) {
+	public function setPassword($password) {
 		$this->password = $this->encryptPassword($password);
 	}
 
