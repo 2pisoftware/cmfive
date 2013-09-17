@@ -150,7 +150,7 @@ class DbObject extends DbService {
 
 	public function __get($name) {
 		// cater for modifiable aspect!
-		if ($this->_modifiable) {
+		if (isset($this->_modifiable)) {
 			if ($name == "dt_created") {
 				return $this->_modifiable->getCreatedDate();
 			}

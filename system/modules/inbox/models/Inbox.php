@@ -25,7 +25,7 @@ class Inbox extends DbObject {
 		return $this->_message;
 	}
 
-	function & getSender() {
+	function getSender() {
 		if ($this->sender_id) {
 			return $this->Auth->getUser($this->sender_id);
 		} else {
@@ -33,7 +33,7 @@ class Inbox extends DbObject {
 		}
 	}
 
-	function & getParentMessage() {
+	function getParentMessage() {
 		if(!$this->parent_message_id == 0){
 			$message = $this->getMessage($this->parent_message_id);
 			$message_arr[$this->parent_message_id] = $message;
