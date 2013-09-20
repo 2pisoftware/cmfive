@@ -725,7 +725,8 @@ class Web {
         $match = array();
         for($i=0;$i<func_num_args();$i++) {
             $param = func_get_arg($i);
-            $val = urldecode($this->_paths[$i]);
+            $val = urldecode(!empty($this->_paths[$i]) ? $this->_paths[$i] : "");
+            
             if (is_array($param)) {
                 $key = $param[0];
                 if (!$val) {
