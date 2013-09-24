@@ -142,7 +142,7 @@ class DbService {
 	 * 
 	 * @return <type>
 	 */
-	function & getObjects($class,$where=null,$cache_list = false, $use_cache = true) {
+	function getObjects($class,$where=null,$cache_list = false, $use_cache = true) {
 		if (!$class) return null;
 
 		// if using the list cache

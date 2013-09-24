@@ -7,8 +7,6 @@ class TaskGroupMember extends DbObject {
 	public $priority;		// number to assign placement in user's list of groups
 	public $is_active;
 
-	// actual table name
-	function getDbTableName() {
-		return "task_group_member";
-	}
+	public static $_db_table = "task_group_member";
+
 }

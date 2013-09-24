@@ -654,8 +654,11 @@ class DbObject extends DbService {
 	 * @return String
 	 */
 	function getDbTableName() {
-		if (property_exists($this, "_db_table") && $this->_db_table) {
+		if (isset($this->_db_table)) {
 			return $this->_db_table;
+		}
+		if (isset(static::$_db_table)) {
+			return static::$_db_table;
 		}
 		return strtolower(get_class($this));
 	}

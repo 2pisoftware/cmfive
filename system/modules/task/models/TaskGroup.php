@@ -21,10 +21,7 @@ class TaskGroup extends DbObject {
 	
 	public $_modifiable;
 	
-	// actual table name
-	function getDbTableName() {
-		return "task_group";
-	}
+	public static $_db_table = "task_group";
 	
 	// get my member object. compare my role with group role required to view task group
 	function getCanIView() {

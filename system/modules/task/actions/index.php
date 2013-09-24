@@ -68,17 +68,17 @@ function index_ALL(Web $w) {
 						if ($statuses){
 						foreach ($statuses as $stat) {
 							// build URLS with query string to feed task list filter
-							$msurl = "<a title=\"View your " . $stat[0] . " " . $typetitle . " Tasks\" href=\"" . $webroot . "/task/tasklist/?assignee=" . $_SESSION['user_id'] . "&taskgroups=" . $grpid . "&tasktypes=" . $type . "&status=" . $stat[0] . "\">";
-							$mysurl = (count($mytasks[$type][$stat[0]]) > 0) ? $msurl : "";
-							$nsurl = "<a title=\"View " . $stat[0] . " " . $typetitle . " Tasks\" href=\"" . $webroot . "/task/tasklist/?assignee=&taskgroups=" . $grpid . "&tasktypes=" . $type . "&status=" . $stat[0] . "\">";
-							$nosurl = (count($alltasks[$type][$stat[0]]) > 0) ? $nsurl : "";
+							$msurl = "<a title=\"View your " . $stat[0] . " " . $typetitle . " Tasks\" href=\"" . WEBROOT . "/task/tasklist/?assignee=" . $_SESSION['user_id'] . "&taskgroups=" . $grpid . "&tasktypes=" . $type . "&status=" . $stat[0] . "\">";
+							$mysurl = isset($mytasks[$type][$stat[0]]) && (count($mytasks[$type][$stat[0]]) > 0) ? $msurl : "";
+							$nsurl = "<a title=\"View " . $stat[0] . " " . $typetitle . " Tasks\" href=\"" . WEBROOT . "/task/tasklist/?assignee=&taskgroups=" . $grpid . "&tasktypes=" . $type . "&status=" . $stat[0] . "\">";
+							$nosurl = isset($alltasks[$type][$stat[0]]) && (count($alltasks[$type][$stat[0]]) > 0) ? $nsurl : "";
 							$eurl = "</a>";
-							$myeurl = (count($mytasks[$type][$stat[0]]) > 0) ? $eurl : "";
-							$noeurl = (count($alltasks[$type][$stat[0]]) > 0) ? $eurl : "";
+							$myeurl = isset($mytasks[$type][$stat[0]]) && (count($mytasks[$type][$stat[0]]) > 0) ? $eurl : "";
+							$noeurl = isset($alltasks[$type][$stat[0]]) && (count($alltasks[$type][$stat[0]]) > 0) ? $eurl : "";
 							$hds[$stat[0]] = $stat[0];
 						
-							$left = count($mytasks[$type][$stat[0]]);
-							$right = count($alltasks[$type][$stat[0]]);
+							$left = isset($mytasks[$type][$stat[0]]) ? count($mytasks[$type][$stat[0]]) : 0;
+							$right = isset($alltasks[$type][$stat[0]]) ? count($alltasks[$type][$stat[0]]) : 0;
 							if ($left > 0 || $right > 0) {
 								$t[] = $mysurl.$left.$myeurl . " : " . $nosurl.$right.$noeurl;
 							} else {
@@ -96,10 +96,10 @@ function index_ALL(Web $w) {
 					$showtasks = Html::table($grouptasks,null,"tablesorter",true);
 	
 					// continue building accordion with stats gather for current group > task types > statuses
-					$strOut .= '<div class="task-group-list">';
+					$strOut = '<div class="task-group-list">';
 					$strOut .=	"<h3>" . $grouptitle . " " . count($mygrptasks) . "/" . count($opentasks) . "</h3>";
 					$strOut .= $showtasks;
-					$strOut .= "<div style=\"text-align:right;margin-top:-8px;\"><a href=\"" . $webroot . "/task/tasklist/?assignee=&taskgroups=" . $grpid . "\">List Tasks</a> " . $newtasklink . $taskweek . "</div>";
+					$strOut .= "<div style=\"text-align:right;margin-top:-8px;\"><a href=\"" . WEBROOT . "/task/tasklist/?assignee=&taskgroups=" . $grpid . "\">List Tasks</a> " . $newtasklink . $taskweek . "</div>";
 					$strOut .=	"</div>";
 	
 					// reset all array used in counts and continue to next group or end

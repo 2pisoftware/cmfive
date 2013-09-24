@@ -725,11 +725,13 @@ class Web {
         $match = array();
         for($i=0;$i<func_num_args();$i++) {
             $param = func_get_arg($i);
-            $val = sizeof($this->_paths) > 0 ? urldecode($this->_paths[$i]) : null;
+            
+            $val = !empty($this->_paths[$i]) ? urldecode($this->_paths[$i]) : null;
+
             if (is_array($param)) {
                 $key = $param[0];
-                if (!$val) {
-                    $val = $param[1];
+                if (is_null($val) && isset($param[1])) {
+                    $val = $param[1]; // use default parameter
                 }
             } else {
                 $key = $param;
