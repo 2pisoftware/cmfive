@@ -10,8 +10,5 @@ class TaskTime extends  DbObject {
 	public $is_suspect;	// suspect/accept toggle
 	public $is_deleted;	// is deleted flag
 	
-	// actual table name
-	function getDbTableName() {
-		return "task_time";
-	}
+	public static $_db_table = "task_time";
 }

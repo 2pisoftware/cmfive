@@ -120,7 +120,7 @@ class TaskType_ProgrammingTicket extends TaskType {
 	}
 
 	function getTaskTypeDescription() {
-		return "Use this to report any issue or feature request for Taskilo.";
+		return "Use this to report any issue or feature request.";
 	}
 
 	function getFieldFormArray(TaskGroup $taskgroup) {
@@ -162,34 +162,3 @@ class TaskType_ProgrammingTicket extends TaskType {
 	}
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
