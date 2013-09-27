@@ -136,7 +136,7 @@ class Web {
     	session_start();
 
         //$this->debug("Start processing: ".$_SERVER['REQUEST_URI']);
-
+      
         // find out which module to use
         $module_found = false;
         $action_found = false;

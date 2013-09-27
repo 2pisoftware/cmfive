@@ -148,8 +148,9 @@ class DbService {
 		// if using the list cache
 		if ($cache_list) {
 			if (is_array($where)) {
+                                $key = "";
 				foreach ($where as $k=>$v) {
-					$key.=$k."::".$v."::";
+					$key .= $k."::".$v."::";
 				}
 			} else {
 				$key = $where;

@@ -331,7 +331,11 @@ class Html {
         $hidden = "";
         $id = $id ? ' id="'.$id.'"' : null;
         $class = $class ? ' class="'.$class.'"' : null;
-        $buf = ($includeFormTag == true ? '<form'.$id.$class.' action="'.$action.'" method="'.$method.'" target="'.$target.'">' : "")."<table  cellspacing=\"0\" ".$id.$class." class='form-wrapper'>\n";
+        $buf = "";
+        if ($includeFormTag == true)
+            $buf .= '<form'.$id.$class.' action="'.$action.'" method="'.$method.'" target="'.$target.'">';
+        
+        $buf .= "<table  cellspacing=\"0\" ".$id.$class." class='form-wrapper'>\n";
         $valign = ' valign="top" ';
         foreach ($data as $section => $rows) {
             $buf .= "<tr>";
@@ -389,7 +393,7 @@ class Html {
                     } else if ($type == "select") {
                         $items = !empty($field[4]) ? $field[4] : null;
                         
-                        $default = $field[5]=='NoDefault' ; // only values should be displayed without '--Select--' option !
+                        $default = !empty($field[5]) ? $field[5] == 'NoDefault' : false; // only values should be displayed without '--Select--' option !
                         $buf.= "<td  $valign class='fieldtitle'>".htmlentities($title)."</td><td  $valign class='fieldvalue'>";
                         if ($readonly == ""){
                             $buf.= Html::select($name,$items,$value,null,"width: 100%;",$default ? null : "-- Select --",$readonly!="");

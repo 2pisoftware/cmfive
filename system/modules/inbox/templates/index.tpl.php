@@ -106,7 +106,7 @@ if($w->service('Inbox')->inboxCountMarker()){
 	print "&nbsp;";
 	print Html::b($w->localUrl("/inbox/allread"),"Mark all read","Are you sure to mark all messages as read?");
 }
-if ($new) {
+if (!empty($new)) {
 	$newqlines = array(array("<input type='checkbox' id='allChk' onclick='selectAll()' />","Subject","Date","Sender"));
 	$total_new_count = 0;
 	foreach ($new as $q => $in) {
