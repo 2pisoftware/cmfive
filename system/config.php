@@ -4,7 +4,7 @@
 ini_set('gc_maxlifetime', 60*60*6);
 
 //========== Constants =====================================
-define("CMFIVE_VERSION","0.5.0");
+define("CMFIVE_VERSION","0.6.0");
 
 define("LIBPATH", str_replace("\\", "/", dirname(__FILE__).'/lib'));
 define("SYSTEM_LIBPATH", str_replace("\\", "/", dirname(__FILE__).'/system/lib'));

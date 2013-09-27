@@ -22,7 +22,7 @@ class AComment extends DbObject{
 	public $obj_id;
 	public $comment;     // text
 	
-	public $is_internal; // 1 - is_internal - will be displayed only for PP roles ; Default is 0.
+	public $is_internal; // 1 - is_internal - will be displayed only for internal roles ; Default is 0.
 	public $is_system;   // 1 - is system generated comment (on attachment Upload/Delete); Default is 0.
 	
 	public $creator_id;
@@ -32,10 +32,7 @@ class AComment extends DbObject{
 	
 	public $is_deleted;
 	
-	
-	function getDbTableName() {
-		return "comment";
-	}
+	public static $_db_table = "comment";
 	
 	/*
 	 * Output Example:
