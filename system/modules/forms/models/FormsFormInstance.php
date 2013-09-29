@@ -11,6 +11,8 @@ class FormsFormInstance extends DbObject {
 	public $creator_id;
 	public $modifier_id;
 	
+	public static $_db_table = "forms_form_instance";
+	
 	function getData() {
 		return $this->getObjects("FormsFormInstanceData",array("form_instance_id",$this->id));	
 	}
@@ -22,8 +24,5 @@ class FormsFormInstance extends DbObject {
 	function getAttachments() {
 		return $this->File->getAttachments($this);
 	}
-	
-	function getDbTableName() {
-		return "forms_form_instance";
-	}
+
 }

@@ -12,11 +12,10 @@ class FormsApplicationMember extends DbObject {
 	public $dt_modified;
 	public $modifier_id;
 	
+	public static $_db_table = "forms_application_member";
+	
 	static function getRoles() {
 		return explode(',',"Administrator,Creator,User");
 	}
 	
-	function getDbTableName() {
-		return "forms_application_member";
-	}
 }

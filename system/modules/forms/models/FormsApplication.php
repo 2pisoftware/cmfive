@@ -20,6 +20,8 @@ class FormsApplication extends DbObject {
 	public $creator_id;
 	public $modifier_id;
 	
+	public static $_db_table = "forms_application";
+	
 	/**
 	 * 
 	 * return all forms for this application
@@ -57,19 +59,16 @@ class FormsApplication extends DbObject {
 	
 	}
 
-	function insert() {
+	function insert($force_validation = false) {
 		$this->slug = toSlug($this->title);
 		parent::insert();
 	}
 	
-	function delete($force) {
+	function delete($force = false) {
 		// check if there's data in any of the forms
 		// then decide what to do with it before
 		// deleting it
 		parent::delete($force);
 	}
 	
-	function getDbTableName() {
-		return "forms_application";
-	}
 }

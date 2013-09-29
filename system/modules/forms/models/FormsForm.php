@@ -14,6 +14,8 @@ class FormsForm extends DbObject {
 	public $creator_id;
 	public $modifier_id;
 
+	public static $_db_table = "forms_form";
+	
 	/**
 	 * 
 	 * return all fields for this form
@@ -41,19 +43,16 @@ class FormsForm extends DbObject {
 		return $this->getObjects("FormsFormInstance",$where);
 	}
 	
-	function delete($force) {
+	function delete($force = false) {
 		// check if there's data in any of the forms
 		// then decide what to do with it before
 		// deleting it
 		parent::delete($force);
 	}
 	
-	function insert() {
+	function insert($force_validation = false) {
 		$this->slug = toSlug($this->title);
 		parent::insert();
 	}
-	
-	function getDbTableName() {
-		return "forms_form";
-	}
+
 }

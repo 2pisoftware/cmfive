@@ -20,16 +20,14 @@ class FormsFormInstanceData extends DbObject {
 	public $creator_id;
 	public $modifier_id;
 	
+	public static $_db_table = "forms_form_instance_data";
+	
 	function getFormInstance() {
 		return $this->getObject("FormsFormInstance", $this->form_instance_id);
 	}
 
 	function getFormField() {
 		return $this->getObject("FormsFormField", $this->form_field_id);
-	}
-	
-	function getDbTableName() {
-		return "forms_form_instance_data";
 	}
 	
 	
