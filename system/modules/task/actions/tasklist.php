@@ -6,7 +6,7 @@ function tasklist_ALL(Web $w) {
 	// prepare default filter dropdowns
 	// get WHO to return relevant tasks:
 	//		a selected assignee, a blank assignee = all assignee's, no assignee = tasks assigned to me
-	$who = (!array_key_exists("assignee",$_REQUEST)) ? $_SESSION['user_id'] : $_REQUEST['assignee'];
+	$who = (!array_key_exists("assignee",$_REQUEST)) ? $_SESSION['user_id'] : $w->request('assignee');
 
 	// for those groups of which i am a member, get list of all members for display in Assignee & Creator dropdowns
 	$mygroups = $w->Task->getMemberGroups($_SESSION['user_id']);
@@ -127,8 +127,8 @@ function tasklist_ALL(Web $w) {
 	$line = array_merge($hds, $line);
 
 	// if logged in user is owner of current group, display button to edit the task group
-	$btnedit = Html::b("/task-group/viewmembergroup/".$_REQUEST['taskgroups']," Edit Task Group ");
-	$grpedit = ($_REQUEST['taskgroups'] != "") && ($w->Task->getIsOwner($_REQUEST['taskgroups'], $_SESSION['user_id'])) ? $btnedit : "";
+	$btnedit = Html::b("/task-group/viewmembergroup/".$w->request('taskgroups')," Edit Task Group ");
+	$grpedit = ($w->request('taskgroups') != "") && ($w->Task->getIsOwner($w->request('taskgroups'), $_SESSION['user_id'])) ? $btnedit : "";
 	$w->ctx("grpedit",$grpedit);
 
 	// display task list

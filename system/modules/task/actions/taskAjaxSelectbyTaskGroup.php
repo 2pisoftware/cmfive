@@ -2,7 +2,7 @@
 // Create Task: selecting Task Type dynamically loads the related task types, proprity and assignee's
 
 function taskAjaxSelectbyTaskGroup_ALL(Web $w) {
-	$tid = $_REQUEST['id'];
+	$tid = $w->request('id');
 	$t = $w->Task->getTaskGroup($tid);
 
 	$tasktypes = ($t != "") ? $w->Task->getTaskTypes($t->task_group_type) : array();

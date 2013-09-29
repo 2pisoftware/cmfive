@@ -9,11 +9,12 @@ function updatetask_POST(Web &$w) {
 	// if task exists, first gather changes for display in comments
 	if ($task) {
 		// if no due date, make 1 month from now
-		if ($_REQUEST['dt_due'] == "")
-		$_REQUEST['dt_due'] = $w->Task->getNextMonth();
+		if (empty($w->request('dt_due'))) { 
+			$_POST['dt_due'] = $w->Task->getNextMonth();
+		}
 
 		// convert dates to d/m/y for display. if assignee changes, get name of new assignee
-		foreach ($_REQUEST as $name => $value) {
+		foreach ($_POST as $name => $value) {
 			if (startsWith($name,"dt_")) {
 				list($d,$m,$y) = preg_split('/\//',$value);
 				$value = Date("U",strtotime($y . "-" . $m . "-" . $d));
@@ -30,8 +31,8 @@ function updatetask_POST(Web &$w) {
 
 
 		// update the task
-		$_REQUEST['dt_assigned'] = Date('c');
-		$task->fill($_REQUEST);
+		$_POST['dt_assigned'] = Date('c');
+		$task->fill($_POST);
 
 		// if task has a 'closed' status, set flag so task no longer appear in dashboard count or task list
 		if ($task->getisTaskClosed()) {
@@ -47,7 +48,7 @@ function updatetask_POST(Web &$w) {
 		// if we have comments, add them
 		if ($comments) {
 			$comm = new TaskComment($w);
-			$comm->fill($_REQUEST);
+			$comm->fill($_POST);
 			$comm->obj_table = $task->getDbTableName();
 			$comm->obj_id = $task->id;
 			$comm->comment = $comments;
@@ -63,14 +64,14 @@ function updatetask_POST(Web &$w) {
 	// if there is current no task data, but relevant input in the REQUEST object, create the task data
 	if ($taskdata) {
 		foreach ($taskdata as $td) {
-			$arr = array("value"=>$_REQUEST[$td->key]);
+			$arr = array("value"=>$w->request($td->key));
 			$td->fill($arr);
 			$td->update();
 			unset($arr);
 		}
 	}
 	else {
-		foreach ($_REQUEST as $name => $value) {
+		foreach ($_POST as $name => $value) {
 			if ($name != "FLOW_SID") {
 				$tdata = new TaskData($w);
 				$arr = array("task_id"=>$task->id,"key"=>$name,"value"=>$value);

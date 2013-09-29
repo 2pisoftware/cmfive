@@ -4,7 +4,7 @@ function taskAjaxTypetoPriority_ALL(Web &$w) {
 	$priority = array();
 
 	// split the query string into type, group and assignee
-	list($type, $group, $assignee) = preg_split('/_/',$_REQUEST['id']);
+	list($type, $group, $assignee) = preg_split('/_/',$w->request('id'));
 
 	// organise criteria
 	$who = ($assignee != "") ? $assignee : null;

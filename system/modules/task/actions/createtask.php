@@ -20,8 +20,8 @@ function createtask_GET(Web &$w) {
 			}
 		}
 
-		if ($_REQUEST['gid'] != "") {
-			$t = $w->Task->getTaskGroup($_REQUEST['gid']);
+		if ($w->request($key) != "") {
+			$t = $w->Task->getTaskGroup($w->request('gid'));
 
 			$tasktypes = ($t != "") ? $w->Task->getTaskTypes($t->task_group_type) : array();
 			$priority = ($t != "") ? $w->Task->getTaskPriority($t->task_group_type) : array();
@@ -41,7 +41,7 @@ function createtask_GET(Web &$w) {
 		// build form
 		$f = Html::form(array(
 		array("Create a New Task - Step One","section"),
-		array("Task Group","select","task_group_id",$_REQUEST['gid'],$mytaskgroups),
+		array("Task Group","select","task_group_id",$w->request('gid'),$mytaskgroups),
 		array("Task Title","text","title"),
 		array("Task Type","select","task_type",null,$tasktypes),
 		array("Priority","select","priority",null,$priority),
@@ -58,7 +58,7 @@ function createtask_POST(Web &$w) {
 	TaskLib::task_navigation($w, "Create Task");
 
 	// unserialise input from step I and store in array: arr_req
-	$arr_req = unserialize($_REQUEST['formone']);
+	$arr_req = unserialize($w->request('formone'));
 
 	// set relevant dt variables with: Today.
 	$arr_req['dt_assigned'] = Date('c');
@@ -72,7 +72,7 @@ function createtask_POST(Web &$w) {
 	// if insert is successful, store additional fields as task data
 	// we do not want to store data from step I, the task_id (as a key=>value pair) nor the FLOW_SID
 	if ($task->id) {
-		foreach ($_REQUEST as $name => $value) {
+		foreach ($_POST as $name => $value) {
 			if (($name != "formone") && ($name != "FLOW_SID") && ($name != "task_id")) {
 				$tdata = new TaskData($w);
 				$arr = array("task_id"=>$task->id,"key"=>$name,"value"=>$value);

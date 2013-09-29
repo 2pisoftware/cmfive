@@ -4,7 +4,7 @@ function taskAjaxGrouptoType_ALL(Web &$w) {
 	$types = array();
 
 	// split query string into group and assignee
-	list($group, $assignee) = preg_split('/_/',$_REQUEST['id']);
+	list($group, $assignee) = preg_split('/_/',$w->request('id'));
 
 	// organise criteria
 	$who = ($assignee != "") ? $assignee : null;
