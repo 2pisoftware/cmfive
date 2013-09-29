@@ -134,7 +134,8 @@ class Web {
     	$sess = new SessionManager($this);
     	session_name(SESSION_NAME);
     	session_start();
-
+		$_SESSION['last_request'] = time();
+		
         //$this->debug("Start processing: ".$_SERVER['REQUEST_URI']);
       
         // find out which module to use

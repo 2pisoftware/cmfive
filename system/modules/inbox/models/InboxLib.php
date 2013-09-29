@@ -10,7 +10,7 @@ class InboxLib {
 			$w->menuLink("inbox","New Messages",$nav);
 			$w->menuLink("inbox/read","Read Messages",$nav);
 			$w->menuLink("inbox/showarchive","Archive",$nav);
-			$w->menuLink("inbox/trash","Trash",$nav);
+			$w->menuLink("inbox/trash","Bin",$nav);
 		}
 		$w->ctx("navigation", $nav);
 	}
