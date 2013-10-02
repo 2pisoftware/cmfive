@@ -51,7 +51,7 @@ class TemplateService extends DbService {
 	 * @param array $data
 	 * @return string
 	 */
-	function render($template, $data) {
+	function render($template, array $data) {
 		if (empty($template)) return;
 		
 		// falling through the options:
@@ -59,6 +59,9 @@ class TemplateService extends DbService {
 		// if passing a template's id
 		if (is_int($template)) {
 			$template = $this->getTemplate($template);
+			if ($template == null) {
+				return;
+			}
 		}
 		
 		// if passing a Template object
