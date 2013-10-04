@@ -22,12 +22,18 @@ class Template extends DbObject {
 	
 	protected $_db_table = "template";
 	
-	public function renderTitle(array $data) {
+	public function renderTitle($data) {
+            if (is_array($data))
 		return $this->Template->render($this->template_title,$data);
+            else 
+                return null;
 	}
 
-	public function renderBody(array $data) {
+	public function renderBody($data) {
+            if (is_array($data))
 		return $this->Template->render($this->template_body,$data);
+            else
+                return null;
 	}
 	
 	public function testTitle() {

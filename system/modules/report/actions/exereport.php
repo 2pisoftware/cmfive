@@ -10,9 +10,9 @@ function exereport_ALL(Web &$w) {
 		$arrreq[] = $name ."=" . urlencode($value);
 	}
 
-	$viewurl = $webroot . "/report/viewreport/" . $p['id'];
-	$runurl = $webroot . "/report/runreport/" . $p['id'] . "/?" . implode("&",$arrreq);
-	$repurl = $webroot . "/report/exereport/" . $p['id'] . "?";
+	$viewurl = "/report/viewreport/" . $p['id'];
+	$runurl = "/report/runreport/" . $p['id'] . "/?" . implode("&",$arrreq);
+	$repurl = "/report/exereport/" . $p['id'] . "?";
 	$strREQ = $arrreq ? implode("&",$arrreq) : "";
 	$urlcsv = $repurl . $strREQ . "&format=csv";
 	$urlpdf = $repurl . $strREQ . "&format=pdf";
@@ -86,7 +86,7 @@ function exereport_ALL(Web &$w) {
 							}
 						}
 
-						if ($ukey) {
+						if (!empty($ukey)) {
 							// now need to find key of fields to link
 							foreach ($tvalues as $m => $h) {
 								foreach ($ukey as $n => $u) {
@@ -140,7 +140,7 @@ function exereport_ALL(Web &$w) {
 						// put headings back into array
 						$t = array_merge($hds,$t);
 						// build results table
-						$results .= "<b>" . $title . "</b>" .  Html::table($t,null,"tablesorter",true) ;
+						$results = "<b>" . $title . "</b>" .  Html::table($t,null,"tablesorter",true) ;
 						// reset parameters string
 						$strcrumb = "";
 						unset($hds);

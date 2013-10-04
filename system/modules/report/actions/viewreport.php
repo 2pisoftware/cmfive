@@ -41,7 +41,7 @@ function viewreport_GET(Web &$w) {
 				),$w->localUrl("/report/editreport/".$rep->id),"POST"," Update Report ");
 
 				// provide a button by which the report may be tested, ie. executed
-				$btntestreport = Html::b($webroot."/report/runreport/".$rep->id," Test the Report ");
+				$btntestreport = Html::b("/report/runreport/".$rep->id," Test the Report ");
 				$w->ctx("btntestreport",$btntestreport);
 					
 				// create form providing view of tables and fields
@@ -101,7 +101,7 @@ function viewreport_GET(Web &$w) {
 	// return the form for display and edit
 	$w->ctx("viewreport",$f);
 
-	$btnrun = Html::b($webroot."/report/runreport/".$rep->id, " Execute Report ");
+	$btnrun = Html::b("/report/runreport/".$rep->id, " Execute Report ");
 	$w->ctx("btnrun",$btnrun);
 
 

@@ -8,10 +8,10 @@
 			<table cellpadding=2 cellspacing=2 border=0>
 			<tr valign=top>
 			<td>
-			<?php  echo $createfeed; ?>
-			<?php echo $feedurl; ?>
+			<?php echo !empty($createfeed) ? $createfeed : ''; ?>
+			<?php echo !empty($feedurl) ? $feedurl : ''; ?>
 			</td>
-			<td><span id="feedtext"><?php echo $feedtext; ?></span></td>
+			<td><span id="feedtext"><?php echo !empty($feedtext) ? $feedtext : ''; ?></span></td>
             </tr>
             </table>
 		</div>

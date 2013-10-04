@@ -49,9 +49,9 @@ function createtask_GET(Web &$w) {
 		array("Description","textarea","description",null,"80","15"),
 		array("Assigned To","select","first_assignee_id",null,$members),
 		),$w->localUrl("/task/tasktypeform/"),"POST"," Continue >> ");
+
+                $w->ctx("createtask",$f);
 	}
-	// display form
-	$w->ctx("createtask",$f);
 }
 
 function createtask_POST(Web &$w) {

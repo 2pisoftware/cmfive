@@ -100,7 +100,7 @@ thead {
 $readcount = 0;
 print "<button onclick='deleteMessage()'>Delete</button>";
 $qlines = array(array("<input type='checkbox' id='allChk' onclick='selectAll()' />","Subject","Date","Sender"));
-if ($new_arch) {
+if (!empty($new_arch)) {
 	$count = 0;
 	foreach ($new_arch as $q) {
 		$count++;
@@ -115,7 +115,7 @@ if ($new_arch) {
 	$count == 1 ? $appstr = " unread archived message." : $appstr = " unread archived messages.";
 }
 
-if ($arch) {
+if (!empty($arch)) {
 //	$qlines = array(array("Subject","Date","Sender"));
 	foreach ($arch as $q) {
 		$line = array();
@@ -129,7 +129,7 @@ if ($arch) {
 }
 
 print Html::table($qlines,null,"tablesorter",true);
-$last_page = ceil($readtotal/40);
+$last_page = ceil($readcount/40);
 	$minPage = ($pgnum*1)-5;
 	($minPage <= 0) ? $minPage = 1 : '';
 	//print $minPage . "\n";

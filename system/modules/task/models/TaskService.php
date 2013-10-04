@@ -307,7 +307,7 @@ class TaskService extends DbService {
 
     // return all resulting tasks from the database modified in the last week
 	function getTaskWeek($group, $assignee, $from, $to) {
-		$grps = $who = "";
+		$grps = $who = $grplist = "";
 
 		// if no group supplied, get all my groups
 		if ($group != "") {

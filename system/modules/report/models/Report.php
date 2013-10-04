@@ -53,13 +53,16 @@ class Report extends DbObject {
 						$f = preg_replace($patterns, $replacements, $f);
 
 						// split element on ||. rules provide for at most 4 parts in strict order
-						list($name,$type,$label,$sql) = preg_split("/\|\|/", $f);
-						$name = trim($name);
-						$type = trim($type);
-						$label = trim($label);
-						$sql = trim($sql);
+                                                $name = $type = $label = $sql = null;
+						// list($name,$type,$label,$sql) = preg_split("/\|\|/", $f);
+                                                $split_arr = preg_split("/\|\|/", $f);
+						$name = trim(!empty($split_arr[0]) ? $split_arr[0] : '');
+						$type = trim(!empty($split_arr[1]) ? $split_arr[1] : '');
+						$label = trim(!empty($split_arr[2]) ? $split_arr[2] : '');
+						$sql = trim(!empty($split_arr[3]) ? $split_arr[3] : '');
 
-						$sql = $this->Report->putSpecialSQL($sql);
+                                                if ($sql !== "")
+                                                    $sql = $this->Report->putSpecialSQL($sql);
 
 						// do something different based on form element type
 						switch ($type) {
@@ -83,14 +86,14 @@ class Report extends DbObject {
 									$values = array("No SQL statement");
 								}
 								// complete array which becomes form dropdown
-								$arr[] = array($label,$type,$name,$_REQUEST[$name],$values);
+								$arr[] = array($label,$type,$name,$this->w->request($name),$values);
 								break;
 							case "checkbox":
 							case "text":
 							case "date":
 							default:
 								// complete array which becomes other form element type
-								$arr[] = array($label,$type,$name,$_REQUEST[$name]);
+								$arr[] = array($label,$type,$name,$this->w->request($name));
 						}
 					}
 				}

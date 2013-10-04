@@ -121,8 +121,8 @@ function tasklist_ALL(Web $w) {
 	}
 
 	// if no tasks found, say as much
-	if (!$line)
-	$line = array(array("No Tasks found.","","","","","","","",""));
+	if (empty($line))
+            $line = array(array("No Tasks found.","","","","","","","",""));
 
 	$line = array_merge($hds, $line);
 

@@ -11,7 +11,7 @@ function permissionedit_GET(Web $w)
 
 	//fill in permission tables;
 	$groupUsers = $w->Auth->getUser($option['group_id'])->isInGroups();
-
+        $groupRoles = array();
 	if ($groupUsers)
 	{
 		foreach ($groupUsers as $groupUser)

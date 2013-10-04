@@ -15,7 +15,7 @@ function delete_ALL(Web &$w){
 }
 
 function trash_ALL(Web &$w){
-	InboxLib::inbox_navigation($w,'Bin',$nav);
+	InboxLib::inbox_navigation($w,'Bin');
 	$p = $w->pathMatch('num');
 	$num = $p['num'];
 	$num ? $num : $num = 1;

@@ -27,5 +27,6 @@ function viewform_GET(Web $w) {
 		$w->ctx("fieldtable",Html::table($lines,null,"tablesorter",true));
 	}
 	
-	
+	$w->ctx("form", $form);
+        $w->ctx("app", $app);
 }

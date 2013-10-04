@@ -18,6 +18,7 @@ function index_ALL(Web $w) {
 	// build accordion based on all tasks allocated to groups of which i am a member
 	// drilling down through group > task type > status
 	// if group permissions mean 'i can view' then show count of my tasks / group tasks
+        $strOut = '';
 	if ($group) {
 		foreach ($group as $grpid => $grptype) {
 			// i as arbitory value. really looking at array count

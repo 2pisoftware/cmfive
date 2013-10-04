@@ -1,6 +1,5 @@
 <?php
 function edit_GET(Web &$w){
-	WikiLib::wiki_navigation($w,$wiki,$page);
 	$pm = $w->pathMatch("wikiname","pagename");
 	try {
 		$wiki = $w->Wiki->getWikiByName($pm['wikiname']);
@@ -11,10 +10,10 @@ function edit_GET(Web &$w){
 	if (!$wp) {
 		$w->error("Page does not exist.","/wiki/index");
 	}
+        WikiLib::wiki_navigation($w,$wiki,$pm["pagename"]);
 	$w->ctx("wiki",$wiki);
 	$w->ctx("page",$wp);
 	$w->ctx("attachments",$w->service("File")->getAttachments($wp));
-	$w->ctx("title",$wiki->title." - ".$wp->name);
 }
 
 function edit_POST(Web &$w) {

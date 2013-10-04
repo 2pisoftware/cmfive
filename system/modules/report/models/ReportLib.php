@@ -35,9 +35,9 @@ class ReportLib {
 				$line[] = array(
 				$w->Report->getUserById($member->user_id),
 				$member->role,
-				Html::box($webroot."/report/editmember/".$report->id . "/". $member->user_id," Edit ", true) .
+				Html::box("/report/editmember/".$report->id . "/". $member->user_id," Edit ", true) .
 					"&nbsp;&nbsp;" . 
-				Html::box($webroot."/report/deletemember/".$report->id."/".$member->user_id," Delete ", true)
+				Html::box("/report/deletemember/".$report->id."/".$member->user_id," Delete ", true)
 				);
 			}
 		}

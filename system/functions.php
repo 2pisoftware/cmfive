@@ -100,6 +100,7 @@ function rotateImage($img, $rotation) {
 }
 
 function lookupForSelect(&$w,$type) {
+    $select = array();
     $rows = $w->db->select("code,title")->from("lookup")->where("type",$type)->fetch_all();
     if ($rows) {
 	    foreach ($rows as $row) {
