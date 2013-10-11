@@ -77,12 +77,13 @@ class Html {
      * @param <type> $button (O) if true create a buttin instead of a link
      * @param <type> $iframe (O) whether to use an iframe to display the html contents (default: false)
      */
-    public static function box($href,$title,$button=false,$iframe=false,$width=null,$height=null,$param="isbox") {
+    public static function box($href,$title,$button=false,$iframe=false,$width=null,$height=null,$param="isbox",$id=null,$class=null) {
         $onclick = Html::boxOnClick($href,$iframe,$width,$height,$param);
         $tag = "a";
         if ($button) {
             $tag = "button";
         }
+                
         return "<".$tag.$onclick."><span>".$title."</span></".$tag.">";
     }
 
@@ -294,6 +295,17 @@ class Html {
     }
     
     /**
+     * This function invokes multiColForm with default parameters
+     * to remove unnecessary html when displaying data
+     * 
+     * @param Array $data
+     * @return String html
+     */
+    public static function multiColTable($data) {
+        return self::multiColForm($data, null, "", "", null, null, null, "", false);
+    }
+    
+    /**
      * Creates a complex form where each section can have
      * a different number of columns.
      * 
@@ -314,12 +326,16 @@ class Html {
      * @param <type> $extrabuttons
      * @return <type>
      */
-    public static function multiColForm($data, $action=null, $method="POST", $submitTitle="Save", $id=null, $class=null,$extrabuttons=null, $target="_self", $enctype = null) {
+    public static function multiColForm($data, $action=null, $method="POST", $submitTitle="Save", $id=null, $class=null,$extrabuttons=null, $target="_self", $includeFormTag = true) {
         if (!$data) return;
         $hidden = "";
         $id = $id ? ' id="'.$id.'"' : null;
         $class = $class ? ' class="'.$class.'"' : null;
-        $buf = '<form'.$id.$class.' action="'.$action.'" method="'.$method.'" target="'.$target.'">'."<table  cellspacing=\"0\" class='form-wrapper'>\n";
+        $buf = "";
+        if ($includeFormTag == true)
+            $buf .= '<form'.$id.$class.' action="'.$action.'" method="'.$method.'" target="'.$target.'">';
+        
+        $buf .= "<table  cellspacing=\"0\" ".$id.$class." class='form-wrapper'>\n";
         $valign = ' valign="top" ';
         foreach ($data as $section => $rows) {
             $buf .= "<tr>";
@@ -328,10 +344,10 @@ class Html {
             foreach ($rows as $row) {
                 $buf .= "<tr>";
                 foreach ($row as $field) {
-                    $title = $field[0];
-                    $type = $field[1];
-                    $name = $field[2];
-                    $value = $field[3];
+                    $title = !empty($field[0]) ? $field[0] : null;
+                    $type = !empty($field[1]) ? $field[1] : null;
+                    $name = !empty($field[2]) ? $field[2] : null;
+                    $value = !empty($field[3]) ? $field[3] : null;
                     $readonly = "";
                     // handle disabled fields
                     if ($name[0]=='-') {
@@ -339,45 +355,45 @@ class Html {
                         $readonly = " readonly='true' ";
                     }
                     if ($type == "text" || $type == "password") {
-                        $size = $field[4];
+                        $size = !empty($field[4]) ? $field[4] : null;
                         $buf .= "<td $valign class='fieldtitle'>$title</td><td $valign  class='fieldvalue'>";
                         $buf .= '<input'.$readonly.' style="width:100%;" type="'.$type.'" name="'.$name.'" value="'.htmlspecialchars($value).'" size="'.$size.'" id="'.$name.'"/>';
                         $buf .= "</td>\n";
                     } else if ($type == "autocomplete") {
-                        $options = $field[4];
+                        $options = !empty($field[4]) ? $field[4] : null;
                         $buf.= "<td  $valign class='fieldtitle'>".htmlentities($title)."</td><td  $valign class='fieldvalue'>";
                         $buf.= Html::autocomplete($name,$options,$value,null,"width: 100%;");
                         $buf .= "</td>\n";
                     } else if ($type == "date") {
-                        $size = $field[4];
+                        $size = !empty($field[4]) ? $field[4] : null;
                         $buf .= "<td $valign class='fieldtitle'>$title</td><td  $valign class='fieldvalue'>";
                         $buf .= Html::datePicker($name,$value,$size);
                         $buf .= "</td>\n";
                     } else if ($type == "datetime") {
-                        $size = $field[4];
+                        $size = !empty($field[4]) ? $field[4] : null;
                         $buf .= "<td $valign class='fieldtitle'>$title</td><td  $valign class='fieldvalue'>";
                         $buf .= Html::datetimePicker($name,$value,$size);
                         $buf .= "</td>\n";
                     } else if ($type == "time") {
-                        $size = $field[4];
+                        $size = !empty($field[4]) ? $field[4] : null;
                         $buf .= "<td $valign class='fieldtitle'>$title</td><td  $valign class='fieldvalue'>";
                         $buf .= Html::timePicker($name,$value,$size);
                         $buf .= "</td>\n";
                     } else if ($type == "static") {
-                        $size = $field[4];
+                        $size = !empty($field[4]) ? $field[4] : null;
                         $buf .= "<td $valign class='fieldtitle'>$title</td><td  $valign class='fieldvalue'>";
                         $buf .= $value;
                         $buf .= "</td>\n";
                     } else if ($type == "textarea") {
                         $buf .= "<td $valign class='fieldtitle'>$title</td><td  $valign class='fieldvalue'>";
-                        $c = $field[4];
-                        $r = $field[5];
+                        $c = !empty($field[4]) ? $field[4] : null;
+                        $r = !empty($field[5]) ? $field[5] : null;
                         $buf .= '<textarea'.$readonly.' style="width:100%;" name="'.$name.'" rows="'.$r.'" cols="'.$c.'" id="'.$name.'">'.$value.'</textarea>';
                         $buf .= "</td>\n";
                     } else if ($type == "select") {
-                        $items = $field[4];
+                        $items = !empty($field[4]) ? $field[4] : null;
                         
-                        $default = $field[5]=='NoDefault' ; // only values should be displayed without '--Select--' option !
+                        $default = !empty($field[5]) ? $field[5] == 'NoDefault' : false; // only values should be displayed without '--Select--' option !
                         $buf.= "<td  $valign class='fieldtitle'>".htmlentities($title)."</td><td  $valign class='fieldvalue'>";
                         if ($readonly == ""){
                             $buf.= Html::select($name,$items,$value,null,"width: 100%;",$default ? null : "-- Select --",$readonly!="");
@@ -386,7 +402,7 @@ class Html {
                         }
                         $buf .= "</td>\n";
                     } else if ($type == "multiSelect") {
-                        $items = $field[4];
+                        $items = !empty($field[4]) ? $field[4] : null;
                         $buf.= "<td  $valign class='fieldtitle'>".htmlentities($title)."</td><td  $valign class='fieldvalue'>";
                         if ($readonly == ""){
                             $buf.= Html::multiSelect($name,$items,$value,null,"width: 100%;");
@@ -395,36 +411,41 @@ class Html {
                         }
                         $buf .= "</td>\n";
                     } else if ($type == "checkbox") {
-                        $buf.= "<td  $valign align='left' class='fieldtitle' colspan='2'>".Html::checkbox($name,$value,$field[4],$field[5])."&nbsp;".htmlentities($title)."</td>\n";
+                        $defaultValue = !empty($field[4]) ? $field[4] : null;
+                        $class = !empty($field[5]) ? $field[5] : null;
+                        $buf.= "<td  $valign align='left' class='fieldtitle' colspan='2'>".Html::checkbox($name, $value, $defaultValue, $class)."&nbsp;".htmlentities($title)."</td>\n";
                     } else if ($type == "radio") {
-                    	$buf.= "<td  $valign align='left' class='fieldtitle' colspan='2'>".Html::radio($name,$field[4],$value,$field[5])."&nbsp;".htmlentities($title)."</td>\n";
+                        $defaultValue = !empty($field[4]) ? $field[4] : null;
+                        $class = !empty($field[5]) ? $field[5] : null;
+                    	$buf.= "<td  $valign align='left' class='fieldtitle' colspan='2'>".Html::radio($name, $group, $value, $defaultValue, $class)."&nbsp;".htmlentities($title)."</td>\n";
                     } else if ($type == "hidden") {
                         $hidden .= '<input type="hidden" name="'.$name.'" value="'.htmlspecialchars($value).'" id="'.$name.'"/>'."\n";
-		            } else if ($type == "file") {
-                $size = $row[4];
-		                if ($title){
-		                    $buf .= "<tr><td $valign class='fieldtitle'>".htmlentities($title)."</td>";
-		                }
-		            	$buf .= "<td colspan=\"$colspan\">";
-		                $buf .= '<input style="width:100%;"  type="'.$type.'" name="'.$name.'" size="'.$size.'" id="'.$name.'"/>';
-		                $buf .= "</td></tr>\n";
-		            }                                        }
+                    } else if ($type == "file") {
+                        $size = !empty($row[4]) ? $row[4] : null;
+                        if ($title){
+                            $buf .= "<tr><td $valign class='fieldtitle'>".htmlentities($title)."</td>";
+                        }
+                        $buf .= "<td colspan=\"$colspan\">";
+                        $buf .= '<input style="width:100%;"  type="'.$type.'" name="'.$name.'" size="'.$size.'" id="'.$name.'"/>';
+                        $buf .= "</td></tr>\n";
+                    }
+                }
                 $buf.="</tr>";
             }
             $buf.="</table></td></tr>\n";
         }
         $buf .= '<tr><td align="center" style="padding: 10px;">';
-        if ($extrabuttons) {
+        if (!empty($extrabuttons)) {
             foreach ($extrabuttons as $id => $title) {
                 $buf.="<input type='button' style='padding-top: 3px;padding-bottom: 3px;width:100px' id='".$id."' value='".$title."'/>&nbsp;";
             }
         }
-        if ($action) {
+        if (!empty($action)) {
             $buf.= '<input id="submit" style="padding-top: 3px;padding-bottom: 3px;width:100px;" type="submit" value="'.$submitTitle.'"/>';
         }
         $buf.='</td></tr>';
         $buf .= "</table>\n";
-        $buf .= $hidden."</form>\n";
+        $buf .= $hidden . ($includeFormTag == true ? "</form>" : "") . "\n";
         return $buf;
     }
 

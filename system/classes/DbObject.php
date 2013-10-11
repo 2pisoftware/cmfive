@@ -150,7 +150,7 @@ class DbObject extends DbService {
 
 	public function __get($name) {
 		// cater for modifiable aspect!
-		if ($this->_modifiable) {
+		if (isset($this->_modifiable)) {
 			if ($name == "dt_created") {
 				return $this->_modifiable->getCreatedDate();
 			}
@@ -654,8 +654,11 @@ class DbObject extends DbService {
 	 * @return String
 	 */
 	function getDbTableName() {
-		if (property_exists($this, "_db_table") && $this->_db_table) {
+		if (isset($this->_db_table)) {
 			return $this->_db_table;
+		}
+		if (isset(static::$_db_table)) {
+			return static::$_db_table;
 		}
 		return strtolower(get_class($this));
 	}
@@ -886,6 +889,7 @@ class DbObject extends DbService {
 				}
 				switch($rule){
 					case "number":
+                                                $this->$$vr_key = filter_var($this->$$vr_key, FILTER_SANITIZE_NUMBER_FLOAT);
 						if (!filter_var($this->$$vr_key, FILTER_VALIDATE_FLOAT)){
 							$response["invalid"]["$vr_key"][] = "Invalid Number";
 						} else {
@@ -895,6 +899,7 @@ class DbObject extends DbService {
 					case "url":
 						// please be aware that this may accept invalid urls
 						// see http://www.php.net/manual/en/function.filter-var.php
+                                                $this->$$vr_key = filter_var($this->$$vr_key, FILTER_SANITIZE_URL);
 						if (!filter_var($this->$$vr_key, FILTER_VALIDATE_URL)){
 							$response["invalid"]["$vr_key"][] = "Invalid URL";
 						} else {
@@ -904,6 +909,7 @@ class DbObject extends DbService {
 					case "email":
 						// please be aware that this may accept invalid emails
 						// see http://www.php.net/manual/en/function.filter-var.php
+                                                $this->$$vr_key = filter_var($this->$$vr_key, FILTER_SANITIZE_EMAIL);
 						if (!filter_var($this->$$vr_key, FILTER_VALIDATE_EMAIL)){
 							$response["invalid"]["$vr_key"][] = "Invalid Email";
 						} else {
@@ -913,7 +919,8 @@ class DbObject extends DbService {
 					case "in":
 						// Case insensitive field check against an array of predefined values
 						if (is_array($rule_array)){
-							if (!in_array(ucfirst(strtolower($this->$$vr_key)),	$rule_array)){
+                                                        $this->$$vr_key = filter_var($this->$$vr_key, FILTER_SANITIZE_STRING);
+							if (!in_array(ucfirst(strtolower($this->$$vr_key)), $rule_array)){
 								$response["invalid"]["$vr_key"][] = "Invalid value, allowed are [".substr(explode(",", $rule_array), 0, -1) . "]";
 							} else {
 								$response["valid"][] = $vr_key;
@@ -925,6 +932,7 @@ class DbObject extends DbService {
 						break;
 					case "custom":
 					case "regex":
+                                                // Add surrounding regex slashes if they dont exist
 						if ($rule[0] !== '/') $rule = '/' . $rule;
 						if ($rule[strlen($rule)-1] !== '/') $rule = $rule . '/';
 						

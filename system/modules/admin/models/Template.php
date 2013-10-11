@@ -23,18 +23,26 @@ class Template extends DbObject {
 	protected $_db_table = "template";
 	
 	public function renderTitle($data) {
+            if (is_array($data))
 		return $this->Template->render($this->template_title,$data);
+            else 
+                return null;
 	}
 
 	public function renderBody($data) {
+            if (is_array($data))
 		return $this->Template->render($this->template_body,$data);
+            else
+                return null;
 	}
 	
 	public function testTitle() {
-		return $this->Template->render($this->template_title,$this->test_title_json);
+		return $this->renderTitle(json_decode($this->test_title_json,true));
 	}
 
 	public function testBody() {
-		return $this->Template->render($this->template_body,$this->test_body_json);
+		//echo $this->test_body_json;
+		//print_r(json_decode($this->test_body_json));
+		return $this->renderBody(json_decode($this->test_body_json,true));
 	}
 }

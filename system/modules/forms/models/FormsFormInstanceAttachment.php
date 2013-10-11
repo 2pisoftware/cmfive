@@ -11,7 +11,6 @@ class FormsFormInstanceAttachment extends DbObject {
 	public $creator_id;
 	public $modifier_id;
 
-	function getDbTableName() {
-		return "forms_form_instance_attachment";
-	}
+	public static $_db_table = "forms_form_instance_attachment";
+
 }

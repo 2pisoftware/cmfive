@@ -1,5 +1,21 @@
 <?php
-function defaultVal($val,$default,$forceNull = false) {
+
+function defaultVal($val,$default = null,$forceNull = false) {
+        // Experiment to see if we can easily remove the strict standards
+        // errors with a small function      
+        if (empty($default)){
+            if (empty($val)){
+                return null;
+            } else {
+                return $val;
+            }
+        } else {
+            return $default;
+        }
+
+        // The above more of less emulates below but using empty we can test
+        // for isset, which below doesn't and is the cause of most of the strict
+        // standards errors
 	if ($forceNull) {
 		return $val === null ? $default : $val;
 	}
@@ -84,6 +100,7 @@ function rotateImage($img, $rotation) {
 }
 
 function lookupForSelect(&$w,$type) {
+    $select = array();
     $rows = $w->db->select("code,title")->from("lookup")->where("type",$type)->fetch_all();
     if ($rows) {
 	    foreach ($rows as $row) {

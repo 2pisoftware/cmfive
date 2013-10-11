@@ -99,6 +99,8 @@ class ObjectModification extends DbObject {
 	// do not audit this table!
 	public $__use_auditing = false;
 
+	public static $_db_table = "object_modification";
+	
 	/**
 	 * returns the creator of the
 	 * object which is attached to this
@@ -125,8 +127,5 @@ class ObjectModification extends DbObject {
 		}
 	}
 
-	function getDbTableName() {
-		return "object_modification";
-	}
 }
 

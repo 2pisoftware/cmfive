@@ -1,5 +1,5 @@
 <p>
-<?php echo $grouptasks; ?>
+    <?php echo !empty($grouptasks) ? $grouptasks : ''; ?>
 <p>
 
 <script language="javascript">

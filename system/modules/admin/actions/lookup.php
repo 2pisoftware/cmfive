@@ -4,12 +4,12 @@ function lookup_ALL(Web &$w) {
 
 	$types = $w->Admin->getLookupTypes();
 
-	$typelist = Html::select("type",$types, $_REQUEST['type']);
+	$typelist = Html::select("type",$types, $w->request('type'));
 	$w->ctx("typelist",$typelist);
 
 	// tab: Lookup List
 	$where = array();
-	if ($_REQUEST['type'] != "") {
+	if ($w->request('type') != "") {
 		$where['type'] = $_REQUEST['type'];
 	}
 	$lookup = $w->Admin->getAllLookup($where);

@@ -1,7 +1,7 @@
 <?php
 class WikiService extends DbService {
 
-	function & getWikiById($wiki_id) {
+	function getWikiById($wiki_id) {
 		$wiki = $this->getObject("Wiki",$wiki_id);
 		if ($wiki && $wiki->canRead($this->w->Auth->user())) {
 			return $wiki;
@@ -10,7 +10,7 @@ class WikiService extends DbService {
 		}
 	}
 
-	function & getWikiByName($name) {
+	function getWikiByName($name) {
 		$wiki = $this->getObject("Wiki",array("name"=>$name));
 		if (!$wiki) return null;
 		
@@ -21,7 +21,7 @@ class WikiService extends DbService {
 		}
 	}
 
-	function & getWikis() {
+	function getWikis() {
 		if ($this->w->Auth->user()->is_admin) {
 			return $this->getObjects("Wiki",array("is_deleted"=>0));
 		} else {
@@ -36,7 +36,7 @@ class WikiService extends DbService {
 		}
 	}
 
-	function & createWiki($title, $is_public) {
+	function createWiki($title, $is_public) {
 		$wiki = new Wiki($this->w);
 		$wiki->title = $title;
 		$wiki->is_public = $is_public ? 1 : 0;

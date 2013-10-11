@@ -142,14 +142,15 @@ class DbService {
 	 * 
 	 * @return <type>
 	 */
-	function & getObjects($class,$where=null,$cache_list = false, $use_cache = true) {
+	function getObjects($class,$where=null,$cache_list = false, $use_cache = true) {
 		if (!$class) return null;
 
 		// if using the list cache
 		if ($cache_list) {
 			if (is_array($where)) {
+                                $key = "";
 				foreach ($where as $k=>$v) {
-					$key.=$k."::".$v."::";
+					$key .= $k."::".$v."::";
 				}
 			} else {
 				$key = $where;

@@ -12,8 +12,7 @@ class TaskGroupUserNotify extends DbObject {
 	public $time_log;			// notify event = change to time log 
 	public $task_documents;	// notify event = change to task documents 
 	public $task_pages;		// notify event = change to task pages 
-	
-	function getDbTableName() {
-		return "task_group_user_notify";
-	}
+
+	public static $_db_table = "task_group_user_notify";
+
 }

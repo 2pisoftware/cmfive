@@ -23,7 +23,7 @@ class User extends DbObject {
 
 	public $_modifiable;
 	
-	function delete($force = false) {
+	public function delete($force = false) {
 		$contact = $this->getContact();
 		if ($contact) {
 			$contact->delete();
@@ -34,14 +34,14 @@ class User extends DbObject {
 		$this->update();
 	}
 
-	function getContact() {
+	public function getContact() {
 		if (!$this->_contact) {
 			$this->_contact = $this->getObject("Contact", $this->contact_id);
 		}
 		return $this->_contact;
 	}
 
-	function isInGroups($group_id = null)
+	public function isInGroups($group_id = null)
 	{
 		$groupUsers = isset($group_id) ? $this->getObjects("GroupUser", array('user_id'=>$this->id,'group_id'=>$group_id)) : $this->getObjects("GroupUser", array('user_id'=>$this->id));
 		 
@@ -52,7 +52,7 @@ class User extends DbObject {
 		return null;
 	}
 
-	function inGroup($group) {
+	public function inGroup($group) {
 		$groupmembers = $this->Auth->getGroupMembers($group->id, null);
 		 
 		if ($groupmembers) {
@@ -69,7 +69,7 @@ class User extends DbObject {
 		}
 	}
 
-	function getFirstName()
+	public function getFirstName()
 	{
 		$contact = $this->getContact();
 		 
@@ -79,7 +79,7 @@ class User extends DbObject {
 		return $name;
 	}
 
-	function getSurname()
+	public function getSurname()
 	{
 		$contact = $this->getContact();
 		if ($contact) {
@@ -88,7 +88,7 @@ class User extends DbObject {
 		return $name;
 	}
 
-	function getFullName() {
+	public function getFullName() {
 		$contact = $this->getContact();
 		$name = ucfirst($this->login);
 		if ($contact) {
@@ -97,11 +97,11 @@ class User extends DbObject {
 		return $name;
 	}
 
-	function getSelectOptionTitle() {
+	public function getSelectOptionTitle() {
 		return $this->getFullName();
 	}
 
-	function getShortName() {
+	public function getShortName() {
 		$contact = $this->getContact();
 		$name = ucfirst($this->login);
 		if ($contact) {
@@ -110,7 +110,7 @@ class User extends DbObject {
 		return $name;
 	}
 
-	function getRoles($force = false) {
+	public function getRoles($force = false) {
 		if ($this->is_admin) {
 			return $this->Auth->getAllRoles();
 		}
@@ -146,12 +146,12 @@ class User extends DbObject {
 		return $this->_roles;
 	}
 
-	function updateLastLogin() {
+	public function updateLastLogin() {
 		$data = array("dt_lastlogin" => $this->time2Dt(time()));
 		$this->_db->update("user",$data)->where("id",$this->id)->execute();
 	}
 
-	function hasRole($role) {
+	public function hasRole($role) {
 		if ($this->is_admin) {
 			return true;
 		}
@@ -162,7 +162,7 @@ class User extends DbObject {
 		}
 	}
 
-	function hasAnyRole($roles) {
+	public function hasAnyRole($roles) {
 		if ($this->is_admin) {
 			return true;
 		}
@@ -176,7 +176,7 @@ class User extends DbObject {
 		return false;
 	}
 
-	function addRole($role) {
+	public function addRole($role) {
 		if (!$this->hasRole($role)) {
 			$data = array(
                     "user_id"=>$this->id,
@@ -186,14 +186,14 @@ class User extends DbObject {
 		}
 	}
 
-	function removeRole($role) {
+	public function removeRole($role) {
 		if ($this->hasRole($role)) {
 			$this->_db->delete("user_role")->where("user_id",$this->id)->and("role",$role)->execute();
 			$this->getRoles(true);
 		}
 	}
 
-	function allowed(&$w,$path) {
+	public function allowed(&$w,$path) {
 		if (!$this->is_active) {
 			return false;
 		}
@@ -221,13 +221,13 @@ class User extends DbObject {
 	 * @param unknown $password
 	 * @return string
 	 */
-	public static function encryptPassword($password) {
+	static public function encryptPassword($password) {
 		global $PASSWORD_SALT;
 		return sha1($PASSWORD_SALT.$password);
 	}
 
 	public function setPassword($password) {
-		$this->password = $this->encryptPassword($password);
+		$this->password = User::encryptPassword($password);//$this->encryptPassword($password);
 	}
 
 }

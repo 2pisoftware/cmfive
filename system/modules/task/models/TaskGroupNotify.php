@@ -6,8 +6,7 @@ class TaskGroupNotify extends DbObject {
 	public $type;			// notify type: creator|assignee|all others
 	public $value;			// flag: 0|1
 	
-	function getDbTableName() {
-		return "task_group_notify";
-	}
+	public static $_db_table = "task_group_notify";
+
 }
 

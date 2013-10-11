@@ -134,9 +134,10 @@ class Web {
     	$sess = new SessionManager($this);
     	session_name(SESSION_NAME);
     	session_start();
-
+		$_SESSION['last_request'] = time();
+		
         //$this->debug("Start processing: ".$_SERVER['REQUEST_URI']);
-
+      
         // find out which module to use
         $module_found = false;
         $action_found = false;
@@ -725,11 +726,13 @@ class Web {
         $match = array();
         for($i=0;$i<func_num_args();$i++) {
             $param = func_get_arg($i);
-            $val = urldecode($this->_paths[$i]);
+            
+            $val = !empty($this->_paths[$i]) ? urldecode($this->_paths[$i]) : null;
+
             if (is_array($param)) {
                 $key = $param[0];
-                if (!$val) {
-                    $val = $param[1];
+                if (is_null($val) && isset($param[1])) {
+                    $val = $param[1]; // use default parameter
                 }
             } else {
                 $key = $param;

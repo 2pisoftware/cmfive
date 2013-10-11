@@ -1,33 +1,22 @@
-<script type="text/javascript">
-    var current_tab = 1;
-    function switchTab(num){
-        if (num == current_tab) return;
-        $('#tab-'+current_tab).hide()
-        $('#tab-link-'+current_tab).removeClass("active");
-        $('#tab-'+num).show().addClass("active");
-        $('#tab-link-'+num).addClass("active");
-        current_tab = num;
-    }
-</script>
 <div class="tabs">
     <div class="tab-head">
-        <a href="<?=WEBROOT."/wiki/view/".$wikiname."/".$pagename?>">View</a>
+        <a href="<?php echo WEBROOT."/wiki/view/".$wikiname."/".$pagename; ?>">View</a>
         <a id="tab-link-1" href="#" class="active" onclick="switchTab(1);">Edit</a>
     </div>
     <div class="tab-body">
     
-		<?// ============== Text Edit ===================================== ?>            
+		<?php // ============== Text Edit ===================================== ; ?>            
         <div id="tab-1">
-			<form action="<?=WEBROOT."/wiki/edit/".$wikiname."/".$pagename?>" method="POST">
-			<textarea style="width:80%;height:500px;" name="body"><?=$page->body?></textarea>
+			<form action="<?php echo WEBROOT."/wiki/edit/".$wikiname."/".$pagename; ?>" method="POST">
+			<textarea style="width:80%;height:500px;" name="body"><?php echo $page->body; ?></textarea>
 			<p></p>
 			<input type="submit" value="Save">
-			<?=Html::b(WEBROOT."/wiki/view/".$wikiname."/".$pagename,"Cancel")?> 
-			<?=Html::box(WEBROOT."/wiki/markup","Markup Help",true)?>
-			<?=Html::box($webroot."/file/attach/WikiPage/".$page->id."/wiki+edit+".$wiki->name."+".$page->name,"Attach a File",true)?>		
+			<?php echo Html::b(WEBROOT."/wiki/view/".$wikiname."/".$pagename,"Cancel"); ?> 
+			<?php echo Html::box(WEBROOT."/wiki/markup","Markup Help",true); ?>
+			<?php echo Html::box($webroot."/file/attach/WikiPage/".$page->id."/wiki+edit+".$wiki->name."+".$page->name,"Attach a File",true); ?>		
 			</form>
 			<p></p>			
-			<?if ($attachments):?>
+			<?php if (!empty($attachments)): ?>
 			<table class="tablesorter">
                 <thead>
                     <tr>
@@ -37,25 +26,25 @@
                     </tr>
                 </thead>
                 <tbody>
-                <?foreach($attachments as $att):?>
+                <?php foreach($attachments as $att):; ?>
                 <tr>
                     <td>
-                    	<?if ($att->isImage()):?>
-                    	<a href="<?=$webroot?>/file/atthumb/<?=$att->id?>/1024/768/a.jpg" rel="gallery">
-                    	<?else:?>
-                    	<a href="<?=$webroot?>/file/atfile/<?=$att->id?>/<?=$att->filename?>">
-                    	<?endif;?>
-                    	<?=$att->filename?></a>
+                    	<?php if ($att->isImage()):; ?>
+                    	<a href="<?php echo $webroot; ?>/file/atthumb/<?php echo $att->id; ?>/1024/768/a.jpg" rel="gallery">
+                    	<?php else:; ?>
+                    	<a href="<?php echo $webroot; ?>/file/atfile/<?php echo $att->id; ?>/<?php echo $att->filename; ?>">
+                    	<?php endif;; ?>
+                    	<?php echo $att->filename; ?></a>
                     </td>
                     <td>
-                       	<?=$att->description?></a>
+                       	<?php echo $att->description; ?></a>
                     </td>                    
-                    <td><?=Html::a($webroot."/file/atdel/".$att->id."/wiki+edit+".$wiki->name."+".$page->name,"Delete",null,null,"Do you want to delete this attachment?")?></td>
+                    <td><?php echo Html::a($webroot."/file/atdel/".$att->id."/wiki+edit+".$wiki->name."+".$page->name,"Delete",null,null,"Do you want to delete this attachment?"); ?></td>
                 </tr>
-                <?endforeach;?>
+                <?php endforeach;; ?>
                 </tbody>
             </table>
-            <?endif;?>
+            <?php endif;; ?>
 			<p></p>
         </div>
 

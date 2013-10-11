@@ -7,11 +7,11 @@ class WikiPageHistory extends WikiPage {
 	
 	public $wiki_page_id;
 
-	function update() {
+	function update($force_null_values = false, $force_validation = false) {
 		DbObject::update();
 	}
 
-	function insert() {
+	function insert($force_validation = false) {
 		DbObject::insert();
 	}
 

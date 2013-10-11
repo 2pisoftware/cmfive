@@ -28,10 +28,9 @@ class Task extends DbObject {
 	function addToIndex() {
 		
 	}
-	// actual table name
-	function getDbTableName() {
-		return "task";
-	}
+
+	
+	public static $_db_table = "task";
 
 	/**
 	 * Return a html string which will be displayed alongside
@@ -93,15 +92,15 @@ class Task extends DbObject {
 	 * Used by the search interface
 	 * @see DbObject::canView()
 	 */
-	function canView() {
-		return $this->getCanIView();
+	function canView(User $user) {
+		return $this->getCanIView($user);
 	}
 	
 	/**
 	 * Used by the search interface
 	 * @see DbObject::canList()
 	 */
-	function canList() {
+	function canList(User $user) {
 		return $this->getCanIView();
 	}
 	
@@ -319,7 +318,7 @@ class Task extends DbObject {
 	 * (non-PHPdoc)
 	 * @see DbObject::insert()
 	 */
-	function insert() {
+	function insert($force_validation = false) {
 		if ($this->task_group_id) {
 			// set default status for newly created tasks
 			$this->status = $this->getTaskGroupTypeObject()->get_default_status($this);
@@ -365,12 +364,12 @@ class Task extends DbObject {
 	 * (non-PHPdoc)
 	 * @see DbObject::update()
 	 */
-	function update($force = false) {
+	function update($force = false, $force_validation = false) {
 		if ($this->task_type) {
 			$this->getTaskTypeObject()->on_before_update($this);			
 		}
 		
-		parent::update($force);
+		parent::update($force, $force_validation);
 		
 		if ($this->task_type) {
 			$this->getTaskTypeObject()->on_after_update($this);			

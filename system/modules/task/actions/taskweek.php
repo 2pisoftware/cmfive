@@ -4,13 +4,13 @@ function taskweek_ALL(Web &$w) {
 	TaskLib::task_navigation($w, "");
 
 	// if no group then no group
-	$taskgroup = ($_REQUEST['taskgroup'] != "") ? $_REQUEST['taskgroup'] : "";
+	$taskgroup = $w->request('taskgroup');
 	// if no group member then no group member
-	$assignee = ($_REQUEST['assignee'] != "") ? $_REQUEST['assignee'] : "";
+	$assignee = $w->request('assignee');
 	// if no from date then 7 days ago
-	$from = ($_REQUEST['dt_from'] != "") ? $_REQUEST['dt_from'] : $w->Task->getLastWeek();
+	$from = $w->request('dt_from',$w->Task->getLastWeek());
 	// if no to date then today
-	$to = ($_REQUEST['dt_to'] != "") ? $_REQUEST['dt_to'] : date("d/m/Y");
+	$to = $w->request('dt_to',date("d/m/Y"));
 	// display
 	$w->ctx("from",$from);
 	$w->ctx("to",$to);
@@ -37,8 +37,8 @@ function taskweek_ALL(Web &$w) {
 					$line[] = array("<b>" . date("l jS F, Y", strtotime($task['dt_modified'])) . "</b>");
 				}
 				// display comments. if no group selected, display with link to task list with group preselected
-				$thisgroup = ($taskgroup != "") ? "" : "<a title=\"View Task Group\" href=\"" . $webroot . "/task/tasklist/?taskgroups=" . $task['task_group_id'] . "\">" . $w->Task->getTaskGroupTitleById($task['task_group_id']) . "</a>:&nbsp;&nbsp;";
-				$line[] = array("<dd>" . date("g:i a", strtotime($task['dt_modified'])) . " - " . $thisgroup . "<a title=\"View Task Details\" href=\"".$webroot."/task/viewtask/".$task['id']."\"><b>".$task['title']."</b></a>: " . $w->Task->findURL($task['comment']) . " - " . $w->Task->getUserById($task['creator_id']) . "</dd>");
+				$thisgroup = ($taskgroup != "") ? "" : "<a title=\"View Task Group\" href=\"" . WEBROOT . "/task/tasklist/?taskgroups=" . $task['task_group_id'] . "\">" . $w->Task->getTaskGroupTitleById($task['task_group_id']) . "</a>:&nbsp;&nbsp;";
+				$line[] = array("<dd>" . date("g:i a", strtotime($task['dt_modified'])) . " - " . $thisgroup . "<a title=\"View Task Details\" href=\"".WEBROOT."/task/viewtask/".$task['id']."\"><b>".$task['title']."</b></a>: " . $w->Task->findURL($task['comment']) . " - " . $w->Task->getUserById($task['creator_id']) . "</dd>");
 				$olddate = formatDate($task['dt_modified']);
 				$i++;
 			}
@@ -74,10 +74,10 @@ function taskweek_ALL(Web &$w) {
 	}
 
 	// load the search filters
-	$a = Html::select("assignee",$members,$_REQUEST['assignee']);
+	$a = Html::select("assignee",$members,$w->request('assignee'));
 	$w->ctx("assignee",$a);
 
-	$taskgroups = Html::select("taskgroup",$group, $_REQUEST['taskgroup']);
+	$taskgroups = Html::select("taskgroup",$group, $w->request('taskgroup'));
 	$w->ctx("taskgroups",$taskgroups);
 
 }

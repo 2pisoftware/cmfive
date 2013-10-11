@@ -122,7 +122,7 @@ class InboxService extends DbService {
 		return $count;
 	}
 
-	function & getMessages($page,$page_size,$user_id,$is_new,$is_arch=0,$is_del=0,$has_parent=0) {
+	function getMessages($page,$page_size,$user_id,$is_new,$is_arch=0,$is_del=0,$has_parent=0) {
 		$offset = $page * $page_size;
 		if ($is_arch == 0 && $is_del == 0){
 			$rows = $this->_db->get("inbox")
@@ -160,24 +160,24 @@ class InboxService extends DbService {
 		}
 	}
 
-	function & getDelMessageCount($user){
+	function getDelMessageCount($user){
 		$sql = "SELECT COUNT(*) FROM `inbox` WHERE is_deleted = 1 AND user_id = ".$user." AND del_forever = 0";
 		$result = $this->_db->sql($sql)->fetch_row();
 		$result ? $result = $result['COUNT(*)'] : $result = 0;
 		return $result;
 	}
 	
-	function & getNewMessageCount($user){
+	function getNewMessageCount($user){
 		$sql = "SELECT COUNT(*) FROM `inbox` WHERE is_deleted = 0 AND is_new = 1 AND is_archived = 0 AND user_id = ".$user." AND del_forever = 0";
 		return $this->_db->sql($sql)->fetch_row();
 	}
 
-	function & getReadMessageCount($user){
+	function getReadMessageCount($user){
 		$sql = "SELECT COUNT(*) FROM `inbox` WHERE is_deleted = 0 AND is_new = 0 AND is_archived = 0 AND user_id = ".$user." AND del_forever = 0";
 		return $this->_db->sql($sql)->fetch_row();
 	}
 
-	function & getArchCount($user){
+	function getArchCount($user){
 		$sql = "SELECT COUNT(*) FROM `inbox` WHERE is_deleted = 0 AND is_new = 1 AND is_archived = 1 AND user_id = ".$user." AND del_forever = 0";
 		$newarch = $this->_db->sql($sql)->fetch_row();
 		$newarch ? $newarch = $newarch['COUNT(*)'] : $newarch = 0;
@@ -188,7 +188,7 @@ class InboxService extends DbService {
 		return $total;
 	}
 
-	function & getMessage($id) {
+	function getMessage($id) {
 		return $this->getObject("Inbox", $id);
 	}
 

@@ -101,7 +101,7 @@ print "<button onclick='deleteMessage()'>Delete Forever</button>";
 
 $qlines = array(array("<input type='checkbox' id='allChk' onclick='selectAll()' />","Subject","Date","Sender"));
 
-if ($readdel) {
+if (!empty($readdel)) {
 	$count = 0;
 	foreach ($readdel as $q) {
 		$count++;

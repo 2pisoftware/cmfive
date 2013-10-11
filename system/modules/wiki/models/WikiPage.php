@@ -13,11 +13,11 @@ class WikiPage extends DbObject {
 	public $is_deleted;
 	public $body;
 
-	function & getWiki() {
+	function getWiki() {
 		return $this->Wiki->getWikiById($this->wiki_id);			
 	}
 	
-	function canList($user) {
+	function canList(User $user) {
 		try {
 			$wiki = $this->getWiki();
 			return $wiki->canRead($user);
@@ -26,11 +26,11 @@ class WikiPage extends DbObject {
 		}
 	}
 	
-	function & getHistory() {
+	function getHistory() {
 		return $this->getObjects("WikiPageHistory",array("wiki_page_id"=>$this->id));
 	}
 	
-	function canView($user) {
+	function canView(User $user) {
 		return $this->canList($user);
 	}
 	
@@ -49,7 +49,7 @@ class WikiPage extends DbObject {
 		return "wiki/view/".$this->getWiki()->name."/".$this->name;
 	}
 	
-	function update() {
+	function update($force_null_values = false, $force_validation = false) {
 		$hist = new WikiPageHistory($this->w);
 		$hist->fill($this->toArray());
 		$hist->id = null;
@@ -58,7 +58,7 @@ class WikiPage extends DbObject {
 		parent::update();
 	}
 
-	function insert() {
+	function insert($force_validation = false) {
 		parent::insert();
 		$hist = new WikiPageHistory($this->w);
 		$hist->fill($this->toArray());

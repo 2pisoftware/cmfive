@@ -12,6 +12,6 @@ function showarchive_ALL(Web $w){
 	//$read_total ? $read_total = $read_total['COUNT(*)'] : "";
 	$w->ctx('pgnum',$num);
 	$w->ctx("readtotal",$arch_count);
-	$w->ctx("arch",$arch);
+	//$w->ctx("arch",$arch);
 	$w->ctx("new_arch",$new_arch);
 }

@@ -22,7 +22,7 @@
 	</div>
 	<div class="tab-body">
 		<div id="tab-1">
-			<form id="leadfilter" action="<?=$webroot."/task/tasklist"?>" method="POST">
+			<form id="leadfilter" action="<?php echo WEBROOT."/task/tasklist"?>" method="POST">
 				<fieldset style="margin-top: 10px;">
 					<legend>Search Tasks</legend>
 						<table cellpadding=2 cellspacing=2 border=0>
@@ -38,14 +38,14 @@
 								<td align=right style="padding-left:20px;">Status</td><td><?php echo $status ?></td>
 							</tr>
 							<tr>
-								<td align=right style="padding-left:20px;">From Date</td><td><input class="date_picker" type="text" name="dt_from" value="<?php echo $reqdtFrom ?>" size="" id="dt_from"/><script>$('#dt_from').datepicker({dateFormat: 'dd/mm/yy'});$('#dt_from').keyup( function(event) { $(this).val('');}); </script></td>
-								<td align=right style="padding-left:20px;">To Date</td><td><input class="date_picker" type="text" name="dt_to" value="<?php echo $reqdtTo ?>" size="" id="dt_to"/><script>$('#dt_to').datepicker({dateFormat: 'dd/mm/yy'});$('#dt_to').keyup( function(event) { $(this).val('');}); </script></td>
+								<td align=right style="padding-left:20px;">From Date</td><td><input class="date_picker" type="text" name="dt_from" value="<?php echo !empty($reqdtFrom) ? $reqdtFrom : ''?>" size="" id="dt_from"/><script>$('#dt_from').datepicker({dateFormat: 'dd/mm/yy'});$('#dt_from').keyup( function(event) { $(this).val('');}); </script></td>
+								<td align=right style="padding-left:20px;">To Date</td><td><input class="date_picker" type="text" name="dt_to" value="<?php echo !empty($reqdtTo) ? $reqdtTo : '' ?>" size="" id="dt_to"/><script>$('#dt_to').datepicker({dateFormat: 'dd/mm/yy'});$('#dt_to').keyup( function(event) { $(this).val('');}); </script></td>
 								<td align=right style="padding-left:20px;" colspan=2>Incl. Closed Tasks?&nbsp;&nbsp;&nbsp;<?php echo $closed ?></td>
 								<td colspan=2>&nbsp;</td>
 							</tr>
 							<tr>
 								<td>&nbsp;</td>
-								<td align=center><? echo $grpedit ?></td>
+								<td align=center><?php echo !empty($grpedit) ? $grpedit : '' ?></td>
 								<td>&nbsp;</td>
 								<td align=left><input type="submit" name="taskFilter" value=" Search Tasks "/></td>
 								<td align=left><button id="clrForm">Reset Filter</button></td>

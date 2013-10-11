@@ -20,7 +20,7 @@ function viewtaskgrouptypes_ALL(Web &$w) {
 			$group->getTypeTitle(),
 			$group->description,
 			$group->getDefaultAssigneeName(),
-			Html::b($webroot."/task-group/viewmembergroup/".$group->id," More Info ")
+			Html::b(WEBROOT."/task-group/viewmembergroup/".$group->id," More Info ")
 			);
 		}
 	}
@@ -282,9 +282,9 @@ function viewmembergroup_GET(Web &$w) {
 	if ($member_group) {
 		foreach ($member_group as $member) {
 			$line[] = array($w->Task->getUserById($member->user_id), $member->role,
-				Html::box($webroot."/task-group/viewmember/".$member->id," Edit ", true) .
+				Html::box(WEBROOT."/task-group/viewmember/".$member->id," Edit ", true) .
 				"&nbsp;&nbsp;" . 
-				Html::box($webroot."/task-group/deletegroupmember/".$member->id," Delete ", true)
+				Html::box(WEBROOT."/task-group/deletegroupmember/".$member->id," Delete ", true)
 				);
 			}
 		}

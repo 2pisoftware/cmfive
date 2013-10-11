@@ -418,6 +418,7 @@ class ReportService extends DbService {
 
 			// get user roles
 			$usr = $this->w->Auth->user();
+                        $roles = '';
 			foreach ($usr->getRoles() as $role) {
 				$roles .= "'" . $role ."',";
 			}

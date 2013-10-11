@@ -14,7 +14,7 @@ class ReportFeed extends DBObject {
 	}
 
 	// get feed key upon insert of new feed
-	function insert() {
+	function insert($force_validation = false) {
 		if (!$this->key)
 		$this->key = uniqid();
 

@@ -13,11 +13,11 @@ function createreport_ALL(Web &$w) {
 	// using lookup with type ReportCategory for category listing
 	$f = Html::form(array(
 	array("Create a New Report","section"),
-	array("Title","text","title", $_REQUEST['title']),
-	array("Module","select","module", $_REQUEST['module'], $modules),
-	array("Category","select","category", $_REQUEST['category'], lookupForSelect($w, "ReportCategory")),
-	array("Description","textarea","description",$_REQUEST['description'],"100","2"),
-	array("Code","textarea","report_code",$_REQUEST['report_code'],"100","22"),
+	array("Title","text","title", $w->request('title')),
+	array("Module","select","module", $w->request('module'), $modules),
+	array("Category","select","category", $w->request('category'), lookupForSelect($w, "ReportCategory")),
+	array("Description","textarea","description",$w->request('description'),"100","2"),
+	array("Code","textarea","report_code",$w->request('report_code'),"100","22"),
 	),$w->localUrl("/report/savereport/"),"POST"," Save Report ");
 
 	$t = Html::form(array(

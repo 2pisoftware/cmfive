@@ -9,7 +9,5 @@ class TaskData extends DbObject {
 	public $key;
 	public $value;	
 	
-	function getDbTableName() {
-		return "task_data";
-	}
+	public static $_db_table = "task_data";
 }

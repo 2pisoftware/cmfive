@@ -1,5 +1,5 @@
 <?php
-if ($wikis) {
+if (!empty($wikis)) {
 	$table[]=array(
 		"Wiki Title",
 		"Date Created",

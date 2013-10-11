@@ -5,13 +5,14 @@ function tasktypeform_POST(Web $w) {
 	TaskLib::task_navigation($w, "Create Task");
 
 	// get task type, serialise REQUEST object from step 1 of creating a new task
-	$tid = $_REQUEST['task_type'];
-	$tg = $w->Task->getTaskGroup($_REQUEST['task_group_id']);
+	$tid = $w->request('task_type');
+	$tg = $w->Task->getTaskGroup($w->request('task_group_id'));
 	// if no due date given, make 1 month from today
-	if ($_REQUEST['dt_due'] == "")
-	$_REQUEST['dt_due'] = $w->Task->getNextMonth();
+	if ($w->request('dt_due') == "") {
+		$w->request('dt_due') = $w->Task->getNextMonth();
+	}
 
-	$req = serialize($_REQUEST);
+	$req = serialize($_POST);
 
 	// get the additional form fields based on type type
 	$theform = array();

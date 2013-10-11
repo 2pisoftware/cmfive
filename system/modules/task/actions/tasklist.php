@@ -6,7 +6,7 @@ function tasklist_ALL(Web $w) {
 	// prepare default filter dropdowns
 	// get WHO to return relevant tasks:
 	//		a selected assignee, a blank assignee = all assignee's, no assignee = tasks assigned to me
-	$who = (!array_key_exists("assignee",$_REQUEST)) ? $_SESSION['user_id'] : $_REQUEST['assignee'];
+	$who = (!array_key_exists("assignee",$_REQUEST)) ? $_SESSION['user_id'] : $w->request('assignee');
 
 	// for those groups of which i am a member, get list of all members for display in Assignee & Creator dropdowns
 	$mygroups = $w->Task->getMemberGroups($_SESSION['user_id']);
@@ -24,7 +24,7 @@ function tasklist_ALL(Web $w) {
 	$a = Html::select("assignee",$members, $who);
 	$w->ctx("assignee",$a);
 
-	$b = Html::select("creator",$members, $_REQUEST['creator']);
+	$b = Html::select("creator",$members, $w->request('creator'));
 	$w->ctx("creator",$b);
 
 	$taskgroups = array();
@@ -43,35 +43,35 @@ function tasklist_ALL(Web $w) {
 	$f = Html::select("status",$status);
 	$w->ctx("status",$f);
 
-	$g = Html::checkbox("closed", $_REQUEST['closed']);
+	$g = Html::checkbox("closed", $w->request('closed'));
 	$w->ctx("closed",$g);
 
 	// change filter dropdowns to show selectedIndex for current search
-	$w->ctx("reqTaskgroups",$_REQUEST['taskgroups']);
-	$w->ctx("reqTasktypes",$_REQUEST['tasktypes']);
-	$w->ctx("reqPriority",$_REQUEST['tpriority']);
-	$w->ctx("reqStatus",$_REQUEST['status']);
-	$w->ctx("reqdtFrom",$_REQUEST['dt_from']);
-	$w->ctx("reqdtTo",$_REQUEST['dt_to']);
+	$w->ctx("reqTaskgroups",$w->request('taskgroups'));
+	$w->ctx("reqTasktypes",$w->request('tasktypes'));
+	$w->ctx("reqPriority",$w->request('tpriority'));
+	$w->ctx("reqStatus",$w->request('status'));
+	$w->ctx("reqdtFrom",$w->request('dt_from'));
+	$w->ctx("reqdtTo",$w->request('dt_to'));
 
 	// prepare WHERE clause as string
 	$where = "";
-	if ($_REQUEST['taskgroups'] != "")
-	$where .= "t.task_group_id = '" . $_REQUEST['taskgroups'] . "' and ";
-	if ($_REQUEST['tasktypes'] != "")
-	$where .= "t.task_type = '" . $_REQUEST['tasktypes'] . "' and ";
-	if ($_REQUEST['tpriority'] != "")
-	$where .= "t.priority = '" . $_REQUEST['tpriority'] . "' and ";
-	if (($_REQUEST['status'] != ""))
-	$where .= "t.status = '" . $_REQUEST['status'] . "' and ";
-	if (($_REQUEST['status'] == "") && ($_REQUEST['closed']))
+	if ($w->request('taskgroups') != "")
+	$where .= "t.task_group_id = '" . $w->request('taskgroups') . "' and ";
+	if ($w->request('tasktypes') != "")
+	$where .= "t.task_type = '" . $w->request('tasktypes') . "' and ";
+	if ($w->request('tpriority') != "")
+	$where .= "t.priority = '" . $w->request('tpriority') . "' and ";
+	if (($w->request('status') != ""))
+	$where .= "t.status = '" . $w->request('status') . "' and ";
+	if (($w->request('status') == "") && ($w->request('closed')))
 	$where .= "(t.is_closed = 0 or t.is_closed = 1) and ";
 	if ((array_key_exists("status",$_REQUEST)) && ($_REQUEST['status'] == "") && (!$_REQUEST['closed']))
 	$where .= "t.is_closed = 0 and ";
-	if ($_REQUEST['dt_from'] != "")
-	$where .= "t.dt_due >= '" . $w->Task->date2db($_REQUEST['dt_from']) . "' and ";
-	if ($_REQUEST['dt_to'] != "")
-	$where .= "t.dt_due <= '" . $w->Task->date2db($_REQUEST['dt_to']) . "' and ";
+	if ($w->request('dt_from') != "")
+	$where .= "t.dt_due >= '" . $w->Task->date2db($w->request('dt_from')) . "' and ";
+	if ($w->request('dt_to') != "")
+	$where .= "t.dt_due <= '" . $w->Task->date2db($w->request('dt_to')) . "' and ";
 
 	$where = rtrim($where, " and ");
 
@@ -79,8 +79,8 @@ function tasklist_ALL(Web $w) {
 	$hds = array(array("Title","Assigned To", "Group", "Type", "Priority", "Created By", "Status", "Due", "Time Log"));
 
 	// either use sql join to object_modified, if searching for tasks 'created by' or getObjects for all other searches
-	if ($_REQUEST['creator'] != "") {
-		$tasks = $w->Task->getCreatorTasks($_REQUEST['creator'],$where);
+	if ($w->request('creator') != "") {
+		$tasks = $w->Task->getCreatorTasks($w->request('creator'),$where);
 	}
 	else {
 		$tasks = $w->Task->getTasks($who,$where);
@@ -104,7 +104,7 @@ function tasklist_ALL(Web $w) {
 			}
 				
 			$thisline = array(
-			Html::a($webroot."/task/viewtask/".$task->id,$task->title),
+			Html::a(WEBROOT."/task/viewtask/".$task->id,$task->title),
 			$w->Task->getUserById($task->assignee_id),
 			$task->getTaskGroupTypeTitle(),
 			$task->getTypeTitle(),
@@ -113,7 +113,7 @@ function tasklist_ALL(Web $w) {
 			$taskstatus,
 			$task->isTaskLate(),
 			$task->assignee_id == $w->Auth->user()->id ? 
-			Html::a($webroot."/task/starttimelog/".$task->id,"Start Log","Start Log","startTime") :
+			Html::a(WEBROOT."/task/starttimelog/".$task->id,"Start Log","Start Log","startTime") :
 			"",
 			);
 			$line[] = $thisline;
@@ -121,14 +121,14 @@ function tasklist_ALL(Web $w) {
 	}
 
 	// if no tasks found, say as much
-	if (!$line)
-	$line = array(array("No Tasks found.","","","","","","","",""));
+	if (empty($line))
+            $line = array(array("No Tasks found.","","","","","","","",""));
 
 	$line = array_merge($hds, $line);
 
 	// if logged in user is owner of current group, display button to edit the task group
-	$btnedit = Html::b("/task-group/viewmembergroup/".$_REQUEST['taskgroups']," Edit Task Group ");
-	$grpedit = ($_REQUEST['taskgroups'] != "") && ($w->Task->getIsOwner($_REQUEST['taskgroups'], $_SESSION['user_id'])) ? $btnedit : "";
+	$btnedit = Html::b("/task-group/viewmembergroup/".$w->request('taskgroups')," Edit Task Group ");
+	$grpedit = ($w->request('taskgroups') != "") && ($w->Task->getIsOwner($w->request('taskgroups'), $_SESSION['user_id'])) ? $btnedit : "";
 	$w->ctx("grpedit",$grpedit);
 
 	// display task list
@@ -172,7 +172,7 @@ function tasklist_ALL(Web $w) {
 				$v[$role]["creator"],
 				$v[$role]["assignee"],
 				$v[$role]["other"],
-				Html::box($webroot."/task/updateusergroupnotify/".$mygroup->task_group_id," Edit ",true)
+				Html::box(WEBROOT."/task/updateusergroupnotify/".$mygroup->task_group_id," Edit ",true)
 				);
 			}
 			unset($v);

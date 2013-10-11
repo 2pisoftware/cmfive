@@ -1,7 +1,7 @@
 <?php
 class TemplateService extends DbService {
-	
-	private $div_lib = "div-4.4/div.php";
+
+	private $twig_lib = "Twig-1.13.2";
 	
 	/**
 	 * 
@@ -48,10 +48,10 @@ class TemplateService extends DbService {
 	 * 4) template code as a string
 	 * 
 	 * @param int|Template|string $template
-	 * @param array|object $data
+	 * @param array $data
 	 * @return string
 	 */
-	function render($template, $data) {
+	function render($template, array $data) {
 		if (empty($template)) return;
 		
 		// falling through the options:
@@ -59,6 +59,9 @@ class TemplateService extends DbService {
 		// if passing a template's id
 		if (is_int($template)) {
 			$template = $this->getTemplate($template);
+			if ($template == null) {
+				return;
+			}
 		}
 		
 		// if passing a Template object
@@ -68,8 +71,21 @@ class TemplateService extends DbService {
 		
 		// if passing a file path or string template
 		if (is_string($template)) {
-			include_once $this->div_lib;
-			return new div($template,$data);
+								
+			require_once $this->twig_lib.'/lib/Twig/Autoloader.php';
+			Twig_Autoloader::register();
+			
+			if ( file_exists($template) ) {
+				$dir = dirname($template);
+				$loader = new Twig_Loader_Filesystem($dir);
+				$template = str_replace($dir.DIRECTORY_SEPARATOR, "", $template);
+			} else {
+				$loader = new Twig_Loader_String();
+			}
+
+			$twig = new Twig_Environment($loader);
+			
+			return $twig->render($template, $data);			
 		}
 		
 	} 

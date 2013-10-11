@@ -2,7 +2,7 @@
 // Search Filter: selecting an Assignee will dynamically load the Group dropdown with available values
 function taskAjaxAssigntoGroup_ALL(Web $w) {
 	$group = array();
-	$assignee = $_REQUEST['id'];
+	$assignee = $w->request('id');
 
 	// organise criteria
 	$who = ($assignee != "") ? $assignee : null;

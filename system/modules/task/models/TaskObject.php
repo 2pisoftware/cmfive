@@ -10,10 +10,9 @@
 class TaskObject extends DbObject {
 	public $task_id; 			// which task this object is attached to
 	public $key;				// Task value reference
-	public $table_name;		// DB table name of object 
+	public $table_name;			// DB table name of object // this is problematic!! needs class name too
 	public $object_id;			// object id
 
-	function getDbTableName() {
-		return "task_object";
-	}
+	public static $_db_table = "task_object";
+
 }

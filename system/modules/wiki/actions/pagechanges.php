@@ -1,6 +1,5 @@
 <?php
 function pagechanges_GET(Web $w) {
-	WikiLib::wiki_navigation($w,$wiki,$page);
 	$pm = $w->pathMatch("wid","pagename");
 	$wiki = $w->Wiki->getWikiById($pm['wid']);
 	if (!$wiki || !$wiki->canRead($w->Auth->user()) ) {
@@ -10,6 +9,7 @@ function pagechanges_GET(Web $w) {
 	if (!$wp) {
 		$w->error("Page does not exist.","/wiki/index");
 	}
+        WikiLib::wiki_navigation($w,$wiki,$pm["pagename"]);
 	$w->ctx("wiki",$wiki);
 	$w->ctx("page",$wp);
 }

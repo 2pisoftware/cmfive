@@ -11,7 +11,5 @@ class FormsFormInstanceComment extends DbObject {
 	public $creator_id;
 	public $modifier_id;
 	
-	function getDbTableName() {
-		return "forms_form_instance_comment";
-	}
+	public static $_db_table = "forms_form_instance_comment";
 }

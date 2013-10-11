@@ -10,18 +10,18 @@
 	</div>
 	<div class="tab-body">
 		<div id="tab-1">
-			<?php echo $editdetailsform;?>
+			<?php echo !empty($editdetailsform) ? $editdetailsform : '';?>
 		</div>
 		<div id="tab-2" style="display: none;">
-			<?php echo $templateform;?>
+			<?php echo !empty($templateform) ? $templateform : '';?>
 		</div>
 		<div id="tab-3" style="display: none;">
-			<?php echo $testdataform;?>
+			<?php echo !empty($testdataform) ? $testdataform : '';?>
 		</div>
 		<div id="tab-4" style="display: none;">	
-			<p><?php echo $testtitle;?></p>
+			<p><?php echo !empty($testtitle) ? $testtitle : '';?></p>
 			<hr>
-			<p><?php echo $testbody;?></p>
+			<p><?php echo !empty($testbody) ? $testbody : '';?></p>
         </div>
         <div id="tab-5" style="display: none;">
 			this is the template manual

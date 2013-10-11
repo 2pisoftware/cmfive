@@ -21,17 +21,17 @@ class Wiki extends DbObject{
 		
 		return $this->_db->sql($sql)->fetch_all();
 	}
-	function & getHomePage() {
+	function getHomePage() {
 		return $this->getPage($this->id,"HomePage");
 	}
 
-	function & getPage($name) {
+	function getPage($name) {
 		return $this->getObject("WikiPage",
 		array("is_deleted"=>0,
 				  "wiki_id"=>$this->id,
 				  "name"=>$name));
 	}
-	function & getPageById($id) {
+	function getPageById($id) {
 		return $this->getObject("WikiPage",
 		array("is_deleted"=>0,
 				  "id"=>$id));
@@ -41,7 +41,7 @@ class Wiki extends DbObject{
 		return ucfirst(str_replace(" ","",$this->title));
 	}
 
-	function insert() {
+	function insert($force_validation = false) {
 		if (!$this->title) {
 			throw new WikiException("This wiki needs a title.");
 		}
@@ -58,7 +58,7 @@ class Wiki extends DbObject{
 		$this->addUser($this->w->Auth->user(),"editor");
 	}
 
-	function & updatePage($name,$body) {
+	function updatePage($name,$body) {
 		$p = $this->getPage($name);
 		if ($p) {
 			$p->body = $body;
@@ -69,7 +69,7 @@ class Wiki extends DbObject{
 		return $p;
 	}
 
-	function & addPage($name,$body) {
+	function addPage($name,$body) {
 		$p = new WikiPage($this->w);
 		$p->wiki_id = $this->id;
 		$p->name = $name;
@@ -80,16 +80,16 @@ class Wiki extends DbObject{
 		return $p;
 	}
 
-	function & getUsers() {
+	function getUsers() {
 		return $this->getObjects("WikiUser",array("wiki_id"=>$this->id));
 	}
 
-	function canRead($user) {
+	function canRead(User $user) {
 		$wu = $this->getObject("WikiUser",array("user_id"=>$user->id,"wiki_id"=>$this->id));
 		return $wu != null && ($this->isOwner($user) || $wu->role == "reader" || $wu->role == "editor");
 	}
 	
-	function canEdit($user) {
+	function canEdit(User $user) {
 		$wu = $this->getObject("WikiUser",array("user_id"=>$user->id,"wiki_id"=>$this->id));
 		return $wu != null && ($this->isOwner($user)  || $wu->role == "editor");
 	}

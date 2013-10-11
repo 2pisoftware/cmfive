@@ -1,6 +1,6 @@
 <?
 $currentIndex = "";
-if ($results):
+if (!empty($results)):
 ?>
     <?foreach ($results as $res):
     			if ($res['class_name'] != $currentIndex):
