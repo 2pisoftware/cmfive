@@ -1,7 +1,7 @@
 <?php
 
 // ========= Session ========================
-ini_set('gc_maxlifetime', 60 * 60 * 6);
+ini_set('session.gc_maxlifetime', 60 * 60 * 6);
 
 //========== Constants =====================================
 define("CMFIVE_VERSION", "0.5.0");

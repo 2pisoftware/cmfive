@@ -10,7 +10,7 @@ class DbPDO extends PDO {
     private $query = null;
     private $fpdo = null;
     public $sql = null;
-    public $meta = array("page" => 0, "per_page" => 0, "total_results" => 0);
+    public $total_results = 0;
     
     public function __construct($config = array()) {
         // Set up our PDO class
