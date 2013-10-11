@@ -6,44 +6,72 @@
  * @author Adam Buckley for TripleACS
  */
 class DbPDO extends PDO {
-    private $statement = null;
-    private $table_names = array();
-    private $bind_parameters = array();
+    private static $table_names = array();
+    private $query = null;
+    private $fpdo = null;
+    public $sql = null;
     
     public function __construct($config = array()) {
+        // Set up our PDO class
         $url = "{$config['driver']}:host={$config['hostname']};dbname={$config['database']}";
         parent::__construct($url,$config["username"],$config["password"], null);
         
         // Since you cant bind table names, maybe its a good idea to
         // load an array of table names to check against? But this is probably
         // unecessary to do on every call so maybe move it to get()
-        foreach($this->query("show tables")->fetchAll(PDO::FETCH_NUM) as $table)
-            $this->table_names[] = $table[0];
-
+        // Setting this to static however should make this array share the memory
+        // heap for this var across all instances
+        if (empty(DbPDO::$table_names)){
+            foreach($this->query("show tables")->fetchAll(PDO::FETCH_NUM) as $table)
+                DbPDO::$table_names[] = $table[0];
+        }
+        // Instantiate a FluentPDO class and init vars
+        $this->fpdo = new FluentPDO($this);
+        $this->sql = $this->getSql();
     } 
 
+    /**
+     * This function sets up a FluentPDO query with the given table name, an
+     * error will be thrown if the table name doesn't exist in the database
+     * 
+     * @param type $table_name
+     * @return \DbPDO|null
+     */
     public function get($table_name){
-        if (!in_array($table_name, $this->table_names)){
+        if (!in_array($table_name, DbPDO::$table_names)){
             trigger_error("Table does not exist in the databse", E_USER_ERROR);
             return null;
-        }     
-        $this->statement = "SELECT * FROM " . $table_name . " ";// $this->prepare("SELECT * FROM " . $table_name);
+        }  
+        $this->query = $this->fpdo->from($table_name);
+        // $this->statement = "SELECT * FROM " . $table_name . " ";// $this->prepare("SELECT * FROM " . $table_name);
         return $this;
     }
     
-    public function where($column, $equals){
-        if ($this->statement !== null){
-            if (!strpos($this->statement, "WHERE"))
-                $this->statement .= " WHERE ";
-            else
-                $this->statement .= " AND ";
-            $this->statement .= " $column = :$column ";
-            $this->bind_parameters[':'.$column] = $equals;
+    /**
+     * This function appends where clauses to the query, the where part of the
+     * statement can be reset by passing NULL as the first parameter
+     * 
+     * @param String|Array $column
+     * @param String $equals
+     * @return \DbPDO|null
+     */
+    public function where($column, $equals = null){
+        if ($this->query !== null){
+            if (!empty($column)){
+                // Resets the where part of the statement
+                $this->query = $this->query->where(null);
+            } else {
+                if (is_array($column)){
+                    $this->query = $this->query->where($column);
+                } else {
+                    $this->query = $this->query->where($column, $equals);
+                }
+            }
             return $this;
         }
         return null;
     }
-
+    
     /**
      * Prepares a statement with a query
      * Note that in the migration from Crystal, the sql function executed RAW SQL
@@ -53,7 +81,7 @@ class DbPDO extends PDO {
      * @return DbPDO
      */
     public function sql($query){
-        $this->statement = $this->prepare($query);
+        $this->query = $this->prepare($query);
         return $this;
     }
     
@@ -63,34 +91,17 @@ class DbPDO extends PDO {
      * @return Result
      */
     public function execute(){
-        if ($this->statement !== null){
-            return $this->statement->execute();
-        }
-        return null;
+        return $this->query->execute();
     }
     
     /**
      * A grace method for our migration from Crystal
      * Crystal used "fetch_row" whereas PDO uses "fetch"
      * 
-     * @return Result se
+     * @return Result set
      */
     public function fetch_row() {
-        if ($this->statement !== null){
-            // Prepare statement if $this->statement is a string
-            if (is_string($this->statement)){
-                $this->statement = $this->prepare($this->statement);
-            }
-            // Bind parameters if not empty
-            if (!empty($this->bind_parameters)){
-                foreach($this->bind_parameters as $param => &$value){
-                    $this->statement->bindValue($param, $value);
-                }
-            }
-
-            return $this->statement->fetch();
-        }
-        return null;
+        return $this->query->fetch();
     }
     
     /**
@@ -100,10 +111,46 @@ class DbPDO extends PDO {
      * @return Result set
      */
     public function fetch_all(){
-        if ($this->statement !== null){
-            return $this->statement->fetchAll();
+        return $this->query->fetchAll();
+    }
+    
+    /**
+     * Sets up class with a PDO insert query and required array of values
+     * 
+     * @param String $table_name Name of data table
+     * @param Array $data Data to insert
+     * @return \DbPDO
+     */
+    public function insert($table_name, $data){
+        $this->query = $this->fpdo->insertInto($table_name, $data);
+        return $this;
+    }
+    
+    /**
+     * Sets up class with a PDO update query, also appends optional
+     * update data if needed
+     * 
+     * @param String $table_name
+     * @param Array $data
+     * @return \DbPDO
+     */
+    public function update($table_name, $data = null) {
+        $this->query = $this->fpdo->update($table_name);
+        if (!empty($data)){
+            $this->query = $this->query->set($data);
         }
-        return null;
+        return $this;
+    }
+    
+    /**
+     * Sets up class with a PDO delete query
+     * 
+     * @param String $table_name
+     * @return \DbPDO
+     */
+    public function delete($table_name){
+        $this->query = $this->fpdo->deleteFrom($table_name);
+        return $this;
     }
     
     /**
@@ -123,5 +170,23 @@ class DbPDO extends PDO {
                 trigger_error("Call to undefined method ".__CLASS__."::$func()", E_USER_ERROR);
                 die ();
         }
+    }
+    
+    // Returns the SQL query string
+    public function getSql(){
+        if ($this->query !== null){
+            return $this->query->getQuery();
+        }
+        return null;
+    }
+    
+    // Returns the last insert id
+    // WARNING: If execute is not called before hand, you will receive the
+    // PDO object
+    public function last_insert_id(){
+        if ($this->query !== null){
+            return $this->query;
+        }
+        return null;
     }
 }

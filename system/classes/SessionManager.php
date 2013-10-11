@@ -49,7 +49,7 @@ class SessionManager extends DbService {
 		$sql = "SELECT `session_data` FROM `sessions` WHERE
 				`session_id` = '$id' AND `expires` > $time";
 
-		$rs = $this->_db->sql($sql)->fetch_all();
+		$rs = $this->_db->get("sessions")->fetch_all();
 
 		if($rs) {
 			$data = $rs[0]['session_data'];
@@ -64,14 +64,17 @@ class SessionManager extends DbService {
 		// Build query
 		$time = time() + $this->life_time;
 
-		$newid = addslashes($id);
-		$newdata = addslashes($data);
-
-		$sql = "REPLACE `sessions`
-			(`session_id`,`session_data`,`expires`) VALUES('$newid',
-				'$newdata', $time)";
-
-		$this->_db->sql($sql)->execute();
+//		$newid = addslashes($id);
+//		$newdata = addslashes($data);
+                $data = ['session_id' => $id, 'session_data' => $data, 'expires' => $time];
+                $this->_db->delete('sessions')->where('session_id', $id)->execute();
+                $this->_db->insert('sessions', $data)->execute();
+                
+//		$sql = "REPLACE `sessions`
+//			(`session_id`,`session_data`,`expires`) VALUES('$newid',
+//				'$newdata', $time)";
+//
+//		$this->_db->sql($sql)->execute();
 
 		return TRUE;
 

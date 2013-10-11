@@ -968,6 +968,7 @@ class Web {
         if ($this->_action_executed) {
             $this->_callPostListeners();
         }
+        
         header("Location: ".$url);
         exit();
     }
