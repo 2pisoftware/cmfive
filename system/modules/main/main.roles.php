@@ -44,7 +44,7 @@ function anonymous_allowed(&$w,$path) {
     $action = $path_explode[1];
     $allowed = in_array($module,$ALLOW_MODULE);
     
-    return $allowed || $in_path || $has_ip;
+    return $allowed || $in_path;
 }
 
 

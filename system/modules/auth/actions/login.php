@@ -10,7 +10,7 @@ function login_GET(Web $w) {
 
 function login_POST(Web &$w) {
 	if ($_POST['login'] && $_POST['password']) {
-		$client_timezone = $_POST['user_timezone'];
+		$client_timezone = "Australia/Sydney";//$_POST['user_timezone'];
 		$user = $w->Auth->login($_POST['login'],$_POST['password'],$client_timezone);
 		if ($user) {
 			if ($w->session('orig_path') != "auth/login") {
