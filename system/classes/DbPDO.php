@@ -10,6 +10,7 @@ class DbPDO extends PDO {
     private $query = null;
     private $fpdo = null;
     public $sql = null;
+    public $meta = array("page" => 0, "per_page" => 0, "total_results" => 0);
     
     public function __construct($config = array()) {
         // Set up our PDO class
@@ -57,7 +58,7 @@ class DbPDO extends PDO {
      */
     public function where($column, $equals = null){
         if ($this->query !== null){
-            if (!empty($column)){
+            if (empty($column)){
                 // Resets the where part of the statement
                 $this->query = $this->query->where(null);
             } else {
@@ -91,7 +92,8 @@ class DbPDO extends PDO {
      * @return Result
      */
     public function execute(){
-        return $this->query->execute();
+        $this->query = $this->query->execute();
+        return $this->query;
     }
     
     /**
@@ -185,6 +187,10 @@ class DbPDO extends PDO {
     // PDO object
     public function last_insert_id(){
         if ($this->query !== null){
+            // This might be too much, oh well it works
+            if ($this->query instanceof InsertQuery)
+                $this->execute();
+
             return $this->query;
         }
         return null;

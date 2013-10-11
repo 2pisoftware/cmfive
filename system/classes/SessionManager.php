@@ -43,11 +43,11 @@ class SessionManager extends DbService {
 
 		// Fetch session data from the selected database
 
-		$time = time();
+//		$time = time();
 
-		$newid = addslashes($id);
-		$sql = "SELECT `session_data` FROM `sessions` WHERE
-				`session_id` = '$id' AND `expires` > $time";
+//		$newid = addslashes($id);
+//		$sql = "SELECT `session_data` FROM `sessions` WHERE
+//				`session_id` = '$id' AND `expires` > $time";
 
 		$rs = $this->_db->get("sessions")->fetch_all();
 

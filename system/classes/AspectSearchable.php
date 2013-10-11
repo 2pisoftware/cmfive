@@ -37,7 +37,7 @@ class AspectSearchable {
 		$this->object = $obj;
 	}
 	
-	private function & getIndex() {
+	private function getIndex() {
 		if ($this->object && $this->object->id && !$this->_index) {
 			$this->_index = $this->object->getObject("ObjectIndex", 
 					array("class_name"=>get_class($this->object), 
