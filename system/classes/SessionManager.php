@@ -94,8 +94,7 @@ class SessionManager extends DbService {
 		// Garbage Collection
 
 		// Build DELETE query.  Delete all records who have passed the expiration time
-		$sql = 'DELETE FROM `sessions` WHERE `expires` <
-				UNIX_TIMESTAMP();';
+		$sql = 'DELETE FROM `sessions` WHERE `expires` < '.time().';';
 
 		$this->_db->sql($sql)->execute();
 

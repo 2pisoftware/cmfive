@@ -1,8 +1,3 @@
-<?php
-
-?>
-
-
 <script type="text/javascript">
     var current_tab = 1;
     function switchTab(num){
