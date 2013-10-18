@@ -30,7 +30,7 @@ function forgotpassword_POST(Web $w) {
 	// Send email
 	$message = "Dear {$user->getFullName()},\n";
 	$message .= "Please go to this link to reset your password:\n";
-	$message .= "<a href=\"$webroot/auth/resetpassword?email={$user_contact->email}&token=$token\">$webroot/auth/resetpassword?email={$user_contact->email}&token=$token</a>\n";
+	$message .= "<a href=\"".WEBROOT."/auth/resetpassword?email={$user_contact->email}&token=$token\">".WEBROOT."/auth/resetpassword?email={$user_contact->email}&token=$token</a>\n";
 	$message .= "Thank you\ncmfive support";
 	
 	mail($user->email, "cmfive password reset", $message);
