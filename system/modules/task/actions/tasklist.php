@@ -21,10 +21,10 @@ function tasklist_ALL(Web $w) {
 		sort($members);
 	}
 	// load the search filters
-	$a = Html::select("assignee",$members, $who);
+	$a = Html::select("assignee",!empty($members) ? $members : null, $who);
 	$w->ctx("assignee",$a);
 
-	$b = Html::select("creator",$members, $w->request('creator'));
+	$b = Html::select("creator",!empty($members) ? $members : null, $w->request('creator'));
 	$w->ctx("creator",$b);
 
 	$taskgroups = array();

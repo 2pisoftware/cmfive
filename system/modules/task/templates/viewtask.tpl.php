@@ -1,51 +1,35 @@
-<?php
-
-?>
-
-<script type="text/javascript">
-    var current_tab = 1;
-    function switchTab(num){
-        if (num == current_tab) return;
-        $('#tab-'+current_tab).hide();
-        $('#tab-link-'+current_tab).removeClass("active");
-        $('#tab-'+num).show().addClass("active");
-        $('#tab-link-'+num).addClass("active");
-        current_tab = num;
-    }
-</script>
-
 <div class="tabs">
 	<div class="tab-head">
 		<a href="/task/index">Task Dashboard</a>
 		<a href="/task/tasklist">Task List</a>
 		<a id="tab-link-1" href="#" onclick="switchTab(1);" class="active">Task Details</a>
 		<a id="tab-link-2" href="#" onclick="switchTab(2);">Time Log</a>
-		<a id="tab-link-3" href="#"	onclick="switchTab(3);">Task Comments (<?= $numComments ?>)</a>
-		<a id="tab-link-4" href="#" onclick="switchTab(4);">Task Documents (<?= $numDocos ?>)</a>
-		<?= $tasknotifications ?>
+		<a id="tab-link-3" href="#"	onclick="switchTab(3);">Task Comments (<?php echo !empty($numComments) ? $numComments : 0; ?>)</a>
+		<a id="tab-link-4" href="#" onclick="switchTab(4);">Task Documents (<?php echo !empty($numDocos) ? $numDocos : 0; ?>)</a>
+		<?php echo !empty($tasknotifications) ? $tasknotifications : null; ?>
 	</div>
 	<div class="tab-body">
 		<div id="tab-1">
-			<?php echo $btndelete; ?>&nbsp;&nbsp;&nbsp;<?php echo $btntimelog; ?>
+			<?php echo !empty($btndelete) ? $btndelete : null; ?>&nbsp;&nbsp;&nbsp;<?php echo !empty($btntimelog) ? $btntimelog : null; ?>
 			<table cellspacing="10">
-			<tr><td valign="top"><?php echo $viewtask; ?></td>
-			<td valign="top"><?php echo $extradetails; ?></td></tr>
+			<tr><td valign="top"><?php echo !empty($viewtask) ? $viewtask : null; ?></td>
+			<td valign="top"><?php echo !empty($extradetails) ? $extradetails : null; ?></td></tr>
 			</table>
 			<p></p>
 		</div>
 		<div id="tab-2" style="display: none;">
-			<?php echo $addtime ?>
-			<?php echo $timelog ?>
+			<?php echo !empty($addtime) ? $addtime : null; ; ?>
+			<?php echo !empty($timelog) ? $timelog : null; ; ?>
 		</div>
 		<div id="tab-3" style="display: none;">
-			<?= $addComment ?>
-			<?= $comments ?>
+			<?php echo !empty($addComment) ? $addComment : null; ; ?>
+			<?php echo !empty($comments) ? $comments : null; ; ?>
 		</div>
 		<div id="tab-4" style="display: none;">
-			<?php echo $btnAttachment ?>&nbsp;&nbsp;&nbsp;<?php echo $btnPage ?>
-			<?php echo $docos ?>
+			<?php echo !empty($btnAttachment) ? $btnAttachment : null;  ?>&nbsp;&nbsp;&nbsp;<?php echo !empty($btnPage) ? $btnPage : null; ?>
+			<?php echo !empty($docos) ? $docos : null; ?>
 		</div>
-		<?= $tasknotify ?>
+		<?php echo !empty($tasknotify) ? $tasknotify : null; ?>
 	</div>
 </div>
 

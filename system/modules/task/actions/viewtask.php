@@ -41,7 +41,7 @@ function viewtask_GET(Web &$w) {
 		// Guests can view but not edit
 		// See if i am assignee or creator, if yes provide editable form, else provide static display
 		if ($task->getCanIEdit()) {
-			$btndelete = Html::b($webroot."/task/deletetask/".$task->id," Delete Task ", "Are you should you with to DELETE this task?");
+			$btndelete = Html::b(WEBROOT."/task/deletetask/".$task->id," Delete Task ", "Are you should you with to DELETE this task?");
 
 			// if task is closed and Task Group type says cannot be reopened, display static status
 			if ($task->getisTaskClosed() && !$task->getTaskReopen()) {
@@ -162,7 +162,7 @@ function viewtask_GET(Web &$w) {
 		//tab: Task Documents
 		// provide a button for adding new documents
 		$line = array();
-		$putdocos = Html::box($webroot."/task/attachForm/".$task->id," Upload a Document ",true);
+		$putdocos = Html::box(WEBROOT."/task/attachForm/".$task->id," Upload a Document ",true);
 		$w->ctx("btnAttachment",$putdocos);
 
 		// provide current document + page count in tab heading for Documents
@@ -183,7 +183,7 @@ function viewtask_GET(Web &$w) {
 		// if documents, list them
 		if ($docos)	{
 			foreach ($docos as $doco) {
-				$line[] = array("<a href=\"" . $webroot . "/file/atfile/" . $doco->id . "/" . $doco->filename . "\" target=\"_blank\">" . $doco->filename . "</a>",
+				$line[] = array("<a href=\"" . WEBROOT . "/file/atfile/" . $doco->id . "/" . $doco->filename . "\" target=\"_blank\">" . $doco->filename . "</a>",
 				$w->Task->getUserById($doco->modifier_user_id),
 				formatDateTime($doco->dt_created),
 				$doco->description,
@@ -206,7 +206,7 @@ function viewtask_GET(Web &$w) {
 		// tab: time log
 		// provide button to add time entry
 		if ($task->assignee_id == $w->Auth->user()->id) {		
-			$addtime = Html::box($webroot."/task/addtime/".$task->id," Add Time Log entry ",true);
+			$addtime = Html::box(WEBROOT."/task/addtime/".$task->id," Add Time Log entry ",true);
 		}
 		$w->ctx("addtime",$addtime);
 
@@ -327,11 +327,11 @@ function viewtask_GET(Web &$w) {
 			// create form. if still no 'notify' all boxes are unchecked
 			$f = array(array("For which Task Events should you receive Notification?","section"));
 			$f[] = array("","hidden","task_creation", "0");
-			$f[] = array("Task Details Update","checkbox","task_details", $task_details);
-			$f[] = array("Comments Added","checkbox","task_comments", $task_comments);
-			$f[] = array("Time Log Entry","checkbox","time_log", $time_log);
-			$f[] = array("Task Data Updated","checkbox","task_data", $task_data);
-			$f[] = array("Documents Added","checkbox","task_documents", $task_documents);
+			$f[] = array("Task Details Update","checkbox","task_details", !empty($task_details) ? $task_details : null);
+			$f[] = array("Comments Added","checkbox","task_comments", !empty($task_comments) ? $task_comments : null);
+			$f[] = array("Time Log Entry","checkbox","time_log", !empty($time_log) ? $time_log : null);
+			$f[] = array("Task Data Updated","checkbox","task_data", !empty($task_data) ? $task_data : null);
+			$f[] = array("Documents Added","checkbox","task_documents", !empty($task_documents) ? $task_documents : null);
 
 			$form = Html::form($f,$w->localUrl("/task/updateusertasknotify/".$task->id),"POST","Save");
 

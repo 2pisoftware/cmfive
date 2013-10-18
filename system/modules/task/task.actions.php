@@ -229,7 +229,7 @@ function addtime_GET(Web &$w) {
 			array("Hours","select","per_hour",null,array_slice($hours, 0, 11)),
 			array("Min","select","per_minute",null,$mins),
 			array("Comments","section"),
-			array("Comments","textarea","comments",$comment,"40","10"),
+			array("Comments","textarea","comments",!empty($comment) ? $comment : null,"40","10"),
 			);
 			
 	$form = Html::form($f,$w->localUrl("/task/edittime/".$p['taskid']."/".$p['log_id']),"POST","Save");

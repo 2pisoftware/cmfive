@@ -19,7 +19,7 @@ function index_ALL(Web $w) {
 	// drilling down through group > task type > status
 	// if group permissions mean 'i can view' then show count of my tasks / group tasks
         $strOut = '';
-	if ($group) {
+	if (!empty($group)) {
 		foreach ($group as $grpid => $grptype) {
 			// i as arbitory value. really looking at array count
 			$i = 0;

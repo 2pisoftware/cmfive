@@ -2,9 +2,6 @@
 // Step II in creating a task. This function gets the additional fields by tasktype.
 // Serialise REQUEST object from step one and store in hidden form element: 'formone'
 function tasktypeform_POST(Web $w) {
-	echo "BEFORE ACTION";
-	die();
-	
 	TaskLib::task_navigation($w, "Create Task");
 
 	// get task type, serialise REQUEST object from step 1 of creating a new task
@@ -12,7 +9,7 @@ function tasktypeform_POST(Web $w) {
 	$tg = $w->Task->getTaskGroup($w->request('task_group_id'));
 	// if no due date given, make 1 month from today
 	if ($w->request('dt_due') == "") {
-		$w->request('dt_due') = $w->Task->getNextMonth();
+		$_POST['dt_due'] = $w->Task->getNextMonth();
 	}
 
 	$req = serialize($_POST);
@@ -34,6 +31,4 @@ function tasktypeform_POST(Web $w) {
 	// display the form
 	$f = Html::form($theform, $w->localUrl("/task/createtask/"),"POST"," Submit ");
 	$w->ctx("formfields",$f);
-	
-	echo "AFTER ACTION";
 }

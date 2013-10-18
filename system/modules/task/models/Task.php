@@ -191,7 +191,7 @@ class Task extends DbObject {
 	}
 
 	// helper funtion: return all task comments given a task ID
-	function & getComments($id) {
+	function getComments($id) {
 		return $this->w->Auth->getObjects("AComment",array("obj_table"=>Task::getDbTableName(),"obj_id"=>$id));
 	}
 
@@ -212,7 +212,7 @@ class Task extends DbObject {
 	}
 
 	// helper function: return all documents attachmented to a task given a task ID
-	function & getDocos($id) {
+	function getDocos($id) {
 		return $this->w->File->getAttachments(Task::getDbTableName(),$id);
 	}
     
@@ -234,7 +234,7 @@ class Task extends DbObject {
 	}
 	
 	// return list of time log entries for a task given task ID
-	function & getTimeLogEntries($id) {
+	function getTimeLogEntries($id) {
 		return $this->getObjects("TaskTime",array("task_id"=>$id,"is_deleted"=>0));
 	}
 	
@@ -309,7 +309,7 @@ class Task extends DbObject {
 		return "task/viewtask/".$this->id;
 	}
 	
-	function & getAssignee() {
+	function getAssignee() {
 		if ($this->assignee_id) {
 			return $this->getObject("User", $this->assignee_id);
 		}

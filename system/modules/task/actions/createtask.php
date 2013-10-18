@@ -20,7 +20,7 @@ function createtask_GET(Web &$w) {
 			}
 		}
 
-		if ($w->request($key) != "") {
+		if ($w->request(!empty($key) ? $key : null) != "") {
 			$t = $w->Task->getTaskGroup($w->request('gid'));
 
 			$tasktypes = ($t != "") ? $w->Task->getTaskTypes($t->task_group_type) : array();

@@ -98,7 +98,7 @@ class TaskService extends DbService {
 				$text = htmlspecialchars($text);
 				
 				// replace the markers in the encoded text with unencoded URLs
-				if ($mark) {
+				if (!empty($mark)) {
 					foreach ($mark as $marker => $url) {
 						$text = str_replace($marker,$url,$text);
 					}
