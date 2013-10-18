@@ -48,6 +48,13 @@ class DbPDO extends PDO {
         return $this;
     }
     
+    public function count(){
+        if ($this->query !== null){
+            $temp_query = $this->query;
+            return count($temp_query->execute());
+        }
+    }
+    
     /**
      * This function appends where clauses to the query, the where part of the
      * statement can be reset by passing NULL as the first parameter
