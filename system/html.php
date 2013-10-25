@@ -612,6 +612,7 @@ EOT;
         } else {
             $source = "'".$options."'";
         }
+
         $buf ='<input type="hidden" id="'.$name.'"  name="'.$name.'" value="'.$value.'"/>';
         $buf.='<input type="text" id="acp_'.$name.'"  name="acp_'.$name.'" value="'.$acp_value.'" class="'.$class.'" style="'.$style.'"/>';
         $buf.="<script type='text/javascript'>";
@@ -621,6 +622,7 @@ EOT;
                         source: '.$source.',
                         select: function(event,ui){
                             $("#'.$name.'").val(ui.item.id); //acp_'.$name.'(event,ui);
+                            selectAutocompleteCallback(event, ui);
                         }
                     });
                 });';

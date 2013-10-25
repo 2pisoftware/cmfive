@@ -89,7 +89,7 @@ class DbService {
 	 * @param <type> $idOrWhere
 	 * @return <type>
 	 */
-	function getObject($class,$idOrWhere,$use_cache = true) {
+	function getObject($class,$idOrWhere,$use_cache = true,$order_by = null) {
 		if (!$idOrWhere || !$class) return null;
 
 		$key = $idOrWhere;
@@ -116,10 +116,14 @@ class DbService {
 		$o = new $class($this->w);
 		$table = $o->getDbTableName();
 		if (is_scalar($idOrWhere)) {
-			$result = $this->_db->get($table)->where('id',$idOrWhere)->fetch_row();
+			$this->_db->get($table)->where('id',$idOrWhere);
 		} elseif (is_array($idOrWhere)) {
-			$result = $this->_db->get($table)->where($idOrWhere)->fetch_row();
+			$this->_db->get($table)->where($idOrWhere);
 		}
+                if (!empty($order_by)){
+                    $this->_db->order_by($order_by);
+                }
+                $result = $this->_db->fetch_row();
 		if ($result) {
 			$obj = $this->getObjectFromRow($class, $result);
 			if ($usecache) {

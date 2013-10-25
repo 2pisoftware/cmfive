@@ -48,11 +48,25 @@ class DbPDO extends PDO {
         return $this;
     }
     
+    public function select($select){
+        if ($this->query !== NULL && !empty($select)){
+            $this->query = $this->query->select($select);
+        }
+        return $this;
+    }
+    
     public function count(){
         if ($this->query !== null){
             $temp_query = $this->query;
             return count($temp_query->execute());
         }
+    }
+    
+    public function leftJoin($leftJoin){
+        if ($this->query !== NULL && !empty($leftJoin)){
+            $this->query = $this->query->leftJoin($leftJoin);
+        }
+        return $this;
     }
     
     /**
@@ -75,9 +89,15 @@ class DbPDO extends PDO {
                     $this->query = $this->query->where($column, $equals);
                 }
             }
-            return $this;
         }
-        return null;
+        return $this;
+    }
+    
+    public function order_by($orderby){
+        if ($this->query !== null && !empty($order)){
+            $this->query = $this->query->orderBy($orderby);
+        }
+        return $this;
     }
     
     /**
@@ -122,7 +142,7 @@ class DbPDO extends PDO {
     public function fetch_all(){
         return $this->query->fetchAll();
     }
-    
+        
     /**
      * Sets up class with a PDO insert query and required array of values
      * 
@@ -195,6 +215,7 @@ class DbPDO extends PDO {
     public function last_insert_id(){
         if ($this->query !== null){
             // This might be too much, oh well it works
+            // It checks if we havent called execute yet, and calls it for us
             if ($this->query instanceof InsertQuery)
                 $this->execute();
 

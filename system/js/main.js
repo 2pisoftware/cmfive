@@ -1,4 +1,5 @@
-
+// placeholder function to stop JS complaining 
+function selectAutocompleteCallback(name) {}
 /**
  * Clears all elements of a form
  */
