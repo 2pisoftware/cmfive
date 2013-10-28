@@ -84,7 +84,7 @@ class Html {
             $tag = "button";
         }
                 
-        return "<".$tag.$onclick."><span>".$title."</span></".$tag.">";
+        return "<".$tag.($tag=='a'?' href="#" ':'').$onclick."><span>".$title."</span></".$tag.">";
     }
 
     public static function boxOnClick($href,$iframe=false,$width=null,$height=null,$param="isbox") {
@@ -604,6 +604,9 @@ EOT;
                     if ($value == $option->getSelectOptionValue()) {
                         $acp_value = $option->getSelectOptionTitle();
                     }
+                } elseif (is_object($option)) {
+                    // Ima go ahead and assume that option will have id and value parameters
+                    $source .= json_encode($option) . ", ";
                 } elseif (is_scalar($option)) {
                     $source .= '{"id":"'.$option.'","value":"'.$option.'"}, ';
                 } 

@@ -656,11 +656,13 @@ class DbObject extends DbService {
 	function getDbTableName() {
 		if (isset($this->_db_table)) {
 			return $this->_db_table;
-		}
-		if (isset(static::$_db_table)) {
+		} else if (isset(static::$_db_table)) {
 			return static::$_db_table;
-		}
-		return strtolower(get_class($this));
+		} else {
+                    // Help from: http://www.tech-recipes.com/rx/5626/php-camel-case-to-spaces-or-underscore/
+                    return strtolower(preg_replace('/(?<=\\w)(?=[A-Z])/', "_$1", get_class($this)));
+                }
+		// return strtolower(get_class($this));
 	}
 
 	/**
