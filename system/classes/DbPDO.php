@@ -94,8 +94,15 @@ class DbPDO extends PDO {
     }
     
     public function order_by($orderby){
-        if ($this->query !== null && !empty($order)){
+        if ($this->query !== null && !empty($orderby)){
             $this->query = $this->query->orderBy($orderby);
+        }
+        return $this;
+    }
+    
+    public function limit($limit){
+        if ($this->query !== null && !empty($limit)){
+            $this->query = $this->query->limit($limit);
         }
         return $this;
     }
@@ -191,13 +198,25 @@ class DbPDO extends PDO {
      * @return This
      */
     public function __call($func, $args){
+        if ($func[0] == "_"){
+            $func = substr($func, 1);
+        }
         switch ($func){
             case 'and':
                 return $this->where($args[0], $args[1]);
                 break;
+            
             default:
-                trigger_error("Call to undefined method ".__CLASS__."::$func()", E_USER_ERROR);
-                die ();
+                // What this does is palm off unknown function calls to the parent
+                // which will still throw an error if the method doesnt exist BUT
+                // with the code above that strips off the leading underscore if present will mean
+                // that we can bypass the whacky adapted DbPDO/FluentPDO and go STRAIGHT to the
+                // underlying PDO implementation, just by prefixing underscores to the first method call! Amazing!
+                
+                // NOTE: You only need to prefix the first method when chaining as the return value for
+                // the first call is a PDOStatement
+                
+                return call_user_func_array("parent::".$func, $args);
         }
     }
     
@@ -209,6 +228,13 @@ class DbPDO extends PDO {
         return null;
     }
     
+    public function columnCount() {
+        return $this->query->columnCount();
+    }
+    
+    public function getColumnMeta($i) {
+        return $this->query->getColumnMeta($i);
+    }
     // Returns the last insert id
     // WARNING: If execute is not called before hand, you will receive the
     // PDO object

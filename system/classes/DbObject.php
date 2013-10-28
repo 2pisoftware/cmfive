@@ -309,9 +309,27 @@ class DbObject extends DbService {
 						}
 					}
 					$this->$k = $v;
-				}
-			}
-		}
+                                
+                                }
+                        }
+                }
+                // May be modifiable data this will only fire if the keys below
+                // aren't defined in the class
+                if (!empty($row["dt_created"]) && empty($this->dt_created)){
+                    $this->dt_created = $this->dt2Time($row["dt_created"]);
+                }
+                if (!empty($row["dt_modified"]) && empty($this->dt_modified)){
+                    $this->dt_modified = $this->dt2Time($row["dt_modified"]);
+                }
+                if (!empty($row["creator_id"]) && empty($this->creator_id)){
+                    $this->creator_id = $row["creator_id"];
+                }
+                if (!empty($row["modifier_id"]) && empty($this->modifier_id)){
+                    $this->modifier_id = $row["modifier_id"];
+                }
+                if (!empty($row["is_deleted"]) && empty($this->is_deleted)){
+                    $this->is_deleted = $row["is_deleted"];
+                }
 	}
 
 	/**
@@ -423,22 +441,27 @@ class DbObject extends DbService {
 			}
 		}
 		$t = $this->getDbTableName();
-
+                $columns = $this->getDbTableColumnNames();
+                
 		// set some default attributes
 		if (!$this->_modifiable) {
 			// for backwards compatibility
-			if (property_exists($this, "dt_created")) {
-				$this->dt_created = time();
-			}
-			if (property_exists($this, "creator_id") && $this->creator_id === null && $this->w->Auth->user()) {
+			//if (property_exists($this, "dt_created")) {
+			if (in_array("dt_created", $columns))
+                            $this->dt_created = time();
+			//}
+			//if (property_exists($this, "creator_id") && $this->creator_id === null && $this->w->Auth->user()) {
+                        if (in_array("creator_id", $columns))
 				$this->creator_id = $this->w->Auth->user()->id;
-			}
-			if (property_exists($this, "dt_modified")) {
+			//}
+			//if (property_exists($this, "dt_modified")) {
+                        if (in_array("dt_modified", $columns))
 				$this->dt_modified = time();
-			}
-			if (property_exists($this, "modifier_id") && $this->w->Auth->user()) {
+			//}
+			//if (property_exists($this, "modifier_id") && $this->w->Auth->user()) {
+                        if (in_array("modifier_id", $columns))
 				$this->modifier_id = $this->w->Auth->user()->id;
-			}
+			//}
 		}
 		$data = array();
 		foreach (get_object_vars($this) as $k => $v) {
@@ -521,18 +544,19 @@ class DbObject extends DbService {
 		}
 		
 		$t = $this->getDbTableName();
-
+                $columns = $this->getDbTableColumnNames();
 		// check delete attribute
-		if (property_exists($this,"is_deleted") && $this->is_deleted === null) {
+		if (in_array("is_deleted", $columns) && $this->is_deleted === null) {
 			$this->is_deleted = 0;
 		}
 
 		// set default attributes the old way
 		if (!$this->_modifiable) {
-			if (property_exists($this, "dt_modified")) {
+			//if (property_exists($this, "dt_modified")) {
+                        if (in_array("dt_modified", $columns)){
 				$this->dt_modified = time();
 			}
-			if (property_exists($this, "modifier_id") && $this->w->Auth->user()) {
+			if (in_array("modifier_id", $columns) && $this->w->Auth->user()) {
 				$this->modifier_id = $this->w->Auth->user()->id;
 			}
 		}
@@ -647,7 +671,7 @@ class DbObject extends DbService {
 	 * Uses either:
 	 * 
 	 * 1) the value of the property $_db_table (if it exists)
-	 * 2) the name of the class (lowercase)
+	 * 2) the name of the class as "snake_case" (lowercase)
 	 * 
 	 * You can also override this function completely.
 	 *
@@ -665,6 +689,16 @@ class DbObject extends DbService {
 		// return strtolower(get_class($this));
 	}
 
+        function getDbTableColumnNames(){
+            $rs = $this->_db->_query('SELECT * FROM ' . $this->getDbTableName() . ' LIMIT 0');
+            $columns = array();
+            for ($i = 0; $i < $rs->columnCount(); $i++) {
+                $col = $rs->getColumnMeta($i);
+                $columns[] = $col['name'];
+            }
+            return $columns;//$this->_db->prepare("DESCRIBE tablename")->execute()->fetchAll(PDO::FETCH_COLUMN);
+        }
+        
 	/**
 	 * Returns the column name for a named attribute
 	 *
