@@ -157,7 +157,7 @@ if (!empty($new)) {
 	$(".ispage").css("cursor","default");
 	$(".ispage").hover(function(){$(this).css("background-color","#CAFF70")});
 	$(document).ready(function(){
-		for(var i=1; i<<?=$pgcount;?>+1; i++){
+		for(var i = 1; i < <?php echo !empty($pgcount) ? $pgcount : 1; ?>+1; i++){
 			if (i == 1){
 				$("#link"+i).addClass('selectedPage');
 			} else {

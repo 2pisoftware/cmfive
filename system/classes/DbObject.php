@@ -638,10 +638,11 @@ class DbObject extends DbService {
 	 */
 	function delete($force=false) {
 		$t = $this->getDbTableName();
-
+                $columns = $this->getDbTableColumnNames();
+                
 		// if an is_deleted property exists, then only set it to 1
 		// and update instead of delete!
-		if (property_exists(get_class($this), "is_deleted") && !$force) {
+		if ((property_exists(get_class($this), "is_deleted") || (in_array("is_deleted", $columns))) && !$force) {
 			$this->is_deleted = 1;
 			$this->update();
 		} else {

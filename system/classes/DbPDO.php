@@ -130,6 +130,11 @@ class DbPDO extends PDO {
         return $this->query;
     }
     
+    public function fetch_element($element){
+        $row = $this->fetch_row();
+        return (!empty($row[$element]) ? $row[$element] : null);
+    }
+    
     /**
      * A grace method for our migration from Crystal
      * Crystal used "fetch_row" whereas PDO uses "fetch"
