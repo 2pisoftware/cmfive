@@ -116,7 +116,7 @@ class DbPDO extends PDO {
      * @return DbPDO
      */
     public function sql($query){
-        $this->query = $this->prepare($query);
+        $this->query = $this->query($query);
         return $this;
     }
     

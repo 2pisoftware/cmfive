@@ -1,8 +1,3 @@
-<?php
-
-?>
-
-
 <script type="text/javascript">
     var current_tab = 1;
     function switchTab(num){
@@ -75,7 +70,7 @@
 
 <script language="javascript">
 <?php 
-	if ($_REQUEST['tab'] && (!empty($_REQUEST['tab']))) {
+	if (!empty($_REQUEST['tab'])) {
 		echo "	switchTab(" . $_REQUEST['tab'] . ");";
 	}
 ?>
@@ -89,7 +84,7 @@
 	$.ajaxSetup ({
 	    cache: false
 		});
-
+        $(this).val("'"+<?php echo $w->Auth->user()->id; ?>+"'");
 	$(".startTime").click(function(e){
     	var url = $(this).attr("href");
     	var screenW = screen.width;
@@ -142,7 +137,7 @@
 			function(result) {
 				$('#taskgroups').parent().html(result);
 				if (myFlag)
-					$("select#taskgroups").val("<?php echo $reqTaskgroups; ?>");
+					$("select#taskgroups").val("<?php echo !empty($reqTaskgroups) ? $reqTaskgroups : ''; ?>");
 				$("select[id='taskgroups']").trigger("change");
 				}
 			);
@@ -156,7 +151,7 @@
 			function(result) {
 				$('#tasktypes').parent().html(result);
 				if (myFlag)
-					$("select#tasktypes").val("<?php echo $reqTasktypes; ?>");
+					$("select#tasktypes").val("<?php echo !empty($reqTasktypes) ? $reqTasktypes : ''; ?>");
 				$("select[id='tasktypes']").trigger("change");
 				}
 			);
@@ -170,7 +165,7 @@
 			function(result) {
 				$('#tpriority').parent().html(result);
 				if (myFlag)
-					$("select#tpriority").val("<?php echo $reqPriority; ?>");
+					$("select#tpriority").val("<?php echo !empty($reqPriority) ? $reqPriority : ''; ?>");
 				$("select[id='tpriority']").trigger("change");
 				}
 			);
@@ -184,7 +179,7 @@
 			function(result) {
 				$('#status').parent().html(result);
 				if (myFlag)
-					$("select#status").val("<?php echo $reqStatus; ?>");
+					$("select#status").val("<?php echo !empty($reqStatus) ? $reqStatus : ''; ?>");
 				}
 			);
 		}
@@ -194,7 +189,11 @@
 	$("select:visible[id*='status_']").live("change",function() {
 		var sid = $(this).attr("id");
 		var s = sid.split("_");
-		$('#updatestatus').attr("action", update_url + "?id=" + s[1] + "&status=" + $(this).val() + "&assignee=" + $("#leadfilter #assignee").val() + "&creator=" + $("#leadfilter #creator").val() + "&taskgroups=" + $("#leadfilter #taskgroups").val() + "&tasktypes=" + $("#leadfilter #tasktypes").val() + "&tpriority=" + $("#leadfilter #tpriority").val() + "&tstatus=" + $("#leadfilter #status").val() + "&dt_from=" + $("#leadfilter #dt_from").val() + "&dt_to=" + $("#leadfilter #dt_to").val());
+		$('#updatestatus').attr("action", update_url + "?id=" + s[1] + "&status=" + $(this).val() + "&assignee=" + 
+                        $("#leadfilter #assignee").val() + "&creator=" + $("#leadfilter #creator").val() + "&taskgroups=" + 
+                        $("#leadfilter #taskgroups").val() + "&tasktypes=" + $("#leadfilter #tasktypes").val() + "&tpriority=" + 
+                        $("#leadfilter #tpriority").val() + "&tstatus=" + $("#leadfilter #status").val() + "&dt_from=" + 
+                        $("#leadfilter #dt_from").val() + "&dt_to=" + $("#leadfilter #dt_to").val());
 		$('#updatestatus').submit();
 		}
 	);
