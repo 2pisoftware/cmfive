@@ -333,7 +333,7 @@ class Html {
         $class = $class ? ' class="'.$class.'"' : null;
         $buf = "";
         if ($includeFormTag == true)
-            $buf .= '<form'.$id.$class.' action="'.$action.'" method="'.$method.'" target="'.$target.'">';
+            $buf .= '<form' . $id . $class . (!empty($action) ? ' action="'.$action.'"' : '') .' method="'.$method.'" target="'.$target.'">';
         
         $buf .= "<table  cellspacing=\"0\" ".$id.$class." class='form-wrapper'>\n";
         $valign = ' valign="top" ';
@@ -440,7 +440,7 @@ class Html {
                 $buf.="<input type='button' style='padding-top: 3px;padding-bottom: 3px;width:100px' id='".$id."' value='".$title."'/>&nbsp;";
             }
         }
-        if (!empty($action)) {
+        if ($includeFormTag == true) {
             $buf.= '<input id="submit" style="padding-top: 3px;padding-bottom: 3px;width:100px;" type="submit" value="'.$submitTitle.'"/>';
         }
         $buf.='</td></tr>';

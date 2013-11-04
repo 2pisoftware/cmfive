@@ -146,7 +146,7 @@ class DbService {
 	 * 
 	 * @return <type>
 	 */
-	function getObjects($class,$where=null,$cache_list = false, $use_cache = true) {
+	function getObjects($class,$where=null,$cache_list = false, $use_cache = true, $order_by = null) {
 		if (!$class) return null;
 
 		// if using the list cache
@@ -176,6 +176,9 @@ class DbService {
 		} else if ($where && is_scalar($where)) {
 			$this->_db->where($where,false);
 		}
+                if (!empty($order_by)){
+                    $this->_db->order_by($order_by);
+                }
 		//echo $this->_db->print_sql();
 		
 		$result = $this->_db->fetch_all();
