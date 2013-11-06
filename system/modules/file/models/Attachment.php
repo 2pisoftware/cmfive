@@ -23,13 +23,13 @@ class Attachment extends DbObject {
 
 	public $type_code; // this is a type of attachment, eg. Receipt of Deposit, PO Variation, Sitephoto, etc.
 
-	function insert() {
+	function insert($force_validation = false) {
 		$this->dt_modified = time();
 		$this->mimetype = $this->w->getMimetype(FILE_ROOT."/".$this->fullpath);
 		$this->modifier_user_id = $this->w->Auth->user()->id;
 		$this->fullpath = str_replace(FILE_ROOT, "", $this->fullpath);
 		$this->is_deleted = 0;
-		parent::insert();
+		parent::insert($force_validation);
 	}
 
 	function & getParent() {

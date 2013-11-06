@@ -8,16 +8,19 @@ function attach_GET(Web &$w) {
 	}
 	$types = $w->File->getAttachmentTypesForObject($object);
 	$w->ctx("types",$types);
+        $w->ctx("table", $p['table']);
+        $w->ctx("id", $p['id']);
+        $w->ctx("url", $p['url']);
 }
 
 function attach_POST(Web &$w) {
-	$table = $_REQUEST['table'];
-	$id = $_REQUEST['id'];
-	$title = $_REQUEST['title'];
-	$description = $_REQUEST['description'];
-	$type_code = $_REQUEST['type_code'];
+	$table = $w->request('table');
+	$id = $w->request('id');
+	$title = $w->request('title');
+	$description = $w->request('description');
+	$type_code = $w->request('type_code');
 
-	$url = str_replace(" ", "/", $_REQUEST['url']);
+	$url = str_replace(" ", "/", $w->request('url'));
 	$object = $w->Auth->getObject($table,$id);
 	if (!$object) {
 		$w->error("Nothing to attach to.",$url);

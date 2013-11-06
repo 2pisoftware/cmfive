@@ -32,7 +32,7 @@ class FileService extends DbService {
 	}
 
 
-	function & getAttachments($objectOrTable,$id=null) {
+	function getAttachments($objectOrTable,$id=null) {
 		if (is_scalar($objectOrTable)) {
 			$table = $objectOrTable;
 		} elseif (is_a($objectOrTable, "DbObject")) {
@@ -46,7 +46,7 @@ class FileService extends DbService {
 		return null;
 	}
 
-	function & getAttachment($id) {
+	function getAttachment($id) {
 		return $this->getObject("Attachment", $id);
 	}
 

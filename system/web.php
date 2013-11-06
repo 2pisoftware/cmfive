@@ -358,7 +358,7 @@ class Web {
      */
     function getMimetype($filename) {
         $mime = "text/html";
-        if (function_exists(finfo_open)) {
+        if (function_exists("finfo_open")) {
             $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
             $mime = finfo_file($finfo, $filename);
             finfo_close($finfo);
@@ -985,8 +985,8 @@ class Web {
         if ($this->_action_executed) {
             $this->_callPostListeners();
         }
-        
-        header("Location: ".$url);
+
+        header("Location: ".trim($url));
         exit();
     }
 
