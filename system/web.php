@@ -49,7 +49,8 @@ class Web {
     public $_moduleConfig;
     public $_paths;
     public $_loginpath = 'auth/login';
-
+	public $_partialsdir = "partials";
+	
     public $db;
     
     /**
@@ -591,6 +592,63 @@ class Web {
         }
         return $this->_services[$name];
     }
+    
+    /**
+     * Call and return code for a partial template.
+     * 
+     * This works like an action/template except that it can't be called directly from a url.
+     * 
+     * Partials don't have access to the global context and do not store anything in the global context!
+     * 
+     * @param string $name
+     * @param array $params
+     * @param string $module
+     * @param string $method
+     */
+    function partial($name,$params=null,$module=null,$method="ALL") {
+    	if($module === null) {
+    		$module = $this->_module;
+    	}
+    	// save current output buffer
+    	$oldbuf = $this->_buffer;
+    	$this->_buffer = null;
+    	
+    	// save the current context
+    	$oldctx = $this->_context;
+    	$this->_context = array();
+    	
+    	// try to find the partial action and execute
+    	$partial_action_file = implode("/",array($this->getModuleDir($module),$this->_partialsdir,"actions",$name.".php"));
+    	if (file_exists($partial_action_file)) {
+    		require_once($partial_action_file);
+    		
+    		// now execute the action
+ 			$partial_action = $name."_".$method;
+ 			if (function_exists($partial_action)) {
+ 				$partial_action($this,$params);
+ 			}
+    	} 
+    	
+		$currentbuf = $this->_buffer;
+		
+		if (empty($currentbuf)) {
+    		// try to find the partial template and execute if found
+    		$partial_template_file = implode("/",array($this->getModuleDir($module),$this->_partialsdir,"templates",$name.$this->_templateExtension));
+	    	if (file_exists($partial_template_file)) {
+	    		$tpl = new WebTemplate();
+	    		$this->ctx("w",$this);
+	    		$tpl->set_vars($this->_context);
+	    		$currentbuf = $tpl->fetch($partial_template_file);
+	    	}
+		}
+    	
+    	// restore output buffer and context
+    	$this->_buffer = $oldbuf;
+    	$this->_context = $oldctx;
+    	
+    	return $currentbuf;
+    }
+    
     
     /////////////////////////////////// Template stuff /////////////////////////
 
