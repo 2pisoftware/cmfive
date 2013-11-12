@@ -32,7 +32,7 @@ class Attachment extends DbObject {
 		parent::insert($force_validation);
 	}
 
-	function & getParent() {
+	function getParent() {
 		return $this->getObject($this->attach_table, $this->attach_id);
 	}
 
@@ -74,7 +74,7 @@ class Attachment extends DbObject {
 	 */
 	function getThumb() {
 		$buf = "<a href='".$this->File->getDownloadUrl($this->fullpath)."'>";
-		$buf .="<img src='".$this->getThumbnailUrl()."' border='0'/></a>";
+		$buf .="<img src='".$this->File->getThumbImg($this->fullpath)."' border='0'/></a>";
 		return $buf;
 	}
 
