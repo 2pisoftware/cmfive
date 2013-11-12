@@ -108,13 +108,13 @@ class FileService extends DbService {
 				$template .= '
 				<div class="attachment">
 				<div class="thumb"><a
-					href="'.$webroot.'/file/atthumb/'.$att->id.'/800/600/a.jpg"
+					href="'.WEBROOT.'/file/atthumb/'.$att->id.'/800/600/a.jpg"
 					rel="gallery"><img
-					src="'.$webroot.'/file/atthumb/'.$att->id.'/250/250" border="0" /></a><br/>'.$att->description.'
+					src="'.WEBROOT.'/file/atthumb/'.$att->id.'/250/250" border="0" /></a><br/>'.$att->description.'
 				</div>
 				
-				<div class="actions">'.Html::a($webroot."/file/atdel/".$att->id."/".$backUrl."+".$object->id,"Delete",null,null,"Do you want to delete this attachment?")
-				.' '.Html::a($webroot."/file/atfile/".$att->id."/".$att->filename,"Download").'
+				<div class="actions">'.Html::a(WEBROOT."/file/atdel/".$att->id."/".$backUrl."+".$object->id,"Delete",null,null,"Do you want to delete this attachment?")
+				.' '.Html::a(WEBROOT."/file/atfile/".$att->id."/".$att->filename,"Download").'
 				</div>
 				</div>';
 			}
