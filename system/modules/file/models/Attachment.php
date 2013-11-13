@@ -20,7 +20,7 @@ class Attachment extends DbObject {
 
 	public $fullpath; // publicchar(255)
 	public $is_deleted; // tinyint 0/1
-
+        
 	public $type_code; // this is a type of attachment, eg. Receipt of Deposit, PO Variation, Sitephoto, etc.
 
 	function insert($force_validation = false) {
@@ -74,7 +74,7 @@ class Attachment extends DbObject {
 	 */
 	function getThumb() {
 		$buf = "<a href='".$this->File->getDownloadUrl($this->fullpath)."'>";
-		$buf .="<img src='".$this->File->getThumbImg($this->fullpath)."' border='0'/></a>";
+		$buf .= $this->File->getThumbImg($this->fullpath) . "</a>";
 		return $buf;
 	}
 

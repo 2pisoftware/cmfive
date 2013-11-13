@@ -1,7 +1,11 @@
 <?php
 class FileService extends DbService {
+    
+        public static $_thumb_height = 200;
+        public static $_thumb_width = 200;
+        
 	function getImg($path) {
-		$file = FILE_ROOT."/".$path;
+		$file = FILE_ROOT.$path;
 		if (!file_exists($file))
 		return null;
 
@@ -12,13 +16,13 @@ class FileService extends DbService {
 	}
 
 	function getThumbImg($path) {
-		$file = FILE_ROOT."/".$path;
+		$file = FILE_ROOT.$path;
 		if (!file_exists($file))
 		return $path." does not exist.";
 
-		list($width, $height, $type, $attr)  = getimagesize($file);
-
-		$tag = "<img src='".WEBROOT."/file/thumb/".$path."' border='0' ".$attr." />";
+		list($width, $height, $type, $attr) = getimagesize($file);
+                
+		$tag = "<img src='".WEBROOT."/file/thumb/".$path."' height='".self::$_thumb_height."' width='".self::$_thumb_width."' />";
 		return $tag;
 	}
 
