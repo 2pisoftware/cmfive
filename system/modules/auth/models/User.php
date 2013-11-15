@@ -1,4 +1,5 @@
 <?php
+
 /**
  * User object
  * 
@@ -7,227 +8,223 @@
  */
 class User extends DbObject {
 
-	public $login;
-	public $is_admin;
-	public $password;
-	public $is_active;
-	public $dt_lastlogin;
-	public $dt_created;
-	public $contact_id;
-	public $is_deleted;
-	public $is_group;
-	public $password_reset_token;
+    public $login;
+    public $is_admin;
+    public $password;
+    public $is_active;
+    public $dt_lastlogin;
+    public $dt_created;
+    public $contact_id;
+    public $is_deleted;
+    public $is_group;
+    public $password_reset_token;
+    public $_roles;
+    public $_contact;
+    public $_modifiable;
 
-	public $_roles;
-	public $_contact;
+    public function delete($force = false) {
+        $contact = $this->getContact();
+        if ($contact) {
+            $contact->delete();
+        }
+        $this->is_deleted = 1;
+        $this->is_active = 0;
+        $this->password = "";
+        $this->update();
+    }
 
-	public $_modifiable;
-	
-	public function delete($force = false) {
-		$contact = $this->getContact();
-		if ($contact) {
-			$contact->delete();
-		}
-		$this->is_deleted = 1;
-		$this->is_active = 0;
-		$this->password = "";
-		$this->update();
-	}
+    public function getContact() {
+        if (!$this->_contact) {
+            $this->_contact = $this->getObject("Contact", $this->contact_id);
+        }
+        return $this->_contact;
+    }
 
-	public function getContact() {
-		if (!$this->_contact) {
-			$this->_contact = $this->getObject("Contact", $this->contact_id);
-		}
-		return $this->_contact;
-	}
+    public function isInGroups($group_id = null) {
+        $groupUsers = isset($group_id) ? $this->getObjects("GroupUser", array('user_id' => $this->id, 'group_id' => $group_id)) : $this->getObjects("GroupUser", array('user_id' => $this->id));
 
-	public function isInGroups($group_id = null)
-	{
-		$groupUsers = isset($group_id) ? $this->getObjects("GroupUser", array('user_id'=>$this->id,'group_id'=>$group_id)) : $this->getObjects("GroupUser", array('user_id'=>$this->id));
-		 
-		if ($groupUsers)
-		{
-			return $groupUsers;
-		}
-		return null;
-	}
+        if ($groupUsers) {
+            return $groupUsers;
+        }
+        return null;
+    }
 
-	public function inGroup($group) {
-		$groupmembers = $this->Auth->getGroupMembers($group->id, null);
-		 
-		if ($groupmembers) {
-			foreach ($groupmembers as $member) {
-				if ($member->user_id == $this->id)
-				return true;
+    public function inGroup($group) {
+        $groupmembers = $this->Auth->getGroupMembers($group->id, null);
 
-				$usr = $this->Auth->getUser($member->user_id);
-				if ($usr->is_group == "1")
-				$flg = $this->inGroup($usr);
-				if ($flg)
-				return true;
-			}
-		}
-	}
+        if ($groupmembers) {
+            foreach ($groupmembers as $member) {
+                if ($member->user_id == $this->id)
+                    return true;
 
-	public function getFirstName()
-	{
-		$contact = $this->getContact();
-		 
-		if ($contact) {
-			$name = $contact->getFirstName();
-		}
-		return $name;
-	}
+                $usr = $this->Auth->getUser($member->user_id);
+                if ($usr->is_group == "1")
+                    $flg = $this->inGroup($usr);
+                if ($flg)
+                    return true;
+            }
+        }
+    }
 
-	public function getSurname()
-	{
-		$contact = $this->getContact();
-		if ($contact) {
-			$name = $contact->getSurname();
-		}
-		return $name;
-	}
+    public function getFirstName() {
+        $contact = $this->getContact();
 
-	public function getFullName() {
-		$contact = $this->getContact();
-		$name = ucfirst($this->login);
-		if ($contact) {
-			$name = $contact->getFullName();
-		}
-		return $name;
-	}
+        if ($contact) {
+            $name = $contact->getFirstName();
+        }
+        return $name;
+    }
 
-	public function getSelectOptionTitle() {
-		return $this->getFullName();
-	}
+    public function getSurname() {
+        $contact = $this->getContact();
+        if ($contact) {
+            $name = $contact->getSurname();
+        }
+        return $name;
+    }
 
-	public function getShortName() {
-		$contact = $this->getContact();
-		$name = ucfirst($this->login);
-		if ($contact) {
-			$name = $contact->firstname;
-		}
-		return $name;
-	}
+    public function getFullName() {
+        $contact = $this->getContact();
+        $name = ucfirst($this->login);
+        if ($contact) {
+            $name = $contact->getFullName();
+        }
+        return $name;
+    }
 
-	public function getRoles($force = false) {
-		if ($this->is_admin) {
-			return $this->Auth->getAllRoles();
-		}
-		if (!$this->_roles || $force) {
-			$this->_roles = array();
+    public function getSelectOptionTitle() {
+        return $this->getFullName();
+    }
 
-			$groupUsers = $this->isInGroups();
+    public function getShortName() {
+        $contact = $this->getContact();
+        $name = ucfirst($this->login);
+        if ($contact) {
+            $name = $contact->firstname;
+        }
+        return $name;
+    }
 
-			if ($groupUsers)
-			{
-				foreach ($groupUsers as $groupUser)
-				{
-					$groupRoles = $groupUser->getGroupRoles();
+    public function getRoles($force = false) {
+        if ($this->is_admin) {
+            return $this->Auth->getAllRoles();
+        }
+        if (!$this->_roles || $force) {
+            $this->_roles = array();
 
-					foreach ($groupRoles as $groupRole)
-					{
-						if (!in_array($groupRole, $this->_roles))
-						$this->_roles[] = $groupRole;
-					}
-				}
-			}
-			$rows = $this->getObjects("UserRole",array("user_id",$this->id),true);
+            $groupUsers = $this->isInGroups();
 
-			if ($rows)
-			{
-				foreach ($rows as $row)
-				{
-					if (!in_array($row->role, $this->_roles))
-					$this->_roles[]=$row->role;
-				}
-			}
-		}
-		return $this->_roles;
-	}
+            if ($groupUsers) {
+                foreach ($groupUsers as $groupUser) {
+                    $groupRoles = $groupUser->getGroupRoles();
 
-	public function updateLastLogin() {
-		$data = array("dt_lastlogin" => $this->time2Dt(time()));
-		$this->_db->update("user",$data)->where("id",$this->id)->execute();
-	}
+                    foreach ($groupRoles as $groupRole) {
+                        if (!in_array($groupRole, $this->_roles))
+                            $this->_roles[] = $groupRole;
+                    }
+                }
+            }
+            $rows = $this->getObjects("UserRole", array("user_id", $this->id), true);
 
-	public function hasRole($role) {
-		if ($this->is_admin) {
-			return true;
-		}
-		if ($this->getRoles()) {
-			return in_array($role, $this->_roles);
-		} else {
-			return false;
-		}
-	}
+            if ($rows) {
+                foreach ($rows as $row) {
+                    if (!in_array($row->role, $this->_roles))
+                        $this->_roles[] = $row->role;
+                }
+            }
+        }
+        return $this->_roles;
+    }
 
-	public function hasAnyRole($roles) {
-		if ($this->is_admin) {
-			return true;
-		}
-		if ($roles) {
-			foreach ($roles as $r) {
-				if ($this->hasRole($r)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+    public function updateLastLogin() {
+        $data = array("dt_lastlogin" => $this->time2Dt(time()));
+        $this->_db->update("user", $data)->where("id", $this->id)->execute();
+    }
 
-	public function addRole($role) {
-		if (!$this->hasRole($role)) {
-			$data = array(
-                    "user_id"=>$this->id,
-                    "role" => $role
-			);
-			$this->_db->insert("user_role",$data)->execute();
-		}
-	}
+    public function hasRole($role) {
+        if ($this->is_admin) {
+            return true;
+        }
+        if ($this->getRoles()) {
+            return in_array($role, $this->_roles);
+        } else {
+            return false;
+        }
+    }
 
-	public function removeRole($role) {
-		if ($this->hasRole($role)) {
-			$this->_db->delete("user_role")->where("user_id",$this->id)->and("role",$role)->execute();
-			$this->getRoles(true);
-		}
-	}
+    public function hasAnyRole($roles) {
+        if ($this->is_admin) {
+            return true;
+        }
+        if (!empty($roles)) {
+            if (is_array($roles)){
+                foreach ($roles as $r) {
+                    if ($this->hasRole($r)) {
+                        return true;
+                    }
+                }
+            } else if (is_string($roles)) {
+                if ($this->hasRole($roles)){
+                    return true;
+                }
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
 
-	public function allowed(&$w,$path) {
-		if (!$this->is_active) {
-			return false;
-		}
-		if ($this->is_admin) {
-			return true;
-		}
-		if ($this->getRoles()) {
-			foreach ($this->getRoles() as $rn) {
-				$rolefunc = "role_".$rn."_allowed";
-				if (function_exists($rolefunc)) {
-					if ($rolefunc($w,$path)) {
-						return true;
-					}
-				} else {
-					$w->logError("Role '".$rn."' does not exist!");
-				}
-			}
-		}
-		return false;
-	}
+    public function addRole($role) {
+        if (!$this->hasRole($role)) {
+            $ur = new UserRole($this->w);
+            $ur->user_id = $this->id;
+            $ur->role = $role;
+            $ur->insert();
+        }
+    }
 
-	/**
-	 * encrypt the password using sha1 and a global salt.
-	 * 
-	 * @param unknown $password
-	 * @return string
-	 */
-	static public function encryptPassword($password) {
-		global $PASSWORD_SALT;
-		return sha1($PASSWORD_SALT.$password);
-	}
+    public function removeRole($role) {
+        if ($this->hasRole($role)) {
+            $this->_db->delete("user_role")->where("user_id", $this->id)->and("role", $role)->execute();
+            $this->getRoles(true);
+        }
+    }
 
-	public function setPassword($password) {
-		$this->password = User::encryptPassword($password);//$this->encryptPassword($password);
-	}
+    public function allowed(&$w, $path) {
+        if (!$this->is_active) {
+            return false;
+        }
+        if ($this->is_admin) {
+            return true;
+        }
+        if ($this->getRoles()) {
+            foreach ($this->getRoles() as $rn) {
+                $rolefunc = "role_" . $rn . "_allowed";
+                if (function_exists($rolefunc)) {
+                    if ($rolefunc($w, $path)) {
+                        return true;
+                    }
+                } else {
+                    $w->logError("Role '" . $rn . "' does not exist!");
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * encrypt the password using sha1 and a global salt.
+     * 
+     * @param unknown $password
+     * @return string
+     */
+    static public function encryptPassword($password) {
+        global $PASSWORD_SALT;
+        return sha1($PASSWORD_SALT . $password);
+    }
+
+    public function setPassword($password) {
+        $this->password = User::encryptPassword($password); //$this->encryptPassword($password);
+    }
 
 }

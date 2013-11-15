@@ -2,7 +2,7 @@
 class Contact extends DbObject {
 
 	// this object will be automatically indexed for fulltext search
-	public $_searchable;
+	// public $_searchable;
 	
 	// these parameters will be excluded from indexing
 	public $_exclude_index = array("is_deleted","private_to_user_id");
@@ -65,6 +65,7 @@ class Contact extends DbObject {
 		return $buf;
 	}
 	function printSearchListing() {
+                $buf = "";
 		if ($this->private_to_user_id) {
 			$buf .= "<img src='".$this->w->localUrl("/templates/img/Lock-icon.png")."' border='0'/>";
 		}

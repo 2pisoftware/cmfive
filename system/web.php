@@ -334,7 +334,11 @@ class Web {
             if (!$this->Auth->allowed($path)) {
                 $this->logInfo("Access Denied to ".$path.$usrmsg." from ".$this->requestIpAddress());
                 // redirect to the last allowed page 
-                $this->error($msg,$_SESSION['LAST_ALLOWED_URI']); 
+                if ($this->Auth->allowed($_SESSION['LAST_ALLOWED_URI'])){
+                    $this->error($msg,$_SESSION['LAST_ALLOWED_URI']);
+                } else {
+                    $this->error($msg);
+                }
             }
         } else if ($this->Auth 
         		&& !$this->Auth->loggedIn() 
