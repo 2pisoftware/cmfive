@@ -90,6 +90,7 @@ class AdminService extends DbService {
 	 * @param $idleMinutes (0..59)
 	 */
 	function getLoggedInUsers($idleMinutes=10) {
+                $users = array();
 		$stmt = "SELECT distinct creator_id FROM audit where timediff(now(), dt_created) < '00:".$idleMinutes.":00' and creator_id > 0";
 		$res = $this->_db->sql($stmt)->fetch_all();
 		if ($res && sizeof($res)) {

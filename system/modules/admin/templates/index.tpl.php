@@ -1,8 +1,8 @@
 <b>Users Currently Logged In</b>
 <ul>
-<?if ($currentUsers):foreach($currentUsers as $u):?>
-<li>
-<?=$u->getFullName()?>
-</li>
-<?endforeach;endif;?>
+    <?php if (!empty($currentUsers)):foreach($currentUsers as $u):?>
+        <li>
+            <?php echo $u->getFullName();?>
+        </li>
+    <?php endforeach;endif;?>
 </ul>
