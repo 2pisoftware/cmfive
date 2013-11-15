@@ -4,7 +4,7 @@
     </div>
     <div class="tab-body">
 <!--  Members Tab  -->
-    	<div id="tab-1" style="display:none">
+    	<div id="tab-1">
     		<div id="members_list" style="width:100%;">
     			<p><?php echo $addMember.$editPermission?></p>
     			<p><?php echo $memberList?></p>
