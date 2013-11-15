@@ -22,22 +22,25 @@ function permissionedit_GET(Web $w) {
         }
     }
 
-    $roles = $w->Auth->getAllRoles();
+    $allroles = $w->Auth->getAllRoles();
 
-    foreach ($roles as $role) {
-        $characters = explode("_", $role);
+    foreach ($allroles as $role) {
+        $parts = explode("_", $role);
 
-        if (count($characters) == 1)
-            array_unshift($characters, "admin");
+        if (count($parts) == 1) {
+            array_unshift($parts, "admin");
+        }
+        
+        $module = array_shift($parts);
 
-        $result[$characters[0]][] = $characters[1];
+        $result[$module][] = implode("_", $parts);
     }
 
-    foreach ($result as $module => $characters) {
-        $characters = array_chunk($characters, 4);
+    foreach ($result as $module => $parts) {
+        $parts = array_chunk($parts, 4);
 
-        foreach ($characters as $level => $character) {
-            foreach ($character as $r) {
+        foreach ($parts as $level => $roles) {
+            foreach ($roles as $r) {
                 $roleName = $module == "admin" ? $r : implode("_", array($module, $r));
 
                 $permission[ucwords($module)][$level][] = array($roleName, "checkbox", "check_" . $roleName, $w->Auth->getUser($option['group_id'])->hasRole($roleName));
