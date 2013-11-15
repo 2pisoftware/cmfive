@@ -139,9 +139,27 @@ function strcontains($haystack, $needle_array) {
 	return false;
 }
 
+/**
+ * Checks for either a scalar prefix ($needle) in the $haystack
+ * or checks whether any of an array of needles is in the $haystack.
+ * 
+ * Returns true when a needle is found at the start of the haystack, false otherwise.
+ * 
+ * @param unknown $haystack
+ * @param unknown $needle
+ * @return boolean
+ */
 function startsWith($haystack,$needle) {
-    return strpos($haystack, $needle) === 0;
+	if (is_scalar($needle)) {
+    	return strpos($haystack, $needle) === 0;
+	} else if (is_array($needle) && sizeof($needle) > 0) {
+		foreach ($needle as $pref) {
+			if (strpos($haystack, $pref) === 0) return true;
+		}
+	}
+	return false;
 }
+
 
 function str_whitelist($dirty_data, $limit=0) {
     if ($limit > 0) {
