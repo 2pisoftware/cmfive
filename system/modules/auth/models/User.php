@@ -156,11 +156,19 @@ class User extends DbObject {
         if ($this->is_admin) {
             return true;
         }
-        if ($roles) {
-            foreach ($roles as $r) {
-                if ($this->hasRole($r)) {
+        if (!empty($roles)) {
+            if (is_array($roles)){
+                foreach ($roles as $r) {
+                    if ($this->hasRole($r)) {
+                        return true;
+                    }
+                }
+            } else if (is_string($roles)) {
+                if ($this->hasRole($roles)){
                     return true;
                 }
+            } else {
+                return false;
             }
         }
         return false;
