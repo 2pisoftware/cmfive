@@ -154,7 +154,10 @@ class DbPDO extends PDO {
      * @return Result set
      */
     public function fetch_all(){
-        return $this->query->fetchAll();
+        if (!empty($this->query)){
+            return $this->query->fetchAll();
+        }
+        return array();
     }
         
     /**
