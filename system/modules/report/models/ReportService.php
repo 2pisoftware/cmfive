@@ -168,7 +168,15 @@ class ReportService extends DbService {
 
 	// given a report SQL statement, return recordset
 	function getRowsfromSQL($sql) {
-		return $this->_db->sql($sql)->fetch_all();
+		$return = $this->_db->sql($sql)->fetch_all();
+		foreach($return as $key => $val){
+			foreach($val as $k => $v){
+				if (is_int($k)){
+					unset($return[$key][$k]);
+				}
+			}
+		}
+		return $return;
 	}
 
 	// given a report SQL statement, return recordset
