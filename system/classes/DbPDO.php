@@ -240,6 +240,18 @@ class DbPDO extends PDO {
     public function getColumnMeta($i) {
         return $this->query->getColumnMeta($i);
     }
+
+    public function clear_sql(){
+        // Clear everything
+        $this->query = $this->query->where(null);
+        $this->query = $this->query->orderBy(null);
+        $this->query = $this->query->limit(null);
+        $this->query = $this->query->offset(null);
+        $this->query = $this->query->fetch(null);
+        $this->query = $this->query->select(null);
+        return $this;
+    }
+
     // Returns the last insert id
     // WARNING: If execute is not called before hand, you will receive the
     // PDO object
