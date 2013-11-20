@@ -1,34 +1,35 @@
-<?
+<?php
 $currentIndex = "";
-if (!empty($results)):
-?>
-    <?foreach ($results as $res):
-    			if ($res['class_name'] != $currentIndex):
-    				$currentIndex = $res['class_name']; ?>
-    				<hr/>
-            		<div class="search-index"><?=$currentIndex?></div>
-            <? $count = 0; 
-            	endif;
-                $object = $w->Search->getObject($res['class_name'],$res['object_id']);
-                if ($object && $object->canList($w->Auth->user())):?>
-                    <div class="search-result">
-                        <?if ($object->canView($w->Auth->user())):?>
-                            <a class="search-title" href="<?=$webroot?>/<?=$object->printSearchUrl()?>">
-                                <?=$object->printSearchTitle()?>
-                            </a>
-                            <div class="search-listing">
-                                <?=$object->printSearchListing()?>
-                            </div>
-                        <?else:?>
-                            <div class="search-title"><?=$object->printSearchTitle()?></div>
-                            <div class="search-listing">(restricted)</div>
-                        <?endif;?>
+if (!empty($results)): ?>
+    <?php foreach ($results as $res):
+
+		if ($res['class_name'] != $currentIndex):
+			$currentIndex = $res['class_name']; ?>
+			<hr/><div class="search-index"><?php echo $currentIndex; ?></div>
+            <?php $count = 0; 
+    	endif;
+
+        $object = $w->Search->getObject($res['class_name'], $res['object_id']);
+
+        if ($object && $object->canList($w->Auth->user())): ?>
+            <div class="search-result">
+                <?php if ($object->canView($w->Auth->user())): ?>
+                    <a class="search-title" href="<?php echo $webroot; ?>/<?php echo $object->printSearchUrl(); ?>">
+                        <?php echo $object->printSearchTitle(); ?>
+                    </a>
+                    <div class="search-listing">
+                        <?php echo $object->printSearchListing(); ?>
                     </div>
-                <?endif;?>
-      
-    <? $count++; endforeach;?>
-<?else:?>
+                <?php else: ?>
+                    <div class="search-title"><?php echo $object->printSearchTitle(); ?></div>
+                    <div class="search-listing">(restricted)</div>
+                <?php endif; ?>
+            </div>
+        <?php endif;
+    $count++; 
+    endforeach;
+else: ?>
     <div class="search-result">
         No documents found.
     </div>
-<?endif;?>
+<?php endif;?>

@@ -42,8 +42,8 @@ function useradd_POST(Web &$w) {
 	$user = new User($w);
 	$user->login = $_REQUEST['login'];
 	$user->setPassword($_REQUEST['password']);
-	$user->is_active = $_REQUEST['is_active'] ? $_REQUEST['is_active'] : 0;
-	$user->is_admin = $_REQUEST['is_admin'] ? $_REQUEST['is_admin'] : 0;
+	$user->is_active = !empty($_REQUEST['is_active']) ? $_REQUEST['is_active'] : 0;
+	$user->is_admin = !empty($_REQUEST['is_admin']) ? $_REQUEST['is_admin'] : 0;
 	$user->dt_created = time();
 	$user->contact_id = $contact->id;
 	$user->insert();
@@ -52,8 +52,10 @@ function useradd_POST(Web &$w) {
 	// now saving the roles
 	$roles = $w->Auth->getAllRoles();
 	foreach ($roles as $r) {
-		if ($_REQUEST["check_".$r]==1) {
-			$user->addRole($r);
+		if (!empty($_REQUEST["check_".$r])){
+			if ($_REQUEST["check_".$r]==1) {
+				$user->addRole($r);
+			}
 		}
 	}
 	$w->msg("User ".$user->login." added","/admin/users");

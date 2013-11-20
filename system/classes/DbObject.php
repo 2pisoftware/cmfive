@@ -692,12 +692,15 @@ class DbObject extends DbService {
 
         function getDbTableColumnNames(){
             $rs = $this->_db->_query('SELECT * FROM ' . $this->getDbTableName() . ' LIMIT 0');
-            $columns = array();
-            for ($i = 0; $i < $rs->columnCount(); $i++) {
-                $col = $rs->getColumnMeta($i);
-                $columns[] = $col['name'];
-            }
-            return $columns;//$this->_db->prepare("DESCRIBE tablename")->execute()->fetchAll(PDO::FETCH_COLUMN);
+            if ($rs !== false){
+	            $columns = array();
+	            for ($i = 0; $i < $rs->columnCount(); $i++) {
+	                $col = $rs->getColumnMeta($i);
+	                $columns[] = $col['name'];
+	            }
+	            return $columns;//$this->_db->prepare("DESCRIBE tablename")->execute()->fetchAll(PDO::FETCH_COLUMN);
+	        }
+	        return array();
         }
         
 	/**
