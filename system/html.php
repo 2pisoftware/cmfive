@@ -84,7 +84,7 @@ class Html {
             $tag = "button";
         }
                 
-        return "<".$tag.($tag=='a'?' href="#" ':'').$onclick."><span>".$title."</span></".$tag.">";
+        return "<".$tag. (!empty($id) ? " id=$id " : "") . (!empty($class) ? " class=$class " : "") . ($tag=='a'?' href="#" ':'').$onclick."><span>".$title."</span></".$tag.">";
     }
 
     public static function boxOnClick($href,$iframe=false,$width=null,$height=null,$param="isbox") {
