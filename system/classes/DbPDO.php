@@ -46,7 +46,6 @@ class DbPDO extends PDO {
             return null;
         }  
         $this->query = $this->fpdo->from($table_name);
-        // $this->statement = "SELECT * FROM " . $table_name . " ";// $this->prepare("SELECT * FROM " . $table_name);
         return $this;
     }
     
@@ -59,8 +58,8 @@ class DbPDO extends PDO {
     
     public function count(){
         if ($this->query !== null){
-            $temp_query = $this->query;
-            return count($temp_query->execute());
+            $result = $this->select("count(*)")->fetch_element("count(*)");
+            return intval($result);
         }
     }
     
@@ -103,7 +102,7 @@ class DbPDO extends PDO {
     }
     
     public function limit($limit){
-        if ($this->query !== null && !empty($limit)){
+        if ($this->query !== null and !is_null($limit)){
             $this->query = $this->query->limit($limit);
         }
         return $this;
@@ -134,7 +133,7 @@ class DbPDO extends PDO {
     
     public function fetch_element($element){
         $row = $this->fetch_row();
-        return (!empty($row[$element]) ? $row[$element] : null);
+        return (!is_null($row[$element]) ? $row[$element] : null);
     }
     
     /**
