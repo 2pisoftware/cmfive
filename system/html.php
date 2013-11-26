@@ -672,4 +672,129 @@ EOT;
     	
     }
 
+    /**
+     *  Filter function returns formatted form for declaring filters. Data is the same
+     *  as how Html::form is used. Filter parameters can be retrieved with $w->request
+     *  and it may be a good idea to prefix input names with 'filter_' to avoid naming
+     *  collisions in requests 
+     *
+     *  @param String $legend
+     *  @param Array $data
+     *  @param String $action
+     *  @param String $method
+     *  @param String $submitTitle
+     *  @param String $id
+     *  @param String $class
+     *
+     *  @return String $buf
+     */
+    public static function filter($legend, $data, $action = null, $method = "POST", $submitTitle = "Filter", $id = null, $class = null) {
+        // This will pretty much be a redesigned Html::form layout
+        if (empty($data)) return;
+
+        // Set up vars
+        $buf = $hidden = "";
+        $id = $id ? " id=\"".$id."\" " : null;
+        $class = $class ? " class=\"".$class."\" " : null;
+        $buf .= "<form " . $id . $class . " action=\"".$action."\" method=\"".$method."\">";
+        $buf .= "<fieldset style=\"margin-top: 10px;\">\n";
+        $buf .= "<legend>" . $legend . "</legend>\n";
+        $buf .= "<table  cellpadding=\"2\" cellspacing=\"2\" border=\"0\"><tr>\n";
+
+        // Loop through data
+        foreach ($data as $row) {
+            // Get row parameters
+            $title = !empty($row[0]) ? $row[0] : null;
+            $type = !empty($row[1]) ? $row[1] : null;
+            $name = !empty($row[2]) ? $row[2] : null;
+            $value = !empty($row[3]) ? $row[3] : null;
+            $readonly = "";
+
+            // handle disabled fields
+            if ($name[0]=='-') {
+                $name = substr($name, 1);
+                $readonly = " readonly='true' ";
+            }
+
+            // span entry fields that have no title
+            if (!$title) { 
+                $colspan = 2; 
+            } else { 
+                $colspan = 1; 
+                $buf .= "<td>".htmlentities($title)."</td>";
+            }
+
+            $buf .= "<td>";
+            $size = !empty($row[4]) ? $row[4] : null;
+
+            // Get the input that we need
+            switch($type){
+                case "text":
+                case "password":
+                    $buf .= '<input'.$readonly.' style="width:100%;"  type="'.$type.'" name="'.$name.'" value="'.htmlspecialchars($value).'" size="'.(!empty($row[4]) ? $row[4] : null).'" id="'.$name.'"/>';
+                    break;
+                case "autocomplete":
+                    $buf .= Html::autocomplete($name, $size, $value, null, "width: 100%;");
+                    break;
+                case "date":
+                    $buf .= Html::datePicker($name, $value, $size);
+                    break;
+                case "datetime":
+                    $buf .= Html::datetimePicker($name, $value, $size);
+                    break;
+                case "time":
+                    $buf .= Html::timePicker($name, $value, $size);
+                    break;
+                case "static":
+                    $buf .= $value;
+                    break;
+                case "textarea":
+                    // Columns is the size variable
+                    $cols = $size;
+                    $rows = !empty($row[5]) ? $row[5] : null;
+                    $buf .= '<textarea name="'.$name.'" rows="'.$rows.'" cols="'.$cols.'" id="'.$name.'">'.$value.'</textarea>';
+                    break;
+                case "section":
+                    $buf .= "<td colspan=\"2\" class=\"section\" >".htmlentities($title) . "</td>\n";
+                    break;
+                case "select":
+                    $items = $size;
+                    if ($readonly == ""){
+                        $buf .= Html::select($name, $items, $value);
+                    } else {
+                        $buf .= $value;
+                    }
+                    break;
+                case "multiSelect":
+                    $items = $size;
+                    if ($readonly == ""){
+                        $buf .= Html::multiSelect($name, $items, $value, null, "width: 100%;");
+                    } else {
+                        $buf .= $value;
+                    }
+                    break;
+                case "checkbox":
+                    $buf .= self::checkbox($name, $value, $value, $class);
+                    break;
+                case "hidden":
+                    $hidden .= "<input type=\"hidden\" name=\"".$name."\" value=\"".htmlspecialchars($value)."\"/>\n";
+                    break;
+                case "file":
+                     $buf .= "<input style=\"width:100%;\" type=\"".$type."\" name=\"".$name."\" size=\"".$size."\" id=\"".$name."\"/>";
+                    break;
+            }
+
+            $buf .= "</td>";
+        }
+
+        // Filter button (optional... though optional is pointless)
+        if (!empty($action)) {
+            $buf .= "<td><button type=\"submit\">".$submitTitle."</button></td>";
+        }
+        $buf .= "</tr>\n</table>\n</fieldset>\n";
+        $buf .= $hidden."</form>\n";
+        
+        return $buf;
+    }
+
 }
