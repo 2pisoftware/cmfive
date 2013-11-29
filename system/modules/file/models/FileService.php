@@ -1,15 +1,79 @@
 <?php
+
+require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Filesystem.php");
+require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Util/Path.php");
+require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Adapter.php");
+require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Adapter/StreamFactory.php");
+require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Adapter/ChecksumCalculator.php");
+require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Adapter/MetadataSupporter.php");
+require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Exception.php");
+require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Exception/FileNotFound.php");
+require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/File.php");
+require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Adapter/Local.php");
+require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Adapter/InMemory.php");
+require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/FilesystemMap.php");
+require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Stream.php");
+require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Stream/InMemoryBuffer.php");
+require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/StreamMode.php");
+require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Util/Size.php");
+require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/StreamWrapper.php");
+
+use Gaufrette\Filesystem;
+use Gaufrette\File as File;
+use Gaufrette\Adapter\Local as LocalAdapter;
+use Gaufrette\Adapter\InMemory as InMemoryAdapter;
+
 class FileService extends DbService {
     
-        public static $_thumb_height = 200;
-        public static $_thumb_width = 200;
-        
+    public static $_thumb_height = 200;
+    public static $_thumb_width = 200;
+    public static $_stream_name = "attachment";
+
+    // This will need a rethink (storing full path in Attachment but also setting the full path here) etc
+    function getFilePath($path) {
+    	if (strpos($path, FILE_ROOT . "attachments/") !== FALSE){
+    		return $path;
+    	}
+    	return FILE_ROOT . "attachments/" . dirname($path);
+    }
+
+    function getFileObject($filesystem, $filename) {
+    	$file = new File(basename($filename), $filesystem);
+    	return $file;
+    }
+
+    function getFilesystem($path = null, $adapter = "local", $content = null) {
+    	$adapter_obj = null;
+    	switch ($adapter){
+    		case "local":
+    			$adapter_obj = new LocalAdapter($this->getFilePath($path), true);
+    			break;
+    		case "memory":
+    			$adapter_obj = new InMemoryAdapter(array(basename($path) => $content));
+    			break;
+    	}
+    		
+    	if ($adapter_obj !== null){
+    		return new Filesystem($adapter_obj);
+    	}
+    	return null;
+    }
+
+    function registerStreamWrapper($filesystem = null) {
+    	if (!empty($filesystem)){
+    		$map = \Gaufrette\StreamWrapper::getFilesystemMap();
+    		$map->set(self::$_stream_name, $filesystem);
+
+    		\Gaufrette\ StreamWrapper::register();
+    	}
+    }
+
 	function getImg($path) {
 		$file = FILE_ROOT.$path;
 		if (!file_exists($file))
 		return null;
 
-		list($width, $height, $type, $attr)  = getimagesize($file);
+		list($width, $height, $type, $attr) = getimagesize($file);
 
 		$tag = "<img src='".WEBROOT."/file/path/".$path."' border='0' ".$attr." />";
 		return $tag;
@@ -27,8 +91,12 @@ class FileService extends DbService {
 	}
 
 	function isImage($path) {
-		list($width, $height, $type, $attr)  = getimagesize(str_replace("'","\\'",FILE_ROOT."/".$path));
-		return $attr !== null;
+		if (file_exists(str_replace("'","\\'",FILE_ROOT."/".$path))) {
+			list($width, $height, $type, $attr) = getimagesize(str_replace("'","\\'",FILE_ROOT."/".$path));
+			return $attr !== null;
+		} else {
+			return false;
+		}
 	}
 
 	function getDownloadUrl($path) {
@@ -73,31 +141,36 @@ class FileService extends DbService {
 		}
 		// we could check if the attach id actually exists
 		// but will leave this for later
-		$uploaddir = FILE_ROOT. 'attachments/'.$parentObject->getDbTableName().'/'.date('Y/m/d').'/'.$parentObject->id.'/';
-		if (!file_exists($uploaddir)) {
-			mkdir($uploaddir,0770,true);
-		}
+		// $uploaddir = FILE_ROOT. 'attachments/'.$parentObject->getDbTableName().'/'.date('Y/m/d').'/'.$parentObject->id.'/';
+		// if (!file_exists($uploaddir)) {
+		// 	mkdir($uploaddir,0770,true);
+		// }
 		$rpl_nil = array("..","'",'"',",","\\","/");
 		$rpl_ws = array(" ","&","+","$","?","|","%","@","#","(",")","{","}","[","]",",",";",":");
 		$filename = str_replace($rpl_nil, "", basename($_FILES[$requestkey]['name']));
 		$filename = str_replace($rpl_ws, "_", $filename);
-		$uploadfile = $uploaddir . $filename;
+		// $uploadfile = $uploaddir . $filename;
 
-		if (move_uploaded_file($_FILES[$requestkey]['tmp_name'], $uploadfile)) {
-			$att = new Attachment($this->w);
-			$att->filename = $filename;
-			$att->fullpath = str_replace(FILE_ROOT, "", $uploadfile);
-			$att->parent_table = $parentObject->getDbTableName();
-			$att->parent_id = $parentObject->id;
-			$att->title = $title;
-			$att->description = $description;
-			$att->type_code = $type_code;
-			$att->insert();
-			return $att->id;
-		} else {
-			$this->w->error("Possible file upload attack.");
-		}
-		return null;
+		// if (move_uploaded_file($_FILES[$requestkey]['tmp_name'], $uploadfile)) {
+		$filesystemPath = $parentObject->getDbTableName().'/'.date('Y/m/d').'/'.$parentObject->id;
+		$filesystem = $this->getFilesystem($filesystemPath);
+		$file = new File($filename, $filesystem);
+		$file->setContent(file_get_contents($_FILES[$requestkey]['tmp_name']));
+
+		$att = new Attachment($this->w);
+		$att->filename = $filename;
+		$att->fullpath = str_replace(FILE_ROOT, "", $this->getFilePath($filesystemPath) . "/" . $filename);
+		$att->parent_table = $parentObject->getDbTableName();
+		$att->parent_id = $parentObject->id;
+		$att->title = $title;
+		$att->description = $description;
+		$att->type_code = $type_code;
+		$att->insert();
+		return $att->id;
+		// } else {
+		// 	$this->w->error("Possible file upload attack.");
+		// }
+		// return null;
 	}
 
 	function getAttachmentTypesForObject($o) {

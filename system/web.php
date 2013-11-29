@@ -387,36 +387,46 @@ class Web {
      * @param string $filename
      */
     function sendFile($filename) {
-        $this->logInfo("Trying to load file: ".$filename);
-        if (!file_exists($filename)) {
-            $this->logWarn("Could not load file: ".$filename);
-            header("HTTP/1.0 404 Not Found");
-            exit;
+        if (file_exists($filename)){
+            $filesystem = $this->File->getFilesystem(dirname($filename));
+            $file = $this->File->getFileObject($filesystem, $filename);
+            header("Content-Type: " . $this->getMimetype($filename));
+            echo $file->getContent();
+        } else {
+            header("HTTP/1.1 404 Not Found");
         }
-        $mimetype = $this->getMimetype($filename);
-
-        header('Content-Type: '.$mimetype );
-        $buffer = '';
-        $cnt =0;
-        $handle = fopen($filename, 'rb');
-        if ($handle === false) {
-            return false;
-        }
-        while (!feof($handle)) {
-            $buffer = fread($handle, CHUNK_SIZE);
-            echo $buffer;
-            ob_flush();
-            flush();
-            if ($retbytes) {
-                $cnt += strlen($buffer);
-            }
-        }
-        $status = fclose($handle);
-        if ($retbytes && $status) {
-            return $cnt; // return num. bytes delivered like readfile() does.
-        }
-
         exit;
+        
+        // $this->logInfo("Trying to load file: ".$filename);
+        // if (!file_exists($filename)) {
+        //     $this->logWarn("Could not load file: ".$filename);
+        //     header("HTTP/1.0 404 Not Found");
+        //     exit;
+        // }
+        // $mimetype = $this->getMimetype($filename);
+
+        // header('Content-Type: '.$mimetype );
+        // $buffer = '';
+        // $cnt =0;
+        // $handle = fopen($filename, 'rb');
+        // if ($handle === false) {
+        //     return false;
+        // }
+        // while (!feof($handle)) {
+        //     $buffer = fread($handle, CHUNK_SIZE);
+        //     echo $buffer;
+        //     ob_flush();
+        //     flush();
+        //     if ($retbytes) {
+        //         $cnt += strlen($buffer);
+        //     }
+        // }
+        // $status = fclose($handle);
+        // if ($retbytes && $status) {
+        //     return $cnt; // return num. bytes delivered like readfile() does.
+        // }
+
+        // exit;
 
     }
 

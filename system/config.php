@@ -4,7 +4,7 @@
 ini_set('session.gc_maxlifetime', 60 * 60 * 6);
 
 //========== Constants =====================================
-define("CMFIVE_VERSION", "0.5.0");
+define("CMFIVE_VERSION", "0.7.0");
 
 define("LIBPATH", str_replace("\\", "/", getcwd() . '/lib'));
 define("SYSTEM_LIBPATH", str_replace("\\", "/", getcwd() . '/system/lib'));
