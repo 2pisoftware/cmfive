@@ -669,7 +669,32 @@ EOT;
     }
     
     public static function pagination($currentpage, $numpages, $pagesize, $totalresults, $baseurl, $pageparam="p", $pagesizeparam="ps", $totalresultsparam="tr") {
-    	
+        // See functions.php for implementation of isNumber
+        // Prepare buffer
+        $buf = "<ul class='pagination'>";
+    	if (isNumber($currentpage) and isNumber($numpages) and isNumber($pagesize) and isNumber($totalresults)) {
+            // Check that we're within range
+            if ($currentpage > 0 and $currentpage <= $numpages and $numpages > 1) {
+                
+                // Build pagination links
+                for($page = 1; $page <= $numpages; $page++) {
+                    $buf .= "<li>";
+                    
+                    // Check if the current page
+                    if ($currentpage == $page) {
+                        $buf .= "<a href='#' class='active'>$page</a>";
+                    } else {
+                        $buf .= "<a href='{$baseurl}";
+                        $buf .= (strpos($baseurl, "?") == 0 ? "?" : "&");
+                        $buf .= "{$pageparam}={$page}&{$pagesizeparam}={$pagesize}&{$totalresultsparam}={$totalresults}'>" . $page . "</a>";
+                    }
+                    $buf .= "</li>";
+                }
+                
+            }
+        }
+        $buf .= "</ul>";
+        return $buf;
     }
 
     /**

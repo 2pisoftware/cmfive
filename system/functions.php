@@ -1,5 +1,15 @@
 <?php
 
+// Small helper function to test for isset and is_numeric
+// wihtout having to write
+function isNumber($var) {
+    if (!isset($var))
+        return false;
+    if ($var === null)
+        return false;
+    return is_numeric($var);
+}
+
 function defaultVal($val,$default = null,$forceNull = false) {
         // Experiment to see if we can easily remove the strict standards
         // errors with a small function      

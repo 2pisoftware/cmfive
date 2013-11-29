@@ -64,7 +64,7 @@ class SearchService extends DbService {
 		$index_all_limit = 10;
 		
 		$select = "SELECT class_name, object_id ";
-        $from = " FROM object_index WHERE MATCH (content) AGAINST ('$str' IN $index_mode) ";
+        $from = " FROM object_index WHERE object_id != 0 AND MATCH (content) AGAINST ('$str' IN $index_mode) ";
         $select .= $from;
         
 		$select_count = "select count(*) as MAX_RESULT ".$from;
@@ -86,7 +86,7 @@ class SearchService extends DbService {
 			
 			// $limitBy will just be an empty string if page and pageSize are invalid
 			$select .= " AND class_name = '".$index."' " . $limitBy;
-					
+			$select_count .= " AND class_name = '".$index."'";
 			$max_result = $this->_db->sql($select_count)->fetch_element('MAX_RESULT');
 			
 		} else {

@@ -28,6 +28,8 @@ if (!empty($results)): ?>
         <?php endif;
     $count++; 
     endforeach;
+
+    echo !empty($pagination) ? $pagination : null;
 else: ?>
     <div class="search-result">
         No documents found.
