@@ -276,20 +276,20 @@ class Html {
         return $buf;
     }
 
-    public static function datePicker($name,$value=null,$size=null) {
-        $buf = '<input class="date_picker" type="text" name="'.$name.'" value="'.$value.'" size="'.$size.'" id="'.$name.'"/>';
+    public static function datePicker($name, $value=null, $size=null, $required=null) {
+        $buf = '<input class="date_picker" type="text" name="'.$name.'" value="'.$value.'" size="'.$size.'" id="'.$name.'" ' . $required . ' />';
         $buf.= "<script>$('#$name').datepicker({dateFormat: 'dd/mm/yy'});$('#$name').keyup( function(event) { $(this).val('');}); </script>";
         return $buf;
     }
 
-    public static function datetimePicker($name,$value=null,$size=null) {
-        $buf = '<input class="date_picker" type="text" name="'.$name.'" value="'.$value.'" size="'.$size.'" id="'.$name.'"/>';
+    public static function datetimePicker($name, $value=null, $size=null, $required=null) {
+        $buf = '<input class="date_picker" type="text" name="'.$name.'" value="'.$value.'" size="'.$size.'" id="'.$name.'" ' . $required . ' />';
         $buf.= "<script>$('#$name').datetimepicker({ampm: true, dateFormat: 'dd/mm/yy'});$('#$name').keyup( function(event) { $(this).val('');}); </script>";
         return $buf;
     }
     
-    public static function timePicker($name,$value,$size) {
-        $buf = '<input class="date_picker" type="text" name="'.$name.'" value="'.$value.'" size="'.$size.'" id="'.$name.'"/>';
+    public static function timePicker($name, $value = null, $size = null, $required = null) {
+        $buf = '<input class="date_picker" type="text" name="'.$name.'" value="'.$value.'" size="'.$size.'" id="'.$name.'" ' . $required . ' />';
         $buf.= "<script>$('#$name').timepicker({ampm: true, dateFormat: 'dd/mm/yy'});$('#$name').keyup( function(event) { $(this).val('');}); </script>";
         return $buf;
     }
@@ -326,7 +326,7 @@ class Html {
      * @param <type> $extrabuttons
      * @return <type>
      */
-    public static function multiColForm($data, $action=null, $method="POST", $submitTitle="Save", $id=null, $class=null,$extrabuttons=null, $target="_self", $includeFormTag = true) {
+    public static function multiColForm($data, $action=null, $method="POST", $submitTitle="Save", $id=null, $class=null,$extrabuttons=null, $target="_self", $includeFormTag = true, $validation = null) {
         if (!$data) return;
         $hidden = "";
         $id = $id ? ' id="'.$id.'"' : null;
@@ -348,6 +348,15 @@ class Html {
                     $type = !empty($field[1]) ? $field[1] : null;
                     $name = !empty($field[2]) ? $field[2] : null;
                     $value = !empty($field[3]) ? $field[3] : null;
+
+                    // Exploit HTML5s inbuilt form validation
+                    $required = null;
+                    if (!empty($validation[$name])) {
+                        if (in_array("required", $validation[$name])) {
+                            $required = "required";
+                        }
+                    }
+
                     $readonly = "";
                     // handle disabled fields
                     if ($name[0]=='-') {
@@ -357,27 +366,27 @@ class Html {
                     if ($type == "text" || $type == "password") {
                         $size = !empty($field[4]) ? $field[4] : null;
                         $buf .= "<td $valign class='fieldtitle'>$title</td><td $valign  class='fieldvalue'>";
-                        $buf .= '<input'.$readonly.' style="width:100%;" type="'.$type.'" name="'.$name.'" value="'.htmlspecialchars($value).'" size="'.$size.'" id="'.$name.'"/>';
+                        $buf .= '<input'.$readonly.' style="width:100%;" type="'.$type.'" name="'.$name.'" value="'.htmlspecialchars($value).'" size="'.$size.'" id="'.$name.'" ' . $required . " />";
                         $buf .= "</td>\n";
                     } else if ($type == "autocomplete") {
                         $options = !empty($field[4]) ? $field[4] : null;
                         $buf.= "<td  $valign class='fieldtitle'>".htmlentities($title)."</td><td  $valign class='fieldvalue'>";
-                        $buf.= Html::autocomplete($name,$options,$value,null,"width: 100%;");
+                        $buf.= Html::autocomplete($name,$options,$value,null,"width: 100%;",null,$required);
                         $buf .= "</td>\n";
                     } else if ($type == "date") {
                         $size = !empty($field[4]) ? $field[4] : null;
                         $buf .= "<td $valign class='fieldtitle'>$title</td><td  $valign class='fieldvalue'>";
-                        $buf .= Html::datePicker($name,$value,$size);
+                        $buf .= Html::datePicker($name,$value,$size,$required);
                         $buf .= "</td>\n";
                     } else if ($type == "datetime") {
                         $size = !empty($field[4]) ? $field[4] : null;
                         $buf .= "<td $valign class='fieldtitle'>$title</td><td  $valign class='fieldvalue'>";
-                        $buf .= Html::datetimePicker($name,$value,$size);
+                        $buf .= Html::datetimePicker($name,$value,$size,$required);
                         $buf .= "</td>\n";
                     } else if ($type == "time") {
                         $size = !empty($field[4]) ? $field[4] : null;
                         $buf .= "<td $valign class='fieldtitle'>$title</td><td  $valign class='fieldvalue'>";
-                        $buf .= Html::timePicker($name,$value,$size);
+                        $buf .= Html::timePicker($name,$value,$size,$required);
                         $buf .= "</td>\n";
                     } else if ($type == "static") {
                         $size = !empty($field[4]) ? $field[4] : null;
@@ -388,7 +397,7 @@ class Html {
                         $buf .= "<td $valign class='fieldtitle'>$title</td><td  $valign class='fieldvalue'>";
                         $c = !empty($field[4]) ? $field[4] : null;
                         $r = !empty($field[5]) ? $field[5] : null;
-                        $buf .= '<textarea'.$readonly.' style="width:100%;" name="'.$name.'" rows="'.$r.'" cols="'.$c.'" id="'.$name.'">'.$value.'</textarea>';
+                        $buf .= '<textarea'.$readonly.' style="width:100%;" name="'.$name.'" rows="'.$r.'" cols="'.$c.'" id="'.$name.'" ' . $required . '>'.$value.'</textarea>';
                         $buf .= "</td>\n";
                     } else if ($type == "select") {
                         $items = !empty($field[4]) ? $field[4] : null;
@@ -396,7 +405,7 @@ class Html {
                         $default = !empty($field[5]) ? $field[5] == 'NoDefault' : false; // only values should be displayed without '--Select--' option !
                         $buf.= "<td  $valign class='fieldtitle'>".htmlentities($title)."</td><td  $valign class='fieldvalue'>";
                         if ($readonly == ""){
-                            $buf.= Html::select($name,$items,$value,null,"width: 100%;",$default ? null : "-- Select --",$readonly!="");
+                            $buf.= Html::select($name,$items,$value,null,"width: 100%;",$default ? null : "-- Select --",$readonly!="",$required);
                         } else {
                             $buf.=$value;
                         }
@@ -405,7 +414,7 @@ class Html {
                         $items = !empty($field[4]) ? $field[4] : null;
                         $buf.= "<td  $valign class='fieldtitle'>".htmlentities($title)."</td><td  $valign class='fieldvalue'>";
                         if ($readonly == ""){
-                            $buf.= Html::multiSelect($name,$items,$value,null,"width: 100%;");
+                            $buf.= Html::multiSelect($name,$items,$value,null,"width: 100%;",$required);
                         } else {
                             $buf.=$value;
                         }
@@ -456,10 +465,10 @@ class Html {
      * @param <type> $value
      * @return <type>
      */
-    public static function checkbox($name,$value,$default_value = '1',$class=null) {
+    public static function checkbox($name, $value, $default_value = '1', $class=null, $required = null) {
     	$default_value = $default_value === null ? '1' : $default_value;
         $checked = $value == $default_value ? 'checked = "checked"' : "";
-        $buf= "<input type=\"checkbox\" name=\"".$name."\" value=\"".$default_value."\" $checked  id=\"".$name."\" class=\"".$class."\">";
+        $buf= "<input type=\"checkbox\" name=\"".$name."\" value=\"".$default_value."\" $checked  id=\"".$name."\" class=\"".$class."\" " . $required . " />";
         return $buf;
     }
     
@@ -471,10 +480,10 @@ class Html {
      * @param <type> $value
      * @return <type>
      */
-    public static function radio($name,$group,$value,$default_value = '1',$class=null) {
+    public static function radio($name, $group, $value, $default_value = '1', $class=null, $required = null) {
     	$default_value = $default_value === null ? '1' : $default_value;
         $checked = $value == $default_value ? 'checked = "checked"' : "";
-        $buf= "<input type=\"radio\" name=\"".$group."\" value=\"".$default_value."\" $checked  id=\"".$name."\" class=\"".$class."\">";
+        $buf= "<input type=\"radio\" name=\"".$group."\" value=\"".$default_value."\" $checked  id=\"".$name."\" class=\"".$class."\" " . $required . " />";
         return $buf;
     }
     
@@ -486,8 +495,8 @@ class Html {
      * @param <type> $value
      * @param <type> $class
      */
-    public static function select($name, $items, $value=null, $class=null, $style=null, $allmsg = "-- Select --") {
-        $buf ='<select id="'.$name.'"  name="'.$name.'" class="'.$class.'" style="'.$style.'">';
+    public static function select($name, $items, $value=null, $class=null, $style=null, $allmsg = "-- Select --", $required = null) {
+        $buf ='<select id="'.$name.'"  name="'.$name.'" class="'.$class.'" style="'.$style.'" ' . $required . '>';
         if ($items) {
             $buf.= $allmsg ? "<option value=''>".$allmsg."</option>" : '';
             foreach ($items as $item) {
@@ -589,7 +598,7 @@ EOT;
      * @param <type> $value
      * @param <type> $class
      */
-    public static function autocomplete($name, $options, $value=null, $class=null, $style=null, $minLength=1) {
+    public static function autocomplete($name, $options, $value=null, $class=null, $style=null, $minLength=1, $required = null) {
         $acp_value = $value;
         if (is_array($options)) {
             $source = "[";
@@ -617,7 +626,7 @@ EOT;
         }
 
         $buf ='<input type="hidden" id="'.$name.'"  name="'.$name.'" value="'.$value.'"/>';
-        $buf.='<input type="text" id="acp_'.$name.'"  name="acp_'.$name.'" value="'.$acp_value.'" class="'.$class.'" style="'.$style.'"/>';
+        $buf.='<input type="text" id="acp_'.$name.'"  name="acp_'.$name.'" value="'.$acp_value.'" class="'.$class.'" style="'.$style.'" ' . $required . ' />';
         $buf.="<script type='text/javascript'>";
         $buf.='$(function(){
                     $("#acp_'.$name.'").autocomplete({
@@ -713,7 +722,7 @@ EOT;
      *
      *  @return String $buf
      */
-    public static function filter($legend, $data, $action = null, $method = "POST", $submitTitle = "Filter", $id = null, $class = null) {
+    public static function filter($legend, $data, $action = null, $method = "POST", $submitTitle = "Filter", $id = null, $class = null, $validation = null) {
         // This will pretty much be a redesigned Html::form layout
         if (empty($data)) return;
 
@@ -734,6 +743,13 @@ EOT;
             $name = !empty($row[2]) ? $row[2] : null;
             $value = !empty($row[3]) ? $row[3] : null;
             $readonly = "";
+
+            $required = null;
+            if (!empty($validation[$name])) {
+                if (in_array("required", $validation[$name])) {
+                    $required = "required";
+                }
+            }
 
             // handle disabled fields
             if ($name[0]=='-') {
@@ -759,16 +775,16 @@ EOT;
                     $buf .= '<input'.$readonly.' style="width:100%;"  type="'.$type.'" name="'.$name.'" value="'.htmlspecialchars($value).'" size="'.(!empty($row[4]) ? $row[4] : null).'" id="'.$name.'"/>';
                     break;
                 case "autocomplete":
-                    $buf .= Html::autocomplete($name, $size, $value, null, "width: 100%;");
+                    $buf .= Html::autocomplete($name, $size, $value, null, "width: 100%;", null, $required);
                     break;
                 case "date":
-                    $buf .= Html::datePicker($name, $value, $size);
+                    $buf .= Html::datePicker($name, $value, $size, $required);
                     break;
                 case "datetime":
-                    $buf .= Html::datetimePicker($name, $value, $size);
+                    $buf .= Html::datetimePicker($name, $value, $size, $required);
                     break;
                 case "time":
-                    $buf .= Html::timePicker($name, $value, $size);
+                    $buf .= Html::timePicker($name, $value, $size, $required);
                     break;
                 case "static":
                     $buf .= $value;

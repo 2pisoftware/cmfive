@@ -423,9 +423,9 @@ class DbObject extends DbService {
 	 */
 	function insertOrUpdate($force_null_values = false, $force_validation = false) {
 		if ($this->id != null) {
-			$this->update($force_null_values, $force_validation);
+			return $this->update($force_null_values, $force_validation);
 		} else {
-			$this->insert($force_validation);
+			return $this->insert($force_validation);
 		}
 	}
 	/**
@@ -544,7 +544,7 @@ class DbObject extends DbService {
 		}
 		
 		$t = $this->getDbTableName();
-                $columns = $this->getDbTableColumnNames();
+        $columns = $this->getDbTableColumnNames();
 		// check delete attribute
 		if (in_array("is_deleted", $columns) && $this->is_deleted === null) {
 			$this->is_deleted = 0;
@@ -553,7 +553,7 @@ class DbObject extends DbService {
 		// set default attributes the old way
 		if (!$this->_modifiable) {
 			//if (property_exists($this, "dt_modified")) {
-                        if (in_array("dt_modified", $columns)){
+            if (in_array("dt_modified", $columns)){
 				$this->dt_modified = time();
 			}
 			if (in_array("modifier_id", $columns) && $this->w->Auth->user()) {
@@ -596,6 +596,7 @@ class DbObject extends DbService {
 				}
 			}
 		}
+
 		$this->_db->update($t,$data)->where($this->_cn('id'),$this->id);
 		if ($t != "audit") {
 			// TODO remove dependency to user code!
@@ -636,15 +637,16 @@ class DbObject extends DbService {
 	 *
 	 * @param $force
 	 */
-	function delete($force=false) {
+	function delete($force = false) {
 		$t = $this->getDbTableName();
-                $columns = $this->getDbTableColumnNames();
+        $columns = $this->getDbTableColumnNames();
                 
 		// if an is_deleted property exists, then only set it to 1
 		// and update instead of delete!
 		if ((property_exists(get_class($this), "is_deleted") || (in_array("is_deleted", $columns))) && !$force) {
 			$this->is_deleted = 1;
-			$this->update();
+			// Hard code to NOT validate soft deletes
+			$this->update(false, false);
 		} else {
 			$this->_db->delete($t)->where($this->_cn('id'),$this->id)->execute();
 		}
@@ -690,19 +692,37 @@ class DbObject extends DbService {
 		// return strtolower(get_class($this));
 	}
 
-        function getDbTableColumnNames(){
-            $rs = $this->_db->_query('SELECT * FROM ' . $this->getDbTableName() . ' LIMIT 0');
-            if ($rs !== false){
-	            $columns = array();
-	            for ($i = 0; $i < $rs->columnCount(); $i++) {
-	                $col = $rs->getColumnMeta($i);
-	                $columns[] = $col['name'];
-	            }
-	            return $columns;//$this->_db->prepare("DESCRIBE tablename")->execute()->fetchAll(PDO::FETCH_COLUMN);
-	        }
-	        return array();
+    function getDbTableColumnNames(){
+        $rs = $this->_db->_query('SELECT * FROM ' . $this->getDbTableName() . ' LIMIT 0');
+        if ($rs !== false){
+            $columns = array();
+            for ($i = 0; $i < $rs->columnCount(); $i++) {
+                $col = $rs->getColumnMeta($i);
+                $columns[] = $col['name'];
+            }
+            return $columns;//$this->_db->prepare("DESCRIBE tablename")->execute()->fetchAll(PDO::FETCH_COLUMN);
         }
-        
+        return array();
+    }
+    
+    function getHumanReadableAttributeName($attribute) {
+    	// Remove magic markers (d_, dt_, etc)
+    	$replace_magic = array("d_", "dt_");
+    	foreach($replace_magic as $rm) {
+    		if (substr($attribute, 0, strlen($rm)) == $rm) {
+			    $attribute = substr($attribute, strlen($rm));
+			    break;
+			}
+    	}
+
+    	// Remove underscores
+    	$attribute = str_replace("_", " ", $attribute);
+    	
+    	// Capitalise all
+    	$attribute = ucwords($attribute);
+    	return $attribute;
+    }
+
 	/**
 	 * Returns the column name for a named attribute
 	 *
@@ -928,9 +948,16 @@ class DbObject extends DbService {
 					$rule = $rule_array;
 				}
 				switch($rule){
+					case "required":
+						if (empty($this->$vr_key)) {
+							$response["invalid"]["$vr_key"][] = "Required Field";
+						} else {
+							$response["valid"][] = $vr_key;
+						}
+						break;
 					case "number":
-                                                $this->$$vr_key = filter_var($this->$$vr_key, FILTER_SANITIZE_NUMBER_FLOAT);
-						if (!filter_var($this->$$vr_key, FILTER_VALIDATE_FLOAT)){
+                        $this->$vr_key = filter_var($this->$vr_key, FILTER_SANITIZE_NUMBER_FLOAT);
+						if (!filter_var($this->$vr_key, FILTER_VALIDATE_FLOAT)){
 							$response["invalid"]["$vr_key"][] = "Invalid Number";
 						} else {
 							$response["valid"][] = $vr_key;
@@ -939,8 +966,8 @@ class DbObject extends DbService {
 					case "url":
 						// please be aware that this may accept invalid urls
 						// see http://www.php.net/manual/en/function.filter-var.php
-                                                $this->$$vr_key = filter_var($this->$$vr_key, FILTER_SANITIZE_URL);
-						if (!filter_var($this->$$vr_key, FILTER_VALIDATE_URL)){
+                        $this->$vr_key = filter_var($this->$vr_key, FILTER_SANITIZE_URL);
+						if (!filter_var($this->$vr_key, FILTER_VALIDATE_URL)){
 							$response["invalid"]["$vr_key"][] = "Invalid URL";
 						} else {
 							$response["valid"][] = $vr_key;
@@ -949,8 +976,8 @@ class DbObject extends DbService {
 					case "email":
 						// please be aware that this may accept invalid emails
 						// see http://www.php.net/manual/en/function.filter-var.php
-                                                $this->$$vr_key = filter_var($this->$$vr_key, FILTER_SANITIZE_EMAIL);
-						if (!filter_var($this->$$vr_key, FILTER_VALIDATE_EMAIL)){
+                        $this->$vr_key = filter_var($this->$vr_key, FILTER_SANITIZE_EMAIL);
+						if (!filter_var($this->$vr_key, FILTER_VALIDATE_EMAIL)){
 							$response["invalid"]["$vr_key"][] = "Invalid Email";
 						} else {
 							$response["valid"][] = $vr_key;
@@ -959,8 +986,8 @@ class DbObject extends DbService {
 					case "in":
 						// Case insensitive field check against an array of predefined values
 						if (is_array($rule_array)){
-                                                        $this->$$vr_key = filter_var($this->$$vr_key, FILTER_SANITIZE_STRING);
-							if (!in_array(ucfirst(strtolower($this->$$vr_key)), $rule_array)){
+                        	$this->$vr_key = filter_var($this->$vr_key, FILTER_SANITIZE_STRING);
+							if (!in_array(ucfirst(strtolower($this->$vr_key)), $rule_array)){
 								$response["invalid"]["$vr_key"][] = "Invalid value, allowed are [".substr(explode(",", $rule_array), 0, -1) . "]";
 							} else {
 								$response["valid"][] = $vr_key;
@@ -972,11 +999,11 @@ class DbObject extends DbService {
 						break;
 					case "custom":
 					case "regex":
-                                                // Add surrounding regex slashes if they dont exist
+                        // Add surrounding regex slashes if they dont exist
 						if ($rule[0] !== '/') $rule = '/' . $rule;
 						if ($rule[strlen($rule)-1] !== '/') $rule = $rule . '/';
 						
-						if (!filter_var($this->$$vr_key, FILTER_VALIDATE_REGEXP, array('regexp' => $rule))){
+						if (!filter_var($this->$vr_key, FILTER_VALIDATE_REGEXP, array('regexp' => $rule))){
 							$response["invalid"]["$vr_key"][] = "Invalid";
 						} else {
 							$response["valid"][] = $vr_key;
