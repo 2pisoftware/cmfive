@@ -526,6 +526,8 @@ class DbObject extends DbService {
 			// TODO remove dependency to user code!
 			$this->w->Admin->addDbAuditLogEntry("insert",get_class($this),$this->id);
 		}
+
+		return true;
 	}
 
 	/**
