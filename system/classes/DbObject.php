@@ -709,19 +709,20 @@ class DbObject extends DbService {
     
     function getHumanReadableAttributeName($attribute) {
     	// Remove magic markers (d_, dt_, etc)
-    	$replace_magic = array("d_", "dt_");
+    	$replace_magic = array("d_", "dt_", "t_");
     	foreach($replace_magic as $rm) {
     		if (substr($attribute, 0, strlen($rm)) == $rm) {
 			    $attribute = substr($attribute, strlen($rm));
+			    // There can be only one...
 			    break;
 			}
     	}
 
-    	// Remove underscores
-    	$attribute = str_replace("_", " ", $attribute);
+    	// Remove underscores and " Id"
+    	$attribute = str_ireplace(array("_", " id"), array(" ", ""), $attribute);
     	
     	// Capitalise all
-    	$attribute = ucwords($attribute);
+    	$attribute = ucwords(trim($attribute));
     	return $attribute;
     }
 

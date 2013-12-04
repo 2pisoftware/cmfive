@@ -371,7 +371,7 @@ class Html {
                     } else if ($type == "autocomplete") {
                         $options = !empty($field[4]) ? $field[4] : null;
                         $buf.= "<td  $valign class='fieldtitle'>".htmlentities($title)."</td><td  $valign class='fieldvalue'>";
-                        $buf.= Html::autocomplete($name,$options,$value,null,"width: 100%;",null,$required);
+                        $buf.= Html::autocomplete($name,$options,$value,null,"width: 100%;",1,$required);
                         $buf .= "</td>\n";
                     } else if ($type == "date") {
                         $size = !empty($field[4]) ? $field[4] : null;
@@ -402,10 +402,10 @@ class Html {
                     } else if ($type == "select") {
                         $items = !empty($field[4]) ? $field[4] : null;
                         
-                        $default = !empty($field[5]) ? $field[5] == 'NoDefault' : false; // only values should be displayed without '--Select--' option !
+                        $default = !empty($field[5]) ? ($field[5] == "null" ? null : $field[5]) : "-- Select --";
                         $buf.= "<td  $valign class='fieldtitle'>".htmlentities($title)."</td><td  $valign class='fieldvalue'>";
                         if ($readonly == ""){
-                            $buf.= Html::select($name,$items,$value,null,"width: 100%;",$default ? null : "-- Select --",$readonly!="",$required);
+                            $buf.= Html::select($name,$items,$value,null,"width: 100%;", $default, $readonly!="",$required);
                         } else {
                             $buf.=$value;
                         }
@@ -599,17 +599,20 @@ EOT;
      * @param <type> $class
      */
     public static function autocomplete($name, $options, $value=null, $class=null, $style=null, $minLength=1, $required = null) {
+        if ($minLength == null){
+            $minLength = 1;
+        }
         $acp_value = $value;
         if (is_array($options)) {
             $source = "[";
             foreach ($options as $option){
                 if (is_array($option)) {
-                    $source .= '{"id":"'.$option[1].'","value":"'.$option[0].'"}, ';
+                    $source .= '{"id":"'.$option[1].'","value":"'.$option[0].'"},';
                     if ($value == $option[1]) {
                         $acp_value = $option[0];
                     }
                 } elseif (is_a($option, "DbObject")) {
-                    $source .= '{"id":"'.htmlentities($option->getSelectOptionValue()).'","value":"'.htmlentities($option->getSelectOptionTitle()).'"}, ';
+                    $source .= '{"id":"'.htmlentities($option->getSelectOptionValue()).'","value":"'.htmlentities($option->getSelectOptionTitle()).'"},';
                     if ($value == $option->getSelectOptionValue()) {
                         $acp_value = $option->getSelectOptionTitle();
                     }
@@ -617,9 +620,11 @@ EOT;
                     // Ima go ahead and assume that option will have id and value parameters
                     $source .= json_encode($option) . ", ";
                 } elseif (is_scalar($option)) {
-                    $source .= '{"id":"'.$option.'","value":"'.$option.'"}, ';
+                    $source .= '{"id":"'.$option.'","value":"'.$option.'"},';
                 } 
             }
+            // Remove traiiing comma
+            $source = substr($source, 0, -1);
             $source .= "]";
         } else {
             $source = "'".$options."'";
@@ -775,7 +780,7 @@ EOT;
                     $buf .= '<input'.$readonly.' style="width:100%;"  type="'.$type.'" name="'.$name.'" value="'.htmlspecialchars($value).'" size="'.(!empty($row[4]) ? $row[4] : null).'" id="'.$name.'"/>';
                     break;
                 case "autocomplete":
-                    $buf .= Html::autocomplete($name, $size, $value, null, "width: 100%;", null, $required);
+                    $buf .= Html::autocomplete($name, $size, $value, null, "width: 100%;", 1, $required);
                     break;
                 case "date":
                     $buf .= Html::datePicker($name, $value, $size, $required);
