@@ -434,7 +434,7 @@ class DbObject extends DbService {
 	 * @param <type> $table
 	 */
 	function insert($force_validation = false) {
-		if ($force_validation) {
+		if ($force_validation && property_exists($this, "_validation")) {
 			$valid_response = $this->validate();
 			if (!$valid_response['success']) {
 				return $valid_response;
@@ -538,13 +538,13 @@ class DbObject extends DbService {
 	 * @return true or array("success"=>false,"invalid"=>array()) if validation failed
 	 */
 	function update($force_null_values=false, $force_validation=false) {
-		if ($force_validation) {
+		if ($force_validation && property_exists($this, "_validation")) {
 			$valid_response = $this->validate();
 			if (!$valid_response['success']) {
 				return $valid_response;
 			}
 		}
-		
+
 		$t = $this->getDbTableName();
         $columns = $this->getDbTableColumnNames();
 		// check delete attribute
@@ -959,7 +959,7 @@ class DbObject extends DbService {
 						}
 						break;
 					case "number":
-                        $this->$vr_key = filter_var($this->$vr_key, FILTER_SANITIZE_NUMBER_FLOAT);
+                        // $this->$vr_key = filter_var($this->$vr_key, FILTER_SANITIZE_NUMBER_FLOAT);
 						if (!filter_var($this->$vr_key, FILTER_VALIDATE_FLOAT)){
 							$response["invalid"]["$vr_key"][] = "Invalid Number";
 						} else {

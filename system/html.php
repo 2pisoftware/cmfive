@@ -77,8 +77,8 @@ class Html {
      * @param <type> $button (O) if true create a buttin instead of a link
      * @param <type> $iframe (O) whether to use an iframe to display the html contents (default: false)
      */
-    public static function box($href,$title,$button=false,$iframe=false,$width=null,$height=null,$param="isbox",$id=null,$class=null) {
-        $onclick = Html::boxOnClick($href,$iframe,$width,$height,$param);
+    public static function box($href,$title,$button=false,$iframe=false,$width=null,$height=null,$param="isbox",$id=null,$class=null,$confirm=null) {
+        $onclick = Html::boxOnClick($href,$iframe,$width,$height,$param,$confirm);
         $tag = "a";
         if ($button) {
             $tag = "button";
@@ -87,7 +87,7 @@ class Html {
         return "<".$tag. (!empty($id) ? " id=$id " : "") . (!empty($class) ? " class=$class " : "") . ($tag=='a'?' href="#" ':'').$onclick."><span>".$title."</span></".$tag.">";
     }
 
-    public static function boxOnClick($href,$iframe=false,$width=null,$height=null,$param="isbox") {
+    public static function boxOnClick($href,$iframe=false,$width=null,$height=null,$param="isbox",$confirm=null) {
         if ($iframe) {
             $width = ", innerWidth:".$width;
             $height = ", innerHeight:".$height;
@@ -96,7 +96,13 @@ class Html {
         $prefix = stripos($href,"?") ? "&" : "?";
         $href .= $prefix.$param."=1";
         $iframe = $iframe ? "true" : "false";
-        return " onclick=\"$.fn.colorbox({transition:'elastic', href:'".$href."', iframe:".$iframe.$width.$height."});return false;\" ";
+
+        $confirm_str = '';
+        if ($confirm) {
+            $confirm_str = "if(confirm('".$confirm."')) { ";
+        } 
+
+        return " onclick=\"{$confirm_str}$.fn.colorbox({transition:'elastic', href:'".$href."', iframe:".$iframe.$width.$height."});return false;".(!empty($confirm) ? "}" : "")."\" ";
     }
     /**
      * creates a ul from an array structure:
