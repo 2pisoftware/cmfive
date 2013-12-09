@@ -421,7 +421,7 @@ class DbObject extends DbService {
 	 * whether to insert or update
 	 * an object in the database.
 	 */
-	function insertOrUpdate($force_null_values = false, $force_validation = false) {
+	function insertOrUpdate($force_null_values = false, $force_validation = true) {
 		if ($this->id != null) {
 			return $this->update($force_null_values, $force_validation);
 		} else {
@@ -433,7 +433,7 @@ class DbObject extends DbService {
 	 *
 	 * @param <type> $table
 	 */
-	function insert($force_validation = false) {
+	function insert($force_validation = true) {
 		if ($force_validation && property_exists($this, "_validation")) {
 			$valid_response = $this->validate();
 			if (!$valid_response['success']) {
@@ -537,7 +537,7 @@ class DbObject extends DbService {
 	 * @param $force_validation default false
 	 * @return true or array("success"=>false,"invalid"=>array()) if validation failed
 	 */
-	function update($force_null_values=false, $force_validation=false) {
+	function update($force_null_values=false, $force_validation=true) {
 		if ($force_validation && property_exists($this, "_validation")) {
 			$valid_response = $this->validate();
 			if (!$valid_response['success']) {
@@ -991,7 +991,7 @@ class DbObject extends DbService {
 						if (is_array($rule_array)){
                         	$this->$vr_key = filter_var($this->$vr_key, FILTER_SANITIZE_STRING);
 							if (!in_array(ucfirst(strtolower($this->$vr_key)), $rule_array)){
-								$response["invalid"]["$vr_key"][] = "Invalid value, allowed are [".substr(explode(",", $rule_array), 0, -1) . "]";
+								$response["invalid"]["$vr_key"][] = "Invalid value, allowed are " . implode(", ", $rule_array);
 							} else {
 								$response["valid"][] = $vr_key;
 							}

@@ -516,6 +516,32 @@ class Web {
         $this->redirect($this->localUrl($url));
     }
 
+    // This function generates an error message based on whats returned from the DbObject validation method
+    // $w is for the error() function
+    // $object is the object that one is saving/updating whatever
+    // $type is for the message returned, i.e. "Updating this $type failed"
+    // $response is the reponse array from the validation method
+    // $isUpdating is a helper for the message i.e. creating/updating
+    // $returnUrl is where the redirection in error() will go
+    function errorMessage($object, $type = null, $response = true, $isUpdating = false, $returnUrl = "/") {
+        if ($response === true || empty($type)) {
+            return;
+        } else {
+            if (is_array($response)) {
+                $errorMsg = ($isUpdating ? "Updating" : "Creating") . " this $type failed because<br/><br/>\n";
+
+                foreach($response["invalid"] as $property => $reason) {
+                    foreach($reason as $r) {
+                        $errorMsg .= $object->getHumanReadableAttributeName($property) . ": $r <br/>\n";
+                    }
+                }
+                $this->error($errorMsg, $returnUrl);
+            } else {
+                $this->error(($isUpdating ? "Updating" : "Creating") . " this $type failed.", $returnUrl);
+            }
+        }
+    }
+
     /**
      * Redirect to $url and display
      * a message
