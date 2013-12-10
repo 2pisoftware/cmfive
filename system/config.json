@@ -1,10 +1,7 @@
 {
 	"config": {
-		"vendor-dir": "composer/vendor",
-		"cache-dir": "composer/cache",
-		"bin-dir": "composer/bin",
-		"cache-files-dir": "composer/cache/files",
-		"cache-repo-dir": "composer/cache/repo",
-		"cache-vcs-dir": "composer/cache/vcs"
+		"vendor-dir": "system/composer/vendor",
+		"cache-dir": "system/composer/cache",
+		"bin-dir": "system/composer/bin"
 	}
 }

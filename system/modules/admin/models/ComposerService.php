@@ -37,15 +37,19 @@ class ComposerService extends DbService {
 		if (!file_exists(ROOT_PATH . "/composer.json")){
 			// Hardcode config settings into user composer.json
 			file_put_contents(ROOT_PATH . "/composer.json", 
-				"{\n\t\"config\": {
-					\n\t\t\"vendor-dir\": \"system/composer/vendor\",
-					\n\t\t\"cache-dir\": \"system/composer/cache\",
-					\n\t\t\"bin-dir\": \"system/composer/bin\",
-					\n\t\t\"cache-files-dir\": \"system/composer/cache/files\",
-					\n\t\t\"cache-repo-dir\": \"system/composer/cache/repo\",
-					\n\t\t\"cache-vcs-dir\": \"system/composer/cache/vcs\"
-			},\n
-			\t\"require\": {\n\n\t}\n}");
+<<<COMPOSER
+{
+	"config": {
+		"vendor-dir": "system/composer/vendor",
+		"cache-dir": "system/composer/cache",
+		"bin-dir": "system/composer/bin"
+	},
+	"require": {
+
+	}
+}
+COMPOSER
+);
 		}
 		$chk_user->location = ROOT_PATH . "/composer.json";
 		$chk_user->insertOrUpdate();
