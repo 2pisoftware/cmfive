@@ -1,5 +1,14 @@
 <?php
 
+// Load system Composer autoloader
+if (file_exists("composer/vendor/autoload.php")) {
+    require "composer/vendor/autoload.php";
+}
+// Load user Composer autoloader
+if (file_exists("../vendor/autoload.php")) {
+    require "../vendor/autoload.php";
+}
+
 require_once "html.php";
 require_once "functions.php";
 require_once "classes/SessionManager.php";

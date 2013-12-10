@@ -11,6 +11,11 @@ class AdminLib {
 			$w->menuLink("admin/lookup","Lookup",$nav);
 			$w->menuLink("admin-templates","Templates",$nav);
 			$w->menuLink("admin/phpinfo","PHP Info",$nav);
+
+			if ($w->Composer->shouldAddFiles()) {
+				$w->menuLink("admin/composeradd","Add composer.json files", $nav);
+			}
+			$w->menuLink("admin/composer","Update Composer", $nav);
 		}
 		$w->ctx("navigation", $nav);
 	}

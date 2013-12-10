@@ -728,3 +728,9 @@ CREATE TABLE IF NOT EXISTS `template` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+CREATE TABLE IF NOT EXISTS `composer_checksums` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `location` text NOT NULL,
+  `checksum` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;

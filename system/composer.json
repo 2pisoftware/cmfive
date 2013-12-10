@@ -1,0 +1,13 @@
+{
+	"config": {
+		"vendor-dir": "composer/vendor",
+		"cache-dir": "composer/cache",
+		"bin-dir": "composer/bin",
+		"cache-files-dir": "composer/cache/files",
+		"cache-repo-dir": "composer/cache/repo",
+		"cache-vcs-dir": "composer/cache/vcs"
+	},
+	"require": {
+		"knplabs/gaufrette":"0.1.*"
+	}
+}
