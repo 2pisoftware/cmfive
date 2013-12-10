@@ -1,22 +1,22 @@
 <?php
 
-require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Filesystem.php");
-require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Util/Path.php");
-require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Adapter.php");
-require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Adapter/StreamFactory.php");
-require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Adapter/ChecksumCalculator.php");
-require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Adapter/MetadataSupporter.php");
-require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Exception.php");
-require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Exception/FileNotFound.php");
-require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/File.php");
-require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Adapter/Local.php");
-require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Adapter/InMemory.php");
-require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/FilesystemMap.php");
-require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Stream.php");
-require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Stream/InMemoryBuffer.php");
-require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/StreamMode.php");
-require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Util/Size.php");
-require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/StreamWrapper.php");
+// require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Filesystem.php");
+// require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Util/Path.php");
+// require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Adapter.php");
+// require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Adapter/StreamFactory.php");
+// require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Adapter/ChecksumCalculator.php");
+// require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Adapter/MetadataSupporter.php");
+// require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Exception.php");
+// require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Exception/FileNotFound.php");
+// require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/File.php");
+// require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Adapter/Local.php");
+// require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Adapter/InMemory.php");
+// require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/FilesystemMap.php");
+// require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Stream.php");
+// require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Stream/InMemoryBuffer.php");
+// require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/StreamMode.php");
+// require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/Util/Size.php");
+// require_once(SYSTEM_LIBPATH."/Gaufrette/src/Gaufrette/StreamWrapper.php");
 
 use Gaufrette\Filesystem;
 use Gaufrette\File as File;

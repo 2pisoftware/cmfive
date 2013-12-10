@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "0f75243262e794fe0087d371f744548d",
+    "hash": "b5c021388983b5c0be71cceac5a87779",
     "packages": [
         {
             "name": "knplabs/gaufrette",
@@ -85,6 +85,105 @@
                 "media"
             ],
             "time": "2013-10-10 06:25:07"
+        },
+        {
+            "name": "psecio/iniscan",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/psecio/iniscan.git",
+                "reference": "c4f7cdee8f1a5078fdefb603a0a47ad237ac9703"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/psecio/iniscan/zipball/c4f7cdee8f1a5078fdefb603a0a47ad237ac9703",
+                "reference": "c4f7cdee8f1a5078fdefb603a0a47ad237ac9703",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.1",
+                "symfony/console": "~2.1"
+            },
+            "bin": [
+                "bin/iniscan"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Psecio": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Chris Cornutt",
+                    "email": "ccornutt@phpdeveloper.org",
+                    "homepage": "http://www.phpdeveloper.org/"
+                }
+            ],
+            "description": "A scanner to evaluate php.ini security",
+            "homepage": "https://github.com/psecio/iniscan.git",
+            "keywords": [
+                "php.ini",
+                "scanner"
+            ],
+            "time": "2013-12-10 03:25:59"
+        },
+        {
+            "name": "symfony/console",
+            "version": "v2.4.0",
+            "target-dir": "Symfony/Component/Console",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/Console.git",
+                "reference": "3c1496ae96d24ccc6c340fcc25f71d7a1ab4c12c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/Console/zipball/3c1496ae96d24ccc6c340fcc25f71d7a1ab4c12c",
+                "reference": "3c1496ae96d24ccc6c340fcc25f71d7a1ab4c12c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "symfony/event-dispatcher": "~2.1"
+            },
+            "suggest": {
+                "symfony/event-dispatcher": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\Console\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Console Component",
+            "homepage": "http://symfony.com",
+            "time": "2013-11-27 09:10:40"
         }
     ],
     "packages-dev": [
@@ -94,9 +193,9 @@
 
     ],
     "minimum-stability": "stable",
-    "stability-flags": [
-
-    ],
+    "stability-flags": {
+        "psecio/iniscan": 20
+    },
     "platform": [
 
     ],

@@ -1,11 +1,11 @@
 <?php
 
 // Load system Composer autoloader
-if (file_exists("composer/vendor/autoload.php")) {
+if (file_exists(__DIR__."/composer/vendor/autoload.php")) {
     require "composer/vendor/autoload.php";
 }
 // Load user Composer autoloader
-if (file_exists("../vendor/autoload.php")) {
+if (file_exists(__DIR__."/../vendor/autoload.php")) {
     require "../vendor/autoload.php";
 }
 
