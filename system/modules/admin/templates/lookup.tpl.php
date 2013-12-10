@@ -16,7 +16,7 @@
 	</div>
 	<div class="tab-body">
 		<div id="tab-1">
-			<form action="<?=$webroot."/admin/lookup"?>" method="POST">
+			<form action="<?php echo $webroot."/admin/lookup"; ?>" method="POST">
 				<fieldset style="margin-top: 10px;">
 					<legend>Search Lookup Items</legend>
 						<table cellpadding=2 cellspacing=2 border=0>

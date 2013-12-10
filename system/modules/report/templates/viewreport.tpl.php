@@ -23,7 +23,7 @@
 			<p>
 		</div>
 		<div id="tab-2" style="display: none;">
-			<?= Html::box("/report/addmembers/".$reportid," Add New Members ",true) ?>
+			<?php echo Html::box("/report/addmembers/".$reportid," Add New Members ",true) ?>
 			<p>
 			<?php echo $viewmembers; ?>
 		</div>

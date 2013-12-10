@@ -96,76 +96,76 @@ thead {
 }
 
 </style>
-<?
-$readcount = 0;
-print "<button onclick='deleteMessage()'>Delete</button>";
-$qlines = array(array("<input type='checkbox' id='allChk' onclick='selectAll()' />","Subject","Date","Sender"));
-if (!empty($new_arch)) {
-	$count = 0;
-	foreach ($new_arch as $q) {
-		$count++;
-		//$readcount++;
-		$line = array();
-		$line[]="<input type='checkbox' id='".$q->id."' value='".$q->id."' class='classChk'/>";
-		$line[]=Html::a(WEBROOT."/inbox/view/".$q->id,"<b>".$q->subject."</b>");
-		$line[]="<b>".$q->getDate("dt_created","d/m/Y H:i")."</b>";
-		$line[]="<b>".($q->sender_id ? $q->getSender()->getFullName() : "")."</b>";
-		$qlines[]=$line;
-	}
-	$count == 1 ? $appstr = " unread archived message." : $appstr = " unread archived messages.";
-}
-
-if (!empty($arch)) {
-//	$qlines = array(array("Subject","Date","Sender"));
-	foreach ($arch as $q) {
-		$line = array();
-		//$readcount++;
-		$line[]="<input type='checkbox' id='".$q->id."' value='".$q->id."' class='classChk'/>";
-		$line[]=Html::a(WEBROOT."/inbox/view/".$q->id,$q->subject);
-		$line[]="<b>".$q->getDate("dt_created","d/m/Y H:i")."</b>";
-		$line[]="<b>".($q->sender_id ? $q->getSender()->getFullName() : "")."</b>";
-		$qlines[]=$line;
-	}
-}
-
-print Html::table($qlines,null,"tablesorter",true);
-$last_page = ceil($readcount/40);
-	$minPage = ($pgnum*1)-5;
-	($minPage <= 0) ? $minPage = 1 : '';
-	//print $minPage . "\n";
-	$maxPage = ($pgnum*1)+5;
-	($maxPage > $last_page) ? $maxPage = $last_page : '';
-	//print $maxPage . "\n";
-	//exit();
-	
-	if ($last_page > 1){
-		print "<table style='margin:auto;'><tr id='nav'>";
-		if($pgnum > 1){
-			print "<td style='background-color:#eee;' id='link".$i." prevlink' class='link' onclick='switchPage(".($pgnum-1).")'><a class='link'  href='#'>Prev</a></td>&nbsp";
+<?php
+	$readcount = 0;
+	print "<button onclick='deleteMessage()'>Delete</button>";
+	$qlines = array(array("<input type='checkbox' id='allChk' onclick='selectAll()' />","Subject","Date","Sender"));
+	if (!empty($new_arch)) {
+		$count = 0;
+		foreach ($new_arch as $q) {
+			$count++;
+			//$readcount++;
+			$line = array();
+			$line[]="<input type='checkbox' id='".$q->id."' value='".$q->id."' class='classChk'/>";
+			$line[]=Html::a(WEBROOT."/inbox/view/".$q->id,"<b>".$q->subject."</b>");
+			$line[]="<b>".$q->getDate("dt_created","d/m/Y H:i")."</b>";
+			$line[]="<b>".($q->sender_id ? $q->getSender()->getFullName() : "")."</b>";
+			$qlines[]=$line;
 		}
-		for($i=$minPage;$i<=$maxPage;$i++){
-		if ($pgnum == $i){
-			print "<td id='link".$i." ' class='link ispage' ><b>*".$i."*</b></td>&nbsp";
-		} else {
-			print "<td id='link".$i."' class='link' onclick='switchPage(".$i.")'><a class='link'  href='#'>".$i."</a></td>&nbsp";
+		$count == 1 ? $appstr = " unread archived message." : $appstr = " unread archived messages.";
+	}
+
+	if (!empty($arch)) {
+	//	$qlines = array(array("Subject","Date","Sender"));
+		foreach ($arch as $q) {
+			$line = array();
+			//$readcount++;
+			$line[]="<input type='checkbox' id='".$q->id."' value='".$q->id."' class='classChk'/>";
+			$line[]=Html::a(WEBROOT."/inbox/view/".$q->id,$q->subject);
+			$line[]="<b>".$q->getDate("dt_created","d/m/Y H:i")."</b>";
+			$line[]="<b>".($q->sender_id ? $q->getSender()->getFullName() : "")."</b>";
+			$qlines[]=$line;
 		}
 	}
-	if ($pgnum < $last_page && $last_page !== 1){
-		print "<td style='background-color: #eee; width:30px;' id='link".$i." nextlink' class='link' onclick='switchPage(".($pgnum+1).")'><a class='link'  href='#'>Next</a></td>&nbsp";
+
+	print Html::table($qlines,null,"tablesorter",true);
+	$last_page = ceil($readcount/40);
+		$minPage = ($pgnum*1)-5;
+		($minPage <= 0) ? $minPage = 1 : '';
+		//print $minPage . "\n";
+		$maxPage = ($pgnum*1)+5;
+		($maxPage > $last_page) ? $maxPage = $last_page : '';
+		//print $maxPage . "\n";
+		//exit();
+		
+		if ($last_page > 1){
+			print "<table style='margin:auto;'><tr id='nav'>";
+			if($pgnum > 1){
+				print "<td style='background-color:#eee;' id='link".$i." prevlink' class='link' onclick='switchPage(".($pgnum-1).")'><a class='link'  href='#'>Prev</a></td>&nbsp";
+			}
+			for($i = $minPage; $i <= $maxPage; $i++){
+			if ($pgnum == $i){
+				print "<td id='link".$i." ' class='link ispage' ><b>*".$i."*</b></td>&nbsp";
+			} else {
+				print "<td id='link".$i."' class='link' onclick='switchPage(".$i.")'><a class='link'  href='#'>".$i."</a></td>&nbsp";
+			}
+		}
+		if ($pgnum < $last_page && $last_page !== 1){
+			print "<td style='background-color: #eee; width:30px;' id='link".$i." nextlink' class='link' onclick='switchPage(".($pgnum+1).")'><a class='link'  href='#'>Next</a></td>&nbsp";
+		}
+		print "</tr></table>";
 	}
-	print "</tr></table>";
-}
 ?>
 <script type='text/javascript'>
 
-<?if (!$count == 0):?>
-$(".content-header").append(" (<?=$count.$appstr;?>)");
-<?endif;?>
+<?php if (!$count == 0) : ?>
+$(".content-header").append(" (<?php echo $count.$appstr; ?>)");
+<?php endif; ?>
 
 $(".ispage").css("cursor","default");
 $(".ispage").hover(function(){$(this).css("background-color","#CAFF70")});
 $(document).ready(function(){
-	for(var i=1; i<<?=$pgcount;?>+1; i++){
+	for(var i=1; i<<?php echo $pgcount; ?>+1; i++){
 		if (i == 1){
 			$("#link"+i).addClass('selectedPage');
 		} else {
@@ -175,7 +175,7 @@ $(document).ready(function(){
 });
 
 function switchPage(page){
-	window.location.href = "<?=$webroot;?>/inbox/showarchive/"+page;
+	window.location.href = "<?php echo $webroot; ?>/inbox/showarchive/"+page;
 }
 function selectAll(){
 	$(":checkbox").attr("checked","checked");
@@ -189,7 +189,7 @@ function deleteMessage(){
 		count++;
 	});
 	if (count !== 0){
-		window.location.href = "<?=$webroot;?>/inbox/delete/showarchive/"+check;
+		window.location.href = "<?php echo $webroot; ?>/inbox/delete/showarchive/"+check;
 	}
 }
 

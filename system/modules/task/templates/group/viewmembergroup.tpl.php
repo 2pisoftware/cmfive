@@ -24,11 +24,11 @@
 		<div id="tab-1">
 			<p>
 			&nbsp;&nbsp;
-			<?= Html::box($webroot."/task-group/deletetaskgroup/".$groupid," Delete Task Group ", true) ?>
+			<?php echo Html::box($webroot."/task-group/deletetaskgroup/".$groupid," Delete Task Group ", true); ?>
 			&nbsp;&nbsp;
-			<?= Html::box($webroot."/task-group/viewtaskgroup/".$groupid," Edit Task Group ", true) ?>
+			<?php echo Html::box($webroot."/task-group/viewtaskgroup/".$groupid," Edit Task Group ", true); ?>
 			&nbsp;&nbsp;
-			<?= Html::box("/task-group/addgroupmembers/".$grpid," Add New Members ",true) ?>
+			<?php echo Html::box("/task-group/addgroupmembers/".$grpid," Add New Members ",true); ?>
 			<p>
 			<?php echo $viewmembers; ?>
 		</div>

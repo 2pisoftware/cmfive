@@ -1,1 +1,1 @@
-<?=$help_content?>
+<?php echo $help_content; ?>

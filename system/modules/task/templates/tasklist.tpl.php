@@ -50,7 +50,7 @@
 				</fieldset>
 			</form>
 			<p>
-			<form id="updatestatus" action="<?=$webroot."/task/updatestatus"?>" method="POST">
+			<form id="updatestatus" action="<?php echo $webroot."/task/updatestatus"; ?>" method="POST">
 			<?php echo $mytasks; ?>
 			</form>
 		</div>

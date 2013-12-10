@@ -1,15 +1,15 @@
 <div class="tabs">
     <div class="tab-head">
-        <a href="<?=WEBROOT."/wiki/index"?>" >List</a>
-        <a href="<?=WEBROOT."/wiki/view/$wiki->name/HomePage"?>" >Home</a>
-        <a  class="active" href="#" >Members</a>
+        <a href="<?php echo WEBROOT."/wiki/index"; ?>">List</a>
+        <a href="<?php echo WEBROOT."/wiki/view/$wiki->name/HomePage"; ?>">Home</a>
+        <a class="active" href="#" >Members</a>
     </div>
     <div class="tab-body">
     
-		<?// ============== Text Edit ===================================== ?>            
+		<?php // ============== Text Edit ===================================== ?>            
         <div id="tab-1">
-			<?=Html::box(WEBROOT."/wiki/editmember/".$wiki->id,"Add Member",true)?>
-			<?if ($wiki->getUsers()):?>
+			<?php echo Html::box(WEBROOT."/wiki/editmember/".$wiki->id,"Add Member",true); ?>
+			<?php if ($wiki->getUsers()) : ?>
 			<table class="tablesorter">
 				<thead>
 					<tr>
@@ -19,17 +19,17 @@
 					</tr>
 				</thead>
 				<tbody>
-				<?foreach($wiki->getUsers() as $mem):?>
+				<?php foreach($wiki->getUsers() as $mem) : ?>
 					<tr>
-						<td><?=$mem->getFullName()?></td>
-						<td><?=$mem->role?></td>
-						<td><?=Html::box($webroot."/wiki/editmember/".$wiki->id."/".$mem->id,"Edit",true)?>&nbsp;
-						<?=Html::b($webroot."/wiki/delmember/".$wiki->id."/".$mem->id,"Delete")?></td>
+						<td><?php echo $mem->getFullName(); ?></td>
+						<td><?php echo $mem->role; ?></td>
+						<td><?php echo Html::box($webroot."/wiki/editmember/".$wiki->id."/".$mem->id,"Edit",true); ?>&nbsp;
+						<?php echo Html::b($webroot."/wiki/delmember/".$wiki->id."/".$mem->id,"Delete"); ?></td>
 					</tr>
-					<?endforeach;?>
+					<?php endforeach; ?>
 				</tbody>
 			</table>
-			<?endif;?>
+			<?php endif; ?>
 			<p></p>
 		</div>
 	</div>

@@ -8,5 +8,5 @@
     </form>
 </div>
 -->
-<?=Html::box($webroot."/admin/useradd/box","Add New User",true)?>
-<?=$table?>
+<?php echo Html::box($webroot."/admin/useradd/box","Add New User",true); ?>
+<?php echo $table; ?>

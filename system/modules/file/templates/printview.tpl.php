@@ -1,9 +1,8 @@
 <html>
     <body>
-        <?$col=0; $row=0;?>
-        <?foreach ($attachments as $att):?>
-            <?if ($att->isImage()):?>
-            <?
+        <?php $col=0; $row=0;?>
+        <?php foreach ($attachments as $att) : ?>
+            <?php if ($att->isImage()) :
                 if ($row === 0) {
                     echo "<table>\n";
                 }
@@ -19,11 +18,11 @@
                     echo "</table>\n";
                     $row = 0;
                 }
-            ?>
-                <td><img src="<?=$webroot."/file/atfile/".$att->id."/".$att->filename?>" border="0"/></td>
-            <?endif;?>
-        <?endforeach;?>
-        <?
+                ?>
+                <td><img src="<?php echo $webroot."/file/atfile/".$att->id."/".$att->filename; ?>" border="0"/></td>
+            <?php endif; ?>
+        <?php endforeach; ?>
+        <?php 
             if ($col != 0) {
                 echo "</tr>\n";
             }

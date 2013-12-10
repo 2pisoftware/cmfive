@@ -12,7 +12,7 @@
 </script>
 
 <script type="text/javascript">
-	var maskedArray = <?=$groupRoles?>
+	var maskedArray = <?php echo $groupRoles; ?>
 
 	for(var i in maskedArray)
 	{

@@ -41,5 +41,5 @@
         current_tab = num;
     }
     
-    switchTab(<?=$_REQUEST['tab']?$_REQUEST['tab']:current_tab?>);
+    switchTab(<?php echo $_REQUEST['tab'] ? $_REQUEST['tab'] : current_tab; ?>);
 </script>

@@ -160,7 +160,7 @@ print "</tr></table>";
 	});
 
 	function switchPage(page){
-		window.location.href = "<?=$webroot;?>/inbox/read/"+page ;
+		window.location.href = "<?php echo $webroot; ?>/inbox/read/"+page ;
 	}
 	
 	function selectAll(){
@@ -175,7 +175,7 @@ print "</tr></table>";
 			count++;
 		});
 		if (count !== 0){
-			window.location.href = "<?=$webroot;?>/inbox/archive/read/"+check;
+			window.location.href = "<?php echo $webroot; ?>/inbox/archive/read/"+check;
 		}
 	}
 
@@ -187,7 +187,7 @@ print "</tr></table>";
 			count++;
 		});
 		if (count !== 0){
-			window.location.href = "<?=$webroot;?>/inbox/delete/read/"+check;
+			window.location.href = "<?php echo $webroot; ?>/inbox/delete/read/"+check;
 		}
 	}
 </script>

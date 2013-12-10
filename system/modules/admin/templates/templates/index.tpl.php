@@ -1,8 +1,8 @@
-<?= Html::b("/admin-templates/edit","Add Template") ?>
+<?php echo Html::b("/admin-templates/edit","Add Template"); ?>
 <?php
-$table_rows = array();
+	$table_rows = array();
 
-if (!empty($templates_list)) : ?>
+	if (!empty($templates_list)) : ?>
 	<table class="tablesorter">
 		<thead>
 			<tr>
@@ -20,12 +20,12 @@ if (!empty($templates_list)) : ?>
 					<td><?php echo Date("H:i d-m-Y", $t->dt_created); ?></td>
 					<td><?php echo Date("H:i d-m-Y", $t->dt_modified); ?></td>
 					<td>
-						<?= Html::b("/admin-templates/edit/".$t->id,"Edit",false) ?>
+						<?php echo Html::b("/admin-templates/edit/".$t->id,"Edit",false); ?>
 					</td>
 				</tr>
 			<?php endforeach; ?>
 		</tbody>
 	</table>	
-<? else: ?>
-<p>There are no templates.</p>
-<? endif; ?>
+<?php else: ?>
+	<p>There are no templates.</p>
+<?php endif; ?>

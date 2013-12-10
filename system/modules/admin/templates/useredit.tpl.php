@@ -1,5 +1,5 @@
-<?if ($user):?>
-<?if ($box):?><h1>Edit User</h1><?endif;?>
+<?php if ($user) : ?>
+<?php if ($box) : ?><h1>Edit User</h1><?php endif; ?>
 <?php
     $contact = $user->getContact();
     $form['User Details'][]=array(
@@ -38,9 +38,9 @@
     print Html::multiColForm($form,$w->localUrl("/admin/useredit/".$w->ctx("id")),"POST","Save");
 ?>
 
-<?else:?>
-<div class="error">User with ID <?=$id?> does not exist.</div>
-<?endif;?>
+<?php else : ?>
+<div class="error">User with ID <?php echo $id; ?> does not exist.</div>
+<?php endif; ?>
 
 <script type="text/javascript">
 	$(".form-section").attr("width","");

@@ -1,1 +1,1 @@
-<p><?=$app->description?></p>
+<p><?php echo $app->description; ?></p>

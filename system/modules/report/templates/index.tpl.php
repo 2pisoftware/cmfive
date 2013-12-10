@@ -1,4 +1,4 @@
-		   <form id="leadfilter" action="<?=$webroot."/report/index"?>" method="POST">
+		   <form id="leadfilter" action="<?php echo $webroot."/report/index"; ?>" method="POST">
 				<fieldset style="margin-top: 10px;">
 					<legend>Search Reports</legend>
 						<table cellpadding=2 cellspacing=2 border=0>

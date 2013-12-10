@@ -167,7 +167,7 @@ if (!empty($new)) {
 	});
 
 	function switchPage(page){
-		window.location.href = "<?=$webroot;?>/inbox/index/"+page;
+		window.location.href = "<?php echo $webroot; ?>/inbox/index/"+page;
 	}
 	function selectAll(){
 		$(":checkbox").attr("checked","checked");
@@ -181,7 +181,7 @@ if (!empty($new)) {
 			count++;
 		});
 		if (count !== 0){
-			window.location.href = "<?=$webroot;?>/inbox/archive/index/"+check;
+			window.location.href = "<?php echo $webroot; ?>/inbox/archive/index/"+check;
 		}
 	}
 
@@ -193,7 +193,7 @@ if (!empty($new)) {
 			count++;
 		});
 		if (count !== 0){
-			window.location.href = "<?=$webroot;?>/inbox/delete/index/"+check;
+			window.location.href = "<?php echo $webroot; ?>/inbox/delete/index/"+check;
 		}
 	}
 </script>

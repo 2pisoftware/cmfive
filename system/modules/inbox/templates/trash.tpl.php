@@ -144,14 +144,14 @@ $last_page = ceil($del_count/40);
 ?>
 <script type="text/javascript">
 
-<?if (!$count == 0):?>
-$(".content-header").append(" (<?=$count.$appstr;?>)");
-<?endif;?>
+<?php if (!$count == 0) : ?>
+$(".content-header").append(" (<?php echo $count.$appstr; ?>)");
+<?php endif; ?>
 
 $(".ispage").css("cursor","default");
 $(".ispage").hover(function(){$(this).css("background-color","#CAFF70")});
 $(document).ready(function(){
-	for(var i=1; i<<?=$pgcount;?>+1; i++){
+	for(var i=1; i<<?php echo $pgcount; ?>+1; i++){
 		if (i == 1){
 			$("#link"+i).addClass('selectedPage');
 		} else {
@@ -161,7 +161,7 @@ $(document).ready(function(){
 });
 
 function switchPage(page){
-	window.location.href = "<?=$webroot;?>/inbox/trash/"+page;
+	window.location.href = "<?php echo $webroot; ?>/inbox/trash/"+page;
 }
 
 function selectAll(){
@@ -175,7 +175,7 @@ function deleteMessage(){
 		count++;
 	});
 	if (count !== 0){
-		window.location.href = "<?=$webroot;?>/inbox/deleteforever/"+check;
+		window.location.href = "<?php echo $webroot; ?>/inbox/deleteforever/"+check;
 	}
 }
 </script>
