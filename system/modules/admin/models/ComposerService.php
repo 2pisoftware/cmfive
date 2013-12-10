@@ -30,15 +30,22 @@ class ComposerService extends DbService {
 		// Add new entries and update
 		// Use empty checksums so updates are run for the first time
 		$chk = new ComposerChecksums($this->w);
-		if (!file_exists(SYSTEM_PATH . "/composer.json")){
-			file_put_contents(SYSTEM_PATH . "/composer.json", "{\n\t\"require\": {\n\n\t}\n}");
-		}
 		$chk->location = SYSTEM_PATH . "/composer.json";
 		$chk->insertOrUpdate();
 
 		$chk_user = new ComposerChecksums($this->w);
 		if (!file_exists(ROOT_PATH . "/composer.json")){
-			file_put_contents(ROOT_PATH . "/composer.json", "{\n\t\"require\": {\n\n\t}\n}");
+			// Hardcode config settings into user composer.json
+			file_put_contents(ROOT_PATH . "/composer.json", 
+				"{\n\t\"config\": {
+					\n\t\t\"vendor-dir\": \"system/composer/vendor\",
+					\n\t\t\"cache-dir\": \"system/composer/cache\",
+					\n\t\t\"bin-dir\": \"system/composer/bin\",
+					\n\t\t\"cache-files-dir\": \"system/composer/cache/files\",
+					\n\t\t\"cache-repo-dir\": \"system/composer/cache/repo\",
+					\n\t\t\"cache-vcs-dir\": \"system/composer/cache/vcs\"
+			},\n
+			\t\"require\": {\n\n\t}\n}");
 		}
 		$chk_user->location = ROOT_PATH . "/composer.json";
 		$chk_user->insertOrUpdate();
