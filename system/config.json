@@ -1,7 +1,0 @@
-{
-	"config": {
-		"vendor-dir": "system/composer/vendor",
-		"cache-dir": "composer/cache",
-		"bin-dir": "system/composer/bin"
-	}
-}

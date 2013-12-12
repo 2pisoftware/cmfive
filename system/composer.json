@@ -7,7 +7,6 @@
 	"require": {
 		"knplabs/gaufrette": "0.1.*",
 		"swiftmailer/swiftmailer": "5.1.*@dev",
-		"tecnick.com/tcpdf": "dev-master",
 		"twig/twig": "1.15.*@dev"
 	}
 }

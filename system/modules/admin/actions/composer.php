@@ -4,8 +4,6 @@ function composer_ALL(Web &$w) {
 
 	$w->setLayout(null);
 
-	header("Content-type: text/html");
-
 	echo "Use this page to track execution of the Composer update processes<br/>The system will be usable again when this has finished<br/><br/>";
 
 	// tell php to automatically flush after every output
@@ -25,7 +23,7 @@ function composer_ALL(Web &$w) {
 			// Get checksum of current file
 			$current_checksum = md5_file($chk->location);
 			if (!$chk->isEqual($current_checksum)) {
-				$cmd = "COMPOSER_HOME=".realpath(SYSTEM_PATH) . " composer.phar --working-dir=" . dirname($chk->location) . " update -vv &";
+				$cmd = "COMPOSER_HOME=".realpath(SYSTEM_PATH) . " php composer.phar --working-dir=" . dirname($chk->location) . " update -vv";
 				echo "Running \"" . $cmd . "\"...<br/><br/>";
 				// Something has checked, we need to update
 				$process = proc_open($cmd, $descriptorspec, $pipes, getcwd() . '/system', array());
@@ -33,7 +31,6 @@ function composer_ALL(Web &$w) {
 				if (is_resource($process)) {
 				    while ($s = fgets($pipes[1])) {
 				        print str_replace("\n", "<br/>", $s);//$s;
-				        @ob_flush(); 
 				        flush();
 				    }
 				}
