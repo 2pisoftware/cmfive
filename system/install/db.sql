@@ -277,6 +277,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 
 -- Change to add password reset token
 ALTER TABLE  `user` ADD  `password_reset_token` VARCHAR( 32 ) NULL AFTER  `contact_id` ;
+ALTER TABLE  `user` ADD  `dt_password_reset_at` TIMESTAMP NULL AFTER  `password_reset_token` ;
 
 --
 -- Dumping data for table `user`
@@ -727,10 +728,3 @@ CREATE TABLE IF NOT EXISTS `template` (
   `modifier_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
-
-CREATE TABLE IF NOT EXISTS `composer_checksums` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `location` text NOT NULL,
-  `checksum` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
