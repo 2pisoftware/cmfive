@@ -403,7 +403,7 @@ class Html {
                         $buf .= "<td $valign class='fieldtitle'>$title</td><td  $valign class='fieldvalue'>";
                         $c = !empty($field[4]) ? $field[4] : null;
                         $r = !empty($field[5]) ? $field[5] : null;
-                        $buf .= '<textarea'.$readonly.' style="width:100%;" name="'.$name.'" rows="'.$r.'" cols="'.$c.'" id="'.$name.'" ' . $required . '>'.$value.'</textarea>';
+                        $buf .= '<textarea'.$readonly.' style="width:100%;" name="'.$name.'" rows="'.$r.'" cols="'.$c.'" class="ckeditor" id="'.$name.'" ' . $required . '>'.$value.'</textarea>';
                         $buf .= "</td>\n";
                     } else if ($type == "select") {
                         $items = !empty($field[4]) ? $field[4] : null;
