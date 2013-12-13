@@ -141,7 +141,9 @@ class Web {
         $this->initDB();
         
     	// start the session
-    	$sess = new SessionManager($this);
+        // The custom session manager is playing up, logging out sometimes doesn't work
+        // Removing this seems to make everything work fine.
+    	// $sess = new SessionManager($this);
     	session_name(SESSION_NAME);
     	session_start();
 		$_SESSION['last_request'] = time();
