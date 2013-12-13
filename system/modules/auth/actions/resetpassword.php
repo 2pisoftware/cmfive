@@ -60,7 +60,12 @@ function resetpassword_POST(Web $w) {
 				$user->password_reset_token = null;
 				$user->dt_password_reset_at = null;
 				$user->update(true);
-				
+
+				// Precautionary logout
+				if ($w->Auth->loggedIn()) {
+					$w->sessionDestroy();
+				}
+
 				$validData = true;
 			}
 		}
@@ -69,6 +74,6 @@ function resetpassword_POST(Web $w) {
 		$w->logWarn("Password reset attempt failed with email: $email, token: $token");
 		$w->out("Invalid email or token, this incident has been logged");
 	} else {
-		$w->msg("Your password has been reset", "/");
+		$w->msg("Your password has been reset", "/auth/login");
 	}
 }

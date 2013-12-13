@@ -11,7 +11,7 @@ if (file_exists(__DIR__."/../vendor/autoload.php")) {
 
 require_once "html.php";
 require_once "functions.php";
-require_once "classes/SessionManager.php";
+// require_once "classes/SessionManager.php";
 
 define("CHUNK_SIZE", 1024*1024); // Size (in bytes) of tiles chunk
 
