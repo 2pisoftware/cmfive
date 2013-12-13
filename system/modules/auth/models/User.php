@@ -17,6 +17,7 @@ class User extends DbObject {
 	public $is_deleted;
 	public $is_group;
 	public $password_reset_token;
+	public $dt_password_reset_at;
 	public $_roles;
 	public $_contact;
 	public $_modifiable;

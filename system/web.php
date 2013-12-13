@@ -1059,6 +1059,10 @@ class Web {
     function sessionDestroy() {
     	$_SESSION = array();
     	
+        // Logout wasnt working, googling the problem I found the solution
+        // That is used here, with one key ingredient left out:
+        session_name(SESSION_NAME);
+
     	// If it's desired to kill the session, also delete the session cookie.
     	// Note: This will destroy the session, and not just the session data!
     	if (ini_get("session.use_cookies")) {

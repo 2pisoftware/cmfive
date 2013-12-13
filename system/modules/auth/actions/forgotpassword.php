@@ -25,16 +25,22 @@ function forgotpassword_POST(Web $w) {
 	// We can use the cstrong to check that a cryptographically secure token was generated
 	$token = sha1(openssl_random_pseudo_bytes(32, $cstrong));
 	$user->password_reset_token = $token;
+	$user->dt_password_reset_at = $user->time2Dt();
 	$user->update();
 	
 	// Send email
-	$message = "Dear {$user->getFullName()},\n";
-	$message .= "Please go to this link to reset your password:\n";
-	$message .= "<a href=\"".WEBROOT."/auth/resetpassword?email={$user_contact->email}&token=$token\">".WEBROOT."/auth/resetpassword?email={$user_contact->email}&token=$token</a>\n";
-	$message .= "Thank you\ncmfive support";
+	$message = "Hello {$user->getFullName()},\n<br/>";
+	$message .= "Please go to this link to reset your password:<br/>\n";
+	$message .= "<a href=\"http://".$_SERVER["HTTP_HOST"]."/auth/resetpassword?email={$user_contact->email}&token=$token\">http://"
+			.$_SERVER["HTTP_HOST"]."/auth/resetpassword?email={$user_contact->email}&token=$token</a>\n<br/>You have 24 hours to reset your password.<br/><br/>";
+	$message .= "Thank you,\n<br/>cmfive support";
 	
-	mail($user->email, "cmfive password reset", $message);
+	$result = $w->Mail->sendMail($user_contact->email, "support@tripleacs.com", "cmfive password reset", $message);
+	if ($result !== 0) {
+		$w->msg($responseString, "/auth/login");
+	} else {
+		$w->error("There was a problem sending an email, check your settings.", "/auth/login");
+	}
 	
 	// explain
-	$w->msg($responseString,"/auth/login");
 }

@@ -446,22 +446,17 @@ class DbObject extends DbService {
 		// set some default attributes
 		if (!$this->_modifiable) {
 			// for backwards compatibility
-			//if (property_exists($this, "dt_created")) {
 			if (in_array("dt_created", $columns))
-                            $this->dt_created = time();
-			//}
-			//if (property_exists($this, "creator_id") && $this->creator_id === null && $this->w->Auth->user()) {
-                        if (in_array("creator_id", $columns))
+                $this->dt_created = time();
+
+            if (in_array("creator_id", $columns) && $this->w->Auth->loggedIn())
 				$this->creator_id = $this->w->Auth->user()->id;
-			//}
-			//if (property_exists($this, "dt_modified")) {
-                        if (in_array("dt_modified", $columns))
+
+            if (in_array("dt_modified", $columns))
 				$this->dt_modified = time();
-			//}
-			//if (property_exists($this, "modifier_id") && $this->w->Auth->user()) {
-                        if (in_array("modifier_id", $columns))
+
+            if (in_array("modifier_id", $columns) && $this->w->Auth->loggedIn())
 				$this->modifier_id = $this->w->Auth->user()->id;
-			//}
 		}
 		$data = array();
 		foreach (get_object_vars($this) as $k => $v) {
