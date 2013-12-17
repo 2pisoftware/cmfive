@@ -5,105 +5,68 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 class SessionManager extends DbService {
-
-	public $life_time;
+	private $tableName = 'sessions';
 
 	function __construct(Web $w) {
 		parent::__construct($w);
 
-		// Read the maxlifetime setting from PHP
-		$this->life_time = get_cfg_var("session.gc_maxlifetime");
-
-		// Register this object as the session handler
 		session_set_save_handler(
-		array( $this, "open" ),
-		array( $this, "close" ),
-		array( $this, "read" ),
-		array( $this, "write"),
-		array( $this, "destroy"),
-		array( $this, "gc" )
+			array($this, "open"),
+			array($this, "close"),
+			array($this, "read"),
+			array($this, "write"),
+			array($this, "destroy"),
+			array($this, "gc")
 		);
 
+		register_shutdown_function('session_write_close');
 	}
 
-	function open( $save_path, $session_name ) {
-		global $sess_save_path;
-		$sess_save_path = $save_path;
-		return true;
-	}
+	// Open and close aren't needed to be overloaded (this is handled in DbService)
+	function open($save_path, $session_name) { return true; }
+	function close() { return true; }
 
-	function close() {
-		return true;
-	}
-
-	function read( $id ) {
-
-		// Set empty result
-		$data = '';
-
-		// Fetch session data from the selected database
-
-//		$time = time();
-
-//		$newid = addslashes($id);
-//		$sql = "SELECT `session_data` FROM `sessions` WHERE
-//				`session_id` = '$id' AND `expires` > $time";
-
-		$rs = $this->_db->get("sessions")->fetch_all();
-
-		if($rs) {
-			$data = $rs[0]['session_data'];
+	function read($id) {
+		// Get session by id
+		$rs = $this->_db->get($this->tableName)->where("session_id", $id)->fetch_all();
+		// Should always only be one row
+		if (count($rs) == 1){
+			return $rs[0]["session_data"];
 		}
 
-		return $data;
-
+		// It doesnt exist, create it
+		$this->_db->insert($this->tableName, array('session_id' => $id, "expires" => time()))->execute();
+		return '';
 	}
 
-	function write( $id, $data ) {
-
-		// Build query
-		$time = time() + $this->life_time;
-
-//		$newid = addslashes($id);
-//		$newdata = addslashes($data);
-                $data = ['session_id' => $id, 'session_data' => $data, 'expires' => $time];
-                $this->_db->delete('sessions')->where('session_id', $id)->execute();
-                $this->_db->insert('sessions', $data)->execute();
-                
-//		$sql = "REPLACE `sessions`
-//			(`session_id`,`session_data`,`expires`) VALUES('$newid',
-//				'$newdata', $time)";
-//
-//		$this->_db->sql($sql)->execute();
-
-		return TRUE;
-
-	}
-
-	function destroy( $id ) {
-
-		// Build query
-		$newid = addslashes($id);
-		$sql = "DELETE FROM `sessions` WHERE `session_id` =
-				'$newid'";
-
-		$this->_db->sql($sql)->execute();
-
-		return TRUE;
-
-	}
-	function gc() {
-
-		// Garbage Collection
-
-		// Build DELETE query.  Delete all records who have passed the expiration time
-		$sql = 'DELETE FROM `sessions` WHERE `expires` < '.time().';';
-
-		$this->_db->sql($sql)->execute();
-
-		// Always return TRUE
+	function write($id, $data) {
+        $db_data = array('session_id' => $id, 
+        			   'session_data' => $data, 
+        			   		'expires' => time());
+        
+        // Check is session id is already in db
+        $rs = $this->_db->get($this->tableName)->where("session_id", $id)->fetch_all();
+		// Should always only be one row
+		if (count($rs) !== 1){
+			// Create if missing...?
+        	$this->_db->insert($this->tableName, $db_data)->execute();
+        } else {
+        	// Update instead
+        	$this->_db->update($this->tableName, $db_data)->execute();
+        }
 		return true;
+	}
 
+	function destroy($id) {
+		$this->_db->delete($this->tableName)->where("session_id", $id)->execute();
+		return true;
+	}
+
+	function gc($lifetime) {
+		// Garbage Collection
+		$this->_db->delete($this->tableName)->where("expires < ?", (time() - $lifetime))->execute();
+
+		return true;
 	}
 
 }

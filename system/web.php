@@ -11,7 +11,7 @@ if (file_exists(__DIR__."/../vendor/autoload.php")) {
 
 require_once "html.php";
 require_once "functions.php";
-// require_once "classes/SessionManager.php";
+require_once "classes/SessionManager.php";
 
 define("CHUNK_SIZE", 1024*1024); // Size (in bytes) of tiles chunk
 
@@ -143,9 +143,12 @@ class Web {
     	// start the session
         // The custom session manager is playing up, logging out sometimes doesn't work
         // Removing this seems to make everything work fine.
-    	// $sess = new SessionManager($this);
+    	$sess = new SessionManager($this);
+        // session_set_save_handler($sess, true);
     	session_name(SESSION_NAME);
     	session_start();
+        // session_regenerate_id(true);
+
 		$_SESSION['last_request'] = time();
 		
         //$this->debug("Start processing: ".$_SERVER['REQUEST_URI']);        
@@ -1061,8 +1064,6 @@ class Web {
     function sessionDestroy() {
     	$_SESSION = array();
     	
-        // Logout wasnt working, googling the problem I found the solution
-        // That is used here, with one key ingredient left out:
         session_name(SESSION_NAME);
 
     	// If it's desired to kill the session, also delete the session cookie.
