@@ -66,7 +66,7 @@ function useredit_POST(Web &$w) {
     }
     // deleting roles
     foreach ($user->getRoles() as $r) {
-        if (!$_REQUEST["check_" . $r]) {
+        if (!@$_REQUEST["check_" . $r]) {
             $user->removeRole($r);
         }
     }
@@ -77,6 +77,7 @@ function useredit_POST(Web &$w) {
         $contact->private_to_user_id = null;
         $contact->update();
     }
+    $w->callHook("admin", "account_changed", $user);
 
     $w->msg("User " . $user->login . " updated.", "/admin/users");
 }

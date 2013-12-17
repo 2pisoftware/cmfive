@@ -51,6 +51,7 @@ class Web {
     public $_modulePath;
     public $_moduleExtension;
     public $_modules;
+    public $_hooks;
     public $_requestMethod;
     public $_action_executed = false;
     public $_action_redirected = false;
@@ -89,6 +90,7 @@ class Web {
         $this->_headers = null;
         $this->_module = null;
         $this->_submodule = null;
+        $this->_hooks = array();
         $this->_webroot = "/";
         $this->_actionMethod = null;
         spl_autoload_register(array($this, 'modelLoader'));
@@ -141,13 +143,9 @@ class Web {
         $this->initDB();
         
     	// start the session
-        // The custom session manager is playing up, logging out sometimes doesn't work
-        // Removing this seems to make everything work fine.
     	$sess = new SessionManager($this);
-        // session_set_save_handler($sess, true);
     	session_name(SESSION_NAME);
     	session_start();
-        // session_regenerate_id(true);
 
 		$_SESSION['last_request'] = time();
 		
@@ -703,7 +701,60 @@ class Web {
     	return $currentbuf;
     }
     
-    
+    /**
+     * Call hook method to invoke other modules helper functions
+     * 
+     * @param String module
+     * @param String $function
+     * @param Mixed $data
+     */
+    public function callHook($module = null, $function = null, $data = null) {
+        if (empty($module) or empty($function)) {
+            return;
+        }
+
+        // Build _hook registry if empty
+        if (empty($this->_hooks)) {
+            foreach($this->_moduleConfig as $modulename => $conf) {
+                if (array_key_exists("hooks", $conf)) {
+                    foreach($conf["hooks"] as $hook) {
+                        $this->_hooks[$hook][] = $modulename;
+                    }
+                }
+            }
+        }
+
+        // Check that $module is a module
+        if (!in_array($module, $this->modules())){
+            return;
+        }
+
+        // Check that the module calling has subscribed to hooks
+        if (!array_key_exists($module, $this->_hooks)){
+            return;
+        }
+
+        // Loop through each registered module to try and invoke the function
+        foreach($this->_hooks[$module] as $toInvoke) {
+            // Check if the file exits
+            if (!file_exists($this->getModuleDir($toInvoke) . "$toInvoke.hooks.php")){
+                continue;
+            }
+
+            // Include and check if function exists
+            include $this->getModuleDir($toInvoke) . "$toInvoke.hooks.php";
+
+            $hook_function_name = $toInvoke . "_" . $module . "_" . $function;
+            if (!function_exists($hook_function_name)) {
+                continue;
+            }
+
+            // Call function
+            $hook_function_name($this, $data);
+        }
+        
+    }
+
     /////////////////////////////////// Template stuff /////////////////////////
 
     function setLayout($l) {

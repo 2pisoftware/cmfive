@@ -58,5 +58,7 @@ function useradd_POST(Web &$w) {
 			}
 		}
 	}
+	$w->callHook("admin", "account_changed", $user);
+
 	$w->msg("User ".$user->login." added","/admin/users");
 }
