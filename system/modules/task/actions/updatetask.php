@@ -9,7 +9,8 @@ function updatetask_POST(Web &$w) {
 	// if task exists, first gather changes for display in comments
 	if ($task) {
 		// if no due date, make 1 month from now
-		if (empty($w->request('dt_due'))) { 
+		$dt_due = $w->request('dt_due');
+		if (empty($dt_due)) { 
 			$_POST['dt_due'] = $w->Task->getNextMonth();
 		}
 

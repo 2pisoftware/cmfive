@@ -102,7 +102,7 @@ class Html {
             $confirm_str = "if(confirm('".$confirm."')) { ";
         } 
 
-        return " onclick=\"{$confirm_str}$.fn.colorbox({transition:'elastic', href:'".$href."', iframe:".$iframe.$width.$height."});return false;".(!empty($confirm) ? "}" : "")."\" ";
+        return " onclick=\"{$confirm_str}\$.colorbox({onComplete:function(){\$(this).colorbox.resize()}, transition:'elastic', href:'".$href."', iframe:".$iframe.$width.$height."});return false;".(!empty($confirm) ? "}" : "")."\" ";
     }
     /**
      * creates a ul from an array structure:
@@ -278,6 +278,7 @@ class Html {
             $buf .= '<tr><td colspan="2" align="right"><input type="submit" value="'.$submitTitle.'"/></td></tr>';
         }
         $buf .= "</table>\n";
+        // Need to load manually the ckeditor within colorboxes
         $buf .= $hidden."</form>\n";
         return $buf;
     }
@@ -459,6 +460,7 @@ class Html {
             $buf.= '<input id="submit" style="padding-top: 3px;padding-bottom: 3px;width:100px;" type="submit" value="'.$submitTitle.'"/>';
         }
         $buf.='</td></tr>';
+        $buf.= "<script>$(function(){\$('textarea').each(function(){CKEDITOR.replace(this)})});</script>";
         $buf .= "</table>\n";
         $buf .= $hidden . ($includeFormTag == true ? "</form>" : "") . "\n";
         return $buf;
