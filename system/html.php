@@ -229,7 +229,7 @@ class Html {
                 $buf .= "<td colspan=\"$colspan\">";
                 $cols = !empty($row[4]) ? $row[4] : null;
                 $rows = !empty($row[5]) ? $row[5] : null;
-                $buf .= '<textarea name="'.$name.'" rows="'.$rows.'" cols="'.$cols.'" id="'.$name.'">'.$value.'</textarea>';
+                $buf .= '<textarea name="'.$name.'" rows="'.$rows.'" cols="'.$cols.'" class="ckeditor" id="'.$name.'">'.$value.'</textarea>';
                 $buf .= "</td></tr>\n";
             } else if ($type == "section") {
                 $buf .= '<tr><td colspan="2" class="section" >'.htmlentities($title);

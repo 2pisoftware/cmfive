@@ -143,7 +143,7 @@ class Web {
         $this->initDB();
         
     	// start the session
-    	$sess = new SessionManager($this);
+    	// $sess = new SessionManager($this);
     	session_name(SESSION_NAME);
     	session_start();
 

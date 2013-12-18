@@ -30,8 +30,7 @@ class MailService extends DbService {
  		// Send
  		$result = $mailer->send($message, $failures);
  		if (!$result) {
- 			var_dump(func_get_args());
- 			var_dump($failures); die();
+ 			
  		}
  		return $result;
 	}
