@@ -48,6 +48,7 @@ function index_ALL(Web $w) {
 				// build arrays accordingly to give relevant counts of respective status for each group > task type
 				// create appropriate HTML to build accordion with task count tables and any required URLs
 				if ($tasks) {
+					$mygrptasks = array();
 					foreach ($tasks as $task) {
 						if (!$task->getisTaskClosed())
 							$opentasks[] = $i;

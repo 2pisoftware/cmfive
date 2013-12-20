@@ -15,6 +15,7 @@ function updatetask_POST(Web &$w) {
 		}
 
 		// convert dates to d/m/y for display. if assignee changes, get name of new assignee
+		$comments = "";
 		foreach ($_POST as $name => $value) {
 			if (startsWith($name,"dt_")) {
 				list($d,$m,$y) = preg_split('/\//',$value);
@@ -47,7 +48,7 @@ function updatetask_POST(Web &$w) {
 		$task->update();
 
 		// if we have comments, add them
-		if ($comments) {
+		if (!empty($comments)) {
 			$comm = new TaskComment($w);
 			$comm->fill($_POST);
 			$comm->obj_table = $task->getDbTableName();
