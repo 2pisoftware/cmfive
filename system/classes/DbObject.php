@@ -945,6 +945,11 @@ class DbObject extends DbService {
 				if (is_string($rule_array)) {
 					$rule = $rule_array;
 				}
+				
+				if (empty($this->$vr_key) && $rule !== "required") {
+					continue;
+				}
+
 				switch($rule){
 					case "required":
 						if (empty($this->$vr_key)) {
