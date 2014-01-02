@@ -6,6 +6,7 @@
 	},
 	"require": {
 		"knplabs/gaufrette": "0.1.*",
-		"swiftmailer/swiftmailer": "@stable"
+		"swiftmailer/swiftmailer": "@stable",
+		"twig/twig": "1.*"
 	}
 }
