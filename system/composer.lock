@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "922c7cdeb23e7890ebaa3cf9aca58850",
+    "hash": "9d4e1d5627b36777d21793cb1c37eccf",
     "packages": [
         {
             "name": "knplabs/gaufrette",
@@ -88,16 +88,16 @@
         },
         {
             "name": "swiftmailer/swiftmailer",
-            "version": "dev-master",
+            "version": "v5.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/swiftmailer/swiftmailer.git",
-                "reference": "f0be8302f28913af7bd7df6639e5bec5b5e79257"
+                "reference": "32edc3b0de0fdc1b10f5c4912e8677b3f411a230"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/f0be8302f28913af7bd7df6639e5bec5b5e79257",
-                "reference": "f0be8302f28913af7bd7df6639e5bec5b5e79257",
+                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/32edc3b0de0fdc1b10f5c4912e8677b3f411a230",
+                "reference": "32edc3b0de0fdc1b10f5c4912e8677b3f411a230",
                 "shasum": ""
             },
             "require": {
@@ -133,56 +133,7 @@
                 "mail",
                 "mailer"
             ],
-            "time": "2013-12-03 13:34:24"
-        },
-        {
-            "name": "twig/twig",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/fabpot/Twig.git",
-                "reference": "6387fc457792f38189bdd5729b500772bbddfa4d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/fabpot/Twig/zipball/6387fc457792f38189bdd5729b500772bbddfa4d",
-                "reference": "6387fc457792f38189bdd5729b500772bbddfa4d",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.2.4"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.15-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Twig_": "lib/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Armin Ronacher",
-                    "email": "armin.ronacher@active-4.com"
-                }
-            ],
-            "description": "Twig, the flexible, fast, and secure template language for PHP",
-            "homepage": "http://twig.sensiolabs.org",
-            "keywords": [
-                "templating"
-            ],
-            "time": "2013-12-10 10:23:00"
+            "time": "2013-12-03 13:33:24"
         }
     ],
     "packages-dev": [
@@ -193,8 +144,7 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "swiftmailer/swiftmailer": 20,
-        "twig/twig": 20
+        "swiftmailer/swiftmailer": 0
     },
     "platform": [
 
