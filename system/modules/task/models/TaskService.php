@@ -510,4 +510,67 @@ class TaskService extends DbService {
         }
         $this->_tasks_loaded = true;
     }
+    
+    /**
+     * Create a new Taskgroup using all the form details of the taskgroup form
+     * 
+     * $data['task_group_type'], eg. "TaskGroupType_TaskTodo"
+     * $data['title'], the task group title
+     * $data['can_assign'], OWNER|MEMBER|GUEST
+     * $data['can_view'], OWNER|MEMBER|GUEST
+     * $data['can_create'], OWNER|MEMBER|GUEST
+     * $data['is_active'], 0|1
+     * $data['is_deleted'], 0|1
+     * $data['description'], a description
+     * $data['default_assignee_id'], a user_id
+     * 
+     * @param array<mixed> $data
+     * @return TaskGroup
+     */
+    function createTaskGroup($data) {
+    	// insert newly created task group into the task_group database
+    	$taskgroup = new TaskGroup($this->w);
+    	$taskgroup->fill($data);
+    	$taskgroup->insert();
+    	
+    	// if created succcessfully, create default notify matrix: all on
+    	if ($taskgroup->id) {
+    		$arr['guest']['creator'] = 1;
+    		$arr['member']['creator'] = 1;
+    		$arr['member']['assignee'] = 1;
+    		$arr['owner']['creator'] = 1;
+    		$arr['owner']['assignee'] = 1;
+    		$arr['owner']['other'] = 1;
+    	
+    		// so foreach role/type lets put the values in the database
+    		foreach ($arr as $role => $types) {
+    			foreach ($types as $type => $value) {
+    				$notify = new TaskGroupNotify($$this->w);
+    				$notify->task_group_id = $taskgroup->id;
+    				$notify->role = $role;
+    				$notify->type = $type;
+    				$notify->value = $value;
+    				$notify->insert();
+    			}
+    		}
+    	}
+    	
+    	// if task group is successfully created and a default assignee is defined
+    	// create a task group membership list and set this person as the task group owner
+    	// if no default assignee, a task group membership list can be created at any time
+    	if (($taskgroup->id) && ($data['default_assignee_id'] != "")) {
+    		$arrdb = array();
+    		$arrdb['task_group_id'] = $taskgroup->id;
+    		$arrdb['user_id'] = $data['default_assignee_id'];
+    		$arrdb['role'] = "OWNER";
+    		$arrdb['priority'] = 1;
+    		$arrdb['is_active'] = 0;
+    	
+    		$mem = new TaskGroupMember($this->w);
+    		$mem->fill($arrdb);
+    		$mem->insert();
+    	}
+    	 
+    	return $taskgroup;
+    }
 }

@@ -116,49 +116,8 @@ function createtaskgroup_POST(Web &$w) {
 	 }
 	 */
 
-	// insert newly created task group into the task_group database
-	$taskgroup = new TaskGroup($w);
-	$taskgroup->fill($_REQUEST);
-	$taskgroup->insert();
+	$taskgroup = $w->Task->createTaskGroup($_REQUEST);
 	
-	// if created succcessfully, create default notify matrix: all on
-	if ($taskgroup->id) {
-		$arr['guest']['creator'] = 1;
-		$arr['member']['creator'] = 1;
-		$arr['member']['assignee'] = 1;
-		$arr['owner']['creator'] = 1;
-		$arr['owner']['assignee'] = 1;
-		$arr['owner']['other'] = 1;
-
-		// so foreach role/type lets put the values in the database
-		foreach ($arr as $role => $types) {
-			foreach ($types as $type => $value) {
-				$notify = new TaskGroupNotify($w);
-				$notify->task_group_id = $taskgroup->id;
-				$notify->role = $role;
-				$notify->type = $type;
-				$notify->value = $value;
-				$notify->insert();
-			}
-		}
-	}
-
-	// if task group is successfully created and a default assignee is defined
-	// create a task group membership list and set this person as the task group owner
-	// if no default assignee, a task group membership list can be created at any time
-	if (($taskgroup->id) && ($_REQUEST['default_assignee_id'] != "")) {
-		$arrdb = array();
-		$arrdb['task_group_id'] = $taskgroup->id;
-		$arrdb['user_id'] = $_REQUEST['default_assignee_id'];
-		$arrdb['role'] = "OWNER";
-		$arrdb['priority'] = 1;
-		$arrdb['is_active'] = 0;
-	
-		$mem = new TaskGroupMember($w);
-		$mem->fill($arrdb);
-		$mem->insert();
-	}
-
 	// return
 	$w->msg("Task Group ".$taskgroup->title." added","/task-group/viewmembergroup/".$taskgroup->id);
 }
