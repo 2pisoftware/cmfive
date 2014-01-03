@@ -40,6 +40,7 @@ function viewtask_GET(Web &$w) {
 
 		// Guests can view but not edit
 		// See if i am assignee or creator, if yes provide editable form, else provide static display
+		$btndelete = "";
 		if ($task->getCanIEdit()) {
 			$btndelete = Html::b(WEBROOT."/task/deletetask/".$task->id," Delete Task ", "Are you should you with to DELETE this task?");
 
@@ -121,9 +122,10 @@ function viewtask_GET(Web &$w) {
 		$form = Html::form($f,$w->localUrl("/task/updatetask/".$task->id),"POST"," Update ");
 
 		// create 'start time log' button
+		$btntimelog = "";
 		if ($task->assignee_id == $w->Auth->user()->id) {
 			$btntimelog = "<button class=\"startTime\" href=\"/task/starttimelog/".$task->id."\"> Start Time Log </button>";
-		}
+		} 
 
 		// display variables
 		$w->ctx("btntimelog",$btntimelog);
@@ -205,6 +207,7 @@ function viewtask_GET(Web &$w) {
 
 		// tab: time log
 		// provide button to add time entry
+		$addtime = "";
 		if ($task->assignee_id == $w->Auth->user()->id) {		
 			$addtime = Html::box(WEBROOT."/task/addtime/".$task->id," Add Time Log entry ",true);
 		}

@@ -23,6 +23,7 @@ function taskweek_ALL(Web &$w) {
 	if ($tasks) {
 		// dont wanna keep displaying same date so set a variable for comparison
 		$olddate = "";
+		$i = 0;
 		foreach ($tasks as $task) {
 			$taskgroup = $w->Task->getTaskGroup($task['task_group_id']);
 			$caniview = $taskgroup->getCanIView();
