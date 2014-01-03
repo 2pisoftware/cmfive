@@ -24,20 +24,20 @@ function edit_GET(Web $w) {
 	
 	$newForm = array();
 	$newForm["Template Title"] = array(
-			array(array("", "textarea", "template_title",$t->template_title,100,1))
+			array(array("", "textarea", "template_title",$t->template_title,100,1, false))
 	);
 	$newForm["Template Body"] = array(
-			array(array("", "textarea", "template_body",$t->template_body,100,30))
+			array(array("", "textarea", "template_body",$t->template_body,100,30, false))
 	);
 
 	$w->ctx("templateform", Html::multiColForm($newForm, $w->localUrl('/admin-templates/edit/'.$t->id)));
 	
 	$newForm = array();
 	$newForm["Title Data"] = array(
-			array(array("", "textarea", "test_title_json",$t->test_title_json,100,5))
+			array(array("", "textarea", "test_title_json",$t->test_title_json,100,5, false))
 	);
 	$newForm["Body Data"] = array(
-			array(array("", "textarea", "test_body_json",$t->test_body_json,100,20))
+			array(array("", "textarea", "test_body_json",$t->test_body_json,100,20, false))
 	);
 	
 	$w->ctx("testdataform", Html::multiColForm($newForm, $w->localUrl('/admin-templates/edit/'.$t->id)));

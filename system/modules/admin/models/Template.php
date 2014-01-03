@@ -41,8 +41,8 @@ class Template extends DbObject {
 	}
 
 	public function testBody() {
-		//echo $this->test_body_json;
-		//print_r(json_decode($this->test_body_json));
+		// echo $this->test_body_json;
+		// print_r(json_decode($this->test_body_json));
 		return $this->renderBody(json_decode($this->test_body_json,true));
 	}
 }

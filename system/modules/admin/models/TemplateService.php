@@ -57,16 +57,16 @@ class TemplateService extends DbService {
 		// falling through the options:
 		
 		// if passing a template's id
-		if (is_int($template)) {
+		if (is_numeric($template)) {
 			$template = $this->getTemplate($template);
 			if ($template == null) {
 				return;
 			}
 		}
-		
+
 		// if passing a Template object
 		if (is_a($template, "Template")) {
-			$template = $template->body;
+			$template = $template->template_body;
 		}
 		
 		// if passing a file path or string template

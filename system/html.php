@@ -229,7 +229,11 @@ class Html {
                 $buf .= "<td colspan=\"$colspan\">";
                 $cols = !empty($row[4]) ? $row[4] : null;
                 $rows = !empty($row[5]) ? $row[5] : null;
-                $buf .= '<textarea name="'.$name.'" rows="'.$rows.'" cols="'.$cols.'" class="ckeditor" id="'.$name.'">'.$value.'</textarea>';
+                $useCKEditor = true;
+                if (isset($row[6])){
+                    $useCKEditor = (boolean) $row[6];
+                }
+                $buf .= '<textarea name="'.$name.'" rows="'.$rows.'" cols="'.$cols.'" ' . ($useCKEditor ? 'class="ckeditor" ' : '') . ' id="'.$name.'">'.$value.'</textarea>';
                 $buf .= "</td></tr>\n";
             } else if ($type == "section") {
                 $buf .= '<tr><td colspan="2" class="section" >'.htmlentities($title);
@@ -239,7 +243,8 @@ class Html {
                 if ($title){
                     $buf .= "<tr><td $valign class='fieldtitle'>".htmlentities($title)."</td>";
                 }
-                $buf .= "<td colspan=\"$colspan\">";                if ($readonly == ""){
+                $buf .= "<td colspan=\"$colspan\">";                
+                if ($readonly == ""){
                     $buf.= Html::select($name,$items,$value);
                 } else {
                     $buf.=$value;
@@ -404,7 +409,11 @@ class Html {
                         $buf .= "<td $valign class='fieldtitle'>$title</td><td  $valign class='fieldvalue'>";
                         $c = !empty($field[4]) ? $field[4] : null;
                         $r = !empty($field[5]) ? $field[5] : null;
-                        $buf .= '<textarea'.$readonly.' style="width:100%;" name="'.$name.'" rows="'.$r.'" cols="'.$c.'" class="ckeditor" id="'.$name.'" ' . $required . '>'.$value.'</textarea>';
+                        $useCKEditor = true;
+                        if (isset($field[6])){
+                            $useCKEditor = $field[6];
+                        }
+                        $buf .= '<textarea'.$readonly.' style="width:100%;" name="'.$name.'" rows="'.$r.'" cols="'.$c.'" '. ($useCKEditor ? 'class="ckeditor" ' : '') . ' id="'.$name.'" ' . $required . '>'.$value.'</textarea>';
                         $buf .= "</td>\n";
                     } else if ($type == "select") {
                         $items = !empty($field[4]) ? $field[4] : null;
@@ -460,7 +469,7 @@ class Html {
             $buf.= '<input id="submit" style="padding-top: 3px;padding-bottom: 3px;width:100px;" type="submit" value="'.$submitTitle.'"/>';
         }
         $buf.='</td></tr>';
-        $buf.= "<script>$(function(){\$('textarea').each(function(){CKEDITOR.replace(this)})});</script>";
+        $buf.= "<script>$(function(){\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})});</script>";
         $buf .= "</table>\n";
         $buf .= $hidden . ($includeFormTag == true ? "</form>" : "") . "\n";
         return $buf;
