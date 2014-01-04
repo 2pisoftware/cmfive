@@ -19,7 +19,7 @@ function defaultVal($val,$default = null,$forceNull = false) {
             } else {
                 return $val;
             }
-        } else {
+        } else if (empty($val)) {
             return $default;
         }
 
