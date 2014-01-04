@@ -511,26 +511,69 @@ class TaskService extends DbService {
         $this->_tasks_loaded = true;
     }
     
+    function getTaskGroupByUniqueTitle($title) {
+    	return $this->getObject("TaskGroup", array("title" => $title, "is_deleted" => 0));
+    }
+
+    /**
+     * Create a new Task
+     * 
+     * @param unknown $task_type
+     * @param unknown $task_group_id
+     * @param unknown $title
+     * @param unknown $description
+     * @param unknown $priority
+     * @param unknown $dt_due
+     * @param unknown $first_assignee_id
+     */
+    function createTask($task_type, $task_group_id, $title, $description, $priority, $dt_due, $first_assignee_id) {
+		$task = new Task($this->w);
+		$task->task_type = $task_type;
+		$task->task_group_id = $task_group_id;
+		$task->title = $title;
+		$task->description = $description;
+		$task->priority = $priority;
+		$task->dt_due = $dt_due;
+		$task->first_assignee_id = $first_assignee_id;
+		$task->dt_assigned = time();
+		$task->dt_first_assigned = time();
+		$task->insert();
+		return $task;
+    }
+    
     /**
      * Create a new Taskgroup using all the form details of the taskgroup form
      * 
-     * $data['task_group_type'], eg. "TaskGroupType_TaskTodo"
-     * $data['title'], the task group title
-     * $data['can_assign'], OWNER|MEMBER|GUEST
-     * $data['can_view'], OWNER|MEMBER|GUEST
-     * $data['can_create'], OWNER|MEMBER|GUEST
-     * $data['is_active'], 0|1
-     * $data['is_deleted'], 0|1
-     * $data['description'], a description
-     * $data['default_assignee_id'], a user_id
-     * 
-     * @param array<mixed> $data
+     * @param task_group_type, eg. "TaskGroupType_TaskTodo"
+     * @param title, the task group title
+     * @param description, a description
+     * @param default_assignee_id, a user_id or null
+     * @param can_assign, OWNER|MEMBER|GUEST
+     * @param can_view, OWNER|MEMBER|GUEST
+     * @param can_create, OWNER|MEMBER|GUEST
+     * @param is_active, 0|1
+     * @param is_deleted, 0|1
+     *  
      * @return TaskGroup
      */
-    function createTaskGroup($data) {
+    function createTaskGroup($type, $title, $description, $default_assignee_id, $can_assign = "OWNER", $can_view = "OWNER", $can_create = "OWNER", $is_active = 1, $is_deleted = 0) {
+    	// title should be unique!
+    	$taskgroup = $this->getTaskGroupByUniqueTitle($title);
+    	if (null !== $taskgroup) {
+    		return $taskgroup;
+    	} 
+    	
     	// insert newly created task group into the task_group database
     	$taskgroup = new TaskGroup($this->w);
-    	$taskgroup->fill($data);
+    	$taskgroup->task_group_type = $type;
+    	$taskgroup->title = $title;
+    	$taskgroup->description = $description;
+    	$taskgroup->can_assign = $can_assign;
+    	$taskgroup->can_view = $can_view;
+    	$taskgroup->can_create = $can_create;
+    	$taskgroup->is_active = $is_active;
+    	$taskgroup->is_deleted = $is_deleted;
+    	$taskgroup->default_assignee_id = $default_assignee_id;
     	$taskgroup->insert();
     	
     	// if created succcessfully, create default notify matrix: all on
@@ -545,7 +588,7 @@ class TaskService extends DbService {
     		// so foreach role/type lets put the values in the database
     		foreach ($arr as $role => $types) {
     			foreach ($types as $type => $value) {
-    				$notify = new TaskGroupNotify($$this->w);
+    				$notify = new TaskGroupNotify($this->w);
     				$notify->task_group_id = $taskgroup->id;
     				$notify->role = $role;
     				$notify->type = $type;
@@ -558,10 +601,10 @@ class TaskService extends DbService {
     	// if task group is successfully created and a default assignee is defined
     	// create a task group membership list and set this person as the task group owner
     	// if no default assignee, a task group membership list can be created at any time
-    	if (($taskgroup->id) && ($data['default_assignee_id'] != "")) {
+    	if (($taskgroup->id) && ($default_assignee_id != "")) {
     		$arrdb = array();
     		$arrdb['task_group_id'] = $taskgroup->id;
-    		$arrdb['user_id'] = $data['default_assignee_id'];
+    		$arrdb['user_id'] = $default_assignee_id;
     		$arrdb['role'] = "OWNER";
     		$arrdb['priority'] = 1;
     		$arrdb['is_active'] = 0;

@@ -116,7 +116,17 @@ function createtaskgroup_POST(Web &$w) {
 	 }
 	 */
 
-	$taskgroup = $w->Task->createTaskGroup($_REQUEST);
+	$taskgroup = $w->Task->createTaskGroup(
+			$_REQUEST['task_group_type'],
+			$_REQUEST['title'],
+			$_REQUEST['description'],
+			$_REQUEST['default_assignee_id'],
+			$_REQUEST['can_assign'],
+			$_REQUEST['can_view'],
+			$_REQUEST['can_create'],
+			$_REQUEST['is_active'],
+			$_REQUEST['is_deleted']
+		);
 	
 	// return
 	$w->msg("Task Group ".$taskgroup->title." added","/task-group/viewmembergroup/".$taskgroup->id);
