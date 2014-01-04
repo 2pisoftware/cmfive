@@ -18,20 +18,21 @@ function index_ALL(Web $w) {
 	// build accordion based on all tasks allocated to groups of which i am a member
 	// drilling down through group > task type > status
 	// if group permissions mean 'i can view' then show count of my tasks / group tasks
-        $strOut = '';
+    $strOut = '';
 	if (!empty($group)) {
+
 		foreach ($group as $grpid => $grptype) {
-			// i as arbitory value. really looking at array count
 			$i = 0;
-	
+			
 			// get current group title for display
 			$taskgroup = $w->Task->getTaskGroup($grpid);
 			$grouptitle = $taskgroup->title;
-			
+
 			// if i can create tasks in this group, provide link with group stats
 			$newtasklink = "";
-			if ($taskgroup->getCanICreate())
+			if ($taskgroup->getCanICreate()) {
 				$newtasklink = "&nbsp;&nbsp;<a href=\"/task/createtask/?gid=" . $grpid . "\">Create Task</a>";
+			}
 						
 			$taskweek = "&nbsp;&nbsp;<a href=\"/task/taskweek/?taskgroup=" . $grpid . "\">Group Activity</a>";
 			
@@ -39,6 +40,7 @@ function index_ALL(Web $w) {
 			$caniview = $taskgroup->getCanIView();
 			
 			if ($caniview) {
+
 				// get group tasks
 				$tasks = $w->Task->getTasksbyGroupId($grpid);
 				// get group status list
@@ -98,7 +100,7 @@ function index_ALL(Web $w) {
 					$showtasks = Html::table($grouptasks,null,"tablesorter",true);
 	
 					// continue building accordion with stats gather for current group > task types > statuses
-					$strOut = '<div class="task-group-list">';
+					$strOut .= '<div class="task-group-list">';
 					$strOut .=	"<h3>" . $grouptitle . " " . count($mygrptasks) . "/" . count($opentasks) . "</h3>";
 					$strOut .= $showtasks;
 					$strOut .= "<div style=\"text-align:right;margin-top:-8px;\"><a href=\"" . WEBROOT . "/task/tasklist/?assignee=&taskgroups=" . $grpid . "\">List Tasks</a> " . $newtasklink . $taskweek . "</div>";

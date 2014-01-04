@@ -116,12 +116,12 @@ class TaskService extends DbService {
 		
 	// get all active task groups from the database
 	function getTaskGroups() {
-		return  $this->getObjects("TaskGroup", array("is_active"=>0,"is_deleted"=>0));
+		return  $this->getObjects("TaskGroup", array("is_active"=>1,"is_deleted"=>0));
 	}
 
 	// get all task groups from the database of given task group type
 	function getTaskGroupsByType($id) {
-		return $this->getObjects("TaskGroup",array("is_active"=>0,"is_deleted"=>0,"task_group_type"=>$id));
+		return $this->getObjects("TaskGroup",array("is_active"=>1,"is_deleted"=>0,"task_group_type"=>$id));
 	}
 
 	// get all task group types as defined in our tasks file
@@ -254,7 +254,7 @@ class TaskService extends DbService {
 		if (is_array($where)) {
 			if (($id) && ($id = ""))
 				 	$where['t.assignee_id'] = $id;
-			$where['g.is_active'] = 0;
+			$where['g.is_active'] = 1;
 			$where['g.is_deleted'] = 0;
 			$where['t.is_deleted'] = 0;
 		}
@@ -263,14 +263,14 @@ class TaskService extends DbService {
 			if (($id) && ($id != "")) {
 				$assign = "(t.assignee_id = " . $id . " or t.assignee_id = 0) and ";
 			}
-			$where = "where " . $assign . $grps . $where . " and t.is_deleted = 0 and g.is_active = 0 and g.is_deleted = 0";
+			$where = "where " . $assign . $grps . $where . " and t.is_deleted = 0 and g.is_active = 1 and g.is_deleted = 0";
 		}
 		// if where is blank string, do this
 		elseif ($where == "") {
 			if (($id) && ($id != "")) {
 				$assign = "(t.assignee_id = " . $id . " or t.assignee_id = 0) and ";
 			}
-			$where = "where " . $assign . $grps . " t.is_closed = 0 and t.is_deleted = 0 and g.is_active = 0 and g.is_deleted = 0";
+			$where = "where " . $assign . $grps . " t.is_closed = 0 and t.is_deleted = 0 and g.is_active = 1 and g.is_deleted = 0";
 		}
 		
 //		return $this->getObjects("Task",$clause);
@@ -297,7 +297,7 @@ class TaskService extends DbService {
 		elseif ($clause != "") {
 			$where = " and " . $clause;
 		}
-		$where .= " and t.is_deleted = 0 and g.is_active = 0 and g.is_deleted = 0";
+		$where .= " and t.is_deleted = 0 and g.is_active = 1 and g.is_deleted = 0";
 
 		// check that task group is active and not deleted
 		$rows = $this->_db->sql("SELECT t.* from ".Task::$_db_table." as t inner join ".ObjectModification::$_db_table." as o on t.id = o.object_id inner join ".TaskGroup::$_db_table." as g on t.task_group_id = g.id where o.creator_id = " . $id . " and o.table_name = '".Task::$_db_table."' " . $where . " order by t.id")->fetch_all();
@@ -332,7 +332,7 @@ class TaskService extends DbService {
 		// create where clause giving all active tasks which have shown activity in the last week
 		// need to check if task group is deleted
 		$grps = "t.task_group_id in (" . $grplist . ") and ";
-		$where = "where " . $grps . $who . " t.is_deleted = 0 and g.is_active = 0 and g.is_deleted = 0";
+		$where = "where " . $grps . $who . " t.is_deleted = 0 and g.is_active = 1 and g.is_deleted = 0";
 		$where .= " and date_format(c.dt_modified,'%Y-%m-%d') >= '" . $this->date2db($from) . "' and date_format(c.dt_modified,'%Y-%m-%d') <= '" . $this->date2db($to) . "'";
 
 		// get and return tasks
@@ -426,7 +426,7 @@ class TaskService extends DbService {
 	
 	// return an array of the owners of a task group from the database
 	function getTaskGroupOwners($id) {
-		return $this->getObjects("TaskGroupMember",array("task_group_id"=>$id,"role"=>"OWNER","is_active"=>0));
+		return $this->getObjects("TaskGroupMember",array("task_group_id"=>$id,"role"=>"OWNER","is_active"=>1));
 	}
 	
 	// determine if a given user is an owner of a task group.
@@ -448,7 +448,7 @@ class TaskService extends DbService {
 //		return $this->getObjects("TaskGroupMember",$where);
 
 		// check if task group is active and not deleted
-		$where = "where m.user_id = " . $id . " and m.is_active = 0 and g.is_active = 0 and g.is_deleted = 0";
+		$where = "where m.user_id = " . $id . " and m.is_active = 1 and g.is_active = 1 and g.is_deleted = 0";
 		$rows = $this->_db->sql("SELECT m.* from ".TaskGroupMember::$_db_table." as m inner join ".TaskGroup::$_db_table." as g on m.task_group_id = g.id " . $where . " order by m.task_group_id")->fetch_all();
 		$rows = $this->fillObjects("TaskGroupMember",$rows);
 		return $rows;
@@ -456,12 +456,12 @@ class TaskService extends DbService {
 
 	// return all members of a task group from the database, given the task group ID
 	function getMemberGroup($id) {
-		return $this->getObjects("TaskGroupMember",array("task_group_id"=>$id,"is_active"=>0));
+		return $this->getObjects("TaskGroupMember",array("task_group_id"=>$id,"is_active"=>1));
 	}
 
 	// return an array for display of all members in a given task group, by task group ID
 	function getMembersInGroup($id) {
-		$members = $this->getObjects("TaskGroupMember",array("task_group_id"=>$id,"is_active"=>0));
+		$members = $this->getObjects("TaskGroupMember",array("task_group_id"=>$id,"is_active"=>1));
 		foreach ($members as $member) {
 			$line[] = array($this->getUserById($member->user_id),$member->user_id);
 		}
@@ -470,7 +470,7 @@ class TaskService extends DbService {
 	
 	// return an array for display of all members of a task group who can be assigned tasks, given task group ID
 	function getMembersBeAssigned($id) {
-		$where = "task_group_id = " . $id . " and (role = 'MEMBER' or role = 'OWNER') and is_active = 0";
+		$where = "task_group_id = " . $id . " and (role = 'MEMBER' or role = 'OWNER') and is_active = 1";
 		$members = $this->getObjects("TaskGroupMember",$where);
 		foreach ($members as $member) {
 			$line[] = array($this->getUserById($member->user_id),$member->user_id);
@@ -485,7 +485,7 @@ class TaskService extends DbService {
 
 	// return a member object given a task group ID and a user ID
 	function getMemberGroupById($group, $uid) {
-		return $this->getObject("TaskGroupMember",array("task_group_id"=>$group,"user_id"=>$uid,"is_active"=>0));
+		return $this->getObject("TaskGroupMember",array("task_group_id"=>$group,"user_id"=>$uid,"is_active"=>1));
 	}
 
 	// return a users full name given their user ID
@@ -559,7 +559,7 @@ class TaskService extends DbService {
     function createTaskGroup($type, $title, $description, $default_assignee_id, $can_assign = "OWNER", $can_view = "OWNER", $can_create = "OWNER", $is_active = 1, $is_deleted = 0) {
     	// title should be unique!
     	$taskgroup = $this->getTaskGroupByUniqueTitle($title);
-    	if (null !== $taskgroup) {
+    	if (null != $taskgroup) {
     		return $taskgroup;
     	} 
     	
@@ -607,7 +607,7 @@ class TaskService extends DbService {
     		$arrdb['user_id'] = $default_assignee_id;
     		$arrdb['role'] = "OWNER";
     		$arrdb['priority'] = 1;
-    		$arrdb['is_active'] = 0;
+    		$arrdb['is_active'] = 1;
     	
     		$mem = new TaskGroupMember($this->w);
     		$mem->fill($arrdb);

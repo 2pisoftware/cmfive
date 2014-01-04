@@ -39,7 +39,7 @@ function viewtaskgrouptypes_ALL(Web &$w) {
 	unset($arrassign[0]);
 	
 	// set Is Task Active dropdown
-	$is_active = array(array("Yes","0"), array("No","1"));
+	$is_active = array(array("Yes","1"), array("No","0"));
 
 	$grouptypes = $w->Task->getAllTaskGroupTypes();
 	
@@ -68,10 +68,10 @@ function viewtaskgroup_GET(Web &$w) {
 	$group_details = $w->Task->getTaskGroup($p['id']);
 
 	// if is_active is set to '0', display 'Yes', else display 'No'
-	$isactive = $group_details->is_active == "0" ? "Yes" : "No";
+	$isactive = $group_details->is_active == "1" ? "Yes" : "No";
 
 	// set Is Task Active, Is Task Deleted dropdowns for display
-	$is_active = array(array("Yes","0"), array("No","1"));
+	$is_active = array(array("Yes","1"), array("No","0"));
 	$is_deleted = array(array("Yes","1"), array("No","0"));
 	
 	// get generic task group permissions
@@ -154,7 +154,7 @@ function updatetaskgroup_POST(Web &$w) {
 			$arrdb['user_id'] = $_REQUEST['default_assignee_id'];
 			$arrdb['role'] = $mem->role ? $mem->role : "OWNER";
 			$arrdb['priority'] = 1;
-			$arrdb['is_active'] = 0;
+			$arrdb['is_active'] = 1;
 			
 			// if they don't exist, create the membership entry, otherwise update their current entry
 			if (!$mem) {
@@ -183,7 +183,7 @@ function deletetaskgroup_GET(Web &$w) {
 	$group_details = $w->Task->getTaskGroup($p['id']);
 
 	// if is_active is set to '0', display 'Yes', else display 'No'
-	$isactive = $group_details->is_active == "0" ? "Yes" : "No";
+	$isactive = $group_details->is_active == "1" ? "Yes" : "No";
 
 	// build static form displaying group details for confirmation of delete
 	$f = Html::form(array(
@@ -408,7 +408,7 @@ function updategroupmembers_POST(Web &$w) {
 	$arrdb['task_group_id'] = $_REQUEST['task_group_id'];
 	$arrdb['role'] = $_REQUEST['role'];
 	$arrdb['priority'] = 1;
-	$arrdb['is_active'] = 0;
+	$arrdb['is_active'] = 1;
 
 	// for each selected member, complete population of input array
 	foreach ($_REQUEST['member'] as $member) {
