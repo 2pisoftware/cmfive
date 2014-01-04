@@ -405,6 +405,7 @@ class TaskService extends DbService {
 	// returns the additional form fields for a task type as defined in our task file
 	function getFormFieldsByTask($tasktype,TaskGroup $tg) {
         $this->_loadTaskFiles();
+        $fieldform = null;
         foreach (get_declared_classes() as $class) {
         	if (startsWith($class, "TaskType_".$tasktype)) {
         		$tgt = new $class($this->w);

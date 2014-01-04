@@ -528,8 +528,10 @@ class DbObject extends DbService {
 	/**
 	 * Update an object
 	 *
-	 * @param $force_null_values if true set null values in db, if false, null values in object will be ignored
-	 * @param $force_validation default false
+	 * if $force_null_values is true set null values in db, if false, null values in object will be ignored.
+	 * 
+	 * @param boolean $force_null_values
+	 * @param boolean $force_validation
 	 * @return true or array("success"=>false,"invalid"=>array()) if validation failed
 	 */
 	function update($force_null_values=false, $force_validation=true) {
