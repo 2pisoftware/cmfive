@@ -1,11 +1,9 @@
 <div class="tabs">
 	<div class="tab-head">
-		<a href="/task/index">Task Dashboard</a>
-		<a href="/task/tasklist">Task List</a>
 		<a id="tab-link-1" href="#" onclick="switchTab(1);" class="active">Task Details</a>
 		<a id="tab-link-2" href="#" onclick="switchTab(2);">Time Log</a>
-		<a id="tab-link-3" href="#"	onclick="switchTab(3);">Task Comments (<?php echo !empty($numComments) ? $numComments : 0; ?>)</a>
-		<a id="tab-link-4" href="#" onclick="switchTab(4);">Task Documents (<?php echo !empty($numDocos) ? $numDocos : 0; ?>)</a>
+		<a id="tab-link-3" href="#"	onclick="switchTab(3);">Task Comments</a>
+		<a id="tab-link-4" href="#" onclick="switchTab(4);">Task Documents</a>
 		<?php echo !empty($tasknotifications) ? $tasknotifications : null; ?>
 	</div>
 	<div class="tab-body">
@@ -22,12 +20,10 @@
 			<?php echo !empty($timelog) ? $timelog : null; ; ?>
 		</div>
 		<div id="tab-3" style="display: none;">
-			<?php echo !empty($addComment) ? $addComment : null; ; ?>
-			<?php echo !empty($comments) ? $comments : null; ; ?>
+			 <?php echo $w->partial("listcomments",array("object"=>$task,"redirect"=>"task/viewtask/{$task->id}?tab=3"),"admin");?>
 		</div>
 		<div id="tab-4" style="display: none;">
-			<?php echo !empty($btnAttachment) ? $btnAttachment : null;  ?>&nbsp;&nbsp;&nbsp;<?php echo !empty($btnPage) ? $btnPage : null; ?>
-			<?php echo !empty($docos) ? $docos : null; ?>
+			 <?php echo $w->partial("listattachments",array("object"=>$task,"redirect"=>"task/viewtask/{$task->id}?tab=4"),"file");?>
 		</div>
 		<?php echo !empty($tasknotify) ? $tasknotify : null; ?>
 	</div>

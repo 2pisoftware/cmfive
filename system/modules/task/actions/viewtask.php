@@ -7,6 +7,7 @@ function viewtask_GET(Web &$w) {
 
 	// get relevant object for viewing a task given input task ID
 	$task = $w->Task->getTask($p['id']);
+	$w->ctx("task",$task);
 	$taskdata = $w->Task->getTaskData($p['id']);
 	$group = $w->Task->getTaskGroup($task->task_group_id);
 
@@ -133,78 +134,7 @@ function viewtask_GET(Web &$w) {
 		$w->ctx("viewtask",$form);
 		$w->ctx("extradetails",$task->displayExtraDetails());
 
-		// tab: Task Comments
-		// provide button for adding new comments
-		$add_c = Html::box($w->localUrl("/task/editComment/".$task->id),"Add a New Comment",true);
-		$w->ctx("addComment",$add_c);
-
-		// provide current comment count in the tab heading for Comments
-		$numComments = $task->countTaskComments();
-		$w->ctx("numComments",$numComments);
-
-		// get the comments list for this task
-		$comments = $task->getTaskComments();
-
-		// build the table of comments
-		$line = array(array("Comments for Task: " . $task->title));
-		if ($comments) {
-			foreach($comments as $com) {
-				$line[] = array("<dt><b>".formatDateTime($com->dt_created)."</b><dd>".str_replace("\n","<br>",$w->Task->findURL($com->comment))." - ".$w->Task->getUserById($com->modifier_id) . "</dd>");
-				// edit comments?
-				//Html::box($w->localUrl("/task/editComment/".$task->id."/".$com->id)," Edit ",true)
-			}
-		}
-		else {
-			$line[] = array("There are no comments for this task");
-		}
-
-		// display the table of comments
-		$w->ctx("comments",Html::table($line,null,"tablesorter",true));
-
-		//tab: Task Documents
-		// provide a button for adding new documents
-		$line = array();
-		$putdocos = Html::box(WEBROOT."/task/attachForm/".$task->id," Upload a Document ",true);
-		$w->ctx("btnAttachment",$putdocos);
-
-		// provide current document + page count in tab heading for Documents
-		$numDocos = $task->countTaskDocos();
-		$num = intval($numDocos);
-		if ($num == "") {
-			$num = "0";
-		}
-
-		$w->ctx("numDocos",$num);
-
-		// get the list of documents
-		$docos = $task->getTaskDocos();
-		// get the list of pages accessible to me
-		// build the table of documents
-		$hds = array(array("Document", "Uploaded by", "Date", "Description"));
-
-		// if documents, list them
-		if ($docos)	{
-			foreach ($docos as $doco) {
-				$line[] = array("<a href=\"" . WEBROOT . "/file/atfile/" . $doco->id . "/" . $doco->filename . "\" target=\"_blank\">" . $doco->filename . "</a>",
-				$w->Task->getUserById($doco->modifier_user_id),
-				formatDateTime($doco->dt_created),
-				$doco->description,
-				);
-			}
-		}
-
-
-		// if no documents or pages, say as much
-		if (!$line) {
-			$line[] = array("There are no documents attached to this task", "", "", "");
-		}
-
-		// put column headings onto doco/page list
-		$line = array_merge($hds, $line);
-
-		// display the table of documents
-		$w->ctx("docos",Html::table($line,null,"tablesorter",true));
-
+		
 		// tab: time log
 		// provide button to add time entry
 		$addtime = "";
