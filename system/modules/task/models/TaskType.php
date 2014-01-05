@@ -65,4 +65,11 @@ abstract class TaskType {
 	 */
 	function displayExtraDetails(Task $task) {}
 	
+	/**
+	 * Return a Html string which will be appended to the row of buttons in the viewtask screen.
+	 * 
+	 * @param Task $task
+	 */
+	function displayExtraButtons(Task $task) {}
+	
 }
