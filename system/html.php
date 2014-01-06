@@ -60,12 +60,16 @@ class Html {
         return '<a href="'.$href.'" alt="'.$alt.'" class="'.$class.'"'.$confirm.$target.'><span>'.$title.'</span></a>';
     }
 
-    public static function b($href,$title,$confirm=null,$id=null) {
+    public static function b($href,$title,$confirm=null,$id=null,$newtab=false) {
     	$js = '';
         if ($confirm) {
             $js = "if(confirm('".$confirm."'))";
-        }        
-        $js .= "{ parent.location='".$href."'; return false;}";
+        }
+        if (!$newtab){        
+            $js .= "{ parent.location='".$href."'; return false; }";
+        } else {
+            $js .= "{ window.open('".$href."', '_blank').focus(); return false; }";
+        }
         return "<button id='".$id."' onclick=\"".$js."\">".$title."</button>";
     }
     /**

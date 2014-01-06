@@ -148,6 +148,10 @@ class DbObject extends DbService {
 		}
 	}
 
+	// public function __clone(){
+
+	// }
+
 	public function __get($name) {
 		// cater for modifiable aspect!
 		if (isset($this->_modifiable)) {
@@ -330,6 +334,31 @@ class DbObject extends DbService {
                 if (!empty($row["is_deleted"]) && empty($this->is_deleted)){
                     $this->is_deleted = $row["is_deleted"];
                 }
+	}
+
+	/**
+	 * Creates a shallow copy of an object without saving to DB (by default)
+	 * 
+	 * @param boolean saveToDB (optional, default false)
+	 * @return Object
+	 */
+	public function copy($saveToDB = false) {
+		$newObject = clone $this;
+
+		$toClear = array("id", "creator_id", "modifier_id", "dt_created", "dt_modified", "is_deleted");
+
+		foreach($toClear as $tc) {
+			if (property_exists($newObject, $tc)) {
+				$newObject->$tc = null;
+			}
+		}
+		
+		if ($saveToDB){
+			// Dont force validation so we dont get errors if data is missing, this is the responsibility of the dev
+			$this->insert(false);
+		}
+
+		return $newObject;
 	}
 
 	/**
