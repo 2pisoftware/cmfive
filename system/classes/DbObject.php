@@ -355,7 +355,7 @@ class DbObject extends DbService {
 		
 		if ($saveToDB){
 			// Dont force validation so we dont get errors if data is missing, this is the responsibility of the dev
-			$this->insert(false);
+			$newObject->insert(false);
 		}
 
 		return $newObject;
