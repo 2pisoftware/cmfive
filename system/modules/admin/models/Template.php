@@ -20,7 +20,7 @@ class Template extends DbObject {
 	public $creator_id;
 	public $modifier_id;
 	
-	protected $_db_table = "template";
+	// protected $_db_table = "template";
 	
 	public function renderTitle($data) {
             if (is_array($data))

@@ -83,8 +83,8 @@ class TemplateService extends DbService {
 				$loader = new Twig_Loader_String();
 			}
 
-			$twig = new Twig_Environment($loader);
-			
+			$twig = new Twig_Environment($loader, array('debug' => true));
+			$twig->addExtension(new Twig_Extension_Debug());
 			return $twig->render($template, $data);			
 		}
 		

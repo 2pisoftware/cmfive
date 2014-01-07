@@ -6837,7 +6837,7 @@ class TCPDF {
 					if ((ini_get('open_basedir') == '') AND (!ini_get('safe_mode'))) {
 						curl_setopt($cs, CURLOPT_FOLLOWLOCATION, true);
 					}
-					curl_setopt($cs, CURLOPT_CONNECTTIMEOUT, 5);
+					curl_setopt($cs, CURLOPT_CONNECTTIMEOUT, 10); // Had to change to 10 as connecting was taking longer than 5 seconds
 					curl_setopt($cs, CURLOPT_TIMEOUT, 30);
 					curl_setopt($cs, CURLOPT_SSL_VERIFYPEER, false);
 					curl_setopt($cs, CURLOPT_SSL_VERIFYHOST, false);

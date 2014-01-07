@@ -49,8 +49,7 @@ function edit_GET(Web $w) {
 
 function edit_POST(Web $w) {
 	$p = $w->pathMatch("id");
-	$t = $w->Template->getTemplate($p['id']);
-	$t = $t ? $t : new Template($w);
+	$t = $p["id"] ? $w->Template->getTemplate($p['id']) : new Template($w);
 	$t->fill($_POST);
 	$t->insertOrUpdate();
 	$w->msg("Template saved", "/admin-templates/edit/".$t->id);	
