@@ -156,6 +156,8 @@ class Web {
 
         $this->_paths = $this->_getCommandPath();
 
+        $this->loadConfiguationFiles();
+        
         // first find the module file
         if ($this->_paths && sizeof($this->_paths) > 0) {
             $this->_module = array_shift($this->_paths);
@@ -327,6 +329,51 @@ class Web {
         }
     }
     
+    private function loadConfiguationFiles() {
+        // Load System config first
+        $baseDir = SYSTEM_PATH . '/modules';
+        $result = $this->scanModuleDirForConfigurationFiles($baseDir);
+        if (!empty($result)) {
+            foreach($result as $key => $val) {
+                $this->_moduleConfig[$key] = $val;
+            }
+        }
+
+        // Load project module config second
+        $baseDir = ROOT_PATH . '/modules';
+        $result = $this->scanModuleDirForConfigurationFiles($baseDir);
+        if (!empty($result)) {
+            foreach($result as $key => $val) {
+                $this->_moduleConfig[$key] = $val;
+            }
+        }
+    }
+
+    private function scanModuleDirForConfigurationFiles($dir = "") {
+        $modules = array();
+        // Check that dir is dir
+        if (is_dir($dir)) {
+
+            // Scan directory
+            $dirListing = scandir($dir);
+            if (!empty($dirListing)) {
+
+                // Loop through listing
+                foreach($dirListing as $item) {
+                    $searchingDir = $dir . "/" . $item;
+                    if (is_dir($searchingDir) and $item[0] !== '.') {
+
+                        // If is also a directory, look for config.php file
+                        if (file_exists($searchingDir . "/config.php")) {
+                            include($searchingDir . "/config.php");
+                        }
+                    }
+                }
+            }
+        }
+        return $modules;
+    }
+
     function isAjax() {
     	return isset($_SERVER['HTTP_X_REQUESTED_WITH']);
     }

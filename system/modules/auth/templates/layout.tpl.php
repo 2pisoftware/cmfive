@@ -22,7 +22,7 @@
         <div class="row">
             <div class="large-6 small-10 columns small-centered">
                 <div class="row small-6 small-centered">
-                    <h1 style="text-align: center;"><?php echo empty($title) ? $w->moduleConf('main','application_name') : $title; ?></h1>
+                    <h1 style="text-align: center;"><?php echo empty($pagetitle) ? $w->moduleConf('main','application_name') : $pagetitle; ?></h1>
                 </div>
 
                 <?php if (!empty($error) || !empty($msg)) : ?>

@@ -5,7 +5,7 @@ function forgotpassword_GET(Web $w) {
 	// array("Your Login","text","login"),
 	// ),$w->localUrl("auth/forgotpassword"),"POST","Reset");
 	// $w->out($loginform);	
-	$w->ctx("title", "Forgot Password");
+	$w->ctx("pagetitle", "Forgot Password");
 }
 
 function forgotpassword_POST(Web $w) {
