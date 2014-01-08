@@ -1,10 +1,11 @@
 <?php
 function forgotpassword_GET(Web $w) {
-	$loginform = Html::form(array(
-	array("Reset Password","section"),
-	array("Your Login","text","login"),
-	),$w->localUrl("auth/forgotpassword"),"POST","Reset");
-	$w->out($loginform);	
+	// $loginform = Html::form(array(
+	// array("Reset Password","section"),
+	// array("Your Login","text","login"),
+	// ),$w->localUrl("auth/forgotpassword"),"POST","Reset");
+	// $w->out($loginform);	
+	$w->ctx("title", "Forgot Password");
 }
 
 function forgotpassword_POST(Web $w) {
