@@ -140,6 +140,7 @@ class Web {
      * 2. if not set, look at the pathinfo and use first
      */
     function start() {
+        $this->loadConfiguationFiles();
         $this->initDB();
         
     	// start the session
@@ -155,8 +156,6 @@ class Web {
         $action_found = false;
 
         $this->_paths = $this->_getCommandPath();
-
-        $this->loadConfiguationFiles();
         
         // first find the module file
         if ($this->_paths && sizeof($this->_paths) > 0) {

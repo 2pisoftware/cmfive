@@ -6,14 +6,14 @@
  * @param unknown_type $w
  */
 function main_listener_PRE_ACTION($w) {
-	global $modules;
+	// global $modules; 
 			
     // set the top navigation
     $nav = array();
     if ($w->Auth->loggedIn()) {
         $nav[]=$w->menuLink("main/index","Home");
         
-        foreach ($modules as $name => $options) {
+        foreach ($w->_moduleConfig as $name => $options) {
         	if ($options['topmenu']) {
             	$w->menuLink($name."/index",ucfirst($name),$nav);
         	}

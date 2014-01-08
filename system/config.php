@@ -41,11 +41,11 @@ $modules['main'] = array(
     'company_url' => 'http://github.com/careck/cmfive',
 );
 
-$modules['report'] = array(
-    'active' => true,
-    'path' => 'system/modules',
-    'topmenu' => true,
-);
+// $modules['report'] = array(
+//     'active' => true,
+//     'path' => 'system/modules',
+//     'topmenu' => true,
+// );
 
 $modules['inbox'] = array(
     'active' => true,
