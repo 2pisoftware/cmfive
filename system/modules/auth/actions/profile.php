@@ -24,6 +24,7 @@ function profile_GET(Web &$w) {
 	$lines[] = array("Work Mobile","text","mobile",$contact ? $contact->mobile : "");
 	$lines[] = array("Fax","text","fax",$contact ? $contact->fax : "");
 	$lines[] = array("Email","text","email",$contact ? $contact->email : "");
+	$lines[] = array("Redirect URL", "text", "redirect_url", $user->redirect_url);
 
 	$f = Html::form($lines,$w->localUrl("/auth/profile"),"POST","Update");
 	if ($p['box']) {
@@ -58,6 +59,16 @@ function profile_POST(Web &$w) {
 	}
 
 	$user->fill($_REQUEST);
+	// Filter out everything except the path so that users cant make redirect urls out of cmfive
+    $parse_url = parse_url($user->redirect_url);
+    $redirect_url = $parse_url["path"];
+
+    // Menu link doesnt like a leading slash
+    if ($redirect_url[0] == "/") {
+        $redirect_url = substr($redirect_url, 1);
+    }
+    $user->redirect_url = $redirect_url;
+
 	if ($_REQUEST['password']) {
 		$user->setPassword($_REQUEST['password']);
 	} else {

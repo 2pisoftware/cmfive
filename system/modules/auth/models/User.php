@@ -18,9 +18,12 @@ class User extends DbObject {
 	public $is_group;
 	public $password_reset_token;
 	public $dt_password_reset_at;
+	public $redirect_url;
+
 	public $_roles;
 	public $_contact;
 	public $_modifiable;
+
 	public function delete($force = false) {
 		$contact = $this->getContact ();
 		if ($contact) {

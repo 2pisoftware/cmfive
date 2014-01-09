@@ -16,6 +16,11 @@ function login_POST(Web &$w) {
 			if ($w->session('orig_path') != "auth/login") {
 				$url = $w->session('orig_path');
 				$w->logDebug("original path: ".$url);
+
+				// If no url specified, go to the users defined url
+				if (empty($url)){
+					$url = $user->redirect_url;
+				}
 				$w->sessionUnset('orig_path');
 				$w->redirect($w->localUrl($url));
 			} else {

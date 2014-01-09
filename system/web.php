@@ -319,7 +319,7 @@ class Web {
      * @param <type> $key
      * @return <type>
      */
-    function moduleConf($module,$key) {
+    function moduleConf($module, $key) {
         if (array_key_exists($module, $this->_moduleConfig)
                 && array_key_exists($key, $this->_moduleConfig[$module])) {
             return $this->_moduleConfig[$module][$key];
@@ -348,6 +348,7 @@ class Web {
         }
     }
 
+    // Helper function for the above, scans a directory for config files in child folders
     private function scanModuleDirForConfigurationFiles($dir = "") {
         $modules = array();
         // Check that dir is dir
