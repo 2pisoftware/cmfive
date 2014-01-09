@@ -42,6 +42,10 @@ function useradd_POST(Web &$w) {
 	$user = new User($w);
 	$user->login = $_REQUEST['login'];
 	$user->setPassword($_REQUEST['password']);
+
+	// Generate per user salt, same technique used for csrf token
+	$user->password_salt = md5(uniqid(rand(), TRUE));
+
 	$user->is_active = !empty($_REQUEST['is_active']) ? $_REQUEST['is_active'] : 0;
 	$user->is_admin = !empty($_REQUEST['is_admin']) ? $_REQUEST['is_admin'] : 0;
 	$user->dt_created = time();

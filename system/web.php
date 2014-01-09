@@ -193,7 +193,18 @@ class Web {
             	$reqpath = $this->getModuleDir($this->_module).'/'.$this->_module.'.'.$this->_submodule.".actions.php";
         	}
         }
-               
+
+        // try to find action for the request type
+        // using <module>_<action>_<type>()
+        // or just <action>_<type>()
+        
+        $this->_requestMethod = $_SERVER['REQUEST_METHOD'];
+        $actionmethods[] = $this->_action.'_'.$this->_requestMethod;
+        $actionmethods[] = $this->_action.'_ALL';
+        
+        // Check/validate CSRF token 
+        $this->validateCSRF();
+
         //
         // if a module file for this url exists, then start processing
         //
@@ -212,17 +223,6 @@ class Web {
             $this->logError("No Action found for: ".$reqpath);
             $this->notFoundPage();
         }
-
-        // try to find action for the request type
-        // using <module>_<action>_<type>()
-        // or just <action>_<type>()
-        
-        $this->_requestMethod = $_SERVER['REQUEST_METHOD'];
-        $actionmethods[] = $this->_action.'_'.$this->_requestMethod;
-        $actionmethods[] = $this->_action.'_ALL';
-        
-        // Check/validate CSRF token 
-        $this->validateCSRF();
 
         foreach ($actionmethods as $action_method) {
             if (function_exists($action_method)) {
@@ -284,6 +284,9 @@ class Web {
         } else {
             $this->notFoundPage();
         }
+
+        // Keep token until end of execution in case there is an error
+        unset($_SESSION["token"]);
         exit(); // nothing comes after start()!!!
     }
 
@@ -388,10 +391,10 @@ class Web {
                 echo "Cross site request forgery detected";
                 die();
             }
-
-            // Request is valid, clear this data for the request
-            $_SESSION["token"] = null;
-            unset($_SESSION["token"]);
+            
+            // // Request is valid, clear this data for the request
+            // $_SESSION["token"] = null;
+            // unset($_SESSION["token"]);
         }
     }
 

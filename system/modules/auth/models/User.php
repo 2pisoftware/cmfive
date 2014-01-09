@@ -10,6 +10,7 @@ class User extends DbObject {
 	public $login;
 	public $is_admin;
 	public $password;
+	public $password_salt;
 	public $is_active;
 	public $dt_lastlogin;
 	public $dt_created;
@@ -215,11 +216,15 @@ class User extends DbObject {
 	 * @param unknown $password        	
 	 * @return string
 	 */
-	static public function encryptPassword($password) {
-		global $PASSWORD_SALT;
-		return sha1 ( $PASSWORD_SALT . $password );
+	public function encryptPassword($password) {
+		if (empty($this->password_salt)){
+			$this->password_salt = md5(uniqid(rand(), TRUE));
+			$this->update();
+		}
+		// global $PASSWORD_SALT;
+		return sha1 ( $this->password_salt . $password );
 	}
 	public function setPassword($password) {
-		$this->password = User::encryptPassword ( $password ); // $this->encryptPassword($password);
+		$this->password = $this->encryptPassword ( $password ); // $this->encryptPassword($password);
 	}
 }

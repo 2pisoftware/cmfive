@@ -8,20 +8,24 @@ class AuthService extends DbService {
     public $_rest_user = null;
 
     function login($login, $password, $client_timezone, $skip_session = false) {
-        $password = User::encryptPassword($password);
-        $user_data = $this->_db->get("user")->where("login", $login)->and("password", $password)->and("is_active", "1")->and("is_deleted", "0")->fetch_row();
-        if ($user_data != null) {
-            $user = new User($this->w);
-            $user->fill($user_data);
-            $user->updateLastLogin();
-            if (!$skip_session) {
-                $this->w->session('user_id', $user->id);
-                $this->w->session('timezone', $client_timezone);
-            }
-            return $user;
-        } else {
+        // $password = User::encryptPassword($password);
+        // $user_data = $this->_db->get("user")->where("login", $login)->and("password", $password)->and("is_active", "1")->and("is_deleted", "0")->fetch_row();
+        $user = $this->getUserForLogin($login);
+        if ($user->encryptPassword($password) !== $user->password) {
             return null;
         }
+        // if ($user_data != null) {
+        // $user = new User($this->w);
+        // $user->fill($user_data);
+        $user->updateLastLogin();
+        if (!$skip_session) {
+            $this->w->session('user_id', $user->id);
+            $this->w->session('timezone', $client_timezone);
+        }
+        return $user;
+        // } else {
+        //     return null;
+        // }
     }
 
     function loginLocalUser() {
