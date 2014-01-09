@@ -1,4 +1,10 @@
 <form method="POST" action="/auth/login">
+	<?php
+		$token = md5(uniqid(rand(), TRUE));
+        $_SESSION['token'] = $token;
+    ?>
+    <input type='hidden' name='csrf_token' value='<?php echo $token; ?>' />
+    
 	<label for="login">Login</label>
 	<input id="login" name="login" type="text" placeholder="Your login" />
 	<label for="password">Password</label>

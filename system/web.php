@@ -221,6 +221,9 @@ class Web {
         $actionmethods[] = $this->_action.'_'.$this->_requestMethod;
         $actionmethods[] = $this->_action.'_ALL';
         
+        // Check/validate CSRF token 
+        $this->validateCSRF();
+
         foreach ($actionmethods as $action_method) {
             if (function_exists($action_method)) {
         	    $action_found = true;
@@ -372,6 +375,24 @@ class Web {
             }
         }
         return $modules;
+    }
+
+    private function validateCSRF() {
+        // Check for CSRF token and that we have a valid request method
+        if (in_array($this->_requestMethod, array("POST", "PUT", "DELETE"))) {
+            
+            // Check that it matches given token
+            global ${'_'.$this->_requestMethod};
+            $method = ${'_'.$this->_requestMethod};
+            if ((empty($method["csrf_token"]) or empty($_SESSION["token"])) or ($_SESSION["token"] !== $method["csrf_token"])) {
+                echo "Cross site request forgery detected";
+                die();
+            }
+
+            // Request is valid, clear this data for the request
+            $_SESSION["token"] = null;
+            unset($_SESSION["token"]);
+        }
     }
 
     function isAjax() {

@@ -161,6 +161,12 @@ class Html {
         $enctype = $enctype ? " enctype='".$enctype."' " : "";
         $buf = '<form'.$id.$class.$enctype.' action="'.$action.'" method="'.$method.'" target="'.$target.'">'."<table cellspacing=\"0\" class='form'>\n";
         $valign = ' valign="top" ';
+
+        // Generate CSRF Token
+        $token = md5(uniqid(rand(), TRUE));
+        $_SESSION['token'] = $token;
+        $buf .= "<input type='hidden' name='csrf_token' value='{$token}' />";
+
         foreach ($data as $row) {
             $title = !empty($row[0]) ? $row[0] : null;
             $type = !empty($row[1]) ? $row[1] : null;
@@ -353,6 +359,12 @@ class Html {
         
         $buf .= "<table  cellspacing=\"0\" ".$id.$class." class='form-wrapper'>\n";
         $valign = ' valign="top" ';
+
+        // Generate CSRF Token
+        $token = md5(uniqid(rand(), TRUE));
+        $_SESSION['token'] = $token;
+        $buf .= "<input type='hidden' name='csrf_token' value='{$token}' />";
+        
         foreach ($data as $section => $rows) {
             $buf .= "<tr>";
             $buf .= '<td class="section" >'.htmlentities($section);
