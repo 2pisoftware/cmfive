@@ -285,8 +285,10 @@ class Web {
             $this->notFoundPage();
         }
 
-        // Keep token until end of execution in case there is an error
-        unset($_SESSION["token"]);
+        // Keep token until end of execution in case there is an error (only remove if we are POSTing something)
+        if ($this->_requestMethod !== "GET") {
+            unset($_SESSION["token"]);
+        }
         exit(); // nothing comes after start()!!!
     }
 
@@ -383,18 +385,15 @@ class Web {
     private function validateCSRF() {
         // Check for CSRF token and that we have a valid request method
         if (in_array($this->_requestMethod, array("POST", "PUT", "DELETE"))) {
-            
-            // Check that it matches given token
+            $web_token = $this->session("token");
             global ${'_'.$this->_requestMethod};
             $method = ${'_'.$this->_requestMethod};
-            if ((empty($method["csrf_token"]) or empty($_SESSION["token"])) or ($_SESSION["token"] !== $method["csrf_token"])) {
+
+            // Check that it matches given token
+            if ((empty($method["csrf_token"]) or empty($web_token)) or ($web_token !== $method["csrf_token"])) {
                 echo "Cross site request forgery detected";
                 die();
             }
-            
-            // // Request is valid, clear this data for the request
-            // $_SESSION["token"] = null;
-            // unset($_SESSION["token"]);
         }
     }
 
@@ -446,20 +445,23 @@ class Web {
      */
     function getMimetype($filename) {
         $mime = "text/html";
-        if (function_exists("finfo_open")) {
-            $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
-            $mime = finfo_file($finfo, $filename);
-            finfo_close($finfo);
-        } else {
-            ob_start();
-            system("file -i -b {$filepath}");
-            $output = ob_get_clean();
-            $output = explode("; ",$output);
-            if ( is_array($output) ) {
-                $output = $output[0];
-            }
-            $mime = $output;
-        }
+        // finfo_open was introduced in 5.3, I think we can safely assume that 5.3 would be a minimum requirement
+        // these days, plus we should avoid using system
+        // if (function_exists("finfo_open")) {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
+        $mime = finfo_file($finfo, $filename);
+        finfo_close($finfo);
+        // }
+        //  else {
+        //     ob_start();
+        //     system("file -i -b {$filepath}");
+        //     $output = ob_get_clean();
+        //     $output = explode("; ",$output);
+        //     if ( is_array($output) ) {
+        //         $output = $output[0];
+        //     }
+        //     $mime = $output;
+        // }
         return $mime;
     }
 
