@@ -1,3 +1,1 @@
-<?php 
-
-?>
+<?php echo $w->partial("listwidgets", null, "main"); ?>

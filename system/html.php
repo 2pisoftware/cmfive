@@ -48,6 +48,41 @@ class Html {
     }
 
     /**
+     *  Html function to draw a chart, see: http://www.chartjs.org/docs/ for how the data structure and options should be put together for each
+     */
+    public static function chart($id = "chartjs", $type = "line", $data = array(), $options = array(), $height = "300px", $width = "400px") {
+        // Create the canvas
+        $buffer = "<canvas id='{$id}' width='{$width}' height='{$height}'></canvas>\n";
+        $buffer .= "<script type='text/javascript'>\n";
+        // Get canvas context via jQuery
+        $buffer .= "\tvar ctx = jQuery(\"#{$id}\").get(0).getContext(\"2d\");\n";
+
+        // Create the chart
+        $buffer .= "var chart{$id} = new Chart(ctx).";
+            switch(strtolower($type)) {
+                case "line": 
+                    $buffer .= "Line"; break;
+                case "bar": 
+                    $buffer .= "Bar"; break;
+                case "radar":
+                    $buffer .= "Radar"; break;
+                case "polar":
+                    $buffer .= "PolarArea"; break;
+                case "pie":
+                    $buffer .= "Pie"; break;
+                case "doughtnut":
+                    $buffer .= "Doughtnut"; break;
+                default:
+                    $buffer .= "Line";
+            }
+        $buffer .= "(" . json_encode($data) . ", " . json_encode($options) . ");";
+
+
+        $buffer .= "</script>";
+        return $buffer;
+    }
+
+    /**
      * creates a html link
      */
     public static function a($href,$title,$alt=null,$class=null,$confirm=null,$target=null) {

@@ -286,7 +286,9 @@ class Web {
         }
 
         // Keep token until end of execution in case there is an error (only remove if we are POSTing something)
-        if ($this->_requestMethod !== "GET") {
+        // and only remove if there isn't an error in execution (this avoids losing the token when receiving lovely E_ERROR|WARN|INFO messages)
+        // We might need to test for the type of error, i.e. with strict standards or info we may still want to remove the token
+        if ($this->_requestMethod !== "GET" and error_get_last() === null) {
             unset($_SESSION["token"]);
         }
         exit(); // nothing comes after start()!!!
@@ -396,6 +398,40 @@ class Web {
             }
         }
     }
+
+    // function getWidgets($module) {
+    //     if (array_key_exists($module, $this->_moduleConfig)) {
+    //         $widget_conf = $this->moduleConf($module, 'widgets');
+    //         // $dir = $this->getModuleDir($module);
+    //         // $dir = substr($dir, 0, -1);
+    //         if (!empty($widget_conf)) {
+    //             foreach($widget_conf as $widget) {
+    //                 $this->out($this->partial($widget, null, $module));
+
+    //                 // The following code was used as the prototype using just actions
+    //                 // but didnt support templates, the easiest solution was to just use partials
+                    
+    //                 // $path = (ROOT_PATH . '/' . $dir . '/actions/' . $action . '/' . $widget . ".php");
+    //                 // if (file_exists($path)) {
+    //                 //     @include($path);
+    //                 //     $function_name = $widget."_ALL";
+    //                 //     if (function_exists($function_name)){
+    //                 //         $function_name($this);
+    //                 //     }
+    //                 // } else {
+    //                 //     $path = str_replace('-', '/', $path);
+    //                 //     if (file_exists($path)) {
+    //                 //         @include($path);
+    //                 //         $function_name = $widget."_ALL";
+    //                 //         if (function_exists($function_name)){
+    //                 //             $function_name($this);
+    //                 //         }
+    //                 //     }
+    //                 // }
+    //             }
+    //         }
+    //     }
+    // }
 
     function isAjax() {
     	return isset($_SERVER['HTTP_X_REQUESTED_WITH']);

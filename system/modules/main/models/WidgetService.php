@@ -1,0 +1,25 @@
+<?php
+
+class WidgetService extends DbService {
+
+	public function getWidget($destination, $source, $widget) {
+		return $this->getObject("WidgetConfig", array(
+			"destination_module" => $destination, 
+			"source_module" => $source, 
+			"widget_name" => $widget)
+		);
+	}
+
+	public function getAll() {
+		return $this->getObjects("WidgetConfig", array("is_deleted" => 0));
+	}
+
+	public function getWidgetsForModule($destination_module) {
+		return $this->getObjects("WidgetConfig", array("destination_module" => $destination_module, "is_deleted" => 0));
+	}
+
+	public function getWidgetNamesForModule($module) {
+		return $this->w->moduleConf($module, "widgets");
+	}
+
+}
