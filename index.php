@@ -5,6 +5,10 @@ error_reporting(E_ALL);
 require "system/config.php";
 
 //========= Load Application Modules Configuration ==========
+if (!file_exists("config.php")) {
+	echo "<b>No config.php found. Please copy config.php.example, change parameters as necessary and rename to config.php<b>";
+	die();
+}
 require "config.php";
 
 //=============== init web.php ==============================
