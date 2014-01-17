@@ -140,7 +140,7 @@ class Web {
      * 2. if not set, look at the pathinfo and use first
      */
     function start() {
-        $this->loadConfiguationFiles();
+        $this->loadConfigurationFiles();
         $this->initDB();
         
     	// start the session
@@ -338,7 +338,7 @@ class Web {
         }
     }
     
-    private function loadConfiguationFiles() {
+    private function loadConfigurationFiles() {
         // Load System config first
         $baseDir = SYSTEM_PATH . '/modules';
         $result = $this->scanModuleDirForConfigurationFiles($baseDir);
