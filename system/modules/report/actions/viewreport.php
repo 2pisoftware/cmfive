@@ -35,8 +35,8 @@ function viewreport_GET(Web &$w) {
 				array("Title","text","title", $rep->title),
 				array("Module","select","module", $rep->module, $modules),
 				array("Category","select","category", $rep->category, lookupForSelect($w, "ReportCategory")),
-				array("Description","textarea","description",$rep->description,"100","2"),
-				array("Code","textarea","report_code",$rep->report_code,"100","22"),
+				array("Description","textarea","description",$rep->description,100,2,true),
+				array("Code","textarea","report_code",$rep->report_code,100,22,false),
 				array("Approved","checkbox","is_approved", $rep->is_approved),
 				),$w->localUrl("/report/editreport/".$rep->id),"POST"," Update Report ");
 
@@ -69,8 +69,8 @@ function viewreport_GET(Web &$w) {
 				array("Title","text","title", $rep->title),
 				array("Module","select","module", $rep->module, $modules),
 				array("Category","select","category", $rep->category, lookupForSelect($w, "ReportCategory")),
-				array("Description","textarea","description",$rep->description,"100","2"),
-				array("Code","textarea","report_code",$rep->report_code,"100","22"),
+				array("Description","textarea","description",$rep->description,100,2,true),
+				array("Code","textarea","report_code",$rep->report_code,100,22,false),
 				array("","hidden","is_approved", "0"),
 				),$w->localUrl("/report/editreport/".$rep->id),"POST"," Update Report ");
 
