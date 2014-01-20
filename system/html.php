@@ -197,10 +197,8 @@ class Html {
         $buf = '<form'.$id.$class.$enctype.' action="'.$action.'" method="'.$method.'" target="'.$target.'">'."<table cellspacing=\"0\" class='form'>\n";
         $valign = ' valign="top" ';
 
-        // Generate CSRF Token
-        $token = md5(uniqid(rand(), TRUE));
-        $_SESSION['token'] = $token;
-        $buf .= "<input type='hidden' name='csrf_token' value='{$token}' />";
+        // Add CSRF Token
+        $buf .= "<input type='hidden' name='" . CSRF::getTokenID() . "' value='" . CSRF::getTokenValue() . "' />";
 
         foreach ($data as $row) {
             $title = !empty($row[0]) ? $row[0] : null;
@@ -396,9 +394,7 @@ class Html {
         $valign = ' valign="top" ';
 
         // Generate CSRF Token
-        $token = md5(uniqid(rand(), TRUE));
-        $_SESSION['token'] = $token;
-        $buf .= "<input type='hidden' name='csrf_token' value='{$token}' />";
+        $buf .= "<input type='hidden' name='" . CSRF::getTokenID() . "' value='" . CSRF::getTokenValue() . "' />";
         
         foreach ($data as $section => $rows) {
             $buf .= "<tr>";
@@ -804,6 +800,7 @@ EOT;
         $id = $id ? " id=\"".$id."\" " : null;
         $class = $class ? " class=\"".$class."\" " : null;
         $buf .= "<form " . $id . $class . " action=\"".$action."\" method=\"".$method."\">";
+        $buf .= "<input type='hidden' name='" . CSRF::getTokenID() . "' value='" . CSRF::getTokenValue() . "' />";
         $buf .= "<fieldset style=\"margin-top: 10px;\">\n";
         $buf .= "<legend>" . $legend . "</legend>\n";
         $buf .= "<table  cellpadding=\"2\" cellspacing=\"2\" border=\"0\"><tr>\n";
