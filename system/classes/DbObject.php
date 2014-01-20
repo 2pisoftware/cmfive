@@ -187,7 +187,7 @@ class DbObject extends DbService {
 		foreach (get_object_vars($this) as $k => $v) {
 			if (strpos($k,"s_") === 0) {
 				if ($v) {
-					$this->$k = decrypt($v,$this->__password);
+					$this->$k = AESdecrypt($v,$this->__password);
 				}
 			}
 		}
@@ -508,7 +508,7 @@ class DbObject extends DbService {
 					}
 				} else if (strpos($k,"s_") === 0) {
 					if ($v) {
-						$v = encrypt($v,$this->__password);
+						$v = AESencrypt($v,$this->__password);
 						$data[$dbk]=$v;
 					}
 				} else {
@@ -609,7 +609,7 @@ class DbObject extends DbService {
 					}
 				} else if (strpos($k,"s_") === 0) {
 					if ($v) {
-						$v = encrypt($v,$this->__password);
+						$v = AESencrypt($v,$this->__password);
 						$data[$dbk]=$v;
 					}
 				} else {

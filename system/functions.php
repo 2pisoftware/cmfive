@@ -425,3 +425,15 @@ function in_multiarray($value, $array) {
 	}
 	return false;
 }
+
+function AESencrypt($text, $password) {
+	include("phpAES/AES.class.php");
+	$aes = new AES($password);
+	return $aes->encrypt($text);
+}
+
+function AESdecrypt($text, $password) {
+	include("phpAES/AES.class.php");
+	$aes = new AES($password);
+	return $aes->decrypt($text);
+}
