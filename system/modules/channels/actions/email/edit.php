@@ -35,4 +35,17 @@ function edit_GET(Web $w) {
 
 function edit_POST(Web $w) {
 
+	$p = $w->pathMatch("id");
+	$channel_id = $p["id"];
+
+	$channel_object = $channel_id ? $w->Channel->getChannel($channel_id) : new Channel($w);
+	$channel_object->fill($_POST);
+	$channel_object->insertOrUpdate();
+
+	$email_channel = $channel_id ? $w->Channel->getEmailChannel($channel_id) : new EmailChannelOption($w);
+	$email_channel->fill($_POST);
+	$email_channel->insertOrUpdate();
+
+	$w->msg("Email Channel " . ($channel_id ? "updated" : "created"), "/channels");
+
 }

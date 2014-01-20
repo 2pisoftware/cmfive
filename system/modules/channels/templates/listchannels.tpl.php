@@ -13,7 +13,7 @@ Add a New Channel: <?php echo Html::select("add_channel", array(array("Email", "
 	
 	jQuery("#add_channel").change(function(e) {
 		if (e.target.selectedIndex > 0) {
-			window.location.href = "/channels-" + jQuery(this).val() + "/edit";
+			jQuery.colorbox({href: "/channels-" + jQuery(this).val() + "/edit"}); //window.location.href = "/channels-" + jQuery(this).val() + "/edit";
 		}
 	});
 
