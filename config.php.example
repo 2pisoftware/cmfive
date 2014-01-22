@@ -32,9 +32,14 @@ $PASSWORD_SALT = "";
 //========= Anonymous Access ================================
 
 // bypass authentication if sent from the following IP addresses
+// but only for certain actions
+// eg.
+// $ALLOW_FROM_IP["127.0.0.1"] = array("channel/get", "rest/get");
+//
 $ALLOW_FROM_IP = array();
 
 // or bypass authentication for the following modules
+//
 $ALLOW_MODULE = array(
 	"rest", // uncomment this to switch on REST access to the database objects. Tread with CAUTION!
 );
