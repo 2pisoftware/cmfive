@@ -21,6 +21,13 @@ class EmailChannelOption extends DbObject {
 		$this->setPassword(hash("md5", $w->moduleConf("channels", "__password")));
 	}
 
+	public function delete($force = false) {
+		$channel = $this->getChannel();
+		$channel->delete($force);
+
+		parent::delete($force);
+	}
+
 	public function getChannel() {
 		if (!empty($this->channel_id)) {
 			return $this->w->Channel->getChannel($this->channel_id);
@@ -36,9 +43,15 @@ class EmailChannelOption extends DbObject {
 	}
 
 	public function doJob() {
-		$this->getUnreadMail();
+		for each $process
+			get $settings
+			apply $settings to email search // i.e $results = $mail->protocol->search(array(implode(" ", $settings)));
  		
 	}	
+
+	public function getRuleSettingsForm() {
+		
+	}
 
 	private function connectToMail($shouldDecrypt = true) {
 		if ($shouldDecrypt) {
@@ -80,10 +93,19 @@ class EmailChannelOption extends DbObject {
 		if (!empty($mail)) {
 			$count = $mail->count();
 			$results = $mail->protocol->search(array("UNSEEN"));
-
+			echo $count; print_r($results);
 			foreach($results as $messagenum) {
 				$mail_message = $mail->getMessage($messagenum);
-				echo $mail_message->subject . "<br/>\n";	
+				foreach ($mail_message->getHeaders() as $name => $value) {
+				    if (is_string($value)) {
+				        echo "$name: $value\n";
+				        continue;
+				    }
+				    foreach ($value as $entry) {
+				        echo "$name: $entry\n";
+				    }
+				}
+				echo "<xmp>" . $mail_message->getContent() . "</xmp><br/><hr/>\n";	
 			}
 		}
 	}

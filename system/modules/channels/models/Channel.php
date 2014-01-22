@@ -17,7 +17,7 @@ class Channel extends DbObject {
 			array(
 				array("Notify Email", "text", "notify_user_email", $this->notify_user_email),
 				// TODO: Need to prefil this with user names
-				array("Notify User", "text", "notify_user_id", $this->notify_user_id)
+				array("Notify User", "select", "notify_user_id", $this->notify_user_id, $this->w->Auth->getUsers())
 			)
 		));
 

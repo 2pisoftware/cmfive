@@ -16,6 +16,7 @@
 					<td><?php echo !empty($channel->name) ? $channel->name : ""; ?></td>
 					<td>
 						<?php echo Html::box("/channels-processor/edit/{$p->id}", "Edit"); ?>
+						<?php echo Html::a("/channels-processor/delete/{$p->id}", "Delete", null, null, "Are you sure you want to delete " . (!empty($p->name) ? "'" . $p->name . "'" : "this processor") . "?"); ?>
 						<?php echo Html::box("/channels-processor/editsettings/{$p->id}", "Edit Settings"); ?>
 					</td>
 				</tr>	

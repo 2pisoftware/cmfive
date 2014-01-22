@@ -30,16 +30,16 @@ function edit_GET(Web $w) {
 		)
 	);
 
-	if (!empty($folder_list)) {
-		$form["Email"][] = array(
-			array("Folder", "select", "folder", $email_channel->folder, $folder_list)
-		);
-	} else {
-		$form["Email"][] = array(
-			array("Folder", "static", "folder_link", Html::a("#", "Get folder list", null, "folder_link")),
-			array("Folder", "select", "folder", $email_channel->folder)
-		);
-	}
+	// if (!empty($folder_list)) {
+	// 	$form["Email"][] = array(
+	// 		array("Folder", "select", "folder", $email_channel->folder, $folder_list)
+	// 	);
+	// } else {
+	// 	$form["Email"][] = array(
+	// 		array("Folder", "static", "folder_link", Html::a("#", "Get folder list", null, "folder_link")),
+	// 		array("Folder", "select", "folder", $email_channel->folder)
+	// 	);
+	// }
 
 	$w->ctx("form", Html::multiColForm($form, "/channels-email/edit/{$channel_id}", "POST", "Save", "channelform"));
 }

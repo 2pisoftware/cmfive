@@ -19,6 +19,7 @@ Add a New Channel: <?php echo Html::select("add_channel", array(array("Email", "
 						<td><?php $user = $base_channel->getNotifyUser(); echo (!empty($user->id) ? $user->getFullName() : ""); ?>
 						<td>
 							<?php echo Html::box("/channels-{$c->_channeltype}/edit/{$base_channel->id}", "Edit"); ?>
+							<?php echo Html::a("/channels-email/delete/{$base_channel->id}", "Delete", null, null, "Are you sure you want to delete " . (!empty($base_channel->name) ? addslashes($base_channel->name) : "this channel") . "?"); ?>
 							<?php echo Html::a("/channels/listmessages/{$base_channel->id}", "Messages"); ?>
 						</td>
 					</tr>
@@ -34,6 +35,7 @@ Add a New Channel: <?php echo Html::select("add_channel", array(array("Email", "
 	jQuery("#add_channel").change(function(e) {
 		if (e.target.selectedIndex > 0) {
 			jQuery.colorbox({href: "/channels-" + jQuery(this).val() + "/edit"}); //window.location.href = "/channels-" + jQuery(this).val() + "/edit";
+			e.target.selectedIndex = 0;
 		}
 	});
 

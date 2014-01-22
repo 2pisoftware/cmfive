@@ -54,6 +54,6 @@ function edit_POST(Web $w) {
 	$processor_object->class = $processor_expl[1];
 	$processor_object->insertOrUpdate();
 
-	$w->msg("Process " . ($processor_id ? "updated" : "created"), "/channels/listprocessors");
+	$w->msg("Processor " . ($processor_id ? "updated" : "created"), "/channels/listprocessors");
 
 }

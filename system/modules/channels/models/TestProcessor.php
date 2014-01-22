@@ -16,7 +16,7 @@ class TestProcessor extends ProcessorType {
 			)
 		));
 	}
-
+	
 	public function doJob() {
 		echo "I am doing something";
 	}

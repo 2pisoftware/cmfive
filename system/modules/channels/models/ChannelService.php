@@ -2,35 +2,63 @@
 
 class ChannelService extends DbService {
 
+	/**
+	 * Returns all non-deleted channel objects
+	 * @return Array<Channel> channels
+	 */
 	public function getChannels() {
 		$where = array("is_deleted" => 0);
 		return $this->getObjects("Channel", $where);
 	}
 
+	/**
+	 * Returns a non-deleted channel object
+	 * @return Object channel
+	 */
 	public function getChannel($id) {
 		return $this->getObject("Channel", $id);
 	}
 
+	/**
+	 * Returns a non-deleted email channel object
+	 * @return Object emailchannel
+	 */
 	public function getEmailChannel($channel_id) {
 		$where = array('is_deleted' => 0, "channel_id" => $channel_id);
 		return $this->getObject('EmailChannelOption', $where);
 	}
 
+	/**
+	 * Returns all non-deleted email channel objects
+	 * @return Array<EmailChannelOption> emailchannels
+	 */
 	public function getEmailChannels() {
 		$where = array('is_deleted' => 0);
 		return $this->getObjects('EmailChannelOption', $where);
 	}
 
+	/**
+	 * Returns all non-deleted processor objects
+	 * @return Array<ChannelProcessor> processors
+	 */
 	public function getProcessors() {
 		$where = array("is_deleted" => 0);
 		return $this->getObjects("ChannelProcessor", $where);
 	}
 
+	/**
+	 * Returns a non-deleted processor object
+	 * @return Object processor
+	 */
 	public function getProcessor($id) {
 		$where = array("is_deleted" => 0, "id" => $id);
 		return $this->getObject("ChannelProcessor", $where);
 	}
 
+	/**
+	 * Returns a parsed list of available processors
+	 * @return Array list
+	 */
 	public function getProcessorList() {
 		// Get Modules => Processor list
 		$list = array();
@@ -47,6 +75,10 @@ class ChannelService extends DbService {
 		return $list;
 	}
 
+	/**
+	 * Aux Channels naivgation function
+	 * @return none
+	 */
 	public function navigation($title,$prenav=null) {
 		if ($title) {
 			$this->w->ctx("title",$title);
