@@ -12,7 +12,7 @@ function edit_GET(Web $w) {
 	$form = $channel_object->getForm();
 
 	$email_channel = $channel_id ? $w->Channel->getEmailChannel($channel_id) : new EmailChannelOption($w);
-
+	// $folder_list = $email_channel->getFolderList();
 	// Decrypt username and password
 	$email_channel->decrypt();
 
@@ -27,17 +27,24 @@ function edit_GET(Web $w) {
 		array(
 			array("Port", "text", "port", $email_channel->port),
 			array("Use Auth?", "checkbox", "use_auth", $email_channel->use_auth)
-		),
-		array(
-			array("Folder", "text", "folder", $email_channel->folder)
 		)
 	);
 
-	$w->out(Html::multiColForm($form, "/channels-email/edit/{$channel_id}", "POST", "Save"));
+	if (!empty($folder_list)) {
+		$form["Email"][] = array(
+			array("Folder", "select", "folder", $email_channel->folder, $folder_list)
+		);
+	} else {
+		$form["Email"][] = array(
+			array("Folder", "static", "folder_link", Html::a("#", "Get folder list", null, "folder_link")),
+			array("Folder", "select", "folder", $email_channel->folder)
+		);
+	}
+
+	$w->ctx("form", Html::multiColForm($form, "/channels-email/edit/{$channel_id}", "POST", "Save", "channelform"));
 }
 
 function edit_POST(Web $w) {
-
 	$p = $w->pathMatch("id");
 	$channel_id = $p["id"];
 

@@ -21,7 +21,7 @@ class Imap extends AbstractStorage implements Folder\FolderInterface, Writable\W
      * protocol handler
      * @var null|\Zend\Mail\Protocol\Imap
      */
-    protected $protocol;
+    public $protocol; // protected
 
     /**
      * name of current folder
