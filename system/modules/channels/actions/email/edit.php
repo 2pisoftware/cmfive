@@ -13,6 +13,9 @@ function edit_GET(Web $w) {
 
 	$email_channel = $channel_id ? $w->Channel->getEmailChannel($channel_id) : new EmailChannelOption($w);
 
+	// Decrypt username and password
+	$email_channel->decrypt();
+
 	$form["Email"] = array(
 		array(
 			array("Server URL", "text", "server", $email_channel->server)
@@ -30,7 +33,7 @@ function edit_GET(Web $w) {
 		)
 	);
 
-	$w->out(Html::multiColForm($form, "/channels-email/edit", "POST", "Save"));
+	$w->out(Html::multiColForm($form, "/channels-email/edit/{$channel_id}", "POST", "Save"));
 }
 
 function edit_POST(Web $w) {
@@ -44,8 +47,9 @@ function edit_POST(Web $w) {
 
 	$email_channel = $channel_id ? $w->Channel->getEmailChannel($channel_id) : new EmailChannelOption($w);
 	$email_channel->fill($_POST);
+	$email_channel->channel_id = $channel_object->id;
 	$email_channel->insertOrUpdate();
 
-	$w->msg("Email Channel " . ($channel_id ? "updated" : "created"), "/channels");
+	$w->msg("Email Channel " . ($channel_id ? "updated" : "created"), "/channels/listchannels");
 
 }

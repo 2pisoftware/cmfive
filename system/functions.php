@@ -427,13 +427,13 @@ function in_multiarray($value, $array) {
 }
 
 function AESencrypt($text, $password) {
-	include("phpAES/AES.class.php");
+	require_once("phpAES/AES.class.php");
 	$aes = new AES($password);
-	return $aes->encrypt($text);
+	return base64_encode($aes->encrypt($text));
 }
 
 function AESdecrypt($text, $password) {
-	include("phpAES/AES.class.php");
+	require_once("phpAES/AES.class.php");
 	$aes = new AES($password);
-	return $aes->decrypt($text);
+	return $aes->decrypt(base64_decode($text));
 }

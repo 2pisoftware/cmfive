@@ -1,4 +1,4 @@
-CREATE TABLE `channel` (
+CREATE TABLE IF NOT EXISTS `channel` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `notify_user_email` varchar(255) DEFAULT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE `channel` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-CREATE TABLE `channel_email_option` (
+CREATE TABLE IF NOT EXISTS `channel_email_option` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `channel_id` bigint(20) NOT NULL,
   `server` varchar(1024) NOT NULL,
@@ -30,15 +30,31 @@ CREATE TABLE `channel_email_option` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-CREATE TABLE `channel_process` (
+CREATE TABLE IF NOT EXISTS `channel_processor` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `processor_class` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `processor_module` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `class` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `module` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `channel_id` bigint(20) NOT NULL,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `settings` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL,
   `creator_id` bigint(20) NOT NULL,
   `modifier_id` bigint(20) NOT NULL,
   `dt_created` datetime NOT NULL,
   `dt_modified` datetime NOT NULL,
   `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=3 ;
+
+
+CREATE TABLE IF NOT EXISTS `channel_message` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `channel_id` bigint(20) NOT NULL,
+  `channel_type` varchar(255) NOT NULL,
+  `is_processed` tinyint(1) NOT NULL DEFAULT '0',
+  `creator_id` bigint(20) DEFAULT NULL,
+  `modifier_id` bigint(20) DEFAULT NULL,
+  `dt_created` datetime NOT NULL,
+  `dt_modified` datetime NOT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
