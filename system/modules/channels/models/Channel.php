@@ -2,9 +2,11 @@
 class Channel extends DbObject {
 	
 	public $name;
-	public $is_active;
+	public $is_active; // 0|1 flag
 	public $notify_user_email;
 	public $notify_user_id;
+	
+	public $do_processing; // 0|1 flag
 	
 
 	public function getForm() {
@@ -23,8 +25,23 @@ class Channel extends DbObject {
 
 	}
 
+	public function read() {
+		$channelImpl = $this->Channels->getEmailChannel($this->id);
+		if(!empty($channelImpl)) {
+			$channelImpl->read();
+		}
+		if ($this->do_processing) {
+			$processors = $this->Channels->getProcessors($this->id);
+			if (!empty($processors)) {
+				foreach ($processors as $processor) {
+					$processor->process();
+				}
+			}
+		}
+	}
+	
 	public function getNotifyUser() {
-		return $this->w->Auth->getUser($this->notify_user_id);
+		return $this->Auth->getUser($this->notify_user_id);
 	}
 
 }

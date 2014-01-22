@@ -13,8 +13,18 @@ class EmailChannelOption extends DbObject {
 	public $s_password;
 	public $port;
 	public $use_auth;
+	public $protocol; // pop3, imap
 
+	public $subject_filter; 
+	public $to_filter; 
+	public $from_filter; 
+	public $cc_filter; 
+	public $body_filter; 
+	
 	public $folder;
+	
+	public $post_read_action; // delete, mark as archived, move to folder, apply tag, forward to email
+	public $post_read_parameter; // stores extra data, eg. tag name, folder name, forward email, etc.
 
 	public function __construct(Web $w) {
 		parent::__construct($w);
@@ -35,7 +45,7 @@ class EmailChannelOption extends DbObject {
 		}
 	}
 
-	public function doJob() {
+	public function read() {
 		$this->getUnreadMail();
  		
 	}	
