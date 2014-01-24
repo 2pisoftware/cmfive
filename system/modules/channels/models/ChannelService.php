@@ -41,8 +41,11 @@ class ChannelService extends DbService {
 	 * Returns all non-deleted processor objects
 	 * @return Array<ChannelProcessor> processors
 	 */
-	public function getProcessors() {
+	public function getProcessors($channel_id = null) {
 		$where = array("is_deleted" => 0);
+		if (!empty($channel_id)) {
+			$where["channel_id"] = $channel_id;
+		}
 		return $this->getObjects("ChannelProcessor", $where);
 	}
 
@@ -74,6 +77,20 @@ class ChannelService extends DbService {
 
 		return $list;
 	}
+
+	public function getMessages($channel_id = null) {
+		$where = array("is_deleted" => 0);
+		if (!empty($channel_id)) {
+			$where["channel_id"] = $channel_id;
+		}
+
+		return $this->getObjects("ChannelMessage", $where);
+	}
+
+	public function getMessage($id) {
+		return $this->getObject("ChannelMessage", $id);
+	}
+
 
 	/**
 	 * Aux Channels naivgation function

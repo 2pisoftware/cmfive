@@ -20,23 +20,22 @@ class Channel extends DbObject {
 				array("Notify Email", "text", "notify_user_email", $this->notify_user_email),
 				// TODO: Need to prefil this with user names
 				array("Notify User", "select", "notify_user_id", $this->notify_user_id, $this->w->Auth->getUsers())
+			),
+			array(
+				array("Run processors?", "checkbox", "do_processing", $this->do_processing)
 			)
 		));
 
 	}
 
 	public function read() {
-		$channelImpl = $this->Channels->getEmailChannel($this->id);
+		$channelImpl = $this->Channel->getEmailChannel($this->id);
 		if(!empty($channelImpl)) {
 			$channelImpl->read();
 		}
 		if ($this->do_processing) {
-			$processors = $this->Channels->getProcessors($this->id);
-			if (!empty($processors)) {
-				foreach ($processors as $processor) {
-					$processor->process();
-				}
-			}
+			// Clear anything in buffer before redirect
+			$this->w->redirect("/channels/process/{$this->id}");
 		}
 	}
 	

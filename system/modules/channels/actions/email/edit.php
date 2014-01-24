@@ -18,6 +18,9 @@ function edit_GET(Web $w) {
 
 	$form["Email"] = array(
 		array(
+			array("Protocol", "select", "protocol", $email_channel->protocol, $email_channel::$_select_protocol)
+		),
+		array(
 			array("Server URL", "text", "server", $email_channel->server)
 		),
 		array(
@@ -27,19 +30,32 @@ function edit_GET(Web $w) {
 		array(
 			array("Port", "text", "port", $email_channel->port),
 			array("Use Auth?", "checkbox", "use_auth", $email_channel->use_auth)
+		),
+		array(
+			array("Folder", "text", "folder", $email_channel->folder)
+		),
+	);
+
+	$form["Filter"] = array(
+		array(
+			array("To", "text", "to_filter", $email_channel->to_filter),
+			array("From", "text", "from_filter", $email_channel->from_filter)
+		),
+		array(
+			array("CC", "text", "cc_filter", $email_channel->cc_filter),
+			array("Subject", "text", "subject_filter", $email_channel->subject_filter)
+		),
+		array(
+			array("Body", "text", "body_filter", $email_channel->body_filter)
 		)
 	);
 
-	// if (!empty($folder_list)) {
-	// 	$form["Email"][] = array(
-	// 		array("Folder", "select", "folder", $email_channel->folder, $folder_list)
-	// 	);
-	// } else {
-	// 	$form["Email"][] = array(
-	// 		array("Folder", "static", "folder_link", Html::a("#", "Get folder list", null, "folder_link")),
-	// 		array("Folder", "select", "folder", $email_channel->folder)
-	// 	);
-	// }
+	$form["Action"] = array(
+		array(
+			array("Post Read Action", "select", "post_read_action", $email_channel->post_read_action, $email_channel::$_select_read_action),
+			array("Post Read Data", "text", "post_read_parameter", $email_channel->post_read_parameter)
+		)
+	);
 
 	$w->ctx("form", Html::multiColForm($form, "/channels-email/edit/{$channel_id}", "POST", "Save", "channelform"));
 }

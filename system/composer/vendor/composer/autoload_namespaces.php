@@ -8,10 +8,12 @@ $baseDir = dirname(dirname($vendorDir));
 return array(
     'Zend\\Stdlib\\' => array($vendorDir . '/zendframework/zend-stdlib'),
     'Zend\\ServiceManager\\' => array($vendorDir . '/zendframework/zend-servicemanager'),
+    'Zend\\Serializer\\' => array($vendorDir . '/zendframework/zend-serializer'),
     'Zend\\Mime\\' => array($vendorDir . '/zendframework/zend-mime'),
     'Zend\\Math\\' => array($vendorDir . '/zendframework/zend-math'),
     'Zend\\Mail\\' => array($vendorDir . '/zendframework/zend-mail'),
     'Zend\\Loader\\' => array($vendorDir . '/zendframework/zend-loader'),
+    'Zend\\Json\\' => array($vendorDir . '/zendframework/zend-json'),
     'Zend\\Crypt\\' => array($vendorDir . '/zendframework/zend-crypt'),
     'Twig_' => array($vendorDir . '/twig/twig/lib'),
     'Gaufrette' => array($vendorDir . '/knplabs/gaufrette/src'),

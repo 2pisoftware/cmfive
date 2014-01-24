@@ -13,4 +13,13 @@ class ChannelProcessor extends DbObject {
 		return $this->w->Channel->getChannel($this->channel_id);
 	}
 
+	public function retrieveProcessor() {
+		try {
+			$processor = new $this->class($this->w);
+			return $processor;
+		} catch (Exception $e) {
+			return null;
+		}
+	}
+
 }

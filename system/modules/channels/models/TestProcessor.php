@@ -17,8 +17,25 @@ class TestProcessor extends ProcessorType {
 		));
 	}
 	
-	public function doJob() {
-		echo "I am doing something";
+	public function process($processor) {
+		if (empty($processor->id)) return;
+
+		$messages = $processor->w->Channel->getMessages($processor->channel_id);
+		if (!empty($messages)) {
+			foreach($messages as $message) {
+				if ($message->is_processed == 0) {
+					$rawdata = $message->getData();
+					if (!empty($rawdata)) {
+						$emailmessage = new EmailMessage($rawdata);
+						$email = $emailmessage->parse();
+
+						echo $email->getBodyText();
+						$message->is_processed = 1;
+						$message->update();
+					}
+				}
+			}
+		}
 	}
 
 }

@@ -155,6 +155,28 @@ class FileService extends DbService {
 		// return null;
 	}
 
+	function saveFileContent($object, $content, $name = null, $type_code = null, $content_type = null) {
+
+		$filename = (!empty($name) ? $name : (str_replace(".", "", microtime()) . getFileExtension($content_type)));
+
+		$filesystemPath = $object->getDbTableName().'/'.date('Y/m/d').'/'.$object->id . '/';
+		$filesystem = $this->getFilesystem($filesystemPath);
+		$file = new File($filename, $filesystem);
+		$file->setContent($content);
+
+		$att = new Attachment($this->w);
+		$att->filename = $filename;
+		$att->fullpath = str_replace(FILE_ROOT, "", $this->getFilePath($filesystemPath) . "/" . $this->filename);
+		$att->parent_table = $object->getDbTableName();
+		$att->parent_id = $object->id;
+		$att->title = $filename;
+		$att->type_code = $type_code;
+		$att->mimetype = $content_type;
+		$att->insert();
+
+		return $att->id;
+	}
+
 	function getAttachmentTypesForObject($o) {
 		return $this->getObjects("AttachmentType",array("table_name"=>$o->getDbTableName(), "is_active"=>'1'));
 	}

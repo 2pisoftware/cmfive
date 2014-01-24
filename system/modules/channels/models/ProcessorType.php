@@ -24,9 +24,10 @@ abstract class ProcessorType extends DbService {
 	 * A processor job should never return anything because it has
 	 * nothing to return to.
 	 *
+	 * @param ChannelProcessor $process
 	 * @return none
 	 */
-	public function process() {
+	public function process($processor) {
 		
 	}
 
