@@ -19,7 +19,7 @@ function anonymous_allowed(&$w,$path) {
 	global $ALLOW_FROM_IP;
 	// array("127.0.0.1" => array("action1","action2", ...), ...)
 	
-	if( $ALLOW_FROM_IP[$w->requestIpAddress()] && in_array($path, $ALLOW_FROM_IP[$w->requestIpAddress()])) {
+	if( array_key_exists($w->requestIpAddress(), $ALLOW_FROM_IP) && in_array($path, $ALLOW_FROM_IP[$w->requestIpAddress()])) {
 		return true;
 	}
 
