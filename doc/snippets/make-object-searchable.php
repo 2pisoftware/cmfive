@@ -1,19 +1,50 @@
 <?php
-// add this to the search index
-public $_searchable;
+//
+// in the class definition add the following properties and functions
+//
 
-// format display
-public function printSearchTitle() {
-}
-public function printSearchListing() {
-}
-public function printSearchUrl() {
+/**
+ * file: /modules/<name>/models/Example.php
+ * 
+ * @author careck
+ *
+ */
+class Example extends DbObject {
+	
+	// add this to the search index
+	public $_searchable;
+	
+	// add custom content to search index
+	public function addToIndex() {
+		return $content;
+	}
+	
+	// format display
+	public function printSearchTitle() {
+		return $title;
+	}
+	public function printSearchListing() {
+		return $listing;
+	}
+	public function printSearchUrl() {
+		return $url;
+	}
+	
+	// does this show in the search results?
+	public function canList(User $user = null) {
+		return true;
+	}
+	
+	// does this display the details link?
+	public function canView(User $user = null) {
+		return true;
+	}
 }
 
-// does this show in the search results?
-public function canList(User $user = null) {
-}
+//
+// in the config.php file add the following key
+//
 
-// does this display the details link?
-public function canView(User $user = null) {
-}
+$modules['<name>']['search'] = array(
+		"<Index Title>" => "Example",
+);
