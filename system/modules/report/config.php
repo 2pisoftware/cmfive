@@ -3,5 +3,6 @@
 $modules['report'] = array(
     'active' => true,
     'path' => 'system/modules',
-    'topmenu' => true,
+    '__password' => 'maybeconsiderchangingthis',
+	'topmenu' => true,
 );

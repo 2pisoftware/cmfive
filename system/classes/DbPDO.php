@@ -16,7 +16,8 @@ class DbPDO extends PDO {
     
     public function __construct($config = array()) {
         // Set up our PDO class
-        $url = "{$config['driver']}:host={$config['hostname']};dbname={$config['database']}";
+        $port = isset($config['port']) && !empty($config['port']) ? ";port=".$config['port'] : "";
+        $url = "{$config['driver']}:host={$config['hostname']};dbname={$config['database']}{$port}";
         parent::__construct($url,$config["username"],$config["password"], null);
         
         // Since you cant bind table names, maybe its a good idea to
