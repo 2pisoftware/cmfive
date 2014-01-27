@@ -13,6 +13,7 @@ class ReportLib {
 	
 			if ($w->Auth->user()->hasRole("report_editor") || $w->Auth->user()->hasRole("report_admin")) {
 				$w->menuLink("report/createreport","Create a Report",$nav);
+				$w->menuLink("report/listconnections","Connections",$nav);
 				$w->menuLink("report/listfeed","Feeds Dashboard",$nav);
 			}
 		}

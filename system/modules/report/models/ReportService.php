@@ -1,6 +1,15 @@
 <?php
 class ReportService extends DbService {
 
+	/**
+	 * Returns array of connection objects
+	 * 
+	 * @return array of connection objects
+	 */
+	public function getConnections() {
+		return $this->getObjects("ReportConnection",array("is_deleted"=>"0"));	
+	}
+	
 	// function to sort lists by date schedule
 	static function sortBySchedule($a, $b) {
 		if ($a->dt_schedule == $b->dt_schedule) {

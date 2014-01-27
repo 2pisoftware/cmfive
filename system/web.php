@@ -92,6 +92,7 @@ class Web {
         $this->_webroot = "/";
         $this->_actionMethod = null;
         spl_autoload_register(array($this, 'modelLoader'));
+        $this->loadConfigurationFiles();
     }
     
     private function modelLoader($className) {
@@ -138,7 +139,6 @@ class Web {
      * 2. if not set, look at the pathinfo and use first
      */
     function start() {
-        $this->loadConfigurationFiles();
         $this->initDB();
 
     	// start the session
@@ -332,31 +332,34 @@ class Web {
         } else {
             return null;
         }
-    }
+    } 
     
     private function loadConfigurationFiles() {
+    	global $modules;
+    	
         // Load System config first
         $baseDir = SYSTEM_PATH . '/modules';
-        $result = $this->scanModuleDirForConfigurationFiles($baseDir);
-        if (!empty($result)) {
-            foreach($result as $key => $val) {
-                $this->_moduleConfig[$key] = $val;
-            }
-        }
+        $this->scanModuleDirForConfigurationFiles($baseDir);
+//         if (!empty($result)) {
+//             foreach($result as $key => $val) {
+//                 $this->_moduleConfig[$key] = $val;
+//             }
+//         }
 
         // Load project module config second
         $baseDir = ROOT_PATH . '/modules';
-        $result = $this->scanModuleDirForConfigurationFiles($baseDir);
-        if (!empty($result)) {
-            foreach($result as $key => $val) {
-                $this->_moduleConfig[$key] = $val;
-            }
-        }
+        $this->scanModuleDirForConfigurationFiles($baseDir);
+//         if (!empty($result)) {
+//             foreach($result as $key => $val) {
+//                 $this->_moduleConfig[$key] = $val;
+//             }
+//         }
     }
 
     // Helper function for the above, scans a directory for config files in child folders
     private function scanModuleDirForConfigurationFiles($dir = "") {
-        $modules = array();
+    	global $modules;
+//         $modules = array();
         // Check that dir is dir
         if (is_dir($dir)) {
 
@@ -377,7 +380,7 @@ class Web {
                 }
             }
         }
-        return $modules;
+//         return $modules;
     }
 
     private function validateCSRF() {

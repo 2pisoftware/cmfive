@@ -8,6 +8,7 @@ class Report extends DbObject {
 	public $sqltype;		// determine type of statement: select/update/insert/delete
 	public $is_approved;	// has the Report Admin approved this report
 	public $is_deleted;	// is report deleted
+	public $report_connection_id; // database connection object or null for default
 
 	public $_modifiable;	// employ the modifiable aspect
 	public static $_db_table = "report";
@@ -16,6 +17,21 @@ class Report extends DbObject {
 		return "report";
 	}
 
+	/**
+	 * return the database object to call the report on.
+	 * 
+	 */
+	function getDb() {
+		if (empty($this->report_connection_id)) {
+			return $this->_db;
+		} else {
+			$dbc = $this->getObject("ReportConnection", $this->report_connection_id);
+			if (!empty($dbc)) {
+				return $dbc->getDb();
+			}
+		}
+	}
+	
 	// return a category title using lookup with type: ReportCategory
 	function getCategoryTitle() {
 		$c = $this->Report->getObject("Lookup",array("type"=>"ReportCategory","code"=>$this->category));
