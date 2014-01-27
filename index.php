@@ -14,14 +14,6 @@ require "config.php";
 
 //=============== init web.php ==============================
 
-$db_config = array(
-		'hostname' => defaultVal(getenv('MYSQL_DB_HOST'),$MYSQL_DB_HOST),
-		'username' => defaultVal(getenv('MYSQL_USERNAME'),$MYSQL_USERNAME),
-		'password'=> defaultVal(getenv('MYSQL_PASSWORD'),$MYSQL_PASSWORD),
-		'database' => defaultVal(getenv('MYSQL_DB_NAME'),$MYSQL_DB_NAME),
-		'driver' => 'mysql'
-);
-$web->db = Crystal::db($db_config);
 $web->setModules($modules);
 $web->setLogLevel($LOG_LEVEL);
 $web->_webroot = "http://".$_SERVER['HTTP_HOST'];
