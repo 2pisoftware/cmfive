@@ -1,15 +1,17 @@
 CREATE TABLE IF NOT EXISTS `channel` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `name` varchar(255) DEFAULT NULL,
   `notify_user_email` varchar(255) DEFAULT NULL,
   `notify_user_id` bigint(20) DEFAULT NULL,
+  `do_processing` tinyint(1) NOT NULL DEFAULT '1',
   `creator_id` bigint(20) NOT NULL,
   `modifier_id` bigint(20) NOT NULL,
   `dt_created` datetime NOT NULL,
   `dt_modified` datetime NOT NULL,
   `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=24 ;
 
 
 CREATE TABLE IF NOT EXISTS `channel_email_option` (

@@ -78,8 +78,11 @@ class ChannelService extends DbService {
 		return $list;
 	}
 
-	public function getMessages($channel_id = null) {
-		$where = array("is_deleted" => 0);
+	public function getMessages($channel_id = null, $include_deleted = false) {
+		$where = array();
+		if ($include_deleted === false) {
+			$where["is_deleted"] = 0;
+		}
 		if (!empty($channel_id)) {
 			$where["channel_id"] = $channel_id;
 		}
