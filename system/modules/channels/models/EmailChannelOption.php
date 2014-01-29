@@ -140,7 +140,7 @@ class EmailChannelOption extends DbObject {
 										$this->w->File->saveFileContent($channel_message, $content, $nameArray["name"], "channel_email_attachment", $mimetype);
 									}
 								} catch(Exception $e) {
-									// Cannot get a certain header, ignore it as its therefor not an attachment we want
+									// Cannot get a certain header, ignore it as its therefore not an attachment that we want
 								} 
 							} catch (Zend\Mail\Storage\Exception\RuntimeException $re) {
 								// no more parts

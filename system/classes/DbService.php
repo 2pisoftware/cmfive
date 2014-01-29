@@ -115,15 +115,16 @@ class DbService {
 
 		$o = new $class($this->w);
 		$table = $o->getDbTableName();
+
 		if (is_scalar($idOrWhere)) {
 			$this->_db->get($table)->where('id',$idOrWhere);
 		} elseif (is_array($idOrWhere)) {
 			$this->_db->get($table)->where($idOrWhere);
 		}
-                if (!empty($order_by)){
-                    $this->_db->order_by($order_by);
-                }
-                $result = $this->_db->fetch_row();
+        if (!empty($order_by)){
+            $this->_db->order_by($order_by);
+        }
+        $result = $this->_db->fetch_row();
 		if ($result) {
 			$obj = $this->getObjectFromRow($class, $result);
 			if ($usecache) {

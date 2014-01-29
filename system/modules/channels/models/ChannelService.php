@@ -94,6 +94,19 @@ class ChannelService extends DbService {
 		return $this->getObject("ChannelMessage", $id);
 	}
 
+	public function getMessageStatus($message_id, $processor_id = null) {
+		$where = array("message_id" => $message_id);
+		if (!empty($processor_id)) {
+			$where["processor_id"] = $processor_id;
+		}
+
+		return $this->getObject("ChannelMessageStatus", $where);
+	}
+
+	public function getMessageStatuses($message_id) {
+		$where = array("message_id" => $message_id);
+		return $this->getObjects("ChannelMessageStatus", $where);
+	}
 
 	/**
 	 * Aux Channels naivgation function
