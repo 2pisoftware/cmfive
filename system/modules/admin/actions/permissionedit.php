@@ -71,7 +71,7 @@ function permissionedit_POST(Web &$w) {
     $userRoles = $user->getRoles();
 
     foreach ($userRoles as $userRole) {
-        if (!$_POST["check_" . $userRole]) {
+        if (!array_key_exists("check_" . $userRole, $_POST)) {
             $user->removeRole($userRole);
         }
     }

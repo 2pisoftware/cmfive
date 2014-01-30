@@ -805,8 +805,15 @@ EOT;
         $buf .= "<legend>" . $legend . "</legend>\n";
         $buf .= "<table  cellpadding=\"2\" cellspacing=\"2\" border=\"0\"><tr>\n";
 
+        $item_count = 0;
+
         // Loop through data
         foreach ($data as $row) {
+
+            // Only print 4 td's per row
+            if ($item_count++ % 4 == 0) {
+                $buf .= "</tr><tr>";
+            }
             // Get row parameters
             $title = !empty($row[0]) ? $row[0] : null;
             $type = !empty($row[1]) ? $row[1] : null;
@@ -870,8 +877,12 @@ EOT;
                     break;
                 case "select":
                     $items = $size;
+                    $class = !empty($row[5]) ? $row[5] : null;
+                    $style = !empty($row[6]) ? $row[6] : null;
+                    $allmsg = !empty($row[7]) ? $row[7] : "-- Select --";
+                    // $name, $items, $value=null, $class=null, $style=null, $allmsg = "-- Select --", $required = null
                     if ($readonly == ""){
-                        $buf .= Html::select($name, $items, $value);
+                        $buf .= Html::select($name, $items, $value, $class, $style, $allmsg);
                     } else {
                         $buf .= $value;
                     }

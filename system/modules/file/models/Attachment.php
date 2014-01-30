@@ -31,7 +31,7 @@ class Attachment extends DbObject {
 		if (empty($this->mimetype)) {
 			$this->mimetype = $this->w->getMimetype(FILE_ROOT."/".$this->fullpath);
 		}
-		$this->modifier_user_id = $this->w->Auth->user()->id;
+		// $this->modifier_user_id = $this->w->Auth->user()->id; <-- why?
 		$this->fullpath = str_replace(FILE_ROOT, "", $this->fullpath);
 
 		// $this->filename = ($this->filename . getFileExtension($this->mimetype));

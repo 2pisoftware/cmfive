@@ -55,7 +55,7 @@ class AspectSearchable {
 			$io->class_name = get_class($this->object);
 			$io->object_id = $this->object->id;
 			$io->dt_created = time();
-			$io->creator_id = $io->Auth->user()->id;
+			$io->creator_id = ($io->Auth->loggedIn() ? $io->Auth->user()->id : 0);
 			
 			$io->content = $this->object->getIndexContent();
 			
@@ -69,7 +69,7 @@ class AspectSearchable {
 	function update() {
 		if ($this->getIndex()) {
 			$this->_index->dt_modified = time();
-			$this->_index->modifier_id = $this->_index->w->Auth->user()->id;
+			$this->_index->modifier_id = ($this->_index->w->Auth->loggedIn() ? $this->_index->w->Auth->user()->id : 0);
 			
 			$this->_index->content = $this->object->getIndexContent();
 					
