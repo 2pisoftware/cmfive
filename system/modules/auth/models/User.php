@@ -123,10 +123,7 @@ class User extends DbObject {
 					}
 				}
 			}
-			$rows = $this->getObjects ( "UserRole", array (
-					"user_id",
-					$this->id 
-			), true );
+			$rows = $this->getObjects("UserRole", array("user_id" => $this->id), true);
 			
 			if ($rows) {
 				foreach ( $rows as $row ) {

@@ -448,7 +448,9 @@ class Web {
                 if ($this->Auth->allowed($_SESSION['LAST_ALLOWED_URI'])){
                     $this->error($msg,$_SESSION['LAST_ALLOWED_URI']);
                 } else {
-                    $this->error($msg);
+                    // Logout user
+                    $this->sessionDestroy();
+                    $this->error($msg, "/auth/login");
                 }
             }
         } else if ($this->Auth 
