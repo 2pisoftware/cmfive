@@ -213,23 +213,26 @@ class DbService {
 	 * @param <type> $id
 	 * @return <type>
 	 */
-	function & getObjectFromRow($class,$row) {
+	function getObjectFromRow($class, $row) {
 		if (!$row || !$class) return null;
 		$o = new $class($this->w);
 		$o->fill($row);
 		return $o;
 	}
 
-	function & fillObjects($class, $rows) {
+	function getObjectsFromRows($class, $rows) {
 		$list = array();
-		if ($class && $rows && class_exists($class)) {
-			foreach($rows as $row) {
-				$o = new $class($this->w);
-				$o->fill($row);
-				$list[]=$o;
+		if (!empty($class) && !empty($rows) && class_exists($class)) {
+			foreach($rows as &$row) {
+				$list[] = $this->getObjectFromRow($class, $row);
 			}
 		}
 		return $list;
+	}
+
+	// DEPRECATED AS OF 0.7.0
+	function fillObjects($class, $rows) {
+		return $this->getObjectsFromRows($class, $rows);
 	}
 
 	/**

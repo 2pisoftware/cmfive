@@ -912,6 +912,7 @@ EOT;
         // Filter button (optional... though optional is pointless)
         if (!empty($action)) {
             $buf .= "<td><button type=\"submit\">".$submitTitle."</button></td>";
+            $buf .= "<td><button type=\"submit\" id=\"filter_reset\" name=\"reset\" value=\"reset\">Reset</button></td>";
         }
         $buf .= "</tr>\n</table>\n</fieldset>\n";
         $buf .= $hidden."</form>\n";
