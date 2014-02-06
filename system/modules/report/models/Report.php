@@ -12,10 +12,7 @@ class Report extends DbObject {
 
 	public $_modifiable;	// employ the modifiable aspect
 	public static $_db_table = "report";
-	// actual table name
-	function getDbTableName() {
-		return "report";
-	}
+
 
 	/**
 	 * return the database object to call the report on.
@@ -182,7 +179,7 @@ class Report extends DbObject {
 
 								// run SQL and return recordset
 								if ($action == "select") {
-									$rows = $this->Report->getRowsfromSQL($sql);
+									$rows = $this->getRowsfromSQL($sql);
 
 									// if we have a recordset ...
 									if ($rows) {
@@ -260,4 +257,18 @@ class Report extends DbObject {
 		}
 		return $alltbl;
 	}
+	
+	// given a report SQL statement, return recordset
+	private function getRowsfromSQL($sql) {
+		$return = $this->_db->sql($sql)->fetch_all();
+		foreach($return as $key => $val){
+			foreach($val as $k => $v){
+				if (is_int($k)){
+					unset($return[$key][$k]);
+				}
+			}
+		}
+		return $return;
+	}
+	
 }
