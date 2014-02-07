@@ -286,7 +286,6 @@ class Web {
         } else {
             $this->notFoundPage();
         }
-
         exit(); // nothing comes after start()!!!
     }
 

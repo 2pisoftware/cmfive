@@ -5,10 +5,16 @@ function addwidget_GET(Web $w) {
 	$p = $w->pathMatch("module");
 	$module = $p["module"];
 
+	$modulelist = $w->modules();
+	$modules = array_filter($modulelist, function($module) use (&$w) {
+		$names = $w->Widget->getWidgetNamesForModule($module);
+		return !empty($names);
+	});
+
 	$form = array("Add a widget" =>
 		array(
 			array(array("Add widget for", "select", "destination_module", $module, $w->modules())),
-			array(array("Source module", "select", "source_module", null, $w->modules())),
+			array(array("Source module", "select", "source_module", null, $modules)),
 			array(array("Widget Name", "select", "widget_name", null, array()))
 		)
 	);

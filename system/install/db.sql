@@ -89,13 +89,6 @@ CREATE TABLE IF NOT EXISTS `contact` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
 
---
--- Dumping data for table `contact`
---
-
-INSERT INTO `contact` (`id`, `firstname`, `lastname`, `othername`, `title`, `homephone`, `workphone`, `mobile`, `priv_mobile`, `fax`, `email`, `notes`, `dt_created`, `dt_modified`, `is_deleted`, `private_to_user_id`, `creator_id`) VALUES
-(1, 'Administrator', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'admin@tripleacs.com', NULL, '2012-04-27 06:31:52', '0000-00-00 00:00:00', 0, NULL, NULL);
-
 -- --------------------------------------------------------
 
 --
@@ -193,14 +186,6 @@ CREATE TABLE IF NOT EXISTS `report` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
 
---
--- Dumping data for table `report`
---
-
-INSERT INTO `report` (`id`, `title`, `module`, `category`, `report_code`, `is_approved`, `is_deleted`, `description`, `sqltype`) VALUES
-(1, 'Audit', 'admin', '', '[[dt_from||date||Date From]]\r\n\r\n[[dt_to||date||Date To]]\r\n\r\n[[user_id||select||User||select u.id as value, concat(c.firstname,'' '',c.lastname) as title from user u, contact c where u.contact_id = c.id order by title]]\r\n\r\n[[module||select||Module||select distinct module as value, module as title from audit order by module asc]]\r\n\r\n[[action||select||Action||select distinct action as value, concat(module,''/'',action) as title from audit order by title]]\r\n\r\n@@Audit Report||\r\n\r\nselect \r\na.dt_created as Date, \r\nconcat(c.firstname,'' '',c.lastname) as User,  \r\na.module as Module,\r\na.path as Url,\r\na.db_class as ''Class'',\r\na.db_action as ''Action'',\r\na.db_id as ''DB Id''\r\n\r\nfrom audit a\r\n\r\nleft join user u on u.id = a.creator_id\r\nleft join contact c on c.id = u.contact_id\r\n\r\nwhere \r\na.dt_created >= ''{{dt_from}} 00:00:00'' \r\nand a.dt_created <= ''{{dt_to}} 23:59:59'' \r\nand (''{{module}}'' = '''' or a.module = ''{{module}}'')\r\nand (''{{action}}'' = '''' or a.action = ''{{action}}'') \r\nand (''{{user_id}}'' = '''' or a.creator_id = ''{{user_id}}'')\r\n\r\n@@\r\n', 1, 0, 'Show Audit Information', 'select'),
-(2, 'Contacts', 'admin', '', '@@Contacts||\r\nselect * from contact\r\n@@', 0, 0, '', 'select');
-
 -- --------------------------------------------------------
 
 --
@@ -234,14 +219,6 @@ CREATE TABLE IF NOT EXISTS `report_member` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=3 ;
 
---
--- Dumping data for table `report_member`
---
-
-INSERT INTO `report_member` (`id`, `report_id`, `user_id`, `role`, `is_deleted`) VALUES
-(1, 1, 1, 'OWNER', 0),
-(2, 2, 1, 'OWNER', 0);
-
 -- --------------------------------------------------------
 
 --
@@ -266,6 +243,8 @@ CREATE TABLE IF NOT EXISTS `user` (
   `login` varchar(32) NOT NULL,
   `password` varchar(255) NOT NULL,
   `contact_id` bigint(20) DEFAULT NULL,
+  `password_reset_token` VARCHAR( 32 ) NULL,
+  `dt_password_reset_at` TIMESTAMP NULL,
   `is_admin` tinyint(1) NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
@@ -275,17 +254,6 @@ CREATE TABLE IF NOT EXISTS `user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `login` (`login`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
-
--- Change to add password reset token
-ALTER TABLE  `user` ADD  `password_reset_token` VARCHAR( 32 ) NULL AFTER  `contact_id` ;
-ALTER TABLE  `user` ADD  `dt_password_reset_at` TIMESTAMP NULL AFTER  `password_reset_token` ;
-
---
--- Dumping data for table `user`
---
-
-INSERT INTO `user` (`id`, `login`, `password`, `contact_id`, `is_admin`, `is_active`, `is_deleted`, `is_group`, `dt_created`, `dt_lastlogin`) VALUES
-(1, 'admin', 'd033e22ae348aeb5660fc2140aec35850c4da997', 1, 1, 1, 0, 0, '2012-04-27 06:31:07', '2012-04-27 17:23:54');
 
 -- --------------------------------------------------------
 
@@ -822,3 +790,18 @@ CREATE TABLE IF NOT EXISTS `report_connection` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+
+CREATE TABLE `widget_config` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NOT NULL,
+  `destination_module` varchar(255) NOT NULL,
+  `source_module` varchar(255) NOT NULL,
+  `widget_name` varchar(255) NOT NULL,
+  `creator_id` bigint(20) NOT NULL,
+  `custom_config` TEXT NULL,
+  `modifier_id` bigint(20) NOT NULL,
+  `dt_created` datetime NOT NULL,
+  `dt_modified` datetime NOT NULL,
+  `is_deleted` tinyint(4) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;

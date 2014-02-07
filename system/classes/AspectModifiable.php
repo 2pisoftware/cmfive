@@ -13,7 +13,7 @@ class AspectModifiable {
 		$this->object = $obj;
 	}
 
-	private function & getMo() {
+	private function getMo() {
 		if ($this->object && $this->object->id && !$this->_mo) {
 			$this->_mo = $this->object->getObject("ObjectModification", array("table_name"=>$this->object->getDbTableName(), "object_id"=>$this->object->id));
 		}
@@ -33,7 +33,8 @@ class AspectModifiable {
 			$mo->table_name = $this->object->getDbTableName();
 			$mo->object_id = $this->object->id;
 			$mo->dt_created = time();
-			$mo->creator_id = $mo->w->Auth->user()->id;
+			$user = $mo->w->Auth->user();
+			$mo->creator_id = (!empty($user->id) ? $user->id : 0);
 			$mo->insert();
 		}
 	}
@@ -44,7 +45,8 @@ class AspectModifiable {
 	function update() {
 		if ($this->getMo()) {
 			$this->_mo->dt_modified = time();
-			$this->_mo->modifier_id = $this->_mo->w->Auth->user()->id;
+			$user = $this->_mo->w->Auth->user();
+			$this->_mo->modifier_id = (!empty($user->id) ? $user->id : 0);
 			$this->_mo->update();
 		}
 	}
@@ -53,13 +55,13 @@ class AspectModifiable {
 	// Methods to be used by client object
 	/////////////////////////////////////////////////
 
-	function & getCreator() {
+	function getCreator() {
 		if ($this->getMo()) {
 			return $this->_mo->getCreator();
 		}
 	}
 
-	function & getModifier() {
+	function getModifier() {
 		if ($this->getMo()) {
 			return $this->_mo->getModifier();
 		}
@@ -108,7 +110,7 @@ class ObjectModification extends DbObject {
 	 *
 	 * @return User
 	 */
-	function & getCreator() {
+	function getCreator() {
 		if ($this->creator_id) {
 			return $this->w->Auth->getUser($this->creator_id);
 		}
@@ -121,7 +123,7 @@ class ObjectModification extends DbObject {
 	 *
 	 * @return User
 	 */
-	function & getModifier() {
+	function getModifier() {
 		if ($this->modifier_id) {
 			return $this->w->Auth->getUser($this->modifier_id);
 		}

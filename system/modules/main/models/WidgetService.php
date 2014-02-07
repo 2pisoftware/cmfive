@@ -6,7 +6,8 @@ class WidgetService extends DbService {
 		return $this->getObject("WidgetConfig", array(
 			"destination_module" => $destination, 
 			"source_module" => $source, 
-			"widget_name" => $widget)
+			"widget_name" => $widget,
+			"is_deleted" => 0)
 		);
 	}
 
