@@ -2,10 +2,10 @@
 
 function removewidget_ALL(Web $w) {
 
-	$p = $w->pathMatch("origin", "source", "widget");
+	$p = $w->pathMatch("origin", "id");// "source", "widget");
 
-	$widget = $w->Widget->getWidget($p["origin"], $p["source"], $p["widget"]);
-	if ($widget == null) {
+	$widget = $w->Widget->getWidgetById($p["id"]);//, $p["source"], $p["widget"]);
+	if (empty($widget->id)) {
 		$w->error("Widget not found", "/{$p['origin']}");
 	}
 

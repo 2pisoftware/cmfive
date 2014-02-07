@@ -26,11 +26,13 @@ function addwidget_POST(Web $w) {
 
 	$p = $w->pathMatch("module");
 	$module = $p["module"];
+	// $id = $p["id"];
 
-	$widget = $w->Widget->getWidget($_POST["destination_module"], $_POST["source_module"], $_POST["widget_name"]);
-	if (null !== $widget) {
-		$w->error("This entry already exists!", "/{$module}/index");
-	}
+	// $widget = $w->Widget->getWidget($_POST["destination_module"], $_POST["source_module"], $_POST["widget_name"]);
+	// $widget = $w->Widget->getWidgetByID($)
+	// if (null !== $widget) {
+	// 	$w->error("This entry already exists!", "/{$module}/index");
+	// }
 
 	$widget = new WidgetConfig($w);
 	$widget->fill($_POST);

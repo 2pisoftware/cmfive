@@ -23,4 +23,8 @@ class WidgetService extends DbService {
 		return $this->w->moduleConf($module, "widgets");
 	}
 
+	public function getWidgetById($id) {
+		return $this->getObject("WidgetConfig", array("id" => $id, "is_deleted" => 0));
+	}
+
 }

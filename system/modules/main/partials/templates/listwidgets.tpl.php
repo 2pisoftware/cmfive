@@ -7,8 +7,8 @@ if (!empty($widgets)) : ?>
 		<?php for($i = 0; $i < count($widgets); $i++) : ?>
 			<div class="widget_part<?php echo $i%$columns + 1; ?>">
 				<div class="widget_button">
-					<?php echo Html::box("/main/configwidget/{$module}/{$widgets[$i]->source_module}/{$widgets[$i]->widget_name}", "Config", false, false, null, null, "isbox", null, "widget_config"); ?>
-					<?php echo Html::a("/main/removewidget/{$module}/{$widgets[$i]->source_module}/{$widgets[$i]->widget_name}", "X", "Remove Widget", "widget_remove"); ?>
+					<?php echo Html::box("/main/configwidget/{$module}/{$widgets[$i]->id}", "Config", false, false, null, null, "isbox", null, "widget_config"); ?>
+					<?php echo Html::a("/main/removewidget/{$module}/{$widgets[$i]->id}", "X", "Remove Widget", "widget_remove"); ?>
 				</div>
 				<?php // echo $w->partial($widgets[$i]->widget_name, null, $widgets[$i]->source_module); ?>
 				<?php if (!empty($widgets[$i]->widget_class)) $widgets[$i]->widget_class->display(); ?>
