@@ -140,11 +140,11 @@ class AuthService extends DbService {
     }
 
     function getUsers($includeDeleted = false) {
-        return $this->getObjects("User", array('is_deleted', $includeDeleted ? 1 : 0), true);
+        return $this->getObjects("User", array('is_deleted' => $includeDeleted ? 1 : 0), true);
     }
 
     function getUserForContact($cid) {
-        return $this->getObject("User", array("contact_id", $cid));
+        return $this->getObject("User", array("contact_id" => $cid));
     }
 
     function getUsersForRole($role) {

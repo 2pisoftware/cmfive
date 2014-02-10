@@ -519,7 +519,7 @@ class DbObject extends DbService {
 		
 		$this->_db->insert($t,$data);
 		if ($t != "audit") {
-			$this->w->logAudit($this->_db->sql);
+			$this->w->logAudit($this->_db->getSql());
 		}
 		
 		// echo $this->_db->print_sql();
