@@ -37,11 +37,3 @@
 		</div>
 	</div>
 </div>
-
-<script language="javascript">
-<?php 
-if ($_REQUEST['tab'] && (!empty($_REQUEST['tab']))) {
-	echo "	switchTab(" . $_REQUEST['tab'] . ");";
-}
-?>
-</script>

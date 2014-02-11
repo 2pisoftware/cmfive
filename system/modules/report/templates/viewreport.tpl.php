@@ -35,15 +35,10 @@
 </div>
 
 <script language="javascript">
-<?php 
-if ($_REQUEST['tab'] && (!empty($_REQUEST['tab']))) {
-	echo "	switchTab(" . $_REQUEST['tab'] . ");";
-}
-?>
 
 	$.ajaxSetup ({
 	    cache: false
-		});
+	});
 
 	var report_url = "/report/taskAjaxSelectbyTable?id="; 
 	$("select[id='dbtables'] option").click(function() {
