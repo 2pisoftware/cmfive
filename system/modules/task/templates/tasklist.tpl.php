@@ -18,6 +18,7 @@
 	<div class="tab-body">
 		<div id="tab-1">
 			<form id="leadfilter" action="<?php echo WEBROOT."/task/tasklist"?>" method="POST">
+				<input type="hidden" name="<?php echo CSRF::getTokenID(); ?>" value="<?php echo CSRF::getTokenValue(); ?>" />
 				<fieldset style="margin-top: 10px;">
 					<legend>Search Tasks</legend>
 						<table cellpadding=2 cellspacing=2 border=0>

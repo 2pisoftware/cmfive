@@ -38,6 +38,24 @@ class CSRF {
     }
 
     /**
+     * Regenerates the CSRF tokens, useful for preventing mulitple
+     * form submissions.
+     */
+    public static function regenerate() {
+        // Unset session variables
+        if (isset($_SESSION[self::$token_id_name])) {
+            unset($_SESSION[self::$token_id_name]);
+        }
+        if (isset($_SESSION[self::$token_value_name])) {
+            unset($_SESSION[self::$token_value_name]);
+        }
+
+        // Create new key/value
+        self::getTokenID();
+        self::getTokenValue();
+    }
+
+    /**
      * Check whether or not the token value passed in $method (GET/POST..) 
      * match the token stored in the $_SESSION.
      * 
@@ -46,7 +64,7 @@ class CSRF {
      */
     public static function isValid($method) {
         $method = strtolower($method);
-
+        
         // Allow get through for now
         if ($method === "get") {
             return true;

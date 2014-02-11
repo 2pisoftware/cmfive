@@ -1,4 +1,5 @@
 <form action="<?php echo WEBROOT; ?>/file/attach" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="<?php echo CSRF::getTokenID(); ?>" value="<?php echo CSRF::getTokenValue(); ?>" />
     <table class="form" width="100%">
         <tr><td class='section' colspan='2'>Attach a File</td></tr>
         <?php if (!empty($types) && sizeof($types)) : ?>

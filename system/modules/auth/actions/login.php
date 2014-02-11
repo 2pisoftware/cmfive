@@ -18,13 +18,13 @@ function login_POST(Web &$w) {
 				$w->logDebug("original path: ".$url);
 
 				// If no url specified, go to the users defined url
-				if (empty($url)){
+				if (empty($url) || $url == "/"){
 					$url = $user->redirect_url;
 				}
 				$w->sessionUnset('orig_path');
 				$w->redirect($w->localUrl($url));
 			} else {
-				$w->redirect($w->localUrl());
+				$w->redirect(!empty($user->redirect_url) ? $w->localUrl($redirect_url) : $w->localUrl());
 			}
 		}
 		else {

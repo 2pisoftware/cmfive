@@ -2,6 +2,7 @@
 ?>
 
 		   <form id="leadfilter" action="<?php $webroot."/task/taskweek"; ?>" method="POST">
+		   	<input type="hidden" name="<?php echo CSRF::getTokenID(); ?>" value="<?php echo CSRF::getTokenValue(); ?>" />
 				<fieldset style="margin-top: 10px;">
 					<legend>Search Tasks</legend>
 						<table cellpadding=2 cellspacing=2 border=0>

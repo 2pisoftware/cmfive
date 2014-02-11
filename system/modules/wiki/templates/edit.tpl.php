@@ -8,6 +8,7 @@
 		<?php // ============== Text Edit ===================================== ; ?>            
         <div id="tab-1">
 			<form action="<?php echo WEBROOT."/wiki/edit/".$wikiname."/".$pagename; ?>" method="POST">
+                <input type="hidden" name="<?php echo CSRF::getTokenID(); ?>" value="<?php echo CSRF::getTokenValue(); ?>" />
 			<textarea style="width:80%;height:500px;" name="body"><?php echo $page->body; ?></textarea>
 			<p></p>
 			<input type="submit" value="Save">

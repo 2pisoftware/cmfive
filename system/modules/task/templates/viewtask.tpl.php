@@ -32,11 +32,6 @@
 </div>
 
 <script language="javascript">
-<?php 
-if ($_REQUEST['tab'] && (!empty($_REQUEST['tab']))) {
-	echo "	switchTab(" . $_REQUEST['tab'] . ");";
-}
-?>
 
 	$(".startTime").click(function(e){
     	var url = $(this).attr("href");

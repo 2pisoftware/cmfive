@@ -74,13 +74,14 @@ function updatetask_POST(Web &$w) {
 	}
 	else {
 		foreach ($_POST as $name => $value) {
-			if ($name != "FLOW_SID") {
-				$tdata = new TaskData($w);
-				$arr = array("task_id"=>$task->id,"key"=>$name,"value"=>$value);
-				$tdata->fill($arr);
-				$tdata->insert();
-				unset($arr);
-			}
+			// This is broken plus what is this?
+			// if (($name != "FLOW_SID") && ($name != "task_id") && ($name !== CSRF::getTokenID())) {
+			// 	$tdata = new TaskData($w);
+			// 	$arr = array("task_id"=>$task->id,"key"=>$name,"value"=>$value);
+			// 	$tdata->fill($arr);
+			// 	$tdata->insert();
+			// 	unset($arr);
+			// }
 		}
 	}
 

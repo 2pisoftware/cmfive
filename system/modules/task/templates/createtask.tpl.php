@@ -32,17 +32,24 @@
     });
 
     var task_url = "/task/taskAjaxSelectbyTaskGroup?id=";
+
+    // Force an ajax request initially, because if the group id is provided
+    // and this doesn't exist then the user would have to reselect the taskgroup
+    // manually, which is bad.
+    $(document).ready(function() {
+        $("select[id='task_group_id']").trigger("change");
+    });
+
     $("select[id='task_group_id']").live("change", function() {
         $.getJSON(
-                task_url + $(this).val(),
-                function(result) {
-                    $('#task_type').parent().html(result[0]);
-                    $('#priority').parent().html(result[1]);
-                    $('#first_assignee_id').parent().html(result[2]);
-                    $('#tasktext').html(result[3]);
-                }
+            task_url + $(this).val(),
+            function(result) {
+                $('#task_type').parent().html(result[0]);
+                $('#priority').parent().html(result[1]);
+                $('#first_assignee_id').parent().html(result[2]);
+                $('#tasktext').html(result[3]);
+            }
         );
-    }
-    );
+    });
 </script>
 

@@ -6,5 +6,6 @@ class WidgetConfig extends DbObject {
 	public $destination_module;
 	public $source_module;
 	public $widget_name;
-
+	public $custom_config;
+	
 }

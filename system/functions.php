@@ -432,22 +432,43 @@ function returncorrectdates(Web &$w, $dm_var, $from_date, $to_date){
 
 // find a value in a multidimension array
 function in_multiarray($value, $array) {
-	$top = sizeof($array) - 1;
-	$bottom = 0;
+    if (is_array($array)) {
+        if (in_array($value, $array)) {
+            return true;
+        } else {
+            foreach ($array as $key => $arr_value) {
+                if (in_multiarray($value, $key)) {
+                    return true;
+                } else {
+                    if (in_multiarray($value, $arr_value)) {
+                        return true;
+                    }
+                }
+            }
+        }
+    } else {
+        if ($value == $array) {
+            return true;
+        }
+    }
+    return false;
+
+	// $top = sizeof($array) - 1;
+	// $bottom = 0;
 	
-	while($bottom <= $top) {
-		if($array[$bottom] == $value) {
-			return true;
-		}
-		else {
-			if(is_array($array[$bottom])) {
-				if(in_multiarray($value, ($array[$bottom])))
-					return true;
-			}
-		}
-		$bottom++;
-	}
-	return false;
+	// while($bottom <= $top) {
+	// 	if($array[$bottom] == $value) {
+	// 		return true;
+	// 	}
+	// 	else {
+	// 		if(is_array($array[$bottom])) {
+	// 			if(in_multiarray($value, ($array[$bottom])))
+	// 				return true;
+	// 		}
+	// 	}
+	// 	$bottom++;
+	// }
+	// return false;
 }
 
 function AESencrypt($text, $password) {

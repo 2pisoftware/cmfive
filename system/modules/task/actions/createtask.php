@@ -73,7 +73,7 @@ function createtask_POST(Web &$w) {
 	// we do not want to store data from step I, the task_id (as a key=>value pair) nor the FLOW_SID
 	if ($task->id) {
 		foreach ($_POST as $name => $value) {
-			if (($name != "formone") && ($name != "FLOW_SID") && ($name != "task_id")) {
+			if (($name != "formone") && ($name != "FLOW_SID") && ($name != "task_id") && ($name !== CSRF::getTokenID())) {
 				$tdata = new TaskData($w);
 				$arr = array("task_id"=>$task->id,"key"=>$name,"value"=>$value);
 				$tdata->fill($arr);

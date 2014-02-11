@@ -359,7 +359,7 @@ class Web {
     // Helper function for the above, scans a directory for config files in child folders
     private function scanModuleDirForConfigurationFiles($dir = "") {
     	global $modules;
-//         $modules = array();
+
         // Check that dir is dir
         if (is_dir($dir)) {
 
@@ -380,51 +380,17 @@ class Web {
                 }
             }
         }
-//         return $modules;
     }
 
     private function validateCSRF() {
         // Check for CSRF token and that we have a valid request method
         if (!CSRF::isValid($this->_requestMethod)) {
+            @$this->logError("CSRF Detected from " . $this->requestIpAddress());
             header("HTTP/1.0 403 Forbidden");
-            echo "CSRF Detected.";
+            echo "Cross site request forgery detected. Your IP has been logged";
             die();
         }
     }
-
-    // function getWidgets($module) {
-    //     if (array_key_exists($module, $this->_moduleConfig)) {
-    //         $widget_conf = $this->moduleConf($module, 'widgets');
-    //         // $dir = $this->getModuleDir($module);
-    //         // $dir = substr($dir, 0, -1);
-    //         if (!empty($widget_conf)) {
-    //             foreach($widget_conf as $widget) {
-    //                 $this->out($this->partial($widget, null, $module));
-
-    //                 // The following code was used as the prototype using just actions
-    //                 // but didnt support templates, the easiest solution was to just use partials
-                    
-    //                 // $path = (ROOT_PATH . '/' . $dir . '/actions/' . $action . '/' . $widget . ".php");
-    //                 // if (file_exists($path)) {
-    //                 //     @include($path);
-    //                 //     $function_name = $widget."_ALL";
-    //                 //     if (function_exists($function_name)){
-    //                 //         $function_name($this);
-    //                 //     }
-    //                 // } else {
-    //                 //     $path = str_replace('-', '/', $path);
-    //                 //     if (file_exists($path)) {
-    //                 //         @include($path);
-    //                 //         $function_name = $widget."_ALL";
-    //                 //         if (function_exists($function_name)){
-    //                 //             $function_name($this);
-    //                 //         }
-    //                 //     }
-    //                 // }
-    //             }
-    //         }
-    //     }
-    // }
 
     function isAjax() {
     	return isset($_SERVER['HTTP_X_REQUESTED_WITH']);

@@ -17,6 +17,7 @@
 	<div class="tab-body">
 		<div id="tab-1">
 			<form action="<?php echo $webroot."/admin/lookup"; ?>" method="POST">
+				<input type="hidden" name="<?php echo CSRF::getTokenID(); ?>" value="<?php echo CSRF::getTokenValue(); ?>" />
 				<fieldset style="margin-top: 10px;">
 					<legend>Search Lookup Items</legend>
 						<table cellpadding=2 cellspacing=2 border=0>
@@ -36,11 +37,3 @@
 		</div>
 	</div>
 </div>
-
-<script language="javascript">
-<?php 
-if ($_REQUEST['tab'] && (!empty($_REQUEST['tab']))) {
-	echo "	switchTab(" . $_REQUEST['tab'] . ");";
-}
-?>
-</script>

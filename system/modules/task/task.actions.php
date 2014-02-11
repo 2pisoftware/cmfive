@@ -374,7 +374,7 @@ function deletetime_ALL(Web &$w) {
 function starttimelog_ALL(Web &$w) {
 	$p = $w->pathMatch("id");
 
-	if ($_POST['started'] == "yes") {
+	if (!empty($_POST['started']) && ($_POST["started"] == "yes")) {
 		// get time log
 		$log = $w->Task->getTimeLogEntry($_POST['logid']);
 	
@@ -444,7 +444,8 @@ function starttimelog_ALL(Web &$w) {
 			"	window.opener.location.href = \"/task/viewtask/" . $taskid . "\";" .
 			"}" .
 			"</script></head><body leftmargin=0 topmargin=0 marginwidth=0 marginheight=0 onbeforeunload=\"javascript: doUnLoading();\">" .
-			"<form name=theForm action=\"/task/starttimelog\" method=POST>" .
+			"<form name=theForm action=\"/task/starttimelog\" method=POST>".
+			"<input type=\"hidden\" name=\"" . CSRF::getTokenID() . "\" value=\"" . CSRF::getTokenValue() . "\" />" .
 			"<table cellpadding=2 cellspacing=2 border=0 width=100%>" .
 			"<tr align=center><td colspan=2 class=timelog>Task Time Log</td></tr>" .
 			"<tr align=center><td colspan=2 class=tasktitle><a title=\"View Task\" href=\"javascript: goTask();\">" . $tasktitle . "</a></td></tr>" .
@@ -452,7 +453,7 @@ function starttimelog_ALL(Web &$w) {
 			"<tr align=center><td>" . date("g:i a", strtotime($start)) . "</td><td>" . date("g:i a", strtotime($end)) . "</td></tr>" .
 			"<tr align=center><td colspan=2 class=timelog>&nbsp;</td></tr>" .
 			"<tr><td colspan=2 class=startend>Comments</td></tr>" .
-			"<tr><td colspan=2 align=center><textarea name=comments rows=4 cols=40>" . $_POST['comments'] . "</textarea></td></tr>" . 
+			"<tr><td colspan=2 align=center><textarea name=comments rows=4 cols=40>" . (!empty($_POST['comments']) ? $_POST['comments'] : '') . "</textarea></td></tr>" . 
 			"<tr align=center>" .
 			"<td class=timelog align=right><button id=end onClick=\"javascript: beforeUnLoading();\">Save Comments</button></td>" .
 			"<td class=timelog align=left><button id=end onClick=\"javascript: doUnLoading();\">Stop Time Now</button></td>" . 

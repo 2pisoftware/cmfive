@@ -50,7 +50,14 @@ class Html {
     /**
      *  Html function to draw a chart, see: http://www.chartjs.org/docs/ for how the data structure and options should be put together for each
      */
-    public static function chart($id = "chartjs", $type = "line", $data = array(), $options = array(), $height = "300px", $width = "400px") {
+    public static function chart($id = "chartjs", $type = "line", $data = array(), $options = array(), $height = null, $width = null) {
+        // Set default values
+        if (empty($height)) {
+            $height = "300px";
+        }
+        if (empty($width)) {
+            $width = "400px";
+        }
         // Create the canvas
         $buffer = "<canvas id='{$id}' width='{$width}' height='{$height}'></canvas>\n";
         $buffer .= "<script type='text/javascript'>\n";
@@ -387,8 +394,14 @@ class Html {
         $id = $id ? ' id="'.$id.'"' : null;
         $class = $class ? ' class="'.$class.'"' : null;
         $buf = "";
+
+        $enctype = '';
+        if (in_multiarray("file", $data)) {
+            $enctype = 'enctype="multipart/form-data"';
+        }
+
         if ($includeFormTag == true)
-            $buf .= '<form' . $id . $class . (!empty($action) ? ' action="'.$action.'"' : '') .' method="'.$method.'" target="'.$target.'">';
+            $buf .= '<form' . $id . $class . (!empty($action) ? ' action="'.$action.'"' : '') .' method="'.$method.'" target="'.$target.'" '.$enctype.'>';
         
         $buf .= "<table  cellspacing=\"0\" ".$id.$class." class='form-wrapper'>\n";
         $valign = ' valign="top" ';
@@ -497,7 +510,7 @@ class Html {
                         if ($title){
                             $buf .= "<tr><td $valign class='fieldtitle'>".htmlentities($title)."</td>";
                         }
-                        $buf .= "<td colspan=\"$colspan\">";
+                        $buf .= "<td colspan=\"2\">";
                         $buf .= '<input style="width:100%;"  type="'.$type.'" name="'.$name.'" size="'.$size.'" id="'.$name.'"/>';
                         $buf .= "</td></tr>\n";
                     }

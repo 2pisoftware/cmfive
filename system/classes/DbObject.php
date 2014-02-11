@@ -519,7 +519,7 @@ class DbObject extends DbService {
 		
 		$this->_db->insert($t,$data);
 		if ($t != "audit") {
-			$this->w->logAudit($this->_db->sql);
+			$this->w->logAudit($this->_db->getSql());
 		}
 		
 		// echo $this->_db->print_sql();
@@ -776,7 +776,7 @@ class DbObject extends DbService {
 	 * 
 	 * @return User
 	 */
-	function & getCreator() {
+	function getCreator() {
 		if ($this->_modifiable) {
 			return $this->_modifiable->getCreator();
 		} else if(property_exists(get_class($this), "creator_id")) {
@@ -791,7 +791,7 @@ class DbObject extends DbService {
 	 * 
 	 * @return User
 	 */
-	function & getModifier() {
+	function getModifier() {
 		if ($this->_modifiable) {
 			return $this->_modifiable->getModifier();
 		} else if(property_exists(get_class($this), "modifier_id")) {

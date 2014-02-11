@@ -6,6 +6,7 @@ CREATE TABLE `widget_config` (
   `source_module` varchar(255) NOT NULL,
   `widget_name` varchar(255) NOT NULL,
   `creator_id` bigint(20) NOT NULL,
+  `custom_config` TEXT NULL,
   `modifier_id` bigint(20) NOT NULL,
   `dt_created` datetime NOT NULL,
   `dt_modified` datetime NOT NULL,

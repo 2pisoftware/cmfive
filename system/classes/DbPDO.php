@@ -19,6 +19,7 @@ class DbPDO extends PDO {
         $port = isset($config['port']) && !empty($config['port']) ? ";port=".$config['port'] : "";
         $url = "{$config['driver']}:host={$config['hostname']};dbname={$config['database']}{$port}";
         parent::__construct($url,$config["username"],$config["password"], null);
+        $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
         // Since you cant bind table names, maybe its a good idea to
         // load an array of table names to check against? But this is probably
