@@ -444,7 +444,8 @@ function starttimelog_ALL(Web &$w) {
 			"	window.opener.location.href = \"/task/viewtask/" . $taskid . "\";" .
 			"}" .
 			"</script></head><body leftmargin=0 topmargin=0 marginwidth=0 marginheight=0 onbeforeunload=\"javascript: doUnLoading();\">" .
-			"<form name=theForm action=\"/task/starttimelog\" method=POST>" .
+			"<form name=theForm action=\"/task/starttimelog\" method=POST>".
+			"<input type=\"hidden\" name=\"" . CSRF::getTokenID() . "\" value=\"" . CSRF::getTokenValue() . "\"" .
 			"<table cellpadding=2 cellspacing=2 border=0 width=100%>" .
 			"<tr align=center><td colspan=2 class=timelog>Task Time Log</td></tr>" .
 			"<tr align=center><td colspan=2 class=tasktitle><a title=\"View Task\" href=\"javascript: goTask();\">" . $tasktitle . "</a></td></tr>" .

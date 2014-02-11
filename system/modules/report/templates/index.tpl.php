@@ -1,19 +1,20 @@
-		   <form id="leadfilter" action="<?php echo $webroot."/report/index"; ?>" method="POST">
-				<fieldset style="margin-top: 10px;">
-					<legend>Search Reports</legend>
-						<table cellpadding=2 cellspacing=2 border=0>
-							<tr>
-								<td align=right style="padding-left:20px;">Modules</td><td><?php echo $modules; ?></td>
-								<td align=right style="padding-left:20px;">Category</td><td><?php echo $category; ?></td>
-								<td align=right style="padding-left:20px;">Type</td><td><?php echo $type; ?></td>
-								<td align=right><input type="submit" name="taskFilter" value=" Search Reports "/></td>
-								<td align=left><button id="clrForm">Reset Filter</button></td>
-							</tr>
-						</table>
-				</fieldset>
-			</form>
-		    <p>
-			<?php echo $viewreports; ?>
+<form id="leadfilter" action="<?php echo $webroot."/report/index"; ?>" method="POST">
+	<input type="hidden" name="<?php echo CSRF::getTokenID(); ?>" value="<?php echo CSRF::getTokenValue(); ?>" />
+	<fieldset style="margin-top: 10px;">
+		<legend>Search Reports</legend>
+			<table cellpadding=2 cellspacing=2 border=0>
+				<tr>
+					<td align=right style="padding-left:20px;">Modules</td><td><?php echo $modules; ?></td>
+					<td align=right style="padding-left:20px;">Category</td><td><?php echo $category; ?></td>
+					<td align=right style="padding-left:20px;">Type</td><td><?php echo $type; ?></td>
+					<td align=right><input type="submit" name="taskFilter" value=" Search Reports "/></td>
+					<td align=left><button id="clrForm">Reset Filter</button></td>
+				</tr>
+			</table>
+	</fieldset>
+</form>
+<p>
+<?php echo $viewreports; ?>
 
 <script language="javascript">
 	var myFlag = true;

@@ -74,7 +74,7 @@ function updatetask_POST(Web &$w) {
 	}
 	else {
 		foreach ($_POST as $name => $value) {
-			if ($name != "FLOW_SID") {
+			if (($name != "FLOW_SID") && ($name !== CSRF::getTokenID())) {
 				$tdata = new TaskData($w);
 				$arr = array("task_id"=>$task->id,"key"=>$name,"value"=>$value);
 				$tdata->fill($arr);

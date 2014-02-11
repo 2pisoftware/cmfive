@@ -1,8 +1,6 @@
 <?php 
 
 function listtaskgroups_ALL(Web $w, $params = array()) {
-	$taskgroups = $params['taskgroups'];
-	$redirect = $params['redirect'];
-
-	$w->ctx("taskgroups", $taskgroups);
+	$w->ctx("taskgroups", $params['taskgroups']);
+	$w->ctx("redirect", $params['redirect']);
 }
