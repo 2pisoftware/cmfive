@@ -139,10 +139,23 @@ class AuthService extends DbService {
         return $this->getObject("User", $id);
     }
 
-    function getUsers($includeDeleted = false) {
-        return $this->getObjects("User", array('is_deleted' => $includeDeleted ? 1 : 0), true);
+    function getUsersAndGroups($includeDeleted = false) {
+    	$where = array();
+    	if (!$includeDeleted) {
+    		$where["is_deleted"]=0;
+    	}
+        return $this->getObjects("User", $where, true);
     }
 
+    function getUsers($includeDeleted = false) {
+        $where = array();
+        $where["is_group"]=0;
+    	if (!$includeDeleted) {
+    		$where["is_deleted"]=0;
+    	}
+    	return $this->getObjects("User", $where, true);
+    }
+    
     function getUserForContact($cid) {
         return $this->getObject("User", array("contact_id" => $cid));
     }
@@ -151,7 +164,7 @@ class AuthService extends DbService {
         if (!$role) {
             return null;
         }
-        $users = $this->getUsers();
+        $users = $this->getUsersAndGroups();
         $roleUsers = array();
         if ($users) {
             foreach ($users as $u) {

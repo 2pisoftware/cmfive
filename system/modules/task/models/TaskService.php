@@ -215,6 +215,10 @@ class TaskService extends DbService {
     	return array("ALL","GUEST","MEMBER","OWNER");
     }
 
+    function getTaskGroupRoles() {
+    	return array("GUEST","MEMBER","OWNER");
+    }
+    
     // determine if current user can perform a task
     // compare users role against required role to perform given task
     function getMyPerms($role,$permission) {
