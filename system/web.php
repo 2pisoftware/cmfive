@@ -1002,7 +1002,7 @@ class Web {
      * @return <type>
      */
     function request($key, $default=null) {	
-    	if(key_exists($key, $_REQUEST) && is_array($_REQUEST[$key]))
+    	if(array_key_exists($key, $_REQUEST) && is_array($_REQUEST[$key]))
     	{
     		foreach ($_REQUEST[$key] as &$k)
     		{
@@ -1010,7 +1010,7 @@ class Web {
     		}
     		return $_REQUEST[$key];
     	}
-        return key_exists($key, $_REQUEST) ? urldecode($_REQUEST[$key]) : $default;
+        return array_key_exists($key, $_REQUEST) ? urldecode($_REQUEST[$key]) : $default;
     }
 
     function requestIpAddress() {

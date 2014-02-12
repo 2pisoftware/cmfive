@@ -8,7 +8,7 @@ function groupmember_GET(Web &$w)
 {
 	$option = $w->pathMatch("group_id");
 
-	$users = $w->Auth->getUsers();
+	$users = $w->Auth->getUsersAndGroups();
 
 	foreach ($users as $user)
 	{

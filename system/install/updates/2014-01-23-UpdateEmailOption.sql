@@ -9,5 +9,5 @@ ADD  `post_read_parameter` VARCHAR( 255 ) NULL AFTER  `post_read_action`;
 
 ALTER TABLE  `channel` ADD  `do_processing` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `notify_user_id`;
 
-ALTER TABLE  `channel_message` CHANGE  `channel_type`  `message_type` VARCHAR( 255 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
+ALTER TABLE  `channel_message` CHANGE  `channel_type`  `message_type` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL;
 
