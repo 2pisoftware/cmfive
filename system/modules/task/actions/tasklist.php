@@ -66,7 +66,7 @@ function tasklist_ALL(Web $w) {
 	$where .= "t.status = '" . $w->request('status') . "' and ";
 	if (($w->request('status') == "") && ($w->request('closed')))
 	$where .= "(t.is_closed = 0 or t.is_closed = 1) and ";
-	if ((array_key_exists("status",$_REQUEST)) && ($_REQUEST['status'] == "") && (!$_REQUEST['closed']))
+	if ((array_key_exists("status",$_REQUEST)) && ($_REQUEST['status'] == "") && (!empty($_REQUEST['closed'])))
 	$where .= "t.is_closed = 0 and ";
 	if ($w->request('dt_from') != "")
 	$where .= "t.dt_due >= '" . $w->Task->date2db($w->request('dt_from')) . "' and ";

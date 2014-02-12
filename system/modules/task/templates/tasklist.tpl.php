@@ -52,6 +52,7 @@
 			</form>
 			<p>
 			<form id="updatestatus" action="<?php echo $webroot."/task/updatestatus"; ?>" method="POST">
+				<input type="hidden" name="<?php echo CSRF::getTokenID(); ?>" value="<?php echo CSRF::getTokenValue(); ?>" />
 			<?php echo $mytasks; ?>
 			</form>
 		</div>

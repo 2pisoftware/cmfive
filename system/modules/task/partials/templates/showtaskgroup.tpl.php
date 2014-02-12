@@ -3,7 +3,9 @@
 		<thead>
 			<tr>
 				<th colspan='2'>
-					<?php echo $taskgroup->title; ?>
+					<a  target="_blank" href="/task/tasklist/?taskgroups=<?php echo $taskgroup->id; ?>">
+						<?php echo $taskgroup->title; ?>
+					</a>
 					<?php if ($taskgroup->getCanICreate()) : ?>
 						<span style="float: right;"><a target="_blank" href="/task/createtask/?gid=<?php echo $taskgroup->id; ?>">+</a></span>
 					<?php endif; ?>
