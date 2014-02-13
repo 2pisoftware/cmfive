@@ -520,6 +520,22 @@ class TaskService extends DbService {
     	return $this->getObject("TaskGroup", array("title" => $title, "is_deleted" => 0));
     }
 
+    function addMemberToProject($taskgroup_id, $user_id, $role = "GUEST") {
+    	if (empty($project_id) || empty($user_id)) return;
+
+    	// Check that they're not already a member
+    	$member = $this->getObject("TaskGroupMember", array("task_group_id" => $taskgroup_id, "user_id" => $user_id));
+    	if (!empty($member->id)) return;
+
+    	$taskgroupmember = new TaskGroupMember($w);
+    	$taskgroupmember->task_group_id = $taskgroup_id;
+    	$taskgroupmember->user_id = $user_id;
+    	$taskgroupmember->role = $role;
+    	$taskgroupmember->is_active = 1;
+    	$taskgroupmember->insert();
+
+    }
+
     /**
      * Create a new Task
      * 
