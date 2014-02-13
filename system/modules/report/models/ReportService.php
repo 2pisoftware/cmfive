@@ -23,9 +23,10 @@ class ReportService extends DbService {
 		$modules = $this->w->modules();
 		if ($modules) {
 			foreach ($modules as $f) {
-				$modules[] = array(ucfirst($f),$f);
+				$modules2[] = array(ucfirst($f),$f);
 			}
-			return $modules;
+			sort($modules2);
+			return $modules2;
 		}
 	}
 
@@ -191,14 +192,14 @@ class ReportService extends DbService {
 
 	// return all tables in the DB for display
 	function getAllDBTables() {
-		global $db_config;
+
 		$dbtbl = array();
-		$sql = "show tables in ".$db_config['database'];
+		$sql = "show tables in ".$this->_db->getDatabase();
 		$tbls = $this->_db->sql($sql)->fetch_all();
 
 		if ($tbls) {
 			foreach ($tbls as $tbl) {
-				$dbtbl[] = array($tbl['Tables_in_'.$db_config['database']],$tbl['Tables_in_'.$db_config['database']]);
+				$dbtbl[] = array($tbl['Tables_in_'.$this->_db->getDatabase()],$tbl['Tables_in_'.$this->_db->getDatabase()]);
 			}
 		}
 		return $dbtbl;

@@ -6,7 +6,7 @@
  * and to ensure concurrency between widgets and their implementation
  */
 abstract class ModuleWidget extends DbService {
-	public $w = null;
+
 	public $module_config = null;
 
 	/**
@@ -15,10 +15,10 @@ abstract class ModuleWidget extends DbService {
 	 *	@param Web $w;
 	 */
 	public function __construct(Web & $w, $module_config = null) {
-		$this->w = $w;
 		if (!empty($module_config)) {
 			$this->module_config = $module_config;
 		}
+		parent::__construct($w);
 	}
 
 	/** 

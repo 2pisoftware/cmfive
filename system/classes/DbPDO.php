@@ -14,6 +14,8 @@ class DbPDO extends PDO {
     public $sql = null;
     public $total_results = 0;
     
+    private $config;
+    
     public function __construct($config = array()) {
         // Set up our PDO class
         $port = isset($config['port']) && !empty($config['port']) ? ";port=".$config['port'] : "";
@@ -33,8 +35,25 @@ class DbPDO extends PDO {
         // Instantiate a FluentPDO class and init vars
         $this->fpdo = new FluentPDO($this);
         $this->sql = $this->getSql();
+        $this->config = $config;
     } 
 
+    public function getDatabase() {
+    	return $this->config['database'];
+    }
+    
+    public function getHost() {
+    	return $this->config['host'];
+    }
+    
+    public function getPort() {
+    	return $this->config['port'];
+    }
+    
+    public function getDriver() {
+    	return $this->config['driver'];
+    }
+    
     /**
      * This function sets up a FluentPDO query with the given table name, an
      * error will be thrown if the table name doesn't exist in the database

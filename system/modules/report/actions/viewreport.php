@@ -34,9 +34,9 @@ function viewreport_GET(Web &$w) {
 				array("Report Definition","section"),
 				array("Title","text","title", $rep->title),
 				array("Module","select","module", $rep->module, $modules),
-				array("Category","select","category", $rep->category, lookupForSelect($w, "ReportCategory")),
-				array("Description","textarea","description",$rep->description,100,2,true),
-				array("Code","textarea","report_code",$rep->report_code,100,22,false),
+				//array("Category","select","category", $rep->category, lookupForSelect($w, "ReportCategory")),
+				array("Description","textarea","description",$rep->description,110,2,true),
+				array("Code","textarea","report_code",$rep->report_code,110,22,false),
 				array("Approved","checkbox","is_approved", $rep->is_approved),
 				),$w->localUrl("/report/editreport/".$rep->id),"POST"," Update Report ");
 

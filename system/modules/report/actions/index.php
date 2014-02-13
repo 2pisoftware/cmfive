@@ -17,10 +17,12 @@ function index_ALL(Web &$w) {
 		$where .= ($_REQUEST['module'] != "") ? " and r.module = '" . $_REQUEST['module'] . "'" : "";
 		$w->ctx("reqModule",$_REQUEST['module']);	
 	}
+	/*
 	if (!empty($_REQUEST['category'])){
 		$where .= ($_REQUEST['category'] != "") ? " and r.category = '" . $_REQUEST['category'] . "'" : "";
 		$w->ctx("reqCategory",$_REQUEST['category']);	
 	}
+	*/
 	if (!empty($_REQUEST['type'])){
 		$where .= ($_REQUEST['type'] != "") ? " and r.sqltype like '%" . $_REQUEST['type'] . "%'" : "";
 		$w->ctx("reqType",$_REQUEST['type']);	
@@ -30,9 +32,9 @@ function index_ALL(Web &$w) {
 	$reports = $w->Report->getReportsbyUserWhere($who, $where);
 
 	// set headings based on role: 'user' sees only approved reports and no approval status
-	$line = ($w->Auth->user()->hasRole("report_editor")  || $w->Auth->user()->hasRole("report_admin")) ?
-	array(array("Title", "Approved", "Module", "Category",  "Description", "")) :
-	array(array("Title", "Module", "Category", "Description",""));
+	$line = ($w->Auth->user()->hasAnyRole("report_editor","report_admin")) ?
+	array(array("Title", "Approved", "Module", /*"Category",*/  "Description", "")) :
+	array(array("Title", "Module", /*"Category",*/ "Description",""));
 
 	// if i am a member of a list of reports, lets display them
 	if ($reports) {
@@ -62,7 +64,7 @@ function index_ALL(Web &$w) {
 					$line[] = array(
 					$rep->title,
 					ucfirst($rep->module),
-					$rep->getCategoryTitle(),
+					//$rep->getCategoryTitle(),
 					$rep->description,
 					$btnedit .
 								"&nbsp;&nbsp;&nbsp;" . 
@@ -76,7 +78,7 @@ function index_ALL(Web &$w) {
 				$rep->title,
 				$app[$rep->is_approved],
 				ucfirst($rep->module),
-				$rep->getCategoryTitle(),
+				//$rep->getCategoryTitle(),
 				$rep->description,
 				$btnedit .
 							"&nbsp;&nbsp;&nbsp;" . 
@@ -94,8 +96,8 @@ function index_ALL(Web &$w) {
 	// populate search dropdowns
 	$modules = array();
 	$w->ctx("modules",Html::select("module",$modules));
-	$category = array();
-	$w->ctx("category",Html::select("category",$category));
+	//$category = array();
+	//$w->ctx("category",Html::select("category",$category));
 	$type = array();
 	$w->ctx("type",Html::select("type",$type));
 

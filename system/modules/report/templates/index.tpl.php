@@ -5,7 +5,7 @@
 			<table cellpadding=2 cellspacing=2 border=0>
 				<tr>
 					<td align=right style="padding-left:20px;">Modules</td><td><?php echo $modules; ?></td>
-					<td align=right style="padding-left:20px;">Category</td><td><?php echo $category; ?></td>
+					<?php /*?><td align=right style="padding-left:20px;">Category</td><td><?php echo $category; ?></td> */?>
 					<td align=right style="padding-left:20px;">Type</td><td><?php echo $type; ?></td>
 					<td align=right><input type="submit" name="taskFilter" value=" Search Reports "/></td>
 					<td align=left><button id="clrForm">Reset Filter</button></td>
