@@ -61,4 +61,16 @@ class TaskGroup extends DbObject {
 		$assign = $this->w->Auth->getUser($this->default_assignee_id);
 		return $assign ? $assign->getFullName() : "";
 	}
+        
+        function getTasks() {
+            return $this->getObjects("Task", array("task_group_id" => $this->id));
+        }
+        
+    public function getSelectOptionTitle() {
+        return $this->title;
+    }
+
+    public function getSelectOptionValue() {
+        return $this->id;
+    }
 }

@@ -234,8 +234,11 @@ class Task extends DbObject {
 	}
 	
 	// return list of time log entries for a task given task ID
-	function getTimeLogEntries($id) {
-		return $this->getObjects("TaskTime",array("task_id"=>$id,"is_deleted"=>0));
+	function getTimeLogEntries($id = null) {
+            if (empty($id)) {
+                $id = $this->id;
+            }
+            return $this->getObjects("TaskTime",array("task_id"=>$id,"is_deleted"=>0));
 	}
 	
 	// return list of task time log entries, sort by start date

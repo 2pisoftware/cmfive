@@ -201,7 +201,7 @@ class Html {
         $id = $id ? ' id="'.$id.'"' : null;
         $class = $class ? ' class="'.$class.'"' : null;
         $enctype = $enctype ? " enctype='".$enctype."' " : "";
-        $buf = '<form'.$id.$class.$enctype.' action="'.$action.'" method="'.$method.'" target="'.$target.'">'."<table cellspacing=\"0\" class='form'>\n";
+        $buf = '<form'.$id.$class.$enctype.' action="'.$action.'" method="'.$method.'" target="'.$target.'">'."<table width='100%' cellspacing=\"0\" class='form'>\n";
         $valign = ' valign="top" ';
 
         // Add CSRF Token
@@ -284,6 +284,9 @@ class Html {
                     $useCKEditor = (boolean) $row[6];
                 }
                 $buf .= '<textarea name="'.$name.'" rows="'.$rows.'" cols="'.$cols.'" ' . ($useCKEditor ? 'class="ckeditor" ' : '') . ' id="'.$name.'">'.$value.'</textarea>';
+                if ($useCKEditor) {
+                   $buf .= "<script>CKEDITOR.replace('$name');</script>";
+                }
                 $buf .= "</td></tr>\n";
             } else if ($type == "section") {
                 $buf .= '<tr><td colspan="2" class="section" >'.htmlentities($title);
@@ -333,7 +336,6 @@ class Html {
             $buf .= '<tr><td colspan="2" align="right"><input type="submit" value="'.$submitTitle.'"/></td></tr>';
         }
         $buf .= "</table>\n";
-        // Need to load manually the ckeditor within colorboxes
         $buf .= $hidden."</form>\n";
         return $buf;
     }
@@ -479,9 +481,10 @@ class Html {
                         $items = !empty($field[4]) ? $field[4] : null;
                         
                         $default = !empty($field[5]) ? ($field[5] == "null" ? null : $field[5]) : "-- Select --";
+                        $class = !empty($field[6]) ? $field[6] : null;
                         $buf.= "<td  $valign class='fieldtitle'>".htmlentities($title)."</td><td  $valign class='fieldvalue'>";
                         if ($readonly == ""){
-                            $buf.= Html::select($name,$items,$value,null,"width: 100%;", $default, $readonly!="",$required);
+                            $buf.= Html::select($name,$items,$value,$class,"width: 100%;", $default, $readonly!="",$required);
                         } else {
                             $buf.=$value;
                         }
@@ -544,7 +547,7 @@ class Html {
      */
     public static function checkbox($name, $value, $default_value = '1', $class=null, $required = null) {
     	$default_value = $default_value === null ? '1' : $default_value;
-        $checked = $value == $default_value ? 'checked = "checked"' : "";
+        $checked = ($value == $default_value ? 'checked = "checked"' : "");
         $buf= "<input type=\"checkbox\" name=\"".$name."\" value=\"".$default_value."\" $checked  id=\"".$name."\" class=\"".$class."\" " . $required . " />";
         return $buf;
     }

@@ -1,11 +1,28 @@
 // placeholder function to stop JS complaining 
-function selectAutocompleteCallback(event, ui) {}
+function selectAutocompleteCallback(event, ui) {
+}
+
+function changeTab(event) {
+    var hash = event.data.alink.hash.substr(1);
+    if (hash.length > 0) {
+        $("div.tab-section").each(function() {
+            $(this).hide();
+            $(this).removeClass("active");
+        });
+        $('a.tab-link').each(function() {
+            $(this).removeClass("active");
+        });
+        $("div#" + hash).show().addClass("active");
+        $('a#' + hash).addClass("active");
+    }
+}
+
 /**
  * Clears all elements of a form
  */
 function clearForm(ele) {
     $(ele).find(':input').each(function() {
-        switch(this.type) {
+        switch (this.type) {
             case 'password':
             case 'select-multiple':
             case 'select-one':
@@ -30,18 +47,18 @@ function clearForm(ele) {
  * This means that it works just like a normal compare.
  * e.g. (05/08/2010 and 01/08/2010, result will be -4/
  */
-function compareDates(from_date, to_date){
-	var d = from_date.split("/"); //To reuse this function, replace the variables 'from_date' here
+function compareDates(from_date, to_date) {
+    var d = from_date.split("/"); //To reuse this function, replace the variables 'from_date' here
     var temp = d[0];
     d[0] = d[1];
     d[1] = temp;
     var oStr = d.join('/');
-    oStr = (Date.parse(oStr)/86400000); 
+    oStr = (Date.parse(oStr) / 86400000);
     var n = to_date.split("/"); // and 'to_date' here, with ones that need to be compared
     temp = n[0];
     n[0] = n[1];
     n[1] = temp;
     var ndStr = n.join('/');
-    ndStr = (Date.parse(ndStr)/86400000);//from milliseconds to days, divide by 86400000
-    return ndStr - oStr;	
+    ndStr = (Date.parse(ndStr) / 86400000);//from milliseconds to days, divide by 86400000
+    return ndStr - oStr;
 }
