@@ -8,10 +8,9 @@
         <div class="comment_container">
             <?php foreach($comments as $c) : ?>
                 <div class="comment_section">
-                    <div class="comment_header"><b><?php echo @$c->w->Auth->getUser($c->creator_id)->getFullName(); ?></b></div>
                     <div class="comment_body"><?php echo $c->comment; ?></div>
                     <div class="comment_meta">
-                        Posted on <?php echo formatDate($c->dt_created, "d M \a\\t H:i"); ?>
+                        Posted on <?php echo formatDate($c->dt_created, "d M \a\\t H:i"); ?> by <b><?php echo @$c->w->Auth->getUser($c->creator_id)->getFullName(); ?></b>
                         <?php if ($c->w->Auth->user()->id == $c->creator_id) {
                             echo " - " . Html::box("/admin/comment/{$c->id}/{$c->obj_table}/{$c->obj_id}?redirect_url=" . $redirect, "Edit", false); 
                             echo " or ";

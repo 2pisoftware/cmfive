@@ -32,6 +32,8 @@ class Comment extends DbObject {
     public $dt_modified;
     public $is_deleted;
 
+    public static $_db_table = "comment";
+        
     /*
      * Output Example:
      * webforum.jpg File deleted. Description: Image of something.
