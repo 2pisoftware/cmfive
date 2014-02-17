@@ -2,18 +2,17 @@
 function selectAutocompleteCallback(event, ui) {
 }
 
-function changeTab(event) {
-    var hash = event.data.alink.hash.substr(1);
+function changeTab(hash) {
     if (hash.length > 0) {
-        $("div.tab-section").each(function() {
+        $(".tab-body > div").each(function() {
             $(this).hide();
             $(this).removeClass("active");
         });
-        $('a.tab-link').each(function() {
+        $('.tab-head > a').each(function() {
             $(this).removeClass("active");
         });
-        $("div#" + hash).show().addClass("active");
-        $('a#' + hash).addClass("active");
+        $(".tab-body > div#" + hash).show().addClass("active");
+        $('.tab-head > a[href$="' + hash + '"]').addClass("active");
     }
 }
 
