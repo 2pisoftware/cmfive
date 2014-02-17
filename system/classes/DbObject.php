@@ -457,6 +457,31 @@ class DbObject extends DbService {
 			return $this->insert($force_validation);
 		}
 	}
+	
+	/**
+	 * Call database action hooks:
+	 * 
+	 * core_dbobject_pre_insert
+	 * core_dbobject_pre_insert_[classname]
+	 * core_dbobject_post_insert
+	 * core_dbobject_post_insert_[classname]
+	 * core_dbobject_pre_update
+	 * core_dbobject_pre_update_[classname]
+	 * core_dbobject_post_update
+	 * core_dbobject_post_update_[classname]
+	 * core_dbobject_pre_delete
+	 * core_dbobject_pre_delete_[classname]
+	 * core_dbobject_post_delete
+	 * core_dbobject_post_delete_[classname]
+	 * 
+	 * @param unknown $type eg. pre / post
+	 * @param unknown $action eg. insert / update / delete
+	 */
+	private function _callHooks($type,$action) {
+		$this->w->callHook("core_dbobject",$type."_".$action,$this);
+		$this->w->callHook("core_dbobject",$type."_".$action."_".get_class($this),$this);
+	}
+	
 	/**
 	 * create and execute a sql insert statement for this object.
 	 *
@@ -469,8 +494,12 @@ class DbObject extends DbService {
 				return $valid_response;
 			}
 		}
+		
+		// calling hooks BEFORE inserting the object
+		$this->_callHooks("pre", "insert");
+		
 		$t = $this->getDbTableName();
-                $columns = $this->getDbTableColumnNames();
+        $columns = $this->getDbTableColumnNames();
                 
 		// set some default attributes
 		if (!$this->_modifiable) {
@@ -518,15 +547,20 @@ class DbObject extends DbService {
 		}
 		
 		$this->_db->insert($t,$data);
-		if ($t != "audit") {
-			$this->w->logAudit($this->_db->getSql());
-		}
-		
+				
 		// echo $this->_db->print_sql();
 		
 		$this->_db->execute();
 		$this->id = $this->_db->last_insert_id();
 
+		// calling hooks AFTER inserting the object
+		$this->_callHooks("post", "insert");
+		
+		// with the hooks in place ... this can go!
+		if ($t != "audit") {
+			$this->w->logAudit($this->_db->getSql());
+		}
+		
 		// call standard aspect methods
 		if ($this->_modifiable) {
 			$this->_modifiable->insert();
@@ -571,6 +605,9 @@ class DbObject extends DbService {
 			}
 		}
 
+		// calling hooks BEFORE updating the object
+		$this->_callHooks("pre", "update");
+		
 		$t = $this->getDbTableName();
         $columns = $this->getDbTableColumnNames();
 		// check delete attribute
@@ -625,13 +662,18 @@ class DbObject extends DbService {
 			}
 		}
 
-		$this->_db->update($t,$data)->where($this->_cn('id'),$this->id);
+		$this->_db->update($t,$data)->where($this->_cn('id'),$this->id);		
+		$this->_db->execute();
+
+		// calling hooks AFTER updating the object
+		$this->_callHooks("post", "update");
+		
+		// with hooks, this can now be removed soon!
 		if ($t != "audit") {
 			// TODO remove dependency to user code!
 			$this->w->logAudit("".$this->_db->sql);
 		}
-		$this->_db->execute();
-
+		
 		// call standard aspect methods
 		if ($this->_modifiable) {
 			$this->_modifiable->update();
@@ -666,6 +708,9 @@ class DbObject extends DbService {
 	 * @param $force
 	 */
 	function delete($force = false) {
+		// calling hooks BEFORE deleting the object
+		$this->_callHooks("pre", "delete");
+		
 		$t = $this->getDbTableName();
         $columns = $this->getDbTableColumnNames();
                 
@@ -678,6 +723,10 @@ class DbObject extends DbService {
 		} else {
 			$this->_db->delete($t)->where($this->_cn('id'),$this->id)->execute();
 		}
+		
+		// calling hooks BEFORE deleting the object
+		$this->_callHooks("post", "delete");
+		
 		// store this id in the context for listeners
 		$deletes = $this->w->ctx('db_deletes');
 		if (!$deletes) {
@@ -691,6 +740,7 @@ class DbObject extends DbService {
 			$this->_searchable->delete();
 		}
 		
+		// with hooks in place this can go!
 		// TODO remove dependency to user code!
 		$this->w->Admin->addDbAuditLogEntry("delete",get_class($this),$this->id);
 	}

@@ -244,18 +244,26 @@ class Web {
            
             try{
 	            // Load all listeners and call PRE ACTION listeners
+	            // phase this out! Hooks are better and faster
 	            $this->_callPreListeners();
 	
+	            // call hooks, generic to specific
+				$this->_callWebHooks("pre");
+					             	            
 	            // Execute the action
 	            $method = $this->_actionMethod;
 	            $this->_action_executed = true;
 	            $method($this);
 	
+	            // call hooks, generic to specific
+	            $this->_callWebHooks("post");
+	            
 	            // Call all POST ACTION listeners
 	            // INFO: These will also be called in the
 	            // redirect method!
+	            // phase this out!
 	            $this->_callPostListeners();
-            
+            	            
             } catch (PermissionDeniedException $ex) { 
             	$this->error($ex->getMessage());
             } 
@@ -290,13 +298,38 @@ class Web {
         exit(); // nothing comes after start()!!!
     }
 
+    /**
+     * This creates and calls the following hooks:
+     * 
+     * core_web_pre_get
+     * core_web_pre_get_[module]
+     * core_web_pre_get_[module]_[action]
+     * core_web_pre_get_[module]_[submodule]
+     * core_web_pre_get_[module]_[submodule]_[action]
+     * core_web_post_get
+     * core_web_post_get_[module]
+     * core_web_post_get_[module]_[action]
+     * core_web_post_get_[module]_[submodule]
+     * core_web_post_get_[module]_[submodule]_[action]
+     * 
+     * @param unknown $type eg. pre / post
+     */
+    private function _callWebHooks($type) {
+    	// call hooks, generic to specific
+    	$this->callHook("core_web",$type."_".$this->_requestMethod); // GET /*
+    	$this->callHook("core_web",$type."_".$this->_requestMethod."_".$this->_module); // GET /module
+    	$this->callHook("core_web",$type."_".$this->_requestMethod."_".$this->_module."_".$this->_action); // GET /module/action
+    	$this->callHook("core_web",$type."_".$this->_requestMethod."_".$this->_module."_".$this->_submodule); // GET /module-submodule/*
+    	$this->callHook("core_web",$type."_".$this->_requestMethod."_".$this->_module."_".$this->_submodule."_".$this->_action); // GET /module-submodule/action
+    }
+        
     public function __get($name) {
 		if ($name == ucfirst($name)) {
 			return $this->service($name);
 		}	
     }
     
-    public function initDB() {
+    private function initDB() {
         global $MYSQL_DB_HOST;
         global $MYSQL_USERNAME;
         global $MYSQL_PASSWORD;
@@ -1218,6 +1251,7 @@ class Web {
         // we don't want to call these if redirected from
         // a role check or pre module/listener
         if ($this->_action_executed) {
+        	$this->_callPostHooks();
             $this->_callPostListeners();
         }
 
