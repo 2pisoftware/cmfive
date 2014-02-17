@@ -65,7 +65,7 @@ function editComment_POST(Web $w) {
    	$w->ctx("TaskEvent","task_comments");
     
     // return
-    $w->msg($commsg,"/task/viewtask/".$p['taskid']."?tab=3");
+    $w->msg($commsg,"/task/viewtask/".$p['taskid']."?tab=2");
 
 } 
 
@@ -279,11 +279,12 @@ function edittime_POST(Web $w) {
 		$logmsg = ($log) ? "Time Log Entry updated." : "Time Log Entry created.";
 		
 	    // add comment
-	    $comm = new TaskComment($w);
+	    $comm = ($log) ? $w->Task->getObject("Comment",$log->comment_id) : new TaskComment($w);
 	    $comm->obj_table = "Task";
 		$comm->obj_id = $arr["task_id"];
-		$comm->comment = $logmsg . $w->Task->getUserById($arr["user_id"]) . " - " . formatDateTime($arr["dt_start"]) . " to " . formatDateTime($arr["dt_end"]) . " - Comments: " . $_REQUEST['comments'];
-	    $comm->insert();
+		$comm->comment = $_REQUEST['comments'];
+		// I'm not sure whether I want comments in the system!
+	    $comm->insertOrUpdate();
 	    
 	    // add to context for notifications post listener
 	    $w->ctx("TaskComment",$comm);

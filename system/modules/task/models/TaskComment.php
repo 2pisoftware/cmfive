@@ -1,5 +1,5 @@
 <?php
-class TaskComment extends AComment {
+class TaskComment extends Comment {
 
 	// Notifier is called directly because notification should be done for comments inserted from 
 	// post listener as well.

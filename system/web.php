@@ -101,7 +101,7 @@ class Web {
             $file = $this->getModuleDir($model).'models/'.ucfirst($className).".php";
             if (file_exists($file)) {
                 include $file;
-                $this->logDebug("Class ".$file." loaded.");
+                //$this->logDebug("Class ".$file." loaded.");
                 return true;
             }
         }
@@ -114,7 +114,7 @@ class Web {
      * http://www.phpaddiction.com/tags/axial/url-routing-with-php-part-one/
      */
     private function _getCommandPath() {
-    	$this->logDebug("REQUEST_URI: ".$_SERVER['REQUEST_URI']);
+    	//$this->logDebug("REQUEST_URI: ".$_SERVER['REQUEST_URI']);
         $uri = explode('?',$_SERVER['REQUEST_URI']);// get rid of parameters
         $uri = $uri[0];
         // get rid of trailing slashes
@@ -1210,7 +1210,7 @@ class Web {
             return;
         }
         $this->_action_redirected = true;
-        $this->logDebug("Redirect: ".$url);
+        //$this->logDebug("Redirect: ".$url);
 
         // although we are redirecting we should
         // still call the POST modules and listeners
@@ -1229,7 +1229,7 @@ class Web {
      * set http header values
      */
     function sendHeader($key,$value) {
-        $this->logDebug("Header[".$key."] = '".$value."'");
+        //$this->logDebug("Header[".$key."] = '".$value."'");
         $this->_headers[$key]=$value;
     }
 

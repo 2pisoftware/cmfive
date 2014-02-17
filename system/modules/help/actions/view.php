@@ -10,6 +10,7 @@ function view_GET(Web &$w) {
 		$w->ctx("help_content","Sorry, there is no help for this topic.");
 	}
 
+	$submodule = "";
 	// check for submodule
 	if (strcontains($p['m'], array("-"))) {
 		$ms = explode("-", $p['m']);
@@ -91,7 +92,7 @@ function replaceVideo($content,$module) {
 			  	  			     display: -moz-inline-stack;
 			  	  			     display: inline-block;
          			  		     border: 2px solid black;\">";
-	$video .= '<a href="'.WEBROOT.'/help/media/'.$module.'/\\2" style="display:block;width:700px;height:394px;" id="video\\1"></a>'.$end;
+	$video .= '<a href="'.WEBROOT.'/help/media/'.$module.'/\\2" style="display:block;width:700px;height:394px;" id="video\\1"></a>';
 	$video .= '<script language="JavaScript">flowplayer("video\\1", "'.WEBROOT.'/js/flowplayer/flowplayer-3.2.5.swf", {clip: {autoPlay:false, autoBuffering:true, scaling:"fit"}});</script>';
 	$video .= "</span>";
 	return preg_replace("/\[\[video\|(.*?)\|(.*?)\]\]/", $video, $content);
