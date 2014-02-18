@@ -429,51 +429,66 @@ class DbObject extends DbService {
         }
     }
 
-    /**
-     * Transform a human readable date into a timestamp to be
-     * stored in this object.
-     *
-     * @param <type> $var
-     * @param <type> $date
-     */
-    function setDateTime($var, $date) {
-        if (array_key_exists($var, get_object_vars($this))) {
-            $this->$var = $this->dt2Time($date);
-        }
-    }
-
-    /**
-     * Utility function to decide
-     * whether to insert or update
-     * an object in the database.
-     */
-    function insertOrUpdate($force_null_values = false, $force_validation = true) {
-        if ($this->id != null) {
-            return $this->update($force_null_values, $force_validation);
-        } else {
-            return $this->insert($force_validation);
-        }
-    }
-
-    /**
-     * create and execute a sql insert statement for this object.
-     *
-     * @param <type> $table
-     */
-    function insert($force_validation = true) {
-        if ($force_validation && property_exists($this, "_validation")) {
-            $valid_response = $this->validate();
-            if (!$valid_response['success']) {
-                return $valid_response;
-            }
-        }
-        $t = $this->getDbTableName();
+	/**
+	 * Utility function to decide
+	 * whether to insert or update
+	 * an object in the database.
+	 */
+	function insertOrUpdate($force_null_values = false, $force_validation = true) {
+		if ($this->id != null) {
+			return $this->update($force_null_values, $force_validation);
+		} else {
+			return $this->insert($force_validation);
+		}
+	}
+	
+	/**
+	 * Call database action hooks:
+	 * 
+	 * core_dbobject_pre_insert
+	 * core_dbobject_pre_insert_[classname]
+	 * core_dbobject_post_insert
+	 * core_dbobject_post_insert_[classname]
+	 * core_dbobject_pre_update
+	 * core_dbobject_pre_update_[classname]
+	 * core_dbobject_post_update
+	 * core_dbobject_post_update_[classname]
+	 * core_dbobject_pre_delete
+	 * core_dbobject_pre_delete_[classname]
+	 * core_dbobject_post_delete
+	 * core_dbobject_post_delete_[classname]
+	 * 
+	 * @param unknown $type eg. pre / post
+	 * @param unknown $action eg. insert / update / delete
+	 */
+	private function _callHooks($type,$action) {
+		$this->w->callHook("core_dbobject",$type."_".$action,$this);
+		$this->w->callHook("core_dbobject",$type."_".$action."_".get_class($this),$this);
+	}
+	
+	/**
+	 * create and execute a sql insert statement for this object.
+	 *
+	 * @param <type> $table
+	 */
+	function insert($force_validation = true) {
+		if ($force_validation && property_exists($this, "_validation")) {
+			$valid_response = $this->validate();
+			if (!$valid_response['success']) {
+				return $valid_response;
+			}
+		}
+		
+		// calling hooks BEFORE inserting the object
+		$this->_callHooks("pre", "insert");
+		
+		$t = $this->getDbTableName();
         $columns = $this->getDbTableColumnNames();
-
-        // set some default attributes
-        if (!$this->_modifiable) {
-            // for backwards compatibility
-            if (in_array("dt_created", $columns))
+                
+		// set some default attributes
+		if (!$this->_modifiable) {
+			// for backwards compatibility
+			if (in_array("dt_created", $columns))
                 $this->dt_created = time();
 
             if (in_array("creator_id", $columns) && $this->w->Auth->loggedIn())
@@ -483,42 +498,71 @@ class DbObject extends DbService {
                 $this->dt_modified = time();
 
             if (in_array("modifier_id", $columns) && $this->w->Auth->loggedIn())
-                $this->modifier_id = $this->w->Auth->user()->id;
-        }
-        $data = array();
-        foreach (get_object_vars($this) as $k => $v) {
-            if ($k{0} != "_" && $k != "w" && $v !== null) {
-                $dbk = $this->getDbColumnName($k);
-                if (strpos($k, "dt_") === 0) {
-                    if ($v) {
-                        $v = $this->time2Dt($v);
-                        $data[$dbk] = $v;
-                    }
-                } else if (strpos($k, "d_") === 0) {
-                    if ($v) {
-                        $v = $this->time2D($v);
-                        $data[$dbk] = $v;
-                    }
-                } else if (strpos($k, "t_") === 0) {
-                    if ($v) {
-                        $v = $this->time2T($v);
-                        $data[$dbk] = $v;
-                    }
-                } else if (strpos($k, "s_") === 0) {
-                    if ($v) {
-                        $v = AESencrypt($v, $this->__password);
-                        $data[$dbk] = $v;
-                    }
-                } else {
-                    $data[$dbk] = $v;
-                }
-            }
-        }
+				$this->modifier_id = $this->w->Auth->user()->id;
+		}
+		$data = array();
+		foreach (get_object_vars($this) as $k => $v) {
+			if ($k{0} != "_" && $k != "w" && $v !== null) {
+				$dbk = $this->getDbColumnName($k);
+				if (strpos($k,"dt_") === 0) {
+					if ($v) {
+						$v = $this->time2Dt($v);
+						$data[$dbk]=$v;
+					}
+				} else if (strpos($k,"d_") === 0) {
+					if ($v) {
+						$v = $this->time2D($v);
+						$data[$dbk]=$v;
+					}
+				} else if (strpos($k,"t_") === 0) {
+					if ($v) {
+						$v = $this->time2T($v);
+						$data[$dbk]=$v;
+					}
+				} else if (strpos($k,"s_") === 0) {
+					if ($v) {
+						$v = AESencrypt($v,$this->__password);
+						$data[$dbk]=$v;
+					}
+				} else {
+					$data[$dbk]=$v;
+				}
+			}
+		}
+		
+		$this->_db->insert($t,$data);
+				
+		// echo $this->_db->print_sql();
+		
+		$this->_db->execute();
+		$this->id = $this->_db->last_insert_id();
 
-        $this->_db->insert($t, $data);
-        if ($t != "audit") {
-            $this->w->logAudit($this->_db->getSql());
-        }
+		// calling hooks AFTER inserting the object
+		$this->_callHooks("post", "insert");
+		
+		// with the hooks in place ... this can go!
+		if ($t != "audit") {
+			$this->w->logAudit($this->_db->getSql());
+		}
+		
+		// call standard aspect methods
+		if ($this->_modifiable) {
+			$this->_modifiable->insert();
+		}
+		if ($this->_versionable) {
+			$this->_versionable->insert();
+		}
+		if ($this->_searchable) {
+			$this->_searchable->insert();
+		}
+		
+		// store this id in the context for listeners
+		$inserts = $this->w->ctx('db_inserts');
+		if (!$inserts) {
+			$inserts = array();
+		}
+		$inserts[get_class($this)][]=$this->id;
+		$this->w->ctx('db_inserts',$inserts);
 
         // echo $this->_db->print_sql();
 
@@ -536,43 +580,10 @@ class DbObject extends DbService {
             $this->_searchable->insert();
         }
 
-        // store this id in the context for listeners
-        $inserts = $this->w->ctx('db_inserts');
-        if (!$inserts) {
-            $inserts = array();
-        }
-        $inserts[get_class($this)][] = $this->id;
-        $this->w->ctx('db_inserts', $inserts);
-
-        if ($this->__use_auditing) {
-            // TODO remove dependency to user code!
-            $this->w->Admin->addDbAuditLogEntry("insert", get_class($this), $this->id);
-        }
-
-        // Call insert hook
-        $this->w->callHook($this->w->_module, get_class($this) . "_object_inserted", $this);
-
-        return true;
-    }
-
-    /**
-     * Update an object
-     *
-     * if $force_null_values is true set null values in db, if false, null values in object will be ignored.
-     * 
-     * @param boolean $force_null_values
-     * @param boolean $force_validation
-     * @return true or array("success"=>false,"invalid"=>array()) if validation failed
-     */
-    function update($force_null_values = false, $force_validation = true) {
-        if ($force_validation && property_exists($this, "_validation")) {
-            $valid_response = $this->validate();
-            if (!$valid_response['success']) {
-                return $valid_response;
-            }
-        }
-
-        $t = $this->getDbTableName();
+		// calling hooks BEFORE updating the object
+		$this->_callHooks("pre", "update");
+		
+		$t = $this->getDbTableName();
         $columns = $this->getDbTableColumnNames();
         // check delete attribute
         if (in_array("is_deleted", $columns) && $this->is_deleted === null) {
@@ -626,23 +637,36 @@ class DbObject extends DbService {
             }
         }
 
-        $this->_db->update($t, $data)->where($this->_cn('id'), $this->id);
-        if ($t != "audit") {
-            // TODO remove dependency to user code!
-            $this->w->logAudit("" . $this->_db->sql);
-        }
-        $this->_db->execute();
+		$this->_db->update($t,$data)->where($this->_cn('id'),$this->id);		
+		$this->_db->execute();
 
-        // call standard aspect methods
-        if ($this->_modifiable) {
-            $this->_modifiable->update();
-        }
-        if ($this->_versionable) {
-            $this->_versionable->update();
-        }
-        if ($this->_searchable) {
-            $this->_searchable->update();
-        }
+		// calling hooks AFTER updating the object
+		$this->_callHooks("post", "update");
+		
+		// with hooks, this can now be removed soon!
+		if ($t != "audit") {
+			// TODO remove dependency to user code!
+			$this->w->logAudit("".$this->_db->sql);
+		}
+		
+		// call standard aspect methods
+		if ($this->_modifiable) {
+			$this->_modifiable->update();
+		}
+		if ($this->_versionable) {
+			$this->_versionable->update();
+		}
+		if ($this->_searchable) {
+			$this->_searchable->update();
+		}
+		
+		// store this id in the context for listeners
+		$updates = $this->w->ctx('db_updates');
+		if (!$updates) {
+			$updates = array();
+		}
+		$updates[get_class($this)][]=$this->id;
+		$this->w->ctx('db_updates',$updates);
 
         // store this id in the context for listeners
         $updates = $this->w->ctx('db_updates');
@@ -652,43 +676,49 @@ class DbObject extends DbService {
         $updates[get_class($this)][] = $this->id;
         $this->w->ctx('db_updates', $updates);
 
-        if ($this->__use_auditing) {
-            // TODO remove dependency to modules code!
-            $this->w->Admin->addDbAuditLogEntry("update", get_class($this), $this->id);
-        }
-
-        // Call update hook
-        $this->w->callHook($this->w->_module, get_class($this) . "_object_updated", $this);
-
-        return true;
-    }
-
-    /**
-     * create and execute a sql delete statement to delete this object from
-     * the database.
-     *
-     * @param boolean $force
-     */
-    function delete($force = false) {
-        $t = $this->getDbTableName();
+	/**
+	 * create and execute a sql delete statement to delete this object from
+	 * the database.
+	 *
+	 * @param $force
+	 */
+	function delete($force = false) {
+		// calling hooks BEFORE deleting the object
+		$this->_callHooks("pre", "delete");
+		
+		$t = $this->getDbTableName();
         $columns = $this->getDbTableColumnNames();
+                
+		// if an is_deleted property exists, then only set it to 1
+		// and update instead of delete!
+		if ((property_exists(get_class($this), "is_deleted") || (in_array("is_deleted", $columns))) && !$force) {
+			$this->is_deleted = 1;
+			// Hard code to NOT validate soft deletes
+			$this->update(false, false);
+		} else {
+			$this->_db->delete($t)->where($this->_cn('id'),$this->id)->execute();
+		}
+		
+		// calling hooks BEFORE deleting the object
+		$this->_callHooks("post", "delete");
+		
+		// store this id in the context for listeners
+		$deletes = $this->w->ctx('db_deletes');
+		if (!$deletes) {
+			$deletes = array();
+		}
+		$deletes[get_class($this)][]=$this->id;
+		$this->w->ctx('db_deletes',$deletes);
 
-        // if an is_deleted property exists, then only set it to 1
-        // and update instead of delete!
-        if ((property_exists(get_class($this), "is_deleted") || (in_array("is_deleted", $columns))) && !$force) {
-            $this->is_deleted = 1;
-            // Hard code to NOT validate soft deletes
-            $this->update(false, false);
-        } else {
-            $this->_db->delete($t)->where($this->_cn('id'), $this->id)->execute();
-        }
-        // store this id in the context for listeners
-        $deletes = $this->w->ctx('db_deletes');
-        if (!$deletes) {
-            $deletes = array();
-        }
-        $deletes[get_class($this)][] = $this->id;
-        $this->w->ctx('db_deletes', $deletes);
+		// delete from search index
+		if ($this->_searchable) {
+			$this->_searchable->delete();
+		}
+		
+		// with hooks in place this can go!
+		// TODO remove dependency to user code!
+		$this->w->Admin->addDbAuditLogEntry("delete",get_class($this),$this->id);
+	}
 
         // delete from search index
         if ($this->_searchable) {
