@@ -17,4 +17,10 @@ class TaskTime extends  DbObject {
             return ($this->dt_end - $this->dt_start);
         }
     }
+    
+    public function getComment() {
+        if (!empty($this->comment_id)) {
+            return $this->w->Comment->getComment($this->comment_id);
+        }
+    }
 }

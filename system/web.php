@@ -57,7 +57,7 @@ class Web {
     public $_moduleConfig;
     public $_paths;
     public $_loginpath = 'auth/login';
-	public $_partialsdir = "partials";
+    public $_partialsdir = "partials";
 
     public $db;
     
@@ -812,7 +812,7 @@ class Web {
             }
 
             // Include and check if function exists
-            include $this->getModuleDir($toInvoke) . "$toInvoke.hooks.php";
+            include_once $this->getModuleDir($toInvoke) . "$toInvoke.hooks.php";
 
             $hook_function_name = $toInvoke . "_" . $module . "_" . $function;
             if (!function_exists($hook_function_name)) {
