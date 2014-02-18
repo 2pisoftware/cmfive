@@ -34,7 +34,8 @@ class DbPDO extends PDO {
         }
         // Instantiate a FluentPDO class and init vars
         $this->fpdo = new FluentPDO($this);
-        $this->sql = $this->getSql();
+        
+        $this->sql = 'getSql'; //$this->getSql();
         $this->config = $config;
     } 
 
@@ -252,7 +253,7 @@ class DbPDO extends PDO {
     
     // Returns the SQL query string
     public function getSql(){
-        if ($this->query !== null){
+        if (!empty($this->query) and is_a($this->query, DbPDO::$_QUERY_CLASSNAME)) {
             return $this->query->getQuery();
         }
         return null;

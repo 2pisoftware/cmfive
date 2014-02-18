@@ -1,7 +1,7 @@
 <?php
 
 // Load system Composer autoloader
-if (file_exists(__DIR__."/composer/vendor/autoload.php")) {
+if (file_exists(__DIR__ . "/composer/vendor/autoload.php")) {
     require "composer/vendor/autoload.php";
 }
 // // Load user Composer autoloader
@@ -13,7 +13,9 @@ require_once "html.php";
 require_once "functions.php";
 require_once "classes/CSRF.php";
 
-class PermissionDeniedException extends Exception {}
+class PermissionDeniedException extends Exception {
+    
+}
 
 /**
  * A class for simple processing of web requests like http://webpy.org
@@ -58,9 +60,8 @@ class Web {
     public $_paths;
     public $_loginpath = 'auth/login';
     public $_partialsdir = "partials";
-
     public $db;
-    
+
     /**
      * Constructor
      */
@@ -76,7 +77,7 @@ class Web {
         $this->_templatePath = "templates";
         $this->_templateExtension = ".tpl.php";
         $this->_template = null;
-        $this->_logLevelArray = array("debug","info","warn","audit","error");
+        $this->_logLevelArray = array("debug", "info", "warn", "audit", "error");
         $this->_action = null;
         $this->_defaultHandler = "main";
         $this->_defaultAction = "index";
@@ -94,18 +95,18 @@ class Web {
         spl_autoload_register(array($this, 'modelLoader'));
         $this->loadConfigurationFiles();
     }
-    
+
     private function modelLoader($className) {
         $modules = $this->modules();
         foreach ($modules as $model) {
-            $file = $this->getModuleDir($model).'models/'.ucfirst($className).".php";
+            $file = $this->getModuleDir($model) . 'models/' . ucfirst($className) . ".php";
             if (file_exists($file)) {
                 include $file;
                 //$this->logDebug("Class ".$file." loaded.");
                 return true;
             }
         }
-        $this->logDebug("Class ".$file." NOT FOUND.");
+        $this->logDebug("Class " . $file . " NOT FOUND.");
         return false;
     }
 
@@ -114,19 +115,19 @@ class Web {
      * http://www.phpaddiction.com/tags/axial/url-routing-with-php-part-one/
      */
     private function _getCommandPath() {
-    	//$this->logDebug("REQUEST_URI: ".$_SERVER['REQUEST_URI']);
-        $uri = explode('?',$_SERVER['REQUEST_URI']);// get rid of parameters
+        //$this->logDebug("REQUEST_URI: ".$_SERVER['REQUEST_URI']);
+        $uri = explode('?', $_SERVER['REQUEST_URI']); // get rid of parameters
         $uri = $uri[0];
         // get rid of trailing slashes
         if (substr($uri, -1) == "/") {
-            $uri = substr($uri,0,-1);
+            $uri = substr($uri, 0, -1);
         }
         $requestURI = explode('/', $uri);
-        $scriptName = explode('/',$_SERVER['SCRIPT_NAME']);
-        for($i= 0;$i < sizeof($scriptName);$i++) {
-        	// Checking is these vars are set makes the logout function not work
-        	// So we can just supress the warnings
-        	if (@$requestURI[$i] == @$scriptName[$i]) {
+        $scriptName = explode('/', $_SERVER['SCRIPT_NAME']);
+        for ($i = 0; $i < sizeof($scriptName); $i++) {
+            // Checking is these vars are set makes the logout function not work
+            // So we can just supress the warnings
+            if (@$requestURI[$i] == @$scriptName[$i]) {
                 unset($requestURI[$i]);
             }
         }
@@ -141,24 +142,24 @@ class Web {
     function start() {
         $this->initDB();
 
-    	// start the session
-    	// $sess = new SessionManager($this);
-    	session_name(SESSION_NAME);
-    	session_start();
-    	
-    	// Generate CSRF tokens and store them in the $_SESSION
-    	CSRF::getTokenID();
-    	CSRF::getTokenValue();
-    	 
-		$_SESSION['last_request'] = time();
-		
+        // start the session
+        // $sess = new SessionManager($this);
+        session_name(SESSION_NAME);
+        session_start();
+
+        // Generate CSRF tokens and store them in the $_SESSION
+        CSRF::getTokenID();
+        CSRF::getTokenValue();
+
+        $_SESSION['last_request'] = time();
+
         //$this->debug("Start processing: ".$_SERVER['REQUEST_URI']);        
         // find out which module to use
         $module_found = false;
         $action_found = false;
 
         $this->_paths = $this->_getCommandPath();
-        
+
         // first find the module file
         if ($this->_paths && sizeof($this->_paths) > 0) {
             $this->_module = array_shift($this->_paths);
@@ -169,41 +170,41 @@ class Web {
             $this->_action = array_shift($this->_paths);
         }
 
-        if (! $this->_module) {
+        if (!$this->_module) {
             $this->_module = $this->_defaultHandler;
         }
 
         // see if the module is a sub module
         // eg. /sales-report/showreport/1..
-        $hsplit = explode("-",$this->_module);
+        $hsplit = explode("-", $this->_module);
         $this->_module = array_shift($hsplit);
         $this->_submodule = array_shift($hsplit);
 
-        if (! $this->_action) {
+        if (!$this->_action) {
             $this->_action = $this->_defaultAction;
         }
-        
+
         // try to load the action file
         if (!$this->_submodule) {
-        	$reqpath = $this->getModuleDir($this->_module).'/actions/'.$this->_action.'.php';
+            $reqpath = $this->getModuleDir($this->_module) . '/actions/' . $this->_action . '.php';
             if (!file_exists($reqpath)) {
-            	$reqpath = $this->getModuleDir($this->_module).'/'.$this->_module.".actions.php";
-        	}
+                $reqpath = $this->getModuleDir($this->_module) . '/' . $this->_module . ".actions.php";
+            }
         } else {
-        	$reqpath = $this->getModuleDir($this->_module).'/actions/'.$this->_submodule.'/'.$this->_action.'.php';
+            $reqpath = $this->getModuleDir($this->_module) . '/actions/' . $this->_submodule . '/' . $this->_action . '.php';
             if (!file_exists($reqpath)) {
-            	$reqpath = $this->getModuleDir($this->_module).'/'.$this->_module.'.'.$this->_submodule.".actions.php";
-        	}
+                $reqpath = $this->getModuleDir($this->_module) . '/' . $this->_module . '.' . $this->_submodule . ".actions.php";
+            }
         }
 
         // try to find action for the request type
         // using <module>_<action>_<type>()
         // or just <action>_<type>()
-        
+
         $this->_requestMethod = $_SERVER['REQUEST_METHOD'];
-        $actionmethods[] = $this->_action.'_'.$this->_requestMethod;
-        $actionmethods[] = $this->_action.'_ALL';
-        
+        $actionmethods[] = $this->_action . '_' . $this->_requestMethod;
+        $actionmethods[] = $this->_action . '_ALL';
+
         // Check/validate CSRF token 
         $this->validateCSRF();
 
@@ -211,67 +212,65 @@ class Web {
         // if a module file for this url exists, then start processing
         //
         if (file_exists($reqpath)) {
-	        $this->ctx('webroot', $this->_webroot);
-	        $this->ctx('module',$this->_module);
-	        $this->ctx('submodule',$this->_module);
-	        $this->ctx('action',$this->_action);
-        	
-	        // CHECK ACCESS!!
-	        $this->checkAccess(); // will redirect if access denied!
-        	        	            
+            $this->ctx('webroot', $this->_webroot);
+            $this->ctx('module', $this->_module);
+            $this->ctx('submodule', $this->_module);
+            $this->ctx('action', $this->_action);
+
+            // CHECK ACCESS!!
+            $this->checkAccess(); // will redirect if access denied!
             // load the module file
             require_once $reqpath;
         } else {
-            $this->logError("No Action found for: ".$reqpath);
+            $this->logError("No Action found for: " . $reqpath);
             $this->notFoundPage();
         }
 
         foreach ($actionmethods as $action_method) {
             if (function_exists($action_method)) {
-        	    $action_found = true;
-            	$this->_actionMethod = $action_method;
-            	break;
+                $action_found = true;
+                $this->_actionMethod = $action_method;
+                break;
             }
         }
-        
+
         if ($action_found) {
-            $this->ctx("loggedIn",$this->Auth->loggedIn());
-            $this->ctx("error",$this->session('error'));
+            $this->ctx("loggedIn", $this->Auth->loggedIn());
+            $this->ctx("error", $this->session('error'));
             $this->sessionUnset('error');
-            $this->ctx("msg",$this->session('msg'));
+            $this->ctx("msg", $this->session('msg'));
             $this->sessionUnset('msg');
-            $this->ctx("w",$this);
-           
-            try{
-	            // Load all listeners and call PRE ACTION listeners
-	            // phase this out! Hooks are better and faster
-	            $this->_callPreListeners();
-	
-	            // call hooks, generic to specific
-				$this->_callWebHooks("pre");
-					             	            
-	            // Execute the action
-	            $method = $this->_actionMethod;
-	            $this->_action_executed = true;
-	            $method($this);
-	
-	            // call hooks, generic to specific
-	            $this->_callWebHooks("post");
-	            
-	            // Call all POST ACTION listeners
-	            // INFO: These will also be called in the
-	            // redirect method!
-	            // phase this out!
-	            $this->_callPostListeners();
-            	            
-            } catch (PermissionDeniedException $ex) { 
-            	$this->error($ex->getMessage());
-            } 
+            $this->ctx("w", $this);
+
+            try {
+                // Load all listeners and call PRE ACTION listeners
+                // phase this out! Hooks are better and faster
+                $this->_callPreListeners();
+
+                // call hooks, generic to specific
+                $this->_callWebHooks("before");
+
+                // Execute the action
+                $method = $this->_actionMethod;
+                $this->_action_executed = true;
+                $method($this);
+
+                // call hooks, generic to specific
+                $this->_callWebHooks("after");
+
+                // Call all POST ACTION listeners
+                // INFO: These will also be called in the
+                // redirect method!
+                // phase this out!
+                $this->_callPostListeners();
+            } catch (PermissionDeniedException $ex) {
+                $this->error($ex->getMessage());
+            }
 
             // send headers first
             if ($this->_headers) {
                 foreach ($this->_headers as $key => $val) {
-                    header($key.': '.$val);
+                    header($key . ': ' . $val);
                 }
             }
             $body = null;
@@ -285,7 +284,7 @@ class Web {
             // if ajax call don't do the layout
             if ($this->_layout && !$this->isAjax()) {
                 $this->_buffer = null;
-                $this->ctx($this->_layoutContentMarker,$body);
+                $this->ctx($this->_layoutContentMarker, $body);
                 $this->templateOut($this->_layout);
             } else {
                 $this->_buffer = $body;
@@ -301,41 +300,51 @@ class Web {
     /**
      * This creates and calls the following hooks:
      * 
-     * core_web_pre_get
-     * core_web_pre_get_[module]
-     * core_web_pre_get_[module]_[action]
-     * core_web_pre_get_[module]_[submodule]
-     * core_web_pre_get_[module]_[submodule]_[action]
-     * core_web_post_get
-     * core_web_post_get_[module]
-     * core_web_post_get_[module]_[action]
-     * core_web_post_get_[module]_[submodule]
-     * core_web_post_get_[module]_[submodule]_[action]
+     * core_web_before_get
+     * core_web_before_get_[module]
+     * core_web_before_get_[module]_[action]
+     * core_web_before_get_[module]_[submodule]
+     * core_web_before_get_[module]_[submodule]_[action]
+     * core_web_after_get
+     * core_web_after_get_[module]
+     * core_web_after_get_[module]_[action]
+     * core_web_after_get_[module]_[submodule]
+     * core_web_after_get_[module]_[submodule]_[action]
+     * core_web_before_post
+     * core_web_before_post_[module]
+     * core_web_before_post_[module]_[action]
+     * core_web_before_post_[module]_[submodule]
+     * core_web_before_post_[module]_[submodule]_[action]
+     * core_web_after_post
+     * core_web_after_post_[module]
+     * core_web_after_post_[module]_[action]
+     * core_web_after_post_[module]_[submodule]
+     * core_web_after_post_[module]_[submodule]_[action]
      * 
-     * @param unknown $type eg. pre / post
+     * @param unknown $type eg. before / after
      */
     private function _callWebHooks($type) {
-    	// call hooks, generic to specific
-    	$this->callHook("core_web",$type."_".$this->_requestMethod); // GET /*
-    	$this->callHook("core_web",$type."_".$this->_requestMethod."_".$this->_module); // GET /module
-    	$this->callHook("core_web",$type."_".$this->_requestMethod."_".$this->_module."_".$this->_action); // GET /module/action
-    	$this->callHook("core_web",$type."_".$this->_requestMethod."_".$this->_module."_".$this->_submodule); // GET /module-submodule/*
-    	$this->callHook("core_web",$type."_".$this->_requestMethod."_".$this->_module."_".$this->_submodule."_".$this->_action); // GET /module-submodule/action
+        // call hooks, generic to specific
+        $this->callHook("core_web", $type . "_" . $this->_requestMethod); // GET /*
+        $this->callHook("core_web", $type . "_" . $this->_requestMethod . "_" . $this->_module); // GET /module
+        $this->callHook("core_web", $type . "_" . $this->_requestMethod . "_" . $this->_module . "_" . $this->_action); // GET /module/action
+        $this->callHook("core_web", $type . "_" . $this->_requestMethod . "_" . $this->_module . "_" . $this->_submodule); // GET /module-submodule/*
+        $this->callHook("core_web", $type . "_" . $this->_requestMethod . "_" . $this->_module . "_" . $this->_submodule . "_" . $this->_action); // GET /module-submodule/action
     }
-        
+
     public function __get($name) {
-		if ($name == ucfirst($name)) {
-			return $this->service($name);
-		}	
+        if ($name == ucfirst($name)) {
+            return $this->service($name);
+        }
     }
-    
+
     private function initDB() {
         global $MYSQL_DB_HOST;
         global $MYSQL_USERNAME;
         global $MYSQL_PASSWORD;
         global $MYSQL_DB_NAME;
         global $MYSQL_DRIVER;
-        
+
         $db_config = array(
             'hostname' => defaultVal(getenv('MYSQL_DB_HOST'), $MYSQL_DB_HOST),
             'username' => defaultVal(getenv('MYSQL_USERNAME'), $MYSQL_USERNAME),
@@ -346,7 +355,7 @@ class Web {
 
         $this->db = new DbPDO($db_config); // Crystal::db($db_config);
     }
-    
+
     function setModules($modules) {
         $this->_moduleConfig = $modules;
     }
@@ -359,17 +368,16 @@ class Web {
      * @return <type>
      */
     function moduleConf($module, $key) {
-        if (array_key_exists($module, $this->_moduleConfig)
-                && array_key_exists($key, $this->_moduleConfig[$module])) {
+        if (array_key_exists($module, $this->_moduleConfig) && array_key_exists($key, $this->_moduleConfig[$module])) {
             return $this->_moduleConfig[$module][$key];
         } else {
             return null;
         }
-    } 
-    
+    }
+
     private function loadConfigurationFiles() {
-    	global $modules;
-    	
+        global $modules;
+
         // Load System config first
         $baseDir = SYSTEM_PATH . '/modules';
         $this->scanModuleDirForConfigurationFiles($baseDir);
@@ -378,7 +386,6 @@ class Web {
 //                 $this->_moduleConfig[$key] = $val;
 //             }
 //         }
-
         // Load project module config second
         $baseDir = ROOT_PATH . '/modules';
         $this->scanModuleDirForConfigurationFiles($baseDir);
@@ -391,7 +398,7 @@ class Web {
 
     // Helper function for the above, scans a directory for config files in child folders
     private function scanModuleDirForConfigurationFiles($dir = "") {
-    	global $modules;
+        global $modules;
 
         // Check that dir is dir
         if (is_dir($dir)) {
@@ -401,7 +408,7 @@ class Web {
             if (!empty($dirListing)) {
 
                 // Loop through listing
-                foreach($dirListing as $item) {
+                foreach ($dirListing as $item) {
                     $searchingDir = $dir . "/" . $item;
                     if (is_dir($searchingDir) and $item[0] !== '.') {
 
@@ -426,8 +433,9 @@ class Web {
     }
 
     function isAjax() {
-    	return isset($_SERVER['HTTP_X_REQUESTED_WITH']);
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']);
     }
+
     /**
      * Check if the currently logged in user
      * has access to this path
@@ -435,34 +443,31 @@ class Web {
      * @param <type> $msg
      * @return <type>
      */
-    function checkAccess($msg="Access Restricted") {
-    	$submodule = $this->_submodule ? "-".$this->_submodule : "";
-        $path = $this->_module.$submodule."/".$this->_action;
+    function checkAccess($msg = "Access Restricted") {
+        $submodule = $this->_submodule ? "-" . $this->_submodule : "";
+        $path = $this->_module . $submodule . "/" . $this->_action;
         if ($this->Auth && $this->Auth->user()) {
             $user = $this->Auth->user();
-            $usrmsg = $user ? " for ".$user->login : "";
+            $usrmsg = $user ? " for " . $user->login : "";
             if (!$this->Auth->allowed($path)) {
-                $this->logInfo("Access Denied to ".$path.$usrmsg." from ".$this->requestIpAddress());
+                $this->logInfo("Access Denied to " . $path . $usrmsg . " from " . $this->requestIpAddress());
                 // redirect to the last allowed page 
-                if ($this->Auth->allowed($_SESSION['LAST_ALLOWED_URI'])){
-                    $this->error($msg,$_SESSION['LAST_ALLOWED_URI']);
+                if ($this->Auth->allowed($_SESSION['LAST_ALLOWED_URI'])) {
+                    $this->error($msg, $_SESSION['LAST_ALLOWED_URI']);
                 } else {
                     // Logout user
                     $this->sessionDestroy();
                     $this->error($msg, "/auth/login");
                 }
             }
-        } else if ($this->Auth 
-        		&& !$this->Auth->loggedIn() 
-        		&& $path != $this->_loginpath 
-        		&& !$this->Auth->allowed($path)) {
-			$_SESSION['orig_path']=$_SERVER['REQUEST_URI'];
-			$this->redirect($this->localUrl($this->_loginpath));        	
+        } else if ($this->Auth && !$this->Auth->loggedIn() && $path != $this->_loginpath && !$this->Auth->allowed($path)) {
+            $_SESSION['orig_path'] = $_SERVER['REQUEST_URI'];
+            $this->redirect($this->localUrl($this->_loginpath));
         }
         // Saving the last allowed uri so we can
         // redirect to it from a failed call
         if (!$this->isAjax()) {
-	    	$_SESSION['LAST_ALLOWED_URI'] = $_SERVER['REQUEST_URI'];
+            $_SESSION['LAST_ALLOWED_URI'] = $_SERVER['REQUEST_URI'];
         }
         return true;
     }
@@ -502,7 +507,7 @@ class Web {
      * @param string $filename
      */
     function sendFile($filename) {
-        if (file_exists($filename)){
+        if (file_exists($filename)) {
             $filesystem = $this->File->getFilesystem(dirname($filename));
             $file = $this->File->getFileObject($filesystem, $filename);
             header("Content-Type: " . $this->getMimetype($filename));
@@ -511,7 +516,7 @@ class Web {
             header("HTTP/1.1 404 Not Found");
         }
         exit;
-        
+
         // $this->logInfo("Trying to load file: ".$filename);
         // if (!file_exists($filename)) {
         //     $this->logWarn("Could not load file: ".$filename);
@@ -519,7 +524,6 @@ class Web {
         //     exit;
         // }
         // $mimetype = $this->getMimetype($filename);
-
         // header('Content-Type: '.$mimetype );
         // $buffer = '';
         // $cnt =0;
@@ -540,9 +544,7 @@ class Web {
         // if ($retbytes && $status) {
         //     return $cnt; // return num. bytes delivered like readfile() does.
         // }
-
         // exit;
-
     }
 
     /**
@@ -557,14 +559,14 @@ class Web {
      * @param array $array
      * @return string
      */
-    function menuLink($path,$title,&$array=null) {
-    	$class = "";
-    	if (startsWith($path, $this->currentModule())){
-    		$class="current";
-    	}
-        $link =$this->Auth->allowed($path,Html::a($this->localUrl($path),$title,$title,$class));
+    function menuLink($path, $title, &$array = null) {
+        $class = "";
+        if (startsWith($path, $this->currentModule())) {
+            $class = "current";
+        }
+        $link = $this->Auth->allowed($path, Html::a($this->localUrl($path), $title, $title, $class));
         if ($array !== null) {
-            $array[]=$link;
+            $array[] = $link;
         }
         return $link;
     }
@@ -576,10 +578,10 @@ class Web {
      * @param string $array
      * @return string html code
      */
-    function menuButton($path,$title,&$array=null) {
-        $link =$this->Auth->allowed($path,Html::b($this->localUrl($path),$title));
+    function menuButton($path, $title, &$array = null) {
+        $link = $this->Auth->allowed($path, Html::b($this->localUrl($path), $title));
         if ($array !== null) {
-            $array[]=$link;
+            $array[] = $link;
         }
         return $link;
     }
@@ -597,10 +599,10 @@ class Web {
      * @param string $title
      * @param array $array
      */
-    function menuBox($path,$title,&$array=null) {
-        $link =$this->Auth->allowed($path,Html::box($this->localUrl($path),$title));
+    function menuBox($path, $title, &$array = null) {
+        $link = $this->Auth->allowed($path, Html::box($this->localUrl($path), $title));
         if ($array !== null) {
-            $array[]=$link;
+            $array[] = $link;
         }
         return $link;
     }
@@ -611,11 +613,11 @@ class Web {
      * @param string $link
      * @return string html code
      */
-    function localUrl($link=null) {
+    function localUrl($link = null) {
         if (strpos($link, "/") !== 0) {
-            $link = "/".$link;
+            $link = "/" . $link;
         }
-        return $this->webroot().$link;
+        return $this->webroot() . $link;
     }
 
     /**
@@ -625,9 +627,9 @@ class Web {
      * @param <type> $msg
      * @param <type> $url
      */
-    function error($msg,$url="") {
-        $_SESSION['error']=$msg;
-        $this->ctx('error',$msg);
+    function error($msg, $url = "") {
+        $_SESSION['error'] = $msg;
+        $this->ctx('error', $msg);
         $this->redirect($this->localUrl($url));
     }
 
@@ -645,8 +647,8 @@ class Web {
             if (is_array($response)) {
                 $errorMsg = ($isUpdating ? "Updating" : "Creating") . " this $type failed because<br/><br/>\n";
 
-                foreach($response["invalid"] as $property => $reason) {
-                    foreach($reason as $r) {
+                foreach ($response["invalid"] as $property => $reason) {
+                    foreach ($reason as $r) {
                         $errorMsg .= $object->getHumanReadableAttributeName($property) . ": $r <br/>\n";
                     }
                 }
@@ -664,9 +666,9 @@ class Web {
      * @param <type> $msg
      * @param <type> $url
      */
-    function msg($msg,$url="") {
-        $_SESSION['msg']=$msg;
-        $this->ctx('msg',$msg);
+    function msg($msg, $url = "") {
+        $_SESSION['msg'] = $msg;
+        $this->ctx('msg', $msg);
         $this->redirect($this->localUrl($url));
     }
 
@@ -675,23 +677,22 @@ class Web {
      * <b>THIS EXITS the current process</b>
      */
     function notFoundPage() {
-        $this->logWarn("Action not found: ".$this->_module."/".$this->_action);
+        $this->logWarn("Action not found: " . $this->_module . "/" . $this->_action);
         if ($this->templateExists($this->_notFoundTemplate)) {
             header("HTTP/1.0 404 Not Found");
             echo $this->fetchTemplate($this->_notFoundTemplate);
-        }
-        else {
+        } else {
             header("HTTP/1.0 404 Not Found");
             echo '<p align="center">Sorry, page not found.</p>';
         }
         exit();
     }
 
-    function internalLink($title,$module,$action=null,$params=null) {
-        if (!$this->Auth->allowed($module,$action)) {
+    function internalLink($title, $module, $action = null, $params = null) {
+        if (!$this->Auth->allowed($module, $action)) {
             return null;
         } else {
-            return "<a href='".$this->localUrl("/".$module."/".$action.$params)."'>".$title."</a>";
+            return "<a href='" . $this->localUrl("/" . $module . "/" . $action . $params) . "'>" . $title . "</a>";
         }
     }
 
@@ -710,20 +711,20 @@ class Web {
      * @return Ambigous <NULL, string>
      */
     function getModuleDir($module) {
-    	// check for explicit module path first
-    	$basepath = $this->moduleConf($module, 'path');
-    	if (!empty($basepath)) {
-    		$path = $basepath.'/'.$module.'/';
-    		return file_exists($path) ? $path : null;
-    	}
+        // check for explicit module path first
+        $basepath = $this->moduleConf($module, 'path');
+        if (!empty($basepath)) {
+            $path = $basepath . '/' . $module . '/';
+            return file_exists($path) ? $path : null;
+        }
 
-    	return null;
+        return null;
     }
 
     function moduleUrl($module) {
-    	return $this->webroot().'/'.$this->getModuleDir($module);
+        return $this->webroot() . '/' . $this->getModuleDir($module);
     }
-    
+
     /**
      * Return a preloaded Service as
      * defined in a model.php inside
@@ -733,9 +734,9 @@ class Web {
      * @return <type>
      */
     function & service($name) {
-    	$name = ucfirst($name);
+        $name = ucfirst($name);
         if (!key_exists($name, $this->_services)) {
-            $cname = $name."Service";
+            $cname = $name . "Service";
             if (class_exists($cname)) {
                 $s = new $cname($this);
                 // initialise
@@ -747,7 +748,7 @@ class Web {
         }
         return $this->_services[$name];
     }
-    
+
     /**
      * Call and return code for a partial template.
      * 
@@ -760,50 +761,50 @@ class Web {
      * @param string $module
      * @param string $method
      */
-    function partial($name,$params=null,$module=null,$method="ALL") {
-    	if($module === null) {
-    		$module = $this->_module;
-    	}
-    	// save current output buffer
-    	$oldbuf = $this->_buffer;
-    	$this->_buffer = null;
-    	
-    	// save the current context
-    	$oldctx = $this->_context;
-    	$this->_context = array();
-    	
-    	// try to find the partial action and execute
-    	$partial_action_file = implode("/",array($this->getModuleDir($module),$this->_partialsdir,"actions",$name.".php"));
-    	if (file_exists($partial_action_file)) {
-    		require_once($partial_action_file);
-    		
-    		// now execute the action
- 			$partial_action = $name."_".$method;
- 			if (function_exists($partial_action)) {
- 				$partial_action($this,$params);
- 			}
-    	} 
-    	
-		$currentbuf = $this->_buffer;
-		
-		if (empty($currentbuf)) {
-    		// try to find the partial template and execute if found
-    		$partial_template_file = implode("/",array($this->getModuleDir($module),$this->_partialsdir,"templates",$name.$this->_templateExtension));
-	    	if (file_exists($partial_template_file)) {
-	    		$tpl = new WebTemplate();
-	    		$this->ctx("w",$this);
-	    		$tpl->set_vars($this->_context);
-	    		$currentbuf = $tpl->fetch($partial_template_file);
-	    	}
-		}
-    	
-    	// restore output buffer and context
-    	$this->_buffer = $oldbuf;
-    	$this->_context = $oldctx;
-    	
-    	return $currentbuf;
+    function partial($name, $params = null, $module = null, $method = "ALL") {
+        if ($module === null) {
+            $module = $this->_module;
+        }
+        // save current output buffer
+        $oldbuf = $this->_buffer;
+        $this->_buffer = null;
+
+        // save the current context
+        $oldctx = $this->_context;
+        $this->_context = array();
+
+        // try to find the partial action and execute
+        $partial_action_file = implode("/", array($this->getModuleDir($module), $this->_partialsdir, "actions", $name . ".php"));
+        if (file_exists($partial_action_file)) {
+            require_once($partial_action_file);
+
+            // now execute the action
+            $partial_action = $name . "_" . $method;
+            if (function_exists($partial_action)) {
+                $partial_action($this, $params);
+            }
+        }
+
+        $currentbuf = $this->_buffer;
+
+        if (empty($currentbuf)) {
+            // try to find the partial template and execute if found
+            $partial_template_file = implode("/", array($this->getModuleDir($module), $this->_partialsdir, "templates", $name . $this->_templateExtension));
+            if (file_exists($partial_template_file)) {
+                $tpl = new WebTemplate();
+                $this->ctx("w", $this);
+                $tpl->set_vars($this->_context);
+                $currentbuf = $tpl->fetch($partial_template_file);
+            }
+        }
+
+        // restore output buffer and context
+        $this->_buffer = $oldbuf;
+        $this->_context = $oldctx;
+
+        return $currentbuf;
     }
-    
+
     /**
      * Call hook method to invoke other modules helper functions
      * 
@@ -818,9 +819,9 @@ class Web {
 
         // Build _hook registry if empty
         if (empty($this->_hooks)) {
-            foreach($this->_moduleConfig as $modulename => $conf) {
+            foreach ($this->_moduleConfig as $modulename => $conf) {
                 if (array_key_exists("hooks", $conf)) {
-                    foreach($conf["hooks"] as $hook) {
+                    foreach ($conf["hooks"] as $hook) {
                         $this->_hooks[$hook][] = $modulename;
                     }
                 }
@@ -828,19 +829,19 @@ class Web {
         }
 
         // Check that $module is a module
-        if (!in_array($module, $this->modules())){
+        if (!in_array($module, $this->modules())) {
             return;
         }
 
         // Check that the module calling has subscribed to hooks
-        if (!array_key_exists($module, $this->_hooks)){
+        if (!array_key_exists($module, $this->_hooks)) {
             return;
         }
 
         // Loop through each registered module to try and invoke the function
-        foreach($this->_hooks[$module] as $toInvoke) {
+        foreach ($this->_hooks[$module] as $toInvoke) {
             // Check if the file exits
-            if (!file_exists($this->getModuleDir($toInvoke) . "$toInvoke.hooks.php")){
+            if (!file_exists($this->getModuleDir($toInvoke) . "$toInvoke.hooks.php")) {
                 continue;
             }
 
@@ -855,7 +856,6 @@ class Web {
             // Call function
             $hook_function_name($this, $data);
         }
-        
     }
 
     /////////////////////////////////// Template stuff /////////////////////////
@@ -895,7 +895,7 @@ class Web {
     }
 
     function getTemplateRealFilename($tmpl) {
-        return $tmpl.$this->_templateExtension;
+        return $tmpl . $this->_templateExtension;
     }
 
     /**
@@ -917,14 +917,17 @@ class Web {
      * /<templatedir>/<module>.tpl.php
      * </pre>
      */
-    function fetchTemplate($name=null) {
+    function fetchTemplate($name = null) {
         if ($this->_submodule) {
-            $paths[] = implode("/",array($this->getModuleDir($this->_module),$this->_templatePath,$this->_submodule));
+            $paths[] = implode("/", array($this->getModuleDir($this->_module), $this->_templatePath, $this->_submodule));
         }
-        $paths[] = implode("/",array($this->getModuleDir($this->_module),$this->_templatePath));
-        $paths[] = implode("/",array($this->getModuleDir($this->_module)));
-        $paths[] = implode("/",array($this->_templatePath,$this->_module));
+        $paths[] = implode("/", array($this->getModuleDir($this->_module), $this->_templatePath));
+        $paths[] = implode("/", array($this->getModuleDir($this->_module)));
+        $paths[] = implode("/", array($this->_templatePath, $this->_module));
         $paths[] = $this->_templatePath;
+        
+        // Add system fallback
+        $paths[] = SYSTEM_PATH . "/" . $this->_templatePath;
 
         $names = array();
         if ($name) {
@@ -944,8 +947,8 @@ class Web {
         $template = null;
         foreach ($paths as $path) {
             foreach ($names as $nam) {
-                if ($nam && $this->templateExists($path.'/'.$nam)) {
-                    $template = $path.'/'.$nam;
+                if ($nam && $this->templateExists($path . '/' . $nam)) {
+                    $template = $path . '/' . $nam;
                     break 2; // break out of both loops
                 } else {
                     //$this->logDebug("no template @ ".$path.'/'.$nam);
@@ -989,7 +992,6 @@ class Web {
         $this->_buffer .= $txt;
     }
 
-
     function webroot() {
         return $this->_webroot;
     }
@@ -1007,9 +1009,9 @@ class Web {
      */
     function pathMatch() {
         $match = array();
-        for($i=0;$i<func_num_args();$i++) {
+        for ($i = 0; $i < func_num_args(); $i++) {
             $param = func_get_arg($i);
-            
+
             $val = !empty($this->_paths[$i]) ? urldecode($this->_paths[$i]) : null;
 
             if (is_array($param)) {
@@ -1020,8 +1022,8 @@ class Web {
             } else {
                 $key = $param;
             }
-            $this->ctx($key,$val);
-            $match[$key]=$val;
+            $this->ctx($key, $val);
+            $match[$key] = $val;
         }
         return $match;
     }
@@ -1034,15 +1036,13 @@ class Web {
      * @param <type> $default
      * @return <type>
      */
-    function request($key, $default=null) {	
-    	if(array_key_exists($key, $_REQUEST) && is_array($_REQUEST[$key]))
-    	{
-    		foreach ($_REQUEST[$key] as &$k)
-    		{
-    			urldecode($k);
-    		}
-    		return $_REQUEST[$key];
-    	}
+    function request($key, $default = null) {
+        if (array_key_exists($key, $_REQUEST) && is_array($_REQUEST[$key])) {
+            foreach ($_REQUEST[$key] as &$k) {
+                urldecode($k);
+            }
+            return $_REQUEST[$key];
+        }
         return array_key_exists($key, $_REQUEST) ? urldecode($_REQUEST[$key]) : $default;
     }
 
@@ -1065,6 +1065,7 @@ class Web {
     function currentSubModule() {
         return $this->_submodule;
     }
+
     /**
      * Return the current Action
      */
@@ -1077,17 +1078,16 @@ class Web {
      */
     function _callPreListeners() {
         foreach ($this->modules() as $h) {
-            $lfile = $this->getModuleDir($h).$h.".listeners.php";
+            $lfile = $this->getModuleDir($h) . $h . ".listeners.php";
             if (file_exists($lfile)) {
                 require_once $lfile;
-                $action = $h."_listener_PRE_ACTION";
-            	if (function_exists($action)) {
-                	$action($this);
-            	}
+                $action = $h . "_listener_PRE_ACTION";
+                if (function_exists($action)) {
+                    $action($this);
+                }
             }
         }
     }
-
 
     /**
      * Call all POST ACTION listeners
@@ -1095,7 +1095,7 @@ class Web {
      */
     function _callPostListeners() {
         foreach ($this->modules() as $h) {
-            $action = $h."_listener_POST_ACTION";
+            $action = $h . "_listener_POST_ACTION";
             if (function_exists($action)) {
                 $action($this);
             }
@@ -1117,15 +1117,16 @@ class Web {
      * messages
      */
     function validate($valarray) {
-        if (!$valarray || !sizeof($valarray)) return null;
+        if (!$valarray || !sizeof($valarray))
+            return null;
         $error = array();
         foreach ($valarray as $rule) {
             $param = $rule[0];
             $regex = $rule[1];
             $message = $rule[2];
             $val = $_REQUEST[$param];
-            if (!preg_match("/".$regex."/", $val)) {
-                $error[]=$message;
+            if (!preg_match("/" . $regex . "/", $val)) {
+                $error[] = $message;
             }
         }
         return $error;
@@ -1143,38 +1144,47 @@ class Web {
      * log functions
      */
     function logDebug($msg) {
-        $this->_log(0,$msg);
+        $this->_log(0, $msg);
     }
+
     function isDebug() {
-    	return $this->_logLevel == 0;
+        return $this->_logLevel == 0;
     }
+
     function logInfo($msg) {
-        $this->_log(1,$msg);
+        $this->_log(1, $msg);
     }
+
     function isInfo() {
-    	return $this->_logLevel <= 1;
+        return $this->_logLevel <= 1;
     }
+
     function logWarn($msg) {
-        $this->_log(2,$msg);
+        $this->_log(2, $msg);
     }
+
     function isWarn() {
-    	return $this->_logLevel <= 2;
+        return $this->_logLevel <= 2;
     }
+
     function logAudit($msg) {
-        $this->_log(3,$msg);
+        $this->_log(3, $msg);
     }
+
     function isAudit() {
-    	return $this->_logLevel <= 3;
+        return $this->_logLevel <= 3;
     }
+
     function logError($msg) {
-        $this->_log(4,$msg);
+        $this->_log(4, $msg);
     }
+
     function isError() {
-    	return $this->_logLevel <= 4;
+        return $this->_logLevel <= 4;
     }
-    
+
     function getPath() {
-        return implode("/",$this->_paths);
+        return implode("/", $this->_paths);
     }
 
     /**
@@ -1188,22 +1198,22 @@ class Web {
      * @param string $value
      * @param boolean $append
      */
-    function ctx($key, $value=null,$append = false) {
+    function ctx($key, $value = null, $append = false) {
         if ($value == null) {
             return !empty($this->_context[$key]) ? $this->_context[$key] : null;
         } else {
-        	if ($append) {
-        		$this->_context[$key] .= $value;
-        	} else {
-            	$this->_context[$key] = $value;
-        	}
+            if ($append) {
+                $this->_context[$key] .= $value;
+            } else {
+                $this->_context[$key] = $value;
+            }
         }
     }
 
     /**
      * get/put a session value
      */
-    function session($key,$value=null) {
+    function session($key, $value = null) {
         if ($value == null) {
             return !empty($_SESSION[$key]) ? $_SESSION[$key] : null;
         } else {
@@ -1212,26 +1222,24 @@ class Web {
     }
 
     function sessionUnset($key) {
-    	unset($_SESSION[$key]);
+        unset($_SESSION[$key]);
     }
-    
+
     function sessionDestroy() {
-    	$_SESSION = array();
-    	
+        $_SESSION = array();
+
         session_name(SESSION_NAME);
 
-    	// If it's desired to kill the session, also delete the session cookie.
-    	// Note: This will destroy the session, and not just the session data!
-    	if (ini_get("session.use_cookies")) {
-    		$params = session_get_cookie_params();
-    		setcookie(session_name(), '', time() - 42000,
-    		$params["path"], $params["domain"],
-    		$params["secure"], $params["httponly"]
-    		);
-    	}
-    	
-    	// Finally, destroy the session.
-    	session_destroy();
+        // If it's desired to kill the session, also delete the session cookie.
+        // Note: This will destroy the session, and not just the session data!
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"]
+            );
+        }
+
+        // Finally, destroy the session.
+        session_destroy();
     }
 
     /**
@@ -1244,27 +1252,26 @@ class Web {
         }
         $this->_action_redirected = true;
         //$this->logDebug("Redirect: ".$url);
-
         // although we are redirecting we should
         // still call the POST modules and listeners
         // but only if we got redirected from a real action
         // we don't want to call these if redirected from
         // a role check or pre module/listener
         if ($this->_action_executed) {
-        	$this->_callPostHooks();
+            $this->_callWebHooks("after");
             $this->_callPostListeners();
         }
 
-        header("Location: ".trim($url));
+        header("Location: " . trim($url));
         exit();
     }
 
     /**
      * set http header values
      */
-    function sendHeader($key,$value) {
+    function sendHeader($key, $value) {
         //$this->logDebug("Header[".$key."] = '".$value."'");
-        $this->_headers[$key]=$value;
+        $this->_headers[$key] = $value;
     }
 
     /**
@@ -1289,19 +1296,20 @@ class Web {
     }
 
     function _log($level, $msg) {
-        if ($level < $this->_logLevel) return;
-        if ( $this->_logMethod == "file") {
+        if ($level < $this->_logLevel)
+            return;
+        if ($this->_logMethod == "file") {
             $this->_logToFile($level, $msg);
         }
     }
 
     function _logToFile($level, $msg) {
         //$f=fopen($this->_logParam, 'a');
-        $f = fopen($this->_logFolder."/".$this->_logFile."-".date("Y-m-d").$this->_logExt,'a');
-        fwrite($f, date('d/m/Y H:i:s').' '.strtoupper($this->_logLevelArray[$level]).' '.$msg."\n");
+        $f = fopen($this->_logFolder . "/" . $this->_logFile . "-" . date("Y-m-d") . $this->_logExt, 'a');
+        fwrite($f, date('d/m/Y H:i:s') . ' ' . strtoupper($this->_logLevelArray[$level]) . ' ' . $msg . "\n");
         fclose($f);
     }
-    
+
     /**
      * 
      * Shortcut for setting the title of a page
@@ -1309,12 +1317,10 @@ class Web {
      * @param String $title
      */
     function setTitle($title) {
-    	$this->ctx("title",$title);
+        $this->ctx("title", $title);
     }
 
 }
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                           //
@@ -1324,6 +1330,7 @@ class Web {
 
 
 class WebTemplate {
+
     public $vars; /// Holds all the template variables
 
     /**
@@ -1333,6 +1340,7 @@ class WebTemplate {
      *
      * @return void
      */
+
     function WebTemplate() {
         $this->vars = array();
     }
@@ -1358,11 +1366,11 @@ class WebTemplate {
      * @return void
      */
     function set_vars($vars, $clear = false) {
-        if($clear) {
+        if ($clear) {
             $this->vars = $vars;
-        }
-        else {
-            if(is_array($vars)) $this->vars = array_merge($this->vars, $vars);
+        } else {
+            if (is_array($vars))
+                $this->vars = array_merge($this->vars, $vars);
         }
     }
 
@@ -1381,6 +1389,7 @@ class WebTemplate {
         ob_end_clean();                // End buffering and discard
         return $contents;              // Return the contents
     }
+
 }
 
 /**
@@ -1388,6 +1397,7 @@ class WebTemplate {
  * template contents.
  */
 class CachedTemplate extends WebTemplate {
+
     public $cache_id;
     public $expire;
     public $cached;
@@ -1404,7 +1414,7 @@ class CachedTemplate extends WebTemplate {
     function CachedTemplate($path, $cache_id = null, $expire = 900) {
         $this->WebTemplate($path);
         $this->cache_id = $cache_id ? 'cache/' . md5($cache_id) : $cache_id;
-        $this->expire   = $expire;
+        $this->expire = $expire;
     }
 
     /**
@@ -1414,23 +1424,26 @@ class CachedTemplate extends WebTemplate {
      * @return bool
      */
     function is_cached() {
-        if($this->cached) return true;
+        if ($this->cached)
+            return true;
 
         // Passed a cache_id?
-        if(!$this->cache_id) return false;
+        if (!$this->cache_id)
+            return false;
 
         // Cache file exists?
-        if(!file_exists($this->cache_id)) return false;
+        if (!file_exists($this->cache_id))
+            return false;
 
         // Can get the time of the file?
-        if(!($mtime = filemtime($this->cache_id))) return false;
+        if (!($mtime = filemtime($this->cache_id)))
+            return false;
 
         // Cache expired?
-        if(($mtime + $this->expire) < time()) {
+        if (($mtime + $this->expire) < time()) {
             @unlink($this->cache_id);
             return false;
-        }
-        else {
+        } else {
             /**
              * Cache the results of this is_cached() call.  Why?  So
              * we don't have to double the overhead for each template.
@@ -1451,29 +1464,27 @@ class CachedTemplate extends WebTemplate {
      * @return string
      */
     function fetch_cache($file) {
-        if($this->is_cached()) {
+        if ($this->is_cached()) {
             $fp = @fopen($this->cache_id, 'r');
             $contents = fread($fp, filesize($this->cache_id));
             fclose($fp);
             return $contents;
-        }
-        else {
+        } else {
             $contents = $this->fetch($file);
 
             // Write the cache
-            if($fp = @fopen($this->cache_id, 'w')) {
+            if ($fp = @fopen($this->cache_id, 'w')) {
                 fwrite($fp, $contents);
                 fclose($fp);
-            }
-            else {
+            } else {
                 die('Unable to write cache.');
             }
 
             return $contents;
         }
     }
-}
 
+}
 
 /**
  * License for Template and CachedTemplate classes:
