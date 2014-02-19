@@ -137,18 +137,35 @@ class Web {
         return array_values($requestURI);
     }
 
+    /**
+     * Enqueue script adds the script entry to the Webs _script var which maintains
+     * already registered scripts and helps prevent multiple additions of the same
+     * library
+     * 
+     * @param Array $script
+     */
     function enqueueScript($script) {
         if (!in_array($script, $this->_scripts)) {
             $this->_scripts[] = $script;
         }
     }
     
+    /**
+     * Enqueue style adds the style entry to the Webs _style var which maintains
+     * already registered styles and helps prevent multiple additions of the same
+     * library
+     * 
+     * @param Array $script
+     */
     function enqueueStyle($style) {
         if (!in_array($style, $this->_styles)) {
             $this->_styles[] = $style;
         }
     }
     
+    /**
+     * Outputs the list of scripts to the buffer in order of weight descending
+     */
     function outputScripts() {
         if (!empty($this->_scripts)) {
             usort($this->_scripts, array($this, "cmp_weights"));
@@ -158,6 +175,9 @@ class Web {
         }
     }
     
+    /**
+     * Outputs the list of styles to the buffer in order of weight descending
+     */
     function outputStyles() {
         if (!empty($this->_styles)) {
             usort($this->_styles, array($this, "cmp_weights"));
@@ -167,6 +187,14 @@ class Web {
         }
     }
     
+    /**
+     * Performs comparison for weights (for the enqueue functions above) to sort
+     * by the "weight" key in descending order
+     * 
+     * @param Array $a
+     * @param Array $b
+     * @return int
+     */
     public function cmp_weights($a, $b) {
         $aw = intval($a["weight"]);
         $bw = intval($b["weight"]);

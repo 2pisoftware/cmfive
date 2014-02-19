@@ -8,14 +8,20 @@
 
         <title><?php echo ucfirst($w->currentModule()); ?><?php echo !empty($title) ? ' - ' . $title : ''; ?></title>
         
-        <link rel="icon" href="<?php echo $webroot; ?>/templates/img/favicon.png" type="image/png"/>
-        <link rel="stylesheet" type="text/css" href="<?php echo $webroot; ?>/templates/css/style.css" />
-        <link rel="stylesheet" type="text/css" href="<?php echo $webroot; ?>/templates/css/liveValidation.css" />
-        <link rel="stylesheet" type="text/css" href="<?php echo $webroot; ?>/system/js/foundation-5.0.2/css/normalize.css" />
-        <link rel="stylesheet" type="text/css" href="<?php echo $webroot; ?>/system/js/foundation-5.0.2/css/foundation.css" />
-        <script type="text/javascript" src="<?php echo $webroot; ?>/system/js/foundation-5.0.2/js/modernizr.js"></script>
-        <?php echo !empty($htmlheader) ? $htmlheader : '';?>
-
+        <?php
+            $w->enqueueStyle(array("name" => "style.css", "uri" => "/system/templates/css/style.css", "weight" => 1000));
+            $w->enqueueStyle(array("name" => "normalize.css", "uri" => "/system/templates/js/foundation-5.0.2/css/normalize.css", "weight" => 990));
+            $w->enqueueStyle(array("name" => "foundation.css", "uri" => "/system/templates/js/foundation-5.0.2/css/foundation.css", "weight" => 980));
+            
+            $w->enqueueScript(array("name" => "modernizr.js", "uri" => "/system/templates/js/foundation-5.0.2/js/modernizr.js", "weight" => 1000));
+            $w->enqueueScript(array("name" => "jquery.js", "uri" => "/system/templates/js/foundation-5.0.2/js/jquery.js", "weight" => 990));
+            $w->enqueueScript(array("name" => "foundation.min.js", "uri" => "/system/templates/js/foundation-5.0.2/js/foundation.min.js", "weight" => 980));
+            $w->enqueueScript(array("name" => "main.js", "uri" => "/system/templates/js/main.js", "weight" => 500));
+           
+            $w->outputStyles();
+            $w->outputScripts();
+        ?>
+        <?php echo !empty($htmlheader) ? $htmlheader : ''; ?>
     </head>
     <body>
         <!-- NEW -->
@@ -48,11 +54,6 @@
         <?php echo !empty($body) ? $body : ''; ?>
 		</td></tr>
 		</table> -->
-
-        <script type="text/javascript" src="<?php echo $webroot; ?>/system/js/foundation-5.0.2/js/jquery.js" ></script>
-        <script type="text/javascript" src="<?php echo $webroot; ?>/system/js/foundation-5.0.2/js/foundation.min.js"></script>
-        <script type="text/javascript" src="<?php echo $webroot; ?>/system/js/livevalidation.js"></script>
-        <script type="text/javascript" src="<?php echo $webroot; ?>/system/js/main.js"></script>
         <script>
             jQuery(document).foundation();
         </script>
