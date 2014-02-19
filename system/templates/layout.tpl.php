@@ -12,27 +12,31 @@
             <link rel="stylesheet" type="text/css" href="<?php echo $webroot; ?>/system/js/foundation-5.0.2/css/foundation.css" />
             <script type="text/javascript" src="<?php echo $webroot; ?>/system/js/foundation-5.0.2/js/modernizr.js"></script>
         -->
-        <link rel="stylesheet" type="text/css" href="<?php echo $webroot; ?>/system/templates/css/style.css" />
-        <link rel="stylesheet" type="text/css" href="<?php echo $webroot; ?>/system/templates/css/tablesorter.css" />
-        <link rel="stylesheet" type="text/css" href="<?php echo $webroot; ?>/system/templates/css/datePicker.css" />
-        <link rel="stylesheet" type="text/css" href="<?php echo $webroot; ?>/system/templates/js/jquery-ui-new/css/custom-theme/jquery-ui-1.8.13.custom.css" />
-        <link rel="stylesheet" type="text/css" href="<?php echo $webroot; ?>/system/templates/css/liveValidation.css" />
-        <link rel="stylesheet" type="text/css" media="screen" href="<?php echo $webroot; ?>/system/templates/js/colorbox/colorbox/colorbox.css" />
-        <link rel="stylesheet" type="text/css" href="<?php echo $webroot; ?>/system/templates/css/jquery.asmselect.css" />
-        <script type="text/javascript" src="<?php echo $webroot; ?>/system/templates/js/jquery-1.4.2.min.js" ></script>
-        <script type="text/javascript" src="<?php echo $webroot; ?>/system/templates/js/tablesorter/jquery.tablesorter.js"></script>
-        <script type="text/javascript" src="<?php echo $webroot; ?>/system/templates/js/tablesorter/addons/pager/jquery.tablesorter.pager.js"></script>
-        <script type="text/javascript" src="<?php echo $webroot; ?>/system/templates/js/colorbox/colorbox/jquery.colorbox-min.js"></script>        
-        <script type="text/javascript" src="<?php echo $webroot; ?>/system/templates/js/jquery-ui-new/js/jquery-ui-1.8.13.custom.min.js"></script>
-        <script type="text/javascript" src="<?php echo $webroot; ?>/system/templates/js/jquery-ui-timepicker-addon.js"></script>
-        <script type="text/javascript" src="<?php echo $webroot; ?>/system/templates/js/livevalidation.js"></script>
-        <script type="text/javascript" src="<?php echo $webroot; ?>/system/templates/js/main.js"></script>
-        <script type="text/javascript" src="<?php echo $webroot; ?>/system/templates/js/jquery.asmselect.js"></script>
-        <script type="text/javascript" src="<?php echo $webroot; ?>/system/templates/js/boxover.js"></script>
-        <script type="text/javascript" src="<?php echo $webroot; ?>/system/templates/js/chart-js/Chart.js"></script>
-
-        <script type="text/javascript" src="<?php echo WEBROOT; ?>/system/templates/js/ckeditor/ckeditor.js"></script>
-
+        <?php
+            $w->enqueueStyle(array("name" => "style.css", "uri" => "/system/templates/css/style.css", "weight" => 1000));
+            $w->enqueueStyle(array("name" => "tablesorter.css", "uri" => "/system/templates/css/tablesorter.css", "weight" => 990));
+            $w->enqueueStyle(array("name" => "datePicker.css", "uri" => "/system/templates/css/datePicker.css", "weight" => 980));
+            $w->enqueueStyle(array("name" => "jquery-ui-1.8.13.custom.css", "uri" => "/system/templates/js/jquery-ui-new/css/custom-theme/jquery-ui-1.8.13.custom.css", "weight" => 970));
+            $w->enqueueStyle(array("name" => "liveValidation.css", "uri" => "/system/templates/css/liveValidation.css", "weight" => 960));
+            $w->enqueueStyle(array("name" => "colorbox.css", "uri" => "/system/templates/js/colorbox/colorbox/colorbox.css", "weight" => 950));
+            $w->enqueueStyle(array("name" => "jquery.asmselect.css", "uri" => "/system/templates/css/jquery.asmselect.css", "weight" => 940));
+            
+            $w->enqueueScript(array("name" => "jquery-1.4.2.min.js", "uri" => "/system/templates/js/jquery-1.4.2.min.js", "weight" => 1000));
+            $w->enqueueScript(array("name" => "jquery.tablesorter.js", "uri" => "/system/templates/js/tablesorter/jquery.tablesorter.js", "weight" => 990));
+            $w->enqueueScript(array("name" => "jquery.tablesorter.pager.js", "uri" => "/system/templates/js/tablesorter/jquery.tablesorter.pager.js", "weight" => 980));
+            $w->enqueueScript(array("name" => "jquery.colorbox-min.js", "uri" => "/system/templates/js/colorbox/colorbox/jquery.colorbox-min.js", "weight" => 970));
+            $w->enqueueScript(array("name" => "jquery-ui-1.8.13.custom.min.js", "uri" => "/system/templates/js/jquery-ui-new/js/jquery-ui-1.8.13.custom.min.js", "weight" => 960));
+            $w->enqueueScript(array("name" => "jquery-ui-timepicker-addon.js", "uri" => "/system/templates/js/jquery-ui-timepicker-addon.js", "weight" => 950));
+            $w->enqueueScript(array("name" => "livevalidation.js", "uri" => "system/templates/js/livevalidation.js", "weight" => 940));
+            $w->enqueueScript(array("name" => "main.js", "uri" => "/system/templates/js/main.js", "weight" => 995));
+            $w->enqueueScript(array("name" => "jquery.asmselect.js", "uri" => "/system/templates/js/jquery.asmselect.js", "weight" => 920));
+            $w->enqueueScript(array("name" => "boxover.js", "uri" => "/system/templates/js/boxover.js", "weight" => 910));
+            $w->enqueueScript(array("name" => "ckeditor.js", "uri" => "/system/templates/js/ckeditor/ckeditor.js", "weight" => 900));
+            $w->enqueueScript(array("name" => "Chart.js", "uri" => "/system/templates/js/chart-js/Chart.js", "weight" => 890));
+            
+            $w->outputStyles();
+            $w->outputScripts();
+        ?>
         <script type="text/javascript">
 
             var current_tab = 0;
@@ -51,11 +55,11 @@
                 $(".msg").delay(3000).fadeOut(3000);
                 $(".error").delay(6000).fadeOut(3000);
                 $("table.tablesorter").tablesorter({dateFormat: "uk", widthFixed: true, widgets: ['zebra']});
-<?php $tab = $w->request('tab');
-if (!empty($tab)) :
-    ?>
+                <?php $tab = $w->request('tab');
+                if (!empty($tab)) :
+                    ?>
                     switchTab("<?php echo $tab; ?>");
-<?php endif; ?>
+                <?php endif; ?>
                 $(".tab-head").children("a").each(function() {
                     $(this).bind("click", {alink: this}, function(event) {
                         changeTab(event.data.alink.hash);
@@ -83,7 +87,7 @@ if (!empty($tab)) :
 
         </script>
 
-<?php echo!empty($htmlheader) ? $htmlheader : ''; ?>
+        <?php echo!empty($htmlheader) ? $htmlheader : ''; ?>
     </head>
     <body>
         <table width="100%" align="center" cellpadding="0" cellspacing="0">

@@ -62,6 +62,9 @@ class Web {
     public $_partialsdir = "partials";
     public $db;
 
+    public $_scripts = array();
+    public $_styles = array();
+    
     /**
      * Constructor
      */
@@ -134,6 +137,42 @@ class Web {
         return array_values($requestURI);
     }
 
+    function enqueueScript($script) {
+        if (!in_array($script, $this->_scripts)) {
+            $this->_scripts[] = $script;
+        }
+    }
+    
+    function enqueueStyle($style) {
+        if (!in_array($style, $this->_styles)) {
+            $this->_styles[] = $style;
+        }
+    }
+    
+    function outputScripts() {
+        if (!empty($this->_scripts)) {
+            usort($this->_scripts, array($this, "cmp_weights"));
+            foreach($this->_scripts as $script) {
+                $this->out("<script src='" . $script["uri"] . "'></script>");
+            }
+        }
+    }
+    
+    function outputStyles() {
+        if (!empty($this->_styles)) {
+            usort($this->_styles, array($this, "cmp_weights"));
+            foreach($this->_styles as $style) {
+                $this->out("<link rel='stylesheet' href='" . $style["uri"] . "'></script>");
+            }
+        }
+    }
+    
+    public function cmp_weights($a, $b) {
+        $aw = intval($a["weight"]);
+        $bw = intval($b["weight"]);
+        return ($aw === $bw ? 0 : ($aw < $bw ? 1 : -1));
+    }
+    
     /**
      * start processing of request
      * 1. look at the request parameter if the action parameter was set
