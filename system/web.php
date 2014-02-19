@@ -324,12 +324,19 @@ class Web {
      * @param unknown $type eg. before / after
      */
     private function _callWebHooks($type) {
+        $request_method = strtolower($this->_requestMethod);
+        
         // call hooks, generic to specific
-        $this->callHook("core_web", $type . "_" . $this->_requestMethod); // GET /*
-        $this->callHook("core_web", $type . "_" . $this->_requestMethod . "_" . $this->_module); // GET /module
-        $this->callHook("core_web", $type . "_" . $this->_requestMethod . "_" . $this->_module . "_" . $this->_action); // GET /module/action
-        $this->callHook("core_web", $type . "_" . $this->_requestMethod . "_" . $this->_module . "_" . $this->_submodule); // GET /module-submodule/*
-        $this->callHook("core_web", $type . "_" . $this->_requestMethod . "_" . $this->_module . "_" . $this->_submodule . "_" . $this->_action); // GET /module-submodule/action
+        $this->callHook("core_web", $type . "_" . $request_method); // GET /*
+        $this->callHook("core_web", $type . "_" . $request_method . "_" . $this->_module); // GET /module
+        
+        // Only call submodule hooks if a submodule is present, else call the module/action hook
+        if (!empty($this->_submodule)) {
+            $this->callHook("core_web", $type . "_" . $request_method . "_" . $this->_module . "_" . $this->_submodule); // GET /module-submodule/*
+            $this->callHook("core_web", $type . "_" . $request_method . "_" . $this->_module . "_" . $this->_submodule . "_" . $this->_action); // GET /module-submodule/action
+        } else {
+            $this->callHook("core_web", $type . "_" . $request_method . "_" . $this->_module . "_" . $this->_action); // GET /module/action
+        }
     }
 
     public function __get($name) {
@@ -827,12 +834,7 @@ class Web {
                 }
             }
         }
-
-        // Check that $module is a module
-        if (!in_array($module, $this->modules())) {
-            return;
-        }
-
+        
         // Check that the module calling has subscribed to hooks
         if (!array_key_exists($module, $this->_hooks)) {
             return;
@@ -840,15 +842,20 @@ class Web {
 
         // Loop through each registered module to try and invoke the function
         foreach ($this->_hooks[$module] as $toInvoke) {
+            // Check that the hook impl module that we are invoking is a module
+            if (!in_array($toInvoke, $this->modules())) {
+                continue;
+            }
+
             // Check if the file exits
             if (!file_exists($this->getModuleDir($toInvoke) . "$toInvoke.hooks.php")) {
                 continue;
             }
 
             // Include and check if function exists
-            include_once $this->getModuleDir($toInvoke) . "$toInvoke.hooks.php";
+            include_once ($this->getModuleDir($toInvoke) . "$toInvoke.hooks.php");
 
-            $hook_function_name = $toInvoke . "_" . $module . "_" . $function;
+            $hook_function_name = ($toInvoke . "_" . $module . "_" . $function);
             if (!function_exists($hook_function_name)) {
                 continue;
             }
