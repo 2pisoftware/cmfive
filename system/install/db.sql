@@ -791,7 +791,7 @@ CREATE TABLE IF NOT EXISTS `report_connection` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 
-CREATE TABLE `widget_config` (
+CREATE TABLE IF NOT EXISTS `widget_config` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `user_id` bigint(20) NOT NULL,
   `destination_module` varchar(255) NOT NULL,
@@ -807,7 +807,7 @@ CREATE TABLE `widget_config` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 
-CREATE TABLE `printer` (
+CREATE TABLE IF NOT EXISTS `printer` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(512) NOT NULL,
   `server` varchar(512) NOT NULL,

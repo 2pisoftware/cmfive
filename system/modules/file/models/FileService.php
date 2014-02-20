@@ -73,7 +73,7 @@ class FileService extends DbService {
 	}
 
 	function isImage($path) {
-		if (file_exists(str_replace("'","\\'",FILE_ROOT."/".$path))) {
+            	if (file_exists(str_replace("'","\\'",FILE_ROOT."/".$path))) {
 			list($width, $height, $type, $attr) = getimagesize(str_replace("'","\\'",FILE_ROOT."/".$path));
 			return $attr !== null;
 		} else {
@@ -172,6 +172,7 @@ class FileService extends DbService {
 		$att->title = $filename;
 		$att->type_code = $type_code;
 		$att->mimetype = $content_type;
+//                $att->modifier_user_id = $this->w->Auth->user()->id;
 		$att->insert();
 
 		return $att->id;

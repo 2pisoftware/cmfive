@@ -64,7 +64,7 @@ class DbPDO extends PDO {
      */
     public function get($table_name){
         if (!in_array($table_name, DbPDO::$table_names)){
-            trigger_error("Table does not exist in the databse", E_USER_ERROR);
+            trigger_error("Table $table_name does not exist in the databse", E_USER_ERROR);
             return null;
         }  
         $this->query = $this->fpdo->from($table_name);

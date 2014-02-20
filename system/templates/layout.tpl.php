@@ -59,20 +59,22 @@
                 if (!empty($tab)) :
                     ?>
                     switchTab("<?php echo $tab; ?>");
-                <?php endif; ?>
-                $(".tab-head").children("a").each(function() {
-                    $(this).bind("click", {alink: this}, function(event) {
-                        changeTab(event.data.alink.hash);
+                <?php else: ?>
+                    
+                    $(".tab-head").children("a").each(function() {
+                        $(this).bind("click", {alink: this}, function(event) {
+                            changeTab(event.data.alink.hash);
+                        });
                     });
-                });
-                // Change tab if hash exists
-                var hash = window.location.hash.split("#")[1];
-                if (hash && hash.length > 0) {
-                    changeTab(hash);
-//                    $("a#" + hash).trigger("click");
-                } else {
-                    $(".tab-head > a:first").trigger("click");
-                }
+
+                    // Change tab if hash exists
+                    var hash = window.location.hash.split("#")[1];
+                    if (hash && hash.length > 0) {
+                        changeTab(hash);
+                    } else {
+                        $(".tab-head > a:first").trigger("click");
+                    }
+                <?php endif; ?>
             });
 
             // Try and prevent multiple form submissions
