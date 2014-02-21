@@ -159,7 +159,10 @@ class TaskService extends DbService {
 	// return the task group type by a task group ID
 	function getTaskGroupTypeById($id) {
 		$c = $this->getTaskGroup($id);
-		return $c->task_group_type;
+                if (!empty($c->id)) {
+                    return $c->task_group_type;
+                }
+                return null;
 	}	
 
 	// return the task group type by a task group ID

@@ -116,7 +116,7 @@ class EmailChannelOption extends DbObject {
                         while ($part->valid()) {
                             try {
                                 // Try and get the next part
-                                $single_part = $part->getPart( ++$partnum);
+                                $single_part = $part->getPart(++$partnum);
 
                                 try {
                                     $transferEncoding = $single_part->getHeader("Content-Transfer-Encoding")->getFieldValue("transferEncoding");
@@ -127,14 +127,14 @@ class EmailChannelOption extends DbObject {
                                     $nameArray = $contentType->getParameters();
                                     $mimetype = $contentType->getType();
                                     // echo $mimetype . "<br/>\n";
-                                    if (!empty($nameArray["name"])) {
+//                                    if (!empty($nameArray["name"])) {
                                         $content = $single_part->getContent();
                                         if ($transferEncoding == "base64") {
                                             $content = base64_decode($content);
                                         }
                                         // Save attachment
                                         $this->w->File->saveFileContent($channel_message, $content, !empty($nameArray["name"]) ? $nameArray["name"] : "attachment" . time(), "channel_email_attachment", $mimetype);
-                                    }
+//                                    }
                                 } catch (Exception $e) {
                                     // Cannot get a certain header, ignore it as its therefore not an attachment that we want
                                 }
@@ -154,7 +154,6 @@ class EmailChannelOption extends DbObject {
             $this->decrypt();
         }
 
-        $mail = null;
         try {
             // Open email connection
             $mail = new Zend_Mail_Storage_Imap(array('host' => $this->server,

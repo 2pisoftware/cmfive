@@ -81,9 +81,10 @@ class Attachment extends DbObject {
 	 * Returns html code for a thumbnail link to download this attachment
 	 */
 	function getThumb() {
-		$buf = "<a href='".$this->File->getDownloadUrl($this->fullpath)."'>";
-		$buf .= $this->File->getThumbImg($this->fullpath) . "</a>";
-		return $buf;
+            $buf = Html::box($this->File->getDownloadUrl($this->fullpath), $this->File->getThumbImg($this->fullpath));
+//		$buf = "<a href='".$this->File->getDownloadUrl($this->fullpath)."'>";
+//		$buf .= $this->File->getThumbImg($this->fullpath) . "</a>";
+            return $buf;
 	}
 
 	function getDownloadUrl() {
