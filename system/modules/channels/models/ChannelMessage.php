@@ -14,7 +14,7 @@ class ChannelMessage extends DbObject {
     public function getData() {
         $attachment = $this->w->File->getAttachments($this, $this->id);
         if (!empty($attachment)) {
-            return file_get_contents(FILE_ROOT . $attachment[0]->fullpath . $attachment[0]->filename);
+            return file_get_contents(FILE_ROOT . $attachment[0]->fullpath);
         }
         return null;
     }

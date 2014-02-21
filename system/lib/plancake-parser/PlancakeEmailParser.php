@@ -209,7 +209,7 @@ class PlancakeEmailParser {
         foreach($boundaries as $i => $v) {
             $boundaries[$i] = str_replace(array("'", '"'), '', $v);
         }
-        
+
         foreach ($this->rawBodyLines as $line) {
             if (!$detectedContentType) {
                 
@@ -239,14 +239,24 @@ class PlancakeEmailParser {
                 
                 // if the delimited is AAAAA, the line will be --AAAAA  - that's why we use substr
                 if (is_array($boundaries)) {
-                    if (in_array(substr($line, 2), $boundaries)) {  // found the delimiter
+                    $var = explode("--" . $boundaries[1], $line);
+                    if (!empty($var)) {
+                        foreach($var as $v) {
+                            if (!empty($v)) {
+                                $v = trim($v);
+                                if (!stristr($v, $boundaries[1])) {
+                                    $body = $v;
+                                    break;
+                                }
+                            }
+                        }
                         break;
                     }
                 }
                 $body .= $line . "\n";
             }
         }
-
+        
         if (!$detectedContentType)
         {
             // if here, we missed the text/plain content-type (probably it was

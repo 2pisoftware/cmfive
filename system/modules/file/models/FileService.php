@@ -166,7 +166,7 @@ class FileService extends DbService {
 
 		$att = new Attachment($this->w);
 		$att->filename = $filename;
-		$att->fullpath = str_replace(FILE_ROOT, "", $this->getFilePath($filesystemPath) . "/" . $this->filename);
+		$att->fullpath = str_replace(FILE_ROOT, "", $this->getFilePath($filesystemPath) . "/" . $att->filename);
 		$att->parent_table = $object->getDbTableName();
 		$att->parent_id = $object->id;
 		$att->title = $filename;
