@@ -560,17 +560,6 @@ class Web {
         $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
         $mime = finfo_file($finfo, $filename);
         finfo_close($finfo);
-        // }
-        //  else {
-        //     ob_start();
-        //     system("file -i -b {$filepath}");
-        //     $output = ob_get_clean();
-        //     $output = explode("; ",$output);
-        //     if ( is_array($output) ) {
-        //         $output = $output[0];
-        //     }
-        //     $mime = $output;
-        // }
         return $mime;
     }
 
@@ -590,35 +579,6 @@ class Web {
             header("HTTP/1.1 404 Not Found");
         }
         exit;
-
-        // $this->logInfo("Trying to load file: ".$filename);
-        // if (!file_exists($filename)) {
-        //     $this->logWarn("Could not load file: ".$filename);
-        //     header("HTTP/1.0 404 Not Found");
-        //     exit;
-        // }
-        // $mimetype = $this->getMimetype($filename);
-        // header('Content-Type: '.$mimetype );
-        // $buffer = '';
-        // $cnt =0;
-        // $handle = fopen($filename, 'rb');
-        // if ($handle === false) {
-        //     return false;
-        // }
-        // while (!feof($handle)) {
-        //     $buffer = fread($handle, CHUNK_SIZE);
-        //     echo $buffer;
-        //     ob_flush();
-        //     flush();
-        //     if ($retbytes) {
-        //         $cnt += strlen($buffer);
-        //     }
-        // }
-        // $status = fclose($handle);
-        // if ($retbytes && $status) {
-        //     return $cnt; // return num. bytes delivered like readfile() does.
-        // }
-        // exit;
     }
 
     /**

@@ -154,7 +154,7 @@ class Html {
      * creates a ul from an array structure:
      * ("1","2", array("2.1","2.2"),"3")
      */
-    public static function ul(& $array, $id=null, $class=null, $subclass=null, $type="ul") {
+    public static function ul($array, $id=null, $class=null, $subclass=null, $type="ul") {
         if (!$array || sizeof($array) < 1) return "";
 
         $id = $id ? ' id="'.$id.'"' : null;
