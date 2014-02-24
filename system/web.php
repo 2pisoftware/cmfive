@@ -170,7 +170,7 @@ class Web {
         if (!empty($this->_scripts)) {
             usort($this->_scripts, array($this, "cmp_weights"));
             foreach($this->_scripts as $script) {
-                $this->out("<script src='" . $script["uri"] . "'></script>");
+                echo "<script src='" . $script["uri"] . "'></script>";
             }
         }
     }
@@ -182,7 +182,7 @@ class Web {
         if (!empty($this->_styles)) {
             usort($this->_styles, array($this, "cmp_weights"));
             foreach($this->_styles as $style) {
-                $this->out("<link rel='stylesheet' href='" . $style["uri"] . "'></script>");
+                echo "<link rel='stylesheet' href='" . $style["uri"] . "'/>";
             }
         }
     }
