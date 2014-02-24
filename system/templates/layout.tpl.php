@@ -21,11 +21,12 @@
         $w->enqueueScript(array("name" => "modernizr.js", "uri" => "/system/templates/js/foundation-5.0.2/js/modernizr.js", "weight" => 1010));
         $w->enqueueScript(array("name" => "jquery.js", "uri" => "/system/templates/js/foundation-5.0.2/js/jquery.js", "weight" => 1000));
         $w->enqueueScript(array("name" => "jquery.tablesorter.js", "uri" => "/system/templates/js/tablesorter/jquery.tablesorter.js", "weight" => 990));
-        $w->enqueueScript(array("name" => "jquery.tablesorter.pager.js", "uri" => "/system/templates/js/tablesorter/jquery.tablesorter.pager.js", "weight" => 980));
+        $w->enqueueScript(array("name" => "jquery.tablesorter.pager.js", "uri" => "/system/templates/js/tablesorter/addons/pager/jquery.tablesorter.pager.js", "weight" => 980));
         $w->enqueueScript(array("name" => "jquery.colorbox-min.js", "uri" => "/system/templates/js/colorbox/colorbox/jquery.colorbox-min.js", "weight" => 970));
-        $w->enqueueScript(array("name" => "jquery-ui-1.8.13.custom.min.js", "uri" => "/system/templates/js/jquery-ui-new/js/jquery-ui-1.8.13.custom.min.js", "weight" => 960));
+        $w->enqueueScript(array("name" => "jquery-ui-1.10.4.custom.min.js", "uri" => "/system/templates/js/jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.min.js", "weight" => 960));
+//        $w->enqueueScript(array("name" => "jquery-ui-1.8.13.custom.min.js", "uri" => "/system/templates/js/jquery-ui-new/js/jquery-ui-1.8.13.custom.min.js", "weight" => 960));
         $w->enqueueScript(array("name" => "jquery-ui-timepicker-addon.js", "uri" => "/system/templates/js/jquery-ui-timepicker-addon.js", "weight" => 950));
-        $w->enqueueScript(array("name" => "livevalidation.js", "uri" => "system/templates/js/livevalidation.js", "weight" => 940));
+        $w->enqueueScript(array("name" => "livevalidation.js", "uri" => "/system/templates/js/livevalidation.js", "weight" => 940));
         $w->enqueueScript(array("name" => "main.js", "uri" => "/system/templates/js/main.js", "weight" => 995));
         $w->enqueueScript(array("name" => "jquery.asmselect.js", "uri" => "/system/templates/js/jquery.asmselect.js", "weight" => 920));
         $w->enqueueScript(array("name" => "boxover.js", "uri" => "/system/templates/js/boxover.js", "weight" => 910));
@@ -53,12 +54,11 @@
                 $(".msg").delay(3000).fadeOut(3000);
                 $(".error").delay(6000).fadeOut(3000);
                 $("table.tablesorter").tablesorter({dateFormat: "uk", widthFixed: true, widgets: ['zebra']});
-<?php
-$tab = $w->request('tab');
-if (!empty($tab)) :
-    ?>
+                <?php
+                $tab = $w->request('tab');
+                if (!empty($tab)) : ?>
                     switchTab("<?php echo $tab; ?>");
-<?php else: ?>
+                <?php else: ?>
 
                     $(".tab-head").children("a").each(function() {
                         $(this).bind("click", {alink: this}, function(event) {
@@ -73,7 +73,7 @@ if (!empty($tab)) :
                     } else {
                         $(".tab-head > a:first").trigger("click");
                     }
-<?php endif; ?>
+                <?php endif; ?>
             });
 
             // Try and prevent multiple form submissions
@@ -90,7 +90,7 @@ if (!empty($tab)) :
     </head>
     <body>
         <div class="row-fluid">
-            <nav class="top-bar" data-topbar data-options="is_hover: false">
+            <nav class="top-bar" data-topbar><!-- To make it that you need to click to activate dropdown use  data-options="is_hover: false" -->
                 <ul class="title-area">
                     <li class="name">
                         <!--<h1><a href="/"><?php // echo str_replace("http://", "", $w->moduleConf('main', 'company_url'));   ?></a></h1>-->
@@ -127,10 +127,10 @@ if (!empty($tab)) :
                                 <a href="#"><?php echo $w->Auth->user()->getShortName(); ?></a>
                                 <?php
                                 echo Html::ul(
-                                        array(
-                                    $w->menuBox("auth/profile/box", "Profile"),
-                                    $w->menuLink("auth/logout", "Logout")
-                                        ), null, "dropdown");
+                                    array(
+                                        $w->menuBox("auth/profile/box", "Profile"),
+                                        $w->menuLink("auth/logout", "Logout")
+                                    ), null, "dropdown");
                                 ?>    
                             </li>
                         <?php endif; ?>
@@ -140,9 +140,10 @@ if (!empty($tab)) :
                     <ul class="left">
                         <?php if ($w->Auth->loggedIn()) : ?>
                             <li><?php echo $w->menuLink($w->Main->getUserRedirectURL(), "Home"); ?></li>
+                            <li class="divider"></li>
                             <?php foreach ($w->_moduleConfig as $name => $options) {
                                 // Check if config is set to display on topmenu
-                                if ($options['topmenu']) {
+                                if ($options['topmenu']) :
                                     // Check for navigation
                                     if (method_exists($name . "Service", "navigation")) : ?>
                                         <li class="has-dropdown <?php $w->_module == $name ? 'active' : ''; ?>">
@@ -151,8 +152,9 @@ if (!empty($tab)) :
                                         </li>
                                     <?php else: ?>
                                         <li><?php echo $w->menuLink($name . "/index", ucfirst($name)); ?></li>
-                                    <?php endif;
-                                }
+                                    <?php endif; ?>
+                                    <li class="divider"></li>
+                                <?php endif;
                             }
                         
                             if ($w->Auth->allowed('help/view')) : ?>
@@ -194,25 +196,23 @@ if (!empty($tab)) :
                         </div>
 <?php endif; ?>
 
-                    <div class="row">
-<?php echo!empty($body) ? $body : ''; ?>
+                        <div class="row">
+    <?php echo!empty($body) ? $body : ''; ?>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2"><div id="footer">Copyright <?php echo date('Y'); ?> <a href="<?php echo $w->moduleConf('main', 'company_url'); ?>"><?php echo $w->moduleConf('main', 'company_name'); ?></a></div></td>
-    </tr>
-</table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><div id="footer">Copyright <?php echo date('Y'); ?> <a href="<?php echo $w->moduleConf('main', 'company_url'); ?>"><?php echo $w->moduleConf('main', 'company_name'); ?></a></div></td>
+        </tr>
+    </table>
 
-<!-- Test foudnation include -->
+    <script type="text/javascript" src="<?php echo $webroot; ?>/system/templates/js/foundation-5.0.2/js/foundation.min.js"></script>
+    <script>
+        jQuery(document).foundation();
+    </script>
 
-<script type="text/javascript" src="<?php echo $webroot; ?>/system/templates/js/foundation-5.0.2/js/foundation.min.js"></script>
-<script>
-    jQuery(document).foundation();
-</script>
-
-</body>
+    </body>
 
 </html>

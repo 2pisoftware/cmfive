@@ -11,6 +11,11 @@ function changeTab(hash) {
         $('.tab-head > a').each(function() {
             $(this).removeClass("active");
         });
+        
+        if (hash[0] === "#"){
+            hash = hash.substr(1);
+        }
+        
         $(".tab-body > div#" + hash).show().addClass("active");
         $('.tab-head > a[href$="' + hash + '"]').addClass("active");
     }
