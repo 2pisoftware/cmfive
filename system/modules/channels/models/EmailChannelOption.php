@@ -80,7 +80,6 @@ class EmailChannelOption extends DbObject {
 
         // Connect and fetch emails
         $mail = $this->connectToMail();
-
         if (!empty($mail)) {
 
             $results = $mail->protocol->search($filter_arr);
@@ -97,6 +96,15 @@ class EmailChannelOption extends DbObject {
 //                     // 
 //                     $rawmessage .= "\n\n";
 //                     $rawmessage .= $message->getContent();
+                    $email = new EmailStructure();
+                    $email->to = $message->to;
+                    $email->from = $message->from;
+                    if (isset($message->cc)) {
+                        $email->cc = $message->cc;
+                    }
+                    $email->subject = $message->subject;
+                    //$email->body["html"] = $message->getContent();
+
                     $rawmessage .= $zend_message->toString();
 
                     // Create messages
@@ -109,41 +117,36 @@ class EmailChannelOption extends DbObject {
 
                     // Save raw email
                     $attachment_id = $this->w->File->saveFileContent($channel_message, $rawmessage, str_replace(".", "", microtime()) . ".txt", "channel_email_raw", "text/plain");
-
                     if ($message->isMultipart()) {
-                        $partnum = 0;
-                        $part = $message;
-                        while ($part->valid()) {
+                        foreach (new RecursiveIteratorIterator($message) as $part) {
                             try {
-                                // Try and get the next part
-                                $single_part = $part->getPart(++$partnum);
-
-                                try {
-                                    $transferEncoding = $single_part->getHeader("Content-Transfer-Encoding")->getFieldValue("transferEncoding");
-
-                                    $contentType = $single_part->getHeader("Content-Type");
-
-                                    // Name is stored under "parameters" in an array
-                                    $nameArray = $contentType->getParameters();
-                                    $mimetype = $contentType->getType();
-                                    // echo $mimetype . "<br/>\n";
-//                                    if (!empty($nameArray["name"])) {
-                                        $content = $single_part->getContent();
-                                        if ($transferEncoding == "base64") {
-                                            $content = base64_decode($content);
-                                        }
-                                        // Save attachment
-                                        $this->w->File->saveFileContent($channel_message, $content, !empty($nameArray["name"]) ? $nameArray["name"] : "attachment" . time(), "channel_email_attachment", $mimetype);
-//                                    }
-                                } catch (Exception $e) {
-                                    // Cannot get a certain header, ignore it as its therefore not an attachment that we want
+                                $contentType = strtok($part->contentType, ';');
+                                switch ($contentType) {
+                                    case "text/plain":
+                                        $email->body["plain"] = trim($part->__toString());
+                                        break;
+                                    case "text/html":
+                                        $email->body["html"] = trim($part->__toString());
+                                        break;
+                                    default:
+                                        // Is probably an attachment so just save it
+                                        $transferEncoding = $part->getHeader("Content-Transfer-Encoding")->getFieldValue("transferEncoding");
+                                        $content_type_header = $part->getHeader("Content-Type");
+                                        // Name is stored under "parameters" in an array
+                                        $nameArray = $content_type_header->getParameters();
+                                        $this->w->File->saveFileContent($channel_message, 
+                                                ($transferEncoding == "base64" ? base64_decode(trim($part->__toString())) : trim($part->__toString())) , 
+                                                !empty($nameArray["name"]) ? $nameArray["name"] : ("attachment" . time()), 
+                                                "channel_email_attachment", 
+                                                $contentType);
                                 }
-                            } catch (Zend\Mail\Storage\Exception\RuntimeException $re) {
-                                // no more parts
-                                break;
+                            } catch (Zend_Mail_Exception $e) {
+                                // Ignore
                             }
                         }
                     }
+
+                    $attachment_id = $this->w->File->saveFileContent($channel_message, serialize($email), "email.txt", "channel_email_raw", "text/plain");
                 }
             }
         }

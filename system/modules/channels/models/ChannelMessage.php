@@ -12,9 +12,15 @@ class ChannelMessage extends DbObject {
     }
 
     public function getData() {
-        $attachment = $this->w->File->getAttachments($this, $this->id);
-        if (!empty($attachment)) {
-            return file_get_contents(FILE_ROOT . $attachment[0]->fullpath);
+        $attachments = $this->w->File->getAttachments($this, $this->id);
+        if (!empty($attachments)) {
+            foreach($attachments as $attachment) {
+                // return the serialised email object
+                if ($attachment->filename == "email.txt") {
+                    return file_get_contents(FILE_ROOT . $attachment->fullpath);
+                }
+            }
+            return file_get_contents(FILE_ROOT . $attachments[0]->fullpath);
         }
         return null;
     }
