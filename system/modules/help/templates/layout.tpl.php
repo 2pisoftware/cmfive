@@ -5,17 +5,17 @@
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
         <link rel="stylesheet" type="text/css" href="<?php echo WEBROOT; ?>/templates/css/style.css" />
         <script type="text/javascript" src="<?php echo WEBROOT; ?>/system/js/jquery-1.4.2.min.js" ></script>
-		<script src="<?php echo WEBROOT; ?>/system/js/flowplayer/flowplayer-3.2.4.min.js"></script>
+        <script src="<?php echo WEBROOT; ?>/system/js/flowplayer/flowplayer-3.2.4.min.js"></script>
     </head>
     <body>
         <table height="600" width="100%">
             <tr>
                 <td valign="top">
                     <?php if (!empty($module_toc)): ?>
-                        <a href="<?php echo WEBROOT.'/help/view/'.$module_toc?>"><?php echo $module_title; ?></a>&nbsp;:&nbsp;
+                        <a href="<?php echo WEBROOT . '/help/view/' . $module_toc ?>"><?php echo $module_title; ?></a>&nbsp;:&nbsp;
                     <?php endif; ?>
-                    <a href="<?php echo WEBROOT.'/help/toc'; ?>">Contents</a>&nbsp;:&nbsp;
-                    <a href="<?php echo WEBROOT.'/help/view/help/onhelp'; ?>">Help on Help</a>&nbsp;:&nbsp;
+                    <a href="<?php echo WEBROOT . '/help/toc'; ?>">Contents</a>&nbsp;:&nbsp;
+                    <a href="<?php echo WEBROOT . '/help/view/help/onhelp'; ?>">Help on Help</a>&nbsp;:&nbsp;
                     <hr />
                 </td>
             </tr>
@@ -24,9 +24,10 @@
             </tr>
             <tr>
                 <td valign="bottom"><hr/>
-                Copyright <?php echo date('Y'); ?> <a href="<?php echo $w->moduleConf('main','company_url'); ?>"><?php echo $w->moduleConf('main','company_name'); ?></a>
+                    Copyright <?php echo date('Y'); ?> <a href="<?php echo $w->moduleConf('main', 'company_url'); ?>"><?php echo $w->moduleConf('main', 'company_name'); ?></a>
                 </td>
             </tr>
         </table>
-	</body>
+
+    </body>
 </html>	
