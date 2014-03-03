@@ -9,6 +9,7 @@
         "swiftmailer/swiftmailer": "@stable",
         "twig/twig": "1.*",
         "zendframework/zend-mail": "2.2.5",
-        "zendframework/zend-serializer": "2.2.5"
+        "zendframework/zend-serializer": "2.2.5",
+        "codeception/codeception" : "*"
     }
 }
