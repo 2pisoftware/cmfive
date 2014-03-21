@@ -51,6 +51,8 @@ CREATE TABLE IF NOT EXISTS `audit` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `dt_created` datetime NOT NULL,
   `creator_id` bigint(20) NOT NULL,
+  `submodule` TEXT NULL, 
+  `message` TEXT NULL,
   `module` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
   `action` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
   `path` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -242,9 +244,11 @@ CREATE TABLE IF NOT EXISTS `user` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `login` varchar(32) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `password_salt` VARCHAR( 255 ) NULL,
   `contact_id` bigint(20) DEFAULT NULL,
   `password_reset_token` VARCHAR( 32 ) NULL,
   `dt_password_reset_at` TIMESTAMP NULL,
+  `redirect_url` VARCHAR( 255 ) NOT NULL DEFAULT 'main/index',
   `is_admin` tinyint(1) NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
@@ -700,9 +704,11 @@ CREATE TABLE IF NOT EXISTS `template` (
 
 CREATE TABLE IF NOT EXISTS `channel` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR( 255 ) NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `notify_user_email` varchar(255) DEFAULT NULL,
   `notify_user_id` bigint(20) DEFAULT NULL,
+  `do_processing` tinyint(1) NOT NULL DEFAULT '1',
   `creator_id` bigint(20) NOT NULL,
   `modifier_id` bigint(20) NOT NULL,
   `dt_created` datetime NOT NULL,
@@ -721,6 +727,14 @@ CREATE TABLE IF NOT EXISTS `channel_email_option` (
   `port` int(11) DEFAULT NULL,
   `use_auth` tinyint(4) NOT NULL DEFAULT '1',
   `folder` varchar(256) DEFAULT NULL,
+  `protocol` varchar(255) NULL,
+  `to_filter` varchar(255) NULL,
+  `from_filter` varchar(255) NULL,
+  `subject_filter` varchar(255) NULL,
+  `cc_filter` varchar(255) NULL,
+  `body_filter` varchar(255) NULL,
+  `post_read_action` varchar(255) NULL,
+  `post_read_parameter` varchar(255) NULL,
   `creator_id` bigint(20) NOT NULL,
   `modifier_id` bigint(20) NOT NULL,
   `dt_created` datetime NOT NULL,
@@ -749,7 +763,7 @@ CREATE TABLE IF NOT EXISTS `channel_processor` (
 CREATE TABLE IF NOT EXISTS `channel_message` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `channel_id` bigint(20) NOT NULL,
-  `channel_type` varchar(255) NOT NULL,
+  `message_type` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `is_processed` tinyint(1) NOT NULL DEFAULT '0',
   `creator_id` bigint(20) DEFAULT NULL,
   `modifier_id` bigint(20) DEFAULT NULL,
@@ -789,7 +803,6 @@ CREATE TABLE IF NOT EXISTS `report_connection` (
   `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
-
 
 CREATE TABLE IF NOT EXISTS `widget_config` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,

@@ -166,52 +166,46 @@
             </nav>
         </div>
 
-        <table width="100%" align="center" cellpadding="0" cellspacing="0">
-            <?php
-            if (!empty($boxes)) {
-                foreach ($boxes as $btitle => $box) {
-                    ?>
-                    <div class="box">
-                        <div class="boxtitle flt"><?php echo ucfirst($btitle); ?></div>
-                        <div class="menubg flt">
-        <?php echo $box; ?>
+        <div class="row-fluid" style="overflow: hidden; padding: 10px;">
+            <?php /* Check if there are side boxes defined */
+            if (!empty($boxes)) : ?>
+                <div class="small-2 left">
+                    <?php foreach ($boxes as $btitle => $box) : ?>
+                        <div class="row panel">
+                            <h5><?php echo ucfirst($btitle); ?></h5>
+                            <?php echo $box; ?>
                         </div>
-                    </div>
-                    <?php
-                }
-            }
-            ?>
-
-        </td>
-
-        <td valign="top" height="100%">
-            <div id="center">
-                <div id="body">
-                    <div class="content-header"><?php echo!empty($title) ? $title : ucfirst($w->currentModule()); ?></div>
-                    <?php if (!empty($error) || !empty($msg)) : ?>
-                            <?php $type = !empty($error) ? array("name" => "error", "class" => "warning") : array("name" => "msg", "class" => "info"); ?>
-                        <div data-alert class="alert-box <?php echo $type["class"]; ?>">
-    <?php echo $$type["name"]; ?>
-                            <a href="#" class="close">&times;</a>
-                        </div>
-<?php endif; ?>
-
-                        <div class="row">
-    <?php echo!empty($body) ? $body : ''; ?>
-                        </div>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2"><div id="footer">Copyright <?php echo date('Y'); ?> <a href="<?php echo $w->moduleConf('main', 'company_url'); ?>"><?php echo $w->moduleConf('main', 'company_name'); ?></a></div></td>
-        </tr>
-    </table>
+            <?php endif; ?>
 
-    <script type="text/javascript" src="<?php echo $webroot; ?>/system/templates/js/foundation-5.0.2/js/foundation.min.js"></script>
-    <script>
-        jQuery(document).foundation();
-    </script>
+            <?php // Body section w/ message and body from template ?>
+            <div class="row-fluid <?php if(!empty($boxes)) echo "small-10"; ?>" style="padding-left: 10px; overflow: hidden;">
+                <h4><?php echo !empty($title) ? $title : ucfirst($w->currentModule()); ?></h4>
+                <?php if (!empty($error) || !empty($msg)) : ?>
+                    <?php $type = !empty($error) ? array("name" => "error", "class" => "warning") : array("name" => "msg", "class" => "info"); ?>
+                    <div data-alert class="alert-box <?php echo $type["class"]; ?>">
+                        <?php echo $$type["name"]; ?>
+                        <a href="#" class="close">&times;</a>
+                    </div>
+                <?php endif; ?>
+
+                <div class="row-fluid">
+                    <?php echo !empty($body) ? $body : ''; ?>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row-fluid">
+            <div id="footer" class="panel">
+                Copyright <?php echo date('Y'); ?> <a href="<?php echo $w->moduleConf('main', 'company_url'); ?>"><?php echo $w->moduleConf('main', 'company_name'); ?></a>
+            </div>
+        </div>
+
+        <script type="text/javascript" src="<?php echo $webroot; ?>/system/templates/js/foundation-5.0.2/js/foundation.min.js"></script>
+        <script>
+            jQuery(document).foundation();
+        </script>
 
     </body>
 

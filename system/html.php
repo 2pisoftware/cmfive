@@ -1,6 +1,7 @@
 <?php
 
 require_once "classes/html/a.php";
+require_once "classes/html/button.php";
 
 class Html {
 
@@ -118,17 +119,10 @@ class Html {
         return $a->__toString();
     }
 
-    public static function b($href, $title, $confirm = null, $id = null, $newtab = false) {
-        $js = '';
-        if ($confirm) {
-            $js = "if(confirm('" . $confirm . "'))";
-        }
-        if (!$newtab) {
-            $js .= "{ parent.location='" . $href . "'; return false; }";
-        } else {
-            $js .= "{ window.open('" . $href . "', '_blank').focus(); return false; }";
-        }
-        return "<button id='" . $id . "' onclick=\"" . $js . "\">" . $title . "</button>";
+    public static function b($href, $title, $confirm = null, $id = null, $newtab = false, $class = null) {
+        $button = new \Html\button();
+        $button->href($href)->text($title)->confirm($confirm)->id($id)->setClass($class)->newtab($newtab);
+        return $button->__toString();
     }
 
     /**
@@ -838,9 +832,9 @@ EOT;
         $class = $class ? " class=\"" . $class . "\" " : null;
         $buf .= "<form " . $id . $class . " action=\"" . $action . "\" method=\"" . $method . "\">";
         $buf .= "<input type='hidden' name='" . CSRF::getTokenID() . "' value='" . CSRF::getTokenValue() . "' />";
-        $buf .= "<fieldset style=\"margin-top: 10px;\">\n";
+        $buf .= "<fieldset style=\"padding: 0; padding-top: 10px; padding-left: 10px;\">\n";
         $buf .= "<legend>" . $legend . "</legend>\n";
-        $buf .= "<table  cellpadding=\"2\" cellspacing=\"2\" border=\"0\"><tr>\n";
+        $buf .= "<div class=\"row-fluid\">\n";
 
         $item_count = 0;
 
@@ -848,9 +842,12 @@ EOT;
         foreach ($data as $row) {
 
             // Only print 4 td's per row
-            if ($item_count++ % 4 == 0) {
-                $buf .= "</tr><tr>";
-            }
+//            if ($item_count++ % 4 == 0) {
+//                $buf .= "</tr><tr>";
+//            }
+            
+            $buf .= "<div class=\"small-3 left\"><div class=\"row\">";
+            
             // Get row parameters
             $title = !empty($row[0]) ? $row[0] : null;
             $type = !empty($row[1]) ? $row[1] : null;
@@ -876,10 +873,10 @@ EOT;
                 $colspan = 2;
             } else {
                 $colspan = 1;
-                $buf .= "<td>" . htmlentities($title) . "</td>";
+                $buf .= "<div class=\"small-2 columns\"><label class=\"right inline\">" . htmlentities($title) . "</label></div>";
             }
 
-            $buf .= "<td>";
+            $buf .= "<div class=\"small-10 columns\">";
             $size = !empty($row[4]) ? $row[4] : null;
 
             // Get the input that we need
@@ -943,15 +940,16 @@ EOT;
                     break;
             }
 
-            $buf .= "</td>";
+            $buf .= "</div></div></div>";
         }
-
+        $buf .= "</div>";
         // Filter button (optional... though optional is pointless)
         if (!empty($action)) {
-            $buf .= "<td><button type=\"submit\">" . $submitTitle . "</button></td>";
-            $buf .= "<td><button type=\"submit\" id=\"filter_reset\" name=\"reset\" value=\"reset\">Reset</button></td>";
+            $button = new \Html\button();
+            $buf .= "<div class=\"left\">" . $button->type("submit")->text($submitTitle)->__toString() . "&nbsp</div>";
+            $buf .= "<div class=\"left\">" . $button->text("Reset")->id("filter_reset")->name("reset")->value("reset")->__toString() . "</div>";
         }
-        $buf .= "</tr>\n</table>\n</fieldset>\n";
+        $buf .= "\n</fieldset>\n";
         $buf .= $hidden . "</form>\n";
 
         return $buf;

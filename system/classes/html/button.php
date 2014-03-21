@@ -16,7 +16,7 @@ class button {
     public $formnovalidate = false; // HTML5
     public $formtarget; // HTML5
     public $id;
-    public $class = "button small";
+    public $_class = "button tiny ";
     public $name;
     public $type;
     public $text;
@@ -28,7 +28,7 @@ class button {
     public $href;
     
     public function __set($property, $value) {
-        echo $property . " " . $value;
+//        echo $property . " " . $value;
         if (method_exists($this, $property)) {
             $this->$property($value);
         } else {
@@ -43,31 +43,30 @@ class button {
 
     public function __toString() {
         $js = "";
-        if (!empty($this->confirm)) {
-            $js .= "if(confirm('" . $this->confirm . "'))";
-        }
+        if (!empty($this->confirm)) { $js .= "if(confirm(\"" . $this->confirm . "\")) {"; }
         if (!$this->newtab) {
-            $js .= "{ parent.location='" . $this->href . "'; return false; }";
+            $js .= "parent.location='" . $this->href . "'; return false;";
         } else {
-            $js .= "{ window.open('" . $this->href . "', '_blank').focus(); return false; }";
+            $js .= "window.open('" . $this->href . "', \"_blank\").focus(); return false;";
         }
+        if (!empty($this->confirm)) { $js .= "}"; }
         
         $buffer = "";
         $buffer .= "<button ";
         if ($this->autofocus === true) $buffer .= "autofocus=true ";
         if ($this->disabled === true) $buffer .= "disabled=true ";
-        if (!empty($this->form)) $buffer .= "form='{$this->form}' ";
-        if (!empty($this->formaction)) $buffer .= "formaction='{$this->formaction}' ";
-        if (!empty($this->formenctype)) $buffer .= "formenctype='{$this->formenctype}' ";
-        if (!empty($this->formmethod)) $buffer .= "formmethod='{$this->formmethod}' ";
-        if (!empty($this->formnovalidate)) $buffer .= "formnovalidate='{$this->formnovalidate}' ";
-        if (!empty($this->formtarget)) $buffer .= "formtarget='{$this->formtarget}' ";
-        if (!empty($this->id)) $buffer .= "id='{$this->id}' ";
-        if (!empty($this->class)) $buffer .= "class='{$this->class}' ";
-        if (!empty($this->name)) $buffer .= "name='{$this->name}' ";
-        if (!empty($this->type)) $buffer .= "type='{$this->type}' ";
-        if (!empty($this->value)) $buffer .= "value='{$this->value}' ";
-        if (!empty($js)) $buffer .= "onclick='{$js}' ";
+        if (!empty($this->form)) $buffer .= "form=\"{$this->form}\" ";
+        if (!empty($this->formaction)) $buffer .= "formaction=\"{$this->formaction}\" ";
+        if (!empty($this->formenctype)) $buffer .= "formenctype=\"{$this->formenctype}\" ";
+        if (!empty($this->formmethod)) $buffer .= "formmethod=\"{$this->formmethod}\" ";
+        if (!empty($this->formnovalidate)) $buffer .= "formnovalidate=\"{$this->formnovalidate}\" ";
+        if (!empty($this->formtarget)) $buffer .= "formtarget=\"{$this->formtarget}\" ";
+        if (!empty($this->id)) $buffer .= "id=\"{$this->id}\" ";
+        if (!empty($this->_class)) $buffer .= "class=\"{$this->_class}\" ";
+        if (!empty($this->name)) $buffer .= "name=\"{$this->name}\" ";
+        if (!empty($this->type)) $buffer .= "type=\"{$this->type}\" ";
+        if (!empty($this->value)) $buffer .= "value=\"{$this->value}\" ";
+        if (!empty($js)) $buffer .= "onclick=\"{$js}\" ";
         $buffer .= (">{$this->text}</button>");
         return $buffer;
     }
@@ -118,7 +117,7 @@ class button {
     }
     
     public function setClass($class) {
-        $this->class = $class;
+        $this->_class .= $class;
         return $this;
     }
     
