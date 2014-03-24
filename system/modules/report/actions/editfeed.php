@@ -1,6 +1,6 @@
 <?php
 function editfeed_GET(Web &$w) {
-	ReportLib::navigation($w, "Edit Feed");
+	$w->Report->navigation($w, "Edit Feed");
 
 	$p = $w->pathMatch("id");
 
@@ -34,7 +34,7 @@ function editfeed_GET(Web &$w) {
 }
 
 function editfeed_POST(Web &$w) {
-	ReportLib::navigation($w, "Create a Feed");
+	$w->Report->navigation($w, "Create a Feed");
 
 	$p = $w->pathMatch("id");
 

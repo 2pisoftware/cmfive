@@ -6,5 +6,5 @@ function members_GET(&$w) {
 		$w->error("No access to this wiki.");
 	}
 	$w->ctx("wiki",$wiki);
-	WikiLib::wiki_navigation($w,$wiki,"Members");
+	$w->Wiki->navigation($w,$wiki,"Members");
 }

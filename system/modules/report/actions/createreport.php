@@ -4,7 +4,7 @@
 //////////////////////////////////////////////////
 
 function createreport_ALL(Web &$w) {
-	ReportLib::navigation($w, "Create a Report");
+	$w->Report->navigation($w, "Create a Report");
 
 	// get list of  modules
 	$modules = $w->Report->getModules();

@@ -1,6 +1,6 @@
 <?php
 function tasklist_ALL(Web $w) {
-	TaskLib::task_navigation($w, "");
+	$w->Task->navigation($w, "");
 
 	// tab: tasks
 	// prepare default filter dropdowns

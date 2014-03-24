@@ -5,7 +5,7 @@
 
 // display the form allowing users to set report parameters
 function runreport_ALL(Web &$w) {
-	ReportLib::navigation($w, "Generate Report");
+	$w->Report->navigation($w, "Generate Report");
 	$p = $w->pathMatch("id");
 
 	// if there is a report ID in the URL ...
@@ -23,7 +23,7 @@ function runreport_ALL(Web &$w) {
 			}
 			else {
 				// display form
-				ReportLib::navigation($w, $rep->title);
+				$w->Report->navigation($w, $rep->title);
 
 				if (($member->role == "EDITOR") || ($w->Auth->user()->hasRole("report_admin"))) {
 					$btnedit = Html::b("/report/viewreport/".$rep->id," Edit Report ");

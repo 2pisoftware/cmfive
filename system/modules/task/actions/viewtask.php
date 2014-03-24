@@ -11,7 +11,7 @@ function viewtask_GET(Web &$w) {
 	$taskdata = $w->Task->getTaskData($p['id']);
 	$group = $w->Task->getTaskGroup($task->task_group_id);
 
-	TaskLib::task_navigation($w, "View Task: " . $task->title);
+	$w->Task->navigation($w, "View Task: " . $task->title);
 
 	// if task is deleted, say as much and return to task list
 	if ($task->is_deleted != 0) {

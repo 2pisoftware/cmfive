@@ -1,6 +1,6 @@
 <?php
 function read_GET(Web $w){
-	InboxLib::inbox_navigation($w,"Read Messages");
+	$w->Inbox->navigation($w,"Read Messages");
 	$p = $w->pathMatch('num');
 	$num = $p['num'];
 	$num ? $num : $num = 1;

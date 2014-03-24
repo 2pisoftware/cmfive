@@ -9,7 +9,7 @@ function useredit_GET(Web &$w) {
     $p = $w->pathMatch("id", "box");
     $user = $w->Auth->getObject("User", $p["id"]);
     if ($user) {
-        AdminLib::navigation($w, "Administration - Edit User - " . $user->login);
+        $w->Admin->navigation($w, "Administration - Edit User - " . $user->login);
     } else {
         if (!$p['box']) {
             $w->error("User " . $w->ctx("id") . " does not exist.", "/admin/users");

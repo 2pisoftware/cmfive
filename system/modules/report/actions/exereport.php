@@ -1,7 +1,7 @@
 <?php
 // criteria/parameter form is submited and report is executed
 function exereport_ALL(Web &$w) {
-	ReportLib::navigation($w, "Generate Report");
+	$w->Report->navigation($w, "Generate Report");
 	$p = $w->pathMatch("id");
 
 	$arrreq = array();
@@ -33,7 +33,7 @@ function exereport_ALL(Web &$w) {
 
 		// if report exists, execute it
 		if ($rep) {
-			ReportLib::navigation($w, $rep->title);
+			$w->Report->navigation($w, $rep->title);
 
 			// prepare and execute the report
 			$tbl = $rep->getReportData();

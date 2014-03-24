@@ -103,8 +103,6 @@ class Html {
                 $buffer .= "Line";
         }
         $buffer .= "(" . json_encode($data) . ", " . json_encode($options) . ");";
-
-
         $buffer .= "</script>";
         return $buffer;
     }
@@ -384,6 +382,155 @@ class Html {
         return self::multiColForm($data, null, "", "", null, null, null, "", false);
     }
 
+    
+    public static function multiColForm($data, $action = null, $method = "POST", $submitTitle = "Save", $id = null, $class = null, $extrabuttons = null, $target = "_self", $includeFormTag = true, $validation = null) {
+     
+        if (empty($data)) return;
+        
+        $buffer = "";
+        $form = new \Html\form();
+        
+        // If form tag is needed print it
+        if ($includeFormTag) {
+            $form->id($id)->setClass($class)->method($method)->action($action)->target($target);
+                
+            if (in_multiarray("file", $data)) {
+                $form->enctype("multipart/form-data");
+            }
+            
+            $buffer .= $form->open();
+        }
+        
+        // Set up shell layout
+        $buffer .= "<div class='row-fluid'>";
+        
+        // Print internals
+        foreach ($data as $section => $rows) {
+            
+            // Print section header
+            $buffer .= "<div class='row-fluid'><h5>{$section}</h5></div>";
+            
+            // Loop through each row
+            foreach ($rows as $row) {
+                $buffer .= "<div class='row-fluid'>";
+                
+                // Print each field
+                $fieldCount = count($row);
+                $buffer .= "<ul class='small-block-grid-{$fieldCount}'>";
+                
+                foreach($row as $field) {
+                    
+                    $title = !empty($field[0]) ? $field[0] : null;
+                    $type = !empty($field[1]) ? $field[1] : null;
+                    $name = !empty($field[2]) ? $field[2] : null;
+                    $value = !empty($field[3]) ? $field[3] : null;
+
+                    // Exploit HTML5s inbuilt form validation
+                    $required = null;
+                    if (!empty($validation[$name])) {
+                        if (in_array("required", $validation[$name])) {
+                            $required = "required";
+                        }
+                    }
+
+                    $readonly = "";
+                    // handle disabled fields
+                    if ($name[0] == '-') {
+                        $name = substr($name, 1);
+                        $readonly = " readonly='true' ";
+                    }
+                    switch($type) {
+                        case "text":
+                        case "password":
+                            $size = !empty($field[4]) ? $field[4] : null;
+                            $buffer .= '<input' . $readonly . ' style="width:100%;" type="' . $type . '" name="' . $name . '" value="' . htmlspecialchars($value) . '" size="' . $size . '" id="' . $name . '" ' . $required . " />";
+                        break;
+                    case "autocomplete":
+                        $options = !empty($field[4]) ? $field[4] : null;
+                        $buffer .= Html::autocomplete($name, $options, $value, null, "width: 100%;", 1, $required);
+                    break;
+                    case "date":
+                        $size = !empty($field[4]) ? $field[4] : null;
+                        $buffer .= Html::datePicker($name, $value, $size, $required);
+                    break;
+                    case "datetime":
+                        $size = !empty($field[4]) ? $field[4] : null;
+                        $buffer .= Html::datetimePicker($name, $value, $size, $required);
+                    break;
+                    case "time":
+                        $size = !empty($field[4]) ? $field[4] : null;
+                        $buffer .= Html::timePicker($name, $value, $size, $required);
+                    break;
+                    case "static":
+                        $size = !empty($field[4]) ? $field[4] : null;
+                        $buffer .= $value;
+                    break;
+                    case "textarea":
+                        $c = !empty($field[4]) ? $field[4] : null;
+                        $r = !empty($field[5]) ? $field[5] : null;
+                        $useCKEditor = true;
+                        if (isset($field[6])) {
+                            $useCKEditor = $field[6];
+                        }
+                        $buffer .= '<textarea' . $readonly . ' style="width:100%;" name="' . $name . '" rows="' . $r . '" cols="' . $c . '" ' . ($useCKEditor ? 'class="ckeditor" ' : '') . ' id="' . $name . '" ' . $required . '>' . $value . '</textarea>';
+                    break;
+                    case "select":
+                        $items = !empty($field[4]) ? $field[4] : null;
+
+                        $default = !empty($field[5]) ? ($field[5] == "null" ? null : $field[5]) : "-- Select --";
+                        $class = !empty($field[6]) ? $field[6] : null;
+                        $buf.= "<td  $valign class='fieldtitle'>" . htmlentities($title) . "</td><td  $valign class='fieldvalue'>";
+                        if ($readonly == "") {
+                            $buf.= Html::select($name, $items, $value, $class, "width: 100%;", $default, $readonly != "", $required);
+                        } else {
+                            $buf.=$value;
+                        }
+                        $buf .= "</td>\n";
+                    } else if ($type == "multiSelect") {
+                        $items = !empty($field[4]) ? $field[4] : null;
+                        $buf.= "<td  $valign class='fieldtitle'>" . htmlentities($title) . "</td><td  $valign class='fieldvalue'>";
+                        if ($readonly == "") {
+                            $buf.= Html::multiSelect($name, $items, $value, null, "width: 100%;", $required);
+                        } else {
+                            $buf.=$value;
+                        }
+                        $buf .= "</td>\n";
+                    } else if ($type == "checkbox") {
+                        $defaultValue = !empty($field[4]) ? $field[4] : null;
+                        $class = !empty($field[5]) ? $field[5] : null;
+                        $buf.= "<td  $valign align='left' class='fieldtitle' colspan='2'>" . Html::checkbox($name, $value, $defaultValue, $class) . "&nbsp;" . htmlentities($title) . "</td>\n";
+                    } else if ($type == "radio") {
+                        $defaultValue = !empty($field[4]) ? $field[4] : null;
+                        $class = !empty($field[5]) ? $field[5] : null;
+                        $buf.= "<td  $valign align='left' class='fieldtitle' colspan='2'>" . Html::radio($name, $group, $value, $defaultValue, $class) . "&nbsp;" . htmlentities($title) . "</td>\n";
+                    } else if ($type == "hidden") {
+                        $hidden .= '<input type="hidden" name="' . $name . '" value="' . htmlspecialchars($value) . '" id="' . $name . '"/>' . "\n";
+                    } else if ($type == "file") {
+                        $size = !empty($row[4]) ? $row[4] : null;
+                        if ($title) {
+                            $buf .= "<tr><td $valign class='fieldtitle'>" . htmlentities($title) . "</td>";
+                        }
+                        $buf .= "<td colspan=\"2\">";
+                        $buf .= '<input style="width:100%;"  type="' . $type . '" name="' . $name . '" size="' . $size . '" id="' . $name . '"/>';
+                        $buf .= "</td></tr>\n";
+                    }
+                    
+                }
+                
+                $buffer .= "</ul></div>";
+            }
+            
+        }
+        
+        // Finish shell div tag
+        $buffer .= "</div>";
+        
+        // Clsoe form tag if needed
+        if ($includeFormTag) {
+            $buffer .= $form->close();
+        }
+    }
+    
     /**
      * Creates a complex form where each section can have
      * a different number of columns.
@@ -846,7 +993,7 @@ EOT;
 //                $buf .= "</tr><tr>";
 //            }
             
-            $buf .= "<div class=\"small-3 left\"><div class=\"row\">";
+            $buf .= "<div class=\"small-12 medium-3 left\"><div class=\"row\">";
             
             // Get row parameters
             $title = !empty($row[0]) ? $row[0] : null;
@@ -873,10 +1020,10 @@ EOT;
                 $colspan = 2;
             } else {
                 $colspan = 1;
-                $buf .= "<div class=\"small-2 columns\"><label class=\"right inline\">" . htmlentities($title) . "</label></div>";
+                $buf .= "<div class=\"small-12 medium-2 columns\"><label class=\"medium-right small-left inline\">" . htmlentities($title) . "</label></div>";
             }
 
-            $buf .= "<div class=\"small-10 columns\">";
+            $buf .= "<div class=\"small-12 medium-10 columns\">";
             $size = !empty($row[4]) ? $row[4] : null;
 
             // Get the input that we need

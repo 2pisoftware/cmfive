@@ -16,7 +16,7 @@ function view_GET(Web &$w) {
 		$_SESSION['wikicrumbs'][$pm['wikiname']][$pm['pagename']] = 1;
 	}
         
-        WikiLib::wiki_navigation($w,$wiki,$pm["pagename"]);
+    $w->Wiki->navigation($w,$wiki,$pm["pagename"]);
 	$w->ctx("body",WikiLib::wiki_format_creole($wiki,$wp));
 	$w->ctx("wiki",$wiki);
 	$w->ctx("page",$wp);

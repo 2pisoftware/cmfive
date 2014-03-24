@@ -2,7 +2,7 @@
 // Step II in creating a task. This function gets the additional fields by tasktype.
 // Serialise REQUEST object from step one and store in hidden form element: 'formone'
 function tasktypeform_POST(Web $w) {
-	TaskLib::task_navigation($w, "Create Task");
+	$w->Task->navigation($w, "Create Task");
 
 	// get task type, serialise REQUEST object from step 1 of creating a new task
 	$tid = $w->request('task_type');

@@ -8,7 +8,7 @@ function moreInfo_GET(Web &$w)
 {
 	$option = $w->pathMatch("group_id");
 
-	AdminLib::navigation($w, $w->Auth->getUser($option['group_id'])->login);
+	$w->Admin->navigation($w, $w->Auth->getUser($option['group_id'])->login);
 
 	if ($w->Auth->user()->is_admin || $w->Auth->getRoleForLoginUser($option['group_id'], $w->Auth->user()->id) == "owner")
 	{

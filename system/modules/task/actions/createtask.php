@@ -1,7 +1,7 @@
 <?php
 // Step I in creating a task. This function displays the default task creation form
 function createtask_GET(Web &$w) {
-	TaskLib::task_navigation($w, "Create Task");
+	$w->Task->navigation($w, "Create Task");
 
 	// set default dropdowns for these task attributes as empty arrays
 	// dropdowns are populated dynamically via JSON based upon task group type selected
@@ -55,7 +55,7 @@ function createtask_GET(Web &$w) {
 }
 
 function createtask_POST(Web &$w) {
-	TaskLib::task_navigation($w, "Create Task");
+	$w->Task->navigation($w, "Create Task");
 
 	// unserialise input from step I and store in array: arr_req
 	$arr_req = unserialize($w->request('formone'));

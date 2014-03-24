@@ -4,7 +4,7 @@
  */
 
 function edit_GET(Web $w) {
-	AdminLib::navigation($w,"Templates");
+	$w->Admin->navigation($w,"Templates");
 	$p = $w->pathMatch("id");
 	
 	$t = $w->Template->getTemplate($p['id']);

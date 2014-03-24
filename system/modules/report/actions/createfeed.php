@@ -1,6 +1,6 @@
 <?php
 function createfeed_GET(Web &$w) {
-	ReportLib::navigation($w, "Create a Feed");
+	$w->Report->navigation($w, "Create a Feed");
 
 	// get list of reports for logged in user. sort to list unapproved reports first
 	$reports = $w->Report->getReportsbyUserId($w->session('user_id'));
@@ -25,7 +25,7 @@ function createfeed_GET(Web &$w) {
 }
 
 function createfeed_POST(Web &$w) {
-	ReportLib::navigation($w, "Create a Feed");
+	$w->Report->navigation($w, "Create a Feed");
 
 	// create a new feed
 	$feed = new ReportFeed($w);

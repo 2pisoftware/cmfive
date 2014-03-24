@@ -1,7 +1,7 @@
 <?php
 // list available feeds in the feed dashboard
 function listfeed_ALL(Web &$w) {
-	ReportLib::navigation($w, "Feeds");
+	$w->Report->navigation($w, "Feeds");
 
 	// get all feeds
 	$feeds = $w->Report->getFeeds();

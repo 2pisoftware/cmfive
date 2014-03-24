@@ -4,7 +4,7 @@
 //////////////////////////////////////////
 
 function index_ALL(Web $w) {
-	TaskLib::task_navigation($w, "Task Dashboard");
+	$w->Task->navigation($w, "Task Dashboard");
 
 	//tab: tasks
 	// get list of groups of which i am a member

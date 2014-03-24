@@ -924,34 +924,7 @@ class Web {
     /**
      * check if a template file exists!
      */
-    function templateExists($tmpl) {
-        return file_exists($this->getTemplateRealFilename($tmpl));
-    }
-
-    function getTemplateRealFilename($tmpl) {
-        return $tmpl . $this->_templateExtension;
-    }
-
-    /**
-     * Evaluates a template in the web context and
-     * returns it as string. The template is searched for
-     * in the following order: <br/>
-     * <pre>
-     * /<moduledir>/<module>/templates/<submodule>/<action>_<httpmethod>.tpl.php
-     * /<moduledir>/<module>/templates/<submodule>/<action>.tpl.php
-     * /<moduledir>/<module>/templates/<submodule>/<submodule>.tpl.php
-     * /<moduledir>/<module>/templates/<action>_<httpmethod>.tpl.php
-     * /<moduledir>/<module>/templates/<action>.tpl.php
-     * /<moduledir>/<module>/templates/<module>.tpl.php
-     * /<moduledir>/<module>/<action>_<httpmethod>.tpl.php
-     * /<moduledir>/<module>/<action>.tpl.php
-     * /<moduledir>/<module>/<module>.tpl.php
-     * /<templatedir>/<action>_<httpmethod>.tpl.php
-     * /<templatedir>/<action>.tpl.php
-     * /<templatedir>/<module>.tpl.php
-     * </pre>
-     */
-    function fetchTemplate($name = null) {
+    function templateExists($name) {
         if ($this->_submodule) {
             $paths[] = implode("/", array($this->getModuleDir($this->_module), $this->_templatePath, $this->_submodule));
         }
@@ -981,7 +954,8 @@ class Web {
         $template = null;
         foreach ($paths as $path) {
             foreach ($names as $nam) {
-                if ($nam && $this->templateExists($path . '/' . $nam)) {
+                $name = $this->getTemplateRealFilename($nam);
+                if ($name && file_exists($path . '/' . $name)) {
                     $template = $path . '/' . $nam;
                     break 2; // break out of both loops
                 } else {
@@ -989,6 +963,35 @@ class Web {
                 }
             }
         }
+    
+        return $template;
+    }
+
+    function getTemplateRealFilename($tmpl) {
+        return $tmpl . $this->_templateExtension;
+    }
+
+    /**
+     * Evaluates a template in the web context and
+     * returns it as string. The template is searched for
+     * in the following order: <br/>
+     * <pre>
+     * /<moduledir>/<module>/templates/<submodule>/<action>_<httpmethod>.tpl.php
+     * /<moduledir>/<module>/templates/<submodule>/<action>.tpl.php
+     * /<moduledir>/<module>/templates/<submodule>/<submodule>.tpl.php
+     * /<moduledir>/<module>/templates/<action>_<httpmethod>.tpl.php
+     * /<moduledir>/<module>/templates/<action>.tpl.php
+     * /<moduledir>/<module>/templates/<module>.tpl.php
+     * /<moduledir>/<module>/<action>_<httpmethod>.tpl.php
+     * /<moduledir>/<module>/<action>.tpl.php
+     * /<moduledir>/<module>/<module>.tpl.php
+     * /<templatedir>/<action>_<httpmethod>.tpl.php
+     * /<templatedir>/<action>.tpl.php
+     * /<templatedir>/<module>.tpl.php
+     * </pre>
+     */
+    function fetchTemplate($name = null) {
+        $template = $this->templateExists($name);
 
         if (!$template) {
             $this->logError("No Template found.");

@@ -4,7 +4,7 @@
 //////////////////////////////////////////////////
 
 function index_ALL(Web &$w) {
-	ReportLib::navigation($w, "Reports");
+	$w->Report->navigation($w, "Reports");
 
 	// report approval flag: display appropriate image
 	$app[0] = "<img alt=\"No\" src=\"/templates/img/no.gif\" style=\"display: block; margin-left: auto; margin-right: auto;\">";

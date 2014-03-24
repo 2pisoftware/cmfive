@@ -1,6 +1,6 @@
 <?php
 function newlookup_POST(Web &$w) {
-	AdminLib::navigation($w,"Lookup");
+	$w->Admin->navigation($w,"Lookup");
 
 	$_REQUEST['type'] = ($_REQUEST['ntype'] != "") ? $_REQUEST['ntype'] : $_REQUEST['type'];
 

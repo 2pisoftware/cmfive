@@ -1,6 +1,6 @@
 <?php
 function view_GET(Web $w) {
-	InboxLib::inbox_navigation($w,"Message View");
+	$w->Inbox->navigation($w,"Message View");
 	$p = $w->pathMatch("type","id");
 	$msg = $w->Inbox->getMessage($p['id']);
 	if (!$msg) {

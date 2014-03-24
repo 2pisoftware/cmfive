@@ -1,7 +1,7 @@
 <?php
 // show task activity for the group and date span specified
 function taskweek_ALL(Web &$w) {
-	TaskLib::task_navigation($w, "");
+	$w->Task->navigation($w, "");
 
 	// if no group then no group
 	$taskgroup = $w->request('taskgroup');

@@ -1,7 +1,7 @@
 <?php
 // save newly created form
 function savereport_POST(Web &$w) {
-	ReportLib::navigation($w, "Create Report");
+	$w->Report->navigation($w, "Create Report");
 
 	// get type of statement: select/insert/update/delete
 	$_POST['sqltype'] = $w->Report->getSQLStatementType($_POST['report_code']);

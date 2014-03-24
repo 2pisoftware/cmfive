@@ -23,7 +23,7 @@ function forms_listener_PRE_ACTION(&$w) {
 		if ($w->Auth->hasRole("forms_admin")) {
 			$adm = array();
 			$w->menuLink("forms-admin/index","Edit Applications",$adm);
-			$boxes["Forms Admin"] = Html::ul($adm,null,"side-nav");
+			$boxes["Forms Admin"] = Html::ul($adm, null);
 		}
 	
 		$w->ctx("boxes",$boxes);

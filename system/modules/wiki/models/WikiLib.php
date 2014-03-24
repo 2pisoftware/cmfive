@@ -2,21 +2,6 @@
 
 class WikiLib {
 
-    static function wiki_navigation(Web $w, $wiki, $page) {
-        if (!empty($wiki)){
-            if (property_exists($wiki, "title")) {
-                $w->ctx("title", $wiki->title . (!empty($page) ? " - " . $page : ''));
-            }
-        }
-        
-        $nav = !empty($nav) ? $nav : array();
-        if ($w->Auth->loggedIn()) {
-            $w->menuLink("wiki/index", "Wiki List", $nav);
-            $w->menuBox("wiki/createwiki", "New Wiki", $nav);
-        }
-        $w->ctx("navigation", $nav);
-    }
-
     /**
      * Returns HTML transformed from wiki markup
      * @param $page

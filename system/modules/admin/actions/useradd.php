@@ -7,7 +7,7 @@
 function useradd_GET(Web &$w) {
 	$p = $w->pathMatch("box");
 	if (!$p['box']) {
-		AdminLib::navigation($w,"Add User");
+		$w->Admin->navigation($w,"Add User");
 	} else {
 		$w->setLayout(null);
 	}

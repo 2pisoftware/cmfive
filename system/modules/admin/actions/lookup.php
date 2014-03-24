@@ -1,6 +1,6 @@
 <?php
 function lookup_ALL(Web &$w) {
-	AdminLib::navigation($w,"Lookup");
+	$w->Admin->navigation($w,"Lookup");
 
 	$types = $w->Admin->getLookupTypes();
 

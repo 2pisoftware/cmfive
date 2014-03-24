@@ -109,20 +109,21 @@ class ChannelService extends DbService {
 	}
 
 	/**
-	 * Aux Channels naivgation function
+	 * Channels naivgation function
 	 * @return none
 	 */
-	public function navigation($title,$prenav=null) {
+    public function navigation(Web $w, $title = null, $prenav=null) {
 		if ($title) {
-			$this->w->ctx("title",$title);
+			$w->ctx("title",$title);
 		}
 		$nav = $prenav ? $prenav : array();
-		if ($this->w->Auth->loggedIn()) {
-			$this->w->menuLink("channels/listchannels","List Channels", $nav);
-			$this->w->menuLink("channels/listprocessors","List Processors", $nav);
-			$this->w->menuLink("channels/listmessages","List Messages", $nav);
+		if ($w->Auth->loggedIn()) {
+			$w->menuLink("channels/listchannels","List Channels", $nav);
+			$w->menuLink("channels/listprocessors","List Processors", $nav);
+			$w->menuLink("channels/listmessages","List Messages", $nav);
 		}
-		$this->w->ctx("navigation", $nav);
+		$w->ctx("navigation", $nav);
+        return $nav;
 	}
 
 }

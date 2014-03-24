@@ -461,4 +461,26 @@ class ReportService extends DbService {
 			return false;
 		}
 	}
+    
+    // build the Report navigation
+	public function navigation(Web $w, $title = null, $nav = null) {
+		if ($title) {
+			$w->ctx("title",$title);
+		}
+	
+		$nav = $nav ? $nav : array();
+	
+		if ($w->Auth->loggedIn()) {
+			$w->menuLink("report/index","Report Dashboard",$nav);
+	
+			if ($w->Auth->user()->hasRole("report_editor") || $w->Auth->user()->hasRole("report_admin")) {
+				$w->menuLink("report/createreport","Create a Report",$nav);
+				$w->menuLink("report/listconnections","Connections",$nav);
+				$w->menuLink("report/listfeed","Feeds Dashboard",$nav);
+			}
+		}
+	
+		$w->ctx("navigation", $nav);
+        return $nav;
+	}
 }

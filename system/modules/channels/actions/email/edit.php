@@ -5,7 +5,7 @@ function edit_GET(Web $w) {
 	$p = $w->pathMatch("id");
 	$channel_id = $p["id"];
 
-	$w->Channel->navigation($channel_id ? "Edit" : "Add" . " an Email Channel");
+	$w->Channels->navigation($w, $channel_id ? "Edit" : "Add" . " an Email Channel");
 
 	// Get channel and form
 	$channel_object = $channel_id ? $w->Channel->getChannel($channel_id) : new Channel($w);

@@ -6,7 +6,7 @@
 */
 function groups_GET(Web &$w)
 {
-	AdminLib::navigation($w,"Groups");
+	$w->Admin->navigation($w,"Groups");
 
 	$table = array(array("Title","Parent Groups","Operations"));
 

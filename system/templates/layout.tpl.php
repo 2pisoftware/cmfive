@@ -119,8 +119,8 @@
                                     </div>
                                 </div>
                             </form>
-                        </li>
-                        <!-- End search bar -->
+                        </li> <!-- End search bar -->
+                        
                         <!-- User Profile dropdown -->
                         <?php if ($w->Auth->user()): ?>
                             <li class="has-dropdown">
@@ -146,12 +146,12 @@
                                 if ($options['topmenu']) :
                                     // Check for navigation
                                     if (method_exists($name . "Service", "navigation")) : ?>
-                                        <li class="has-dropdown <?php $w->_module == $name ? 'active' : ''; ?>">
-                                            <a href="#"><?php echo ucfirst($name); ?></a>
+                                        <li class="has-dropdown <?php echo $w->_module == $name ? 'active' : ''; ?>">
+                                            <?php echo $w->menuLink($name . "/index", ucfirst($name)); ?>
                                             <?php echo Html::ul($w->service($name)->navigation($w), null, "dropdown"); ?>
                                         </li>
                                     <?php else: ?>
-                                        <li><?php echo $w->menuLink($name . "/index", ucfirst($name)); ?></li>
+                                        <li <?php echo $w->_module == $name ? 'class="active"' : ''; ?>><?php echo $w->menuLink($name . "/index", ucfirst($name)); ?></li>
                                     <?php endif; ?>
                                     <li class="divider"></li>
                                 <?php endif;
@@ -161,7 +161,7 @@
                                 <li><?php echo Html::box(WEBROOT . "/help/view/" . $w->_module . ($w->_submodule ? "-" . $w->_submodule : "") . "/" . $w->_action, "HELP", false, true, 750, 500); ?> </li>
                             <?php endif;
                         endif; ?>
-                    </ul>
+                    </ul> <!-- End left nav section -->
                 </section>
             </nav>
         </div>
@@ -169,9 +169,9 @@
         <div class="row-fluid" style="overflow: hidden; padding: 10px;">
             <?php /* Check if there are side boxes defined */
             if (!empty($boxes)) : ?>
-                <div class="small-2 left">
+                <div class="small-12 medium-2 left">
                     <?php foreach ($boxes as $btitle => $box) : ?>
-                        <div class="row panel">
+                        <div class="row boxes">
                             <h5><?php echo ucfirst($btitle); ?></h5>
                             <?php echo $box; ?>
                         </div>
@@ -180,8 +180,8 @@
             <?php endif; ?>
 
             <?php // Body section w/ message and body from template ?>
-            <div class="row-fluid <?php if(!empty($boxes)) echo "small-10"; ?>" style="padding-left: 10px; overflow: hidden;">
-                <h4><?php echo !empty($title) ? $title : ucfirst($w->currentModule()); ?></h4>
+            <div class="body row-fluid <?php if(!empty($boxes)) echo "medium-10 small-12 "; ?>">
+                <h3 class="header"><?php echo !empty($title) ? $title : ucfirst($w->currentModule()); ?></h3>
                 <?php if (!empty($error) || !empty($msg)) : ?>
                     <?php $type = !empty($error) ? array("name" => "error", "class" => "warning") : array("name" => "msg", "class" => "info"); ?>
                     <div data-alert class="alert-box <?php echo $type["class"]; ?>">
@@ -197,12 +197,12 @@
         </div>
         
         <div class="row-fluid">
-            <div id="footer" class="panel">
-                Copyright <?php echo date('Y'); ?> <a href="<?php echo $w->moduleConf('main', 'company_url'); ?>"><?php echo $w->moduleConf('main', 'company_name'); ?></a>
+            <div id="footer">
+                Copyright &#169; <?php echo date('Y'); ?>&nbsp;&nbsp;&nbsp;<a href="<?php echo $w->moduleConf('main', 'company_url'); ?>"><?php echo $w->moduleConf('main', 'company_name'); ?></a>
             </div>
         </div>
 
-        <script type="text/javascript" src="<?php echo $webroot; ?>/system/templates/js/foundation-5.0.2/js/foundation.min.js"></script>
+        <script type="text/javascript" src="/system/templates/js/foundation-5.0.2/js/foundation.min.js"></script>
         <script>
             jQuery(document).foundation();
         </script>

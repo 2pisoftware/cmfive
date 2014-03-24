@@ -44,4 +44,19 @@ class WikiService extends DbService {
 		return $wiki;
 	}
 
+    public function navigation(Web $w, Wiki $wiki = null, $page = null) {
+        if (!empty($wiki)){
+            if (property_exists($wiki, "title")) {
+                $w->ctx("title", $wiki->title . (!empty($page) ? " - " . $page : ''));
+            }
+        }
+        
+        $nav = !empty($nav) ? $nav : array();
+        if ($w->Auth->loggedIn()) {
+            $w->menuLink("wiki/index", "Wiki List", $nav);
+            $w->menuBox("wiki/createwiki", "New Wiki", $nav);
+        }
+        $w->ctx("navigation", $nav);
+        return $nav;
+    }
 }

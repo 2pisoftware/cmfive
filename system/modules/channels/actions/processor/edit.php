@@ -5,7 +5,7 @@ function edit_GET(Web $w) {
 	$p = $w->pathMatch("id");
 	$processor_id = $p["id"];
 
-	$w->Channel->navigation($processor_id ? "Edit" : "Add" . " a Processor");
+	$w->Channels->navigation($w, $processor_id ? "Edit" : "Add" . " a Processor");
 
 	// Get channel and form
 	$processor = $processor_id ? $w->Channel->getProcessor($processor_id) : new ChannelProcessor($w);

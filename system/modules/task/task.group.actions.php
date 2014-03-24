@@ -5,7 +5,7 @@
 ////////////////////////////////////////////
 
 function viewtaskgrouptypes_ALL(Web &$w) {
-	TaskLib::task_navigation($w, "Manage Task Groups");
+	$w->Task->navigation($w, "Manage Task Groups");
     $task_groups = $w->Task->getTaskGroups();
     if ($task_groups) {
     	usort($task_groups, array("TaskService","sortbyGroup"));
@@ -242,7 +242,7 @@ function viewmembergroup_GET(Web &$w) {
 	$group = $w->Task->getTaskGroup($p['id']);
 
 	// put the group title into the page heading
-	TaskLib::task_navigation($w, "Task Group - " . $group->title);
+	$w->Task->navigation($w, "Task Group - " . $group->title);
 	
 	// set columns headings for display of members
 	$line[] = array("Member","Role","");

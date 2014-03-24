@@ -4,7 +4,7 @@
 //////////////////////////////////////////////////
 
 function viewreport_GET(Web &$w) {
-	ReportLib::navigation($w, "Edit Report");
+	$w->Report->navigation($w, "Edit Report");
 	$p = $w->pathMatch("id");
 
 	// tab: view report

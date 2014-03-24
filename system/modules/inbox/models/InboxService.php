@@ -223,4 +223,19 @@ class InboxService extends DbService {
 		$user_id = $this->Auth->user()->id;
 		return $this->_db->sql("update inbox set is_new = 0, dt_read = NOW() where user_id = $user_id and is_new = 1")->execute();
 	}
+    
+    public function navigation(Web $w, $title = null, $nav=null) {
+		if ($title) {
+			$w->ctx("title",$title);
+		}
+		$nav = $nav ? $nav : array();
+		if ($w->Auth->loggedIn()) {
+			$w->menuLink("inbox","New Messages",$nav);
+			$w->menuLink("inbox/read","Read Messages",$nav);
+			$w->menuLink("inbox/showarchive","Archive",$nav);
+			$w->menuLink("inbox/trash","Bin",$nav);
+		}
+		$w->ctx("navigation", $nav);
+        return $nav;
+	}
 }

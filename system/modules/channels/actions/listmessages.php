@@ -1,7 +1,7 @@
 <?php
 
 function listmessages_GET(Web $w) {
-	$w->Channel->navigation("Messages list");
+	$w->Channels->navigation($w, "Messages list");
 
 	$p = $w->pathMatch("id");
 	$channel_id = $p["id"];

@@ -9,7 +9,8 @@ function pagechanges_GET(Web $w) {
 	if (!$wp) {
 		$w->error("Page does not exist.","/wiki/index");
 	}
-        WikiLib::wiki_navigation($w,$wiki,$pm["pagename"]);
+    
+    $w->Wiki->navigation($w,$wiki,$pm["pagename"]);
 	$w->ctx("wiki",$wiki);
 	$w->ctx("page",$wp);
 }

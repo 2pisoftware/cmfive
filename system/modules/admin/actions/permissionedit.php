@@ -7,7 +7,7 @@ function permissionedit_GET(Web $w) {
 
     $userName = $user->is_group == 1 ? $user->login : $user->getContact()->getFullName();
 
-    AdminLib::navigation($w, "Permissions - " . $userName);
+    $w->Admin->navigation($w, "Permissions - " . $userName);
 
     //fill in permission tables;
     $groupUsers = $w->Auth->getUser($option['group_id'])->isInGroups();
