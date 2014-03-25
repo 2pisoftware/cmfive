@@ -52,6 +52,8 @@ CREATE TABLE IF NOT EXISTS `audit` (
   `dt_created` datetime NOT NULL,
   `creator_id` bigint(20) NOT NULL,
   `module` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
+  `submodule` TEXT NULL,
+  `message` TEXT NULL,
   `action` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
   `path` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `ip` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
@@ -242,9 +244,11 @@ CREATE TABLE IF NOT EXISTS `user` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `login` varchar(32) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `password_salt` VARCHAR( 255 ) NULL,
   `contact_id` bigint(20) DEFAULT NULL,
   `password_reset_token` VARCHAR( 32 ) NULL,
   `dt_password_reset_at` TIMESTAMP NULL,
+  `redirect_url` VARCHAR( 255 ) NOT NULL DEFAULT 'main/index',
   `is_admin` tinyint(1) NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
@@ -701,6 +705,7 @@ CREATE TABLE IF NOT EXISTS `template` (
 CREATE TABLE IF NOT EXISTS `channel` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `name` VARCHAR( 255 ) NULL,
   `notify_user_email` varchar(255) DEFAULT NULL,
   `notify_user_id` bigint(20) DEFAULT NULL,
   `creator_id` bigint(20) NOT NULL,
@@ -708,6 +713,7 @@ CREATE TABLE IF NOT EXISTS `channel` (
   `dt_created` datetime NOT NULL,
   `dt_modified` datetime NOT NULL,
   `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `do_processing` TINYINT( 1 ) NOT NULL DEFAULT  '1'
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
@@ -726,17 +732,27 @@ CREATE TABLE IF NOT EXISTS `channel_email_option` (
   `dt_created` datetime NOT NULL,
   `dt_modified` datetime NOT NULL,
   `is_deleted` tinyint(4) NOT NULL DEFAULT '0',
+  `protocol` VARCHAR( 255 ) NULL,
+  `to_filter` VARCHAR( 255 ) NULL,
+  `from_filter` VARCHAR( 255 ) NULL,
+  `subject_filter` VARCHAR( 255 ) NULL,
+  `cc_filter` VARCHAR( 255 ) NULL,
+  `body_filter` VARCHAR( 255 ) NULL,
+  `post_read_action` VARCHAR( 255 ) NULL,
+  `post_read_parameter` VARCHAR( 255 ) NULL,
+   
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 
 CREATE TABLE IF NOT EXISTS `channel_processor` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `class` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `module` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `class` varchar(255)  NOT NULL,
+  `module` varchar(255)  NOT NULL,
   `channel_id` bigint(20) NOT NULL,
-  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `settings` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `processor_settings` VARCHAR( 1024 ) NULL,
+  `settings` varchar(1024)  DEFAULT NULL,
   `creator_id` bigint(20) NOT NULL,
   `modifier_id` bigint(20) NOT NULL,
   `dt_created` datetime NOT NULL,
@@ -749,7 +765,7 @@ CREATE TABLE IF NOT EXISTS `channel_processor` (
 CREATE TABLE IF NOT EXISTS `channel_message` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `channel_id` bigint(20) NOT NULL,
-  `channel_type` varchar(255) NOT NULL,
+  `message_type` varchar(255) NOT NULL,
   `is_processed` tinyint(1) NOT NULL DEFAULT '0',
   `creator_id` bigint(20) DEFAULT NULL,
   `modifier_id` bigint(20) DEFAULT NULL,
@@ -780,8 +796,8 @@ CREATE TABLE IF NOT EXISTS `report_connection` (
   `db_port` varchar(255) NULL,
   `db_database` varchar(255) NULL,
   `db_file` varchar(255) NULL,
-  `s_db_user` varchar(255) NULL,
-  `s_db_password` varchar(255) NULL,  
+  `s_db_user` varchar(1024) NULL,
+  `s_db_password` varchar(1024) NULL,  
   `creator_id` bigint(20) DEFAULT NULL,
   `modifier_id` bigint(20) DEFAULT NULL,
   `dt_created` datetime NOT NULL,
