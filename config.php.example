@@ -20,6 +20,17 @@ $MYSQL_USERNAME = 'cmfive';
 $MYSQL_PASSWORD = 'cmfive';
 $MYSQL_DB_NAME = 'cmfive';
 
+//=========== Email Layer Configuration =====================
+
+$EMAIL_CONFIG = array(
+	"layer"		=> "swiftmailer",		// mail, swiftmailer
+	"host"		=> "smtp.gmail.com",
+	"port"		=> 465,
+	"auth"		=> true,
+	"username"	=> '<email>',
+	"password"	=> '<password>'
+);
+
 //========= Application Log Level ===========================
 
 $LOG_LEVEL = 'debug';
