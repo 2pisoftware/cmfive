@@ -19,6 +19,7 @@ $MYSQL_DB_HOST = 'localhost';
 $MYSQL_USERNAME = 'cmfive';
 $MYSQL_PASSWORD = 'cmfive';
 $MYSQL_DB_NAME = 'cmfive';
+$MYSQL_DRIVER = 'mysql';
 
 //=========== Email Layer Configuration =====================
 
@@ -59,6 +60,7 @@ $ALLOW_MODULE = array(
 $ALLOW_ACTION = array(
 		"auth/login",
         "auth/forgotpassword",
+        "auth/resetpassword",
 );
 
 //========= REST Configuration ==============================

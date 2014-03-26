@@ -713,7 +713,7 @@ CREATE TABLE IF NOT EXISTS `channel` (
   `dt_created` datetime NOT NULL,
   `dt_modified` datetime NOT NULL,
   `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
-  `do_processing` TINYINT( 1 ) NOT NULL DEFAULT  '1'
+  `do_processing` TINYINT( 1 ) NOT NULL DEFAULT  '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
