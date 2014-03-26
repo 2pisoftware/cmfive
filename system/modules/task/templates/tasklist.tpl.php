@@ -1,22 +1,10 @@
-<script type="text/javascript">
-    var current_tab = 1;
-    function switchTab(num){
-        if (num == current_tab) return;
-        $('#tab-'+current_tab).hide();
-        $('#tab-link-'+current_tab).removeClass("active");
-        $('#tab-'+num).show().addClass("active");
-        $('#tab-link-'+num).addClass("active");
-        current_tab = num;
-    }
-</script>
 <div class="tabs">
 	<div class="tab-head">
-		<a href="/task/index">Task Dashboard</a>
-		<a id="tab-link-1" href="#" class="active"	onclick="switchTab(1);">Task List</a>
-		<a id="tab-link-2" href="#" onclick="switchTab(2);">Notifications</a>
+		<a href="#list" class="active">Task List</a>
+		<a href="#notifications">Notifications</a>
 	</div>
 	<div class="tab-body">
-		<div id="tab-1">
+		<div id="list">
 			<form id="leadfilter" action="<?php echo WEBROOT."/task/tasklist"?>" method="POST">
 				<input type="hidden" name="<?php echo CSRF::getTokenID(); ?>" value="<?php echo CSRF::getTokenValue(); ?>" />
 				<fieldset style="margin-top: 10px;">
@@ -56,7 +44,7 @@
 			<?php echo $mytasks; ?>
 			</form>
 		</div>
-		<div id="tab-2" style="display:none;">
+		<div id="notifications" style="display:none;">
 		Set up each of your Task Groups so that you will be notified, via your Inbox, of events that take place to Tasks relevant to you.
 		<dl>
 		<dt><b>Key</b>

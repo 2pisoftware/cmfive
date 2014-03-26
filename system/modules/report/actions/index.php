@@ -7,8 +7,8 @@ function index_ALL(Web &$w) {
 	ReportLib::navigation($w, "Reports");
 
 	// report approval flag: display appropriate image
-	$app[0] = "<img alt=\"No\" src=\"/templates/img/no.gif\" style=\"display: block; margin-left: auto; margin-right: auto;\">";
-	$app[1] = "<img alt=\"Yes\" src=\"/templates/img/yes.gif\" style=\"display: block; margin-left: auto; margin-right: auto;\">";
+	$app[0] = "<img alt=\"No\" src=\"/system/templates/img/no.gif\" style=\"display: block; margin-left: auto; margin-right: auto;\">";
+	$app[1] = "<img alt=\"Yes\" src=\"/system/templates/img/yes.gif\" style=\"display: block; margin-left: auto; margin-right: auto;\">";
 
 	// organise criteria
 	$who = $w->session('user_id');
@@ -94,7 +94,7 @@ function index_ALL(Web &$w) {
 		$line[] = array("You have no available reports","","","","","","");
 	}
 	// populate search dropdowns
-	$modules = array();
+	$modules = $w->Report->getModules();
 	$w->ctx("modules",Html::select("module",$modules));
 	//$category = array();
 	//$w->ctx("category",Html::select("category",$category));

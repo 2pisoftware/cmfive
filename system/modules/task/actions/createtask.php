@@ -46,7 +46,7 @@ function createtask_GET(Web &$w) {
 		array("Task Type","select","task_type",null,$tasktypes),
 		array("Priority","select","priority",null,$priority),
 		array("Date Due","date","dt_due"),
-		array("Description","textarea","description",null,"80","15"),
+		array("Description","textarea","description",null,110,15),
 		array("Assigned To","select","first_assignee_id",null,$members),
 		),$w->localUrl("/task/tasktypeform/"),"POST"," Continue >> ");
 

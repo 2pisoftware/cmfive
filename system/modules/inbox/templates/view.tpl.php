@@ -1,8 +1,4 @@
-<div class="tabs">
-	<div class="tab-head">
-		<a id="tab-link-1" href="#" class="active" onclick="switchTab(1);">Message</a>
-	</div>
-	<div class="tab-body">
+
 
 	<?php
 		print $w->menuButton("inbox/"/*.$row['status']*/,"Back");
@@ -24,15 +20,16 @@
 		print Html::table($qlines,null,"tablesorter",true);
 	?>
 
-	<div class="tab-body" style="margin-bottom: 20px; padding: 10px;">
-		<?php echo $message->getMessage(); ?>
-	</div>
+	<hr/>
+	<?php echo $message->getMessage(); ?>
+
+	<hr/>
 	<?php
 		$parent_id = $message->parent_message_id;
 		$parent_id = $message->parent_message_id;
 	
 		if ($parent_id){
-			print "<div class='tab-body' style='width: 500px; margin-bottom: 20px; padding: 10px;'>";
+			print "<div style='width: 500px; margin-bottom: 20px; padding: 10px;'>";
 			print "<b><u> Previous Messages </u></b><br/><hr/>";
 			$counter = 1;
 			while (!$parent_id == 0 || !$parent_id == null){
@@ -52,5 +49,4 @@
 		}
 		
 		?>
-	</div>
-</div>
+
