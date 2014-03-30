@@ -1,13 +1,15 @@
 <div class="tabs">
-	<div class="tab-head">
-		<a id="tab-link-1" href="#" onclick="switchTab(1);" class="active">Task Details</a>
-		<a id="tab-link-2" href="#" onclick="switchTab(2);">Time Log</a>
-		<a id="tab-link-3" href="#"	onclick="switchTab(3);">Task Comments</a>
-		<a id="tab-link-4" href="#" onclick="switchTab(4);">Task Documents</a>
-		<?php echo !empty($tasknotifications) ? $tasknotifications : null; ?>
-	</div>
+
+    <div class="tab-head">
+        <a href="#details">Task Details</a>
+        <a href="#timelog">Time Log</a>
+        <a href="#comments">Comments</a>
+        <a href="#documents">Documents</a>
+       	<?php if ($task->getCanINotify()):?><a href="#notification">Notifications</a><?php endif;?>
+    </div>	
+	
 	<div class="tab-body">
-		<div id="tab-1">
+		<div id="details">
 			<?php echo !empty($btndelete) ? $btndelete : null; ?>
 			&nbsp;&nbsp;&nbsp;<?php echo !empty($btntimelog) ? $btntimelog : null; ?>
 			&nbsp;&nbsp;&nbsp;<?php echo $task->getTaskTypeObject()->displayExtraButtons($task);?>
@@ -17,17 +19,23 @@
 			</table>
 			<p></p>
 		</div>
-		<div id="tab-2" style="display: none;">
+		<div id="timelog" style="display: none;">
 			<?php echo !empty($addtime) ? $addtime : null; ; ?>
 			<?php echo !empty($timelog) ? $timelog : null; ; ?>
 		</div>
-		<div id="tab-3" style="display: none;">
-			 <?php echo $w->partial("listcomments",array("object"=>$task,"redirect"=>"task/viewtask/{$task->id}?tab=3"),"admin");?>
+		<div id="comments" style="display: none;">
+			 <?php echo $w->partial("listcomments",array("object"=>$task,"redirect"=>"task/viewtask/{$task->id}#comments"),"admin");?>
 		</div>
-		<div id="tab-4" style="display: none;">
-			 <?php echo $w->partial("listattachments",array("object"=>$task,"redirect"=>"task/viewtask/{$task->id}?tab=4"),"file");?>
+		<div id="documents" style="display: none;">
+			 <?php echo $w->partial("listattachments",array("object"=>$task,"redirect"=>"task/viewtask/{$task->id}#documents"),"file");?>
 		</div>
-		<?php echo !empty($tasknotify) ? $tasknotify : null; ?>
+		<?php if ($task->getCanINotify()):?>
+		<div id="notification" style="display: none;">
+			Set your Notifications specific to this Task, otherwise your notifications for this Task Group will be employed.
+			<p>
+			<?php echo $tasknotify;?>
+		</div>
+		<?php endif;?>
 	</div>
 </div>
 

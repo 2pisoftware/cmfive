@@ -1,4 +1,5 @@
-ALTER TABLE  `channel_email_option` ADD  `protocol` VARCHAR( 255 ) NULL AFTER  `folder` ,
+ALTER TABLE  `channel_email_option` 
+ADD  `protocol` VARCHAR( 255 ) NULL AFTER  `folder` ,
 ADD  `to_filter` VARCHAR( 255 ) NULL AFTER  `protocol` ,
 ADD  `from_filter` VARCHAR( 255 ) NULL AFTER  `to_filter` ,
 ADD  `subject_filter` VARCHAR( 255 ) NULL AFTER  `from_filter` ,

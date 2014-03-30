@@ -99,7 +99,7 @@
                         <div id="dolphinnav">
                             <?php
                             if ($w->Auth->allowed('help/view')) {
-                                $top_navigation[] = Html::box(WEBROOT . "/help/view/" . $w->_module . ($w->_submodule ? "-" . $w->_submodule : "") . "/" . $w->_action, "HELP", false, true, 750, 500);
+                                $top_navigation[] = Html::box(WEBROOT . "/help/view/" . $w->_module . ($w->_submodule ? "-" . $w->_submodule : "") . "/" . $w->_action, "HELP", false, true, 750, 750);
                             }
                             echo Html::ul($top_navigation);
                             ?>
