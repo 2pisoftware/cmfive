@@ -365,6 +365,7 @@ class DbObject extends DbService {
      * @return array
      */
     function toArray() {
+        $arr = array();
         foreach (get_object_vars($this) as $k => $v) {
             if ($k{0} != "_" && $k != "w") { // ignore volatile vars
                 $arr[$k] = $v;

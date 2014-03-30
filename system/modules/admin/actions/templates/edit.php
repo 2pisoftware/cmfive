@@ -41,9 +41,13 @@ function edit_GET(Web $w) {
 	);
 	
 	$w->ctx("testdataform", Html::multiColForm($newForm, $w->localUrl('/admin-templates/edit/'.$t->id)));
-	
-	$w->ctx("testtitle",$t->testTitle());
-	$w->ctx("testbody",$t->testBody());
+	$w->ctx("id", $p['id']);
+//        try {
+//            $w->ctx("testtitle",$t->testTitle());
+//            $w->ctx("testbody",$t->testBody());
+//        } catch (Exception $e) {
+//            $w->ctx("testbody", "Error: Couldn't not render Twig template.<br/>Error Message: " . $e->getMessage());
+//        }
 		
 }
 
