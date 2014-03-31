@@ -58,7 +58,9 @@ class PrinterService extends DbService {
             // Run the command
             // echo $command . "<br/>";
             $response = shell_exec($command . " 2>&1");
-            // echo $response;
+            if (!empty($response)){
+                echo $response;
+            }
             return $response;
         }
     }
