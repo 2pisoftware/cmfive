@@ -46,4 +46,38 @@ table .section {
     font-weight: lighter;
 }
 
+.section-header {
+    margin-bottom: 10px;
+    padding: 5px;
+    font-weight: bolder;
+    background-color: #4D88A5;
+}
 
+.section-body {
+    
+}
+
+.widget_part1 {
+    margin: 10px;
+    padding-bottom: 10px;
+    /*width: 29.8%;*/
+    background-color: #fff;
+    /*border: 1px #565656 solid;*/
+    float: left;
+}
+
+.widget_part2 {
+    margin: 10px;
+    padding-bottom: 10px;
+    /*width: 29.8%;*/
+    /*background-color: #9c9c9c;*/
+    float: left;
+}
+
+.widget_part3 {
+    margin: 10px;
+    padding-bottom: 10px;
+    /*width: 29.8%;*/
+    /*background-color: #cacaca;*/
+    float: left;
+}

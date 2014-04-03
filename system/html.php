@@ -2,6 +2,7 @@
 
 require_once "classes/html/a.php";
 require_once "classes/html/button.php";
+require_once "classes/html/form.php";
 
 class Html {
 
@@ -402,21 +403,20 @@ class Html {
         }
         
         // Set up shell layout
-        $buffer .= "<div class='row-fluid'>";
+        $buffer .= "<div class='row-fluid small-12 multicolform'>";
         
         // Print internals
         foreach ($data as $section => $rows) {
             
             // Print section header
-            $buffer .= "<div class='row-fluid'><h5>{$section}</h5></div>";
+            $buffer .= "<div class='row-fluid section-header'><h4>{$section}</h4></div>";
             
             // Loop through each row
             foreach ($rows as $row) {
-                $buffer .= "<div class='row-fluid'>";
                 
                 // Print each field
                 $fieldCount = count($row);
-                $buffer .= "<ul class='small-block-grid-{$fieldCount}'>";
+                $buffer .= "<ul class='small-block-grid-1 medium-block-grid-{$fieldCount} section-body'>";
                 
                 foreach($row as $field) {
                     
@@ -434,6 +434,17 @@ class Html {
                     }
 
                     $readonly = "";
+                    
+                    $buffer .= "<li>";
+                    
+                    // Add title field
+                    if (!empty($title)) {
+                        $buffer .= "<div class='row-fluid'><div class='small-12 medium-3 columns'>{$title}</div>";
+                        $buffer .= "<div class='small-12 medium-9 columns'>";
+                    } else {
+                        $buffer .= "<div class='small-12'>";
+                    }
+                    
                     // handle disabled fields
                     if ($name[0] == '-') {
                         $name = substr($name, 1);
@@ -445,90 +456,88 @@ class Html {
                             $size = !empty($field[4]) ? $field[4] : null;
                             $buffer .= '<input' . $readonly . ' style="width:100%;" type="' . $type . '" name="' . $name . '" value="' . htmlspecialchars($value) . '" size="' . $size . '" id="' . $name . '" ' . $required . " />";
                         break;
-                    case "autocomplete":
-                        $options = !empty($field[4]) ? $field[4] : null;
-                        $buffer .= Html::autocomplete($name, $options, $value, null, "width: 100%;", 1, $required);
-                    break;
-                    case "date":
-                        $size = !empty($field[4]) ? $field[4] : null;
-                        $buffer .= Html::datePicker($name, $value, $size, $required);
-                    break;
-                    case "datetime":
-                        $size = !empty($field[4]) ? $field[4] : null;
-                        $buffer .= Html::datetimePicker($name, $value, $size, $required);
-                    break;
-                    case "time":
-                        $size = !empty($field[4]) ? $field[4] : null;
-                        $buffer .= Html::timePicker($name, $value, $size, $required);
-                    break;
-                    case "static":
-                        $size = !empty($field[4]) ? $field[4] : null;
-                        $buffer .= $value;
-                    break;
-                    case "textarea":
-                        $c = !empty($field[4]) ? $field[4] : null;
-                        $r = !empty($field[5]) ? $field[5] : null;
-                        $useCKEditor = true;
-                        if (isset($field[6])) {
-                            $useCKEditor = $field[6];
-                        }
-                        $buffer .= '<textarea' . $readonly . ' style="width:100%;" name="' . $name . '" rows="' . $r . '" cols="' . $c . '" ' . ($useCKEditor ? 'class="ckeditor" ' : '') . ' id="' . $name . '" ' . $required . '>' . $value . '</textarea>';
-                    break;
-                    case "select":
-                        $items = !empty($field[4]) ? $field[4] : null;
+                        case "autocomplete":
+                            $options = !empty($field[4]) ? $field[4] : null;
+                            $buffer .= Html::autocomplete($name, $options, $value, null, "width: 100%;", 1, $required);
+                        break;
+                        case "date":
+                            $size = !empty($field[4]) ? $field[4] : null;
+                            $buffer .= Html::datePicker($name, $value, $size, $required);
+                        break;
+                        case "datetime":
+                            $size = !empty($field[4]) ? $field[4] : null;
+                            $buffer .= Html::datetimePicker($name, $value, $size, $required);
+                        break;
+                        case "time":
+                            $size = !empty($field[4]) ? $field[4] : null;
+                            $buffer .= Html::timePicker($name, $value, $size, $required);
+                        break;
+                        case "static":
+                            $size = !empty($field[4]) ? $field[4] : null;
+                            $buffer .= $value;
+                        break;
+                        case "textarea":
+                            $c = !empty($field[4]) ? $field[4] : null;
+                            $r = !empty($field[5]) ? $field[5] : null;
+                            $useCKEditor = true;
+                            if (isset($field[6])) {
+                                $useCKEditor = $field[6];
+                            }
+                            $buffer .= '<textarea' . $readonly . ' style="width:100%;" name="' . $name . '" rows="' . $r . '" cols="' . $c . '" ' . ($useCKEditor ? 'class="ckeditor" ' : '') . ' id="' . $name . '" ' . $required . '>' . $value . '</textarea>';
+                        break;
+                        case "select":
+                            $items = !empty($field[4]) ? $field[4] : null;
 
-                        $default = !empty($field[5]) ? ($field[5] == "null" ? null : $field[5]) : "-- Select --";
-                        $class = !empty($field[6]) ? $field[6] : null;
-                        $buf.= "<td  $valign class='fieldtitle'>" . htmlentities($title) . "</td><td  $valign class='fieldvalue'>";
-                        if ($readonly == "") {
-                            $buf.= Html::select($name, $items, $value, $class, "width: 100%;", $default, $readonly != "", $required);
-                        } else {
-                            $buf.=$value;
-                        }
-                        $buf .= "</td>\n";
-//                    } else if ($type == "multiSelect") {
-//                        $items = !empty($field[4]) ? $field[4] : null;
-//                        $buf.= "<td  $valign class='fieldtitle'>" . htmlentities($title) . "</td><td  $valign class='fieldvalue'>";
-//                        if ($readonly == "") {
-//                            $buf.= Html::multiSelect($name, $items, $value, null, "width: 100%;", $required);
-//                        } else {
-//                            $buf.=$value;
-//                        }
-//                        $buf .= "</td>\n";
-//                    } else if ($type == "checkbox") {
-//                        $defaultValue = !empty($field[4]) ? $field[4] : null;
-//                        $class = !empty($field[5]) ? $field[5] : null;
-//                        $buf.= "<td  $valign align='left' class='fieldtitle' colspan='2'>" . Html::checkbox($name, $value, $defaultValue, $class) . "&nbsp;" . htmlentities($title) . "</td>\n";
-//                    } else if ($type == "radio") {
-//                        $defaultValue = !empty($field[4]) ? $field[4] : null;
-//                        $class = !empty($field[5]) ? $field[5] : null;
-//                        $buf.= "<td  $valign align='left' class='fieldtitle' colspan='2'>" . Html::radio($name, $group, $value, $defaultValue, $class) . "&nbsp;" . htmlentities($title) . "</td>\n";
-//                    } else if ($type == "hidden") {
-//                        $hidden .= '<input type="hidden" name="' . $name . '" value="' . htmlspecialchars($value) . '" id="' . $name . '"/>' . "\n";
-//                    } else if ($type == "file") {
-//                        $size = !empty($row[4]) ? $row[4] : null;
-//                        if ($title) {
-//                            $buf .= "<tr><td $valign class='fieldtitle'>" . htmlentities($title) . "</td>";
-//                        }
-//                        $buf .= "<td colspan=\"2\">";
-//                        $buf .= '<input style="width:100%;"  type="' . $type . '" name="' . $name . '" size="' . $size . '" id="' . $name . '"/>';
-//                        $buf .= "</td></tr>\n";
+                            $default = !empty($field[5]) ? ($field[5] == "null" ? null : $field[5]) : "-- Select --";
+                            $class = !empty($field[6]) ? $field[6] : null;
+                            if ($readonly == "") {
+                                $buffer .= Html::select($name, $items, $value, $class, "width: 100%;", $default, $readonly != "", $required);
+                            } else {
+                                $buffer .= $value;
+                            }
+                        break;
+                        case "multiSelect":
+                            $items = !empty($field[4]) ? $field[4] : null;
+                            if ($readonly == "") {
+                                $buffer .= Html::multiSelect($name, $items, $value, null, "width: 100%;", $required);
+                            } else {
+                                $buffer .= $value;
+                            }
+                        break;
+                        case "checkbox":
+                            $defaultValue = !empty($field[4]) ? $field[4] : null;
+                            $class = !empty($field[5]) ? $field[5] : null;
+                            $buffer .= Html::checkbox($name, $value, $defaultValue, $class);
+                        break;
+                        case "radio":
+                            $defaultValue = !empty($field[4]) ? $field[4] : null;
+                            $class = !empty($field[5]) ? $field[5] : null;
+                            $buffer .= Html::radio($name, $group, $value, $defaultValue, $class) . "&nbsp;" . htmlentities($title);
+                        break;
+                        case "hidden":
+                            $buffer .= '<input type="hidden" name="' . $name . '" value="' . htmlspecialchars($value) . '" id="' . $name . '"/>';
+                        break;
+                        case "file":
+                            $size = !empty($row[4]) ? $row[4] : null;
+                            $buffer .= '<input style="width:100%;"  type="' . $type . '" name="' . $name . '" size="' . $size . '" id="' . $name . '"/>';
+                        break;
                     }
-                    
+                    $buffer .= "</div></div>";
                 }
                 
-                $buffer .= "</ul></div>";
+                $buffer .= "</li></ul>";
             }
-            
         }
         
         // Finish shell div tag
         $buffer .= "</div>";
         
-        // Clsoe form tag if needed
+        // Close form tag if needed
         if ($includeFormTag) {
             $buffer .= $form->close();
         }
+        
+        return $buffer;
     }
     
     /**

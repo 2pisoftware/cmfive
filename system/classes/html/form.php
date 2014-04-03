@@ -2,7 +2,7 @@
 
 class form {
     
-    public $accept-charset;
+    public $accept_charset;
     public $action;
     public $autocomplete; // HTML5 (on/off)
     public $enctype;
@@ -14,8 +14,8 @@ class form {
     public $id;
     public $_class;
     
-    public function accept-charset($accept) {
-        $this->accept-charset = $accept;
+    public function accept_charset($accept) {
+        $this->accept_charset = $accept;
         return $this;
     }
     
@@ -73,8 +73,8 @@ class form {
     public function open() {
         $buffer = "";
         $buffer .= "<form ";
-        if (!empty($this->accept-charset)) {
-            $buffer .= "accept-charset='{$this->accept-charset}' ";
+        if (!empty($this->accept_charset)) {
+            $buffer .= "accept-charset='{$this->accept_charset}' ";
         }
         
         if (!empty($this->action)) {
@@ -117,13 +117,13 @@ class form {
         
         // Automatically print CSRF token
         if (class_exists("CSRF")) {
-            $buffer .= "<input type='hidden' name='" . CSRF::getTokenID() . "' value='" . CSRF::getTokenValue() . "' />";
+            $buffer .= "<input type='hidden' name='" . \CSRF::getTokenID() . "' value='" . \CSRF::getTokenValue() . "' />";
         }
         
         return $buffer;
     }
     
-    public function close() {
-        return "</form>";
+    public function close($button_title = 'Save') {
+        return "<button type='submit' class='button small-12'>{$button_title}</button></form>";
     }
 }
