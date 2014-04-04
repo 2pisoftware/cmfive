@@ -12,7 +12,8 @@ class AdminLib {
 			$w->menuLink("admin-templates","Templates",$nav);
 			$w->menuLink("admin/phpinfo","PHP Info",$nav);
 
-                        $w->menuBox("admin/gitpull", "GIT Pull", $nav);
+                        $w->menuLink("admin/databasebackup", "Backup Database", $nav);
+                        //$w->menuBox("admin/gitpull", "GIT Pull", $nav);
                                 
 			// if ($w->Composer->shouldAddFiles()) {
 			// 	$w->menuLink("admin/composeradd","Add composer.json files", $nav);
