@@ -26,6 +26,7 @@ class button {
     public $confirm;
     public $newtab = false;
     public $href;
+    public $onclick;
     
     public function __set($property, $value) {
 //        echo $property . " " . $value;
@@ -43,11 +44,13 @@ class button {
 
     public function __toString() {
         $js = "";
-        if (!empty($this->confirm)) { $js .= "if(confirm(\"" . $this->confirm . "\")) {"; }
-        if (!$this->newtab) {
-            $js .= "parent.location='" . $this->href . "'; return false;";
-        } else {
-            $js .= "window.open('" . $this->href . "', \"_blank\").focus(); return false;";
+        if (!empty($this->confirm)) { $js .= "if(confirm('" . $this->confirm . "')) {"; }
+        if (!empty($this->href)){
+            if (!$this->newtab) {
+                $js .= "parent.location='" . $this->href . "'; return false;";
+            } else {
+                $js .= "window.open('" . $this->href . "', '_blank').focus(); return false;";
+            }
         }
         if (!empty($this->confirm)) { $js .= "}"; }
         
@@ -66,7 +69,7 @@ class button {
         if (!empty($this->name)) $buffer .= "name=\"{$this->name}\" ";
         if (!empty($this->type)) $buffer .= "type=\"{$this->type}\" ";
         if (!empty($this->value)) $buffer .= "value=\"{$this->value}\" ";
-        if (!empty($js)) $buffer .= "onclick=\"{$js}\" ";
+        if (!empty($js)) $buffer .= (!empty($this->onclick) ? $this->onclick : (!empty($js) ? "onclick=\"{$js}\" " : ""));
         $buffer .= (">{$this->text}</button>");
         return $buffer;
     }
@@ -115,7 +118,7 @@ class button {
         $this->id = $id;
         return $this;
     }
-    
+        
     public function setClass($class) {
         $this->_class .= $class;
         return $this;
@@ -123,6 +126,11 @@ class button {
     
     public function name($name) {
         $this->name = $name;
+        return $this;
+    }
+    
+    public function onclick($onclick) {
+        $this->onclick = $onclick;
         return $this;
     }
     

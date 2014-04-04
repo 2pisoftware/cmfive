@@ -135,12 +135,17 @@ class Html {
      */
     public static function box($href, $title, $button = false, $iframe = false, $width = null, $height = null, $param = "isbox", $id = null, $class = null, $confirm = null) {
         $onclick = Html::boxOnClick($href, $iframe, $width, $height, $param, $confirm);
-        $tag = "a";
+        $element = null;
         if ($button) {
-            $tag = "button";
+            // $tag = "button";
+            $element = new \Html\button();
+            $element->id($id)->setClass($class)->onclick($onclick)->text($title);
+        } else {
+            $element = new \Html\a();
+            $element->id($id)->setClass($class)->onclick($onclick)->text($title);
         }
-
-        return "<" . $tag . (!empty($id) ? " id=$id " : "") . (!empty($class) ? " class=$class " : "") . ($tag == 'a' ? ' href="#" ' : '') . $onclick . "><span>" . $title . "</span></" . $tag . ">";
+        return $element->__toString();
+//        return "<" . $tag . (!empty($id) ? " id=$id " : "") . (!empty($class) ? " class=$class " : "") . ($tag == 'a' ? ' href="#" ' : '') . $onclick . "><span>" . $title . "</span></" . $tag . ">";
     }
 
     public static function boxOnClick($href, $iframe = false, $width = null, $height = null, $param = "isbox", $confirm = null) {
@@ -425,6 +430,9 @@ class Html {
                     $name = !empty($field[2]) ? $field[2] : null;
                     $value = !empty($field[3]) ? $field[3] : null;
 
+                    // Can I do this?
+                    if (empty($title) and empty($value)) continue;
+                                        
                     // Exploit HTML5s inbuilt form validation
                     $required = null;
                     if (!empty($validation[$name])) {
@@ -439,8 +447,8 @@ class Html {
                     
                     // Add title field
                     if (!empty($title)) {
-                        $buffer .= "<div class='row-fluid'><div class='small-12 medium-3 columns'>{$title}</div>";
-                        $buffer .= "<div class='small-12 medium-9 columns'>";
+                        $buffer .= "<div class='small-12 medium-" . (2 + ($fieldCount > 1 ? $fieldCount + 1 : 0)) . " columns'><label class='inline'>{$title}</label></div>";
+                        $buffer .= "<div class='small-12 medium-" . (9 - ($fieldCount > 1 ? $fieldCount + 1 : 0)) . " columns'>";
                     } else {
                         $buffer .= "<div class='small-12'>";
                     }
@@ -522,13 +530,14 @@ class Html {
                             $buffer .= '<input style="width:100%;"  type="' . $type . '" name="' . $name . '" size="' . $size . '" id="' . $name . '"/>';
                         break;
                     }
-                    $buffer .= "</div></div>";
+                    $buffer .= "</div>";
                 }
                 
                 $buffer .= "</li></ul>";
             }
         }
-        
+        $buffer .= "<script>$(function(){\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})});</script>";
+//        
         // Finish shell div tag
         $buffer .= "</div>";
         
@@ -982,27 +991,23 @@ EOT;
         if (empty($data))
             return;
 
+        $form = new \Html\form();
+        // If form tag is needed print it
+        $form->id($id)->setClass($class)->method($method)->action($action);
+                
+        $buffer = "";
+        $buffer .= $form->open();
+        
         // Set up vars
-        $buf = $hidden = "";
-        $id = $id ? " id=\"" . $id . "\" " : null;
-        $class = $class ? " class=\"" . $class . "\" " : null;
-        $buf .= "<form " . $id . $class . " action=\"" . $action . "\" method=\"" . $method . "\">";
-        $buf .= "<input type='hidden' name='" . CSRF::getTokenID() . "' value='" . CSRF::getTokenValue() . "' />";
-        $buf .= "<fieldset style=\"padding: 0; padding-top: 10px; padding-left: 10px;\">\n";
-        $buf .= "<legend>" . $legend . "</legend>\n";
-        $buf .= "<div class=\"row-fluid\">\n";
-
-        $item_count = 0;
+        $hidden = "";
+        $buffer .= "<fieldset style=\"padding: 0; padding-top: 10px; padding-left: 10px;\">\n";
+        $buffer .= "<legend>" . $legend . "</legend>\n";
+        $buffer .= "<div class=\"row-fluid\">\n";
 
         // Loop through data
         foreach ($data as $row) {
 
-            // Only print 4 td's per row
-//            if ($item_count++ % 4 == 0) {
-//                $buf .= "</tr><tr>";
-//            }
-            
-            $buf .= "<div class=\"small-12 medium-3 left\"><div class=\"row\">";
+            $buffer .= "<div class=\"small-12 medium-3 left\"><div class=\"row\">";
             
             // Get row parameters
             $title = !empty($row[0]) ? $row[0] : null;
@@ -1025,45 +1030,45 @@ EOT;
             }
 
             // span entry fields that have no title
-            if (!$title) {
-                $colspan = 2;
+            if (!empty($title)) {
+                $buffer .= "<div class='small-12 medium-3 columns'><label class='inline'>{$title}</label></div>";
+                $buffer .= "<div class='small-12 medium-9 columns'>";
             } else {
-                $colspan = 1;
-                $buf .= "<div class=\"small-12 medium-2 columns\"><label class=\"medium-right small-left inline\">" . htmlentities($title) . "</label></div>";
+                $buffer .= "<div class='small-12'>";
             }
 
-            $buf .= "<div class=\"small-12 medium-10 columns\">";
+//            $buffer .= "<div class=\"small-12 medium-10 columns\">";
             $size = !empty($row[4]) ? $row[4] : null;
 
             // Get the input that we need
             switch ($type) {
                 case "text":
                 case "password":
-                    $buf .= '<input' . $readonly . ' style="width:100%;"  type="' . $type . '" name="' . $name . '" value="' . htmlspecialchars($value) . '" size="' . (!empty($row[4]) ? $row[4] : null) . '" id="' . $name . '"/>';
+                    $buffer .= '<input' . $readonly . ' style="width:100%;"  type="' . $type . '" name="' . $name . '" value="' . htmlspecialchars($value) . '" size="' . (!empty($row[4]) ? $row[4] : null) . '" id="' . $name . '"/>';
                     break;
                 case "autocomplete":
-                    $buf .= Html::autocomplete($name, $size, $value, null, "width: 100%;", 1, $required);
+                    $buffer .= Html::autocomplete($name, $size, $value, null, "width: 100%;", 1, $required);
                     break;
                 case "date":
-                    $buf .= Html::datePicker($name, $value, $size, $required);
+                    $buffer .= Html::datePicker($name, $value, $size, $required);
                     break;
                 case "datetime":
-                    $buf .= Html::datetimePicker($name, $value, $size, $required);
+                    $buffer .= Html::datetimePicker($name, $value, $size, $required);
                     break;
                 case "time":
-                    $buf .= Html::timePicker($name, $value, $size, $required);
+                    $buffer .= Html::timePicker($name, $value, $size, $required);
                     break;
                 case "static":
-                    $buf .= $value;
+                    $buffer .= $value;
                     break;
                 case "textarea":
                     // Columns is the size variable
                     $cols = $size;
                     $rows = !empty($row[5]) ? $row[5] : null;
-                    $buf .= '<textarea name="' . $name . '" rows="' . $rows . '" cols="' . $cols . '" id="' . $name . '">' . $value . '</textarea>';
+                    $buffer .= '<textarea name="' . $name . '" rows="' . $rows . '" cols="' . $cols . '" id="' . $name . '">' . $value . '</textarea>';
                     break;
                 case "section":
-                    $buf .= "<td colspan=\"2\" class=\"section\" >" . htmlentities($title) . "</td>\n";
+                    $buffer .= htmlentities($title);
                     break;
                 case "select":
                     $items = $size;
@@ -1072,43 +1077,45 @@ EOT;
                     $allmsg = !empty($row[7]) ? $row[7] : "-- Select --";
                     // $name, $items, $value=null, $class=null, $style=null, $allmsg = "-- Select --", $required = null
                     if ($readonly == "") {
-                        $buf .= Html::select($name, $items, $value, $class, $style, $allmsg);
+                        $buffer .= Html::select($name, $items, $value, $class, $style, $allmsg);
                     } else {
-                        $buf .= $value;
+                        $buffer .= $value;
                     }
                     break;
                 case "multiSelect":
                     $items = $size;
                     if ($readonly == "") {
-                        $buf .= Html::multiSelect($name, $items, $value, null, "width: 100%;");
+                        $buffer .= Html::multiSelect($name, $items, $value, null, "width: 100%;");
                     } else {
-                        $buf .= $value;
+                        $buffer .= $value;
                     }
                     break;
                 case "checkbox":
-                    $buf .= self::checkbox($name, $value, $value, $class);
+                    $buffer .= Html::checkbox($name, $value, $value, $class);
                     break;
                 case "hidden":
                     $hidden .= "<input type=\"hidden\" name=\"" . $name . "\" value=\"" . htmlspecialchars($value) . "\"/>\n";
                     break;
                 case "file":
-                    $buf .= "<input style=\"width:100%;\" type=\"" . $type . "\" name=\"" . $name . "\" size=\"" . $size . "\" id=\"" . $name . "\"/>";
+                    $buffer .= "<input style=\"width:100%;\" type=\"" . $type . "\" name=\"" . $name . "\" size=\"" . $size . "\" id=\"" . $name . "\"/>";
                     break;
             }
 
-            $buf .= "</div></div></div>";
+            $buffer .= "</div></div></div>";
         }
-        $buf .= "</div>";
+        $buffer .= "</div>";
         // Filter button (optional... though optional is pointless)
         if (!empty($action)) {
             $button = new \Html\button();
-            $buf .= "<div class=\"left\">" . $button->type("submit")->text($submitTitle)->__toString() . "&nbsp</div>";
-            $buf .= "<div class=\"left\">" . $button->text("Reset")->id("filter_reset")->name("reset")->value("reset")->__toString() . "</div>";
+            if ($submitTitle !== NULL) {
+                $buffer .= "<div class=\"left\">" . $button->type("submit")->text($submitTitle)->__toString() . "&nbsp</div>";
+            }
+            $buffer .= "<div class=\"left\">" . $button->text("Reset")->id("filter_reset")->name("reset")->value("reset")->__toString() . "</div>";
         }
-        $buf .= "\n</fieldset>\n";
-        $buf .= $hidden . "</form>\n";
+        $buffer .= "\n</fieldset>\n";
+        $buffer .= $hidden . "</form>\n";
 
-        return $buf;
+        return $buffer;
     }
 
 }

@@ -38,18 +38,6 @@
         ?>
         <script type="text/javascript">
 
-            var current_tab = 0;
-
-            function switchTab(num) {
-                if (num == current_tab)
-                    return;
-                $('#tab-' + current_tab).hide();
-                $('#tab-link-' + current_tab).removeClass("active");
-                $('#tab-' + num).show().addClass("active");
-                $('#tab-link-' + num).addClass("active");
-                current_tab = num;
-            }
-
             $(document).ready(function() {
                 $(".msg").delay(3000).fadeOut(3000);
                 $(".error").delay(6000).fadeOut(3000);
@@ -63,6 +51,7 @@
                     $(".tab-head").children("a").each(function() {
                         $(this).bind("click", {alink: this}, function(event) {
                             changeTab(event.data.alink.hash);
+                            return false;
                         });
                     });
 

@@ -9,6 +9,8 @@ body {
     overflow: hidden;
 }
 
+.top-bar{ height: inherit; }
+
 button {
     font-size: 0.8rem !important;
 }
@@ -57,27 +59,26 @@ table .section {
     
 }
 
-.widget_part1 {
-    margin: 10px;
-    padding-bottom: 10px;
-    /*width: 29.8%;*/
-    background-color: #fff;
-    /*border: 1px #565656 solid;*/
-    float: left;
-}
+.widget_buttons { opacity: 0; }
+.widget_config { padding-left: 40px; }
+.widget_remove { float: right; padding-right: 40px; }
 
-.widget_part2 {
-    margin: 10px;
-    padding-bottom: 10px;
-    /*width: 29.8%;*/
-    /*background-color: #9c9c9c;*/
-    float: left;
+/*.tab-head { margin-top: 20px; }*/
+.tab-head a {
+    color: black;
+    text-decoration: none;
+    padding: 5px;
+    border: 1px solid #a9a9a9;
+    line-height: 40px;
 }
+.tab-head a.active {
+    background: #074e68;
+    color: white;
+}
+.tab-head a:hover { background: #6FA9C7; }
+.tab-body { border: 1px solid #a9a9a9; padding: 5px; }
 
-.widget_part3 {
-    margin: 10px;
-    padding-bottom: 10px;
-    /*width: 29.8%;*/
-    /*background-color: #cacaca;*/
-    float: left;
+td button {
+    margin: 0 !important;
+    padding: 5px 15px !important;
 }

@@ -21,6 +21,8 @@ class a {
     public $target;
     public $type; // New in HTML5
     
+    public $onclick;
+    
     public function __construct() {
         
     }
@@ -42,7 +44,7 @@ class a {
     public function __toString() {
         $buffer = "";
         $buffer .= "<a ";
-        if (!empty($this->confirm)) $buffer .= "onclick=\"javascript:return confirm('" . $this->confirm . "');\" ";
+        if (!empty($this->confirm)) $buffer .= (!empty($this->onclick) ? $this->onclick : "onclick=\"javascript:return confirm('" . $this->confirm . "');\" ");
         if (!empty($this->download)) $buffer .= "download='{$this->download}' ";
         if (!empty($this->href)) $buffer .= "href='{$this->href}' ";
         if (!empty($this->hreflang)) $buffer .= "hreflang='{$this->hreflang}' ";
@@ -88,6 +90,11 @@ class a {
     
     public function id($id) {
         $this->id = $id;
+        return $this;
+    }
+    
+    public function onclick($onclick) {
+        $this->onclick = $onclick;
         return $this;
     }
     
