@@ -1,3 +1,4 @@
 /log/*.log
 /uploads/*
 .project
+/config.php
