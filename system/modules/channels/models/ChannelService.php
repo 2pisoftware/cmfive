@@ -63,19 +63,18 @@ class ChannelService extends DbService {
 	 * @return Array list
 	 */
 	public function getProcessorList() {
-		// Get Modules => Processor list
-		$list = array();
-		$config = $this->w->_moduleConfig;
-		foreach($config as $key => $conf) {
-			if (array_key_exists("processors", $conf)) {
-				// $list[$key] = $conf["processors"];
-				foreach($conf["processors"] as $processor) {
-					$list[] = $key.".".$processor;
-				}
-			}
-		}
+            // Get Modules => Processor list
+            $list = array();
+            foreach($this->w->modules() as $module) {
+                $processors = Config::get("{$module}.processors");
+                if (!empty($processors)) {
+                    foreach($processors as $processor) {
+                        $list[] = $key.".".$processor;
+                    }
+                }
+            }
 
-		return $list;
+            return $list;
 	}
 
 	public function getMessages($channel_id = null, $include_deleted = false) {

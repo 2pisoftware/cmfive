@@ -27,19 +27,11 @@ class PermissionDeniedException extends Exception {
 class Web {
 
     public $_buffer;
-    public $_logLevel;
-    public $_logHandlers;
     public $_template;
     public $_templatePath;
     public $_templateExtension;
     public $_url;
     public $_context;
-    public $_logMethod;
-    public $_logParam;
-    public $_logFolder = "log";
-    public $_logFile = "web";
-    public $_logExt = ".log";
-    public $_logLevelArray;
     public $_action;
     public $_defaultHandler;
     public $_defaultAction;
@@ -57,7 +49,6 @@ class Web {
     public $_action_executed = false;
     public $_action_redirected = false;
     public $_services;
-    public $_moduleConfig;
     public $_paths;
     public $_loginpath = 'auth/login';
     public $_partialsdir = "partials";
@@ -410,41 +401,18 @@ class Web {
     }
 
     private function initDB() {
-//        global $MYSQL_DB_HOST;
-//        global $MYSQL_USERNAME;
-//        global $MYSQL_PASSWORD;
-//        global $MYSQL_DB_NAME;
-//        global $MYSQL_DRIVER;
-//
-//        $db_config = array(
-//            'hostname' => defaultVal(getenv('MYSQL_DB_HOST'), $MYSQL_DB_HOST),
-//            'username' => defaultVal(getenv('MYSQL_USERNAME'), $MYSQL_USERNAME),
-//            'password' => defaultVal(getenv('MYSQL_PASSWORD'), $MYSQL_PASSWORD),
-//            'database' => defaultVal(getenv('MYSQL_DB_NAME'), $MYSQL_DB_NAME),
-//            'driver' => defaultVal(getenv('MYSQL_DRIVER'), $MYSQL_DRIVER),
-//        );
-
         $this->db = new DbPDO(Config::get("database")); // Crystal::db($db_config);
-    }
-
-    function setModules($modules) {
-        $this->_moduleConfig = $modules;
     }
 
     /**
      * Read Module configuration values
      * 
-     * @param <type> $module
-     * @param <type> $key
-     * @return <type>
+     * @param string $module
+     * @param string $key
+     * @return mixed
      */
     function moduleConf($module, $key) {
         return Config::get("{$module}.{$key}");
-//        if (array_key_exists($module, $this->_moduleConfig) && array_key_exists($key, $this->_moduleConfig[$module])) {
-//            return $this->_moduleConfig[$module][$key];
-//        } else {
-//            return null;
-//        }
     }
 
     private function loadConfigurationFiles() {
@@ -459,8 +427,6 @@ class Web {
 
     // Helper function for the above, scans a directory for config files in child folders
     private function scanModuleDirForConfigurationFiles($dir = "") {
-        global $modules;
-
         // Check that dir is dir
         if (is_dir($dir)) {
 
