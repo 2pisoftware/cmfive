@@ -46,42 +46,12 @@ function composer_ALL(Web $w) {
     // Create the JSON file
     file_put_contents(SYSTEM_PATH . "/composer.json", json_encode($json_obj, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
 
-    $cmd = "./composer.phar update";
-    
-    // Only use live process output on unix machines
-    if (substr(PHP_OS, 0, 3) == "WIN") {
-        system($cmd);
-        exit;
-    }
-    
-    // Turn off output buffering
-    ini_set('output_buffering', 'off');
-    // Turn off PHP output compression
-    ini_set('zlib.output_compression', false);
-    // Implicitly flush the buffer(s)
-    ini_set('implicit_flush', true);
-    ob_implicit_flush(true);
-    // Clear, and turn off output buffering
-    while (ob_get_level() > 0) {
-        // Get the curent level
-        $level = ob_get_level();
-        // End the buffering
-        ob_end_clean();
-        // If the current level has not changed, abort
-        if (ob_get_level() == $level) break;
-    }
-    // Disable apache output buffering/compression
-    if (function_exists('apache_setenv')) {
-        apache_setenv('no-gzip', '1');
-        apache_setenv('dont-vary', '1');
-    }
-    
-    echo "<pre>";
-    echo "Composer updates can take some time, please be patient...\n";
+    $cmd = "./composer.phar update > ".ROOT_PATH."/log/composer.log 2>&1 &";
+
+    echo "Composer update is now running in the background. You can read the log at " . ROOT_PATH . "/log/composer.log";
+    echo "Composer updates can take some time, please be patient...<br/>";
     flush();
     system($cmd);
-    echo "</pre>";
-    
     // Change dir back
     chdir(ROOT_PATH);
 }

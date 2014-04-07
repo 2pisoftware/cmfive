@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "d690532393c0843b38df0f8726a63537",
+    "hash": "4d986388eb4116e6cb63100a3d23dc7e",
     "packages": [
         {
             "name": "behat/mink",
@@ -728,16 +728,16 @@
         },
         {
             "name": "monolog/monolog",
-            "version": "1.8.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "392ef35fd470638e08d0160d6b1cbab63cb23174"
+                "reference": "c3dd9b972b8e070580f0660b842a898871fadf13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/392ef35fd470638e08d0160d6b1cbab63cb23174",
-                "reference": "392ef35fd470638e08d0160d6b1cbab63cb23174",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/c3dd9b972b8e070580f0660b842a898871fadf13",
+                "reference": "c3dd9b972b8e070580f0660b842a898871fadf13",
                 "shasum": ""
             },
             "require": {
@@ -792,7 +792,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2014-03-23 19:50:26"
+            "time": "2014-04-04 15:22:02"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -2134,6 +2134,7 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
+        "monolog/monolog": 20,
         "swiftmailer/swiftmailer": 0
     },
     "platform": [
