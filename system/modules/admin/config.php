@@ -1,16 +1,20 @@
 <?php
 
-
-$modules['admin'] = array(
+Config::set("admin", array(
     'active' => true,
     'path' => 'system/modules',
     'topmenu' => true,
     'audit_ignore' => array("index"),
+    'database_backup' => true,
     'printing' => array(
         'command' => array(
-            'unix' => 'lpr %filename%',
-            'windows' => 'lpr -S %servername% -P %printername% %filename%'
+            'unix' => 'lpr $filename',
+            'windows' => '/Path/to/SumatraPDF.exe -print-to $printername $filename'
         )
+    ),
+    "dependencies" => array(
+        "swiftmailer/swiftmailer" => "@stable",
+        "twig/twig" => "1.*"
     )
-);
+));
 

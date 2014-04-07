@@ -123,12 +123,12 @@ class WebDriverWindow {
    *
    * @param string $orientation
    * @return WebDriverWindow The instance.
-   * @throws IndexOutOfBoundsException
+   * @throws IndexOutOfBoundsWebDriverError
    */
   public function setScreenOrientation($orientation) {
     $orientation = strtoupper($orientation);
     if (!in_array($orientation, array('PORTRAIT', 'LANDSCAPE'))) {
-      throw new IndexOutOfBoundsException(
+      throw new IndexOutOfBoundsWebDriverError(
         "Orientation must be either PORTRAIT, or LANDSCAPE"
       );
     }

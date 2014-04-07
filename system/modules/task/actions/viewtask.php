@@ -201,9 +201,6 @@ function viewtask_GET(Web &$w) {
 		// tab: notifications
 		// if i am assignee, creator or task group owner, i can get notifications for this task
 		if ($task->getCanINotify()) {
-			// if i can get notifications for this Task, display tbe navigation tab
-			$tab = "<a id=\"tab-link-5\" href=\"#\" onclick=\"switchTab(5);\">Task Notifications</a>\n";
-			$w->ctx("tasknotifications",$tab);
 				
 			// get User set notifications for this Task
 			$notify = $w->Task->getTaskUserNotify($_SESSION['user_id'],$task->id);
@@ -268,15 +265,9 @@ function viewtask_GET(Web &$w) {
 
 			$form = Html::form($f,$w->localUrl("/task/updateusertasknotify/".$task->id),"POST","Save");
 
-			// display form in tab.div
-			$tasknotify = "<div id=\"tab-5\" style=\"display: none;\">\n" .
-						  "Set your Notifications specific to this Task, otherwise your notifications for this Task Group will be employed.\n" .
-			    		  "<p>\n" .
-			$form .
-						  "</div>\n";
 
 			// display
-			$w->ctx("tasknotify",$tasknotify);
+			$w->ctx("tasknotify",$form);
 		}
 	}
 	else {

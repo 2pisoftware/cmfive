@@ -12,6 +12,10 @@ class PrinterService extends DbService {
         return $this->getObject("printer", $printer_id);
     }
     
+    public function getPrinters() {
+        return $this->getObjects("printer");
+    }
+    
     /**
      * Printjob sends a file to printer based on config rules
      * 
@@ -44,17 +48,19 @@ class PrinterService extends DbService {
             // Fill the string with our printer values
             $printer = $this->w->Printer->getPrinter(1);
             if (!empty($printer->id)) {
-            $command = str_replace(array("%filename%", "%servername%", "%port%", "%printername%"), 
-                    array(escapeshellarg($filename), escapeshellarg($printer->server), escapeshellarg($printer->port), escapeshellarg($printer->name)),
+            $command = str_replace(array('$filename', '$servername', '$port', '$printername'), 
+                    array($filename, escapeshellarg($printer->server), escapeshellarg($printer->port), escapeshellarg($printer->name)),
                     $command);
             } else {
-                $command = str_replace("%filename%", escapeshellarg($filename), $command);
+                $command = str_replace('$filename', escapeshellarg($filename), $command);
             }
 
             // Run the command
-            echo escapeshellcmd($command) . "<br/>";
-            $response = shell_exec(escapeshellcmd($command) . " 2>&1");
-            echo $response;
+            // echo $command . "<br/>";
+            $response = shell_exec($command . " 2>&1");
+            if (!empty($response)){
+                echo $response;
+            }
             return $response;
         }
     }

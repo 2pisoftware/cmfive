@@ -1,13 +1,3 @@
-<?php ?>
-
-<div class="tabs">
-    <div class="tab-head">
-        <a href="/task/index">Task Dashboard</a>
-        <a href="/task/tasklist">Task List</a>
-        <a id="tab-link-1" href="#" class="active">Create Task</a>
-    </div>
-    <div class="tab-body">
-        <div id="tab-1">
             Creating a new Task is a two step process.<br>Please complete all steps to register a Task.
             <p>
             <table border=0>
@@ -21,9 +11,7 @@
                     <td><span id="tasktext"><?php echo !empty($tasktext) ? $tasktext : ''; ?></span></td>
                 </tr>
             </table>
-        </div>
-    </div>
-</div>
+
 
 
 <script language="javascript">

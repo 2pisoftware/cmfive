@@ -19,6 +19,18 @@ $MYSQL_DB_HOST = 'localhost';
 $MYSQL_USERNAME = 'cmfive';
 $MYSQL_PASSWORD = 'cmfive';
 $MYSQL_DB_NAME = 'cmfive';
+$MYSQL_DRIVER = 'mysql';
+
+//=========== Email Layer Configuration =====================
+
+$EMAIL_CONFIG = array(
+	"layer"		=> "swiftmailer",		// mail, swiftmailer
+	"host"		=> "smtp.gmail.com",
+	"port"		=> 465,
+	"auth"		=> true,
+	"username"	=> '<email>',
+	"password"	=> '<password>'
+);
 
 //========= Application Log Level ===========================
 
@@ -48,6 +60,7 @@ $ALLOW_MODULE = array(
 $ALLOW_ACTION = array(
 		"auth/login",
         "auth/forgotpassword",
+        "auth/resetpassword",
 );
 
 //========= REST Configuration ==============================

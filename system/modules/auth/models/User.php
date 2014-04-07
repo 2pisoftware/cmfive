@@ -200,7 +200,7 @@ class User extends DbObject {
 						return true;
 					}
 				} else {
-					$w->logError ( "Role '" . $rn . "' does not exist!" );
+					$w->Log->error( "Role '" . $rn . "' does not exist!" );
 				}
 			}
 		}

@@ -35,7 +35,7 @@ function viewreport_GET(Web &$w) {
 				array("Title","text","title", $rep->title),
 				array("Module","select","module", $rep->module, $modules),
 				//array("Category","select","category", $rep->category, lookupForSelect($w, "ReportCategory")),
-				array("Description","textarea","description",$rep->description,110,2,true),
+				array("Description","textarea","description",$rep->description,110,2,false),
 				array("Code","textarea","report_code",$rep->report_code,110,22,false),
 				array("Approved","checkbox","is_approved", $rep->is_approved),
 				),$w->localUrl("/report/editreport/".$rep->id),"POST"," Update Report ");
@@ -52,7 +52,7 @@ function viewreport_GET(Web &$w) {
 				array("Site URL","static","webroot","{{webroot}}"),
 				array("View Database","section"),
 				array("Tables","select","dbtables",null,$w->Report->getAllDBTables()),
-				array("Fields","static","dbfields","<span id=dbfields></span>")
+				array("Fields","static","dbfields","<span id='dbfields'></span>")
 				));
 				$w->ctx("dbform",$t);
 			}
@@ -82,7 +82,7 @@ function viewreport_GET(Web &$w) {
 				array("Site URL","static","webroot","{{webroot}}"),
 				array("View Database","section"),
 				array("Tables","select","dbtables",null,$w->Report->getAllDBTables()),
-				array("Fields","static","dbfields","<span id=dbfields></span>")
+				array("Fields","static","dbfields","<span id='dbfields'></span>")
 				));
 				$w->ctx("dbform",$t);
 			}

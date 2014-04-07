@@ -37,8 +37,8 @@ interface WebDriverTouchScreen {
   /**
    * Finger down on the screen.
    *
-   * @param int $x
-   * @param int $y
+   * @param $x
+   * @param $y
    * @return $this
    */
   public function down($x, $y);

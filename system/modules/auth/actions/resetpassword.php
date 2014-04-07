@@ -28,7 +28,7 @@ function resetpassword_GET(Web $w) {
 		}
 	}
 	if (!$validData){
-		$w->logWarn("Password reset attempt failed with email: $email, token: $token");
+		$w->Log->warn("Password reset attempt failed with email: $email, token: $token");
 		$w->out("Invalid email or token, this incident has been logged");
 	}
 }
@@ -71,7 +71,7 @@ function resetpassword_POST(Web $w) {
 		}
 	}
 	if (!$validData){
-		$w->logWarn("Password reset attempt failed with email: $email, token: $token");
+		$w->Log->warn("Password reset attempt failed with email: $email, token: $token");
 		$w->out("Invalid email or token, this incident has been logged");
 	} else {
 		$w->msg("Your password has been reset", "/auth/login");

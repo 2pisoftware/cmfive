@@ -1,15 +1,22 @@
 <div class="tabs">
     <div class="tab-head">
-        <?php if (($w->Auth->user()->hasRole("report_editor")) || ($w->Auth->user()->hasRole("report_admin"))) { ?>
-            <a href="#view-report" class="active">Edit Report</a>
-            <a href="#members">Members</a>
-            <a href="#view-database">View Database</a>
-        <?php } ?>
-    </div>
-    <div class="tab-body">
-        <div id="view-report">
-            <?php echo $btnrun . "<p>" . $viewreport; ?>
-            <p>
+        <a href="#report">Edit Report</a>
+        <a href="#members">Members</a>
+        <a href="#database">View Database</a>
+    </div>	
+	<div class="tab-body">
+		<div id="report">
+			<?php echo $btnrun . "<p>" . $viewreport; ?>
+			<p>
+		</div>
+		<div id="members" style="display: none;">
+			<?php echo Html::box("/report/addmembers/".$reportid," Add New Members ",true) ?>
+			<p>
+			<?php echo $viewmembers; ?>
+		</div>
+		<div id="database" style="display: none;">
+			<?php echo $dbform; ?>
+			<p>
         </div>
         <div id="members">
             <?php echo Html::box("/report/addmembers/" . $reportid, " Add New Members ", true) ?>

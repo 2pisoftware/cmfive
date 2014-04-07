@@ -734,6 +734,6 @@ function updateusertasknotify_POST(Web &$w) {
 		}
 	
 	// return
-	$w->msg("Notifications Updated","/task/viewtask/".$p['id']."/?tab=5");
+	$w->msg("Notifications Updated","/task/viewtask/".$p['id']."/#notification");
 }
 ?>

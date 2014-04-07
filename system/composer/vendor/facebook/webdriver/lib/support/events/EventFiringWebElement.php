@@ -44,8 +44,7 @@ class EventFiringWebElement implements WebDriverElement, WebDriverLocatable {
   }
 
   /**
-   * @param mixed $method
-   * @return void
+   * @param $method
    */
   protected function dispatch($method) {
     if (!$this->dispatcher) {
@@ -72,7 +71,7 @@ class EventFiringWebElement implements WebDriverElement, WebDriverLocatable {
   }
 
   /**
-   * @param mixed $value
+   * @param $value
    * @return $this
    * @throws WebDriverException
    */
@@ -172,7 +171,7 @@ class EventFiringWebElement implements WebDriverElement, WebDriverLocatable {
   }
 
   /**
-   * @param string $attribute_name
+   * @param $attribute_name
    * @return string
    * @throws WebDriverException
    */
@@ -185,7 +184,7 @@ class EventFiringWebElement implements WebDriverElement, WebDriverLocatable {
   }
 
   /**
-   * @param string $css_property_name
+   * @param $css_property_name
    * @return string
    * @throws WebDriverException
    */
@@ -335,7 +334,7 @@ class EventFiringWebElement implements WebDriverElement, WebDriverLocatable {
    * Test if two element IDs refer to the same DOM element.
    *
    * @param WebDriverElement $other
-   * @return bool
+   * @return boolean
    */
   public function equals(WebDriverElement $other) {
     try {

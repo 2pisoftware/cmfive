@@ -1,7 +1,7 @@
 <?php
 
-$modules['rest'] = array(
+Config::set('rest', array(
     'active' => true,
     'path' => 'system/modules',
     'topmenu' => false,
-);
+));

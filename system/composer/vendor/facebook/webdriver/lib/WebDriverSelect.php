@@ -72,7 +72,7 @@ class WebDriverSelect {
       }
     }
 
-    throw new NoSuchElementException('No options are selected');
+    throw new NoSuchElementWebDriverError('No options are selected');
   }
 
   /**
@@ -114,7 +114,7 @@ class WebDriverSelect {
       }
     }
     if (!$matched) {
-      throw new NoSuchElementException(
+      throw new NoSuchElementWebDriverError(
         sprintf('Cannot locate option with index: %d', $index)
       );
     }
@@ -145,7 +145,7 @@ class WebDriverSelect {
     }
 
     if (!$matched) {
-      throw new NoSuchElementException(
+      throw new NoSuchElementWebDriverError(
         sprintf('Cannot locate option with value: %s', $value)
       );
     }
@@ -192,7 +192,7 @@ class WebDriverSelect {
     }
 
     if (!$matched) {
-      throw new NoSuchElementException(
+      throw new NoSuchElementWebDriverError(
         sprintf('Cannot locate option with text: %s', $text)
       );
     }

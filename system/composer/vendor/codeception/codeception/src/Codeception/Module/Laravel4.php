@@ -60,6 +60,7 @@ class Laravel4 extends \Codeception\Util\Framework implements \Codeception\Util\
         $unitTesting = true;
         $testEnvironment = 'testing';
         $app = require $projectDir . 'bootstrap/start.php';
+        $app->boot();
         $this->kernel = $app;
 
         $this->revertErrorHandler();
@@ -293,7 +294,7 @@ class Laravel4 extends \Codeception\Util\Framework implements \Codeception\Util\
 
     protected function findRecord($model, $attributes = array())
     {
-        $query = $this->kernel['db']->table[$model];
+        $query = $this->kernel['db']->table($model);
         foreach ($attributes as $key => $value) {
             $query->where($key, $value);
         }
