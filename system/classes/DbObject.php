@@ -554,11 +554,6 @@ class DbObject extends DbService {
         // calling hooks AFTER inserting the object
         $this->_callHooks("after", "insert");
 
-        // with the hooks in place ... this can go!
-        if ($t != "audit") {
-            $this->w->logAudit($this->_db->getSql());
-        }
-
         // call standard aspect methods
         if ($this->_modifiable) {
             $this->_modifiable->insert();
@@ -665,12 +660,6 @@ class DbObject extends DbService {
 
         // calling hooks AFTER updating the object
         $this->_callHooks("after", "update");
-
-        // with hooks, this can now be removed soon!
-        if ($t != "audit") {
-            // TODO remove dependency to user code!
-            $this->w->logAudit("" . $this->_db->sql);
-        }
 
         // call standard aspect methods
         if ($this->_modifiable) {

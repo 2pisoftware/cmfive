@@ -16,7 +16,6 @@ use Composer\Console\Application;
 use Composer\Command\UpdateCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 
-    
 function composer_ALL(Web $w) {
     $w->setLayout(null);
     ob_implicit_flush(true);
@@ -48,7 +47,7 @@ function composer_ALL(Web $w) {
 
     $cmd = "./composer.phar update > ".ROOT_PATH."/log/composer.log 2>&1 &";
 
-    echo "Composer update is now running in the background. You can read the log at " . ROOT_PATH . "/log/composer.log";
+    echo "Composer update is now running in the background. You can read the log at " . ROOT_PATH . "/log/composer.log=";
     echo "Composer updates can take some time, please be patient...<br/>";
     flush();
     system($cmd);

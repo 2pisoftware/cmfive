@@ -105,13 +105,11 @@ class DbService {
 		if ($usecache) {
 			$obj = !empty(self::$_cache[$class][$key]) ? self::$_cache[$class][$key] : null;
 			if ($obj) {
-				//$this->w->logDebug("cached object:".$class.", ".$idOrWhere);
 				return $obj;
 			}
 		}
 
 		// not using cache or object not found in cache
-		//$this->w->logDebug("load object:".$class.", ".$idOrWhere);
 
 		$o = new $class($this->w);
 		$table = $o->getDbTableName();

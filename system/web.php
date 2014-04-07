@@ -70,18 +70,11 @@ class Web {
      * Constructor
      */
     function __construct() {
-        $this->_logMethod = "file";
-        $this->_logParam = "web.log";
-        $this->_logFolder = "log";
-        $this->_logFile = "web";
-        $this->_logExt = ".log";
-        $this->_logLevel = 0;
         $this->_buffer = null;
         $this->_context = array();
         $this->_templatePath = "templates";
         $this->_templateExtension = ".tpl.php";
         $this->_template = null;
-        $this->_logLevelArray = array("debug", "info", "warn", "audit", "error");
         $this->_action = null;
         $this->_defaultHandler = "main";
         $this->_defaultAction = "index";
@@ -100,8 +93,6 @@ class Web {
         $this->loadConfigurationFiles();
         
         define("WEBROOT", $this->_webroot);
-        
-        $this->setLogLevel("info");
     }
 
     private function modelLoader($className) {
@@ -110,11 +101,10 @@ class Web {
             $file = $this->getModuleDir($model) . 'models/' . ucfirst($className) . ".php";
             if (file_exists($file)) {
                 include $file;
-                //$this->logDebug("Class ".$file." loaded.");
                 return true;
             }
         }
-        $this->logDebug("Class " . $file . " NOT FOUND.");
+        $this->service('log')->debug("Class " . $file . " not found.");
         return false;
     }
 
@@ -123,7 +113,6 @@ class Web {
      * http://www.phpaddiction.com/tags/axial/url-routing-with-php-part-one/
      */
     private function _getCommandPath() {
-        //$this->logDebug("REQUEST_URI: ".$_SERVER['REQUEST_URI']);
         $uri = explode('?', $_SERVER['REQUEST_URI']); // get rid of parameters
         $uri = $uri[0];
         // get rid of trailing slashes
@@ -214,6 +203,9 @@ class Web {
     function start() {
         $this->initDB();
 
+        // Initialise the logger
+        $this->service("log");
+        
         // start the session
         // $sess = new SessionManager($this);
         session_name(SESSION_NAME);
@@ -294,7 +286,7 @@ class Web {
             // load the module file
             require_once $reqpath;
         } else {
-            $this->logError("No Action found for: " . $reqpath);
+            $this->service('log')->error("No Action found for: " . $reqpath);
             $this->notFoundPage();
         }
 
@@ -494,7 +486,7 @@ class Web {
     private function validateCSRF() {
         // Check for CSRF token and that we have a valid request method
         if (!CSRF::isValid($this->_requestMethod)) {
-            @$this->logError("CSRF Detected from " . $this->requestIpAddress());
+            @$this->service('log')->error("CSRF Detected from " . $this->requestIpAddress());
             header("HTTP/1.0 403 Forbidden");
             echo "Cross site request forgery detected. Your IP has been logged";
             die();
@@ -519,7 +511,7 @@ class Web {
             $user = $this->Auth->user();
             $usrmsg = $user ? " for " . $user->login : "";
             if (!$this->Auth->allowed($path)) {
-                $this->logInfo("Access Denied to " . $path . $usrmsg . " from " . $this->requestIpAddress());
+                $this->service('log')->info("Access Denied to " . $path . $usrmsg . " from " . $this->requestIpAddress());
                 // redirect to the last allowed page 
                 if ($this->Auth->allowed($_SESSION['LAST_ALLOWED_URI'])) {
                     $this->error($msg, $_SESSION['LAST_ALLOWED_URI']);
@@ -555,17 +547,7 @@ class Web {
         $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
         $mime = finfo_file($finfo, $filename);
         finfo_close($finfo);
-        // }
-        //  else {
-        //     ob_start();
-        //     system("file -i -b {$filepath}");
-        //     $output = ob_get_clean();
-        //     $output = explode("; ",$output);
-        //     if ( is_array($output) ) {
-        //         $output = $output[0];
-        //     }
-        //     $mime = $output;
-        // }
+
         return $mime;
     }
 
@@ -717,7 +699,7 @@ class Web {
      * <b>THIS EXITS the current process</b>
      */
     function notFoundPage() {
-        $this->logWarn("Action not found: " . $this->_module . "/" . $this->_action);
+        $this->service('log')->warn("Action not found: " . $this->_module . "/" . $this->_action);
         if ($this->templateExists($this->_notFoundTemplate)) {
             header("HTTP/1.0 404 Not Found");
             echo $this->fetchTemplate($this->_notFoundTemplate);
@@ -773,7 +755,7 @@ class Web {
      * @param <type> $name
      * @return <type>
      */
-    function & service($name) {
+    function service($name) {
         $name = ucfirst($name);
         if (!key_exists($name, $this->_services)) {
             $cname = $name . "Service";
@@ -991,14 +973,12 @@ class Web {
                 if ($nam && $this->templateExists($path . '/' . $nam)) {
                     $template = $path . '/' . $nam;
                     break 2; // break out of both loops
-                } else {
-                    //$this->logDebug("no template @ ".$path.'/'.$nam);
                 }
             }
         }
 
         if (!$template) {
-            $this->logError("No Template found.");
+            $this->service('log')->error("No Template found.");
             return null;
         }
         $tpl = new WebTemplate();
@@ -1181,49 +1161,6 @@ class Web {
         return $this->_requestMethod;
     }
 
-    /**
-     * log functions
-     */
-    function logDebug($msg) {
-        $this->_log(0, $msg);
-    }
-
-    function isDebug() {
-        return $this->_logLevel == 0;
-    }
-
-    function logInfo($msg) {
-        $this->_log(1, $msg);
-    }
-
-    function isInfo() {
-        return $this->_logLevel <= 1;
-    }
-
-    function logWarn($msg) {
-        $this->_log(2, $msg);
-    }
-
-    function isWarn() {
-        return $this->_logLevel <= 2;
-    }
-
-    function logAudit($msg) {
-        $this->_log(3, $msg);
-    }
-
-    function isAudit() {
-        return $this->_logLevel <= 3;
-    }
-
-    function logError($msg) {
-        $this->_log(4, $msg);
-    }
-
-    function isError() {
-        return $this->_logLevel <= 4;
-    }
-
     function getPath() {
         return implode("/", $this->_paths);
     }
@@ -1292,7 +1229,7 @@ class Web {
             return;
         }
         $this->_action_redirected = true;
-        //$this->logDebug("Redirect: ".$url);
+
         // although we are redirecting we should
         // still call the POST modules and listeners
         // but only if we got redirected from a real action
@@ -1311,7 +1248,6 @@ class Web {
      * set http header values
      */
     function sendHeader($key, $value) {
-        //$this->logDebug("Header[".$key."] = '".$value."'");
         $this->_headers[$key] = $value;
     }
 
@@ -1330,25 +1266,6 @@ class Web {
         echo "<b>========= SESSION =========</b>";
         print_r($_SESSION);
         echo "</pre>";
-    }
-
-    function setLogLevel($levelstring) {
-        $this->_logLevel = array_search($levelstring, $this->_logLevelArray);
-    }
-
-    function _log($level, $msg) {
-        if ($level < $this->_logLevel)
-            return;
-        if ($this->_logMethod == "file") {
-            $this->_logToFile($level, $msg);
-        }
-    }
-
-    function _logToFile($level, $msg) {
-        //$f=fopen($this->_logParam, 'a');
-        $f = fopen($this->_logFolder . "/" . $this->_logFile . "-" . date("Y-m-d") . $this->_logExt, 'a');
-        fwrite($f, date('d/m/Y H:i:s') . ' ' . strtoupper($this->_logLevelArray[$level]) . ' ' . $msg . "\n");
-        fclose($f);
     }
 
     /**
