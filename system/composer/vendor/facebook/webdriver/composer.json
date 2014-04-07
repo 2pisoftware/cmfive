@@ -5,15 +5,8 @@
   "homepage": "https://github.com/facebook/php-webdriver",
   "type": "library",
   "license": "Apache-2.0",
-  "support": {
-    "issues": "https://github.com/facebook/php-webdriver/issues",
-    "forum": "https://www.facebook.com/groups/phpwebdriver/",
-    "source": "https://github.com/facebook/php-webdriver"
-  },
   "require": {
-    "php": ">=5.3.19"
-  },
-  "require-dev": {
+    "php": ">=5.3.19",
     "phpunit/phpunit": "3.7.*"
   },
   "autoload": {

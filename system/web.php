@@ -94,10 +94,14 @@ class Web {
         $this->_module = null;
         $this->_submodule = null;
         $this->_hooks = array();
-        $this->_webroot = "/";
+        $this->_webroot = "http://" . $_SERVER['HTTP_HOST'];
         $this->_actionMethod = null;
         spl_autoload_register(array($this, 'modelLoader'));
         $this->loadConfigurationFiles();
+        
+        define("WEBROOT", $this->_webroot);
+        
+        $this->setLogLevel("info");
     }
 
     private function modelLoader($className) {
@@ -256,12 +260,12 @@ class Web {
         if (!$this->_submodule) {
             $reqpath = $this->getModuleDir($this->_module) . '/actions/' . $this->_action . '.php';
             if (!file_exists($reqpath)) {
-                $reqpath = $this->getModuleDir($this->_module) . '/' . $this->_module . ".actions.php";
+                $reqpath = $this->getModuleDir($this->_module) . $this->_module . ".actions.php";
             }
         } else {
             $reqpath = $this->getModuleDir($this->_module) . '/actions/' . $this->_submodule . '/' . $this->_action . '.php';
             if (!file_exists($reqpath)) {
-                $reqpath = $this->getModuleDir($this->_module) . '/' . $this->_module . '.' . $this->_submodule . ".actions.php";
+                $reqpath = $this->getModuleDir($this->_module) . $this->_module . '.' . $this->_submodule . ".actions.php";
             }
         }
 
@@ -414,21 +418,21 @@ class Web {
     }
 
     private function initDB() {
-        global $MYSQL_DB_HOST;
-        global $MYSQL_USERNAME;
-        global $MYSQL_PASSWORD;
-        global $MYSQL_DB_NAME;
-        global $MYSQL_DRIVER;
+//        global $MYSQL_DB_HOST;
+//        global $MYSQL_USERNAME;
+//        global $MYSQL_PASSWORD;
+//        global $MYSQL_DB_NAME;
+//        global $MYSQL_DRIVER;
+//
+//        $db_config = array(
+//            'hostname' => defaultVal(getenv('MYSQL_DB_HOST'), $MYSQL_DB_HOST),
+//            'username' => defaultVal(getenv('MYSQL_USERNAME'), $MYSQL_USERNAME),
+//            'password' => defaultVal(getenv('MYSQL_PASSWORD'), $MYSQL_PASSWORD),
+//            'database' => defaultVal(getenv('MYSQL_DB_NAME'), $MYSQL_DB_NAME),
+//            'driver' => defaultVal(getenv('MYSQL_DRIVER'), $MYSQL_DRIVER),
+//        );
 
-        $db_config = array(
-            'hostname' => defaultVal(getenv('MYSQL_DB_HOST'), $MYSQL_DB_HOST),
-            'username' => defaultVal(getenv('MYSQL_USERNAME'), $MYSQL_USERNAME),
-            'password' => defaultVal(getenv('MYSQL_PASSWORD'), $MYSQL_PASSWORD),
-            'database' => defaultVal(getenv('MYSQL_DB_NAME'), $MYSQL_DB_NAME),
-            'driver' => defaultVal(getenv('MYSQL_DRIVER'), $MYSQL_DRIVER),
-        );
-
-        $this->db = new DbPDO($db_config); // Crystal::db($db_config);
+        $this->db = new DbPDO(Config::get("database")); // Crystal::db($db_config);
     }
 
     function setModules($modules) {
@@ -855,9 +859,10 @@ class Web {
 
         // Build _hook registry if empty
         if (empty($this->_hooks)) {
-            foreach ($this->_moduleConfig as $modulename => $conf) {
-                if (array_key_exists("hooks", $conf)) {
-                    foreach ($conf["hooks"] as $hook) {
+            foreach ($this->modules() as $modulename) {
+                $hooks = Config::get("{$modulename}.hooks");
+                if (!empty($hooks)) {
+                    foreach ($hooks as $hook) {
                         $this->_hooks[$hook][] = $modulename;
                     }
                 }

@@ -44,8 +44,7 @@ class EventFiringWebDriverNavigation {
   }
 
   /**
-   * @param mixed $method
-   * @return void
+   * @param $method
    */
   protected function dispatch($method) {
     if (!$this->dispatcher) {
@@ -120,7 +119,7 @@ class EventFiringWebDriverNavigation {
   }
 
   /**
-   * @param mixed $url
+   * @param $url
    * @return $this
    * @throws WebDriverException
    */

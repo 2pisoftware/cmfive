@@ -7,4 +7,7 @@ Config::set('main', array(
     'application_name' => 'cmfive',
     'company_name' => 'cmfive',
     'company_url' => 'http://github.com/careck/cmfive',
+    "dependencies" => array(
+        "codeception/codeception" => "*"
+    )
 ));

@@ -14,11 +14,8 @@ class AdminLib {
 
                         $w->menuLink("admin/databasebackup", "Backup Database", $nav);
                         //$w->menuBox("admin/gitpull", "GIT Pull", $nav);
-                                
-			// if ($w->Composer->shouldAddFiles()) {
-			// 	$w->menuLink("admin/composeradd","Add composer.json files", $nav);
-			// }
-			// $w->menuLink("admin/composer","Update Composer", $nav);
+                        
+			$w->menuLink("admin/composer","Install/Update Composer", $nav);
 		}
 		$w->ctx("navigation", $nav);
 	}

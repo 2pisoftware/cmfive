@@ -11,11 +11,11 @@ class SearchService extends DbService {
 	public function getIndexes() {
 		$indexes = array();
 		
-		foreach ($this->w->_moduleConfig as $module => $params) {
-			if (array_key_exists("search", $params)) {
-				$search = $params['search'];
-				$indexes = array_merge($indexes,$search);
-			}
+		foreach ($this->w->modules() as $module) {
+                    $search = Config::get("{$module}.search");
+                    if (!empty($search)) {
+                        $indexes = array_merge($indexes,$search);
+                    }
 		}
 		asort($indexes);
 		return $indexes;
