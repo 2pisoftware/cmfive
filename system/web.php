@@ -12,6 +12,7 @@ if (file_exists(__DIR__ . "/composer/vendor/autoload.php")) {
 require_once "html.php";
 require_once "functions.php";
 require_once "classes/CSRF.php";
+require_once "classes/Config.php";
 
 class PermissionDeniedException extends Exception {
     
@@ -442,32 +443,22 @@ class Web {
      * @return <type>
      */
     function moduleConf($module, $key) {
-        if (array_key_exists($module, $this->_moduleConfig) && array_key_exists($key, $this->_moduleConfig[$module])) {
-            return $this->_moduleConfig[$module][$key];
-        } else {
-            return null;
-        }
+        return Config::get("{$module}.{$key}");
+//        if (array_key_exists($module, $this->_moduleConfig) && array_key_exists($key, $this->_moduleConfig[$module])) {
+//            return $this->_moduleConfig[$module][$key];
+//        } else {
+//            return null;
+//        }
     }
 
     private function loadConfigurationFiles() {
-        global $modules;
-
         // Load System config first
         $baseDir = SYSTEM_PATH . '/modules';
         $this->scanModuleDirForConfigurationFiles($baseDir);
-//         if (!empty($result)) {
-//             foreach($result as $key => $val) {
-//                 $this->_moduleConfig[$key] = $val;
-//             }
-//         }
+
         // Load project module config second
         $baseDir = ROOT_PATH . '/modules';
         $this->scanModuleDirForConfigurationFiles($baseDir);
-//         if (!empty($result)) {
-//             foreach($result as $key => $val) {
-//                 $this->_moduleConfig[$key] = $val;
-//             }
-//         }
     }
 
     // Helper function for the above, scans a directory for config files in child folders
@@ -590,35 +581,6 @@ class Web {
             header("HTTP/1.1 404 Not Found");
         }
         exit;
-
-        // $this->logInfo("Trying to load file: ".$filename);
-        // if (!file_exists($filename)) {
-        //     $this->logWarn("Could not load file: ".$filename);
-        //     header("HTTP/1.0 404 Not Found");
-        //     exit;
-        // }
-        // $mimetype = $this->getMimetype($filename);
-        // header('Content-Type: '.$mimetype );
-        // $buffer = '';
-        // $cnt =0;
-        // $handle = fopen($filename, 'rb');
-        // if ($handle === false) {
-        //     return false;
-        // }
-        // while (!feof($handle)) {
-        //     $buffer = fread($handle, CHUNK_SIZE);
-        //     echo $buffer;
-        //     ob_flush();
-        //     flush();
-        //     if ($retbytes) {
-        //         $cnt += strlen($buffer);
-        //     }
-        // }
-        // $status = fclose($handle);
-        // if ($retbytes && $status) {
-        //     return $cnt; // return num. bytes delivered like readfile() does.
-        // }
-        // exit;
     }
 
     /**
@@ -774,7 +736,7 @@ class Web {
      * Return all modules currently in the codebase
      */
     function modules() {
-        return array_keys($this->_moduleConfig);
+        return Config::keys();
     }
 
     /**
