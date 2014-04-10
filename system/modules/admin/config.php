@@ -15,7 +15,7 @@ Config::set("admin", array(
     'database' => array(
         'command' => array(
             'unix' => 'mysqldump -u $username -p$password $dbname | gzip > $filename.gz',
-            'windows' => 'C:\xampp\mysql\bin\mysqldump.exe -u $username -p$password $db_name > $filename'
+            'windows' => 'C:\xampp\mysql\bin\mysqldump.exe -u $username -p$password $dbname > $filename'
         )
     ),
     "dependencies" => array(

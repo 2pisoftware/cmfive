@@ -2,10 +2,6 @@
 
 // Using this as a guide: http://www.bendemeyer.com/2013/03/12/automated-site-backups-using-php-and-cron/
 function databasebackup_ALL(Web $w) {
-    global $MYSQL_USERNAME;
-    global $MYSQL_PASSWORD;
-    global $MYSQL_DB_NAME;
-    
     AdminLib::navigation($w, "Database Backup");
     
     $datestamp = date("Y-m-d-H-i");
