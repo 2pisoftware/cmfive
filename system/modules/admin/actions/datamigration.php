@@ -9,10 +9,10 @@
  * 
  */
 
-@require ROOT."/system/classes/DbMigration.php";
+// Why supress warnings when using require?
+require_once ROOT_PATH . "/system/classes/DbMigration.php";
 
 function datamigration_GET(Web $w) {
-	
-	// go through all modules and find the migration file
-	
+    $modules = Config::keys();
+    
 }
