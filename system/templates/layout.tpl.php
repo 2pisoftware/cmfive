@@ -130,17 +130,17 @@
                         <?php if ($w->Auth->loggedIn()) : ?>
                             <li><?php echo $w->menuLink($w->Main->getUserRedirectURL(), "Home"); ?></li>
                             <li class="divider"></li>
-                            <?php foreach ($w->_moduleConfig as $name => $options) {
+                            <?php foreach ($w->modules() as $module) {
                                 // Check if config is set to display on topmenu
-                                if ($options['topmenu']) :
+                                if (Config::get("{$module}.topmenu")) :
                                     // Check for navigation
-                                    if (method_exists($name . "Service", "navigation")) : ?>
-                                        <li class="has-dropdown <?php echo $w->_module == $name ? 'active' : ''; ?>">
-                                            <?php echo $w->menuLink($name . "/index", ucfirst($name)); ?>
-                                            <?php echo Html::ul($w->service($name)->navigation($w), null, "dropdown"); ?>
+                                    if (method_exists($module . "Service", "navigation")) : ?>
+                                        <li class="has-dropdown <?php echo $w->_module == $module ? 'active' : ''; ?>">
+                                            <?php echo $w->menuLink($module . "/index", ucfirst($module)); ?>
+                                            <?php echo Html::ul($w->service($module)->navigation($w), null, "dropdown"); ?>
                                         </li>
                                     <?php else: ?>
-                                        <li <?php echo $w->_module == $name ? 'class="active"' : ''; ?>><?php echo $w->menuLink($name . "/index", ucfirst($name)); ?></li>
+                                        <li <?php echo $w->_module == $module ? 'class="active"' : ''; ?>><?php echo $w->menuLink($module . "/index", ucfirst($module)); ?></li>
                                     <?php endif; ?>
                                     <li class="divider"></li>
                                 <?php endif;
