@@ -39,7 +39,7 @@ class Config {
         if (!empty($exploded_key)) {
             $register = &self::$register;
             // Loop through each key
-            while($ekey = array_shift($exploded_key)) {
+            foreach($exploded_key as $ekey) {
                 $i_ekey = strtolower($ekey);
                 if (!array_key_exists($i_ekey, $register)) {
                     $register[$i_ekey] = array();
@@ -63,7 +63,7 @@ class Config {
         $value = self::$register;
         if (!empty($exploded_key)) {
             // Loop through each key
-            while($ekey = array_shift($exploded_key)) {
+            foreach($exploded_key as $ekey) {
                 if (array_key_exists(strtolower($ekey), $value)) {
                     $value = $value[strtolower($ekey)];
                 } else {
@@ -82,7 +82,11 @@ class Config {
      * @return array
      */
     public static function keys() {
-        return array_keys(self::$register);
+        $required = array("topmenu", "active", "path");
+        $modules = array_filter(self::$register, function($var) use ($required) {
+            return count(array_intersect_key(array_flip($required), $var)) === count($required);
+        });
+        return array_keys($modules);
     }
     
     // Sanity checking
