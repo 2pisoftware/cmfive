@@ -2,10 +2,6 @@
 
 // Using this as a guide: http://www.bendemeyer.com/2013/03/12/automated-site-backups-using-php-and-cron/
 function databasebackup_ALL(Web $w) {
-    global $MYSQL_USERNAME;
-    global $MYSQL_PASSWORD;
-    global $MYSQL_DB_NAME;
-    
     AdminLib::navigation($w, "Database Backup");
     
     $datestamp = date("Y-m-d-H-i");
@@ -16,7 +12,8 @@ function databasebackup_ALL(Web $w) {
         if (!$fileinfo->isDot()) {
             $filename = $fileinfo->getFilename();
             try {
-                $backuptime = DateTime::createFromFormat("Y-m-d-H-i\.\s\q\l", $filename);
+                $datepart = substr($filename, 0, strpos($filename, ".sql"));
+                $backuptime = DateTime::createFromFormat("Y-m-d-H-i", $datepart);
                 if ($backuptime) {
                     if (time() - $backuptime->getTimestamp() < (60*60*4)) {
                         $w->out("You cannot backup more than once every 4 hours");
@@ -30,14 +27,20 @@ function databasebackup_ALL(Web $w) {
     }
     
     $filename = "$datestamp.sql";
-    if (!strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-        $w->out(shell_exec("mysqldump -u $MYSQL_USERNAME -p'$MYSQL_PASSWORD' $MYSQL_DB_NAME | gzip > {$filedir}{$filename}"));
+    $command = NULL;
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        $command = Config::get('admin.database.command.windows');
     } else {
-        // What to do with windows?
-        // Either enter the path to mysqldump or create a shortcut thing
-        // echo 'J:\xampp\mysql\bin\mysqldump.exe -u '.$MYSQL_USERNAME.' -p\''.$MYSQL_PASSWORD.'\' '.$MYSQL_DB_NAME.' > ' . "{$filedir}{$filename}";
-        $w->out(exec('J:\xampp\mysql\bin\mysqldump.exe -u '.$MYSQL_USERNAME.' -p'.$MYSQL_PASSWORD.' ' . $MYSQL_DB_NAME . ' > ' . "{$filedir}{$filename}"));
+        $command = Config::get('admin.database.command.unix');
     }
-    $w->out("Backup completed to: {$filedir}{$filename}");
-//    $w->out($response);
+    if (!empty($command)) {
+        $command = str_replace(
+                array('$username', '$password', '$dbname', '$filename'), 
+                array(Config::get('database.username'), Config::get('database.password'), Config::get('database.database'), $filedir.$filename), 
+                $command);
+        $w->out(shell_exec($command));
+        $w->out("Backup completed to: {$filedir}{$filename}");
+    } else {
+        $w->out("Could not find backup command");
+    }
 }

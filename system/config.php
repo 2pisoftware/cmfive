@@ -20,13 +20,5 @@ set_include_path(get_include_path() . PATH_SEPARATOR . LIBPATH);
 set_include_path(get_include_path() . PATH_SEPARATOR . SYSTEM_LIBPATH);
 
 require_once "system/db.php";
-
-// or bypass authentication only for the following actions
-// Why was this not in system config? Maybe im missing something here?
-
-Config::set('system.allow_action', array(
-    "auth/login",
-    "auth/forgotpassword",
-    "auth/resetpassword"
-));
+require_once "system/web.php";
 

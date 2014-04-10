@@ -61,6 +61,7 @@ $ALLOW_ACTION = array(
 		"auth/login",
         "auth/forgotpassword",
         "auth/resetpassword",
+        "admin/datamigration", // remove this line after the very first migration
 );
 
 //========= REST Configuration ==============================
