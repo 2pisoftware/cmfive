@@ -81,11 +81,15 @@ class Config {
      * 
      * @return array
      */
-    public static function keys() {
+    public static function keys($getAll = false) {
+        if ($getAll === true) {
+            return array_keys(self::$register);
+        }
         $required = array("topmenu", "active", "path");
         $modules = array_filter(self::$register, function($var) use ($required) {
-            return count(array_intersect_key(array_flip($required), $var)) === count($required);
+            return (count(array_intersect_key($var, array_flip($required))) === count($required));
         });
+
         return array_keys($modules);
     }
     

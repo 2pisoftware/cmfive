@@ -1,6 +1,6 @@
 <?php
 
-$modules['main'] = array(
+Config::set('main', array(
     'version' => '0.7.0',
     'active' => true,
     'path' => 'system/modules',
@@ -8,4 +8,4 @@ $modules['main'] = array(
     'application_name' => 'cmfive',
     'company_name' => 'cmfive',
     'company_url' => 'http://github.com/careck/cmfive',
-);
+));

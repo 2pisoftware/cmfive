@@ -1,8 +1,8 @@
 <?php
 
-$modules['forms'] = array(
-	'version' => '0.7.0',
+Config::set('forms', array(
+    'version' => '0.7.0',
     'active' => true,
     'path' => 'system/modules',
     'topmenu' => true,
-);
+));

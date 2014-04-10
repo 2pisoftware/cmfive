@@ -1,8 +1,7 @@
 <?php
 
-
-$modules['admin'] = array(
-	'version' => '0.7.0',
+Config::set('admin', array(
+    'version' => '0.7.0',
     'active' => true,
     'path' => 'system/modules',
     'topmenu' => true,
@@ -13,5 +12,5 @@ $modules['admin'] = array(
             'windows' => 'C:\Users\adam\Desktop\SumatraPDF-2.4\SumatraPDF.exe -print-to $printername $filename'
         )
     )
-);
+));
 

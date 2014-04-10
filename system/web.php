@@ -4,10 +4,6 @@
 if (file_exists(__DIR__ . "/composer/vendor/autoload.php")) {
     require "composer/vendor/autoload.php";
 }
-// // Load user Composer autoloader
-// if (file_exists(__DIR__."/../vendor/autoload.php")) {
-//     require "../vendor/autoload.php";
-// }
 
 require_once "html.php";
 require_once "functions.php";
@@ -80,8 +76,9 @@ class Web {
         $this->_hooks = array();
         $this->_webroot = "http://" . $_SERVER['HTTP_HOST'];
         $this->_actionMethod = null;
-        spl_autoload_register(array($this, 'modelLoader'));
+        
         $this->loadConfigurationFiles();
+        spl_autoload_register(array($this, 'modelLoader'));
         
         define("WEBROOT", $this->_webroot);
     }
@@ -732,6 +729,8 @@ class Web {
                     $s->__init();
                 }
                 $this->_services[$name] = & $s;
+            } else {
+//                throw new Exception("Class $name not found!");
             }
         }
         return $this->_services[$name];

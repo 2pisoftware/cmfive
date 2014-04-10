@@ -1,6 +1,6 @@
 <?php
 
-$modules['channels'] = array(
+Config::set('channels', array(
 	'version' => '0.7.0',
     'active' => true,
     'path' => 'system/modules',
@@ -9,4 +9,4 @@ $modules['channels'] = array(
     'processors' => array(
     	'TestProcessor'
 	),
-);
+));
