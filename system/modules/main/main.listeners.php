@@ -28,10 +28,10 @@ function main_listener_PRE_ACTION($w) {
 
         $nav[] = $w->menuLink($redirect_url, "Home");
         
-        foreach ($w->_moduleConfig as $name => $options) {
-        	if ($options['topmenu']) {
-            	$w->menuLink($name."/index",ucfirst($name),$nav);
-        	}
+        foreach ($w->modules() as $module) {
+            if ($w->moduleConf($module, "topmenu") == true) {
+                $w->menuLink($module."/index",ucfirst($module),$nav);
+            }
         }
     }
     $w->ctx("top_navigation", $nav);

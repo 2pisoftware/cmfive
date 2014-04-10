@@ -16,10 +16,12 @@ use Gaufrette\Exception;
  */
 class Local implements Adapter,
                        StreamFactory,
-                       ChecksumCalculator
+                       ChecksumCalculator,
+                       SizeCalculator
 {
     protected $directory;
     private $create;
+    private $mode;
 
     /**
      * Constructor
@@ -27,11 +29,12 @@ class Local implements Adapter,
      * @param string  $directory Directory where the filesystem is located
      * @param boolean $create    Whether to create the directory if it does not
      *                            exist (default FALSE)
+     * @param integer $mode      Mode for mkdir
      *
      * @throws RuntimeException if the specified directory does not exist and
      *                          could not be created
      */
-    public function __construct($directory, $create = false)
+    public function __construct($directory, $create = false, $mode = 0777)
     {
         $this->directory = Util\Path::normalize($directory);
 
@@ -40,6 +43,7 @@ class Local implements Adapter,
         }
 
         $this->create = $create;
+        $this->mode = $mode;
     }
 
     /**
@@ -88,16 +92,15 @@ class Local implements Adapter,
         $this->ensureDirectoryExists($this->directory, $this->create);
 
         try {
-            $iterator = new \RecursiveIteratorIterator(
+            $files = new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator(
                     $this->directory,
                     \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS
                 )
             );
         } catch (\Exception $e) {
-            $iterator = new \EmptyIterator;
+            $files = new \EmptyIterator;
         }
-        $files = iterator_to_array($iterator);
 
         $keys = array();
         foreach ($files as $file) {
@@ -151,6 +154,11 @@ class Local implements Adapter,
     public function checksum($key)
     {
         return Util\Checksum::fromFile($this->computePath($key));
+    }
+
+    public function size($key)
+    {
+        return Util\Size::fromFile($this->computePath($key));
     }
 
     /**
@@ -234,12 +242,12 @@ class Local implements Adapter,
      */
     protected function createDirectory($directory)
     {
-        $umask = umask(0);
-        $created = mkdir($directory, 0777, true);
-        umask($umask);
+        $created = mkdir($directory, $this->mode, true);
 
         if (!$created) {
-            throw new \RuntimeException(sprintf('The directory \'%s\' could not be created.', $directory));
+            if (!is_dir($directory)) {
+                throw new \RuntimeException(sprintf('The directory \'%s\' could not be created.', $directory));
+            }
         }
     }
 }

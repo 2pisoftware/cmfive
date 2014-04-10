@@ -36,9 +36,6 @@ abstract class WebDriverTouchAction {
     $this->locationProvider = $location_provider;
   }
 
-  /**
-   * @return null|WebDriverCoordinates
-   */
   protected function getActionLocation() {
     return $this->locationProvider !== null
       ? $this->locationProvider->getCoordinates() : null;

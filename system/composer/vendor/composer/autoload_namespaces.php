@@ -26,7 +26,6 @@ return array(
     'Symfony\\Component\\Console\\' => array($vendorDir . '/symfony/console'),
     'Symfony\\Component\\BrowserKit\\' => array($vendorDir . '/symfony/browser-kit'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log'),
-    'Monolog' => array($vendorDir . '/monolog/monolog/src'),
     'Guzzle\\Stream' => array($vendorDir . '/guzzle/stream'),
     'Guzzle\\Parser' => array($vendorDir . '/guzzle/parser'),
     'Guzzle\\Http' => array($vendorDir . '/guzzle/http'),

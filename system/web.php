@@ -12,6 +12,7 @@ if (file_exists(__DIR__ . "/composer/vendor/autoload.php")) {
 require_once "html.php";
 require_once "functions.php";
 require_once "classes/CSRF.php";
+require_once "classes/Config.php";
 
 class PermissionDeniedException extends Exception {
     
@@ -26,19 +27,11 @@ class PermissionDeniedException extends Exception {
 class Web {
 
     public $_buffer;
-    public $_logLevel;
-    public $_logHandlers;
     public $_template;
     public $_templatePath;
     public $_templateExtension;
     public $_url;
     public $_context;
-    public $_logMethod;
-    public $_logParam;
-    public $_logFolder = "log";
-    public $_logFile = "web";
-    public $_logExt = ".log";
-    public $_logLevelArray;
     public $_action;
     public $_defaultHandler;
     public $_defaultAction;
@@ -56,7 +49,6 @@ class Web {
     public $_action_executed = false;
     public $_action_redirected = false;
     public $_services;
-    public $_moduleConfig;
     public $_paths;
     public $_loginpath = 'auth/login';
     public $_partialsdir = "partials";
@@ -69,18 +61,11 @@ class Web {
      * Constructor
      */
     function __construct() {
-        $this->_logMethod = "file";
-        $this->_logParam = "web.log";
-        $this->_logFolder = "log";
-        $this->_logFile = "web";
-        $this->_logExt = ".log";
-        $this->_logLevel = 0;
         $this->_buffer = null;
         $this->_context = array();
         $this->_templatePath = "templates";
         $this->_templateExtension = ".tpl.php";
         $this->_template = null;
-        $this->_logLevelArray = array("debug", "info", "warn", "audit", "error");
         $this->_action = null;
         $this->_defaultHandler = "main";
         $this->_defaultAction = "index";
@@ -93,10 +78,12 @@ class Web {
         $this->_module = null;
         $this->_submodule = null;
         $this->_hooks = array();
-        $this->_webroot = "/";
+        $this->_webroot = "http://" . $_SERVER['HTTP_HOST'];
         $this->_actionMethod = null;
         spl_autoload_register(array($this, 'modelLoader'));
         $this->loadConfigurationFiles();
+        
+        define("WEBROOT", $this->_webroot);
     }
 
     private function modelLoader($className) {
@@ -105,11 +92,10 @@ class Web {
             $file = $this->getModuleDir($model) . 'models/' . ucfirst($className) . ".php";
             if (file_exists($file)) {
                 include $file;
-                //$this->logDebug("Class ".$file." loaded.");
                 return true;
             }
         }
-        $this->logDebug("Class " . $file . " NOT FOUND.");
+        $this->service('log')->debug("Class " . $file . " not found.");
         return false;
     }
 
@@ -118,7 +104,6 @@ class Web {
      * http://www.phpaddiction.com/tags/axial/url-routing-with-php-part-one/
      */
     private function _getCommandPath() {
-        //$this->logDebug("REQUEST_URI: ".$_SERVER['REQUEST_URI']);
         $uri = explode('?', $_SERVER['REQUEST_URI']); // get rid of parameters
         $uri = $uri[0];
         // get rid of trailing slashes
@@ -209,6 +194,9 @@ class Web {
     function start() {
         $this->initDB();
 
+        // Initialise the logger
+        $this->service("log");
+        
         // start the session
         // $sess = new SessionManager($this);
         session_name(SESSION_NAME);
@@ -255,12 +243,12 @@ class Web {
         if (!$this->_submodule) {
             $reqpath = $this->getModuleDir($this->_module) . '/actions/' . $this->_action . '.php';
             if (!file_exists($reqpath)) {
-                $reqpath = $this->getModuleDir($this->_module) . '/' . $this->_module . ".actions.php";
+                $reqpath = $this->getModuleDir($this->_module) . $this->_module . ".actions.php";
             }
         } else {
             $reqpath = $this->getModuleDir($this->_module) . '/actions/' . $this->_submodule . '/' . $this->_action . '.php';
             if (!file_exists($reqpath)) {
-                $reqpath = $this->getModuleDir($this->_module) . '/' . $this->_module . '.' . $this->_submodule . ".actions.php";
+                $reqpath = $this->getModuleDir($this->_module) . $this->_module . '.' . $this->_submodule . ".actions.php";
             }
         }
 
@@ -289,7 +277,7 @@ class Web {
             // load the module file
             require_once $reqpath;
         } else {
-            $this->logError("No Action found for: " . $reqpath);
+            $this->service('log')->error("No Action found for: " . $reqpath);
             $this->notFoundPage();
         }
 
@@ -413,67 +401,32 @@ class Web {
     }
 
     private function initDB() {
-        global $MYSQL_DB_HOST;
-        global $MYSQL_USERNAME;
-        global $MYSQL_PASSWORD;
-        global $MYSQL_DB_NAME;
-        global $MYSQL_DRIVER;
-
-        $db_config = array(
-            'hostname' => defaultVal(getenv('MYSQL_DB_HOST'), $MYSQL_DB_HOST),
-            'username' => defaultVal(getenv('MYSQL_USERNAME'), $MYSQL_USERNAME),
-            'password' => defaultVal(getenv('MYSQL_PASSWORD'), $MYSQL_PASSWORD),
-            'database' => defaultVal(getenv('MYSQL_DB_NAME'), $MYSQL_DB_NAME),
-            'driver' => defaultVal(getenv('MYSQL_DRIVER'), $MYSQL_DRIVER),
-        );
-
-        $this->db = new DbPDO($db_config); // Crystal::db($db_config);
-    }
-
-    function setModules($modules) {
-        $this->_moduleConfig = $modules;
+        $this->db = new DbPDO(Config::get("database")); // Crystal::db($db_config);
     }
 
     /**
      * Read Module configuration values
      * 
-     * @param <type> $module
-     * @param <type> $key
-     * @return <type>
+     * @param string $module
+     * @param string $key
+     * @return mixed
      */
     function moduleConf($module, $key) {
-        if (array_key_exists($module, $this->_moduleConfig) && array_key_exists($key, $this->_moduleConfig[$module])) {
-            return $this->_moduleConfig[$module][$key];
-        } else {
-            return null;
-        }
+        return Config::get("{$module}.{$key}");
     }
 
     private function loadConfigurationFiles() {
-        global $modules;
-
         // Load System config first
         $baseDir = SYSTEM_PATH . '/modules';
         $this->scanModuleDirForConfigurationFiles($baseDir);
-//         if (!empty($result)) {
-//             foreach($result as $key => $val) {
-//                 $this->_moduleConfig[$key] = $val;
-//             }
-//         }
+
         // Load project module config second
         $baseDir = ROOT_PATH . '/modules';
         $this->scanModuleDirForConfigurationFiles($baseDir);
-//         if (!empty($result)) {
-//             foreach($result as $key => $val) {
-//                 $this->_moduleConfig[$key] = $val;
-//             }
-//         }
     }
 
     // Helper function for the above, scans a directory for config files in child folders
     private function scanModuleDirForConfigurationFiles($dir = "") {
-        global $modules;
-
         // Check that dir is dir
         if (is_dir($dir)) {
 
@@ -499,7 +452,7 @@ class Web {
     private function validateCSRF() {
         // Check for CSRF token and that we have a valid request method
         if (!CSRF::isValid($this->_requestMethod)) {
-            @$this->logError("CSRF Detected from " . $this->requestIpAddress());
+            @$this->service('log')->error("CSRF Detected from " . $this->requestIpAddress());
             header("HTTP/1.0 403 Forbidden");
             echo "Cross site request forgery detected. Your IP has been logged";
             die();
@@ -524,7 +477,7 @@ class Web {
             $user = $this->Auth->user();
             $usrmsg = $user ? " for " . $user->login : "";
             if (!$this->Auth->allowed($path)) {
-                $this->logInfo("Access Denied to " . $path . $usrmsg . " from " . $this->requestIpAddress());
+                $this->service('log')->info("Access Denied to " . $path . $usrmsg . " from " . $this->requestIpAddress());
                 // redirect to the last allowed page 
                 if ($this->Auth->allowed($_SESSION['LAST_ALLOWED_URI'])) {
                     $this->error($msg, $_SESSION['LAST_ALLOWED_URI']);
@@ -560,17 +513,7 @@ class Web {
         $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
         $mime = finfo_file($finfo, $filename);
         finfo_close($finfo);
-        // }
-        //  else {
-        //     ob_start();
-        //     system("file -i -b {$filepath}");
-        //     $output = ob_get_clean();
-        //     $output = explode("; ",$output);
-        //     if ( is_array($output) ) {
-        //         $output = $output[0];
-        //     }
-        //     $mime = $output;
-        // }
+
         return $mime;
     }
 
@@ -590,35 +533,6 @@ class Web {
             header("HTTP/1.1 404 Not Found");
         }
         exit;
-
-        // $this->logInfo("Trying to load file: ".$filename);
-        // if (!file_exists($filename)) {
-        //     $this->logWarn("Could not load file: ".$filename);
-        //     header("HTTP/1.0 404 Not Found");
-        //     exit;
-        // }
-        // $mimetype = $this->getMimetype($filename);
-        // header('Content-Type: '.$mimetype );
-        // $buffer = '';
-        // $cnt =0;
-        // $handle = fopen($filename, 'rb');
-        // if ($handle === false) {
-        //     return false;
-        // }
-        // while (!feof($handle)) {
-        //     $buffer = fread($handle, CHUNK_SIZE);
-        //     echo $buffer;
-        //     ob_flush();
-        //     flush();
-        //     if ($retbytes) {
-        //         $cnt += strlen($buffer);
-        //     }
-        // }
-        // $status = fclose($handle);
-        // if ($retbytes && $status) {
-        //     return $cnt; // return num. bytes delivered like readfile() does.
-        // }
-        // exit;
     }
 
     /**
@@ -751,7 +665,7 @@ class Web {
      * <b>THIS EXITS the current process</b>
      */
     function notFoundPage() {
-        $this->logWarn("Action not found: " . $this->_module . "/" . $this->_action);
+        $this->service('log')->warn("Action not found: " . $this->_module . "/" . $this->_action);
         if ($this->templateExists($this->_notFoundTemplate)) {
             header("HTTP/1.0 404 Not Found");
             echo $this->fetchTemplate($this->_notFoundTemplate);
@@ -774,7 +688,7 @@ class Web {
      * Return all modules currently in the codebase
      */
     function modules() {
-        return array_keys($this->_moduleConfig);
+        return Config::keys();
     }
 
     /**
@@ -807,7 +721,7 @@ class Web {
      * @param <type> $name
      * @return <type>
      */
-    function & service($name) {
+    function service($name) {
         $name = ucfirst($name);
         if (!key_exists($name, $this->_services)) {
             $cname = $name . "Service";
@@ -893,9 +807,10 @@ class Web {
 
         // Build _hook registry if empty
         if (empty($this->_hooks)) {
-            foreach ($this->_moduleConfig as $modulename => $conf) {
-                if (array_key_exists("hooks", $conf)) {
-                    foreach ($conf["hooks"] as $hook) {
+            foreach ($this->modules() as $modulename) {
+                $hooks = Config::get("{$modulename}.hooks");
+                if (!empty($hooks)) {
+                    foreach ($hooks as $hook) {
                         $this->_hooks[$hook][] = $modulename;
                     }
                 }
@@ -1024,14 +939,12 @@ class Web {
                 if ($nam && $this->templateExists($path . '/' . $nam)) {
                     $template = $path . '/' . $nam;
                     break 2; // break out of both loops
-                } else {
-                    //$this->logDebug("no template @ ".$path.'/'.$nam);
                 }
             }
         }
 
         if (!$template) {
-            $this->logError("No Template found.");
+            $this->service('log')->error("No Template found.");
             return null;
         }
         $tpl = new WebTemplate();
@@ -1214,49 +1127,6 @@ class Web {
         return $this->_requestMethod;
     }
 
-    /**
-     * log functions
-     */
-    function logDebug($msg) {
-        $this->_log(0, $msg);
-    }
-
-    function isDebug() {
-        return $this->_logLevel == 0;
-    }
-
-    function logInfo($msg) {
-        $this->_log(1, $msg);
-    }
-
-    function isInfo() {
-        return $this->_logLevel <= 1;
-    }
-
-    function logWarn($msg) {
-        $this->_log(2, $msg);
-    }
-
-    function isWarn() {
-        return $this->_logLevel <= 2;
-    }
-
-    function logAudit($msg) {
-        $this->_log(3, $msg);
-    }
-
-    function isAudit() {
-        return $this->_logLevel <= 3;
-    }
-
-    function logError($msg) {
-        $this->_log(4, $msg);
-    }
-
-    function isError() {
-        return $this->_logLevel <= 4;
-    }
-
     function getPath() {
         return implode("/", $this->_paths);
     }
@@ -1325,7 +1195,7 @@ class Web {
             return;
         }
         $this->_action_redirected = true;
-        //$this->logDebug("Redirect: ".$url);
+
         // although we are redirecting we should
         // still call the POST modules and listeners
         // but only if we got redirected from a real action
@@ -1344,7 +1214,6 @@ class Web {
      * set http header values
      */
     function sendHeader($key, $value) {
-        //$this->logDebug("Header[".$key."] = '".$value."'");
         $this->_headers[$key] = $value;
     }
 
@@ -1363,25 +1232,6 @@ class Web {
         echo "<b>========= SESSION =========</b>";
         print_r($_SESSION);
         echo "</pre>";
-    }
-
-    function setLogLevel($levelstring) {
-        $this->_logLevel = array_search($levelstring, $this->_logLevelArray);
-    }
-
-    function _log($level, $msg) {
-        if ($level < $this->_logLevel)
-            return;
-        if ($this->_logMethod == "file") {
-            $this->_logToFile($level, $msg);
-        }
-    }
-
-    function _logToFile($level, $msg) {
-        //$f=fopen($this->_logParam, 'a');
-        $f = fopen($this->_logFolder . "/" . $this->_logFile . "-" . date("Y-m-d") . $this->_logExt, 'a');
-        fwrite($f, date('d/m/Y H:i:s') . ' ' . strtoupper($this->_logLevelArray[$level]) . ' ' . $msg . "\n");
-        fclose($f);
     }
 
     /**

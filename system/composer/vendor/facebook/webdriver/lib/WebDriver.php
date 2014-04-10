@@ -29,7 +29,7 @@ interface WebDriver extends WebDriverSearchContext {
    * Find the first WebDriverElement using the given mechanism.
    *
    * @param WebDriverBy $locator
-   * @return WebDriverElement NoSuchElementException is thrown in
+   * @return WebDriverElement NoSuchElementWebDriverError is thrown in
    *    HttpCommandExecutor if no element is found.
    * @see WebDriverBy
    */
@@ -40,8 +40,8 @@ interface WebDriver extends WebDriverSearchContext {
    * mechanism.
    *
    * @param WebDriverBy $locator
-   * @return array<WebDriverElement> A list of all WebDriverElements,
-   *    or an empty array if nothing matches
+   * @return array A list of all WebDriverElements, or an empty array if
+   *    nothing matches
    * @see WebDriverBy
    */
   public function findElements(WebDriverBy $locator);

@@ -28,9 +28,6 @@ class WebDriverMouseAction {
     $this->locationProvider = $location_provider;
   }
 
-  /**
-   * @return null|WebDriverCoordinates
-   */
   protected function getActionLocation() {
     if ($this->locationProvider !== null) {
       return $this->locationProvider->getCoordinates();
@@ -39,9 +36,6 @@ class WebDriverMouseAction {
     }
   }
 
-  /**
-   * @return void
-   */
   protected function moveToLocation() {
     $this->mouse->mouseMove($this->locationProvider);
   }

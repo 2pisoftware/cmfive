@@ -25,6 +25,19 @@ solution.
 Try it!
 -------
 
+### Installation
+
+Development version:
+
+```bash
+php composer.phar require knplabs/gaufrette:0.2.*@dev
+```
+Stable version:
+
+```bash
+php composer.phar require knplabs/gaufrette:0.1.*
+```
+
 ### Setup your filesystem
 
 Following an example with the local filesystem adapter. To setup other adapters, look up the [testcases](https://github.com/KnpLabs/Gaufrette/tree/master/tests/Gaufrette/Functional/adapters).
@@ -36,7 +49,7 @@ use Gaufrette\Filesystem;
 use Gaufrette\Adapter\Local as LocalAdapter;
 
 $adapter = new LocalAdapter('/var/media');
-$filesystem = new Filesystem($adapter)
+$filesystem = new Filesystem($adapter);
 ```
 
 ### Use the filesystem
@@ -112,6 +125,14 @@ define("AWS_CERTIFICATE_AUTHORITY", true);
 Specifying a custom CA certificate is not required when using the
 `Gaufrette\Adapter\AmazonS3` adapter because it uses the newest version of the
 AWS SDK for PHP.
+
+If you use the newer adapter ``\AwsS3`` you will need to use the S3Client factory method, and the plug that into the Adapter.
+
+```php
+$service = S3Client::factory(array('key' => 'your_key_here', 'secret' => 'your_secret' ));
+$client  = new AwsS3($service,'your-bucket-name');
+```
+
 
 Using OpenCloud
 ---------------
@@ -205,7 +226,7 @@ $filesystem = new Gaufrette\Filesystem($adapter);
 Using FTP adapters
 ---------------
 
-Some FTP servers need valid configuration so Gaufrette can working with them as expected.
+Some FTP servers need valid configuration so Gaufrette can work with them as expected.
 
 ### Pure Ftpd
 

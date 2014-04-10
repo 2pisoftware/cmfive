@@ -26,7 +26,8 @@ class RemoteKeyboard implements WebDriverKeyboard {
 
   /**
    * Send keys to active element
-   * @param string|array $keys
+   *
+   * @param $keys
    * @return $this
    */
   public function sendKeys($keys) {

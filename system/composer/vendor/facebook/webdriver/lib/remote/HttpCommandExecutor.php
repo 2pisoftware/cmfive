@@ -160,7 +160,6 @@ class HttpCommandExecutor implements WebDriverCommandExecutor {
    * @param suffix       What to append to the base URL.
    * @param command      The Command object, modelled as a hash.
    * @param extra_opts   key => value pairs of curl options for curl_setopt()
-   * @return array
    */
   protected static function curl(
     $http_method,
@@ -255,9 +254,6 @@ class HttpCommandExecutor implements WebDriverCommandExecutor {
     return array('value' => $value, 'info' => $info, 'sessionId' => $sessionId);
   }
 
-  /**
-   * @return string
-   */
   public function getSessionID() {
     return $this->sessionID;
   }
