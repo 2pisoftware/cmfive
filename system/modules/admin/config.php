@@ -12,6 +12,12 @@ Config::set("admin", array(
             'windows' => '/Path/to/SumatraPDF.exe -print-to $printername $filename'
         )
     ),
+    'database' => array(
+        'command' => array(
+            'unix' => 'mysqldump -u $username -p$password $dbname | gzip > $filename.gz',
+            'windows' => 'C:\xampp\mysql\bin\mysqldump.exe -u $username -p$password $db_name > $filename'
+        )
+    ),
     "dependencies" => array(
         "swiftmailer/swiftmailer" => "@stable",
         "twig/twig" => "1.*"
