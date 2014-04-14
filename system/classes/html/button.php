@@ -69,7 +69,13 @@ class button {
         if (!empty($this->name)) $buffer .= "name=\"{$this->name}\" ";
         if (!empty($this->type)) $buffer .= "type=\"{$this->type}\" ";
         if (!empty($this->value)) $buffer .= "value=\"{$this->value}\" ";
-        if (!empty($js)) $buffer .= (!empty($this->onclick) ? $this->onclick : (!empty($js) ? "onclick=\"{$js}\" " : ""));
+        if (!empty($this->onclick)) {
+            $buffer .= $this->onclick;
+        } else {
+            if (!empty($js)) {
+                $buffer .= "onclick=\"{$js}\" ";
+            }
+        }
         $buffer .= (">{$this->text}</button>");
         return $buffer;
     }

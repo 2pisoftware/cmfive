@@ -44,7 +44,13 @@ class a {
     public function __toString() {
         $buffer = "";
         $buffer .= "<a ";
-        if (!empty($this->confirm)) $buffer .= (!empty($this->onclick) ? $this->onclick : "onclick=\"javascript:return confirm('" . $this->confirm . "');\" ");
+        if (!empty($this->onclick)){
+            $buffer .= $this->onclick;
+        } else {
+            if (!empty($this->confirm)) {
+                $buffer .= "onclick=\"javascript:return confirm('" . $this->confirm . "');\" ";
+            }
+        }
         if (!empty($this->download)) $buffer .= "download='{$this->download}' ";
         if (!empty($this->href)) $buffer .= "href='{$this->href}' ";
         if (!empty($this->hreflang)) $buffer .= "hreflang='{$this->hreflang}' ";

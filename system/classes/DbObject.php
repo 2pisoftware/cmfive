@@ -498,9 +498,9 @@ class DbObject extends DbService {
 
         $t = $this->getDbTableName();
         $columns = $this->getDbTableColumnNames();
-
+        
         // set some default attributes
-        if (!$this->_modifiable) {
+        if (!property_exists($this, "_modifiable")) { //$this->_modifiable) {
             // for backwards compatibility
             if (in_array("dt_created", $columns))
                 $this->dt_created = time();
@@ -514,6 +514,7 @@ class DbObject extends DbService {
             if (in_array("modifier_id", $columns) && $this->w->Auth->loggedIn())
                 $this->modifier_id = $this->w->Auth->user()->id;
         }
+        
         $data = array();
         foreach (get_object_vars($this) as $k => $v) {
             if ($k{0} != "_" && $k != "w" && $v !== null) {
@@ -543,25 +544,29 @@ class DbObject extends DbService {
                 }
             }
         }
-
+        
         $this->_db->insert($t, $data);
-
-        // echo $this->_db->print_sql();
-
-        $this->_db->execute();
+        try {
+            $this->_db->execute();
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            $this->w->Log->error($e->getMessage());
+            return NULL;
+        }
         $this->id = $this->_db->last_insert_id();
-
+        
         // calling hooks AFTER inserting the object
         $this->_callHooks("after", "insert");
 
         // call standard aspect methods
-        if ($this->_modifiable) {
+        
+        if (property_exists($this, "_modifiable")) {
             $this->_modifiable->insert();
         }
-        if ($this->_versionable) {
+        if (property_exists($this, "_versionable")) {
             $this->_versionable->insert();
         }
-        if ($this->_searchable) {
+        if (property_exists($this, "_searchable")) {
             $this->_searchable->insert();
         }
 
@@ -573,11 +578,11 @@ class DbObject extends DbService {
         $inserts[get_class($this)][] = $this->id;
         $this->w->ctx('db_inserts', $inserts);
 
-        if ($this->__use_auditing) {
+        if (property_exists($this, "__use_auditing")) {
             // TODO remove dependency to user code!
             $this->w->Admin->addDbAuditLogEntry("insert", get_class($this), $this->id);
         }
-
+        
         return true;
     }
 
@@ -609,7 +614,7 @@ class DbObject extends DbService {
         }
 
         // set default attributes the old way
-        if (!$this->_modifiable) {
+        if (!property_exists($this, "_modifiable")) {//$this->_modifiable) {
             //if (property_exists($this, "dt_modified")) {
             if (in_array("dt_modified", $columns)) {
                 $this->dt_modified = time();
@@ -656,19 +661,22 @@ class DbObject extends DbService {
         }
 
         $this->_db->update($t, $data)->where($this->_cn('id'), $this->id);
-        $this->_db->execute();
-
+        try {
+            $this->_db->execute();
+        } catch (Exception $e) {
+            echo $t . " " . $e->getMessage() . "<br/>";
+        }
         // calling hooks AFTER updating the object
         $this->_callHooks("after", "update");
 
         // call standard aspect methods
-        if ($this->_modifiable) {
+        if (property_exists($this, "_modifiable")) {
             $this->_modifiable->update();
         }
-        if ($this->_versionable) {
+        if (property_exists($this, "_versionable")) {
             $this->_versionable->update();
         }
-        if ($this->_searchable) {
+        if (property_exists($this, "_searchable")) {
             $this->_searchable->update();
         }
 
@@ -680,7 +688,7 @@ class DbObject extends DbService {
         $updates[get_class($this)][] = $this->id;
         $this->w->ctx('db_updates', $updates);
 
-        if ($this->__use_auditing) {
+        if (property_exists($this, "__use_auditing")) {
             // TODO remove dependency to modules code!
             $this->w->Admin->addDbAuditLogEntry("update", get_class($this), $this->id);
         }

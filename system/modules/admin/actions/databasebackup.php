@@ -12,6 +12,7 @@ function databasebackup_ALL(Web $w) {
         if (!$fileinfo->isDot()) {
             $filename = $fileinfo->getFilename();
             try {
+                
                 $datepart = substr($filename, 0, strpos($filename, ".sql"));
                 $backuptime = DateTime::createFromFormat("Y-m-d-H-i", $datepart);
                 if ($backuptime) {

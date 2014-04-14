@@ -1,5 +1,5 @@
 <?php
-@require_once "DbTable.php";
+require_once "DbTable.php";
 
 class DbMigration extends DbService {
 	

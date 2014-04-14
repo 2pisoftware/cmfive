@@ -86,8 +86,9 @@ class Config {
             return array_keys(self::$register);
         }
         $required = array("topmenu", "active", "path");
-        $modules = array_filter(self::$register, function($var) use ($required) {
-            return (count(array_intersect_key($var, array_flip($required))) === count($required));
+        $req_count = count($required);
+        $modules = array_filter(self::$register, function($var) use ($required, $req_count) {
+            return ($req_count === count(array_intersect_key($var, array_flip($required))));
         });
 
         return array_keys($modules);

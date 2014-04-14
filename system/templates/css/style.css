@@ -83,3 +83,53 @@ td button {
     padding: 5px 15px !important;
 }
 
+ul.ui-autocomplete {
+    z-index: 10000;
+}
+
+/* Comment section */
+.comment_section {
+    border-bottom: 1px #ddd solid;
+    margin: 5px;
+    padding: 10px;
+}
+
+.comment_header {
+    font-size: 12pt;
+    font-weight: lighter;
+    color: #363636;
+}
+
+.comment_body {
+    padding: 10px 0px;
+}
+
+.comment_meta {
+    color: #797979;
+}
+
+.comment_meta a {
+    text-decoration: underline;
+    color: inherit;
+}
+
+/* Attachments section */
+.attachments_container {
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.image_attachment {
+    border: 1px solid grey;
+    width: 200px;
+    float: left;
+    margin: 10px;
+    margin-top: 0px;
+    padding: 5px;
+    background-color: #eee;
+}
+
+.image_attachment_text {
+    width: 200px;
+    padding-top: 5px;
+}

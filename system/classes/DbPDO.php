@@ -7,7 +7,7 @@
  */
 class DbPDO extends PDO {
     private static $table_names = array();
-    private static $_QUERY_CLASSNAME = "PDOStatement";
+    private static $_QUERY_CLASSNAME = array("InsertQuery"); //"PDOStatement", 
 
     private $query = null;
     private $fpdo = null;
@@ -253,7 +253,8 @@ class DbPDO extends PDO {
     
     // Returns the SQL query string
     public function getSql(){
-        if (!empty($this->query) and is_a($this->query, DbPDO::$_QUERY_CLASSNAME)) {
+        if (!empty($this->query) and in_array(get_class($this->query), DbPDO::$_QUERY_CLASSNAME)) {
+            var_dump($this->query);
             return $this->query->getQuery();
         }
         return null;
@@ -269,7 +270,7 @@ class DbPDO extends PDO {
 
     public function clear_sql(){
         // Clear everything
-        if (!empty($this->query) and is_a($this->query, DbPDO::$_QUERY_CLASSNAME)) {
+        if (!empty($this->query) and is_a($this->query, "PDOStatement")) {
             $this->query = $this->query->where(null);
             $this->query = $this->query->orderBy(null);
             $this->query = $this->query->limit(null);
