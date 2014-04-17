@@ -191,8 +191,6 @@
             </div>
         </div>
 
-        <div id="cmfive-modal" class="reveal-modal" data-reveal><iframe></iframe></div>
-        
         <script type="text/javascript" src="/system/templates/js/foundation-5.0.2/js/foundation.min.js"></script>
         <script>
             jQuery(document).foundation();
