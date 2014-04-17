@@ -11,6 +11,10 @@ Config::set('admin', array(
             'unix' => 'lpr $filename',
             'windows' => 'C:\Users\adam\Desktop\SumatraPDF-2.4\SumatraPDF.exe -print-to $printername $filename'
         )
+    ),
+    "dependencies" => array(
+        "swiftmailer/swiftmailer" => "@stable",
+        "twig/twig" => "1.*"
     )
 ));
 
