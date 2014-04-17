@@ -543,12 +543,12 @@ class Web {
      * @param array $array
      * @return string
      */
-    function menuLink($path, $title, &$array = null) {
+    function menuLink($path, $title, &$array = null, $confirm = null, $target = null) {
         $class = "";
         if (startsWith($path, $this->currentModule())) {
-            $class = "current";
+            $class = "current active";
         }
-        $link = $this->Auth->allowed($path, Html::a($this->localUrl($path), $title, $title, $class));
+        $link = $this->Auth->allowed($path, Html::a($this->localUrl($path), $title, $title, $class, $confirm, $target));
         if ($array !== null) {
             $array[] = $link;
         }

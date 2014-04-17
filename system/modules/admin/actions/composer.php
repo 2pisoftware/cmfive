@@ -21,7 +21,6 @@ use Composer\Command\UpdateCommand;
 use Symfony\Component\Console\Output\StreamOutput;
 
 function composer_ALL(Web $w) {
-    $w->setLayout(null);    
     
     // Collect dependencies
     $dependencies_array = array();
@@ -48,11 +47,11 @@ function composer_ALL(Web $w) {
     //Create the commands
     $input = new ArrayInput(array('command' => 'update'));
     $filestream = new StreamOutput(fopen(ROOT_PATH . '/log/composer.log', 'w'));
-    
+
     //Create the application and run it with the commands
     $application = new Application();
     $exitcode = $application->run($input, $filestream);
-    
+    echo "<pre>".file_get_contents(ROOT_PATH . '/log/composer.log') . "</pre>";
     // Change dir back to root
     chdir(ROOT_PATH);
     
