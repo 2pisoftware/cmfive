@@ -1,4 +1,10 @@
 <?php
+
+/**
+ * Some composer packages require git installed before it can clone.
+ * Ensure git is installed and properly configured to be run as 'git' from CLI
+ */
+
 ini_set('memory_limit', '512M');
 ini_set('max_execution_time', 300);
 
@@ -21,7 +27,7 @@ use Composer\Command\UpdateCommand;
 use Symfony\Component\Console\Output\StreamOutput;
 
 function composer_ALL(Web $w) {
-    
+    echo "<pre>".file_get_contents(ROOT_PATH . '/log/composer.log') . "</pre>";
     // Collect dependencies
     $dependencies_array = array();
     foreach($w->modules() as $module) {
@@ -45,13 +51,12 @@ function composer_ALL(Web $w) {
     file_put_contents(SYSTEM_PATH . "/composer.json", json_encode($json_obj, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_FORCE_OBJECT));
 
     //Create the commands
-    $input = new ArrayInput(array('command' => 'update'));
+    $input = new ArrayInput(array('command' => 'update', '--prefer-dist' => 'true'));
     $filestream = new StreamOutput(fopen(ROOT_PATH . '/log/composer.log', 'w'));
-
+    
     //Create the application and run it with the commands
     $application = new Application();
     $exitcode = $application->run($input, $filestream);
-    echo "<pre>".file_get_contents(ROOT_PATH . '/log/composer.log') . "</pre>";
     // Change dir back to root
     chdir(ROOT_PATH);
     

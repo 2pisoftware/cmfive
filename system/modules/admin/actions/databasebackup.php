@@ -2,7 +2,7 @@
 
 // Using this as a guide: http://www.bendemeyer.com/2013/03/12/automated-site-backups-using-php-and-cron/
 function databasebackup_ALL(Web $w) {
-    AdminLib::navigation($w, "Database Backup");
+    $w->Admin->navigation($w, "Database Backup");
     
     $datestamp = date("Y-m-d-H-i");
     $filedir = SYSTEM_PATH . "/install/backups/";

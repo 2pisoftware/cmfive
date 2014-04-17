@@ -732,12 +732,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "607f20d4f9757e28e762f71d4a89d49f6900c564"
+                "reference": "03000a7fcd4072bd7e1f99c8ce4328621c5773b9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/607f20d4f9757e28e762f71d4a89d49f6900c564",
-                "reference": "607f20d4f9757e28e762f71d4a89d49f6900c564",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/03000a7fcd4072bd7e1f99c8ce4328621c5773b9",
+                "reference": "03000a7fcd4072bd7e1f99c8ce4328621c5773b9",
                 "shasum": ""
             },
             "require": {
@@ -792,7 +792,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2014-04-08 08:59:38"
+            "time": "2014-04-10 15:52:42"
         },
         {
             "name": "phpunit/php-code-coverage",
