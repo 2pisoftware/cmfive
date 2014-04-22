@@ -1,7 +1,7 @@
 <?php
 
 Config::set('inbox', array(
-	'version' => '0.7.0',
+	'version' => '0.8.0',
     'active' => true,
     'path' => 'system/modules',
     'topmenu' => true,

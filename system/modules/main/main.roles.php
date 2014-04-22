@@ -1,6 +1,6 @@
 <?php
 
-function role_user_allowed(&$w,$path) {
+function role_user_allowed(Web $w,$path) {
     $include = array(
         "main",
         "auth",
