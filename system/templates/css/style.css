@@ -45,6 +45,12 @@ button {
     margin: 0px;
 }
 
+/* Grid List */
+.grid-list-panel .panel {
+    padding: 10px 0px;
+    margin-bottom: 0px;
+}
+
 /* Table styles */
 table .section {
     background-color: #074e68;

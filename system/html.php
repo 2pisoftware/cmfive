@@ -1122,4 +1122,52 @@ EOT;
         return $buffer;
     }
 
+    public static function listGrid($data, $fields = array(), $link = null, $perRow = 2) {
+        if (!is_array($data)) {
+            return;
+        }
+        
+        $buffer = "";
+        $buffer .= "<div class='row-fluid'>";
+        $buffer .= "<ul class='small-block-grid-$perRow'>";
+        
+        // List data items
+        foreach($data as $d) {
+            $buffer .= "<li class='grid-list-panel'>";
+            if (!empty($link) && !empty($d->id)) {
+                $buffer .= "<a href='{$link}{$d->id}'>";
+            }
+            $buffer .= "<div class='panel clearfix'>";
+            // Print the first field
+            if (!empty($fields[0])) {
+                $buffer .= ("<div class='row-fluid small-12 columns'><h4>" . $d->{$fields[0]} . "</h4></div>");
+            }
+            
+            // Print the bottom line
+            $buffer .= "<div class='row-fluid'>";
+            $buffer .= "<div class='small-6 columns'>";
+            if (!empty($fields[1])) {
+                if (!empty($d->{$fields[1]})){
+                    $buffer .= $d->{$fields[1]};
+                }
+            }
+            $buffer .= "</div>";
+            
+            // Right side data
+            $buffer .= "<div class='small-6 columns right text-right'>";
+            if (!empty($fields[2])) {
+                if (!empty($d->{$fields[2]})){
+                    $buffer .= $d->{$fields[2]};
+                }
+            }
+            // Close all the tags!
+            $buffer .= "</div></div></div>"
+                    . (!empty($link) ? "</a>" : "") ."</li>";
+        }
+        
+        $buffer .= "</ul><script>jQuery('.grid-list-panel .panel').hover(function(){jQuery(this).addClass('callout')},function(){jQuery(this).removeClass('callout')});</script></div>";
+        
+        return $buffer;
+    }
+    
 }
