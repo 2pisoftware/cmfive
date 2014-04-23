@@ -398,6 +398,7 @@ class Html {
         
         // If form tag is needed print it
         if ($includeFormTag) {
+            $class .= " small-12 medium-8 columns";
             $form->id($id)->setClass($class)->method($method)->action($action)->target($target);
                 
             if (in_multiarray("file", $data)) {
@@ -414,6 +415,7 @@ class Html {
         foreach ($data as $section => $rows) {
             
             // Print section header
+            $buffer .= "<div class='panel'>";
             $buffer .= "<div class='row-fluid section-header'><h4>{$section}</h4></div>";
             
             // Loop through each row
@@ -447,11 +449,12 @@ class Html {
                     
                     // Add title field
                     if (!empty($title)) {
-                        $buffer .= "<div class='small-12 medium-" . (2 + ($fieldCount > 1 ? $fieldCount + 1 : 0)) . " columns'><label class='inline'>{$title}</label></div>";
-                        $buffer .= "<div class='small-12 medium-" . (9 - ($fieldCount > 1 ? $fieldCount + 1 : 0)) . " columns'>";
-                    } else {
+                        $buffer .= "<label>$title";
+//                        $buffer .= "<div class='small-12 medium-" . (2 + ($fieldCount > 1 ? $fieldCount + 1 : 0)) . " columns'><label class='inline'>{$title}</label></div>";
+//                        $buffer .= "<div class='small-12 medium-" . (9 - ($fieldCount > 1 ? $fieldCount + 1 : 0)) . " columns'>";
+                    } //else {
                         $buffer .= "<div class='small-12'>";
-                    }
+//                    }
                     
                     // handle disabled fields
                     if ($name[0] == '-') {
@@ -530,11 +533,12 @@ class Html {
                             $buffer .= '<input style="width:100%;"  type="' . $type . '" name="' . $name . '" size="' . $size . '" id="' . $name . '"/>';
                         break;
                     }
-                    $buffer .= "</div>";
+                    $buffer .= "</div></label>";
                 }
                 
                 $buffer .= "</li></ul>";
             }
+            $buffer .= "</div>";
         }
         $buffer .= "<script>$(function(){\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})});</script>";
 //        

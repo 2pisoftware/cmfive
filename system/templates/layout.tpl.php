@@ -8,8 +8,8 @@
         <link rel="icon" href="<?php echo WEBROOT; ?>/templates/img/favicon.png" type="image/png"/>
 
         <?php
-        $w->enqueueStyle(array("name" => "normalize.css", "uri" => "/system/templates/js/foundation-5.0.2/css/normalize.css", "weight" => 1010));
-        $w->enqueueStyle(array("name" => "foundation.css", "uri" => "/system/templates/js/foundation-5.0.2/css/foundation.css", "weight" => 1005));
+        $w->enqueueStyle(array("name" => "normalize.css", "uri" => "/system/templates/js/foundation-5.2.2/css/normalize.css", "weight" => 1010));
+        $w->enqueueStyle(array("name" => "foundation.css", "uri" => "/system/templates/js/foundation-5.2.2/css/foundation.css", "weight" => 1005));
         $w->enqueueStyle(array("name" => "style.css", "uri" => "/system/templates/css/style.css", "weight" => 1000));
         $w->enqueueStyle(array("name" => "tablesorter.css", "uri" => "/system/templates/css/tablesorter.css", "weight" => 990));
         $w->enqueueStyle(array("name" => "datePicker.css", "uri" => "/system/templates/css/datePicker.css", "weight" => 980));
@@ -18,8 +18,8 @@
         $w->enqueueStyle(array("name" => "colorbox.css", "uri" => "/system/templates/js/colorbox/colorbox/colorbox.css", "weight" => 950));
         $w->enqueueStyle(array("name" => "jquery.asmselect.css", "uri" => "/system/templates/css/jquery.asmselect.css", "weight" => 940));
 
-        $w->enqueueScript(array("name" => "modernizr.js", "uri" => "/system/templates/js/foundation-5.0.2/js/modernizr.js", "weight" => 1010));
-        $w->enqueueScript(array("name" => "jquery.js", "uri" => "/system/templates/js/foundation-5.0.2/js/jquery.js", "weight" => 1000));
+        $w->enqueueScript(array("name" => "modernizr.js", "uri" => "/system/templates/js/foundation-5.2.2/js/vendor/modernizr.js", "weight" => 1010));
+        $w->enqueueScript(array("name" => "jquery.js", "uri" => "/system/templates/js/foundation-5.2.2/js/vendor/jquery.js", "weight" => 1000));
         $w->enqueueScript(array("name" => "jquery.tablesorter.js", "uri" => "/system/templates/js/tablesorter/jquery.tablesorter.js", "weight" => 990));
         $w->enqueueScript(array("name" => "jquery.tablesorter.pager.js", "uri" => "/system/templates/js/tablesorter/addons/pager/jquery.tablesorter.pager.js", "weight" => 980));
         $w->enqueueScript(array("name" => "jquery.colorbox-min.js", "uri" => "/system/templates/js/colorbox/colorbox/jquery.colorbox-min.js", "weight" => 970));
@@ -84,7 +84,7 @@
                     <li class="name">
                         <!--<h1><a href="/"><?php // echo str_replace("http://", "", $w->moduleConf('main', 'company_url'));   ?></a></h1>-->
                     </li>
-                    <li class="toggle-topbar menu-icon"><a href="#">Menu</a></li>
+                    <li class="toggle-topbar"><a href="">Menu</a></li>
                 </ul>
 
                 <section class="top-bar-section">
@@ -95,8 +95,8 @@
                             <form action="<?php echo WEBROOT; ?>/search/results" method="GET">
                                 <input type="hidden" name="<?php echo CSRF::getTokenID(); ?>" value="<?php echo CSRF::getTokenValue(); ?>" />
                                 <div class="row collapse">
-                                    <div class="large-8 small-8 columns">
-                                        <input style="height: 1.8rem;" type="text" id="q" name="q" value="<?php echo!empty($_REQUEST['q']) ? $_REQUEST['q'] : ''; ?>" placeholder="Search..." />
+                                    <div class="large-8 small-8 columns search-bar">
+                                        <input type="text" id="q" name="q" value="<?php echo!empty($_REQUEST['q']) ? $_REQUEST['q'] : ''; ?>" placeholder="Search..." />
                                     </div>
                                     <!--<div class="large-4 small-4 columns">-->
                                     <?php //echo Html::select("idx", $w->service('Search')->getIndexes(), (!empty($_REQUEST['idx']) ? $_REQUEST['idx'] : null), null, null, "Search All"); ?>
@@ -104,7 +104,7 @@
                                     <input type="hidden" name="ps" value="25"/>
                                     <!--</div>-->
                                     <div class="large-4 small-4 columns">
-                                        <button class="alert button expand">Search</button>
+                                        <button class="alert button expand search-button">Search</button>
                                     </div>
                                 </div>
                             </form>
@@ -191,7 +191,7 @@
             </div>
         </div>
 
-        <script type="text/javascript" src="/system/templates/js/foundation-5.0.2/js/foundation.min.js"></script>
+        <script type="text/javascript" src="/system/templates/js/foundation-5.2.2/js/foundation.min.js"></script>
         <script>
             jQuery(document).foundation();
         </script>
