@@ -1122,50 +1122,76 @@ EOT;
         return $buffer;
     }
 
-    public static function listGrid($data, $fields = array(), $link = null, $perRow = 2) {
+    public static function listGrid($data, $buttons = array(), $perRow = 2) {
         if (!is_array($data)) {
             return;
         }
         
         $buffer = "";
-        $buffer .= "<div class='row-fluid'>";
-        $buffer .= "<ul class='small-block-grid-$perRow'>";
+        $mediumPerRow = ($perRow > 1 ? $perRow - 1 : 1);
+        $buffer .= "<ul class='small-block-grid-1 medium-block-grid-$mediumPerRow large-block-grid-$perRow'>";
         
         // List data items
         foreach($data as $d) {
-            $buffer .= "<li class='grid-list-panel'>";
-            if (!empty($link) && !empty($d->id)) {
-                $buffer .= "<a href='{$link}{$d->id}'>";
-            }
+            $buffer .= "<li class='grid-list-panel'><div class='row'><div class='small-12";
+            
+            // Add code for buttons
+//            if (!empty($buttons)) {
+//                $buffer .= " medium-9 left";
+//            }
+            $buffer .= "'>";
+            
             $buffer .= "<div class='panel clearfix'>";
             // Print the first field
-            if (!empty($fields[0])) {
-                $buffer .= ("<div class='row-fluid small-12 columns'><h4>" . $d->{$fields[0]} . "</h4></div>");
-            }
+//            if (!empty($d[0])) {
+                $buffer .= ("<div class='row-fluid small-12 columns'><h4>" . (!empty($d[0]) ? $d[0] : "") . "&nbsp</h4></div>");
+//            }
             
             // Print the bottom line
             $buffer .= "<div class='row-fluid'>";
-            $buffer .= "<div class='small-6 columns'>";
-            if (!empty($fields[1])) {
-                if (!empty($d->{$fields[1]})){
-                    $buffer .= $d->{$fields[1]};
-                }
+            if (empty($d[2])) {
+                $buffer .= "<div class='small-12 columns'>";
+            } else {
+                $buffer .= "<div class='small-6 columns'>";
+            }
+            if (!empty($d[1])) {
+                $buffer .= $d[1];
             }
             $buffer .= "</div>";
             
             // Right side data
             $buffer .= "<div class='small-6 columns right text-right'>";
-            if (!empty($fields[2])) {
-                if (!empty($d->{$fields[2]})){
-                    $buffer .= $d->{$fields[2]};
-                }
+            if (!empty($d[2])) {
+                $buffer .= $d[2];
             }
             // Close all the tags!
             $buffer .= "</div></div></div>"
-                    . (!empty($link) ? "</a>" : "") ."</li>";
+                    . (!empty($link) ? "</a>" : "") . "</div>";
+            
+            // Add buttons
+            if (!empty($buttons)) {
+                $buffer .= "<div class='small-12 columns'>";
+                foreach($buttons as $b) {
+                    $button = new \Html\button();
+                    if (!empty($b['link'])) {
+                        $button->href($b['link']);
+                    }        
+                    if (!empty($b['text'])) {
+                        $button->text($b['text']);
+                    }
+                    if (!empty($b['message'])) {
+                        $button->confirm($b['message']);
+                    }
+                    $button->setClass("small-12");
+                    $buffer .= "<div class='row'>" . $button->__toString() . "</div>";
+                }
+                $buffer .= "</div>";
+            }
+            
+            $buffer .= "</div></li>";
         }
         
-        $buffer .= "</ul><script>jQuery('.grid-list-panel .panel').hover(function(){jQuery(this).addClass('callout')},function(){jQuery(this).removeClass('callout')});</script></div>";
+        $buffer .= "</ul>";
         
         return $buffer;
     }

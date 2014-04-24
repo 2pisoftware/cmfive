@@ -179,7 +179,7 @@
                     </div>
                 <?php endif; ?>
 
-                <div class="row-fluid">
+                <div class="row-fluid" style="overflow: hidden;">
                     <?php echo !empty($body) ? $body : ''; ?>
                 </div>
             </div>
