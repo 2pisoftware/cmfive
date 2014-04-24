@@ -1182,7 +1182,7 @@ EOT;
                     if (!empty($b['message'])) {
                         $button->confirm($b['message']);
                     }
-                    $button->setClass("small-12");
+                    $button->setClass("small-" . (12/floor(count($buttons))));
                     $buffer .= "<div class='row'>" . $button->__toString() . "</div>";
                 }
                 $buffer .= "</div>";

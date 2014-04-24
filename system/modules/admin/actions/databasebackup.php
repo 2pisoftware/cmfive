@@ -12,11 +12,10 @@ function databasebackup_ALL(Web $w) {
         if (!$fileinfo->isDot()) {
             $filename = $fileinfo->getFilename();
             try {
-                
                 $datepart = substr($filename, 0, strpos($filename, ".sql"));
                 $backuptime = DateTime::createFromFormat("Y-m-d-H-i", $datepart);
                 if ($backuptime) {
-                    if (time() - $backuptime->getTimestamp() < (60*60*4)) {
+                    if ((time() - $backuptime->getTimestamp()) < (60*60*4)) {
                         $w->out("You cannot backup more than once every 4 hours");
                         return;
                     }
