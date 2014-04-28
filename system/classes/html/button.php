@@ -53,7 +53,6 @@ class button {
             }
         }
         if (!empty($this->confirm)) { $js .= "}"; }
-        
         $buffer = "";
         $buffer .= "<button ";
         if ($this->autofocus === true) $buffer .= "autofocus=true ";

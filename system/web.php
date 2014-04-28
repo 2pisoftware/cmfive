@@ -232,6 +232,12 @@ class Web {
         $this->_module = array_shift($hsplit);
         $this->_submodule = array_shift($hsplit);
 
+        // Check to see if the module is active (protect against main disabling)
+        if (!Config::get("{$this->_module}.active") && $this->_module !== "main") {
+            $this->error("The {$this->_module} module is not active, you can change it's active state in it's config file.", "/");
+        }
+        
+        
         if (!$this->_action) {
             $this->_action = $this->_defaultAction;
         }
@@ -274,7 +280,7 @@ class Web {
             // load the module file
             require_once $reqpath;
         } else {
-            $this->service('log')->error("No Action found for: " . $reqpath);
+            $this->Log->error("No Action found for: " . $reqpath);
             $this->notFoundPage();
         }
 
@@ -718,6 +724,11 @@ class Web {
      * @return <type>
      */
     function service($name) {
+        // Check if the module if active or not
+//        if (!Config::get("{$name}.active") && $name !== "main") {
+//            return NULL;
+//        }
+        
         $name = ucfirst($name);
         if (!key_exists($name, $this->_services)) {
             $cname = $name . "Service";
@@ -751,6 +762,13 @@ class Web {
         if ($module === null) {
             $module = $this->_module;
         }
+        
+        // Check if the module if active or not
+//        if (!Config::get("{$name}.active") && $name !== "main") {
+//            // Do we want to do something else?
+//            return NULL;
+//        }
+        
         // save current output buffer
         $oldbuf = $this->_buffer;
         $this->_buffer = null;
@@ -803,6 +821,12 @@ class Web {
             return;
         }
 
+        // Check if the module if active or not
+//        if (!Config::get("{$module}.active") && $module !== "main") {
+//            // Do we want to do something else?
+//            return NULL;
+//        }
+        
         // Build _hook registry if empty
         if (empty($this->_hooks)) {
             foreach ($this->modules() as $modulename) {

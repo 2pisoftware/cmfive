@@ -1,5 +1,5 @@
 <?php
-function role_file_upload_allowed(&$w,$path) {
+function role_file_upload_allowed(Web $w,$path) {
     $actions = "/file\/(index";
     $actions .= "|attach";
 
@@ -7,7 +7,7 @@ function role_file_upload_allowed(&$w,$path) {
     return preg_match($actions, $path);
 }
 
-function role_file_download_allowed(&$w,$path) {
+function role_file_download_allowed(Web $w,$path) {
     $actions = "/file\/(index";
     $actions .= "|path";
     $actions .= "|atthumb";

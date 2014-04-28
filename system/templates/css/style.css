@@ -9,8 +9,12 @@ body {
     overflow: hidden;
 }
 
-.top-bar{ height: inherit; }
-
+.search-bar input {
+    height: 1.8rem;
+}
+.search-button {
+    height: 1.8rem;
+}
 button {
     font-size: 0.8rem !important;
 }
@@ -41,6 +45,12 @@ button {
     margin: 0px;
 }
 
+/* Grid List */
+.grid-list-panel .panel {
+    padding: 10px 0px;
+    margin-bottom: 0px;
+}
+
 /* Table styles */
 table .section {
     background-color: #074e68;
@@ -52,7 +62,8 @@ table .section {
     margin-bottom: 10px;
     padding: 5px;
     font-weight: bolder;
-    background-color: #4D88A5;
+    /*background-color: #4D88A5;*/
+    border-bottom: 1px solid black;
 }
 
 .section-body {

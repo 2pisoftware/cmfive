@@ -14,9 +14,8 @@
  * @param <type> $w
  * @return boolean
  */
-function anonymous_allowed(&$w,$path) {
+function anonymous_allowed(Web $w,$path) {
 
-//	global $ALLOW_FROM_IP;
 	// array("127.0.0.1" => array("action1","action2", ...), ...)
 	$allow_from_ip = Config::get('system.allow_from_ip');
         if (!empty($allow_from_ip)) {
@@ -25,14 +24,12 @@ function anonymous_allowed(&$w,$path) {
             }
         }
 
-//	global $ALLOW_ACTION;
 	$in_path = in_array($path,Config::get('system.allow_action'));
 
-//	global $ALLOW_MODULE;
 	$path_explode = explode("/", $path);
 	$module = $path_explode[0];
 	$action = $path_explode[1];
-	$allowed = in_array($module,Config::get('system.allow_module')); //$ALLOW_MODULE);
+	$allowed = in_array($module,Config::get('system.allow_module'));
 
 	return $allowed || $in_path;
 }

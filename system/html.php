@@ -398,6 +398,7 @@ class Html {
         
         // If form tag is needed print it
         if ($includeFormTag) {
+            $class .= " small-12 medium-8 columns";
             $form->id($id)->setClass($class)->method($method)->action($action)->target($target);
                 
             if (in_multiarray("file", $data)) {
@@ -414,6 +415,7 @@ class Html {
         foreach ($data as $section => $rows) {
             
             // Print section header
+            $buffer .= "<div class='panel'>";
             $buffer .= "<div class='row-fluid section-header'><h4>{$section}</h4></div>";
             
             // Loop through each row
@@ -447,11 +449,12 @@ class Html {
                     
                     // Add title field
                     if (!empty($title)) {
-                        $buffer .= "<div class='small-12 medium-" . (2 + ($fieldCount > 1 ? $fieldCount + 1 : 0)) . " columns'><label class='inline'>{$title}</label></div>";
-                        $buffer .= "<div class='small-12 medium-" . (9 - ($fieldCount > 1 ? $fieldCount + 1 : 0)) . " columns'>";
-                    } else {
+                        $buffer .= "<label>$title";
+//                        $buffer .= "<div class='small-12 medium-" . (2 + ($fieldCount > 1 ? $fieldCount + 1 : 0)) . " columns'><label class='inline'>{$title}</label></div>";
+//                        $buffer .= "<div class='small-12 medium-" . (9 - ($fieldCount > 1 ? $fieldCount + 1 : 0)) . " columns'>";
+                    } //else {
                         $buffer .= "<div class='small-12'>";
-                    }
+//                    }
                     
                     // handle disabled fields
                     if ($name[0] == '-') {
@@ -530,11 +533,12 @@ class Html {
                             $buffer .= '<input style="width:100%;"  type="' . $type . '" name="' . $name . '" size="' . $size . '" id="' . $name . '"/>';
                         break;
                     }
-                    $buffer .= "</div>";
+                    $buffer .= "</div></label>";
                 }
                 
                 $buffer .= "</li></ul>";
             }
+            $buffer .= "</div>";
         }
         $buffer .= "<script>$(function(){\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})});</script>";
 //        
@@ -1118,4 +1122,78 @@ EOT;
         return $buffer;
     }
 
+    public static function listGrid($data, $buttons = array(), $perRow = 2) {
+        if (!is_array($data)) {
+            return;
+        }
+        
+        $buffer = "";
+        $mediumPerRow = ($perRow > 1 ? $perRow - 1 : 1);
+        $buffer .= "<ul class='small-block-grid-1 medium-block-grid-$mediumPerRow large-block-grid-$perRow'>";
+        
+        // List data items
+        foreach($data as $d) {
+            $buffer .= "<li class='grid-list-panel'><div class='row'><div class='small-12";
+            
+            // Add code for buttons
+//            if (!empty($buttons)) {
+//                $buffer .= " medium-9 left";
+//            }
+            $buffer .= "'>";
+            
+            $buffer .= "<div class='panel clearfix'>";
+            // Print the first field
+//            if (!empty($d[0])) {
+                $buffer .= ("<div class='row-fluid small-12 columns'><h4>" . (!empty($d[0]) ? $d[0] : "") . "&nbsp</h4></div>");
+//            }
+            
+            // Print the bottom line
+            $buffer .= "<div class='row-fluid'>";
+            if (empty($d[2])) {
+                $buffer .= "<div class='small-12 columns'>";
+            } else {
+                $buffer .= "<div class='small-6 columns'>";
+            }
+            if (!empty($d[1])) {
+                $buffer .= $d[1];
+            }
+            $buffer .= "</div>";
+            
+            // Right side data
+            $buffer .= "<div class='small-6 columns right text-right'>";
+            if (!empty($d[2])) {
+                $buffer .= $d[2];
+            }
+            // Close all the tags!
+            $buffer .= "</div></div></div>"
+                    . (!empty($link) ? "</a>" : "") . "</div>";
+            
+            // Add buttons
+            if (!empty($buttons)) {
+                $buffer .= "<div class='small-12 columns'>";
+                foreach($buttons as $b) {
+                    $button = new \Html\button();
+                    if (!empty($b['link'])) {
+                        $button->href($b['link']);
+                    }        
+                    if (!empty($b['text'])) {
+                        $button->text($b['text']);
+                    }
+                    if (!empty($b['message'])) {
+                        $button->confirm($b['message']);
+                    }
+                    $button->setClass("small-" . (12/floor(count($buttons))));
+                    $buffer .= "<div class='row'>" . $button->__toString() . "</div>";
+                }
+                $buffer .= "</div>";
+            }
+            
+            $buffer .= "</div></li>";
+        }
+        
+        $buffer .= "</ul>";
+        
+        return $buffer;
+    }
+    
 }

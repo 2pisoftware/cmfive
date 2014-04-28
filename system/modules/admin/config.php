@@ -1,7 +1,7 @@
 <?php
 
 Config::set('admin', array(
-    'version' => '0.7.0',
+    'version' => '0.8.0',
     'active' => true,
     'path' => 'system/modules',
     'topmenu' => true,
@@ -13,16 +13,9 @@ Config::set('admin', array(
         )
     ),
     'database' => array(
-        'output' => 'sql', // To backup to XML, you need to add -X after 'mysqldump' i.e. 'mysqldump -X ...'
         'command' => array(
-            'unix' => 'mysqldump -u $username -p$password $dbname | > gzip $filename',
+            'unix' => 'mysqldump -u $username -p$password $dbname | gzip > $filename.gz',
             'windows' => 'J:\\xampp\\mysql\\bin\\mysqldump.exe -u $username -p$password $dbname > $filename'
-        ),
-        'backuplocations' => array(
-            'dropbox' => array(
-                'key' => 'ovqyh81xiocztij',
-                'secret' => 'nqqf9hfhsic4p10'
-            )
         )
     ),
     "dependencies" => array(
