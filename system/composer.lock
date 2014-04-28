@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "4d986388eb4116e6cb63100a3d23dc7e",
+    "hash": "df8d34354dcd607f025bd77d6b84f9f0",
     "packages": [
         {
             "name": "behat/mink",
@@ -290,6 +290,66 @@
                 "unit testing"
             ],
             "time": "2014-04-04 21:22:42"
+        },
+        {
+            "name": "dropbox-php/dropbox-php",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Dropbox-PHP/dropbox-php.git",
+                "reference": "81977a8b021dd5a32b34d84721712f1284029667"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Dropbox-PHP/dropbox-php/zipball/81977a8b021dd5a32b34d84721712f1284029667",
+                "reference": "81977a8b021dd5a32b34d84721712f1284029667",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "suggest": {
+                "http_oauth": ">=1.1.18",
+                "oauth": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Dropbox": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Evert Pot",
+                    "email": "evert@rooftopsolutions.nl",
+                    "homepage": "http://www.rooftopsolutions.nl/",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Joe Constant",
+                    "email": "lazyguru@jofee.com",
+                    "homepage": "http://www.joeconstant.me/",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Evan Kaufman",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Naoki Sawada",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Dropbox PHP library",
+            "homepage": "http://dropbox-php.com/",
+            "keywords": [
+                "dropbox"
+            ],
+            "time": "2012-09-10 06:07:54"
         },
         {
             "name": "fabpot/goutte",
@@ -645,16 +705,16 @@
         },
         {
             "name": "knplabs/gaufrette",
-            "version": "v0.1.7",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/KnpLabs/Gaufrette.git",
-                "reference": "4663c6605e3c96d4b9affa1c38dc66a4d8e1fedf"
+                "reference": "c2b6af8eb6fc093409ee0753137817dce1673763"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KnpLabs/Gaufrette/zipball/4663c6605e3c96d4b9affa1c38dc66a4d8e1fedf",
-                "reference": "4663c6605e3c96d4b9affa1c38dc66a4d8e1fedf",
+                "url": "https://api.github.com/repos/KnpLabs/Gaufrette/zipball/c2b6af8eb6fc093409ee0753137817dce1673763",
+                "reference": "c2b6af8eb6fc093409ee0753137817dce1673763",
                 "shasum": ""
             },
             "require": {
@@ -672,7 +732,7 @@
                 "phpspec/phpspec": "2.0.*",
                 "phpunit/phpunit": "3.7.*",
                 "rackspace/php-cloudfiles": "*",
-                "rackspace/php-opencloud": "1.6.*"
+                "rackspace/php-opencloud": "1.9.*"
             },
             "suggest": {
                 "amazonwebservices/aws-sdk-for-php": "to use the legacy Amazon S3 adapters",
@@ -724,7 +784,7 @@
                 "filesystem",
                 "media"
             ],
-            "time": "2014-02-24 18:17:33"
+            "time": "2014-03-24 21:53:22"
         },
         {
             "name": "monolog/monolog",
@@ -2135,6 +2195,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "monolog/monolog": 20,
+        "knplabs/gaufrette": 20,
         "swiftmailer/swiftmailer": 0
     },
     "platform": [

@@ -27,11 +27,13 @@ function databasebackup_ALL(Web $w) {
         }
     }
     
-    $filename = "$datestamp.sql";
+    $backupformat = Config::get('admin.database.output');
+    $filename = "$datestamp.$backupformat";
     $command = NULL;
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
         $command = Config::get('admin.database.command.windows');
     } else {
+        $filename .= ".gz";
         $command = Config::get('admin.database.command.unix');
     }
     if (!empty($command)) {
@@ -41,6 +43,34 @@ function databasebackup_ALL(Web $w) {
                 $command);
         $w->out(shell_exec($command));
         $w->out("Backup completed to: {$filedir}{$filename}");
+        
+        // Save elsewhere if defined
+        $backuplocations = Config::get('admin.database.backuplocations');
+        if (!empty($backuplocations)) {
+            foreach($backuplocations as $location => $data) {
+                $adapter = null;
+                // Create adapter
+                switch($location) {
+                    case 'dropbox':
+                        // Dropbox requires the OAuth extension
+                        if (!class_exists("OAuth")) {
+                            $w->out("You need the OAuth extension installed to backup to dropbox");
+                            continue;
+                        }
+                            
+                        $dropboxapi = new Dropbox_API(new Dropbox_OAuth_PHP($data['key'], $data['secret']));
+                        $dropboxadapter = new Gaufrette\Adapter\Dropbox($dropboxapi);
+                        $adapter = new \Gaufrette\Adapter($dropboxadapter);
+                        break;
+                }
+                
+                // Use adapter to save to external source
+                if (!empty($adapter)) {
+                    $filesystem = new Gaufrette\Filesystem($adapter);
+                    $filesystem->write($filedir.$filename, file_get_contents($filedir.$filename));
+                }
+            }
+        }
     } else {
         $w->out("Could not find backup command");
     }

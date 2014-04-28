@@ -8,7 +8,8 @@ Config::set('file', array(
     'topmenu' => false,
     'search' => array("File Attachments" => "Attachment"),
     "dependencies" => array(
-        "knplabs/gaufrette" => "0.1.*"
+        "knplabs/gaufrette" => "0.2.*@dev",
+        "dropbox-php/dropbox-php" => "*"
     ) 
 
 ));
