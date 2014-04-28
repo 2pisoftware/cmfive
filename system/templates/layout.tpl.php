@@ -132,7 +132,7 @@
                             <li class="divider"></li>
                             <?php foreach ($w->modules() as $module) {
                                 // Check if config is set to display on topmenu
-                                if (Config::get("{$module}.topmenu")) :
+                                if (Config::get("{$module}.topmenu") && Config::get("{$module}.active")) :
                                     // Check for navigation
                                     if (method_exists($module . "Service", "navigation")) : ?>
                                         <li class="has-dropdown <?php echo $w->_module == $module ? 'active' : ''; ?>">
