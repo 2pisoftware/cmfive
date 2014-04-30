@@ -231,6 +231,7 @@ class ReportService extends DbService {
 		preg_match_all("/@@.*?@@/",preg_replace("/\n/"," ",$report_code), $arrsql);
 
 		// if we have statements, continue ...
+		$action = "";
 		if ($arrsql) {
 			foreach ($arrsql as $sql) {
 				if ($sql) {
@@ -272,7 +273,7 @@ class ReportService extends DbService {
 		$filename = str_replace(" ","_",$title) . "_" . date("Y.m.d-H.i") . ".csv";
 
 		// if we have records, comma delimit the fields/columns and carriage return delimit the rows
-		if ($rows) {
+		if (!empty($rows)) {
 			foreach ($rows as $row) {
 				//throw away the first line which list the form parameters
 				$crumbs = array_shift($row);
@@ -290,7 +291,7 @@ class ReportService extends DbService {
 				}
 
 				// iterate row to build URL. if required
-				if ($ukey) {
+				if (!empty($ukey)) {
 					foreach ($row as $r) {
 						foreach ($ukey as $n => $u) {
 							// dump the URL related fields for display
@@ -345,7 +346,7 @@ class ReportService extends DbService {
 		$pdf->writeHTMLCell(0,10,60,25,$created,0,1,0,true);
 
 		// display recordset
-		if ($rows) {
+		if (!empty($rows)) {
 			foreach ($rows as $row) {
 				//throw away the first line which list the form parameters
 				$crumbs = array_shift($row);
@@ -384,7 +385,7 @@ class ReportService extends DbService {
 		$this->w->out("\t<created>" . date("d/m/Y h:i:s") . "</created>\n");
 
 		// if we have records ...
-		if ($rows) {
+		if (!empty($rows)) {
 			foreach ($rows as $row) {
 				//throw away the first line which list the form parameters
 				$crumbs = array_shift($row);
@@ -464,7 +465,7 @@ class ReportService extends DbService {
     
     // build the Report navigation
 	public function navigation(Web $w, $title = null, $nav = null) {
-		if ($title) {
+		if (!empty($title)) {
 			$w->ctx("title",$title);
 		}
 	

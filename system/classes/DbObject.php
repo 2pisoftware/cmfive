@@ -157,7 +157,8 @@ class DbObject extends DbService {
             if ($name == "dt_modified") {
                 return $this->_modifiable->getModifiedDate();
             }
-        } else if(property_exists($this, $name)) {
+        }
+        if(property_exists($this, $name)) {
 	        $reflection = new ReflectionProperty($this, $name);
 	        $reflection->setAccessible($name);
 	        return $reflection->getValue($this);
