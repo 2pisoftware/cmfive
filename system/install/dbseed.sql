@@ -12,5 +12,5 @@ INSERT INTO `report_member` (`id`, `report_id`, `user_id`, `role`, `is_deleted`)
 (2, 2, 1, 'OWNER', 0);
 
 
-INSERT INTO `user` (`id`, `login`, `password`, `contact_id`, `is_admin`, `is_active`, `is_deleted`, `is_group`, `dt_created`, `dt_lastlogin`) VALUES
-(1, 'admin', 'd033e22ae348aeb5660fc2140aec35850c4da997', 1, 1, 1, 0, 0, '2012-04-27 06:31:07', '2012-04-27 17:23:54');
+INSERT INTO `user` (`id`, `login`, `password`, `password_salt`, `contact_id`, `is_admin`, `is_active`, `is_deleted`, `is_group`, `dt_created`, `dt_lastlogin`) VALUES
+(1, 'admin', '6fc181be3bee08b3187e76ac820963b16d89f159', '460874ffe56611e7f7d9769bb954834f', 1, 1, 1, 0, 0, '2012-04-27 06:31:07', '2012-04-27 17:23:54');

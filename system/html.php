@@ -385,10 +385,80 @@ class Html {
      * @return String html
      */
     public static function multiColTable($data) {
-        return self::multiColForm($data, null, "", "", null, null, null, "", false);
+//      public static function multiColForm($data, $action = null, $method = "POST", $submitTitle = "Save", $id = null, $class = null, $extrabuttons = null, $target = "_self", $includeFormTag = true, $validation = null) {
+     
+        if (empty($data)) return;
+        
+        $buffer = "";
+//        $form = new \Html\form();
+//        
+//        // If form tag is needed print it
+//        if ($includeFormTag) {
+//            $class .= " small-12 medium-8 columns";
+//            $form->id($id)->setClass($class)->method($method)->action($action)->target($target);
+//                
+//            if (in_multiarray("file", $data)) {
+//                $form->enctype("multipart/form-data");
+//            }
+//            
+//            $buffer .= $form->open();
+//        }
+        
+        // Set up shell layout
+        $buffer .= "<div class='row-fluid small-12 multicolform'>";
+        
+        // Print internals
+        foreach ($data as $section => $rows) {
+            
+            // Print section header
+            $buffer .= "<div class='panel'>";
+            $buffer .= "<div class='row-fluid section-header'><h4>{$section}</h4></div>";
+            
+            // Loop through each row
+            foreach ($rows as $row) {
+                
+                // Print each field
+                $fieldCount = count($row);
+                $buffer .= "<ul class='small-block-grid-1 medium-block-grid-{$fieldCount} section-body'>";
+                
+                foreach($row as $field) {
+                    
+                    $title = !empty($field[0]) ? $field[0] : null;
+                    $type = !empty($field[1]) ? $field[1] : null;
+                    $name = !empty($field[2]) ? $field[2] : null;
+                    $value = !empty($field[3]) ? $field[3] : null;
+
+                    // Can I do this?
+                    if (empty($title) and empty($value)) continue;
+                                        
+                    // Exploit HTML5s inbuilt form validation
+                    $required = null;
+                    if (!empty($validation[$name])) {
+                        if (in_array("required", $validation[$name])) {
+                            $required = "required";
+                        }
+                    }
+
+                    $buffer .= "<li>";
+                    
+                    // Add title field
+                    if (!empty($title)) {
+                        $buffer .= "<b class='small-6 columns'>{$title}</b>";
+                    }
+                    
+                    $buffer .= "<div class='small-6 columns'>" . $value . "</div></li>";
+                }
+                
+                $buffer .= "</ul>";
+            }
+            $buffer .= "</div>";
+        }
+
+        // Finish shell div tag
+        $buffer .= "</div>";        
+        return $buffer;
     }
 
-    
     public static function multiColForm($data, $action = null, $method = "POST", $submitTitle = "Save", $id = null, $class = null, $extrabuttons = null, $target = "_self", $includeFormTag = true, $validation = null) {
      
         if (empty($data)) return;

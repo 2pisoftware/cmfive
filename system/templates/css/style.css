@@ -70,6 +70,11 @@ table .section {
     
 }
 
+.section-body li {
+    padding: 0px;
+    border-bottom: 1px #cacaca solid;
+}
+
 .widget_buttons { opacity: 0; }
 .widget_config { padding-left: 40px; }
 .widget_remove { float: right; padding-right: 40px; }
