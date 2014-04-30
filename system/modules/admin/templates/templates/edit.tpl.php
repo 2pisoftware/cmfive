@@ -1,29 +1,25 @@
 <?php echo Html::b("/admin-templates","Back to Templates List",false); ?>
 <br/><br/>
 <div class="tabs">
+
 	<div class="tab-head">
-		<a id="tab-link-1" href="#" class="active" onclick="switchTab(1);">Details</a>
-		<a id="tab-link-2" href="#"	onclick="switchTab(2);">Template</a>
-		<a id="tab-link-3" href="#"	onclick="switchTab(3);">Test Data</a>
-                <a id="tab-link-4" href="#"	onclick="$.colorbox({iframe:true, width: '95%', height: '95%', href:'/admin-templates/rendertemplate/<?php echo !empty($id) ? $id : ""; ?>'});">Test Output</a>
-		<a id="tab-link-5" href="#"	onclick="switchTab(5);">Manual</a>
+		<a href="#details">Details</a>
+		<a href="#template">Template</a>
+		<a href="#test">Test Data</a>
+        <a href="#"	onclick="$.colorbox({iframe:true, width: '95%', height: '95%', href:'/admin-templates/rendertemplate/<?php echo !empty($id) ? $id : ""; ?>'});">Test Output</a>
+		<a href="#manual">Manual</a>
 	</div>
-	<div class="tab-body">
-            <div id="tab-1">
+	<div class="tab-body clearfix">
+            <div id="details"><p>
                     <?php echo !empty($editdetailsform) ? $editdetailsform : '';?>
             </div>
-            <div id="tab-2" style="display: none;">
+            <div id="template" style="display: none;"><p>
                     <?php echo !empty($templateform) ? $templateform : '';?>
             </div>
-            <div id="tab-3" style="display: none;">
+            <div id="test" style="display: none;"><p>
                     <?php echo !empty($testdataform) ? $testdataform : '';?>
             </div>
-            <div id="tab-4" style="display: none;">	
-                    <p><?php // echo !empty($testtitle) ? $testtitle : '';?></p>
-                    <hr>
-                    <p><?php // echo !empty($testbody) ? $testbody : '';?></p>
-            </div>
-            <div id="tab-5" style="display: none;">
+            <div id="manual" style="display: none;"><p>
                             this is the template manual
             </div>
 	</div>

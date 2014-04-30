@@ -11,7 +11,7 @@ function comment_GET(Web &$w){
     
     $form = array(
         array("Comment","section"),
-        array("", "textarea", "comment", $comment->comment, 100, 15, true),
+        array("", "textarea", "comment", $comment->comment, 100, 15, false),
         array("", "hidden", "redirect_url", urlencode($w->request("redirect_url")))
     );
 

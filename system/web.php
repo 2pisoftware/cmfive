@@ -509,13 +509,84 @@ class Web {
      * @return string
      */
     function getMimetype($filename) {
-        $mime = "text/html";
-        // finfo_open was introduced in 5.3, I think we can safely assume that 5.3 would be a minimum requirement
-        // these days, plus we should avoid using system
-        // if (function_exists("finfo_open")) {
-        $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
-        $mime = finfo_file($finfo, $filename);
-        finfo_close($finfo);
+        $mime = "application/octet-stream";
+        
+        // finfo_open was introduced in 5.3, however some hosts like Crazydomains make it extra difficult 
+        // by compiling php without the finfo extension.
+        
+        // BEST OPTION
+        if (function_exists("finfo_open")) {
+        	$finfo = finfo_open(FILEINFO_MIME_TYPE);
+        	$mime = finfo_file($finfo, $filename);
+        	finfo_close($finfo);
+        } 
+        
+        // SECOND BEST OPTION BUT ONLY ON *NIX
+        else if (strtolower(substr(PHP_OS, 0, 3)) != "win") {
+            ob_start();
+            system("file -i -b {$filename}");
+            $output = ob_get_clean();
+            $output = explode("; ",$output);
+            if ( is_array($output) ) {
+                $output = $output[0];
+            }
+            $mime = $output;
+        } 
+        
+        // THIS IS A VERY BAD ALTERNATIVE, BUT MAY BE BETTER THAN NOTHING
+        else {
+        	$mime_types = array(
+        			'txt' => 'text/plain',
+        			'csv' => 'text/plain',
+        			'htm' => 'text/html',
+        			'html' => 'text/html',
+        			'php' => 'text/html',
+        			'css' => 'text/css',
+        			'js' => 'application/javascript',
+        			'json' => 'application/json',
+        			'xml' => 'application/xml',
+        			'swf' => 'application/x-shockwave-flash',
+        			'flv' => 'video/x-flv',
+        			'png' => 'image/png',
+        			'jpe' => 'image/jpeg',
+        			'jpeg' => 'image/jpeg',
+        			'jpg' => 'image/jpeg',
+        			'gif' => 'image/gif',
+        			'bmp' => 'image/bmp',
+        			'ico' => 'image/vnd.microsoft.icon',
+        			'tiff' => 'image/tiff',
+        			'tif' => 'image/tiff',
+        			'svg' => 'image/svg+xml',
+        			'svgz' => 'image/svg+xml',
+        			'zip' => 'application/zip',
+        			'rar' => 'application/x-rar-compressed',
+        			'exe' => 'application/x-msdownload',
+        			'msi' => 'application/x-msdownload',
+        			'cab' => 'application/vnd.ms-cab-compressed',
+        			'mp3' => 'audio/mpeg',
+        			'qt' => 'video/quicktime',
+        			'mov' => 'video/quicktime',
+        			'pdf' => 'application/pdf',
+        			'psd' => 'image/vnd.adobe.photoshop',
+        			'ai' => 'application/postscript',
+        			'eps' => 'application/postscript',
+        			'ps' => 'application/postscript',
+        			'doc' => 'application/msword',
+        			'docx' => 'application/msword',
+        			'rtf' => 'application/rtf',
+        			'xls' => 'application/vnd.ms-excel',
+        			'xlsx' => 'application/vnd.ms-excel',
+        			'ppt' => 'application/vnd.ms-powerpoint',
+        			'pptx' => 'application/vnd.ms-powerpoint',
+        			'odt' => 'application/vnd.oasis.opendocument.text',
+        			'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
+        	);
+        	
+        	$ext = strtolower(array_pop(explode('.',$filename)));
+        	if (array_key_exists($ext, $mime_types)) {
+        		$mime = $mime_types[$ext];
+        	}
+        }
         return $mime;
     }
 

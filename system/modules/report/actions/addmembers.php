@@ -18,11 +18,12 @@ function addmembers_GET(Web &$w) {
 	}
 
 	// build form
-	$addUserForm['Add Members'] = array(
-	array(array("","hidden", "report_id",$p['id'])),
-	array(array("As Role","select","role","",$w->Report->getReportPermissions())),
-	array(array("Add Members","multiSelect","member",null,$members)));
+	$addUserForm = array(
+	array("","hidden", "report_id",$p['id']),
+	array("Add Member","select","member",null,$members),
+	array("With Role","select","role","",$w->Report->getReportPermissions()),
+	);
 
 	$w->setLayout(null);
-	$w->ctx("addmembers",Html::multiColForm($addUserForm,$w->localUrl("/report/updatemembers/"),"POST"," Submit "));
+	$w->ctx("addmembers",Html::form($addUserForm,$w->localUrl("/report/updatemembers/"),"POST"," Submit "));
 }

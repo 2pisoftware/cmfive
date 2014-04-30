@@ -18,15 +18,6 @@
 			<?php echo $dbform; ?>
 			<p>
         </div>
-        <div id="members">
-            <?php echo Html::box("/report/addmembers/" . $reportid, " Add New Members ", true) ?>
-            <p>
-                <?php echo $viewmembers; ?>
-        </div>
-        <div id="view-database">
-            <?php echo $dbform; ?>
-            <p>
-        </div>
     </div>
 </div>
 
