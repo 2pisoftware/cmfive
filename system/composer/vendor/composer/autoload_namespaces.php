@@ -32,6 +32,7 @@ return array(
     'Guzzle\\Common' => array($vendorDir . '/guzzle/common'),
     'Goutte' => array($vendorDir . '/fabpot/goutte'),
     'Gaufrette' => array($vendorDir . '/knplabs/gaufrette/src'),
+    'Dropbox' => array($vendorDir . '/dropbox-php/dropbox-php/src'),
     'Codeception' => array($vendorDir . '/codeception/codeception/src'),
     'Behat\\Mink\\Driver' => array($vendorDir . '/behat/mink-selenium2-driver/src', $vendorDir . '/behat/mink-browserkit-driver/src', $vendorDir . '/behat/mink-goutte-driver/src'),
     'Behat\\Mink' => array($vendorDir . '/behat/mink/src'),

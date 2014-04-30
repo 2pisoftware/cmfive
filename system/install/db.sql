@@ -54,8 +54,6 @@ CREATE TABLE IF NOT EXISTS `audit` (
   `submodule` TEXT NULL, 
   `message` TEXT NULL,
   `module` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
-  `submodule` TEXT NULL,
-  `message` TEXT NULL,
   `action` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
   `path` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `ip` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
@@ -706,12 +704,10 @@ CREATE TABLE IF NOT EXISTS `template` (
 
 CREATE TABLE IF NOT EXISTS `channel` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR( 255 ) NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `name` VARCHAR( 255 ) NULL,
   `notify_user_email` varchar(255) DEFAULT NULL,
   `notify_user_id` bigint(20) DEFAULT NULL,
-  `do_processing` tinyint(1) NOT NULL DEFAULT '1',
   `creator_id` bigint(20) NOT NULL,
   `modifier_id` bigint(20) NOT NULL,
   `dt_created` datetime NOT NULL,
@@ -744,15 +740,6 @@ CREATE TABLE IF NOT EXISTS `channel_email_option` (
   `dt_created` datetime NOT NULL,
   `dt_modified` datetime NOT NULL,
   `is_deleted` tinyint(4) NOT NULL DEFAULT '0',
-  `protocol` VARCHAR( 255 ) NULL,
-  `to_filter` VARCHAR( 255 ) NULL,
-  `from_filter` VARCHAR( 255 ) NULL,
-  `subject_filter` VARCHAR( 255 ) NULL,
-  `cc_filter` VARCHAR( 255 ) NULL,
-  `body_filter` VARCHAR( 255 ) NULL,
-  `post_read_action` VARCHAR( 255 ) NULL,
-  `post_read_parameter` VARCHAR( 255 ) NULL,
-   
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
