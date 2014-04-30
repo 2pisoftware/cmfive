@@ -20,29 +20,26 @@ class Template extends DbObject {
 	public $creator_id;
 	public $modifier_id;
 	
-	// protected $_db_table = "template";
-	
 	public function renderTitle($data) {
-            if (is_array($data))
-		return $this->Template->render($this->template_title,$data);
-            else 
-                return null;
+		if (is_array ( $data )) {
+			return $this->Template->render ( $this->template_title, $data );
+		} else {
+			return null;
+		}
 	}
-
 	public function renderBody($data) {
-            if (is_array($data))
-		return $this->Template->render($this->template_body,$data);
-            else
-                return null;
+		if (is_array ( $data )) {
+			return $this->Template->render ( $this->template_body, $data );
+		} else {
+			return null;
+		}
 	}
 	
 	public function testTitle() {
-		return $this->renderTitle(json_decode($this->test_title_json,true));
+		return $this->renderTitle(json_decode(defaultVal($this->test_title_json,"[]"),true));
 	}
 
 	public function testBody() {
-		// echo $this->test_body_json;
-		// print_r(json_decode($this->test_body_json));
-		return $this->renderBody(json_decode($this->test_body_json,true));
+		return $this->renderBody(json_decode(defaultVal($this->test_body_json,"[]"),true));
 	}
 }

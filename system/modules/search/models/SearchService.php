@@ -10,15 +10,44 @@ class SearchService extends DbService {
 	 */
 	public function getIndexes() {
 		$indexes = array();
-		
-		foreach ($this->w->modules() as $module) {
-                    $search = Config::get("{$module}.search");
-                    if (!empty($search)) {
-                        $indexes = array_merge($indexes,$search);
-                    }
+		foreach ( $this->w->modules () as $module ) {
+			$search = Config::get ( "{$module}.search" );
+			if (! empty ( $search )) {
+				$indexes = array_merge ( $indexes, $search );
+			}
 		}
-		asort($indexes);
+		asort ( $indexes );
 		return $indexes;
+	}
+	public function reindex($index) {
+		$indexes = $this->getIndexes ();
+		if (! empty ( $index ) && in_array ( $index, $indexes )) {
+			// first delete all entries in the index table for this index
+			$sql = "DELETE FROM object_index WHERE class_name = '{$index}'";
+			$this->_db->sql ( $sql )->execute ();
+			
+			$objects = $this->getObjects ( $index, array ("is_deleted",0) );
+			if (! empty ( $objects )) {
+				foreach ( $objects as $object ) {
+					$object->_searchable->insert ();
+				}
+			}
+		}
+	}
+	public function reindexAll() {
+		// delete all index entries
+		$sql = "DELETE FROM object_index";
+		$this->_db->sql ( $sql )->execute ();
+		
+		// go over each index and reindex
+		foreach ( $this->getIndexes () as $index ) {
+			$objects = $this->getObjects ( $index, array ("is_deleted",0 ) );
+			if (! empty ( $objects )) {
+				foreach ( $objects as $object ) {
+					$object->_searchable->insert ();
+				}
+			}
+		}
 	}
 	
 	/**

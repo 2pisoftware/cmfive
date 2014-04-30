@@ -157,8 +157,13 @@ class DbObject extends DbService {
             if ($name == "dt_modified") {
                 return $this->_modifiable->getModifiedDate();
             }
+        } else if(property_exists($this, $name)) {
+	        $reflection = new ReflectionProperty($this, $name);
+	        $reflection->setAccessible($name);
+	        return $reflection->getValue($this);
+        } else {
+        	return $this->w->$name;
         }
-        return $this->w->$name;
     }
 
     /**
@@ -731,8 +736,8 @@ class DbObject extends DbService {
         $this->w->ctx('db_deletes', $deletes);
 
         // delete from search index
-        if ($this->_searchable) {
-            $this->_searchable->delete();
+        if (property_exists($this, "_searchable")) {
+        	$this->_searchable->delete();
         }
 
         // with hooks in place this can go!

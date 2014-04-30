@@ -40,6 +40,12 @@ Config::set("system.allow_module", array(
     // "rest", // uncomment this to switch on REST access to the database objects. Tread with CAUTION!
 ));
 
+Config::set('system.allow_action', array(
+    "auth/login",
+    "auth/forgotpassword",
+    "auth/resetpassword",
+    "admin/datamigration"
+));
 //========= REST Configuration ==============================
 // check the following configuration carefully to secure
 // access to the REST infrastructure.

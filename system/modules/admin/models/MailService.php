@@ -52,12 +52,7 @@ class MailService extends DbService {
             }
         }
 
-        // Send
-        $result = $mailer->send($message, $failures);
-        if (!$result) {
-            
-        }
-        return $result;
+        return $mailer->send($message, $failures);
     }
 
     private function initTransport() {
@@ -69,7 +64,11 @@ class MailService extends DbService {
                 ->setPassword(Config::get('email.password'));
                 break;
         	case "sendmail":
-        		if (!empty(Config::get('email.command'))) {
+        		$command = Config::get('email.command');
+        		//
+        		// empty() is a language construct and cannot deal with return values from functions!
+        		//
+        		if (!empty($command)) {
         			$this->transport = Swift_SendmailTransport::newInstance(Config::get('email.command'));
         		} else {
         			$this->transport = Swift_SendmailTransport::newInstance();
