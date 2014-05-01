@@ -37,10 +37,11 @@
         $w->outputScripts();
         ?>
         <script type="text/javascript">
+            var $ = jQuery;
 
             $(document).ready(function() {
-                $(".msg").delay(3000).fadeOut(3000);
-                $(".error").delay(6000).fadeOut(3000);
+//                $(".msg").delay(3000).fadeOut(3000);
+//                $(".error").delay(6000).fadeOut(3000);
                 $("table.tablesorter").tablesorter({dateFormat: "uk", widthFixed: true, widgets: ['zebra']});
                 <?php
                 $tab = $w->request('tab');
@@ -191,6 +192,11 @@
             </div>
         </div>
 
+        <div id="cmfive-modal" class="reveal-modal" data-reveal>
+            
+            <a class="close-reveal-modal">&#215;</a>
+        </div>
+        
         <script type="text/javascript" src="/system/templates/js/foundation-5.2.2/js/foundation.min.js"></script>
         <script>
             jQuery(document).foundation();
