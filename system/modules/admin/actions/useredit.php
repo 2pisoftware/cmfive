@@ -55,22 +55,6 @@ function useredit_POST(Web &$w) {
     $user->is_active = isset($_REQUEST['is_active']) ? 1 : 0;
     $user->update();
 
-    // adding roles
-    $roles = $w->Auth->getAllRoles();
-    foreach ($roles as $r) {
-        if (!empty($_POST["check_" . $r])) {
-            if ($_REQUEST["check_" . $r] == 1) {
-                $user->addRole($r);
-            }
-        }
-    }
-    // deleting roles
-    foreach ($user->getRoles() as $r) {
-        if (!@$_REQUEST["check_" . $r]) {
-            $user->removeRole($r);
-        }
-    }
-
     $contact = $user->getContact();
     if ($contact) {
         $contact->fill($_REQUEST);
