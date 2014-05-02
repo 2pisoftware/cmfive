@@ -1063,47 +1063,39 @@ EOT;
         
         // List data items
         foreach($data as $id => $d) {
-            $buffer .= "<li class='grid-list-panel'><div class='row'><div class='small-12";
+            $buffer .= "<li class='grid-list-panel'>";
+            $buffer .= "<div class='panel clearfix  '><div class='small-12'>";
             
-            // Add code for buttons
-//            if (!empty($buttons)) {
-//                $buffer .= " medium-9 left";
-//            }
-            $buffer .= "'>";
-            
-            $buffer .= "<div class='panel clearfix'>";
-            // Print the first field
-//            if (!empty($d[0])) {
-                $buffer .= ("<div class='row-fluid small-12 columns'><h4>" . (!empty($d[0]) ? $d[0] : "") . "&nbsp</h4></div>");
-//            }
-            
-            // Print the bottom line
-            $buffer .= "<div class='row-fluid'>";
-            if (empty($d[2])) {
-                $buffer .= "<div class='small-12 columns'>";
-            } else {
-                $buffer .= "<div class='small-6 columns'>";
+            if (!empty($d)) {
+                // Loop through each lione
+                foreach($d as $line) {
+                    $buffer .= "<div class='row'><div class='small-12'>";
+                    if (!empty($line)) {
+                        // If data is an array loop through and print
+                        if (is_array($line)) {
+                            $row_width = floor(12/count($line));
+                            foreach ($line as $item) {
+                                // Make the last item in a line text align right
+                                $buffer .= "<div class='small-12 medium-{$row_width} small-text-left " . ($item === end($line) ? "medium-text-right " : "") . "columns'>{$item}</div>";
+                            }
+                        } else {
+                            $buffer .= "<div class='small-12 columns'>{$line}</div>";
+                        }
+                    }
+                    $buffer .= "</div></div>";
+                }
             }
-            if (!empty($d[1])) {
-                $buffer .= $d[1];
-            }
-            $buffer .= "</div>";
-            
-            // Right side data
-            $buffer .= "<div class='small-6 columns right text-right'>";
-            if (!empty($d[2])) {
-                $buffer .= $d[2];
-            }
-            // Close all the tags!
-            $buffer .= "</div></div></div>"
-                    . (!empty($link) ? "</a>" : "") . "</div>";
+            $buffer .= "</div></div>";
             
             // Add buttons
             if (!empty($buttons[$id])) {
-                $buffer .= "<div class='small-12'>";
+                $buffer .= "<div class='row'>";
                 $button_width = floor(12/count($buttons[$id]));
                 $last_increment = 12 - (count($buttons[$id]) * $button_width);
                 $button_counter = 0;
+                
+                // The code just above and below will perfectly fit any amount of buttons (up to 12) in a row
+                // I.e. if there are 7 buttons, the first two will be one column wide but the last 5 will be 2 columns (cool huh?)
                 foreach($buttons[$id] as $b) {
                     $buffer .= "<div class='small-12 left medium-";
                     $buffer .= (++$button_counter > (count($buttons[$id]) - $last_increment) ? ($button_width + 1) : $button_width);
@@ -1112,7 +1104,7 @@ EOT;
                 $buffer .= "</div>";
             }
             
-            $buffer .= "</div></li>";
+            $buffer .= "</li>";
         }
         
         $buffer .= "</ul>";
