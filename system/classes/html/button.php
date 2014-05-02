@@ -1,7 +1,7 @@
 <?php namespace Html;
 
 /**
- * \Html\button clas for creating buttons
+ * \Html\button class for creating buttons
  * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button
  * 
  * @author Adam Buckley <adam.buckley90@gmail.com>
@@ -27,6 +27,10 @@ class button {
     public $newtab = false;
     public $href;
     public $onclick;
+    
+    public static function factory() {
+        return new \Html\button();
+    }
     
     public function __set($property, $value) {
 //        echo $property . " " . $value;

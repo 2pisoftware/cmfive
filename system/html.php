@@ -162,8 +162,20 @@ class Html {
         if ($confirm) {
             $confirm_str = "if(confirm('" . $confirm . "')) { ";
         }
+        
+        return " onclick=\"{$confirm_str}\$('#cmfive-modal').foundation('reveal', 'open', '{$href}');return false;" . (!empty($confirm) ? "}" : "") . "\" ";
+        
+//        $parameters = "transition: 'elastic', href:'{$href}', iframe: {$iframe}";
+//        if (!empty($width)) {
+//            $parameters .= ", " . ($iframe ? "innerWidth:" : "") . "'{$width}'";
+//        } else {
+//            $parameters .= "," . ($iframe ? "innerWidth:" : "") . "'800px'";
+//        }
+//        $parameters .= ", " . ($iframe ? "innerHeight:" : "") . "'{$height}'";
 
-        return " onclick=\"{$confirm_str}\$.colorbox({onComplete:function(){\$(this).colorbox.resize()}, transition:'elastic', href:'" . $href . "', iframe:" . $iframe . $width . $height . "});return false;" . (!empty($confirm) ? "}" : "") . "\" ";
+//        return " onclick=\"{$confirm_str}\$.colorbox({onComplete:function(){\$(this).colorbox.resize()}, {$parameters}});return false;" . (!empty($confirm) ? "}" : "") . "\" ";
+        
+//        return " onclick=\"{$confirm_str}\$.colorbox({onComplete:function(){\$(this).colorbox.resize()}, transition:'elastic', href:'" . $href . "', iframe:" . $iframe . $width . $height . "});return false;" . (!empty($confirm) ? "}" : "") . "\" ";
     }
 
     /**
@@ -459,6 +471,27 @@ class Html {
         return $buffer;
     }
 
+    /**
+     * Creates a complex form where each section can have
+     * a different number of columns.
+     * 
+     * extrabuttons = array("id"=>"title", ..)
+     *
+     * valid field types are:
+     *  text, password, autocomplete, static, date, textarea, section,
+     *  select, multiselect, checkbox, hidden
+     *
+     * when prefixing a fieldname with a minus sign '-' this field will be read-only
+     *
+     * @param <type> $data
+     * @param <type> $action
+     * @param <type> $method
+     * @param <type> $submitTitle
+     * @param <type> $id
+     * @param <type> $class
+     * @param <type> $extrabuttons
+     * @return <type>
+     */
     public static function multiColForm($data, $action = null, $method = "POST", $submitTitle = "Save", $id = null, $class = null, $extrabuttons = null, $target = "_self", $includeFormTag = true, $validation = null) {
      
         if (empty($data)) return;
@@ -468,7 +501,7 @@ class Html {
         
         // If form tag is needed print it
         if ($includeFormTag) {
-            $class .= " small-12 medium-8 columns";
+            $class .= " small-12 columns";
             $form->id($id)->setClass($class)->method($method)->action($action)->target($target);
                 
             if (in_multiarray("file", $data)) {
@@ -519,12 +552,9 @@ class Html {
                     
                     // Add title field
                     if (!empty($title)) {
-                        $buffer .= "<label>$title";
-//                        $buffer .= "<div class='small-12 medium-" . (2 + ($fieldCount > 1 ? $fieldCount + 1 : 0)) . " columns'><label class='inline'>{$title}</label></div>";
-//                        $buffer .= "<div class='small-12 medium-" . (9 - ($fieldCount > 1 ? $fieldCount + 1 : 0)) . " columns'>";
-                    } //else {
-                        $buffer .= "<div class='small-12'>";
-//                    }
+                        $buffer .= "<label class='small-12 columns'>$title";
+                    }
+                    $buffer .= "<div>";
                     
                     // handle disabled fields
                     if ($name[0] == '-') {
@@ -611,7 +641,7 @@ class Html {
             $buffer .= "</div>";
         }
         $buffer .= "<script>$(function(){\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})});</script>";
-//        
+       
         // Finish shell div tag
         $buffer .= "</div>";
         
@@ -622,176 +652,6 @@ class Html {
         
         return $buffer;
     }
-    
-    /**
-     * Creates a complex form where each section can have
-     * a different number of columns.
-     * 
-     * extrabuttons = array("id"=>"title", ..)
-     *
-     * valid field types are:
-     *  text, password, autocomplete, static, date, textarea, section,
-     *  select, multiselect, checkbox, hidden
-     *
-     * when prefixing a fieldname with a minus sign '-' this field will be read-only
-     *
-     * @param <type> $data
-     * @param <type> $action
-     * @param <type> $method
-     * @param <type> $submitTitle
-     * @param <type> $id
-     * @param <type> $class
-     * @param <type> $extrabuttons
-     * @return <type>
-     */
-//    public static function multiColForm($data, $action = null, $method = "POST", $submitTitle = "Save", $id = null, $class = null, $extrabuttons = null, $target = "_self", $includeFormTag = true, $validation = null) {
-//        if (!$data)
-//            return;
-//        $hidden = "";
-//        $id = $id ? ' id="' . $id . '"' : null;
-//        $class = $class ? ' class="' . $class . '"' : null;
-//        $buf = "";
-//
-//        $enctype = '';
-//        if (in_multiarray("file", $data)) {
-//            $enctype = 'enctype="multipart/form-data"';
-//        }
-//
-//        if ($includeFormTag == true)
-//            $buf .= '<form' . $id . $class . (!empty($action) ? ' action="' . $action . '"' : '') . ' method="' . $method . '" target="' . $target . '" ' . $enctype . '>';
-//
-//        $buf .= "<table  cellspacing=\"0\" " . $id . $class . " class='form-wrapper'>\n";
-//        $valign = ' valign="top" ';
-//
-//        // Generate CSRF Token
-//        $buf .= "<input type='hidden' name='" . CSRF::getTokenID() . "' value='" . CSRF::getTokenValue() . "' />";
-//
-//        foreach ($data as $section => $rows) {
-//            $buf .= "<tr>";
-//            $buf .= '<td class="section" >' . htmlentities($section);
-//            $buf .= "</td></tr>\n<tr><td><table class='form-section' width='100%'>";
-//            foreach ($rows as $row) {
-//                $buf .= "<tr>";
-//                foreach ($row as $field) {
-//                    $title = !empty($field[0]) ? $field[0] : null;
-//                    $type = !empty($field[1]) ? $field[1] : null;
-//                    $name = !empty($field[2]) ? $field[2] : null;
-//                    $value = !empty($field[3]) ? $field[3] : null;
-//
-//                    // Exploit HTML5s inbuilt form validation
-//                    $required = null;
-//                    if (!empty($validation[$name])) {
-//                        if (in_array("required", $validation[$name])) {
-//                            $required = "required";
-//                        }
-//                    }
-//
-//                    $readonly = "";
-//                    // handle disabled fields
-//                    if ($name[0] == '-') {
-//                        $name = substr($name, 1);
-//                        $readonly = " readonly='true' ";
-//                    }
-//                    if ($type == "text" || $type == "password") {
-//                        $size = !empty($field[4]) ? $field[4] : null;
-//                        $buf .= "<td $valign class='fieldtitle'>$title</td><td $valign  class='fieldvalue'>";
-//                        $buf .= '<input' . $readonly . ' style="width:100%;" type="' . $type . '" name="' . $name . '" value="' . htmlspecialchars($value) . '" size="' . $size . '" id="' . $name . '" ' . $required . " />";
-//                        $buf .= "</td>\n";
-//                    } else if ($type == "autocomplete") {
-//                        $options = !empty($field[4]) ? $field[4] : null;
-//                        $buf.= "<td  $valign class='fieldtitle'>" . htmlentities($title) . "</td><td  $valign class='fieldvalue'>";
-//                        $buf.= Html::autocomplete($name, $options, $value, null, "width: 100%;", 1, $required);
-//                        $buf .= "</td>\n";
-//                    } else if ($type == "date") {
-//                        $size = !empty($field[4]) ? $field[4] : null;
-//                        $buf .= "<td $valign class='fieldtitle'>$title</td><td  $valign class='fieldvalue'>";
-//                        $buf .= Html::datePicker($name, $value, $size, $required);
-//                        $buf .= "</td>\n";
-//                    } else if ($type == "datetime") {
-//                        $size = !empty($field[4]) ? $field[4] : null;
-//                        $buf .= "<td $valign class='fieldtitle'>$title</td><td  $valign class='fieldvalue'>";
-//                        $buf .= Html::datetimePicker($name, $value, $size, $required);
-//                        $buf .= "</td>\n";
-//                    } else if ($type == "time") {
-//                        $size = !empty($field[4]) ? $field[4] : null;
-//                        $buf .= "<td $valign class='fieldtitle'>$title</td><td  $valign class='fieldvalue'>";
-//                        $buf .= Html::timePicker($name, $value, $size, $required);
-//                        $buf .= "</td>\n";
-//                    } else if ($type == "static") {
-//                        $size = !empty($field[4]) ? $field[4] : null;
-//                        $buf .= "<td $valign class='fieldtitle'>$title</td><td  $valign class='fieldvalue'>";
-//                        $buf .= $value;
-//                        $buf .= "</td>\n";
-//                    } else if ($type == "textarea") {
-//                        $buf .= "<td $valign class='fieldtitle'>$title</td><td  $valign class='fieldvalue'>";
-//                        $c = !empty($field[4]) ? $field[4] : null;
-//                        $r = !empty($field[5]) ? $field[5] : null;
-//                        $useCKEditor = true;
-//                        if (isset($field[6])) {
-//                            $useCKEditor = $field[6];
-//                        }
-//                        $buf .= '<textarea' . $readonly . ' style="width:100%;" name="' . $name . '" rows="' . $r . '" cols="' . $c . '" ' . ($useCKEditor ? 'class="ckeditor" ' : '') . ' id="' . $name . '" ' . $required . '>' . $value . '</textarea>';
-//                        $buf .= "</td>\n";
-//                    } else if ($type == "select") {
-//                        $items = !empty($field[4]) ? $field[4] : null;
-//
-//                        $default = !empty($field[5]) ? ($field[5] == "null" ? null : $field[5]) : "-- Select --";
-//                        $class = !empty($field[6]) ? $field[6] : null;
-//                        $buf.= "<td  $valign class='fieldtitle'>" . htmlentities($title) . "</td><td  $valign class='fieldvalue'>";
-//                        if ($readonly == "") {
-//                            $buf.= Html::select($name, $items, $value, $class, "width: 100%;", $default, $readonly != "", $required);
-//                        } else {
-//                            $buf.=$value;
-//                        }
-//                        $buf .= "</td>\n";
-//                    } else if ($type == "multiSelect") {
-//                        $items = !empty($field[4]) ? $field[4] : null;
-//                        $buf.= "<td  $valign class='fieldtitle'>" . htmlentities($title) . "</td><td  $valign class='fieldvalue'>";
-//                        if ($readonly == "") {
-//                            $buf.= Html::multiSelect($name, $items, $value, null, "width: 100%;", $required);
-//                        } else {
-//                            $buf.=$value;
-//                        }
-//                        $buf .= "</td>\n";
-//                    } else if ($type == "checkbox") {
-//                        $defaultValue = !empty($field[4]) ? $field[4] : null;
-//                        $class = !empty($field[5]) ? $field[5] : null;
-//                        $buf.= "<td  $valign align='left' class='fieldtitle' colspan='2'>" . Html::checkbox($name, $value, $defaultValue, $class) . "&nbsp;" . htmlentities($title) . "</td>\n";
-//                    } else if ($type == "radio") {
-//                        $defaultValue = !empty($field[4]) ? $field[4] : null;
-//                        $class = !empty($field[5]) ? $field[5] : null;
-//                        $buf.= "<td  $valign align='left' class='fieldtitle' colspan='2'>" . Html::radio($name, $group, $value, $defaultValue, $class) . "&nbsp;" . htmlentities($title) . "</td>\n";
-//                    } else if ($type == "hidden") {
-//                        $hidden .= '<input type="hidden" name="' . $name . '" value="' . htmlspecialchars($value) . '" id="' . $name . '"/>' . "\n";
-//                    } else if ($type == "file") {
-//                        $size = !empty($row[4]) ? $row[4] : null;
-//                        if ($title) {
-//                            $buf .= "<tr><td $valign class='fieldtitle'>" . htmlentities($title) . "</td>";
-//                        }
-//                        $buf .= "<td colspan=\"2\">";
-//                        $buf .= '<input style="width:100%;"  type="' . $type . '" name="' . $name . '" size="' . $size . '" id="' . $name . '"/>';
-//                        $buf .= "</td></tr>\n";
-//                    }
-//                }
-//                $buf.="</tr>";
-//            }
-//            $buf.="</table></td></tr>\n";
-//        }
-//        $buf .= '<tr><td align="center" style="padding: 10px;">';
-//        if (!empty($extrabuttons)) {
-//            foreach ($extrabuttons as $id => $title) {
-//                $buf.="<input type='button' style='padding-top: 3px;padding-bottom: 3px;width:100px' id='" . $id . "' value='" . $title . "'/>&nbsp;";
-//            }
-//        }
-//        if ($includeFormTag == true) {
-//            $buf.= '<input id="submit" style="padding-top: 3px;padding-bottom: 3px;width:100px;" type="submit" value="' . $submitTitle . '"/>';
-//        }
-//        $buf.='</td></tr>';
-//        $buf.= "<script>$(function(){\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})});</script>";
-//        $buf .= "</table>\n";
-//        $buf .= $hidden . ($includeFormTag == true ? "</form>" : "") . "\n";
-//        return $buf;
-//    }
 
     /**
      * Creates a checkbox input element
@@ -958,7 +818,7 @@ EOT;
                     $source .= '{"id":"' . $option . '","value":"' . $option . '"},';
                 }
             }
-            // Remove traiiing comma
+            // Remove trailing comma
             $source = substr($source, 0, -1);
             $source .= "]";
         } else {
@@ -1202,63 +1062,49 @@ EOT;
         $buffer .= "<ul class='small-block-grid-1 medium-block-grid-$mediumPerRow large-block-grid-$perRow'>";
         
         // List data items
-        foreach($data as $d) {
-            $buffer .= "<li class='grid-list-panel'><div class='row'><div class='small-12";
+        foreach($data as $id => $d) {
+            $buffer .= "<li class='grid-list-panel'>";
+            $buffer .= "<div class='panel clearfix  '><div class='small-12'>";
             
-            // Add code for buttons
-//            if (!empty($buttons)) {
-//                $buffer .= " medium-9 left";
-//            }
-            $buffer .= "'>";
-            
-            $buffer .= "<div class='panel clearfix'>";
-            // Print the first field
-//            if (!empty($d[0])) {
-                $buffer .= ("<div class='row-fluid small-12 columns'><h4>" . (!empty($d[0]) ? $d[0] : "") . "&nbsp</h4></div>");
-//            }
-            
-            // Print the bottom line
-            $buffer .= "<div class='row-fluid'>";
-            if (empty($d[2])) {
-                $buffer .= "<div class='small-12 columns'>";
-            } else {
-                $buffer .= "<div class='small-6 columns'>";
+            if (!empty($d)) {
+                // Loop through each lione
+                foreach($d as $line) {
+                    $buffer .= "<div class='row'><div class='small-12'>";
+                    if (!empty($line)) {
+                        // If data is an array loop through and print
+                        if (is_array($line)) {
+                            $row_width = floor(12/count($line));
+                            foreach ($line as $item) {
+                                // Make the last item in a line text align right
+                                $buffer .= "<div class='small-12 medium-{$row_width} small-text-left " . ($item === end($line) ? "medium-text-right " : "") . "columns'>{$item}</div>";
+                            }
+                        } else {
+                            $buffer .= "<div class='small-12 columns'>{$line}</div>";
+                        }
+                    }
+                    $buffer .= "</div></div>";
+                }
             }
-            if (!empty($d[1])) {
-                $buffer .= $d[1];
-            }
-            $buffer .= "</div>";
-            
-            // Right side data
-            $buffer .= "<div class='small-6 columns right text-right'>";
-            if (!empty($d[2])) {
-                $buffer .= $d[2];
-            }
-            // Close all the tags!
-            $buffer .= "</div></div></div>"
-                    . (!empty($link) ? "</a>" : "") . "</div>";
+            $buffer .= "</div></div>";
             
             // Add buttons
-            if (!empty($buttons)) {
-                $buffer .= "<div class='small-12 columns'>";
-                foreach($buttons as $b) {
-                    $button = new \Html\button();
-                    if (!empty($b['link'])) {
-                        $button->href($b['link']);
-                    }        
-                    if (!empty($b['text'])) {
-                        $button->text($b['text']);
-                    }
-                    if (!empty($b['message'])) {
-                        $button->confirm($b['message']);
-                    }
-                    $button->setClass("small-" . (12/floor(count($buttons))));
-                    $buffer .= "<div class='row'>" . $button->__toString() . "</div>";
+            if (!empty($buttons[$id])) {
+                $buffer .= "<div class='row'>";
+                $button_width = floor(12/count($buttons[$id]));
+                $last_increment = 12 - (count($buttons[$id]) * $button_width);
+                $button_counter = 0;
+                
+                // The code just above and below will perfectly fit any amount of buttons (up to 12) in a row
+                // I.e. if there are 7 buttons, the first two will be one column wide but the last 5 will be 2 columns (cool huh?)
+                foreach($buttons[$id] as $b) {
+                    $buffer .= "<div class='small-12 left medium-";
+                    $buffer .= (++$button_counter > (count($buttons[$id]) - $last_increment) ? ($button_width + 1) : $button_width);
+                    $buffer .= ("'>" . $b . "</div>");
                 }
                 $buffer .= "</div>";
             }
             
-            $buffer .= "</div></li>";
+            $buffer .= "</li>";
         }
         
         $buffer .= "</ul>";
