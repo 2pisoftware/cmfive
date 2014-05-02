@@ -17,6 +17,7 @@
         $w->enqueueStyle(array("name" => "liveValidation.css", "uri" => "/system/templates/css/liveValidation.css", "weight" => 960));
         $w->enqueueStyle(array("name" => "colorbox.css", "uri" => "/system/templates/js/colorbox/colorbox/colorbox.css", "weight" => 950));
         $w->enqueueStyle(array("name" => "jquery.asmselect.css", "uri" => "/system/templates/css/jquery.asmselect.css", "weight" => 940));
+        $w->enqueueStyle(array("name" => "foundation-icons.css", "uri" => "/system/templates/font/foundation-icons/foundation-icons.css", "weight" => 930));
 
         $w->enqueueScript(array("name" => "modernizr.js", "uri" => "/system/templates/js/foundation-5.2.2/js/vendor/modernizr.js", "weight" => 1010));
         $w->enqueueScript(array("name" => "jquery.js", "uri" => "/system/templates/js/foundation-5.2.2/js/vendor/jquery.js", "weight" => 1000));
@@ -92,33 +93,34 @@
                     <!-- Right Nav Section -->
                     <ul class="right">
                         <!-- Search bar -->
-                        <li class="has-form">
+                        <li><?php echo Html::box("/search", "<span class='fi-magnifying-glass'></span>", false); ?></li>
+<!--                        <li class="has-form">
                             <form action="<?php echo WEBROOT; ?>/search/results" method="GET">
                                 <input type="hidden" name="<?php echo CSRF::getTokenID(); ?>" value="<?php echo CSRF::getTokenValue(); ?>" />
                                 <div class="row collapse">
                                     <div class="large-8 small-8 columns search-bar">
                                         <input type="text" id="q" name="q" value="<?php echo!empty($_REQUEST['q']) ? $_REQUEST['q'] : ''; ?>" placeholder="Search..." />
                                     </div>
-                                    <!--<div class="large-4 small-4 columns">-->
+                                    <div class="large-4 small-4 columns">
                                     <?php //echo Html::select("idx", $w->service('Search')->getIndexes(), (!empty($_REQUEST['idx']) ? $_REQUEST['idx'] : null), null, null, "Search All"); ?>
                                     <input type="hidden" name="p" value="1"/>
                                     <input type="hidden" name="ps" value="25"/>
-                                    <!--</div>-->
+                                    </div>
                                     <div class="large-4 small-4 columns">
                                         <button class="alert button expand search-button">Search</button>
                                     </div>
                                 </div>
                             </form>
-                        </li> <!-- End search bar -->
+                        </li>  End search bar -->
                         
                         <!-- User Profile dropdown -->
                         <?php if ($w->Auth->user()): ?>
                             <li class="has-dropdown">
-                                <a href="#"><?php echo $w->Auth->user()->getShortName(); ?></a>
+                                <a href="#"><span  class="fi-torso"></span><?php // echo $w->Auth->user()->getShortName(); ?></a>
                                 <?php
                                 echo Html::ul(
                                     array(
-                                        $w->menuBox("auth/profile/box", "Profile"),
+                                        $w->menuBox("auth/profile/box", $w->Auth->user()->getShortName()),
                                         $w->menuLink("auth/logout", "Logout")
                                     ), null, "dropdown");
                                 ?>    
@@ -129,7 +131,7 @@
                     <!-- Left Nav Section -->
                     <ul class="left">
                         <?php if ($w->Auth->loggedIn()) : ?>
-                            <li><?php echo $w->menuLink($w->Main->getUserRedirectURL(), "Home"); ?></li>
+                            <li><?php echo $w->menuLink($w->Main->getUserRedirectURL(), "<span class='fi-home'></span>"); ?></li>
                             <li class="divider"></li>
                             <?php foreach ($w->modules() as $module) {
                                 // Check if config is set to display on topmenu
@@ -148,7 +150,7 @@
                             }
                         
                             if ($w->Auth->allowed('help/view')) : ?>
-                                <li><?php echo Html::box(WEBROOT . "/help/view/" . $w->_module . ($w->_submodule ? "-" . $w->_submodule : "") . "/" . $w->_action, "HELP", false, true, 750, 500); ?> </li>
+                                <li><?php echo Html::box(WEBROOT . "/help/view/" . $w->_module . ($w->_submodule ? "-" . $w->_submodule : "") . "/" . $w->_action, "<span class='fi-q'>?</span>", false, true, 750, 500); ?> </li>
                             <?php endif;
                         endif; ?>
                     </ul> <!-- End left nav section -->
@@ -200,6 +202,11 @@
         <script type="text/javascript" src="/system/templates/js/foundation-5.2.2/js/foundation.min.js"></script>
         <script>
             jQuery(document).foundation();
+            
+            // Automatically append the close 'x' to reveal modals
+            $(document).on('opened', '[data-reveal]', function () {
+                $("#cmfive-modal").append("<a class=\"close-reveal-modal\">&#215;</a>");
+            });
         </script>
 
     </body>

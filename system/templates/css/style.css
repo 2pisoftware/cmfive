@@ -9,18 +9,54 @@ body {
     overflow: hidden;
 }
 
-.search-bar input {
-    height: 1.8rem;
+span[class^='fi-'], span[class*=' fi-'] {
+    margin-top: 200px !important;
+    font-size: 18pt;
 }
-.search-button {
-    height: 1.8rem;
+
+.top-bar-section li:not(.has-form) a:not(.button) {
+    height: 45px;
 }
+
+// Search
+#search_form {
+    margin-bottom: 0px !important;
+}
+
+#search-class-header {
+    padding: 0px 30px;
+    font-weight: lighter !important;
+    border-bottom: 1px solid black !important;
+}
+
+.search-class .panel {
+    margin-bottom: 10px !important;
+    padding: 0px 30px !important;
+}
+
+.search-title {
+    font-weight: normal;
+    font-size: 110%;
+}
+
+.search-listing {
+    padding: 0px 30px 20px 15px;
+}
+
 button {
     font-size: 0.8rem !important;
 }
 
 .header {
     border-bottom: 1px #cacaca solid;
+}
+
+.top-bar-section .has-dropdown > a {
+    padding-right: 15px !important;
+}
+.top-bar-section .has-dropdown > a:after {
+    display: none;
+    content: none;
 }
 
 #footer {
