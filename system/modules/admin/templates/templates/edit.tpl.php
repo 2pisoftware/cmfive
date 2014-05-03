@@ -6,7 +6,7 @@
 		<a href="#details">Details</a>
 		<a href="#template">Template</a>
 		<a href="#test">Test Data</a>
-        <a href="#"	onclick="$.colorbox({iframe:true, width: '95%', height: '95%', href:'/admin-templates/rendertemplate/<?php echo !empty($id) ? $id : ""; ?>'});">Test Output</a>
+                <?php echo Html::box("/admin-templates/rendertemplate/".!empty($id) ? $id : "", "Test Output", false); ?>
 		<a href="#manual">Manual</a>
 	</div>
 	<div class="tab-body clearfix">

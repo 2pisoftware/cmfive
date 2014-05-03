@@ -12,12 +12,15 @@ function edit_GET(Web $w) {
 	
 	$newForm = array();
 	$newForm["Template Details"] = array(
-		array(array("Title", "text", "title",$t->title),
-				array("Active", "checkbox", "is_active",$t->is_active)),
-		array(array("Module", "text", "module",$t->module),
-				array("Category", "text", "category",$t->category)));
+		array(
+                    array("Title", "text", "title",$t->title),
+                    array("Active", "checkbox", "is_active",$t->is_active)),
+		array(
+                    array("Module", "text", "module",$t->module),
+                    array("Category", "text", "category",$t->category)));
 	$newForm['Description'] = array(
-		array(array("", "textarea", "description",$t->description)),
+		array(
+                    array("", "textarea", "description",$t->description)),
 	);
 
 	$w->ctx("editdetailsform", Html::multiColForm($newForm, $w->localUrl('/admin-templates/edit/'.$t->id)));
