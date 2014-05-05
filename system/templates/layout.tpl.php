@@ -183,24 +183,26 @@
             $(document).foundation();
             
             // Automatically append the close 'x' to reveal modals
-            $(document).on('open', '[data-reveal]', function () {
-                $("#cmfive-modal").after('<div id="help-modal" class="reveal-modal" data-reveal></div>');
+            $(document).on('opened', '[data-reveal]', function () {
+                $("#cmfive-modal").append("<a class=\"close-reveal-modal\">&#215;</a>");
                 
+                bindModalLinks();
+            });
+            
+            function bindModalLinks() {
                 // Stop a links and follow them inside the reveal modal
                 $("#cmfive-modal a").click(function(event) {
                     if ($(this).hasClass("close-reveal-modal")) {
                         $("#cmfive-modal").foundation("reveal", "close");
                     } else {
-                        $(this).attr("data-reveal-id", "help-modal").attr("data-reveal-ajax", "true");
+                        $.get($(this).attr('href'), function(data) {
+                            $("#cmfive-modal").html(data + "<a class=\"close-reveal-modal\">&#215;</a>");
+                            bindModalLinks();
+                        });
                     }
+                    return false;
                 });
-            });
-            
-            // Automatically append the close 'x' to reveal modals
-            $(document).on('opened', '[data-reveal]', function () {
-                $("#cmfive-modal").append("<a class=\"close-reveal-modal\">&#215;</a>");
-            });
-            
+            }
         </script>
 
     </body>
