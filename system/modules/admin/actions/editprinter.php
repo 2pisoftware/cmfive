@@ -28,5 +28,5 @@ function editprinter_POST(Web $w) {
     $printer->fill($_POST);
     $printer->insertOrUpdate();
     
-    $w->msg("Printer added", "/admin");
+    $w->msg("Printer added", "/admin/printers");
 }

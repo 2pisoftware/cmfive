@@ -19,39 +19,72 @@ class Html {
      * @param boolean $header use first row as <th> if true
      *
      */
-    static function table($array, $id = null, $class = null, $header = null) {
-        if (!$array || sizeof($array) < 1)
-            return "";
+    public static function table($data, $id = null, $class = "tablesorter", $header = null) {
+        if (empty($data)) return;
+        $buffer = "";
 
-        $jstable = "table" . ($class ? "." . $class : "");
-        $id = $id ? ' id="' . $id . '"' : null;
-        $class = $class ? ' class="' . $class . '"' : null;
-
-        $buf = "<table border='0' " . $id . $class . ">\n";
-        $firstline = true;
-        foreach ($array as $line) {
-            // check if this is header line
-            $ct = "td";
-            if ($firstline) {
-                foreach ($line as $cell) {
-                    $buf.="<colgroup></colgroup>";
+        // Opening tags
+        $buffer .= "<table class='{$class}'>";
+            if (!empty($header)) {
+                $buffer .= "<thead><tr>";
+                foreach($header as $h) {
+                    if (!is_array($h)) {
+                        $buffer .= "<th>{$h}</th>";
+                    } else {
+                        $buffer .= "<th " . ($h[1] === true ? "class='show-for-medium-up'" : "") . ">{$h[0]}</th>";
+                    }
                 }
-                $buf.="<thead>\n";
-                $ct = $header ? "th nowrap='true' " : $ct;
+                $buffer .= "</tr></thead>";
             }
-            $buf.="<tr>\n";
-            foreach ($line as $cell) {
-                $buf.="<$ct>$cell</$ct>";
-            }
-            $buf.="\n</tr>\n";
-            if ($firstline) {
-                $buf.="</thead>\n<tbody>\n";
-                $firstline = false;
-            }
-        }
-        $buf .= "</tbody>\n</table>\n";
-        return $buf;
+            $buffer .= "<tbody>";
+            foreach($data as $row) {
+                $buffer .= "<tr>";
+                foreach($row as $column) {
+                    if (!is_array($column)) {
+                        $buffer .= "<td>{$column}</td>";
+                    } else {
+                        $buffer .= "<td " . ($column[1] === true ? "class='show-for-medium-up'" : "") . ">{$column[0]}</td>";
+                    }
+                }
+                $buffer .= "</tr>";
+            } 
+        $buffer .= "</tbody></table>";
+        return $buffer;
     }
+    
+//    static function table($array, $id = null, $class = null, $header = null) {
+//        if (!$array || sizeof($array) < 1)
+//            return "";
+//
+//        $jstable = "table" . ($class ? "." . $class : "");
+//        $id = $id ? ' id="' . $id . '"' : null;
+//        $class = $class ? ' class="' . $class . '"' : null;
+//
+//        $buf = "<table border='0' " . $id . $class . ">\n";
+//        $firstline = true;
+//        foreach ($array as $line) {
+//            // check if this is header line
+//            $ct = "td";
+//            if ($firstline) {
+//                foreach ($line as $cell) {
+//                    $buf.="<colgroup></colgroup>";
+//                }
+//                $buf.="<thead>\n";
+//                $ct = $header ? "th nowrap='true' " : $ct;
+//            }
+//            $buf.="<tr>\n";
+//            foreach ($line as $cell) {
+//                $buf.="<$ct>$cell</$ct>";
+//            }
+//            $buf.="\n</tr>\n";
+//            if ($firstline) {
+//                $buf.="</thead>\n<tbody>\n";
+//                $firstline = false;
+//            }
+//        }
+//        $buf .= "</tbody>\n</table>\n";
+//        return $buf;
+//    }
 
     /**
      * Html function to draw a chart, see: http://www.chartjs.org/docs/ for how
@@ -534,10 +567,7 @@ class Html {
                     $type = !empty($field[1]) ? $field[1] : null;
                     $name = !empty($field[2]) ? $field[2] : null;
                     $value = !empty($field[3]) ? $field[3] : null;
-
-                    // Can I do this?
-                    if (empty($title) and empty($value)) continue;
-                                        
+               
                     // Exploit HTML5s inbuilt form validation
                     $required = null;
                     if (!empty($validation[$name])) {
@@ -561,6 +591,7 @@ class Html {
                         $name = substr($name, 1);
                         $readonly = " readonly='true' ";
                     }
+
                     switch($type) {
                         case "text":
                         case "password":
@@ -965,8 +996,12 @@ EOT;
 
             // span entry fields that have no title
             if (!empty($title)) {
-                $buffer .= "<div class='small-12 medium-3 columns'><label class='inline'>{$title}</label></div>";
-                $buffer .= "<div class='small-12 medium-9 columns'>";
+                $mediumCols = 9;
+                if ($type == "checkbox") {
+                    $mediumCols = 6;
+                }
+                $buffer .= "<div class='small-12 medium-" . (12 - $mediumCols) . " columns'><label class='inline'>{$title}</label></div>";
+                $buffer .= "<div class='small-12 medium-{$mediumCols} columns'>";
             } else {
                 $buffer .= "<div class='small-12'>";
             }

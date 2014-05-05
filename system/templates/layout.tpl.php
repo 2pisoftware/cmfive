@@ -94,29 +94,11 @@
                     <ul class="right">
                         <!-- Search bar -->
                         <li><?php echo Html::box("/search", "<span class='fi-magnifying-glass'></span>", false); ?></li>
-<!--                        <li class="has-form">
-                            <form action="<?php echo WEBROOT; ?>/search/results" method="GET">
-                                <input type="hidden" name="<?php echo CSRF::getTokenID(); ?>" value="<?php echo CSRF::getTokenValue(); ?>" />
-                                <div class="row collapse">
-                                    <div class="large-8 small-8 columns search-bar">
-                                        <input type="text" id="q" name="q" value="<?php echo!empty($_REQUEST['q']) ? $_REQUEST['q'] : ''; ?>" placeholder="Search..." />
-                                    </div>
-                                    <div class="large-4 small-4 columns">
-                                    <?php //echo Html::select("idx", $w->service('Search')->getIndexes(), (!empty($_REQUEST['idx']) ? $_REQUEST['idx'] : null), null, null, "Search All"); ?>
-                                    <input type="hidden" name="p" value="1"/>
-                                    <input type="hidden" name="ps" value="25"/>
-                                    </div>
-                                    <div class="large-4 small-4 columns">
-                                        <button class="alert button expand search-button">Search</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </li>  End search bar -->
                         
-                        <!-- User Profile dropdown -->
+                        <!-- User Profile drop down -->
                         <?php if ($w->Auth->user()): ?>
                             <li class="has-dropdown">
-                                <a href="#"><span  class="fi-torso"></span><?php // echo $w->Auth->user()->getShortName(); ?></a>
+                                <a href="#"><span  class="fi-torso"></span></a>
                                 <?php
                                 echo Html::ul(
                                     array(
@@ -194,21 +176,35 @@
             </div>
         </div>
 
-        <div id="cmfive-modal" class="reveal-modal" data-reveal>
-            
-            <a class="close-reveal-modal">&#215;</a>
-        </div>
+        <div id="cmfive-modal" class="reveal-modal xlarge" data-reveal></div>
         
         <script type="text/javascript" src="/system/templates/js/foundation-5.2.2/js/foundation.min.js"></script>
         <script>
-            jQuery(document).foundation();
+            $(document).foundation();
             
             // Automatically append the close 'x' to reveal modals
             $(document).on('opened', '[data-reveal]', function () {
                 $("#cmfive-modal").append("<a class=\"close-reveal-modal\">&#215;</a>");
+                
+                bindModalLinks();
             });
+            
+            function bindModalLinks() {
+                // Stop a links and follow them inside the reveal modal
+                $("#cmfive-modal a").click(function(event) {
+                    if ($(this).hasClass("close-reveal-modal")) {
+                        $("#cmfive-modal").foundation("reveal", "close");
+                    } else {
+                        if ($(this).attr('href')[0] === "#") return true;
+                        $.get($(this).attr('href'), function(data) {
+                            $("#cmfive-modal").html(data + "<a class=\"close-reveal-modal\">&#215;</a>");
+                            bindModalLinks();
+                        });
+                    }
+                    return false;
+                });
+            }
         </script>
 
     </body>
-
 </html>
