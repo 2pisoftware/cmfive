@@ -162,6 +162,7 @@ class AdminService extends DbService {
 			$w->menuLink("admin/lookup","Lookup",$nav);
 			$w->menuLink("admin-templates","Templates",$nav);
 			$w->menuLink("admin/phpinfo","PHP Info",$nav);
+                        $w->menuLink("admin/printers", "Printers", $nav);
                         $w->menuLink("admin/databasebackup", "Backup Database", $nav);
 			$w->menuLink("admin/composer","Install/Update Composer", $nav, null, "_blank");
 		}
