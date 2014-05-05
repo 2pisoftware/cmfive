@@ -5,8 +5,5 @@
     <?php endif; ?>
     <li><a href="<?php echo WEBROOT . '/help/view/help/onhelp'; ?>">Help on Help</a></li>
 </ul>
-<div class="row">
-    <div class="small-12">
-        <?php echo $help_content; ?>
-    </div>
-</div>
+
+<?php echo $help_content; ?>

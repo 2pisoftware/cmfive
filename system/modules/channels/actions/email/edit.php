@@ -66,6 +66,7 @@ function edit_POST(Web $w) {
 
 	$channel_object = $channel_id ? $w->Channel->getChannel($channel_id) : new Channel($w);
 	$channel_object->fill($_POST);
+        $channel_object->notify_user_id = !empty($_POST["notify_user_id"]) ? intval($_POST["notify_user_id"]) : NULL;
 	$channel_object->insertOrUpdate();
 
 	$email_channel = $channel_id ? $w->Channel->getEmailChannel($channel_id) : new EmailChannelOption($w);

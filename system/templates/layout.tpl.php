@@ -176,7 +176,7 @@
             </div>
         </div>
 
-        <div id="cmfive-modal" class="reveal-modal" data-reveal></div>
+        <div id="cmfive-modal" class="reveal-modal xlarge" data-reveal></div>
         
         <script type="text/javascript" src="/system/templates/js/foundation-5.2.2/js/foundation.min.js"></script>
         <script>
@@ -195,6 +195,7 @@
                     if ($(this).hasClass("close-reveal-modal")) {
                         $("#cmfive-modal").foundation("reveal", "close");
                     } else {
+                        if ($(this).attr('href')[0] === "#") return true;
                         $.get($(this).attr('href'), function(data) {
                             $("#cmfive-modal").html(data + "<a class=\"close-reveal-modal\">&#215;</a>");
                             bindModalLinks();

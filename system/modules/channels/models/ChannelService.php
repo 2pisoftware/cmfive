@@ -69,7 +69,7 @@ class ChannelService extends DbService {
                 $processors = Config::get("{$module}.processors");
                 if (!empty($processors)) {
                     foreach($processors as $processor) {
-                        $list[] = $key.".".$processor;
+                        $list[] = $module.".".$processor;
                     }
                 }
             }
