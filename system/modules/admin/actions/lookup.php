@@ -10,7 +10,7 @@ function lookup_ALL(Web &$w) {
 	// tab: Lookup List
 	$where = array();
 	if ($w->request('type') != "") {
-		$where['type'] = $_REQUEST['type'];
+		$where['type'] = $w->request('type');
 	}
 	$lookup = $w->Admin->getAllLookup($where);
 
@@ -22,9 +22,9 @@ function lookup_ALL(Web &$w) {
 			$look->type,
 			$look->code,
 			$look->title,
-			Html::box($w->localUrl("/admin/editlookup/".$look->id."/".urlencode($_REQUEST['type']))," Edit ",true) .
+			Html::box($w->localUrl("/admin/editlookup/".$look->id."/".urlencode($w->request('type')))," Edit ",true) .
 						"&nbsp;&nbsp;&nbsp;" .
-			Html::b($webroot."/admin/deletelookup/".$look->id."/".urlencode($_REQUEST['type'])," Delete ", "Are you sure you wish to DELETE this Lookup item?")
+			Html::b($w->webroot()."/admin/deletelookup/".$look->id."/".urlencode($w->request('type'))," Delete ", "Are you sure you wish to DELETE this Lookup item?")
 			);
 		}
 	}
