@@ -18,7 +18,7 @@
     <div class="tab-body">
         <div id="tab-1">
             <?php echo Html::filter("Search Lookup Items", array(
-                array("Type", "select", "types", $w->request("types"), $w->Admin->getLookupTypes())
+                array("Type", "select", "type", $w->request("types"), $w->Admin->getLookupTypes())
             ), "/admin/lookup"); ?>
             <?php echo $listitem; ?>
         </div>

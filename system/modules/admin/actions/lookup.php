@@ -9,9 +9,18 @@ function lookup_ALL(Web &$w) {
 
 	// tab: Lookup List
 	$where = array();
-	if ($w->request('type') != "") {
-		$where['type'] = $w->request('type');
-	}
+        if (NULL == $w->request('reset')) {
+            if ($w->request('type') != "") {
+                    $where['type'] = $w->request('type');
+            }
+        } else {
+            // Reset called, unset vars
+            if ($w->request("type") !== null) {
+                unset($_REQUEST["type"]);
+            }
+            var_dump($_REQUEST);
+        }
+       
 	$lookup = $w->Admin->getAllLookup($where);
 
 	$line[] = array("Type","Code","Title","Actions");

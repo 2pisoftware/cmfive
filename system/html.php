@@ -36,7 +36,6 @@ class Html {
                         }
                     }
                 } else {
-                    print_r($data[0]);
                     // Backwards capability!
                     foreach($data[0] as $h) {
                         $buffer .= "<th>{$h}</th>";
