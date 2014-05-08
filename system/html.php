@@ -1,4 +1,4 @@
-<?php
+    <?php
 
 require_once "classes/html/a.php";
 require_once "classes/html/button.php";
@@ -27,15 +27,25 @@ class Html {
         $buffer .= "<table class='{$class}'>";
             if (!empty($header)) {
                 $buffer .= "<thead><tr>";
-                foreach($header as $h) {
-                    if (!is_array($h)) {
-                        $buffer .= "<th>{$h}</th>";
-                    } else {
-                        $buffer .= "<th " . ($h[1] === true ? "class='show-for-medium-up'" : "") . ">{$h[0]}</th>";
+                if (is_array($header)) {
+                    foreach($header as $h) {
+                        if (!is_array($h)) {
+                            $buffer .= "<th>{$h}</th>";
+                        } else {
+                            $buffer .= "<th " . ($h[1] === true ? "class='show-for-medium-up'" : "") . ">{$h[0]}</th>";
+                        }
                     }
-                }
+                } else {
+                    print_r($data[0]);
+                    // Backwards capability!
+                    foreach($data[0] as $h) {
+                        $buffer .= "<th>{$h}</th>";
+                    }
+                    array_shift($data);
+                } 
                 $buffer .= "</tr></thead>";
             }
+            
             $buffer .= "<tbody>";
             foreach($data as $row) {
                 $buffer .= "<tr>";

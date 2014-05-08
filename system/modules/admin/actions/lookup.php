@@ -14,7 +14,7 @@ function lookup_ALL(Web &$w) {
 	}
 	$lookup = $w->Admin->getAllLookup($where);
 
-	$line[] = array("Type","Code","Title","");
+	$line[] = array("Type","Code","Title","Actions");
 
 	if ($lookup) {
 		foreach ($lookup as $look) {
@@ -29,7 +29,7 @@ function lookup_ALL(Web &$w) {
 		}
 	}
 	else {
-		$line[] = array("No Lookup items to list");
+		$line[] = array("No Lookup items to list", null, null, null);
 	}
 
 	// display list of items, if any
