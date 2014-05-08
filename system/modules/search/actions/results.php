@@ -11,10 +11,9 @@ function results_GET(Web $w) {
 	if ($q && strlen($q) >= 3) {
             $results = $w->Search->getResults($q, $idx,$p,$ps);
 
-            if (empty($idx) && empty($p) && empty($ps) && empty($tr)) {
+            if (empty($p) && empty($ps) && empty($tr)) {
                 $buffer = "";
                 if (!empty($results[0])) {
-                    
                     
                     // Group results by class_name
                     $filter_results = array();
@@ -29,7 +28,7 @@ function results_GET(Web $w) {
                         
                         if (!empty($objects)) {
                             foreach($objects as $object) {
-                                if ($object && $object->canList($w->Auth->user())) {
+                                if ($object->canList($w->Auth->user())) {
                                     $buffer .= '<div class="panel search-result">';
                                     if ($object->canView($w->Auth->user())) {
                                         $buffer .= "<a class=\"row search-title\" href=\"/{$object->printSearchUrl()}\">{$object->printSearchTitle()}</a>"

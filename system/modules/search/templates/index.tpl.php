@@ -1,14 +1,17 @@
 <h3 class="subheading" style="border-bottom: 1px solid grey;">Search</h3>
 
-<div class="row">
+<div class="row-fluid">
 <!--    <form action="<?php // echo $webroot; ?>/search/results" method="GET">-->
     <form id="search_form">
         <input type="hidden" name="<?php echo CSRF::getTokenID(); ?>" value="<?php echo CSRF::getTokenValue(); ?>" />
-        <div class="row">
-            <div class="small-8 columns">
+        <div class="row-fluid">
+            <div class="small-12 medium-6 columns">
                 <input class="input-large" type="text" name="q" id="q" autofocus/>
             </div>
-            <div class="small-4 columns">
+            <div class="small-12 medium-3 columns">
+                <?php echo Html::select("idx", $indexes); ?>
+            </div>
+            <div class="small-12 medium-3 columns">
                 <button class="button tiny small-12" type="submit">Go</button>
             </div>
     </form>
