@@ -32,7 +32,6 @@ function databasebackup_ALL(Web $w) {
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
         $command = Config::get('admin.database.command.windows');
     } else {
-        $filename .= ".gz";
         $command = Config::get('admin.database.command.unix');
     }
     if (!empty($command)) {

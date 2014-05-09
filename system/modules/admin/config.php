@@ -13,6 +13,7 @@ Config::set('admin', array(
         )
     ),
     'database' => array(
+        'output' => 'sql',
         'command' => array(
             'unix' => 'mysqldump -u $username -p$password $dbname | gzip > $filename.gz',
             'windows' => 'J:\\xampp\\mysql\\bin\\mysqldump.exe -u $username -p$password $dbname > $filename'

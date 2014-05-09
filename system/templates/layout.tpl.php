@@ -120,7 +120,7 @@
                                 if (Config::get("{$module}.topmenu") && Config::get("{$module}.active")) :
                                     // Check for navigation
                                     if (method_exists($module . "Service", "navigation")) : ?>
-                                        <li class="has-dropdown <?php echo $w->_module == $module ? 'active' : ''; ?>">
+                                        <li class="has-dropdown <?php echo $w->_module == $module ? 'active' : ''; ?>" id="topnav_<?php echo $module; ?>">
                                             <?php echo $w->menuLink($module . "/index", ucfirst($module)); ?>
                                             <?php echo Html::ul($w->service($module)->navigation($w), null, "dropdown"); ?>
                                         </li>
