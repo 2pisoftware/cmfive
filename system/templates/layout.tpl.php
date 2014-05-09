@@ -154,7 +154,7 @@
             <?php // endif; ?>-->
 
             <?php // Body section w/ message and body from template ?>
-            <div class="body row-fluid <?php if(!empty($boxes)) echo "medium-10 small-12 "; ?>">
+            <div class="body row-fluid <?php // if(!empty($boxes)) echo "medium-10 small-12 "; ?>">
                 <h3 class="header"><?php echo !empty($title) ? $title : ucfirst($w->currentModule()); ?></h3>
                 <?php if (!empty($error) || !empty($msg)) : ?>
                     <?php $type = !empty($error) ? array("name" => "error", "class" => "warning") : array("name" => "msg", "class" => "info"); ?>
