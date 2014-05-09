@@ -141,17 +141,17 @@
         </div>
 
         <div class="row-fluid" style="overflow: hidden; padding: 10px;">
-            <?php /* Check if there are side boxes defined */
-            if (!empty($boxes)) : ?>
+         <!--<?php /* Check if there are side boxes defined */
+            // if (!empty($boxes)) : ?>
                 <div class="small-12 medium-2 left">
-                    <?php foreach ($boxes as $btitle => $box) : ?>
+                    <?php // foreach ($boxes as $btitle => $box) : ?>
                         <div class="row boxes">
-                            <h5><?php echo ucfirst($btitle); ?></h5>
-                            <?php echo $box; ?>
+                            <h5><?php // echo ucfirst($btitle); ?></h5>
+                            <?php // echo $box; ?>
                         </div>
-                    <?php endforeach; ?>
+                    <?php // endforeach; ?>
                 </div>
-            <?php endif; ?>
+            <?php // endif; ?>-->
 
             <?php // Body section w/ message and body from template ?>
             <div class="body row-fluid <?php if(!empty($boxes)) echo "medium-10 small-12 "; ?>">
