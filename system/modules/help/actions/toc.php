@@ -4,7 +4,7 @@
 * through all modules for the file
 * ./help/<module>_toc.help
 *
-* @param unknown_type $w
+* @param \Web $w
 */
 function toc_GET(Web $w) {
 	foreach ($w->modules() as $h) {
@@ -20,7 +20,7 @@ function toc_GET(Web $w) {
 			$ul[]=Html::a(WEBROOT.'/help/view/'.$module.'/'.$module.'_toc',$title?$title:ucfirst($module));
 		}
 	}
-	$w->out("<h2>Table of Contents</h2>");
-	$w->out(Html::ul($ul));
+
+	$w->ctx("ul", Html::ul($ul));
 }
 

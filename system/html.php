@@ -205,7 +205,7 @@ class Html {
             $confirm_str = "if(confirm('" . $confirm . "')) { ";
         }
         
-        return " onclick=\"{$confirm_str}\$('#cmfive-modal').foundation('reveal', 'open', '{$href}');return false;" . (!empty($confirm) ? "}" : "") . "\" ";
+        return " onclick=\"{$confirm_str}modal_history.push('{$href}'); \$('#cmfive-modal').foundation('reveal', 'open', '{$href}');return false;" . (!empty($confirm) ? "}" : "") . "\" ";
         
 //        $parameters = "transition: 'elastic', href:'{$href}', iframe: {$iframe}";
 //        if (!empty($width)) {

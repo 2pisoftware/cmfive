@@ -182,26 +182,63 @@
         <script>
             $(document).foundation();
             
+            var modal_history = [];
+            var modal_history_pop = false;
+            
             // Automatically append the close 'x' to reveal modals
             $(document).on('opened', '[data-reveal]', function () {
+                console.log(modal_history);
                 $("#cmfive-modal").append("<a class=\"close-reveal-modal\">&#215;</a>");
-                
+                modal_history.push()
                 bindModalLinks();
             });
             
             function bindModalLinks() {
                 // Stop a links and follow them inside the reveal modal
-                $("#cmfive-modal a").click(function(event) {
+                $("#cmfive-modal a:not(#modal-back)").click(function(event) {                    
                     if ($(this).hasClass("close-reveal-modal")) {
                         $("#cmfive-modal").foundation("reveal", "close");
                     } else {
-                        if ($(this).attr('href')[0] === "#") return true;
-                        $.get($(this).attr('href'), function(data) {
-                            $("#cmfive-modal").html(data + "<a class=\"close-reveal-modal\">&#215;</a>");
-                            bindModalLinks();
-                        });
+                        if ($(this).attr('href')[0] === "#") {
+                            return true;
+                        } else {
+                            // Add href to history if the href wasnt the last item in the stack and that we arent the back link
+                            if (modal_history.indexOf($(this).attr('href')) !== modal_history.length) {
+                                modal_history.push($(this).attr('href'));
+                                modal_history_pop = true;
+                            }
+                            changeModalWindow($(this).attr('href'));
+                        }
                     }
                     return false;
+                });
+                
+                // Bind back traversal to modal window
+                $("#cmfive-modal #modal-back").click(function(event) {
+                    // event.preventDefault();
+                    if (modal_history.length > 0) {
+                        // When you click a link, THAT link goes onto the stack.
+                        // However we want the one before it.
+                        // The modal_history_pop prevents us from popping twice (if back is pressed twice in a row
+                        // for example)
+                        if (modal_history_pop) {
+                            modal_history.pop();
+                            modal_history_pop = false;
+                        }
+                        if (modal_history.length > 0) {
+                            changeModalWindow(modal_history.pop());
+                        }
+                        console.log(modal_history);
+                    } 
+                    return false;
+                });
+            }
+            
+            // Updates the modal window by content from ajax request to uri
+            function changeModalWindow(uri) {
+                $.get(uri, function(data) {
+                    $("#cmfive-modal").html(data + "<a class=\"close-reveal-modal\">&#215;</a>");
+                    bindModalLinks();
                 });
             }
         </script>

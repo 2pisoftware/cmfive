@@ -1,5 +1,7 @@
 [[title|Channels Contents]]
 
-[[help|channels/listchannels|Adding an Email Channel]]<br>
-[[help|channels/listprocessors|Adding a Processor]]<br>
-[[help|channels/listmessages|Messages List]]<br>
+<ul>
+    <li>[[help|channels/listchannels|Adding an Email Channel]]</li>
+    <li>[[help|channels/listprocessors|Adding a Processor]]</li>
+    <li>[[help|channels/listmessages|Messages List]]</li>
+</ul>
