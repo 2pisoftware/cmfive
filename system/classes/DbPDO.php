@@ -254,7 +254,7 @@ class DbPDO extends PDO {
     // Returns the SQL query string
     public function getSql(){
         if (!empty($this->query) and in_array(get_class($this->query), DbPDO::$_QUERY_CLASSNAME)) {
-            var_dump($this->query);
+            // var_dump($this->query);
             return $this->query->getQuery();
         }
         return null;

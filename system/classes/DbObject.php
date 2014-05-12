@@ -559,6 +559,7 @@ class DbObject extends DbService {
             $this->w->Log->error($e->getMessage());
             return NULL;
         }
+        
         $this->id = $this->_db->last_insert_id();
         
         // calling hooks AFTER inserting the object
