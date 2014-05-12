@@ -332,7 +332,7 @@ class ReportService extends DbService {
 		$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
 		$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 		$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-		$pdf->setLanguageArray($l);
+		//$pdf->setLanguageArray($l);
 
 		// no header, set font and create a page
 		$pdf->setPrintHeader(false);
