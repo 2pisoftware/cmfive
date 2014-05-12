@@ -124,6 +124,6 @@ class form {
     }
     
     public function close($button_title = 'Save') {
-        return "<button type='submit' class='button small-12'>{$button_title}</button></form>";
+        return "<div class='row small-12 columns'><button type='submit' class='button'>{$button_title}</button></div></form>";
     }
 }

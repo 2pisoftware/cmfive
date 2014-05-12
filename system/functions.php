@@ -452,23 +452,31 @@ function in_multiarray($value, $array) {
         }
     }
     return false;
+}
 
-	// $top = sizeof($array) - 1;
-	// $bottom = 0;
-	
-	// while($bottom <= $top) {
-	// 	if($array[$bottom] == $value) {
-	// 		return true;
-	// 	}
-	// 	else {
-	// 		if(is_array($array[$bottom])) {
-	// 			if(in_multiarray($value, ($array[$bottom])))
-	// 				return true;
-	// 		}
-	// 	}
-	// 	$bottom++;
-	// }
-	// return false;
+// Find a value in a multidimension array
+// Modified to only look at the keys, this will always return true in instances like:
+// Look for file in form array, will be true is the values in the select is file (like get all modules)
+function in_modified_multiarray($value, $array, $levels = 3) {    
+    if (is_array($array)) {
+        if (in_array($value, $array)) {
+            return true;
+        } else {
+            --$levels;
+            if ($levels <= 0) return false;
+    
+            foreach ($array as $key => $arr_value) {
+                if (in_multiarray($value, $key, $levels)) {
+                    return true;
+                }
+            }
+        }
+    } else {
+        if ($value == $array) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function AESencrypt($text, $password) {
