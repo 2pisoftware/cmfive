@@ -36,7 +36,7 @@ class InboxService extends DbService {
     }
 
     function sendMail($to, $cc, $bcc, $from, $replyto, $subject, $message) {
-        $mailconf = $this->w->moduleConf("inbox", "phpmailer");
+        $mailconf = Config::get('inbox.phpmailer');//$this->w->moduleConf("inbox", "phpmailer");
 
         if ($mailconf) {
             require_once('PHPMailer/class.phpmailer.php');
@@ -107,18 +107,12 @@ class InboxService extends DbService {
         }
     }
 
-    function inboxCountMarker($user_id = null) {
-        if (!$user_id) {
-            $user_id = $this->Auth->user()->id;
-        }
-        if (!$user_id) {
-            return null;
-        }
-        $count = $this->_db->sql("select count(*) as count from inbox where user_id = " . $user_id . " and is_new = 1")->fetch_element("count");
-        if ($count) {
-            $count = " (" . $count . ")";
-        } else {
-            $count = "";
+    function inboxCountMarker() {
+        $user_id = $this->w->Auth->user()->id;
+        $count_messages = $this->_db->get("inbox")->where("user_id", $user_id)->where("is_new", 1)->count();
+        $count = "";
+        if ($count_messages > 0) {
+            $count = " (" . $count_messages . ")";
         }
         return $count;
     }
@@ -135,11 +129,14 @@ class InboxService extends DbService {
         return $this->fillObjects("Inbox", $rows->fetch_all());
     }
 
-    function getDelMessageCount($user) {
-        $sql = "SELECT COUNT(*) FROM `inbox` WHERE is_deleted = 1 AND user_id = " . $user . " AND del_forever = 0";
-        $result = $this->_db->sql($sql)->fetch_row();
-        $result ? $result = $result['COUNT(*)'] : $result = 0;
-        return $result;
+    function getDelMessageCount() {
+        $user_id = $this->w->Auth->user()->id;
+        $count = $this->_db->get('inbox')->where("is_deleted", 1)->where("user_id", $user_id)
+                    ->where("del_forever", 0)->count();
+//        $sql = "SELECT COUNT(*) FROM `inbox` WHERE is_deleted = 1 AND user_id = " . $user . " AND del_forever = 0";
+//        $result = $this->_db->sql($sql)->fetch_row();
+//        $result ? $result = $result['COUNT(*)'] : $result = 0;
+        return $count;
     }
 
     function getNewMessageCount() {
@@ -168,15 +165,22 @@ class InboxService extends DbService {
         return $count;
     }
 
-    function getArchCount($user) {
-        $sql = "SELECT COUNT(*) FROM `inbox` WHERE is_deleted = 0 AND is_new = 1 AND is_archived = 1 AND user_id = " . $user . " AND del_forever = 0";
-        $newarch = $this->_db->sql($sql)->fetch_row();
-        $newarch ? $newarch = $newarch['COUNT(*)'] : $newarch = 0;
-        $sql = "SELECT COUNT(*) FROM `inbox` WHERE is_deleted = 0 AND is_new = 0 AND is_archived = 1 AND user_id = " . $user . " AND del_forever = 0";
-        $arch = $this->_db->sql($sql)->fetch_row();
-        $arch ? $arch = $arch['COUNT(*)'] : $arch = 0;
-        $total = ($newarch * 1) + ($arch * 1);
-        return $total;
+    function getArchCount() {
+        $user_id = $this->w->Auth->user()->id;
+        $new_count = $this->_db->get('inbox')->where("is_deleted", 0)->where("is_new", 1)
+                                ->where("is_archived", 1)->where("user_id", $user_id)
+                                ->where("del_forever", 0)->count();
+        //$sql = "SELECT COUNT(*) FROM `inbox` WHERE is_deleted = 0 AND is_new = 1 AND is_archived = 1 AND user_id = " . $user . " AND del_forever = 0";
+//        $newarch = $this->_db->sql($sql)->fetch_row();
+//        $newarch ? $newarch = $newarch['COUNT(*)'] : $newarch = 0;
+        $arch_count = $this->_db->get('inbox')->where("is_deleted", 0)->where("is_new", 0)
+                                ->where("is_archived", 1)->where("user_id", $user_id)
+                                ->where("del_forever", 0)->count();
+//        $sql = "SELECT COUNT(*) FROM `inbox` WHERE is_deleted = 0 AND is_new = 0 AND is_archived = 1 AND user_id = " . $user . " AND del_forever = 0";
+//        $arch = $this->_db->sql($sql)->fetch_row();
+//        $arch ? $arch = $arch['COUNT(*)'] : $arch = 0;
+//        $total = ($newarch * 1) + ($arch * 1);
+        return ($new_count + $arch_count);
     }
 
     function getMessage($id) {
@@ -213,7 +217,9 @@ class InboxService extends DbService {
 
     function markAllMessagesRead() {
         $user_id = $this->Auth->user()->id;
-        return $this->_db->sql("update inbox set is_new = 0, dt_read = NOW() where user_id = $user_id and is_new = 1")->execute();
+        return $this->_db->update("inbox", array("is_new" => 0, "dt_read" => time()))
+                ->where("user_id", $user_id)->where("is_new", 1)->execute();
+//        return $this->_db->sql("update inbox set is_new = 0, dt_read = NOW() where user_id = $user_id and is_new = 1")->execute();
     }
 
     public function navigation(Web $w, $title = null, $nav = null) {

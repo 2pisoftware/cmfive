@@ -1,52 +1,38 @@
+<?php
+    if ($w->Auth->user()->allowed($w,"/inbox/send")) {
+        echo $w->menuButton("inbox/send/"."$message->id","Reply") . "&nbsp";
+    }
+    echo $w->menuButton("inbox/archive/".$type."/".$message->id,"Archive") . "&nbsp";
+    echo $w->menuButton("inbox/delete/".$type."/".$message->id,"Delete");
+?>
+<div class='panel'>
+    <h3>From: <?php echo $message->sender_id ? $message->getSender()->getFullName() : "Unknown"; ?></h3>
+    <h4>Subject: <?php echo $message->subject; ?></h4>
+    <h4>Date Sent: <?php echo $message->getDate("dt_created","d/m/Y H:i"); ?></h4>
+</div>
+<h5>Message:</h5>
+<?php echo $message->getMessage(); ?>
 
+<hr/>
+<?php
+$parent_id = $message->parent_message_id;
 
-	<?php
-		print $w->menuButton("inbox/"/*.$row['status']*/,"Back");
-
-		if ($w->Auth->user()->allowed($w,"/inbox/send")) {
-			print $w->menuButton("inbox/send/"."$message->id","Reply");
-		}
-		print $w->menuButton("inbox/archive/".$type."/".$message->id,"Archive");
-		
-		print $w->menuButton("inbox/delete/".$type."/".$message->id,"Delete");
-		
-		$qlines = array(array("Subject","Date","Sender"));
-		$line = array();
-		$line[]="<b>".$message->subject."</b>";
-		$line[]=$message->getDate("dt_created","d/m/Y H:i");
-		$line[]=$message->sender_id ? Html::a(WEBROOT."/contact/view/".$message->getSender()->contact_id,$message->getSender()->getFullName()) : "";
-		$qlines[]=$line;
-
-		print Html::table($qlines,null,"tablesorter",true);
-	?>
-
-	<hr/>
-	<?php echo $message->getMessage(); ?>
-
-	<hr/>
-	<?php
-		$parent_id = $message->parent_message_id;
-		$parent_id = $message->parent_message_id;
-	
-		if ($parent_id){
-			print "<div style='width: 500px; margin-bottom: 20px; padding: 10px;'>";
-			print "<b><u> Previous Messages </u></b><br/><hr/>";
-			$counter = 1;
-			while (!$parent_id == 0 || !$parent_id == null){
-				if ($counter % 2 != 0){
-					$bgcolor = "#ddd";
-				} else {
-					$bgcolor = "white";
-				}
-				$parent_message = $w->Inbox->getMessage($parent_id);
-				print "<div style='padding:3px; background-color: ".$bgcolor."';'> Message sent by: <i>" . $w->Auth->getUser($parent_message->sender_id)->getFullname() . "</i>  on: <i>" . $parent_message->getDate("dt_created","d/m/Y H:i") . "</i><br/>";
-				print $parent_message->getMessage();
-				print "</div>";
-				$parent_id = $parent_message->parent_message_id ? $parent_message->parent_message_id : null;
-				$counter++;
-			}
-			print "</div>";
-		}
-		
-		?>
-
+if ($parent_id) : ?>
+    <div style='width: 500px; margin-bottom: 20px; padding: 10px;'>
+        <b><u> Previous Messages </u></b><br/><hr/>
+        <?php $counter = 1;
+        while (!$parent_id == 0 || !$parent_id == null){
+            if ($counter % 2 != 0){
+                $bgcolor = "#ddd";
+            } else {
+                $bgcolor = "white";
+            }
+            $parent_message = $w->Inbox->getMessage($parent_id); ?>
+            <div style='padding:3px; background-color: "<?php echo $bgcolor; ?>"'> Message sent by: <i><?php echo $w->Auth->getUser($parent_message->sender_id)->getFullname(); ?></i>  on: <i>" . $parent_message->getDate("dt_created","d/m/Y H:i") . "</i><br/>";
+                <?php echo $parent_message->getMessage(); ?>
+            </div>
+            <?php $parent_id = $parent_message->parent_message_id ? $parent_message->parent_message_id : null;
+            $counter++;
+        } ?>
+    </div>
+<?php endif; ?>

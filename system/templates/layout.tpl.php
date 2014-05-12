@@ -121,8 +121,9 @@
                                     // Check for navigation
                                     if (method_exists($module . "Service", "navigation")) : ?>
                                         <li class="has-dropdown <?php echo $w->_module == $module ? 'active' : ''; ?>" id="topnav_<?php echo $module; ?>">
-                                            <?php echo $w->menuLink($module . "/index", ucfirst($module)); ?>
-                                            <?php echo Html::ul($w->service($module)->navigation($w), null, "dropdown"); ?>
+                                            <?php // Try and get a badge count for the menu item
+                                            echo $w->menuLink($module . "/index", ucfirst($module));
+                                            echo Html::ul($w->service($module)->navigation($w), null, "dropdown"); ?>
                                         </li>
                                     <?php else: ?>
                                         <li <?php echo $w->_module == $module ? 'class="active"' : ''; ?>><?php echo $w->menuLink($module . "/index", ucfirst($module)); ?></li>
@@ -180,14 +181,18 @@
         
         <script type="text/javascript" src="/system/templates/js/foundation-5.2.2/js/foundation.min.js"></script>
         <script>
-            $(document).foundation();
+            $(document).foundation({
+                reveal : {
+                    animation_speed: 150,
+                    animation: 'fade'
+                }
+            });
             
             var modal_history = [];
             var modal_history_pop = false;
             
             // Automatically append the close 'x' to reveal modals
             $(document).on('opened', '[data-reveal]', function () {
-                console.log(modal_history);
                 $("#cmfive-modal").append("<a class=\"close-reveal-modal\">&#215;</a>");
                 modal_history.push()
                 bindModalLinks();

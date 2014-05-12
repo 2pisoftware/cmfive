@@ -20,7 +20,7 @@ class Html {
      *
      */
     public static function table($data, $id = null, $class = "tablesorter", $header = null) {
-        if (empty($data)) return;
+        if (empty($data)) return null;
         $buffer = "";
 
         // Opening tags
@@ -60,40 +60,6 @@ class Html {
         $buffer .= "</tbody></table>";
         return $buffer;
     }
-    
-//    static function table($array, $id = null, $class = null, $header = null) {
-//        if (!$array || sizeof($array) < 1)
-//            return "";
-//
-//        $jstable = "table" . ($class ? "." . $class : "");
-//        $id = $id ? ' id="' . $id . '"' : null;
-//        $class = $class ? ' class="' . $class . '"' : null;
-//
-//        $buf = "<table border='0' " . $id . $class . ">\n";
-//        $firstline = true;
-//        foreach ($array as $line) {
-//            // check if this is header line
-//            $ct = "td";
-//            if ($firstline) {
-//                foreach ($line as $cell) {
-//                    $buf.="<colgroup></colgroup>";
-//                }
-//                $buf.="<thead>\n";
-//                $ct = $header ? "th nowrap='true' " : $ct;
-//            }
-//            $buf.="<tr>\n";
-//            foreach ($line as $cell) {
-//                $buf.="<$ct>$cell</$ct>";
-//            }
-//            $buf.="\n</tr>\n";
-//            if ($firstline) {
-//                $buf.="</thead>\n<tbody>\n";
-//                $firstline = false;
-//            }
-//        }
-//        $buf .= "</tbody>\n</table>\n";
-//        return $buf;
-//    }
 
     /**
      * Html function to draw a chart, see: http://www.chartjs.org/docs/ for how
