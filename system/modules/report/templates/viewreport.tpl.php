@@ -5,16 +5,16 @@
         <a href="#database">View Database</a>
     </div>	
 	<div class="tab-body">
-		<div id="report">
+		<div id="report" class="clearfix">
 			<?php echo $btnrun . "<p>" . $viewreport; ?>
 			<p>
 		</div>
-		<div id="members" style="display: none;">
+		<div id="members" style="display: none;" class="clearfix">
 			<?php echo Html::box("/report/addmembers/".$reportid," Add New Members ",true) ?>
 			<p>
 			<?php echo $viewmembers; ?>
 		</div>
-		<div id="database" style="display: none;">
+		<div id="database" style="display: none;" class="clearfix">
 			<?php echo $dbform; ?>
 			<p>
         </div>

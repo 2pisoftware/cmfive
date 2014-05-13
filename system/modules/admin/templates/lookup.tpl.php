@@ -16,13 +16,13 @@
         <a id="tab-link-2" href="#"	onclick="switchTab(2);">New Item</a>
     </div>
     <div class="tab-body">
-        <div id="tab-1">
+        <div id="tab-1" class="clearfix">
             <?php echo Html::filter("Search Lookup Items", array(
                 array("Type", "select", "type", $w->request("types"), $w->Admin->getLookupTypes())
             ), "/admin/lookup"); ?>
             <?php echo $listitem; ?>
         </div>
-        <div id="tab-2" style="display: none;">
+        <div id="tab-2" style="display: none;" class="clearfix">
             <?php echo $newitem; ?>
         </div>
     </div>
