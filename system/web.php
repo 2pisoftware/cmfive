@@ -233,7 +233,7 @@ class Web {
         $this->_submodule = array_shift($hsplit);
 
         // Check to see if the module is active (protect against main disabling)
-        if (!Config::get("{$this->_module}.active") && $this->_module !== "main") {
+        if (null !== Config::get("{$this->_module}.active") && !Config::get("{$this->_module}.active") && $this->_module !== "main") {
             $this->error("The {$this->_module} module is not active, you can change it's active state in it's config file.", "/");
         }
         
@@ -739,12 +739,17 @@ class Web {
      */
     function notFoundPage() {
         $this->service('log')->warn("Action not found: " . $this->_module . "/" . $this->_action);
-        if ($this->templateExists($this->_notFoundTemplate)) {
-            header("HTTP/1.0 404 Not Found");
-            echo $this->fetchTemplate($this->_notFoundTemplate);
+        // We want to fail gracefully for ajax requests
+        if ($this->isAjax()) {
+            echo "The page requested could not be found.";
         } else {
-            header("HTTP/1.0 404 Not Found");
-            echo '<p align="center">Sorry, page not found.</p>';
+            if ($this->templateExists($this->_notFoundTemplate)) {
+                header("HTTP/1.0 404 Not Found");
+                echo $this->fetchTemplate($this->_notFoundTemplate);
+            } else {
+                header("HTTP/1.0 404 Not Found");
+                echo '<p align="center">Sorry, page not found.</p>';
+            }
         }
         exit();
     }
@@ -1239,7 +1244,9 @@ class Web {
      * @param boolean $append
      */
     function ctx($key, $value = null, $append = false) {
-        if ($value == null) {
+        // There was a massive bug here, using == over === is BAD as $x == null
+        // will be true for 0, "", null, false, etc. keep this in mind
+        if ($value === null) {
             return !empty($this->_context[$key]) ? $this->_context[$key] : null;
         } else {
             if ($append) {

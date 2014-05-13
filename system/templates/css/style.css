@@ -1,7 +1,6 @@
 body {
     background-color: #fdfefe;
     font-family: "Open Sans", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
-    font-weight: lighter;
 }
 
 .body {
@@ -187,6 +186,7 @@ ul.ui-autocomplete {
 }
 
 .close-reveal-modal {
-    margin-top: -15px;
+    top: 0px !important;
+    margin-top: -5px !important;
     margin-right: -5px;
 }

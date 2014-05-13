@@ -73,7 +73,7 @@ class button {
         if (!empty($this->type)) $buffer .= "type=\"{$this->type}\" ";
         if (!empty($this->value)) $buffer .= "value=\"{$this->value}\" ";
         if (!empty($this->onclick)) {
-            $buffer .= $this->onclick;
+            $buffer .= "onclick=\"{$this->onclick}\"";
         } else {
             if (!empty($js)) {
                 $buffer .= "onclick=\"{$js}\" ";
