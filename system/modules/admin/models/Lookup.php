@@ -9,4 +9,12 @@ class Lookup extends DbObject {
 	function getDbTableName() {
 		return "lookup";
 	}
+	
+	function getSelectOptionValue() {
+		return $this->code;
+	}
+	
+	function getSelectOptionTitle() {
+		return $this->title;
+	}
 }

@@ -1,5 +1,4 @@
-    <?php
-
+<?php
 require_once "classes/html/a.php";
 require_once "classes/html/button.php";
 require_once "classes/html/form.php";
@@ -738,12 +737,12 @@ class Html {
                 if (is_scalar($item)) {
                     $selected = $value == $item ? ' selected = "true" ' : "";
                     $buf .= '<option value="' . htmlspecialchars($item) . '"' . $selected . '>' . htmlentities($item) . '</option>';
+                } elseif ($item instanceof DbObject) {
+                    $selected = $value == $item->getSelectOptionValue() ? ' selected = "true" ' : "";
+                    $buf .= '<option value="' . htmlspecialchars($item->getSelectOptionValue()) . '"' . $selected . '>' . htmlentities($item->getSelectOptionTitle()) . '</option>';
                 } elseif (is_array($item)) {
                     $selected = $value == $item[1] ? ' selected = "true" ' : "";
                     $buf .= '<option value="' . htmlspecialchars($item[1]) . '"' . $selected . '>' . htmlentities($item[0]) . '</option>';
-                } elseif (is_a($item, "DbObject")) {
-                    $selected = $value == $item->id ? ' selected = "true" ' : "";
-                    $buf .= '<option value="' . htmlspecialchars($item->getSelectOptionValue()) . '"' . $selected . '>' . htmlentities($item->getSelectOptionTitle()) . '</option>';
                 }
             }
         }
@@ -770,8 +769,8 @@ class Html {
                     if (is_array($item)) {
                         $selected = ($groupvalue == $groupname && $value == $item[1]) ? ' selected = "true" ' : "";
                         $buf .= '<option value="' . htmlspecialchars($item[1]) . '"' . $selected . '>' . htmlentities($item[0]) . '</option>';
-                    } elseif (is_a($item, "DbObject")) {
-                        $selected = ($groupvalue == $groupname && $value == $item->id) ? ' selected = "true" ' : "";
+                    } elseif ($item instanceof DbObject) {
+                        $selected = ($groupvalue == $groupname && $value == $item->getSelectOptionValue()) ? ' selected = "true" ' : "";
                         $buf .= '<option value="' . htmlspecialchars($item->getSelectOptionValue()) . '"' . $selected . '>' . htmlentities($item->getSelectOptionTitle()) . '</option>';
                     } elseif (is_scalar($item)) {
                         $selected = ($groupvalue == $groupname && $value == $item) ? ' selected = "true" ' : "";
@@ -806,8 +805,8 @@ class Html {
                 if (is_array($item)) {
                     $selected = $values && in_array($item[1], $values) ? ' selected = "true" ' : "";
                     $buf .= '<option value="' . htmlspecialchars($item[1]) . '"' . $selected . '>' . htmlentities($item[0]) . '</option>';
-                } elseif (is_a($item, "DbObject")) {
-                    $selected = $values && in_multiarray($item->id, $values) ? ' selected = "true" ' : "";
+                } elseif ($item instanceof DbObject) {
+                    $selected = $values && in_multiarray($item->getSelectOptionValue(), $values) ? ' selected = "true" ' : "";
                     $buf .= '<option value="' . htmlspecialchars($item->getSelectOptionValue()) . '"' . $selected . '>' . htmlentities($item->getSelectOptionTitle()) . '</option>';
                 } elseif (is_scalar($item)) {
                     $selected = $values && in_array($item, $values) ? ' selected = "true" ' : "";

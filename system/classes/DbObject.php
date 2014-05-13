@@ -976,7 +976,7 @@ class DbObject extends DbService {
                 return $this->$prop_string;
             }
         } else if (property_exists($this, $prop_lookup) && $this->$prop_lookup) {
-            return $this->Admin->getLookupItemsbyType($this->$prop_lookup);
+            return $this->getObjects("Lookup",array("type" => $this->$prop_lookup));
         } else if (property_exists($this, $prop_class) && $this->$prop_class) {
             if (property_exists($this, $prop_filter) && $this->$prop_filter) {
                 return $this->getObjects($this->$prop_class, $this->$prop_filter, true);
