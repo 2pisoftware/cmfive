@@ -45,7 +45,7 @@ class a {
         $buffer = "";
         $buffer .= "<a ";
         if (!empty($this->onclick)){
-            $buffer .= $this->onclick;
+            $buffer .= "onclick=\"{$this->onclick}\"";
         } else {
             if (!empty($this->confirm)) {
                 $buffer .= "onclick=\"javascript:return confirm('" . $this->confirm . "');\" ";

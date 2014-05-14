@@ -141,7 +141,7 @@ class Html {
      * @param <type> $iframe (O) whether to use an iframe to display the html contents (default: false)
      */
     public static function box($href, $title, $button = false, $iframe = false, $width = null, $height = null, $param = "isbox", $id = null, $class = null, $confirm = null) {
-        $onclick = Html::boxOnClick($href, $iframe, $width, $height, $param, $confirm);
+        $onclick = Html::boxOnClick($href, $iframe, $width, $height, $param, $confirm,false);
         $element = null;
         if ($button) {
             // $tag = "button";
@@ -155,7 +155,7 @@ class Html {
 //        return "<" . $tag . (!empty($id) ? " id=$id " : "") . (!empty($class) ? " class=$class " : "") . ($tag == 'a' ? ' href="#" ' : '') . $onclick . "><span>" . $title . "</span></" . $tag . ">";
     }
 
-    public static function boxOnClick($href, $iframe = false, $width = null, $height = null, $param = "isbox", $confirm = null) {
+    public static function boxOnClick($href, $iframe = false, $width = null, $height = null, $param = "isbox", $confirm = null, $include_tag = true) {
         if ($iframe) {
             $width = ", innerWidth:" . $width;
             $height = ", innerHeight:" . $height;
@@ -169,8 +169,15 @@ class Html {
         if ($confirm) {
             $confirm_str = "if(confirm('" . $confirm . "')) { ";
         }
+        if ($include_tag) {
+        	$tag_start = "onclick=\"";
+        	$tag_end = "\"";
+        } else {
+        	$tag_start = "";
+        	$tag_end = "";
+        }
         
-        return " {$confirm_str}modal_history.push('{$href}'); \$('#cmfive-modal').foundation('reveal', 'open', '{$href}');return false;" . ($confirm ? "}" : "");
+        return $tag_start."{$confirm_str}modal_history.push('{$href}'); \$('#cmfive-modal').foundation('reveal', 'open', '{$href}');return false;" . ($confirm ? "}" : "").$tag_end;
         
 //        $parameters = "transition: 'elastic', href:'{$href}', iframe: {$iframe}";
 //        if (!empty($width)) {
