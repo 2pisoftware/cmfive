@@ -12,14 +12,5 @@ if (!file_exists("config.php")) {
 }
 require "config.php";
 
-//=============== init web.php ==============================
-
-$web->setModules($modules);
-$web->setLogLevel($LOG_LEVEL);
-$web->_webroot = "http://".$_SERVER['HTTP_HOST'];
-$web->_defaultHandler = "main";
-
-define("WEBROOT", $web->_webroot);
-
 //============== start application =============
 $web->start();
