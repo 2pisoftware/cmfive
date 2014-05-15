@@ -79,12 +79,15 @@ class EmailChannelOption extends DbObject {
         $filter_arr[] = "UNSEEN";
 
         // Connect and fetch emails
+        $this->w->Log->info("Connecting to mail server");
         $mail = $this->connectToMail();
         if (!empty($mail)) {
-
+            
+            $this->w->Log->info("Getting messages with filter: " . json_encode($filter_arr));
             $results = $mail->protocol->search($filter_arr);
             if (count($results) > 0) {
-
+                
+                $this->w->Log->info("Found messages, looping through");
                 foreach ($results as $messagenum) {
                     $rawmessage = "";
                     $message = $mail->getMessage($messagenum);
@@ -148,6 +151,8 @@ class EmailChannelOption extends DbObject {
 
                     $attachment_id = $this->w->File->saveFileContent($channel_message, serialize($email), "email.txt", "channel_email_raw", "text/plain");
                 }
+            } else {
+                $this->w->Log->info("No new messages found");
             }
         }
     }

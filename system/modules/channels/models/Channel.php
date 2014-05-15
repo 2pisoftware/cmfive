@@ -5,9 +5,7 @@ class Channel extends DbObject {
 	public $is_active; // 0|1 flag
 	public $notify_user_email;
 	public $notify_user_id;
-	
 	public $do_processing; // 0|1 flag
-	
 
 	public function getForm() {
 
