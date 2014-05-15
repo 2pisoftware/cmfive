@@ -837,19 +837,22 @@ EOT;
      * returns an array which contains all produced error
      * messages
      */
-    public static function validate($valarray) {
+    public static function validate($valarray,$values=null) {
         if (!$valarray || !sizeof($valarray))
             return null;
         $error = array();
+        if ($values == null) {
+        	$values = $_REQUEST;
+        }
         foreach ($valarray as $param => $rule) {
             $regex = $rule[0];
             $message = $rule[1];
-            $val = $_REQUEST[$param];
+            $val = trim($values[$param]);
             if (!preg_match("/" . $regex . "/", $val)) {
                 $error[] = $message;
             }
         }
-        return $error;
+        return count($error) > 0 ? $error : null;
     }
 
     public static function pagination($currentpage, $numpages, $pagesize, $totalresults, $baseurl, $pageparam = "p", $pagesizeparam = "ps", $totalresultsparam = "tr") {
