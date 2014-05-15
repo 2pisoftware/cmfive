@@ -130,9 +130,7 @@ class ChromePHPHandler extends AbstractProcessingHandler
             $data = base64_encode(utf8_encode($json));
         }
 
-        if (trim($data) !== '') {
-            $this->sendHeader(self::HEADER_NAME, $data);
-        }
+        $this->sendHeader(self::HEADER_NAME, $data);
     }
 
     /**

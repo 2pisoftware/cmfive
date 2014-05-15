@@ -252,7 +252,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `is_admin` tinyint(1) NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
-  `is_group` tinyint(4) NOT NULL,
+  `is_group` tinyint(4) NULL,
   `dt_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `dt_lastlogin` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),

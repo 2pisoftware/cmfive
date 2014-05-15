@@ -27,6 +27,9 @@ class PrinterService extends DbService {
             return;
         }
         
+        // Log everywhere
+        $w->Log->info("Starting print job: {$filename}");
+        
         // Load print config
         $config = $this->w->moduleConf('admin', 'printing');
         if (!empty($config["command"])) {
@@ -47,8 +50,10 @@ class PrinterService extends DbService {
             
             // Fill the string with our printer values
             $printer = $this->w->Printer->getPrinter(1);
+            
             if (!empty($printer->id)) {
-            $command = str_replace(array('$filename', '$servername', '$port', '$printername'), 
+                $w->Log->info("Printing to: {$printer->name} with command: {$command}");
+                $command = str_replace(array('$filename', '$servername', '$port', '$printername'), 
                     array($filename, escapeshellarg($printer->server), escapeshellarg($printer->port), escapeshellarg($printer->name)),
                     $command);
             } else {
@@ -59,8 +64,10 @@ class PrinterService extends DbService {
             // echo $command . "<br/>";
             $response = shell_exec($command . " 2>&1");
             if (!empty($response)){
+                $w->Log->info("Shell exec repsonse: {$response}");
                 echo $response;
             }
+            
             return $response;
         }
     }
