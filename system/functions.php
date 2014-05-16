@@ -1,5 +1,25 @@
 <?php
 
+function humanReadableBytes($input, $rounding = 2, $bytesValue = true) {
+    $ext = array("B", "KB", "MB", "GB", "TB");
+    $barrier = 1024;
+    if (!$bytesValue) {
+        // If bytes value is false then we what to use 1000 (bits?)
+        $barrier = 1000;
+    }
+
+    while($input > $barrier) {
+        $input /= $barrier;
+        array_shift($ext);
+        if ($ext[0] === end($ext)) {
+            return "$input $ext[0]";
+        }
+    }
+    // Round input to something reasonable
+    $input = round($input, $rounding);
+    return "$input $ext[0]";
+}
+
 function getFileExtension($contentType) {
     $map = array(
         'application/pdf'   => '.pdf',

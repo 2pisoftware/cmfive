@@ -517,13 +517,13 @@ class Html {
 
                     $readonly = "";
                     
-                    $buffer .= "<li>";
+                    $buffer .= ($type !== "hidden" ? "<li>" : "");
                     
                     // Add title field
-                    if (!empty($title)) {
+                    if (!empty($title) && $type !== "hidden") {
                         $buffer .= "<label class='small-12 columns'>$title";
                     }
-                    $buffer .= "<div>";
+                    $buffer .= ($type !== "hidden" ? "<div>" : "");
                     
                     // handle disabled fields
                     if ($name[0] == '-') {
@@ -603,9 +603,9 @@ class Html {
                             $buffer .= '<input style="width:100%;"  type="' . $type . '" name="' . $name . '" size="' . $size . '" id="' . $name . '"/>';
                         break;
                     }
-                    $buffer .= "</div></label>";
+                    $buffer .= ($type !== "hidden" ? "</div></label></li>" : "");
                 }
-                $buffer .= "</li></ul>";
+                $buffer .= "</ul>";
             }
             $buffer .= "</div>";
         }
@@ -616,7 +616,7 @@ class Html {
         
         // Close form tag if needed
         if ($includeFormTag) {
-            $buffer .= $form->close();
+            $buffer .= $form->close($submitTitle);
         }
         
         return $buffer;
