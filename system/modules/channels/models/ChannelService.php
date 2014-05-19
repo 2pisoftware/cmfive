@@ -42,13 +42,15 @@ class ChannelService extends DbService {
 	 * @return Array<ChannelProcessor> processors
 	 */
 	public function getProcessors($channel_id = null) {
-		$where = array("is_deleted" => 0);
-		if (!empty($channel_id)) {
-			$where["channel_id"] = $channel_id;
-		}
-		return $this->getObjects("ChannelProcessor", $where);
+            if (empty($channel_id)) return null;
+            $where = array("is_deleted" => 0, "channel_id" => $channel_id);
+            return $this->getObjects("ChannelProcessor", $where);
 	}
 
+        public function getAllProcessors() {
+            return $this->getObjects("ChannelProcessor", array("is_deleted" => 0));
+        }
+        
 	/**
 	 * Returns a non-deleted processor object
 	 * @return Object processor
