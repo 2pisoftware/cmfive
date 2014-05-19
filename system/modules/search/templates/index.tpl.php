@@ -17,7 +17,7 @@
     </form>
 </div>
         
-<div id="message" class="row-fluid hide">
+<div id="search_message" class="row hide">
     <div data-alert class="alert-box warning" id="message_box"></div>
 </div>
 
@@ -28,7 +28,7 @@
 <script>
     $("#search_form").submit(function(event) {
         event.preventDefault();
-        $("#message").hide();
+        $("#search_message").hide();
         $("#result").hide();
         
         var data = $("#search_form").serialize();
@@ -38,7 +38,7 @@
 //                var j_response = JSON.parse(response);
                 if (response.success === false) {
                     $("#message_box").html(response.data);
-                    $("#message").show();
+                    $("#search_message").show();
                 } else {
                     var text_data = "<span style='padding-left: 20px;'>No results found</span>";
                     if (response.data) {
@@ -49,7 +49,7 @@
             },
             function(response) {
                 $("#message_box").html("Failed to receive a response from search");
-                $("#message").show();
+                $("#search_message").show();
             }
         );
         
