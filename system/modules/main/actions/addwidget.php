@@ -13,7 +13,7 @@ function addwidget_GET(Web $w) {
 
 	$form = array("Add a widget" =>
 		array(
-			array(array("Add widget for", "select", "destination_module", $module, $w->modules())),
+			// array(array("Add widget for", "select", "destination_module", $module, $w->modules())),
 			array(array("Source module", "select", "source_module", null, $modules)),
 			array(array("Widget Name", "select", "widget_name", null, array()))
 		)
@@ -35,6 +35,7 @@ function addwidget_POST(Web $w) {
 	// }
 
 	$widget = new WidgetConfig($w);
+        $widget->destination_module = $module;
 	$widget->fill($_POST);
 	$widget->user_id = $w->Auth->user()->id;
 	$response = $widget->insert();
