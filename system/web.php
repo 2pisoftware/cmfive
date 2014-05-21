@@ -713,8 +713,10 @@ class Web {
                         $errorMsg .= $object->getHumanReadableAttributeName($property) . ": $r <br/>\n";
                     }
                 }
+                $w->Log->error("Saving " . get_class($object) . " error: " . $errorMsg);
                 $this->error($errorMsg, $returnUrl);
             } else {
+                $w->Log->error(($isUpdating ? "Updating" : "Creating") . " this $type failed.");
                 $this->error(($isUpdating ? "Updating" : "Creating") . " this $type failed.", $returnUrl);
             }
         }

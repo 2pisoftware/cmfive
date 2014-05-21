@@ -9,12 +9,9 @@ class LogService extends DbService {
     public function __construct(\Web $w) {
         parent::__construct($w);
         
-        if (class_exists("Logger")) {
-            $this->logger = new Logger('cmfive');
-        
-            $filename = ROOT_PATH . "/log/cmfive.log";
-            $this->logger->pushHandler(new RotatingFileHandler($filename));
-        }
+        $this->logger = new Logger('cmfive');
+        $filename = ROOT_PATH . "/log/cmfive.log";
+        $this->logger->pushHandler(new RotatingFileHandler($filename));
     }
     
     public function logger() { return $this->logger; }
