@@ -3,7 +3,7 @@
 /**
  * User object
  * 
- * @author admin
+ * @author Carsten Eckelmann, May 2014
  *
  */
 class User extends DbObject {
@@ -41,6 +41,11 @@ class User extends DbObject {
 		}
 		return $this->_contact;
 	}
+	
+	/**
+	 * @param integer $group_id
+	 * @return true if this user is in the group with the id
+	 */
 	public function isInGroups($group_id = null) {
 		$groupUsers = isset ( $group_id ) ? $this->getObjects ( "GroupUser", array (
 				'user_id' => $this->id,
@@ -54,7 +59,17 @@ class User extends DbObject {
 		}
 		return null;
 	}
-	public function inGroup($group) {
+	
+	/**
+	 * Check if this user is member of the group.
+	 * 
+	 * (Reminder: Groups are special User objects! so don't get confused
+	 *  that the $group is a User)
+	 *  
+	 * @param User $group
+	 * @return true if this user is part of this group
+	 */
+	public function inGroup(User $group) {
 		$groupmembers = $this->Auth->getGroupMembers ( $group->id, null );
 		
 		if ($groupmembers) {
@@ -64,12 +79,13 @@ class User extends DbObject {
 				}
 				
 				$usr = $this->Auth->getUser ( $member->user_id );
-				if ($usr->is_group == "1" && $this->inGroup ( $usr )) {
+				if ($usr->is_group == 1 && $this->inGroup ( $usr )) {
 					return true;
 				}
 			}
 		}
 	}
+	
 	public function getFirstName() {
 		$contact = $this->getContact ();
 		
@@ -78,6 +94,7 @@ class User extends DbObject {
 		}
 		return $name;
 	}
+	
 	public function getSurname() {
 		$contact = $this->getContact ();
 		if ($contact) {
@@ -85,6 +102,7 @@ class User extends DbObject {
 		}
 		return $name;
 	}
+	
 	public function getFullName() {
 		$contact = $this->getContact ();
 		$name = ucfirst ( $this->login );
@@ -93,9 +111,14 @@ class User extends DbObject {
 		}
 		return $name;
 	}
+	
 	public function getSelectOptionTitle() {
 		return $this->getFullName ();
 	}
+	
+	/**
+	 * @return string, either the login or first name
+	 */
 	public function getShortName() {
 		$contact = $this->getContact ();
 		$name = ucfirst ( $this->login );
@@ -104,6 +127,11 @@ class User extends DbObject {
 		}
 		return $name;
 	}
+	
+	/**
+	 * @param string $force
+	 * @return string array of all roles that this user has
+	 */
 	public function getRoles($force = false) {
 		if ($this->is_admin) {
 			return $this->Auth->getAllRoles ();
@@ -134,12 +162,23 @@ class User extends DbObject {
 		}
 		return $this->_roles;
 	}
+	
+	/**
+	 * update the last login field in the database
+	 */
 	public function updateLastLogin() {
 		$data = array (
 				"dt_lastlogin" => $this->time2Dt ( time () ) 
 		);
 		$this->_db->update ( "user", $data )->where ( "id", $this->id )->execute ();
 	}
+	
+	/**
+	 * Check whether a user has this role
+	 * 
+	 * @param string $role
+	 * @return true if and only if the user has this role
+	 */
 	public function hasRole($role) {
 		if ($this->is_admin) {
 			return true;
@@ -150,6 +189,13 @@ class User extends DbObject {
 			return false;
 		}
 	}
+	
+	/**
+	 * Check whether a user has a role in a list of roles
+	 * 
+	 * @param array $roles
+	 * @return true if the user has any one of these roles
+	 */
 	public function hasAnyRole($roles) {
 		if ($this->is_admin) {
 			return true;
@@ -171,6 +217,12 @@ class User extends DbObject {
 		}
 		return false;
 	}
+	
+	/**
+	 * Add a role to this user
+	 * 
+	 * @param string a role
+	 */
 	public function addRole($role) {
 		if (! $this->hasRole ( $role )) {
 			$ur = new UserRole ( $this->w );
@@ -179,13 +231,31 @@ class User extends DbObject {
 			$ur->insert ();
 		}
 	}
+	
+	/**
+	 * Remove a role from this user
+	 * 
+	 * @param string $role
+	 */
 	public function removeRole($role) {
 		if ($this->hasRole ( $role )) {
 			$this->_db->delete ( "user_role" )->where ( "user_id", $this->id )->and ( "role", $role )->execute ();
 			$this->getRoles ( true );
 		}
 	}
-	public function allowed(&$w, $path) {
+	
+	/**
+	 * Check whether a user is allowed to navigate to a certain url
+	 * in the system.
+	 * 
+	 * This will execute all the functions associated to the user's roles
+	 * until one function returns true.
+	 * 
+	 * @param Web $w
+	 * @param string $path
+	 * @return true if one role function returned true
+	 */
+	public function allowed(Web $w, $path) {
 		if (! $this->is_active) {
 			return false;
 		}
@@ -221,7 +291,13 @@ class User extends DbObject {
 		// global $PASSWORD_SALT;
 		return sha1 ( $this->password_salt . $password );
 	}
+	
+	/**
+	 * set the user's password and encrypt it using sha1 and the user's salt
+	 * 
+	 * @param string $password
+	 */
 	public function setPassword($password) {
-		$this->password = $this->encryptPassword ( $password ); // $this->encryptPassword($password);
+		$this->password = $this->encryptPassword ( $password );
 	}
 }

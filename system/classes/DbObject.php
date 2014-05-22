@@ -21,7 +21,7 @@
  *
  * 3. d_* as above but data only
  *
- * 4. t_* as aboce but time only
+ * 4. t_* as above but time only
  *
  * 5. is_deleted when exists will be set to 1 instead of
  *    deleting the table data on object::delete(), to really
@@ -45,29 +45,7 @@
  * DbObject supports the use of the following 'Aspects' which can be
  * added to any object using a magic '$_<aspect>' property:
  *
- * 1. ModifiableAspect -> public $_modifiable;
- *    This Aspect adds the following functions to a DbObject:
- *    a) $this->_modifiable->getCreator(), returns the user object of the creator
- *    b) $this->_modifiable->getModifier(), returns user object for last modifier
- *    c) $this->_modifiable->getCreatedDate(), returns timestamp of creation
- *    d) $this->_modifiable->getModifiedDate(), returns timestamp of last modification
- *
- *    using this aspect all insert() and update() calls will set these
- *    above properties automatically.
- *
- * 2. VersionableAspect -> public $_versionable;
- *    This Aspect addes the following function to a DbObject:
- *    a) $this->_versionable->getAllVersions(), returns all previous versions for this object
- *    b) $this->_versionable->getVersion($id), returns a specific version
- *    c) $this->_versionable->getLastVersion(), returns the latest version
- *
- *    Using this aspect all insert() and update() calls will cause a
- *    version record to be created with the current values, thus
- *    resulting in a list of previous object states.
- *
- *    Also all version objects have the modifiable aspect (see above).
- *
- * 3. SearchableAspect -> public $_searchable;
+ * 1. SearchableAspect -> public $_searchable;
  *    This Aspect does not add any public functions to the object, but extends
  *    the insert/update/delete behaviour so that an index record is created (or updated)
  *    in the table object_index which contains the object_id reference and a sanitised 
@@ -82,11 +60,11 @@
  *    Which should return a string to be added to the indexable content. All sanitising and
  *    word de-duplication is performed on this.
  *    
- * 4. Aspects can be removed in the case of class inheritance. If the parent class has 
+ * 2. Aspects can be removed in the case of class inheritance. If the parent class has 
  *    public $_searchable; defined then this can be removed by a child class using:
  *    public $_remove_searchable. However further childclasses can no longer add this aspect!
  *    
- * 5. Auditing of inserts and updates happens automatically to an audit table.
+ * 3. Auditing of inserts and updates happens automatically to an audit table.
  *    However this can be turned off by setting
  *    public $__use_auditing = false;
  *
