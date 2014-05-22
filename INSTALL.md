@@ -3,7 +3,7 @@ Installation instructions
 
 1. create a mysql database, eg. cmfive
 
-2. load the system/install/db.sql file into the database
+2. load the system/install/db.sql and dbseed.sql files into the database
 
 3. create a vhost entry for apache, eg.
 
@@ -28,6 +28,8 @@ Installation instructions
 127.0.0.1    cmfive.local
 ```
 
-5. edit the config.php file to change module and database parameters
+5. copy config.php.example to config.php
 
-6. administrator account login: admin/admin
+6. edit the config.php file to change module and database parameters
+
+7. go to http://cmfive.local/ and login as administrator: admin / admin

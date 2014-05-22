@@ -1,7 +1,7 @@
-cmfive
+Cmfive
 ======
 
-cmfive is a php framework for creating robust and extensible business applications.
+Cmfive is a php framework for creating robust and extensible business applications.
 
 It started as a micro framework which was developed by Carsten Eckelmann in 2007 in Sydney on the bus to work, 
 lay dormant for years until it re-emerged as the foundation to the Flow Business System (https://github.com/PyramidPower/flow),
@@ -13,7 +13,7 @@ on other business applications.
 License
 =======
 
-cmfive Copyright (C) 2012 Carsten Eckelmann, NSW, Australia
+Cmfive Copyright (C) 2014 2pi Software, NSW, Australia
 
 original Flow source code Copyright (C) 2012 Pyramid Power Group, NSW, Australia
 
