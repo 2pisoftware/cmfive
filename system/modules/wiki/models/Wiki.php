@@ -114,7 +114,7 @@ class Wiki extends DbObject{
 	 * 
 	 * @param int $id
 	 */
-	function & getUserById($id) {
+	function getUserById($id) {
 		return $this->getObject("WikiUser",$id);
 	}
 	

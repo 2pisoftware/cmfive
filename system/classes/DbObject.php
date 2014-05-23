@@ -276,7 +276,7 @@ class DbObject extends DbService {
      *
      * @param array $row
      */
-    function fill(& $row, $from_db = false) {
+    function fill($row, $from_db = false) {
         foreach (get_object_vars($this) as $k => $v) {
             if ($k{0} != "_") { // ignore volatile vars
                 $dbk = $k;
@@ -545,13 +545,13 @@ class DbObject extends DbService {
 
         // call standard aspect methods
         
-        if (property_exists($this, "_modifiable")) {
+        if (property_exists($this, "_modifiable") && (null !== $this->_modifiable)) {
             $this->_modifiable->insert();
         }
-        if (property_exists($this, "_versionable")) {
+        if (property_exists($this, "_versionable") && (null !== $this->_versionable)) {
             $this->_versionable->insert();
         }
-        if (property_exists($this, "_searchable")) {
+        if (property_exists($this, "_searchable") && (null !== $this->_searchable)) {
             $this->_searchable->insert();
         }
 
@@ -655,13 +655,13 @@ class DbObject extends DbService {
         $this->_callHooks("after", "update");
 
         // call standard aspect methods
-        if (property_exists($this, "_modifiable")) {
+        if (property_exists($this, "_modifiable") && (null !== $this->_modifiable)) {
             $this->_modifiable->update();
         }
-        if (property_exists($this, "_versionable")) {
+        if (property_exists($this, "_versionable") && (null !== $this->_versionable)) {
             $this->_versionable->update();
         }
-        if (property_exists($this, "_searchable")) {
+        if (property_exists($this, "_searchable") && (null !== $this->_searchable)) {
             $this->_searchable->update();
         }
 
@@ -716,7 +716,7 @@ class DbObject extends DbService {
         $this->w->ctx('db_deletes', $deletes);
 
         // delete from search index
-        if (property_exists($this, "_searchable")) {
+        if (property_exists($this, "_searchable") && (null !== $this->_searchable)) {
         	$this->_searchable->delete();
         }
 
