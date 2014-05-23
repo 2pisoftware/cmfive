@@ -7,10 +7,10 @@
 class ExampleService extends DbService {
 	
 	/** 
-	 * @return an array of all ExampleData records from the database
+	 * @return an array of all undeleted ExampleData records from the database
 	 */
 	function getAllData() {
-		return $this->getObjects("ExampleData");
+		return $this->getObjects("ExampleData",array("is_deleted" => 0));
 	}
 	
 	/**

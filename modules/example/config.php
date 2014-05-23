@@ -1,6 +1,4 @@
 <?php
-
-
 Config::set('example', array(
     'active' => true,
     'path' => 'modules',
