@@ -1,18 +1,13 @@
-<div class="tabs">
-    <div class="tab-head">
-        <a href="#" class="active" >View</a>
-        <a href="<?php echo WEBROOT."/wiki/wikichanges/".$wiki->id."/".$page->name?>" >Wiki History</a>
-        <a href="<?php echo WEBROOT."/wiki/pagechanges/".$wiki->id."/".$page->name?>" >Page History</a>
+
+        <?php echo Html::b(WEBROOT."/wiki/wikichanges/".$wiki->id."/".$page->name,"Wiki History");?>
+        <?php echo Html::b(WEBROOT."/wiki/pagechanges/".$wiki->id."/".$page->name,"Page History");?>
         <?php if ($wiki->canEdit($w->Auth->user())):?>
-        <a href="<?php echo WEBROOT."/wiki/edit/".$wiki->name."/".$page->name?>" >Edit</a>
+        <?php echo Html::b(WEBROOT."/wiki/edit/".$wiki->name."/".$page->name,"Edit");?>
         <?php endif;?>
         <?php if ($wiki->isOwner($w->Auth->user()) && $page->name == "HomePage"):?>
-        <a href="<?php echo WEBROOT."/wiki/members/".$wiki->id?>" >Members</a>
+        <?php echo Html::b(WEBROOT."/wiki/members/".$wiki->id,"Members");?>
         <?php endif;?>        
         
-    </div>
-    <div class="tab-body">
-        <div id="tab-1">
         	<div style="font-size:8pt;color:gray;">
         	<a href="<?php echo WEBROOT."/wiki/view/".$wiki->name."/HomePage"?>" >Home</a>
         	<?php 
@@ -55,8 +50,7 @@
             <?php endif;?>
 			<p></p>
         </div>
-    </div>
-</div>
+
 <script type="text/javascript">
     $("a[rel='gallery']").colorbox();
 </script>     
