@@ -18,7 +18,7 @@ function delete_GET(Web $w) {
 		$d = $w->Example->getDataForId($p['id']);
 		if (!empty($d)) {
 			
-			// delete (if is_deleted property exists, this will be set to "1"
+			// delete (if is_deleted property exists, this will be set to "1")
 			$d->delete();
 			
 			// return to the list

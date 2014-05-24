@@ -893,8 +893,9 @@ class Web {
      * @param String module
      * @param String $function
      * @param Mixed $data
+     * @return anything that the hook function wants to return
      */
-    public function callHook($module = null, $function = null, $data = null) {
+    public function callHook($module, $function, $data = null) {
         if (empty($module) or empty($function)) {
             return;
         }
@@ -943,7 +944,7 @@ class Web {
             }
 
             // Call function
-            $hook_function_name($this, $data);
+            return $hook_function_name($this, $data);
         }
     }
 

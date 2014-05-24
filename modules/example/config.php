@@ -7,6 +7,6 @@ Config::set('example', array(
             "Example Data" => "ExampleData",
     ),
     'widgets' => array(),
-    'hooks' => array('core_dbobject'),
+    'hooks' => array('core_dbobject','example'),
     'processors' => array(),
 ));
