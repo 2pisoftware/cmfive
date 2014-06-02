@@ -12,7 +12,7 @@
 		<div id="details">
 			<?php echo !empty($btndelete) ? $btndelete : null; ?>
 			&nbsp;&nbsp;&nbsp;<?php echo !empty($btntimelog) ? $btntimelog : null; ?>
-			&nbsp;&nbsp;&nbsp;<?php echo $task->getTaskTypeObject()->displayExtraButtons($task);?>
+			&nbsp;&nbsp;&nbsp;<?php $tasktypeobject = $task->getTaskTypeObject(); !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null;?>
 			<table cellspacing="10">
 			<tr><td valign="top"><?php echo !empty($viewtask) ? $viewtask : null; ?></td>
 			<td valign="top"><?php echo !empty($extradetails) ? $extradetails : null; ?></td></tr>
