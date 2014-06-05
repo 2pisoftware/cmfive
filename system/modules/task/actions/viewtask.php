@@ -125,11 +125,13 @@ function viewtask_GET(Web &$w) {
 		// create 'start time log' button
 		$btntimelog = "";
 		if ($task->assignee_id == $w->Auth->user()->id) {
-			$btntimelog = "<button class=\"startTime\" href=\"/task/starttimelog/".$task->id."\"> Start Time Log </button>";
+                    $buttontimelog = new \Html\Button();
+                    $buttontimelog->href("/task/starttimelog/{$task->id}")->setClass("startTime button small")->text("Start Time Log");
+                    // $btntimelog = "<button class=\"startTime\" href=\"/task/starttimelog/".$task->id."\"> Start Time Log </button>";
 		} 
 
 		// display variables
-		$w->ctx("btntimelog",$btntimelog);
+		$w->ctx("btntimelog",$buttontimelog->__toString());
 		$w->ctx("btndelete",$btndelete);
 		$w->ctx("viewtask",$form);
 		$w->ctx("extradetails",$task->displayExtraDetails());

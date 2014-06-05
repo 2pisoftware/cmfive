@@ -17,7 +17,7 @@
 		<a id="tab-link-1" href="#" class="active">Create Task</a>
 	</div>
 	<div class="tab-body">
-		<div id="tab-1">
+		<div id="tab-1" class="clearfix">
 			<?php echo $formfields; ?>
 		</div>
 	</div>

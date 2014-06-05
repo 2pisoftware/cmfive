@@ -803,14 +803,16 @@ class Web {
      */
     function service($name) {
         // Check if the module if active or not
-//        if (!Config::get("{$name}.active") && $name !== "main") {
-//            return NULL;
-//        }
-        
+        // This function will need to reject service calls when the active flag is false
+        // To do this we need to check the config for the module housing the service call
+        // As the service may not be the module, see Log in Main
+         
         $name = ucfirst($name);
         if (!key_exists($name, $this->_services)) {
             $cname = $name . "Service";
-            if (class_exists($cname)) {
+            
+            // Checks if class exists and that the module active flag is true
+            if ($this->isClassActive($cname)) {
                 $s = new $cname($this);
                 // initialise
                 if (method_exists($s, "__init")) {
@@ -818,12 +820,51 @@ class Web {
                 }
                 $this->_services[$name] = & $s;
             } else {
+                return null;
 //                throw new Exception("Class $name not found!");
             }
         }
         return $this->_services[$name];
     }
 
+    /**
+     * A helper function to return the module name of a file located in its models directory
+     * 
+     * @param String $classname
+     * @return Mixed $module
+     */
+    public function getModuleNameForModel($classname) {
+        // Check for active in here, if above key exists then we know its already been created
+        $ref_cname = new ReflectionClass($classname);
+        $directory = dirname($ref_cname->getFileName());
+
+        // Don't forget about catering for the elephant in the room
+        $exp_directory = explode(DIRECTORY_SEPARATOR, $directory);
+
+        // We know that the last entry is "models", the entry before it is the module name
+        // Sanity check
+        $module = null;
+        if (end($exp_directory) == "models") {
+            // Yay for internal array pointers!
+            $module = prev($exp_directory);
+        }
+        return $module;
+    }
+    
+    /**
+     * Another helper function to quickly determine if a class's host module have been marked inactive
+     */
+    public function isClassActive($classname) {
+        if (class_exists($classname)) {
+            $modulename = $this->getModuleNameForModel($classname);
+            if ($modulename === null || Config::get("$modulename.active") === false) {
+                return false;
+            }   
+            return true;
+        }
+        return false;
+    }
+    
     /**
      * Call and return code for a partial template.
      * 
@@ -922,7 +963,12 @@ class Web {
         if (!array_key_exists($module, $this->_hooks)) {
             return;
         }
-
+        
+        // If module inactive, continue
+        if (Config::get("$module.active") === false) {
+            return;
+        }
+        
         // Loop through each registered module to try and invoke the function
         foreach ($this->_hooks[$module] as $toInvoke) {
             // Check that the hook impl module that we are invoking is a module
