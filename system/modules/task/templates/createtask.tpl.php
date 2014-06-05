@@ -28,7 +28,7 @@
         $("select[id='task_group_id']").trigger("change");
     });
 
-    $("select[id='task_group_id']").live("change", function() {
+    $("select[id='task_group_id']").on("change", function() {
         $.getJSON(
             task_url + $(this).val(),
             function(result) {
