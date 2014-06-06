@@ -50,7 +50,7 @@ class Task extends DbObject {
 	 */
 	function getDataValue($key) {
 		if ($this->id){
-			$c = $this->Task->getObject("TaskData",array("task_id"=>$this->id,"key"=>$key));
+			$c = $this->Task->getObject("TaskData",array("task_id"=>$this->id,"data_key"=>$key));
 			if ($c) {
 				return $c->value;
 			}
@@ -66,13 +66,13 @@ class Task extends DbObject {
 	 */
 	function setDataValue($key,$value) {
 		if ($this->id){
-			$c = $this->Task->getObject("TaskData",array("task_id"=>$this->id,"key"=>$key));
+			$c = $this->Task->getObject("TaskData", array("task_id" => $this->id, "data_key" => $key));
 			if ($c) {
 				$c->value = $value;
 				$c->update();
 			} else {
 				$c = new TaskData($this->w);
-				$c->key = $key;
+				$c->data_key = $key;
 				$c->value = $value;
 				$c->task_id = $this->id;
 				$c->insert();

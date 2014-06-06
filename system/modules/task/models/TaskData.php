@@ -6,7 +6,7 @@
  */
 class TaskData extends DbObject {
 	public $task_id;
-	public $key;
+	public $data_key;
 	public $value;	
 	
 	public static $_db_table = "task_data";

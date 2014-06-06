@@ -357,6 +357,14 @@ class TaskService extends DbService {
 		return $this->getObjects("TaskData",array("task_id"=>$id));
 	}
 
+        function getTaskByTaskDataKeyValuePair($key, $value) {
+            $taskdata = $this->Task->getObject("TaskData", array("data_key" => $key, "value" => $value));
+            if (!empty($taskdata->id)) {
+                return $this->getTask($taskdata->task_id);
+            }
+            return null;
+        }
+        
 	// return an array for display of task type for a task group defined in our tasks file.
 	function getTaskTypes($taskgroup) {
         $this->_loadTaskFiles();

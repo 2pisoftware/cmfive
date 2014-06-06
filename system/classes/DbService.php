@@ -122,6 +122,7 @@ class DbService {
         if (!empty($order_by)){
             $this->_db->order_by($order_by);
         }
+        
         $result = $this->_db->fetch_row();
 		if ($result) {
 			$obj = $this->getObjectFromRow($class, $result);
@@ -178,8 +179,7 @@ class DbService {
                 if (!empty($order_by)){
                     $this->_db->order_by($order_by);
                 }
-		//echo $this->_db->print_sql();
-		
+		// echo $this->_db->getSql();
 		$result = $this->_db->fetch_all();
 		if ($result) {
 			$objects = $this->fillObjects($class, $result);
