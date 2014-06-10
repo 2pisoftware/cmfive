@@ -9,6 +9,8 @@ function listwidgets_ALL(Web $w, $params) {
     }
 
     $widgets = $w->Widget->getWidgetsForModule($module);
+    $filter_widgets = array();
+    
     if (!empty($widgets)) {
 
         // Filter out widgets in an inactive class
