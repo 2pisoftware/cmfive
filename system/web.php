@@ -86,10 +86,13 @@ class Web {
     private function modelLoader($className) {
         $modules = $this->modules();
         foreach ($modules as $model) {
-            $file = $this->getModuleDir($model) . 'models/' . ucfirst($className) . ".php";
-            if (file_exists($file)) {
-                include $file;
-                return true;
+            // Check if the hosting module is active before we autoload it
+            if (Config::get("{$model}.active") === true) {
+                $file = $this->getModuleDir($model) . 'models/' . ucfirst($className) . ".php";
+                if (file_exists($file)) {
+                    include $file;
+                    return true;
+                }
             }
         }
         $this->service('log')->debug("Class " . $file . " not found.");

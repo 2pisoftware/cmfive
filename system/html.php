@@ -365,6 +365,9 @@ class Html {
     }
 
     public static function datePicker($name, $value = null, $size = null, $required = null) {
+//        $buf = "<input type='text' name='{$name}' value='{$value}' id='{$name}' readonly {$required} />";
+//        $buf .= "<script>$('#{$name}').pickadate()</script>";
+//        Old style
         $buf = '<input class="date_picker" type="text" name="' . $name . '" value="' . $value . '" size="' . $size . '" id="' . $name . '" ' . $required . ' />';
         $buf.= "<script>$('#$name').datepicker({dateFormat: 'dd/mm/yy'});$('#$name').keyup( function(event) { $(this).val('');}); </script>";
         return $buf;
