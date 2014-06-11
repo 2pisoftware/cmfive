@@ -14,10 +14,9 @@ class Wiki extends DbObject{
 
 	function getHistory() {
 		$sql="
-		SELECT DISTINCT name, creator_id, DAY( dt_created ) as day , 
-		MONTH( dt_created ) as month, YEAR( dt_created ) as year
+		SELECT DISTINCT name, creator_id, dt_created
 		FROM wiki_page_history
-		WHERE YEAR( dt_created ) > 0 and wiki_id = ".$this->id." order by year,month,day,name desc";
+		WHERE wiki_id = ".$this->id." order by dt_created desc, name asc";
 		
 		return $this->_db->sql($sql)->fetch_all();
 	}

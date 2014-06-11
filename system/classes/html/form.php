@@ -123,7 +123,9 @@ class form {
         return $buffer;
     }
     
-    public function close($button_title = 'Save') {
-        return "<div class='row small-12 columns'><button type='submit' class='button'>{$button_title}</button></div></form>";
+    public function close($button_title = 'Save', $extrabuttons = null) {
+        $button = new \Html\button();
+        $button->type("submit")->text($button_title);        
+        return "<div class='row small-12 columns'>{$button}&nbsp{$extrabuttons}</div></form>";
     }
 }

@@ -1,4 +1,3 @@
-<div style="width:900px; height:500px;">
 <?php 
 require_once 'creole/creole.php';
 $creole = new creole();
@@ -486,5 +485,3 @@ Sample Output:
 # {{{//this// is **not** [[processed]]}}} 
 EOF;
 echo $creole->parse($help);
-?>
-</div>

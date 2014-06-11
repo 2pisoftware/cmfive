@@ -14,7 +14,7 @@
 				"User");
 				foreach($hist as $wh) {
 					$table[]=array(
-    					$wh['day']."/".$wh['month']."/".$wh['year'],
+    					formatDate($wh["dt_created"]),
     					Html::a(WEBROOT."/wiki/view/".$wiki->name."/".$wh['name'],"<b>".$wh['name']."</b>"),
     					$w->Auth->getUser($wh['creator_id'])->getFullName()
 					);

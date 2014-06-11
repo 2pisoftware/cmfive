@@ -626,7 +626,7 @@ class Html {
         
         // Close form tag if needed
         if ($includeFormTag) {
-            $buffer .= $form->close($submitTitle);
+            $buffer .= $form->close($submitTitle, $extrabuttons);
         }
         
         return $buffer;
