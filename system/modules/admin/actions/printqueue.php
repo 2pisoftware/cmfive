@@ -1,7 +1,14 @@
 <?php
 
 function printqueue_GET(Web $w) {
-    $path = realpath(FILE_ROOT . "print");
+    $print_folder = FILE_ROOT . "print";
+    $path = realpath($print_folder);
+    
+    // Check if folder exists
+    if ($path === false) {
+        mkdir($print_folder);
+        $path = realpath($print_folder);
+    }
     $exclude = array("THUMBS.db");
     $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
     
