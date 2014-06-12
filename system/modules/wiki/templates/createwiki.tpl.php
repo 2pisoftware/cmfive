@@ -1,7 +1,9 @@
 <?php
-$lines[] = array("Create Wiki","section");
-$lines[] = array("Title","text","title","");
-$lines[] = array("Public","checkbox","is_public",0);
+$lines = array(
+    "Create Wiki" => array(
+        array(array("Title","text","title","")),
+        array(array("Public","checkbox","is_public",0))
+    )
+);
 
-echo Html::form($lines,$w->localUrl("/wiki/createwiki"),"POST","Create");
-?>
+echo Html::multiColForm($lines,$w->localUrl("/wiki/createwiki"),"POST","Create");
