@@ -6,7 +6,8 @@ function printqueue_GET(Web $w) {
     
     // Check if folder exists
     if ($path === false) {
-        mkdir($print_folder);
+        // Make print folder
+        mkdir($print_folder, 0777, true);
         $path = realpath($print_folder);
     }
     $exclude = array("THUMBS.db");
