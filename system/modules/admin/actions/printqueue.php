@@ -6,7 +6,8 @@ function printqueue_GET(Web $w) {
     
     // Check if folder exists
     if ($path === false) {
-        // Make print folder
+        // Make print folder (If you specify a full path, use the recursion flag because it seems to crash without it in unix)
+        // Other wise you would need to chdir to the parent folder, create and change back to wherever execution currently was at
         mkdir($print_folder, 0777, true);
         $path = realpath($print_folder);
     }

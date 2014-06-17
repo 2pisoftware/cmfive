@@ -285,30 +285,29 @@ function formatDateTime($date,$format="d/m/Y h:i a",$usetimezone = true) {
     return formatDate($date,$format);
 }
 
-/*
-That it is an implementation of the function money_format for the
-platforms that do not it bear.
-
-The function accepts to same string of format accepts for the
-original function of the PHP.
-
-(Sorry. my writing in English is very bad)
-
-The function is tested using PHP 5.1.4 in Windows XP
-and Apache WebServer.
-*/
+/**
+ * A replacement function for the money_format PHP function that is only
+ * available on most Linux based systems with the strfmon C function.
+ * 
+ * For those that do not (Windows), then the function is imitated with code.
+ */
 function formatMoney($format, $number)
 {
     if (function_exists('money_format')){
         return money_format($format, $number);
     }
+    
     $regex  = '/%((?:[\^!\-]|\+|\(|\=.)*)([0-9]+)?'.
               '(?:#([0-9]+))?(?:\.([0-9]+))?([in%])/';
     if (setlocale(LC_MONETARY, 0) == 'C') {
         setlocale(LC_MONETARY, '');
     }
     $locale = localeconv();
+    if (empty($locale['mon_decimal_point'])) {
+        $locale['mon_decimal_point'] = ".";
+    }
     preg_match_all($regex, $format, $matches, PREG_SET_ORDER);
+    
     foreach ($matches as $fmatch) {
         $value = floatval($number);
         $flags = array(
@@ -362,16 +361,18 @@ function formatMoney($format, $number)
             $currency = '';
         }
         $space  = $locale["{$letter}_sep_by_space"] ? ' ' : '';
-
         $value = number_format($value, $right, $locale['mon_decimal_point'],
-                 $flags['nogroup'] ? '' : $locale['mon_thousands_sep']);
+                 $flags['nogroup'] ? '' : $locale['mon_thousands_sep']);        
         $value = @explode($locale['mon_decimal_point'], $value);
-
+        
         $n = strlen($prefix) + strlen($currency) + strlen($value[0]);
         if ($left > 0 && $left > $n) {
             $value[0] = str_repeat($flags['fillchar'], $left - $n) . $value[0];
         }
-        $value = implode($locale['mon_decimal_point'], $value);
+        
+        if (!empty($value)) {
+            $value = implode($locale['mon_decimal_point'], $value);
+        }
         if ($locale["{$letter}_cs_precedes"]) {
             $value = $prefix . $currency . $space . $value . $suffix;
         } else {
@@ -384,7 +385,7 @@ function formatMoney($format, $number)
 
         $format = str_replace($fmatch[0], $value, $format);
     }
-    return $format;
+    return trim($format);
 }
 
 function recursiveArraySearch($haystack, $needle, $index = null)
