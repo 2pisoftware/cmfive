@@ -918,12 +918,14 @@ EOT;
         $hidden = "";
         $buffer .= "<fieldset style=\"padding: 0; padding-top: 10px; padding-left: 10px;\">\n";
         $buffer .= "<legend>" . $legend . "</legend>\n";
-        $buffer .= "<div class=\"row-fluid\">\n";
-
+        // $buffer .= "<div class=\"row-fluid\">\n";
+        $buffer .= "<ul class='small-block-grid-2 medium-block-grid-3'>";
+        
         // Loop through data
         foreach ($data as $row) {
 
-            $buffer .= "<div class=\"small-12 medium-3 left\"><div class=\"row\">";
+//            $buffer .= "<div class=\"small-12 medium-3 left\"><div class=\"row\">";
+            $buffer .= "<li>";
             
             // Get row parameters
             $title = !empty($row[0]) ? $row[0] : null;
@@ -1021,17 +1023,19 @@ EOT;
                     break;
             }
 
-            $buffer .= "</div></div></div>";
+            $buffer .= "</div></li>"; // </div>
         }
-        $buffer .= "</div>";
+        
         // Filter button (optional... though optional is pointless)
         if (!empty($action)) {
             $button = new \Html\button();
+            $buffer .= "<li>";
             if ($submitTitle !== NULL) {
-                $buffer .= "<div class=\"left\">" . $button->type("submit")->text($submitTitle)->__toString() . "&nbsp</div>";
+                $buffer .= $button->type("submit")->text($submitTitle)->__toString();
             }
-            $buffer .= "<div class=\"left\">" . $button->text("Reset")->id("filter_reset")->name("reset")->value("reset")->__toString() . "</div>";
+            $buffer .= $button->text("Reset")->id("filter_reset")->name("reset")->value("reset")->__toString() . "</li>";
         }
+        $buffer .= "</ul>"; // </div>
         $buffer .= "\n</fieldset>\n";
         $buffer .= $hidden . "</form>\n";
 

@@ -13,6 +13,10 @@ span[class^='fi-'], span[class*=' fi-'] {
     font-size: 18pt;
 }
 
+[class*="block-grid-"] > li {
+    padding-bottom: 0px;
+}
+
 .top-bar-section li:not(.has-form) a:not(.button) {
     height: 45px;
 }
