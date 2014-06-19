@@ -33,10 +33,10 @@ function groups_GET(Web &$w)
 			}
 			$line[] = count($ancestors) > 0 ? "<div style=\"color:green;\">".implode(", ", $ancestors)."</div>" : "";
 
-			$operations = Html::b("/admin/moreInfo/".$group->id,"More Info")."&nbsp;";
+			$operations = Html::b("/admin/moreInfo/".$group->id,"More Info");
 			 
 			if ($w->Auth->user()->is_admin)
-			$operations .= Html::b("/admin/groupdelete/".$group->id,"Delete","Are you sure you want to delete this group?")."&nbsp;";
+			$operations .= Html::b("/admin/groupdelete/".$group->id,"Delete","Are you sure you want to delete this group?");
 
 			$line[] = $operations;
 			 

@@ -4,12 +4,12 @@ if ($w->Auth->user()->allowed($w,"/inbox/send")) {
 }
 $button = new \Html\button();
 if (!empty($new)) {
-    echo "&nbsp" . $button->text("Archive")->onclick("sendArch()")->__toString(); // print "<button onclick='sendArch()'>Archive</button>";
-    echo "&nbsp" . $button->text("Delete")->onclick("deleteMessage()")->__toString(); // print "<button onclick='deleteMessage()'>Delete</button>";
+    echo $button->text("Archive")->onclick("sendArch()")->__toString(); // print "<button onclick='sendArch()'>Archive</button>";
+    echo $button->text("Delete")->onclick("deleteMessage()")->__toString(); // print "<button onclick='deleteMessage()'>Delete</button>";
 }
 
 if($w->service('Inbox')->inboxCountMarker()){
-    echo "&nbsp" . Html::b($w->localUrl("/inbox/allread"),"Mark all read","Are you sure to mark all messages as read?");
+    echo Html::b($w->localUrl("/inbox/allread"),"Mark all read","Are you sure to mark all messages as read?");
 }
 
 if (!empty($new)) {

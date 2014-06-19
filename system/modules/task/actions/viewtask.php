@@ -183,11 +183,11 @@ function viewtask_GET(Web &$w) {
 				formatDateTime($log->dt_end),
 				$period,
 				$bedit .
-								"&nbsp;" . 
+								 
 				Html::b($w->localUrl("/task/deletetime/".$task->id."/".$log->id)," Delete ","Are you sure you wish to DELETE this Time Log Entry?") .
-								"&nbsp;" . 
+								
 				$bsuspect .
-								"&nbsp;" . 
+								
 				Html::box($w->localUrl("/task/popComment/".$task->id."/".$log->comment_id)," Comment ",true)
 				);
 			}

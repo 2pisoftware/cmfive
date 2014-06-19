@@ -14,9 +14,9 @@ function users_GET(Web &$w) {
 		$line[]=array($user['is_active'] ? "X" : "", true);
 		$line[]=array($user['dt_created'], true);
 		$line[]=array($user['dt_lastlogin'], true);
-		$view = Html::box($w->localUrl("/admin/useredit/".$user['id']."/box"),"Edit",true)."&nbsp;";
-		$view .= Html::b("/admin/permissionedit/".$user['id'],"Permissions")."&nbsp;";
-		$view .= "&nbsp;".Html::b($w->localUrl("/admin/userdel/".$user['id']),"Delete","Are you sure to delete this user?")."&nbsp;";
+		$view = Html::box($w->localUrl("/admin/useredit/".$user['id']."/box"),"Edit",true);
+		$view .= Html::b("/admin/permissionedit/".$user['id'],"Permissions");
+		$view .= Html::b($w->localUrl("/admin/userdel/".$user['id']),"Delete","Are you sure to delete this user?");
 		$line[]=$view;
 		$users[]=$line;
 	}

@@ -94,8 +94,10 @@
                                     <td><?php echo $mem->getFullName(); ?></td>
                                     <td><?php echo $mem->role; ?></td>
                                     <td>
-                                        <?php echo Html::box($webroot."/wiki/editmember/".$wiki->id."/".$mem->id, "Edit", true); ?>&nbsp;
-                                        <?php echo Html::b($webroot."/wiki/delmember/".$wiki->id."/".$mem->id,"Delete"); ?>
+                                        <?php 
+                                            echo Html::box($webroot."/wiki/editmember/".$wiki->id."/".$mem->id, "Edit", true);
+                                            echo Html::b($webroot."/wiki/delmember/".$wiki->id."/".$mem->id,"Delete"); 
+                                        ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

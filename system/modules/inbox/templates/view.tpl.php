@@ -1,8 +1,8 @@
 <?php
     if ($w->Auth->user()->allowed($w,"/inbox/send")) {
-        echo $w->menuButton("inbox/send/"."$message->id","Reply") . "&nbsp";
+        echo $w->menuButton("inbox/send/"."$message->id","Reply");
     }
-    echo $w->menuButton("inbox/archive/".$type."/".$message->id,"Archive") . "&nbsp";
+    echo $w->menuButton("inbox/archive/".$type."/".$message->id,"Archive");
     echo $w->menuButton("inbox/delete/".$type."/".$message->id,"Delete");
 ?>
 <div class='panel'>

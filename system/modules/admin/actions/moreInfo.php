@@ -12,9 +12,9 @@ function moreInfo_GET(Web &$w)
 
 	if ($w->Auth->user()->is_admin || $w->Auth->getRoleForLoginUser($option['group_id'], $w->Auth->user()->id) == "owner")
 	{
-		$w->ctx("addMember", Html::box("/admin/groupmember/".$option['group_id'],"New Member",true)."&nbsp;");
+		$w->ctx("addMember", Html::box("/admin/groupmember/".$option['group_id'],"New Member",true));
 	}
-	$w->ctx("editPermission", Html::b("/admin/permissionedit/".$option['group_id'],"Edit Permissions")."&nbsp;");
+	$w->ctx("editPermission", Html::b("/admin/permissionedit/".$option['group_id'],"Edit Permissions"));
 
 	//fill in member table;
 	$table = array(array("Name","Role","Operations"));

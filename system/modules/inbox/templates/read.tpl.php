@@ -4,8 +4,8 @@ if ($w->Auth->user()->allowed($w,"/inbox/send")) {
 }
 $button = new \Html\button();
 if (!empty($read)) {
-    echo "&nbsp" . $button->text("Archive")->onclick("sendArch()")->__toString(); // print "<button onclick='sendArch()'>Archive</button>";
-    echo "&nbsp" . $button->text("Delete")->onclick("deleteMessage()")->__toString(); // print "<button onclick='deleteMessage()'>Delete</button>";
+    echo $button->text("Archive")->onclick("sendArch()")->__toString(); // print "<button onclick='sendArch()'>Archive</button>";
+    echo $button->text("Delete")->onclick("deleteMessage()")->__toString(); // print "<button onclick='deleteMessage()'>Delete</button>";
 }
 if ($read) {
     echo $read_table;

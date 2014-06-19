@@ -17,7 +17,7 @@ span[class^='fi-'], span[class*=' fi-'] {
     height: 45px;
 }
 
-// Search
+/* Search */
 #search_form {
     margin-bottom: 0px !important;
 }
@@ -130,7 +130,7 @@ table .section {
 .tab-body { border: 1px solid #a9a9a9; padding: 5px; }
 
 td button {
-    margin: 0 !important;
+    margin: 0;
     padding: 5px 15px !important;
 }
 
@@ -189,4 +189,13 @@ ul.ui-autocomplete {
     top: 0px !important;
     margin-top: -5px !important;
     margin-right: -5px;
+}
+
+button.button {
+    margin: 0;
+}
+
+/* Should be supported in IE7+ */
+button.button + button {
+    margin-left: 5px !important;
 }
