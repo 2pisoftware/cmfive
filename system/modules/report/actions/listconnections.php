@@ -1,4 +1,4 @@
 <?php
-function listconnection_ALL(Web $w) {
+function listconnections_ALL(Web $w) {
     $w->Report->navigation($w, "Database Connections");
 }

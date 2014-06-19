@@ -1,11 +1,12 @@
 <?php
 
 class ReportService extends DbService {
-
+    static private $tables;
+    
     /**
      * Returns array of connection objects
      * 
-     * @return array of connection objects
+     * @return Array connections
      */
     public function getConnections() {
         return $this->getObjects("ReportConnection", array("is_deleted" => "0"));
@@ -78,13 +79,18 @@ class ReportService extends DbService {
             }
         }
         // list of IDs to check for report membership, my ID and my group IDs
-        $id = implode(",", $myid);
-
-        $where .= " and r.is_deleted = 0 and m.is_deleted = 0";
-
-        $rows = $this->_db->sql("SELECT distinct r.* from " . ReportMember::$_db_table . " as m inner join " . Report::$_db_table . " as r on m.report_id = r.id where m.user_id in (" . $id . ") " . $where . " order by r.is_approved desc,r.title")->fetch_all();
-        $rows = $this->fillObjects("Report", $rows);
-        return $rows;
+//        $id = implode(",", $myid);
+        
+        $results = $this->_db->get("report_member")->select("report.*")
+                    ->leftJoin("report on report_member.report_id = report.id")
+                    ->where("report_member.user_id", $myid)->where($where)
+                    ->where("report.is_deleted", 0)->where("report_member.is_deleted", 0)
+                    ->order_by("report.is_approved desc, report.title")->fetch_all();
+        
+//        $rows = $this->_db->sql("SELECT distinct r.* from " . ReportMember::$_db_table . " as m inner join " . 
+//                Report::$_db_table . " as r on m.report_id = r.id where m.user_id in (" . $id . ") " . $where . 
+//                " order by r.is_approved desc,r.title")->fetch_all();
+        return $this->fillObjects("Report", $results);
     }
 
     // return list of APPROVED and NOT DELETED report IDs for a given a user ID as member
@@ -104,15 +110,18 @@ class ReportService extends DbService {
             }
         }
         // list of IDs to check for report membership, my ID and my group IDs
-        $id = implode(",", $myid);
-
-        $rows = $this->_db->sql("SELECT distinct m.report_id from " . ReportMember::$_db_table . " as m inner join " . Report::$_db_table . " as r on m.report_id = r.id where m.user_id in (" . $id . ") and r.is_deleted = 0 and m.is_deleted = 0 order by r.is_approved desc,r.title")->fetch_all();
-        $rows = $this->fillObjects("ReportMember", $rows);
-        return $rows;
+//        $id = implode(",", $myid);
+        $results = $this->_db->get("report_member")->select("report.*")
+                    ->leftJoin("report on report_member.report_id = report.id")
+                    ->where("report_member.user_id", $myid)
+                    ->where("report.is_deleted", 0)->where("report_member.is_deleted", 0)
+                    ->order_by("report.is_approved desc, report.title")->fetch_all();
+//        $rows = $this->_db->sql("SELECT distinct m.report_id from " . ReportMember::$_db_table . " as m inner join " . Report::$_db_table . " as r on m.report_id = r.id where m.user_id in (" . $id . ") and r.is_deleted = 0 and m.is_deleted = 0 order by r.is_approved desc,r.title")->fetch_all();
+        return $this->fillObjects("ReportMember", $results);
     }
 
     // return list of APPROVED and NOT DELETED report IDs for a given a user ID and Module
-    function getReportsbyModulenId() {
+    function getReportsbyModuleId() {
         // need to get reports for me and my groups
         // me
         $myid[] = $this->w->session('user_id');
@@ -131,15 +140,19 @@ class ReportService extends DbService {
         $id = implode(",", $myid);
         $module = $this->w->currentModule();
 
-        $rows = $this->_db->sql("SELECT distinct r.id,r.title from " . ReportMember::$_db_table . " as m inner join " . Report::$_db_table . " as r on m.report_id = r.id where m.user_id in (" . $id . ") and r.module = '" . $module . "' and r.is_deleted = 0 and m.is_deleted = 0 order by r.is_approved desc,r.title")->fetch_all();
-        $rows = $this->fillObjects("Report", $rows);
-        return $rows;
+        $results = $this->_db->get("report_member")->select("report.*")
+                    ->leftJoin("report on report_member.report_id = report.id")
+                    ->where("report_member.user_id", $myid)->where("report.module", $module)
+                    ->where("report.is_deleted", 0)->where("report_member.is_deleted", 0)
+                    ->order_by("report.is_approved desc, report.title")->fetch_all();
+        // $rows = $this->_db->sql("SELECT distinct r.id,r.title from " . ReportMember::$_db_table . " as m inner join " . Report::$_db_table . " as r on m.report_id = r.id where m.user_id in (" . $id . ") and r.module = '" . $module . "' and r.is_deleted = 0 and m.is_deleted = 0 order by r.is_approved desc,r.title")->fetch_all();
+        return $this->fillObjects("Report", $results);
     }
 
     // return menu links of APPROVED and NOT DELETED report IDs for a given a user ID as member
     function getReportsforNav() {
         $repts = array();
-        $reports = $this->getReportsbyModulenId();
+        $reports = $this->getReportsbyModuleId();
 
         if ($reports) {
             foreach ($reports as $report) {
@@ -166,6 +179,7 @@ class ReportService extends DbService {
     }
 
     // for parameter dropdowns, run SQL statement and return an array(value,title) for display
+    // DANGEROUS
     function getFormDatafromSQL($sql) {
         $rows = $this->_db->sql($sql)->fetch_all();
         if ($rows) {
@@ -177,6 +191,7 @@ class ReportService extends DbService {
     }
 
     // given a report SQL statement, return recordset
+    // DANGEROUS
     function getExefromSQL($sql) {
         return $this->_db->sql($sql)->execute();
     }
@@ -191,37 +206,51 @@ class ReportService extends DbService {
 
     // return all tables in the DB for display
     function getAllDBTables() {
-
         $dbtbl = array();
-        $sql = "show tables in " . $this->_db->getDatabase();
-        $tbls = $this->_db->sql($sql)->fetch_all();
-
-        if ($tbls) {
-            foreach ($tbls as $tbl) {
-                $dbtbl[] = array($tbl['Tables_in_' . $this->_db->getDatabase()], $tbl['Tables_in_' . $this->_db->getDatabase()]);
-            }
+        foreach($this->_db->_query("show tables")->fetchAll(PDO::FETCH_NUM) as $table) {
+            $dbtbl[] = $table[0];
         }
+        ReportService::$tables = $dbtbl;
+//        $sql = "show tables in " . $this->_db->getDatabase();
+//        $tbls = $this->_db->sql($sql)->fetch_all();
+
+//        if ($tbls) {
+//            foreach ($tbls as $tbl) {
+//                $dbtbl[] = array($tbl['Tables_in_' . $this->_db->getDatabase()], $tbl['Tables_in_' . $this->_db->getDatabase()]);
+//            }
+//        }
         return $dbtbl;
     }
 
     // return array of fields/type in a given table
-    function getFieldsinTable($tbl) {
-        $dbflds = "";
+    function getFieldsinTable($table) {
+        $output = "";
+        
+        if (empty(ReportService::$tables)) {
+            $this->getAllDBTables();
+        }
+        
+        // Check that the table actually exists, reduces chance for SQL injection
+        if (!in_array(strtolower($table), ReportService::$tables)) {
+            return "";
+        }
+        
+        if ($table != "") {
+            
+            $sql = "show columns in " . $table;
+            $fields = $this->_db->sql($sql)->fetch_all();
 
-        if ($tbl != "") {
-            $sql = "show columns in " . $tbl;
-            $flds = $this->_db->sql($sql)->fetch_all();
-
-            if ($flds) {
-                $dbflds = "<table cellpadding=0 cellspacing=0 border=0>\n";
-                $dbflds .= "<tr><td><b>Field</b></td><td><b>Type</b></td></tr>\n";
-                foreach ($flds as $fld) {
-                    $dbflds .= "<tr><td>" . $fld['Field'] . "</td><td>" . $fld['Type'] . "</td></tr>\n";
+            if ($fields) {
+                $output = "<table>";
+                $output .= "<tr><td><b>Field</b></td><td><b>Type</b></td></tr>";
+                foreach ($fields as $field) {
+                    $output .= "<tr><td>" . $field['Field'] . "</td><td>" . $field['Type'] . "</td></tr>";
                 }
-                $dbflds .= "</table>\n";
+                $output .= "</table>";
             }
         }
-        return $dbflds;
+        
+        return $output;
     }
 
     function getSQLStatementType($report_code) {

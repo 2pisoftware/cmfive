@@ -24,7 +24,6 @@ function listfeed_ALL(Web &$w) {
                     $feed->description,
                     formatDateTime($feed->dt_created),
                     Html::b(WEBROOT . "/report/editfeed/" . $feed->id, " View ") .
-                    "&nbsp;&nbsp;&nbsp;" .
                     Html::b(WEBROOT . "/report/deletefeed/" . $feed->id, " Delete ", "Are you sure you wish to DELETE this feed?")
                 );
             }

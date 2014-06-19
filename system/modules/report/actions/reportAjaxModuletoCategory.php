@@ -2,11 +2,14 @@
 // Search Filter: selecting an Module will dynamically load the Category dropdown with available values
 function reportAjaxModuletoCategory_ALL(Web $w) {
 	$category = array();
-	$module = $_REQUEST['id'];
+	$module = $w->request('id');
 
 	// organise criteria
 	$who = $w->session('user_id');
-	$where = ($_REQUEST['id'] != "") ? " and r.module = '" . $_REQUEST['id'] . "'" : "";
+        $where = array();
+	if ($module != "") {
+            $where['report.module'] = $module;
+        }
 
 	// get report categories from available report list
 	$reports = $w->Report->getReportsbyUserWhere($who, $where);

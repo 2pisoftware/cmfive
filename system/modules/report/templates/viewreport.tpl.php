@@ -4,38 +4,35 @@
         <a href="#members">Members</a>
         <a href="#database">View Database</a>
     </div>	
-	<div class="tab-body">
-		<div id="report" class="clearfix">
-			<?php echo $btnrun . "<p>" . $viewreport; ?>
-			<p>
-		</div>
-		<div id="members" style="display: none;" class="clearfix">
-			<?php echo Html::box("/report/addmembers/".$reportid," Add New Members ",true) ?>
-			<p>
-			<?php echo $viewmembers; ?>
-		</div>
-		<div id="database" style="display: none;" class="clearfix">
-			<?php echo $dbform; ?>
-			<p>
+    <div class="tab-body">
+        <div id="report" class="clearfix">
+            <?php echo $btnrun . $viewreport; ?>
+        </div>
+        <div id="members" style="display: none;" class="clearfix">
+            <?php echo Html::box("/report/addmembers/" . $reportid, " Add New Members ", true) ?>
+            <?php echo $viewmembers; ?>
+        </div>
+        <div id="database" style="display: none;" class="clearfix">
+            <?php echo $dbform; ?>
         </div>
     </div>
 </div>
 
 <script language="javascript">
 
-            $.ajaxSetup({
-                cache: false
-            });
+    $.ajaxSetup({
+        cache: false
+    });
 
-            var report_url = "/report/taskAjaxSelectbyTable?id=";
-            $("select[id='dbtables'] option").click(function() {
-                $.getJSON(
-                        report_url + $(this).val(),
-                        function(result) {
-                            $('#dbfields').html(result);
-                        }
-                );
-            }
-            );
+    var report_url = "/report/taskAjaxSelectbyTable?id=";
+    $("select[id='dbtables'] option").click(function() {
+        $.getJSON(
+                report_url + $(this).val(),
+                function(result) {
+                    $('#dbfields').html(result);
+                }
+        );
+    }
+    );
 
 </script>

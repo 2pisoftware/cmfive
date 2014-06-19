@@ -13,17 +13,17 @@ function index_ALL(Web &$w) {
 
     // organise criteria
     $who = $w->session('user_id');
-    $where = '';
+    $where = array();
 
-    if (empty($_REQUEST["reset"]) && !empty($_REQUEST['module'])) {
-        $where .= ($_REQUEST['module'] != "") ? " and r.module = '" . $_REQUEST['module'] . "'" : "";
-        $w->ctx("reqModule", $_REQUEST['module']);
+    $module = $w->request("module");
+    $reset = $w->request("reset");
+    
+    if (empty($reset)){
+        if (!empty($module)) {
+            $where['report.module'] = $module;
+            $w->ctx("reqModule", $module);
+        }
     }
-
-//	if (!empty($_REQUEST['type'])){
-//		$where .= ($_REQUEST['type'] != "") ? " and r.sqltype like '%" . $_REQUEST['type'] . "%'" : "";
-//		$w->ctx("reqType",$_REQUEST['type']);	
-//	}
 
     // get report categories from available report list
     $reports = $w->Report->getReportsbyUserWhere($who, $where);
@@ -42,8 +42,6 @@ function index_ALL(Web &$w) {
             //			if (($w->Auth->user()->hasRole("report_editor")) || ($w->Auth->user()->hasRole("report_admin"))) {
             if (($member->role == "EDITOR") || ($w->Auth->user()->hasRole("report_admin"))) {
                 $btnedit = Html::b(!empty($webroot) ? $webroot : '' . "/report/viewreport/" . $rep->id, " Edit ");
-            } else {
-                $btnedit = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
             }
 
             // admin also gets DELETE button
@@ -62,7 +60,6 @@ function index_ALL(Web &$w) {
                         //$rep->getCategoryTitle(),
                         $rep->description,
                         $btnedit .
-                        "&nbsp;&nbsp;&nbsp;" .
                         Html::b(!empty($webroot) ? $webroot : '' . "/report/runreport/" . $rep->id, " Execute ")
                     );
                 }
@@ -75,9 +72,7 @@ function index_ALL(Web &$w) {
                     //$rep->getCategoryTitle(),
                     $rep->description,
                     $btnedit .
-                    "&nbsp;&nbsp;&nbsp;" .
                     Html::b(!empty($webroot) ? $webroot : '' . "/report/runreport/" . $rep->id, " Execute ") .
-                    "&nbsp;&nbsp;&nbsp;" .
                     $btndelete,
                 );
             }

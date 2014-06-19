@@ -6,20 +6,16 @@
 function createreport_ALL(Web &$w) {
     $w->Report->navigation($w, "Create a Report");
 
-    // get list of  modules
-    $modules = $w->Report->getModules();
-    $connections = $w->Report->getConnections();
-
     // build form to create a report. display to users by role is controlled by the template
     // using lookup with type ReportCategory for category listing
     $f = Html::form(array(
         array("Create a New Report","section"),
         array("Title","text","title", $w->request('title')),
-        array("Module","select","module", $w->request('module'), $modules),
+        array("Module","select","module", $w->request('module'), $w->Report->getModules()),
         // array("Category","select","category", $w->request('category'), lookupForSelect($w, "ReportCategory")),
         array("Description","textarea","description",$w->request('description'),"110","2"),
         array("Code","textarea","report_code",$w->request('report_code'),"110","22",false),
-        array("Connection","select","report_connection_id",$w->request('report_connection_id'),$connections)
+        array("Connection","select","report_connection_id",$w->request('report_connection_id'), $w->Report->getConnections())
     ), $w->localUrl("/report/savereport"), "POST", "Save Report");
 
     $t = Html::form(array(
