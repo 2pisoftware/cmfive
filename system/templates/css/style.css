@@ -13,10 +13,6 @@ span[class^='fi-'], span[class*=' fi-'] {
     font-size: 18pt;
 }
 
-[class*="block-grid-"] > li {
-    padding-bottom: 0px;
-}
-
 .top-bar-section li:not(.has-form) a:not(.button) {
     height: 45px;
 }
@@ -88,6 +84,10 @@ button {
 .grid-list-panel .panel {
     padding: 10px 0px;
     margin-bottom: 0px;
+}
+
+#filter-grid > li {
+    padding-bottom: 0px;
 }
 
 /* Table styles */

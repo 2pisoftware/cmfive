@@ -919,7 +919,7 @@ EOT;
         $buffer .= "<fieldset style=\"padding: 0; padding-top: 10px; padding-left: 10px;\">\n";
         $buffer .= "<legend>" . $legend . "</legend>\n";
         // $buffer .= "<div class=\"row-fluid\">\n";
-        $buffer .= "<ul class='small-block-grid-2 medium-block-grid-3'>";
+        $buffer .= "<ul id='filter-grid' class='small-block-grid-2 medium-block-grid-3'>";
         
         // Loop through data
         foreach ($data as $row) {
