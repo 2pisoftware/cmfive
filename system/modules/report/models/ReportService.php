@@ -475,20 +475,34 @@ class ReportService extends DbService {
     }
 
     // function to check syntax of report SQL statememnt
-    function getcheckSQL($sql) {
+    function getcheckSQL($sql, $connection = null) {
         // checking for rows will return false if no data is returned, even if SQL is ok
         // so let's just run the statement and try to catch any exceptions otherwise SQL runs ok
         try {
-            $this->startTransaction();
-            $rows = $this->getExefromSQL($sql);
-            $this->rollbackTransaction();
+            if (empty($connection)) {
+                $this->startTransaction();
+                $rows = $this->getExefromSQL($sql);
+                $this->rollbackTransaction();
 
-            return true;
+                return true;
+            } else {
+                $connection->query("START TRANSACTION")->execute();
+                $rows = $connection->query($sql)->execute();
+                $connection->query("ROLLBACK")->execute();
+                return true;
+            }
         } catch (Exception $e) {
+            $this->Log->error($e->getMessage());
             // SQL returns errors so clean up and return false
-            $this->rollbackTransaction();
-            $this->_db->clear_sql();
-            return false;
+            if (empty($connection)) {
+                $this->rollbackTransaction();
+                $this->_db->clear_sql();
+                return false;
+            } else {
+                $connection->query("ROLLBACK")->execute();
+                // $connection->clear_sql();
+                return false;
+            }
         }
     }
 
