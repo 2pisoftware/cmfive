@@ -25,18 +25,18 @@ class ReportConnection extends DbObject {
 	 * returns the database object for this connection
 	 */
 	public function getDb() {
-		if (empty($this->_mydb)) {
+            if (empty($this->_mydb)) {
 	        $db_config = array(
 	            'hostname' => $this->db_host,
-	        	'port' => $this->db_port,
+                    'port' => $this->db_port,
 	            'username' => $this->s_db_user,
 	            'password' => $this->s_db_password,
 	            'database' => $this->db_database,
 	            'driver' => $this->db_driver,
 	        );
-			$this->_mydb = new DbPDO($config);
-		}
-		return $this->_mydb;
+                $this->_mydb = new DbPDO($db_config);
+            }
+            return $this->_mydb;
 	}
 	
 	public function getSelectOptionTitle() {

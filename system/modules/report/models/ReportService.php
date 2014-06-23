@@ -12,6 +12,10 @@ class ReportService extends DbService {
         return $this->getObjects("ReportConnection", array("is_deleted" => "0"));
     }
 
+    public function getConnection($id) {
+        return $this->getObject("ReportConnection", array("id" => $id, "is_deleted" => "0"));
+    }
+    
     // function to sort lists by date schedule
     static function sortBySchedule($a, $b) {
         if ($a->dt_schedule == $b->dt_schedule) {
@@ -501,7 +505,7 @@ class ReportService extends DbService {
 
             if ($w->Auth->user()->hasRole("report_editor") || $w->Auth->user()->hasRole("report_admin")) {
                 $w->menuLink("report/createreport", "Create a Report", $nav);
-                $w->menuLink("report/listconnections", "Connections", $nav);
+                $w->menuLink("report-connections", "Connections", $nav);
                 $w->menuLink("report/listfeed", "Feeds Dashboard", $nav);
             }
         }
