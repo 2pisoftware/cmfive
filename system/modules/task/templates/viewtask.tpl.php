@@ -11,26 +11,28 @@
 	<div class="tab-body">
 		<div id="details">
 			<?php echo !empty($btndelete) ? $btndelete : null; ?>
-			&nbsp;&nbsp;&nbsp;<?php echo !empty($btntimelog) ? $btntimelog : null; ?>
-			&nbsp;&nbsp;&nbsp;<?php $tasktypeobject = $task->getTaskTypeObject(); !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null;?>
+			<?php echo !empty($btntimelog) ? $btntimelog : null; ?>
+			<?php $tasktypeobject = $task->getTaskTypeObject(); !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null;?>
 			<table cellspacing="10">
-			<tr><td valign="top"><?php echo !empty($viewtask) ? $viewtask : null; ?></td>
-			<td valign="top"><?php echo !empty($extradetails) ? $extradetails : null; ?></td></tr>
+			     <tr>
+                     <td valign="top"><?php echo !empty($viewtask) ? $viewtask : null; ?></td>
+                     <td valign="top"><?php echo !empty($extradetails) ? $extradetails : null; ?></td>
+                 </tr>
 			</table>
 			<p></p>
 		</div>
-		<div id="timelog" style="display: none;">
-			<?php echo !empty($addtime) ? $addtime : null; ; ?>
-			<?php echo !empty($timelog) ? $timelog : null; ; ?>
+		<div id="timelog">
+			<?php echo !empty($addtime) ? $addtime : null; ?>
+			<?php echo !empty($timelog) ? $timelog : null; ?>
 		</div>
-		<div id="comments" style="display: none;">
-			 <?php echo $w->partial("listcomments",array("object"=>$task,"redirect"=>"task/viewtask/{$task->id}#comments"),"admin");?>
+		<div id="comments">
+			 <?php echo $w->partial("listcomments",array("object"=>$task,"redirect"=>"task/viewtask/{$task->id}#comments"), "admin"); ?>
 		</div>
-		<div id="documents" style="display: none;">
-			 <?php echo $w->partial("listattachments",array("object"=>$task,"redirect"=>"task/viewtask/{$task->id}#documents"),"file");?>
+		<div id="documents">
+			 <?php echo $w->partial("listattachments",array("object"=>$task,"redirect"=>"task/viewtask/{$task->id}#documents"), "file"); ?>
 		</div>
 		<?php if ($task->getCanINotify()):?>
-		<div id="notification" style="display: none;">
+		<div id="notification" class="clearfix">
 			Set your Notifications specific to this Task, otherwise your notifications for this Task Group will be employed.
 			<p>
 			<?php echo $tasknotify;?>
