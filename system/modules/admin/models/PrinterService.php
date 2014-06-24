@@ -48,9 +48,7 @@ class PrinterService extends DbService {
                     break;
             }
             
-            // Fill the string with our printer values
-            $printer = $this->w->Printer->getPrinter(1);
-            
+            // Fill the string with our printer values            
             if (!empty($printer->id)) {
                 $this->w->Log->info("Printing to: {$printer->name} with command: {$command}");
                 $command = str_replace(array('$filename', '$servername', '$port', '$printername'), 
