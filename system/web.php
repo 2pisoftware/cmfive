@@ -246,16 +246,9 @@ class Web {
         }
 
         // try to load the action file
-        if (!$this->_submodule) {
-            $reqpath = $this->getModuleDir($this->_module) . '/actions/' . $this->_action . '.php';
-            if (!file_exists($reqpath)) {
-                $reqpath = $this->getModuleDir($this->_module) . $this->_module . ".actions.php";
-            }
-        } else {
-            $reqpath = $this->getModuleDir($this->_module) . '/actions/' . $this->_submodule . '/' . $this->_action . '.php';
-            if (!file_exists($reqpath)) {
-                $reqpath = $this->getModuleDir($this->_module) . $this->_module . '.' . $this->_submodule . ".actions.php";
-            }
+        $reqpath = $this->getModuleDir($this->_module) . 'actions/' . ($this->_submodule ? $this->_submodule . '/' : '') . $this->_action . '.php';
+        if (!file_exists($reqpath)) {
+            $reqpath = $this->getModuleDir($this->_module) . $this->_module . ($this->_submodule ? '.' . $this->_submodule : '') . ".actions.php";
         }
 
         // try to find action for the request type
@@ -280,6 +273,7 @@ class Web {
 
             // CHECK ACCESS!!
             $this->checkAccess(); // will redirect if access denied!
+            
             // load the module file
             require_once $reqpath;
         } else {
@@ -294,7 +288,7 @@ class Web {
                 break;
             }
         }
-
+        
         if ($action_found) {
             $this->ctx("loggedIn", $this->Auth->loggedIn());
             $this->ctx("error", $this->session('error'));
@@ -341,6 +335,9 @@ class Web {
             } else {
                 $body = $this->_buffer;
             }
+
+//            $this->Log->error($body);
+//            die();
             // but always check for layout
             // if ajax call don't do the layout
             if ($this->_layout && !$this->isAjax()) {
@@ -354,7 +351,7 @@ class Web {
         } else {
             $this->notFoundPage();
         }
-
+        
         exit(); // nothing comes after start()!!!
     }
 

@@ -17,8 +17,8 @@ function editreport_POST(Web $w) {
 		// if report exists, update it
 		if ($rep) {
 			$_POST['sqltype'] = $w->Report->getSQLStatementType($_POST['report_code']);
-				
 			$rep->fill($_POST);
+                        $rep->report_connection_id = intval($_POST["report_connection_id"]);
 			$rep->update();
 			$repmsg = "Report updated.";
 

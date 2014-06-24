@@ -37,7 +37,7 @@ function viewreport_GET(Web &$w) {
                             array("Description", "textarea", "description", $rep->description, 110, 2, false),
                             array("Code", "textarea", "report_code", $rep->report_code, 110, 22, false),
                             array("Approved", "checkbox", "is_approved", $rep->is_approved),
-                            array("Connection", "select", "report_connection_id", $w->request('report_connection_id'), $w->Report->getConnections())
+                            array("Connection", "select", "report_connection_id", $rep->report_connection_id, $w->Report->getConnections())
                                 ), $w->localUrl("/report/editreport/" . $rep->id), "POST", " Update Report ");
 
                 // provide a button by which the report may be tested, ie. executed

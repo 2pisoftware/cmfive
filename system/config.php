@@ -22,3 +22,34 @@ set_include_path(get_include_path() . PATH_SEPARATOR . SYSTEM_LIBPATH);
 require_once "system/db.php";
 require_once "system/web.php";
 
+//========= Anonymous Access ================================
+
+// bypass authentication if sent from the following IP addresses
+Config::set("system.allow_from_ip", array());
+
+// or bypass authentication for the following modules
+Config::set("system.allow_module", array(
+    // "rest", // uncomment this to switch on REST access to the database objects. Tread with CAUTION!
+));
+
+Config::set('system.allow_action', array(
+    "auth/login",
+    "auth/forgotpassword",
+    "auth/resetpassword",
+    "admin/datamigration"
+));
+
+//========= REST Configuration ==============================
+// check the following configuration carefully to secure
+// access to the REST ifnrastructure.
+
+// use the API_KEY to authenticate with username and password
+Config::set('system.rest_api_key', "abcdefghijklmnopqrstuvwxyz1234567890");
+
+// exclude any objects that you do NOT want available via REST
+// note: only DbObjects which have the $_rest; property are 
+// accessible via REST anyway!
+Config::set('system.rest_exclude', array(
+    "User",
+    "Contact",
+));

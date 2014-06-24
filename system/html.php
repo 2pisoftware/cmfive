@@ -755,13 +755,12 @@ class Html {
             }
         }
         $buf.='</select>';
-        $webroot = WEBROOT;
-        $buf .=<<<EOT
-                <script>
-                $('#$name').asmSelect({addItemTarget: 'bottom', removeLabel: '<img src="$webroot/img/bin_closed.png" border="0"/>'});
-                $('#$name').change(function(e, data) { $.fn.colorbox.resize(); });
-                </script>
-EOT;
+        
+        $buf .= "<script>
+                jQuery(\"#{$name}\").asmSelect({addItemTarget: 'bottom', removeLabel: '<img src=\"'" . WEBROOT . "'/img/bin_closed.png\" border=\"0\"/>'});
+                jQuery(\"#{$name}\").change(function(e, data) { $.fn.colorbox.resize(); });
+                </script>";
+
         return $buf;
     }
 

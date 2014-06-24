@@ -395,10 +395,10 @@ function addgroupmembers_GET(Web &$w) {
 	$addUserForm['Add Group Members'] = array(
 	array(array("","hidden", "task_group_id",$p['task_group_id'])),
 	array(array("As Role","select","role","",$w->Task->getTaskGroupPermissions())),
-	array(array("Add Group Members","multiSelect","member",null,$usr)));
+	array(array("Add Group Members","select","member",null,$usr)));
 
-	$w->setLayout(null);
-	$w->ctx("addmembers",Html::multiColForm($addUserForm,$w->localUrl("/task-group/updategroupmembers/"),"POST"," Submit "));
+//	$w->setLayout(null);
+	$w->out(Html::multiColForm($addUserForm,$w->localUrl("/task-group/updategroupmembers/"),"POST"," Submit "));
 }
 
 function updategroupmembers_POST(Web &$w) {
@@ -411,8 +411,8 @@ function updategroupmembers_POST(Web &$w) {
 	$arrdb['is_active'] = 1;
 
 	// for each selected member, complete population of input array
-	foreach ($_REQUEST['member'] as $member) {
-		$arrdb['user_id'] = $member;
+//	foreach ($_REQUEST['member'] as $member) {
+		$arrdb['user_id'] = $w->request('member');
 		// check to see if member already exists in this group
 		$mem = $w->Task->getMemberGroupById($arrdb['task_group_id'], $arrdb['user_id']);
 		
@@ -429,7 +429,7 @@ function updategroupmembers_POST(Web &$w) {
 		}
 		// prepare input array for next selected member to insert/update
 		unset($arrdb['user_id']);
-	}
+//	}
 	// return
 	$w->msg("Task Group updated","/task-group/viewmembergroup/".$_REQUEST['task_group_id']);
 }

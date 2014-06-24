@@ -5,32 +5,26 @@
     </div>
     <div class="tab-body">
         <div id="list">
-            <?php echo Html::filter("Search Tasks", $filter_data, "/task/tasklist"); ?>
+            <?php echo !empty($filter_data) ? Html::filter("Search Tasks", $filter_data, "/task/tasklist") : ""; ?>
             <form id="updatestatus" action="<?php echo $webroot . "/task/updatestatus"; ?>" method="POST">
                 <input type="hidden" name="<?php echo CSRF::getTokenID(); ?>" value="<?php echo CSRF::getTokenValue(); ?>" />
                 <?php echo $mytasks; ?>
             </form>
         </div>
-        <div id="notifications" style="display:none;">
+        <div id="notifications" class="clearfix">
             Set up each of your Task Groups so that you will be notified, via your Inbox, of events that take place to Tasks relevant to you.
-            <dl>
-                <dt><b>Key</b>
-                <dd><b>Creator</b>: Be notified of changes to Tasks that you have created. (All roles)
-                <dd><b>Assignee</b>: Be notified of changes to Tasks assigned to you. (Members and Owners)
-                <dd><b>All Others</b>: Be notified of changes to any Task within a Task Group. (Task Group Owners only)
-            </dl>
-            <p>
-<?php echo $notify; ?>
+            <ul>
+                <li><b>Creator</b>: Be notified of changes to Tasks that you have created. (All roles)</li>
+                <li><b>Assignee</b>: Be notified of changes to Tasks assigned to you. (Members and Owners)</li>
+                <li><b>All Others</b>: Be notified of changes to any Task within a Task Group. (Task Group Owners only)</li>
+            </ul>
+            
+            <?php echo !empty($notify) ? $notify : ""; ?>
         </div>
     </div>
 </div>
 
 <script language="javascript">
-<?php
-if (!empty($_REQUEST['tab'])) {
-    echo "	switchTab(" . $_REQUEST['tab'] . ");";
-}
-?>
 
     var myFlag = true;
 
