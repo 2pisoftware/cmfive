@@ -194,8 +194,8 @@ class Web {
     function start() {
         $this->initDB();
 
-        // Initialise the logger
-        $this->service("log");
+        // Initialise the logger (needs to log "info" to include the request data, see LogService __call function)
+        $this->Log->info("info");
         
         // start the session
         // $sess = new SessionManager($this);
