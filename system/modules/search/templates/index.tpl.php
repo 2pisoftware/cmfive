@@ -2,7 +2,7 @@
 
 <div class="row-fluid">
 <!--    <form action="<?php // echo $webroot; ?>/search/results" method="GET">-->
-    <form id="search_form">
+    <form id="search_form" class="clearfix">
         <input type="hidden" name="<?php echo CSRF::getTokenID(); ?>" value="<?php echo CSRF::getTokenValue(); ?>" />
         <div class="row-fluid">
             <div class="small-12 medium-6 columns">
@@ -14,6 +14,7 @@
             <div class="small-12 medium-3 columns">
                 <button class="button tiny small-12" type="submit">Go</button>
             </div>
+        </div>
     </form>
 </div>
         

@@ -47,8 +47,6 @@
             var $ = jQuery;
 
             $(document).ready(function() {
-//                $(".msg").delay(3000).fadeOut(3000);
-//                $(".error").delay(6000).fadeOut(3000);
                 $("table.tablesorter").tablesorter({dateFormat: "uk", widthFixed: true, widgets: ['zebra']});
                 <?php
                 $tab = $w->request('tab');
@@ -239,7 +237,7 @@
                         if (modal_history.length > 0) {
                             changeModalWindow(modal_history.pop());
                         }
-                        console.log(modal_history);
+//                        console.log(modal_history);
                     } 
                     return false;
                 });
