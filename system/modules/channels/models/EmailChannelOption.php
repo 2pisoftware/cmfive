@@ -86,8 +86,7 @@ class EmailChannelOption extends DbObject {
             $this->w->Log->info("Getting messages with filter: " . json_encode($filter_arr));
             $results = $mail->protocol->search($filter_arr);
             if (count($results) > 0) {
-                
-                $this->w->Log->info("Found messages, looping through");
+                $this->w->Log->info("Found " . count($results) . " messages, looping through");
                 foreach ($results as $messagenum) {
                     $rawmessage = "";
                     $message = $mail->getMessage($messagenum);
@@ -170,7 +169,7 @@ class EmailChannelOption extends DbObject {
                 'ssl' => ($this->use_auth == 1 ? "SSL" : false)));
             return $mail;
         } catch (Exception $e) {
-            echo "Error: " . $e->getMessage();
+            $this->Log->error("Error connecting to mail server: " . $e->getMessage());
         }
     }
 

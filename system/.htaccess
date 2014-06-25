@@ -1,10 +1,6 @@
 Options All -Indexes
 
 <Files ~ "\.php$">
-	Order allow,deny
-	Deny from all
-</Files>
-<Files ~ "\.sql$">
-	Order allow,deny
-	Deny from all
+    Order allow,deny
+    Deny from all
 </Files>

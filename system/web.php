@@ -194,14 +194,14 @@ class Web {
     function start() {
         $this->initDB();
 
-        // Initialise the logger (needs to log "info" to include the request data, see LogService __call function)
-        $this->Log->info("info");
-        
         // start the session
         // $sess = new SessionManager($this);
         session_name(SESSION_NAME);
         session_start();
 
+        // Initialise the logger (needs to log "info" to include the request data, see LogService __call function)
+        $this->Log->info("info");
+        
         // Generate CSRF tokens and store them in the $_SESSION
         CSRF::getTokenID();
         CSRF::getTokenValue();
@@ -277,7 +277,7 @@ class Web {
             // load the module file
             require_once $reqpath;
         } else {
-            $this->Log->error("No Action found for: " . $reqpath);
+            $this->Log->error("System: No Action found for: " . $reqpath);
             $this->notFoundPage();
         }
 
@@ -455,7 +455,7 @@ class Web {
     private function validateCSRF() {
         // Check for CSRF token and that we have a valid request method
         if (!CSRF::isValid($this->_requestMethod)) {
-            @$this->service('log')->error("CSRF Detected from " . $this->requestIpAddress());
+            @$this->service('log')->error("System: CSRF Detected from " . $this->requestIpAddress());
             header("HTTP/1.0 403 Forbidden");
             echo "Cross site request forgery detected. Your IP has been logged";
             die();
@@ -480,7 +480,7 @@ class Web {
             $user = $this->Auth->user();
             $usrmsg = $user ? " for " . $user->login : "";
             if (!$this->Auth->allowed($path)) {
-                $this->service('log')->info("Access Denied to " . $path . $usrmsg . " from " . $this->requestIpAddress());
+                $this->service('log')->info("System: Access Denied to " . $path . $usrmsg . " from " . $this->requestIpAddress());
                 // redirect to the last allowed page 
                 if ($this->Auth->allowed($_SESSION['LAST_ALLOWED_URI'])) {
                     $this->error($msg, $_SESSION['LAST_ALLOWED_URI']);
@@ -713,10 +713,10 @@ class Web {
                         $errorMsg .= $object->getHumanReadableAttributeName($property) . ": $r <br/>\n";
                     }
                 }
-                $this->Log->error("Saving " . get_class($object) . " error: " . $errorMsg);
+                $this->Log->error("System: Saving " . get_class($object) . " error: " . $errorMsg);
                 $this->error($errorMsg, $returnUrl);
             } else {
-                $this->Log->error(($isUpdating ? "Updating" : "Creating") . " this $type failed.");
+                $this->Log->error("System: " . ($isUpdating ? "Updating" : "Creating") . " this $type failed.");
                 $this->error(($isUpdating ? "Updating" : "Creating") . " this $type failed.", $returnUrl);
             }
         }
@@ -740,7 +740,7 @@ class Web {
      * <b>THIS EXITS the current process</b>
      */
     function notFoundPage() {
-        $this->service('log')->warn("Action not found: " . $this->_module . "/" . $this->_action);
+        $this->service('log')->warn("System: Action not found: " . $this->_module . "/" . $this->_action);
         // We want to fail gracefully for ajax requests
         if ($this->isAjax()) {
             echo "The page requested could not be found.";
@@ -1094,7 +1094,7 @@ class Web {
         $template = $this->templateExists($name);
 
         if (!$template) {
-            $this->service('log')->error("No Template found.");
+            $this->service('log')->error("System: No Template found.");
             return null;
         }
         $tpl = new WebTemplate();

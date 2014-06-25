@@ -57,7 +57,13 @@ function edit_GET(Web $w) {
 function edit_POST(Web $w) {
 	$p = $w->pathMatch("id");
 	$t = $p["id"] ? $w->Template->getTemplate($p['id']) : new Template($w);
-	$t->fill($_POST);
+        $t->fill($_POST);
+        
+        // Set is active if saving is originating from the first page
+        if (isset($_POST["title"]) && isset($_POST["module"]) && isset($_POST["category"])) {
+            $t->is_active = intval($w->request("is_active"));
+        }
+	
 	$t->insertOrUpdate();
 	$w->msg("Template saved", "/admin-templates/edit/".$t->id);	
 }
