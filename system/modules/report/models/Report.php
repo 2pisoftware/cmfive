@@ -87,7 +87,7 @@ class Report extends DbObject {
                                     // if valid SQL ...
                                     if ($flgsql) {
                                         //get returns for display as dropdown
-                                        $values = $this->Report->getFormDatafromSQL($sql);
+                                        $values = $this->Report->getFormDatafromSQL($sql, $this->getDb());
                                     } else {
                                         // there is a problem, say as much
                                         $values = array("SQL error");
@@ -216,7 +216,7 @@ class Report extends DbObject {
                                     // other SQL types do not return recordset so treat differently from SELECT
                                     try {
                                         $this->startTransaction();
-                                        $rows = $this->Report->getExefromSQL($sql);
+                                        $rows = $this->Report->getExefromSQL($sql, $this->getDb());
                                         $this->commitTransaction();
                                         $line = array(array("SUCCESS", "SQL has completed successfully"));
                                     } catch (Exception $e) {
