@@ -184,20 +184,29 @@ class ReportService extends DbService {
 
     // for parameter dropdowns, run SQL statement and return an array(value,title) for display
     // DANGEROUS
-    function getFormDatafromSQL($sql) {
-        $rows = $this->_db->sql($sql)->fetch_all();
+    function getFormDatafromSQL($sql, $connection = null) {
+        if (!empty($connection)) {
+            $rows = $connection->query($sql)->fetchAll();
+        } else {
+            $rows = $this->_db->sql($sql)->fetch_all();
+        }
         if ($rows) {
             foreach ($rows as $row) {
                 $arr[] = array($row['title'], $row['value']);
             }
             return $arr;
         }
+        return null;
     }
 
     // given a report SQL statement, return recordset
     // DANGEROUS
-    function getExefromSQL($sql) {
-        return $this->_db->sql($sql)->execute();
+    function getExefromSQL($sql, $connection = null) {
+        if (!empty($connection)) {
+            return $connection->query($sql)->execute();
+        } else {
+            return $this->_db->sql($sql)->execute();
+        }
     }
 
     // convert dd/mm/yyyy date to yyy-mm-dd for SQL statements

@@ -35,6 +35,9 @@ function edit_POST(Web $w) {
     $p = $w->pathMatch("id");
     $report_connection = !empty($p["id"]) ? $w->Report->getConnection($p["id"]) : new ReportConnection($w);
     $report_connection->fill($_POST);
+    if (empty($_POST["s_db_password"])) {
+        $report_connection->s_db_password = NULL;
+    }
     $report_connection->insertOrUpdate();
     $w->msg("Connection " . (!empty($p["id"]) ? "updated" : "created"), "/report-connections");
 }

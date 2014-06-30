@@ -82,8 +82,8 @@ class Report extends DbObject {
                             case "select":
                                 if ($sql != "") {
                                     // if sql exists, check SQL is valid
-                                    $flgsql = $this->Report->getcheckSQL($sql);
-
+                                    $flgsql = $this->Report->getcheckSQL($sql, $this->getDb());
+                                    $this->w->Log->info("SQL: {$sql} FLGSQL: {$flgsql}");
                                     // if valid SQL ...
                                     if ($flgsql) {
                                         //get returns for display as dropdown
