@@ -79,6 +79,7 @@ class Report extends DbObject {
 
                         // do something different based on form element type
                         switch ($type) {
+                            case "autocomplete":
                             case "select":
                                 if ($sql != "") {
                                     // if sql exists, check SQL is valid
