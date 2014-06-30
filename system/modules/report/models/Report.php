@@ -80,6 +80,7 @@ class Report extends DbObject {
                         // do something different based on form element type
                         switch ($type) {
                             case "autocomplete":
+                                $minValue = 3;
                             case "select":
                                 if ($sql != "") {
                                     // if sql exists, check SQL is valid
@@ -98,7 +99,7 @@ class Report extends DbObject {
                                     $values = array("No SQL statement");
                                 }
                                 // complete array which becomes form dropdown
-                                $arr[] = array($label, $type, $name, $this->w->request($name), $values);
+                                $arr[] = array($label, $type, $name, $this->w->request($name), $values, ($type === "autocomplete" ? $minValue : null));
                                 break;
                             case "checkbox":
                             case "text":

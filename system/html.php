@@ -291,7 +291,8 @@ class Html {
                 break;
                 case "autocomplete":
                     $options = !empty($field[4]) ? $field[4] : null;
-                    $buffer .= Html::autocomplete($name, $options, $value, null, "width: 100%;", 1);
+                    $minValue = !empty($field[5]) ? $field[5] : 1;
+                    $buffer .= Html::autocomplete($name, $options, $value, null, "width: 100%;", $minValue);
                 break;
                 case "date":
                     $size = !empty($field[4]) ? $field[4] : null;
@@ -549,7 +550,8 @@ class Html {
                         break;
                         case "autocomplete":
                             $options = !empty($field[4]) ? $field[4] : null;
-                            $buffer .= Html::autocomplete($name, $options, $value, null, "width: 100%;", 1, $required);
+                            $minValue = !empty($field[5]) ? $field[5] : 1;
+                            $buffer .= Html::autocomplete($name, $options, $value, null, "width: 100%;", $minValue, $required);
                         break;
                         case "date":
                             $size = !empty($field[4]) ? $field[4] : null;
