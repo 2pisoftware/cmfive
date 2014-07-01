@@ -125,7 +125,7 @@ class Report extends DbObject {
         // build array of all contents within any @@...@@
         //		preg_match_all("/@@[a-zA-Z0-9_\s\|,;\(\)\{\}<>\/\-='\.@:%\+\*\$]*?@@/",preg_replace("/\n/"," ",$this->report_code), $arrsql);
         preg_match_all("/@@.*?@@/", preg_replace("/\n/", " ", $this->report_code), $arrsql);
-
+        
         // if we have statements, continue ...
         if ($arrsql) {
             // foreach array element ...
@@ -137,7 +137,7 @@ class Report extends DbObject {
                         // strip our delimiters, remove newlines
                         $sql = preg_replace("/@@/", "", $sql);
                         $sql = preg_replace("/[\r\n]+/", " ", $sql);
-
+                        
                         // split into title and statement fields
                         list($stitle, $sql) = preg_split("/\|\|/", $sql);
                         $title = array(trim($stitle));
@@ -169,7 +169,7 @@ class Report extends DbObject {
                             $sql = $this->Report->putSpecialSQL($sql);
                             // check the SQL statement for validity
                             $flgsql = $this->Report->getcheckSQL($sql, $this->getDb());
-
+                            
                             // if valid SQL ...
                             if ($flgsql) {
                                 // starter arrays
@@ -203,6 +203,7 @@ class Report extends DbObject {
                                         $hds = array($hds);
                                         // merge to create completed report for display
                                         $tbl = array_merge($crumbs, $title, $hds, $line);
+                                        
                                         $alltbl[] = $tbl;
                                         unset($line);
                                         unset($hds);
@@ -248,6 +249,7 @@ class Report extends DbObject {
         } else {
             $alltbl = array(array("ERROR"), array("There is a problem with your SQL statement"));
         }
+        
         return $alltbl;
     }
 
@@ -256,10 +258,10 @@ class Report extends DbObject {
         if (!empty($this->report_connection_id)) {
             $connection = $this->getDb();
             $return = $connection->query($sql)->fetchAll();
-            
         } else {
             $return = $this->_db->sql($sql)->fetch_all();
         }
+        
         if (!empty($return)) {
             foreach ($return as $key => $val) {
                 foreach ($val as $k => $v) {
@@ -269,6 +271,7 @@ class Report extends DbObject {
                 }
             }
         }
+        
         return $return;
     }
 
