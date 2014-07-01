@@ -25,7 +25,7 @@ function runreport_ALL(Web &$w) {
 				// display form
 				$w->Report->navigation($w, $rep->title);
 
-				if (($member->role == "EDITOR") || ($w->Auth->user()->hasRole("report_admin"))) {
+				if ((!empty($member->role) && $member->role == "EDITOR") || ($w->Auth->user()->hasRole("report_admin"))) {
 					$btnedit = Html::b("/report/viewreport/".$rep->id," Edit Report ");
 				}
 				else {

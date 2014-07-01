@@ -160,7 +160,7 @@ function exereport_ALL(Web &$w) {
                     $w->ctx("showreport", $results);
 
                     // allow editor/admin to edit the report
-                    if (($member->role == "EDITOR") || ($w->Auth->user()->hasRole("report_admin"))) {
+                    if ((!empty($member->role) && $member->role == "EDITOR") || ($w->Auth->user()->hasRole("report_admin"))) {
                         $w->ctx("btnview", $btnview);
                     }
                 }
