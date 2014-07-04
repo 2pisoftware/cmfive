@@ -1,12 +1,17 @@
 <div class="tabs">
     <div class="tab-head">
         <a href="#report">Edit Report</a>
+        <a href="#templates">Templates</a>
         <a href="#members">Members</a>
         <a href="#database">View Database</a>
     </div>	
     <div class="tab-body">
         <div id="report" class="clearfix">
             <?php echo $btnrun . $viewreport; ?>
+        </div>
+        <div id="templates">
+            <?php echo Html::box("/report-templates/edit/{$report->id}", "Add Template", true); ?>
+            <?php echo !empty($templates_table) ? $templates_table : ""; ?>
         </div>
         <div id="members" style="display: none;" class="clearfix">
             <?php echo Html::box("/report/addmembers/" . $reportid, " Add New Members ", true) ?>

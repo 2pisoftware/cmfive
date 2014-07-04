@@ -14,6 +14,10 @@ class Report extends DbObject {
     public $_modifiable; // employ the modifiable aspect
     public static $_db_table = "report";
 
+    public function getTemplates() {
+        return $this->getObjects("ReportTemplate", array("report_id" => $this->id, "is_deleted" => 0));
+    }
+    
     /**
      * return the database object to call the report on.
      * 
