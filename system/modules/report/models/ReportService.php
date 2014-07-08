@@ -515,6 +515,10 @@ class ReportService extends DbService {
         }
     }
 
+    public function getReportTemplate($id) {
+        return $this->getObject("ReportTemplate", $id);
+    }
+    
     // build the Report navigation
     public function navigation(Web $w, $title = null, $nav = null) {
         if (!empty($title)) {

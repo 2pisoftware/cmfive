@@ -18,12 +18,12 @@ function exereport_ALL(Web &$w) {
     $urlcsv = $repurl . $strREQ . "&format=csv";
     $urlpdf = $repurl . $strREQ . "&format=pdf";
     $urlxml = $repurl . $strREQ . "&format=xml";
-    $btncsv = Html::b($urlcsv, " Export as CSV ");
-    $btnpdf = Html::b($urlpdf, " Export as PDF ");
-    $btnxml = Html::b($urlxml, " Export as XML ");
-    $btnrun = Html::b($runurl, " Edit Report Parameters ");
-    $btnview = Html::b($viewurl, " Edit Report ");
-
+    $btncsv = Html::b($urlcsv, "Export as CSV");
+    $btnpdf = Html::b($urlpdf, "Export as PDF");
+    $btnxml = Html::b($urlxml, "Export as XML");
+    $btnrun = Html::b($runurl, "Edit Report Parameters");
+    $btnview = Html::b($viewurl, "Edit Report");
+    $results = "";
     // if there is a report ID in the URL ...
     if ($p['id']) {
         // get member
@@ -69,14 +69,16 @@ function exereport_ALL(Web &$w) {
                     // allowing multiple SQL statements, each returns a recordset as a seperate array element, ie. iterate
                     // array: report parameters > report title > data columns > recordset
                     foreach ($tbl as $t) {
+                        
                         $crumbs = array_shift($t);
                         $title = array_shift($t);
-
+                        
                         // first row is our column headings
                         $hds[] = array_shift($t);
+                        
                         // first row has column names as associative. change keys to numeric to match recordset
                         $tvalues = array_values($hds[0]);
-
+                        
                         // find key of any links
                         foreach ($tvalues as $h) {
                             if (stripos($h, "_link")) {
@@ -140,8 +142,10 @@ function exereport_ALL(Web &$w) {
                         }
                         // put headings back into array
                         $t = array_merge($hds, $t);
+                        
                         // build results table
-                        $results = "<b>" . $title . "</b>" . Html::table($t, null, "tablesorter", true);
+                        $results .= "<b>" . $title . "</b>" . Html::table($t, null, "tablesorter", true);
+                        
                         // reset parameters string
                         $strcrumb = "";
                         unset($hds);
@@ -156,7 +160,7 @@ function exereport_ALL(Web &$w) {
                     $w->ctx("showreport", $results);
 
                     // allow editor/admin to edit the report
-                    if (($member->role == "EDITOR") || ($w->Auth->user()->hasRole("report_admin"))) {
+                    if ((!empty($member->role) && $member->role == "EDITOR") || ($w->Auth->user()->hasRole("report_admin"))) {
                         $w->ctx("btnview", $btnview);
                     }
                 }

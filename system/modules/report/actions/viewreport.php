@@ -88,6 +88,33 @@ function viewreport_GET(Web &$w) {
                 // redirect on all other occassions
                 $w->msg($rep->title . ": Report has yet to be approved", "/report/index/");
             }
+
+            // Get list of templates
+            $report_templates = $rep->getTemplates();
+            
+            // Build table
+            $table_header = array("Title", "Category", "Type", "Actions");
+            $table_data = array();
+            
+            if (!empty($report_templates)) {
+                
+                // Add data to table layout
+                foreach($report_templates as $report_template) {
+                    $template = $report_template->getTemplate();
+                    $table_data[] = array(
+                        $template->title,
+                        $template->category,
+                        $report_template->type,
+                        Html::box("/report-templates/edit/{$rep->id}/{$report_template->id}", "Edit", true) . 
+                        Html::b("/report-templates/delete/{$report_template->id}", "Delete", "Are you sure you want to delete this Report template entry?")
+                    );
+                }
+            }
+            
+            // Render table
+            $w->ctx("report", $rep);
+            $w->ctx("templates_table", Html::table($table_data, null, "tablesorter", $table_header));
+            
         } else {
             $f = "Report does not exist";
         }
@@ -100,7 +127,7 @@ function viewreport_GET(Web &$w) {
     $btnrun = Html::b("/report/runreport/" . $rep->id, " Execute Report ");
     $w->ctx("btnrun", $btnrun);
 
-
+    
     // tab: view members
     // see report.lib.php
     ReportLib::viewMemberstab($w, $p['id']);

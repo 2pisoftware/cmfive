@@ -40,7 +40,7 @@ function index_ALL(Web &$w) {
 
             // editor & admin get EDIT button
             //			if (($w->Auth->user()->hasRole("report_editor")) || ($w->Auth->user()->hasRole("report_admin"))) {
-            if (($member->role == "EDITOR") || ($w->Auth->user()->hasRole("report_admin"))) {
+            if ((!empty($member->role) && $member->role == "EDITOR") || ($w->Auth->user()->hasRole("report_admin"))) {
                 $btnedit = Html::b(!empty($webroot) ? $webroot : '' . "/report/viewreport/" . $rep->id, " Edit ");
             }
 
@@ -59,7 +59,7 @@ function index_ALL(Web &$w) {
                         ucfirst($rep->module),
                         //$rep->getCategoryTitle(),
                         $rep->description,
-                        $btnedit .
+                        (!empty($btnedit) ? $btnedit : "") .
                         Html::b(!empty($webroot) ? $webroot : '' . "/report/runreport/" . $rep->id, " Execute ")
                     );
                 }
