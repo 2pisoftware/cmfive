@@ -22,12 +22,12 @@ class PermissionDeniedException extends Exception {
  */
 class Web {
 
-    public $_buffer;
-    public $_template;
+    public $_buffer = null;
+    public $_template = null;
     public $_templatePath;
     public $_templateExtension;
     public $_url;
-    public $_context;
+    public $_context = array();
     public $_action;
     public $_defaultHandler;
     public $_defaultAction;
@@ -49,6 +49,7 @@ class Web {
     public $_loginpath = 'auth/login';
     public $_partialsdir = "partials";
     public $db;
+    public $_isFrontend = false;
 
     public $_scripts = array();
     public $_styles = array();
@@ -57,11 +58,8 @@ class Web {
      * Constructor
      */
     function __construct() {
-        $this->_buffer = null;
-        $this->_context = array();
         $this->_templatePath = "templates";
         $this->_templateExtension = ".tpl.php";
-        $this->_template = null;
         $this->_action = null;
         $this->_defaultHandler = "main";
         $this->_defaultAction = "index";
@@ -103,7 +101,7 @@ class Web {
      * Thanks to:
      * http://www.phpaddiction.com/tags/axial/url-routing-with-php-part-one/
      */
-    private function _getCommandPath() {
+    private function _getCommandPath() {    	
         $uri = explode('?', $_SERVER['REQUEST_URI']); // get rid of parameters
         $uri = $uri[0];
         // get rid of trailing slashes
@@ -215,6 +213,29 @@ class Web {
 
         $this->_paths = $this->_getCommandPath();
 
+        // based on request domain we can route everything to a frontend module
+        // look into the domain routing and prepend the module
+        $routing = Config::get('domain.route');
+        $domainmodule = isset($routing[$_SERVER['HTTP_HOST']]) ? $routing[$_SERVER['HTTP_HOST']] : null;
+        
+        if (!empty($domainmodule)) {
+        	// now we have to decide whether the path points to
+        	// a) a single top level action
+        	// b) an action on a submodule
+        	// but we need to make sure not to mistake a path paramater for a submodule or an action!
+        	$domainsubmodules = $this->getSubmodules($domainmodule);
+        	$action_or_module = !empty($this->_paths[0]) ? $this->_paths[0] : null;
+        	if (!empty($domainsubmodules) && !empty($action_or_module) && array_search($action_or_module, $domainsubmodules) !== false) {
+        			// just add the module to the first path entry, eg. frontend-page/1
+        			$this->_paths[0] = $domainmodule."-".$this->_paths[0];
+        	} else {
+        		// add the module as an entry to the front of paths, eg. frontent/index
+        		array_unshift($this->_paths, $domainmodule);
+        	}
+        }
+        
+        // continue as usual
+        
         // first find the module file
         if ($this->_paths && sizeof($this->_paths) > 0) {
             $this->_module = array_shift($this->_paths);
@@ -462,6 +483,28 @@ class Web {
         }
     }
 
+    /**
+     * reads the /actions folder inside a module
+     * and returns the submodule names
+     * 
+     * @param unknown $module
+     * @return NULL|multitype:unknown
+     */
+    function getSubmodules($module) {
+    	$dir = $this->getModuleDir($module)."actions";
+ 		$listing = scandir($dir);
+ 		if (empty($listing)) {
+ 			return null;
+ 		}
+ 		$submodules = array();
+ 		foreach ($listing as $item) {
+ 			if (is_dir($dir."/".$item) && $item[0] !== '.') {
+ 				$submodules[] = $item;
+ 			}
+ 		}
+ 		return $submodules;
+    }
+    
     function isAjax() {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']);
     }
@@ -778,7 +821,10 @@ class Web {
      * @param string $module
      * @return Ambigous <NULL, string>
      */
-    function getModuleDir($module) {
+    function getModuleDir($module=null) {
+    	if ($module == null) {
+    		$module = $this->_module;
+    	}
         // check for explicit module path first
         $basepath = $this->moduleConf($module, 'path');
         if (!empty($basepath)) {
