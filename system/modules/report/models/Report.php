@@ -89,7 +89,7 @@ class Report extends DbObject {
                                 if ($sql != "") {
                                     // if sql exists, check SQL is valid
                                     $flgsql = $this->Report->getcheckSQL($sql, $this->getDb());
-                                    $this->w->Log->info("SQL: {$sql} FLGSQL: {$flgsql}");
+
                                     // if valid SQL ...
                                     if ($flgsql) {
                                         //get returns for display as dropdown
@@ -116,10 +116,20 @@ class Report extends DbObject {
                 }
             }
         }
+        
         // get the selection of output formats as array
-        $format = $this->Report->selectReportFormat();
+//      $format = $this->Report->selectReportFormat();
+        
+        $templates = $this->getTemplates();
+        $template_values = array();
+        if (!empty($templates)) {
+            foreach($templates as $temp) {
+                $template = $temp->getTemplate(); 
+                $template_values[] = array($template->title, $temp->id);
+            }
+        }
         // merge arrays to give all parameter form requirements
-        $arr = array_merge($arr, $format);
+        $arr = array_merge($arr, array(array("Format", "select", "format", null, $template_values)));
         // return form
         return $arr;
     }

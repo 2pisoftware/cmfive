@@ -49,18 +49,20 @@ function exereport_ALL(Web &$w) {
             }
             // if we have records, present them in the requested format
             else {
+                // Below ifs will no longer work
+                $request_format = $w->request('format');
                 // as a cvs file for download
-                if ($_REQUEST['format'] == "csv") {
+                if ($request_format == "csv") {
                     $w->setLayout(null);
                     $w->Report->exportcsv($tbl, $rep->title);
                 }
                 // as a PDF file for download
-                elseif ($_REQUEST['format'] == "pdf") {
+                elseif ($request_format == "pdf") {
                     $w->setLayout(null);
                     $w->Report->exportpdf($tbl, $rep->title);
                 }
                 // as XML document for download
-                elseif ($_REQUEST['format'] == "xml") {
+                elseif ($request_format == "xml") {
                     $w->setLayout(null);
                     $w->Report->exportxml($tbl, $rep->title);
                 }
@@ -142,9 +144,28 @@ function exereport_ALL(Web &$w) {
                         }
                         // put headings back into array
                         $t = array_merge($hds, $t);
+
+                        // Render selected template
+                        $report_template = $w->Report->getReportTemplate($w->request('format'));
+                        $template = null;
+                        if (empty($report_template->id)) {
+                            
+                            // Use default
+                            $templates = $w->Template->findTemplates('report', 'default');
+                            $template = $templates[0];
+                            if (empty($template->id)) {
+                                $results .= "<b>" . $title . "</b>" . Html::table($t, null, "tablesorter", true);
+//                                $w->error("Report template not found", "/report/editreport/{$p['id']}");
+                            }
+                        } else {
                         
+                            $results .= "<h3 class='subheader'>" . $title . "</h3>" . $w->Template->render(
+                                    !empty($report_template->template_id) ? $report_template->template_id : ($template->id), 
+                                    array("data" => $t)
+                                );
+                        }
                         // build results table
-                        $results .= "<b>" . $title . "</b>" . Html::table($t, null, "tablesorter", true);
+                        // 
                         
                         // reset parameters string
                         $strcrumb = "";
@@ -153,9 +174,9 @@ function exereport_ALL(Web &$w) {
                     }
 
                     // display export and function buttons
-                    $w->ctx("exportxml", $btnxml);
-                    $w->ctx("exportcsv", $btncsv);
-                    $w->ctx("exportpdf", $btnpdf);
+//                    $w->ctx("exportxml", $btnxml);
+//                    $w->ctx("exportcsv", $btncsv);
+//                    $w->ctx("exportpdf", $btnpdf);
                     $w->ctx("btnrun", $btnrun);
                     $w->ctx("showreport", $results);
 

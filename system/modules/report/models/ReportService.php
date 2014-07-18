@@ -3,6 +3,63 @@
 class ReportService extends DbService {
     static private $tables;
     
+    public function getReport($id) {
+        return $this->getObject("Report", $id);
+    }
+    
+    public function getReports() {
+        return $this->getObjects("Report", array("is_deleted" => 0));
+    }
+    
+    
+    
+    // return list of members attached to a report for given report ID
+    function getReportMembers($id) {
+        return $this->getObjects("ReportMember", array("report_id" => $id, "is_deleted" => 0));
+    }
+
+    // return member for given report ID and user id
+    function getReportMember($id, $uid) {
+        return $this->getObject("ReportMember", array("report_id" => $id, "user_id" => $uid, "is_deleted" => 0));
+    }
+    
+    // Helper function to decide whether or not a user has access to a given report
+    function canUserEditReport($report, $member) {
+        if (empty($report->id) or empty($member->id)) {
+            return false;
+        }
+        
+        // First, is logged in user a system admin
+        if ($this->w->Auth->user()->is_admin == 1) {
+            return true;
+        }
+        
+        // Check if logged in user is report_admin
+        if ($this->w->Auth->user()->hasRole("report_admin")) {
+            return true;
+        }
+        
+        // Then check if the user has report_editor role
+        if (!$this->w->Auth->user()->hasRole("report_editor")) {
+            return false;
+        }
+        
+        // Check that the member given is for the given report
+        if ($report->id !== $member->report_id) {
+            // Log this event
+            $this->w->Log->error("Wrong member given for report (In ReportService, line: " . __LINE__ . ")");
+            return false;
+        }
+        
+        // User is report_editor, check if this report is theirs or that they have edit access
+        if ($member->role === "OWNER" or $member->role === "EDITOR") {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    
     /**
      * Returns array of connection objects
      * 
@@ -40,7 +97,7 @@ class ReportService extends DbService {
     function getReportPermissions() {
         return array("USER", "EDITOR");
     }
-
+    
     // return a report given its ID
     function getReportInfo($id) {
         return $this->getObject("Report", array("id" => $id));
@@ -166,15 +223,6 @@ class ReportService extends DbService {
         return $repts;
     }
 
-    // return list of members attached to a report for given report ID
-    function getReportMembers($id) {
-        return $this->getObjects("ReportMember", array("report_id" => $id, "is_deleted" => 0));
-    }
-
-    // return member for given report ID and user id
-    function getReportMember($id, $uid) {
-        return $this->getObject("ReportMember", array("report_id" => $id, "user_id" => $uid));
-    }
 
     // return a users full name given their user ID
     function getUserById($id) {
@@ -531,7 +579,7 @@ class ReportService extends DbService {
             $w->menuLink("report/index", "Report Dashboard", $nav);
 
             if ($w->Auth->user()->hasRole("report_editor") || $w->Auth->user()->hasRole("report_admin")) {
-                $w->menuLink("report/createreport", "Create a Report", $nav);
+                $w->menuLink("report/edit", "Create a Report", $nav);
                 $w->menuLink("report-connections", "Connections", $nav);
                 $w->menuLink("report/listfeed", "Feeds Dashboard", $nav);
             }

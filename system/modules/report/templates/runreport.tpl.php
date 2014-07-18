@@ -1,6 +1,6 @@
 
 <div style="width:400px">
-			<?php echo $btnedit . "<p>" . $report; ?>
+    <?php echo $btnedit . "<p>" . $report; ?>
 </div>		
 
 

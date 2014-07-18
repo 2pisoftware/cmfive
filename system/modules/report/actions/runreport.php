@@ -34,7 +34,7 @@ function runreport_ALL(Web &$w) {
 
 				// get the form array
 				$form = $rep->getReportCriteria();
-
+                                
 				// if there is a form display it, otherwise say as much
 				if ($form) {
 					$theform = Html::form($form,$w->localUrl("/report/exereport/".$rep->id),"POST"," Display Report ");
