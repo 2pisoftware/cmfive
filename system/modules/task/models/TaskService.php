@@ -229,12 +229,13 @@ class TaskService extends DbService {
 
     	// key = permission level, value = ascending number
     	$i = 0;
+        $perm = array();
     	foreach ($permissions as $per) {
     		$perm[$per] = $i++;
     	}
 
     	// if number of user role is >= number of requesite level, then allow
-    	if ($perm[$role] >= $perm[$permission]) {
+        if (!empty($perm[$role]) && !empty($perm[$permission]) && ($perm[$role] >= $perm[$permission])) {
     		return true;
     	}
     	return false;
