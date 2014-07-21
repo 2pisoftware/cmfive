@@ -49,8 +49,8 @@ CREATE TABLE IF NOT EXISTS `attachment_type` (
 
 CREATE TABLE IF NOT EXISTS `audit` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `dt_created` datetime NOT NULL,
-  `creator_id` bigint(20) NOT NULL,
+  `dt_created` datetime NULL DEFAULT NULL,
+  `creator_id` bigint(20) NULL DEFAULT NULL,
   `submodule` TEXT NULL, 
   `message` TEXT NULL,
   `module` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
@@ -199,7 +199,7 @@ CREATE TABLE IF NOT EXISTS `report_feed` (
   `report_id` int(11) NOT NULL,
   `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `description` text COLLATE utf8_unicode_ci NOT NULL,
-  `key` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `report_key` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `url` varchar(1024) COLLATE utf8_unicode_ci NOT NULL,
   `dt_created` datetime NOT NULL,
   `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
@@ -252,7 +252,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `is_admin` tinyint(1) NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
-  `is_group` tinyint(4) NULL,
+  `is_group` tinyint(4) NOT NULL DEFAULT '0',
   `dt_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `dt_lastlogin` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -387,7 +387,7 @@ CREATE TABLE IF NOT EXISTS `task` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `is_closed` tinyint(1) NOT NULL DEFAULT '0',
   `parent_id` int(11) DEFAULT NULL,
-  `title` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `title` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
   `task_group_id` int(11) NOT NULL,
   `status` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `priority` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
@@ -396,13 +396,13 @@ CREATE TABLE IF NOT EXISTS `task` (
   `dt_assigned` datetime NOT NULL,
   `dt_first_assigned` datetime NOT NULL,
   `first_assignee_id` int(11) NOT NULL,
-  `dt_completed` datetime NOT NULL,
-  `dt_planned` datetime NOT NULL,
-  `dt_due` datetime NOT NULL,
-  `estimate_hours` int(11) NOT NULL,
-  `description` text NOT NULL,
-  `latitude` varchar(20) NOT NULL,
-  `longitude` varchar(20) NOT NULL,
+  `dt_completed` datetime NULL DEFAULT NULL,
+  `dt_planned` datetime NULL DEFAULT NULL,
+  `dt_due` datetime NULL DEFAULT NULL,
+  `estimate_hours` int(11) NULL DEFAULT NULL,
+  `description` text NULL DEFAULT NULL,
+  `latitude` varchar(20) NULL DEFAULT NULL,
+  `longitude` varchar(20) NULL DEFAULT NULL,
   `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
@@ -631,15 +631,15 @@ CREATE TABLE IF NOT EXISTS `wiki_user` (
 CREATE TABLE IF NOT EXISTS `comment` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `obj_table` varchar(200) NOT NULL,
-  `obj_id` bigint(20) NOT NULL,
-  `comment` text NOT NULL,
+  `obj_id` bigint(20) NULL DEFAULT NULL,
+  `comment` text NULL DEFAULT NULL,
   `is_internal` tinyint(4) NOT NULL DEFAULT '0',
   `is_system` tinyint(4) NOT NULL DEFAULT '0',
-  `creator_id` bigint(20) NOT NULL,
-  `dt_created` datetime NOT NULL,
-  `modifier_id` bigint(20) NOT NULL,
-  `dt_modified` datetime NOT NULL,
-  `is_deleted` tinyint(1) NOT NULL,
+  `creator_id` bigint(20) NULL DEFAULT NULL,
+  `dt_created` datetime NULL DEFAULT NULL,
+  `modifier_id` bigint(20) NULL DEFAULT NULL,
+  `dt_modified` datetime NULL DEFAULT NULL,
+  `is_deleted` tinyint(1) NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
@@ -651,10 +651,10 @@ CREATE TABLE IF NOT EXISTS `comment` (
 
 CREATE TABLE IF NOT EXISTS `object_index` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `dt_created` datetime NOT NULL,
-  `dt_modified` datetime NOT NULL,
-  `creator_id` bigint(20) NOT NULL,
-  `modifier_id` bigint(20) NOT NULL,
+  `dt_created` datetime NULL DEFAULT NULL,
+  `dt_modified` datetime NULL DEFAULT NULL,
+  `creator_id` bigint(20) NULL DEFAULT NULL,
+  `modifier_id` bigint(20) NULL DEFAULT NULL,
   `class_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `object_id` bigint(20) NOT NULL,
   `content` longtext COLLATE utf8_unicode_ci NOT NULL,
@@ -826,6 +826,20 @@ CREATE TABLE IF NOT EXISTS `printer` (
   `name` varchar(512) NOT NULL,
   `server` varchar(512) NOT NULL,
   `port` varchar(256) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
+CREATE TABLE IF NOT EXISTS `report_template` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `report_id` bigint(20) NOT NULL,
+  `template_id` bigint(20) NOT NULL,
+  `type` varchar(255) DEFAULT NULL,
+  `creator_id` bigint(20) DEFAULT NULL,
+  `modifier_id` bigint(20) DEFAULT NULL,
+  `dt_created` datetime DEFAULT NULL,
+  `dt_updated` datetime DEFAULT NULL,
+  `is_deleted` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
