@@ -17,4 +17,23 @@ class FormsService extends DbService {
 		}
 		return $this->getObjects("FormsApplication",$where);
 	}
+	
+	public function navigation(Web $w, $title = null, $prenav=null) {
+		if ($title) {
+			$w->ctx("title",$title);
+		}
+		$nav = $prenav ? $prenav : array();
+		if ($w->Auth->hasRole("forms_admin")) {
+			$w->menuLink("forms-admin/index","Edit Applications", $nav);
+		}
+		$apps = $w->Forms->getApplications();
+		if ($apps) {
+			foreach ($apps as $app) {
+				$w->menuLink("forms/app/".$app->slug,$app->title,$nav);
+			}
+		}
+		$w->ctx("navigation", $nav);
+		return $nav;
+	}
+	
 }
