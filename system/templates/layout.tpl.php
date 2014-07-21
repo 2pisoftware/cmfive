@@ -48,27 +48,20 @@
 
             $(document).ready(function() {
                 $("table.tablesorter").tablesorter({dateFormat: "uk", widthFixed: true, widgets: ['zebra']});
-                <?php
-                $tab = $w->request('tab');
-                if (!empty($tab)) : ?>
-                    switchTab("<?php echo $tab; ?>");
-                <?php else: ?>
-
-                    $(".tab-head").children("a").each(function() {
-                        $(this).bind("click", {alink: this}, function(event) {
-                            changeTab(event.data.alink.hash);
-                            return false;
-                        });
+                $(".tab-head").children("a").each(function() {
+                    $(this).bind("click", {alink: this}, function(event) {
+                        changeTab(event.data.alink.hash);
+                        return false;
                     });
+                });
 
-                    // Change tab if hash exists
-                    var hash = window.location.hash.split("#")[1];
-                    if (hash && hash.length > 0) {
-                        changeTab(hash);
-                    } else {
-                        $(".tab-head > a:first").trigger("click");
-                    }
-                <?php endif; ?>
+                // Change tab if hash exists
+                var hash = window.location.hash.split("#")[1];
+                if (hash && hash.length > 0) {
+                    changeTab(hash);
+                } else {
+                    $(".tab-head > a:first").trigger("click");
+                }
             });
 
             // Try and prevent multiple form submissions
