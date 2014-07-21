@@ -25,7 +25,7 @@ class TaskGroup extends DbObject {
 
     // get my member object. compare my role with group role required to view task group
     function getCanIView() {
-        $me = $this->Task->getMemberGroupById($this->id, $_SESSION['user_id']);
+        $me = $this->Task->getMemberGroupById($this->id, $this->w->Auth->user()->id);
         if (empty($me))
             return false;
         return ($this->can_view == "ALL") ? true : $this->Task->getMyPerms($me->role, $this->can_view);
@@ -33,7 +33,7 @@ class TaskGroup extends DbObject {
 
     // get my member object. compare my role with group role required to create tasks in this group
     function getCanICreate() {
-        $me = $this->Task->getMemberGroupById($this->id, $_SESSION['user_id']);
+        $me = $this->Task->getMemberGroupById($this->id, $this->w->Auth->user()->id);
         if (empty($me))
             return false;
         return ($this->can_create == "ALL") ? true : $this->Task->getMyPerms($me->role, $this->can_create);
@@ -41,7 +41,7 @@ class TaskGroup extends DbObject {
 
     // get my member object. compare my role with group role required to assign tasks in this group
     function getCanIAssign() {
-        $me = $this->Task->getMemberGroupById($this->id, $_SESSION['user_id']);
+        $me = $this->Task->getMemberGroupById($this->id, $this->w->Auth->user()->id);
         if (empty($me))
             return false;
         return ($this->can_assign == "ALL") ? true : $this->Task->getMyPerms($me->role, $this->can_assign);

@@ -5,6 +5,10 @@ function taskAjaxSelectbyTaskGroup_ALL(Web $w) {
 	$tid = $w->request('id');
 	$t = $w->Task->getTaskGroup($tid);
 
+        if (empty($t->id)) {
+            return;
+        }
+        
 	$tasktypes = ($t != "") ? $w->Task->getTaskTypes($t->task_group_type) : array();
 	$priority = ($t != "") ? $w->Task->getTaskPriority($t->task_group_type) : array();
 	$members = ($t != "") ? $w->Task->getMembersBeAssigned($t->id) : array();
@@ -19,12 +23,12 @@ function taskAjaxSelectbyTaskGroup_ALL(Web $w) {
 	$ttype = Html::select("task_type",$tasktypes,null);
 	$prior = Html::select("priority",$priority,null);
 	$mem = Html::select("first_assignee_id",$members,null);
-	$tasktext = "<table border=0 class=form>" .
-				"<tr><td class=section colspan=2>Task Group Description</td></tr>" . 
-				"<tr><td><b>Task Group</td><td>" . $t->title . "</td></tr>" . 
-				"<tr><td><b>Task Type</b></td><td>" . $typetitle . "</td></tr>" . 
-				"<tr valign=top><td><b>Description</b></td><td>" . $typedesc . "</td></tr>" . 
-				"</table><p>";
+	$tasktext = "<table style='width: 100%;'>" .
+            "<tr><td class=section colspan=2>Task Group Description</td></tr>" . 
+            "<tr><td><b>Task Group</td><td>" . $t->title . "</td></tr>" . 
+            "<tr><td><b>Task Type</b></td><td>" . $typetitle . "</td></tr>" . 
+            "<tr valign=top><td><b>Description</b></td><td>" . $typedesc . "</td></tr>" . 
+        "</table>";
 
 	// return as array of arrays
 	$result = array($ttype, $prior , $mem, $tasktext);

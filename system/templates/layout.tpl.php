@@ -73,10 +73,14 @@
                     $(this).hide();
                 });
             });
-
         </script>
     </head>
     <body>
+        <div class="loading_overlay" style="display:none;">
+            <div class="circle"></div>
+            <div class="circle_inner"></div>
+            <h4 class="subheader">Please wait...</h4>
+        </div>
         <div class="row-fluid">
             <nav class="top-bar" data-topbar><!-- To make it that you need to click to activate dropdown use  data-options="is_hover: false" -->
                 <ul class="title-area">
@@ -139,18 +143,6 @@
         </div>
 
         <div class="row-fluid" style="overflow: hidden; padding: 10px;">
-         <!--<?php /* Check if there are side boxes defined */
-            // if (!empty($boxes)) : ?>
-                <div class="small-12 medium-2 left">
-                    <?php // foreach ($boxes as $btitle => $box) : ?>
-                        <div class="row boxes">
-                            <h5><?php // echo ucfirst($btitle); ?></h5>
-                            <?php // echo $box; ?>
-                        </div>
-                    <?php // endforeach; ?>
-                </div>
-            <?php // endif; ?>-->
-
             <?php // Body section w/ message and body from template ?>
             <div class="body row-fluid <?php // if(!empty($boxes)) echo "medium-10 small-12 "; ?>">
                 <h3 class="header"><?php echo !empty($title) ? $title : ucfirst($w->currentModule()); ?></h3>

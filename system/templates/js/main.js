@@ -21,6 +21,14 @@ function changeTab(hash) {
     }
 }
 
+function toggleModalLoading() {
+    if ($(".loading_overlay").is(":visible")) {
+        $(".loading_overlay").fadeOut();
+    } else {
+        $(".loading_overlay").fadeIn();
+    }
+}
+
 /**
  * Clears all elements of a form
  */

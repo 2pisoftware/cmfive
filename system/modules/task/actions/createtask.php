@@ -28,12 +28,12 @@ function createtask_GET(Web &$w) {
 			$members = ($t != "") ? $w->Task->getMembersBeAssigned($t->id) : array();
 			sort($members);
 				
-			$tasktext = "<table border=0 class=form>" .
+			$tasktext = "<table>" .
 				"<tr><td class=section colspan=2>Task Group Description</td></tr>" . 
 				"<tr><td><b>Task Group</td><td>" . $t->title . "</td></tr>" . 
 				"<tr><td><b>Task Type</b></td><td>" . $t->getTypeTitle() . "</td></tr>" . 
 				"<tr><td><b>Description</b></td><td>" . $t->getTypeDescription() . "</td></tr>" . 
-				"</table><p>";
+				"</table>";
 
 			$w->ctx("tasktext",$tasktext);
 		}
