@@ -165,7 +165,7 @@ function viewtask_GET(Web &$w) {
 				if ($log->is_suspect == "1") {
 					$label = " Accept ";
 					$period = "(" . $period . ")";
-					$bedit = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+					$bedit = "";
 				}
 				// if accepted, label button, tally period, include edit button
 				if ($log->is_suspect == "0") {

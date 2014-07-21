@@ -1055,7 +1055,7 @@ class Html {
         // List data items
         foreach($data as $id => $d) {
             $buffer .= "<li class='grid-list-panel'>";
-            $buffer .= "<div class='panel clearfix  '><div class='small-12'>";
+            $buffer .= "<div class='panel clearfix'><div class='small-12'>";
             
             if (!empty($d)) {
                 // Loop through each lione
