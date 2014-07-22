@@ -25,7 +25,7 @@ class TaskGroup extends DbObject {
 
     // get my member object. compare my role with group role required to view task group
     function getCanIView() {
-        if ($w->Auth->user()->is_admin == 1) {
+        if ($this->w->Auth->user()->is_admin == 1) {
             return true;
         }
         
@@ -37,7 +37,7 @@ class TaskGroup extends DbObject {
 
     // get my member object. compare my role with group role required to create tasks in this group
     function getCanICreate() {
-        if ($w->Auth->user()->is_admin == 1) {
+        if ($this->w->Auth->user()->is_admin == 1) {
             return true;
         }
         
@@ -49,7 +49,7 @@ class TaskGroup extends DbObject {
 
     // get my member object. compare my role with group role required to assign tasks in this group
     function getCanIAssign() {
-        if ($w->Auth->user()->is_admin == 1) {
+        if ($this->w->Auth->user()->is_admin == 1) {
             return true;
         }
         
