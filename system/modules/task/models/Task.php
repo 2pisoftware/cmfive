@@ -82,14 +82,14 @@ class Task extends DbObject {
 	
 	// get my membership object and compare my role with that required to view tasks given a task group ID
 	function getCanIView() {
-            if ($w->Auth->user()->is_admin == 1) {
+            if ($this->w->Auth->user()->is_admin == 1) {
                 return true;
             }
             
-            $me = $this->Task->getMemberGroupById($this->task_group_id, $w->Auth->user()->id);
+            $me = $this->Task->getMemberGroupById($this->task_group_id, $this->w->Auth->user()->id);
             $group = $this->Task->getTaskGroup($this->task_group_id);
 
-            return ($w->Auth->user()->id == $this->getTaskCreatorId()) ? true : $this->Task->getMyPerms($me->role, $group->can_view);
+            return ($this->w->Auth->user()->id == $this->getTaskCreatorId()) ? true : $this->Task->getMyPerms($me->role, $group->can_view);
 	}
 	
 	/**
@@ -110,17 +110,17 @@ class Task extends DbObject {
 	
 	// get my membership object and check i am better than GUEST of a task group given a task group ID
 	function getCanIEdit() {
-            if ($w->Auth->user()->is_admin == 1) {
+            if ($this->w->Auth->user()->is_admin == 1) {
                 return true;
             }
-            if (($w->Auth->user()->id == $this->assignee_id) || ($w->Auth->user()->id == $this->getTaskCreatorId())) {
+            if (($this->w->Auth->user()->id == $this->assignee_id) || ($this->w->Auth->user()->id == $this->getTaskCreatorId())) {
                 return true;
             }
 	}
 	
 	// get my membership object and compare my role with that required to assigne tasks given a task group ID
 	function getCanIAssign() {
-            if ($w->Auth->user()->is_admin == 1) {
+            if ($this->w->Auth->user()->is_admin == 1) {
                 return true;
             }
             $me = $this->Task->getMemberGroupById($this->task_group_id, $_SESSION['user_id']);
@@ -131,7 +131,7 @@ class Task extends DbObject {
 
 	// if i am assignee, creator or task group owner, i can set notifications for this Task
 	function getCanINotify() {
-            if ($w->Auth->user()->is_admin == 1) {
+            if ($this->w->Auth->user()->is_admin == 1) {
                 return true;
             }
             
