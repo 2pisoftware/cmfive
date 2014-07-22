@@ -120,10 +120,13 @@ class Task extends DbObject {
 
 	// if i am assignee, creator or task group owner, i can set notifications for this Task
 	function getCanINotify() {
-		$me = $this->Task->getMemberGroupById($this->task_group_id, $_SESSION['user_id']);
+            $logged_in_user_id = $this->w->Auth->user()->id;
+            $me = $this->Task->getMemberGroupById($this->task_group_id, $logged_in_user_id);
 		
-		if (($_SESSION['user_id'] == $this->assignee_id) || ($_SESSION['user_id'] == $this->getTaskCreatorId()) || ($this->Task->getMyPerms($me->role, "OWNER")))
-				return true;
+            if ($this->w->Auth->user()->is_admin || ($logged_in_user_id == $this->assignee_id) || ($logged_in_user_id == $this->getTaskCreatorId()) || (!empty($me->role) && $this->Task->getMyPerms($me->role, "OWNER"))){
+                return true;
+            }
+            return false;
 	}	
 		
 	// return the ID of the task creator given a task ID

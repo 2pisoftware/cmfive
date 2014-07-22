@@ -226,18 +226,21 @@ class TaskService extends DbService {
 
     // determine if current user can perform a task
     // compare users role against required role to perform given task
-    function getMyPerms($role, $permission) {
+    function getMyPerms($role, $required_permission) {
         $permissions = $this->getTaskGroupPermissions();
 
         // key = permission level, value = ascending number
         $i = 0;
-        foreach ($permissions as $per) {
-            $perm[$per] = $i++;
+        $permission_array = array();
+        foreach ($permissions as $permission) {
+            $permission_array[$permission] = $i++;
         }
 
         // if number of user role is >= number of requesite level, then allow
-        if ($perm[$role] >= $perm[$permission]) {
-            return true;
+        if (!empty($permission_array[$role]) && !empty($permission_array[$required_permission])){
+            if ($permission_array[$role] >= $permission_array[$required_permission]) {
+                return true;
+            }
         }
         return false;
     }
