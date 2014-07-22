@@ -217,7 +217,7 @@ CREATE TABLE IF NOT EXISTS `report_member` (
   `report_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `role` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `is_deleted` tinyint(1) NOT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=3 ;
 
@@ -434,7 +434,7 @@ CREATE TABLE IF NOT EXISTS `task_group` (
   `can_view` varchar(50) NOT NULL,
   `can_create` varchar(50) DEFAULT NULL,
   `is_active` tinyint(4) NOT NULL,
-  `is_deleted` tinyint(4) NOT NULL,
+  `is_deleted` tinyint(4) NOT NULL DEFAULT '0',
   `description` text NOT NULL,
   `task_group_type` varchar(50) NOT NULL,
   `default_assignee_id` int(11) NOT NULL,
@@ -562,7 +562,7 @@ CREATE TABLE IF NOT EXISTS `wiki` (
   `dt_modified` datetime NOT NULL,
   `creator_id` bigint(20) NOT NULL,
   `modifier_id` bigint(20) NOT NULL,
-  `is_deleted` tinyint(1) NOT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
   `owner_id` bigint(20) NOT NULL,
   `is_public` tinyint(1) NOT NULL DEFAULT '0',
   `last_modified_page_id` bigint(20) NOT NULL,
@@ -639,7 +639,7 @@ CREATE TABLE IF NOT EXISTS `comment` (
   `dt_created` datetime NULL DEFAULT NULL,
   `modifier_id` bigint(20) NULL DEFAULT NULL,
   `dt_modified` datetime NULL DEFAULT NULL,
-  `is_deleted` tinyint(1) NULL DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 

@@ -26,7 +26,7 @@ class MailService extends DbService {
     public function sendMail($to, $from, $subject, $body, $cc = null, $bcc = null, $attachments = array()) {
         
         if ($this->transport === NULL) {
-        	$this->w->logError("Could not send mail to {$to} from {$from} about {$subject} no email transport defined!");
+        	$this->w->Log->error("Could not send mail to {$to} from {$from} about {$subject} no email transport defined!");
         	return;
         }
 
