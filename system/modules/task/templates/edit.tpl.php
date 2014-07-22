@@ -4,7 +4,7 @@
         <?php if (!empty($task->id)) : ?>
             <a href="#timelog">Time Log</a>
             <a href="#comments">Comments</a>
-            <a href="#documents">Documents</a>
+            <a href="#attachments">Attachments</a>
             <?php if ($task->getCanINotify()):?><a href="#notification">Notifications</a><?php endif;?>
         <?php endif; ?>
     </div>
