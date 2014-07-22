@@ -3,7 +3,7 @@
     // /admin/comment/[COMMENT_ID]/[TABLE_NAME]/[OBJECT_ID]?redirect_url=[REDIRECT_URL]
     // Its a bit farfetched but provides us with a standard commenting interface
     // Dont need to worry about urlencoding the redirect url
-    echo Html::box("/admin/comment//{$object->getDbTablename()}/{$object->id}?redirect_url=" . $redirect, "Add Comment", true) . "<br/><br/>";
+    echo Html::box("/admin/comment//{$object->getDbTablename()}/{$object->id}?redirect_url=" . $redirect, "Add Comment", true);
     if (!empty($comments)) : ?>
         <div class="comment_container">
             <?php foreach($comments as $c) : ?>

@@ -198,6 +198,11 @@ button.button {
     margin: 0;
 }
 
+/* Task group styling */
+table.taskgroup_summary {
+    margin-bottom: 0px !important;
+}
+
 /* Should be supported in IE7+ */
 button.button + button {
     margin-left: 5px !important;
