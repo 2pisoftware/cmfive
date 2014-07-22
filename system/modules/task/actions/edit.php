@@ -109,7 +109,7 @@ function edit_GET($w) {
             $type = "";
             if ($task->assignee_id == $logged_in_user_id) {
                 $type = "assignee";
-            } else if ($task->getCreatorId() == $logged_in_user_id) {
+            } else if ($task->getTaskCreatorId() == $logged_in_user_id) {
                 $type = "creator";
             } else if ($w->Task->getIsOwner($task->task_group_id, $logged_in_user_id)) {
                 $type = "other";
