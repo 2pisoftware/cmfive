@@ -42,8 +42,102 @@ function edit_GET($w) {
             array(array("Assigned To", "select", "first_assignee_id", $task->first_assignee_id, $members)),
         )
     );
+    
     $w->ctx("task", $task);
     $w->ctx("form", Html::multiColForm($form, $w->localUrl("/task/edit/{$task->id}"), "POST", "Save", "edit_form"));
+    
+    //////////////////////////
+    // Build time log table //
+    //////////////////////////
+    $timelog = $task->getTimeLog();
+    $total_seconds = 0;
+    
+    $table_header = array("Assignee", "Created By", "Start", "End", "Period (hours)", "Actions");
+    $table_data = array();
+    if (!empty($timelog)) {
+        // for each entry display, calculate period and display total time on task
+        foreach ($timelog as $log) {
+            // get time difference, start to end
+            $seconds = $log->dt_end - $log->dt_start;
+            $period = $w->Task->getFormatPeriod($seconds);
+
+            $table_row = array(
+                $w->Task->getUserById($log->user_id),
+                $w->Task->getUserById($log->creator_id),
+                formatDateTime($log->dt_start),
+                formatDateTime($log->dt_end),
+                $period
+            );
+            
+            // Build list of buttons
+            $buttons = '';
+            if ($log->is_suspect == "0") {
+                $total_seconds += $seconds;
+                $buttons .= Html::box($w->localUrl("/task/addtime/".$task->id."/".$log->id)," Edit ",true);
+            }
+
+            if ($w->Task->getIsOwner($task->task_group_id, $w->Auth->user()->id)) {
+                $buttons .= Html::b($w->localUrl("/task/suspecttime/".$task->id."/".$log->id), ((empty($log->is_suspect) || $log->is_suspect == "0") ? "Review" : "Accept"));
+            }
+            
+            $buttons .= Html::b($w->localUrl("/task/deletetime/".$task->id."/".$log->id), "Delete", "Are you sure you wish to DELETE this Time Log Entry?");
+            $buttons .= Html::box($w->localUrl("/task/popComment/".$task->id."/".$log->comment_id)," Comment ",true);
+            $table_row[] = $buttons;
+            
+            $table_data[] = $table_row;
+        }
+        $table_data[] = array("","","","<b>Total</b>", "<b>".$w->Task->getFormatPeriod($total_seconds)."</b>","");
+    }
+    // display the task time log
+    $w->ctx("timelog",Html::table($table_data, null, "tablesorter", $table_header));
+    
+    ///////////////////
+    // Notifications //
+    ///////////////////
+    
+    $notify = null;
+    // If I am assignee, creator or task group owner, I can get notifications for this task
+    if (!empty($task->id) && $task->getCanINotify()) {
+
+        // get User set notifications for this Task
+        $notify = $w->Task->getTaskUserNotify($w->Auth->user()->id, $task->id);
+        if (empty($notify)) {
+            $logged_in_user_id = $w->Auth->user()->id;
+            // Get my role in this task group
+            $me = $w->Task->getMemberGroupById($task->task_group_id, $logged_in_user_id);
+            
+            $type = "";
+            if ($task->assignee_id == $logged_in_user_id) {
+                $type = "assignee";
+            } else if ($task->getCreatorId() == $logged_in_user_id) {
+                $type = "creator";
+            } else if ($w->Task->getIsOwner($task->task_group_id, $logged_in_user_id)) {
+                $type = "other";
+            }
+
+            if (!empty($type)) {
+                $notify = $w->Task->getTaskGroupUserNotifyType($logged_in_user_id, $task->task_group_id, strtolower($me->role), $type);
+            }
+        }
+
+        // create form. if still no 'notify' all boxes are unchecked
+        $form = array(
+            "Notification Events" => array(
+                array(array("","hidden","task_creation", "0")),
+                array(
+                    array("Task Details Update","checkbox","task_details", !empty($notify->task_details) ? $notify->task_details : null),
+                    array("Comments Added","checkbox","task_comments", !empty($notify->task_comments) ? $notify->task_comments : null)
+                ),
+                array(
+                    array("Time Log Entry","checkbox","time_log", !empty($notify->time_log) ? $notify->time_log : null),
+                    array("Task Data Updated","checkbox","task_data", !empty($notify->task_data) ? $notify->task_data : null)
+                ),
+                array(array("Documents Added","checkbox","task_documents", !empty($notify->task_documents) ? $notify->task_documents : null))
+            )
+        );
+
+        $w->ctx("tasknotify", Html::multiColForm($form, $w->localUrl("/task/updateusertasknotify/".$task->id),"POST"));
+    }
 }
 
 function edit_POST($w) {
@@ -72,5 +166,5 @@ function edit_POST($w) {
 //        }
 //    }
     
-    $w->msg("Task " . (!empty($p['id']) ? "updated" : "created"), "/task/viewtask/{$task->id}");
+    $w->msg("Task " . (!empty($p['id']) ? "updated" : "created"), "/task/edit/{$task->id}");
 }

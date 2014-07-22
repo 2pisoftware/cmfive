@@ -309,7 +309,7 @@ class Task extends DbObject {
 	}
 	
 	function printSearchUrl() {
-		return "task/viewtask/".$this->id;
+		return "task/edit/".$this->id;
 	}
 	
 	function getAssignee() {

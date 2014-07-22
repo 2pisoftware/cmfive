@@ -125,7 +125,7 @@ class form {
     
     public function close($button_title = 'Save', $extrabuttons = null) {
         $button = new \Html\button();
-        $button->type("submit")->text($button_title);        
-        return "<div class='row small-12 columns'>{$button}&nbsp{$extrabuttons}</div></form>";
+        $button->type("submit")->text($button_title);
+        return "<div class='row small-12 columns'>{$button->__toString()}{$extrabuttons}</div></form>";
     }
 }

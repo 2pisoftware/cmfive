@@ -82,7 +82,7 @@ function tasklist_ALL(Web $w) {
             }
 
             $thisline = array(
-                Html::a(WEBROOT . "/task/viewtask/" . $task->id, $task->title),
+                Html::a(WEBROOT . "/task/edit/" . $task->id, $task->title),
                 $w->Task->getUserById($task->assignee_id),
                 $task->getTaskGroupTypeTitle(),
                 $task->getTypeTitle(),

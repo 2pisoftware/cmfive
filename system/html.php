@@ -621,7 +621,7 @@ class Html {
             }
             $buffer .= "</div>";
         }
-        $buffer .= "<script>$(function(){\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})});</script>";
+        $buffer .= "<script>$(function(){try{\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})}catch(err){}});</script>";
        
         // Finish shell div tag
         $buffer .= "</div>";

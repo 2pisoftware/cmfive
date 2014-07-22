@@ -26,18 +26,26 @@
         </div>
         <?php if (!empty($task->id)) : ?>
             <div id="timelog">
-                <?php echo !empty($addtime) ? $addtime : null; ?>
-                <?php echo !empty($timelog) ? $timelog : null; ?>
+                <?php 
+                    if (!empty($task->assignee_id) && ($task->assignee_id == $w->Auth->user()->id)) {
+			echo Html::box(WEBROOT."/task/addtime/".$task->id," Add Time Log entry ",true);
+                    }
+                    if (!empty($timelog)) {
+                        echo $timelog;
+                    }
+                ?>
             </div>
             <div id="comments">
                 <?php echo $w->partial("listcomments",array("object"=>$task,"redirect"=>"task/viewtask/{$task->id}#comments"), "admin"); ?>
             </div>
-            <div id="documents">
-                <?php echo $w->partial("listattachments",array("object"=>$task,"redirect"=>"task/viewtask/{$task->id}#documents"), "file"); ?>
+            <div id="attachments">
+                <?php echo $w->partial("listattachments",array("object"=>$task,"redirect"=>"task/viewtask/{$task->id}#attachments"), "file"); ?>
             </div>
             <?php if ($task->getCanINotify()):?>
             <div id="notification" class="clearfix">
-                Set your Notifications specific to this Task, otherwise your notifications for this Task Group will be employed.
+                <div class="row small-12">
+                    <h4>If you do not set notifications for this Task then the default settings for this Task group will be used</h4>
+                </div>
                 <?php echo $tasknotify;?>
             </div>
             <?php endif;?>
@@ -47,7 +55,7 @@
     // Force an ajax request initially, because if the group id is provided
     // and this doesn't exist then the user would have to reselect the taskgroup
     // manually, which is bad.
-    var initialChange = <?php echo (!empty($task) ? "false" : "true"); ?>;
+    var initialChange = <?php echo (!empty($task->id) ? "false" : "true"); ?>;
 
     $(document).ready(function() {
         $("select[id='task_group_id']").trigger("change");

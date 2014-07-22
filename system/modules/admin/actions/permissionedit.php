@@ -36,6 +36,7 @@ function permissionedit_GET(Web $w) {
         $result[$module][] = implode("_", $parts);
     }
 
+    $permission = array();
     foreach ($result as $module => $parts) {
         $parts = array_chunk($parts, 4);
 
@@ -49,7 +50,7 @@ function permissionedit_GET(Web $w) {
     }
     $action = $w->Auth->user()->is_admin ? "/admin/permissionedit/" . $option['group_id'] : null;
 
-    $w->ctx("permission", Html::multiColForm($permission, $action, "POST", "Save", null, null, array('goBack' => 'Go Back')));
+    $w->ctx("permission", Html::multiColForm($permission, $action));
 
     $w->ctx("groupRoles", json_encode($groupRoles));
 }

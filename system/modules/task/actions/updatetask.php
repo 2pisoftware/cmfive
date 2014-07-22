@@ -86,5 +86,5 @@ function updatetask_POST(Web &$w) {
 	}
 
 	// return
-	$w->msg("Task: " . $task->title . " updated.","/task/viewtask/".$task->id."?tab=1");
+	$w->msg("Task: " . $task->title . " updated.","/task/edit/".$task->id."?tab=1");
 }

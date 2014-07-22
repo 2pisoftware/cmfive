@@ -280,6 +280,7 @@ function viewtask_GET(Web &$w) {
 		$owners = $w->Task->getTaskGroupOwners($task->task_group_id);
 
 		// get owners names for display
+                $strOwners = "";
 		foreach ($owners as $owner) {
 			$strOwners .= $w->Task->getUserById($owner->user_id) . ", ";
 		}
