@@ -123,7 +123,7 @@ function viewtask_GET(Web &$w) {
 		$form = Html::form($f,$w->localUrl("/task/updatetask/".$task->id),"POST"," Update ");
 
 		// create 'start time log' button
-		$btntimelog = "";
+		$buttontimelog = "";
 		if ($task->assignee_id == $w->Auth->user()->id) {
                     $buttontimelog = new \Html\Button();
                     $buttontimelog->href("/task/starttimelog/{$task->id}")->setClass("startTime button small")->text("Start Time Log");
@@ -131,7 +131,7 @@ function viewtask_GET(Web &$w) {
 		} 
 
 		// display variables
-		$w->ctx("btntimelog",$buttontimelog->__toString());
+		$w->ctx("btntimelog",!empty($buttontimelog) ? $buttontimelog->__toString() : "");
 		$w->ctx("btndelete",$btndelete);
 		$w->ctx("viewtask",$form);
 		$w->ctx("extradetails",$task->displayExtraDetails());
