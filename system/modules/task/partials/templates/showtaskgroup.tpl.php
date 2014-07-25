@@ -7,7 +7,7 @@
                         <?php echo $taskgroup->title; ?>
                     </a>
                     <?php if ($taskgroup->getCanICreate()) : ?>
-                        <span style="float: right;"><a target="_blank" href="/task/createtask/?gid=<?php echo $taskgroup->id; ?>">+</a></span>
+                        <span style="float: right;"><a target="_blank" href="/task/edit/?gid=<?php echo $taskgroup->id; ?>">+</a></span>
                     <?php endif; ?>
                 </th>
             </tr>

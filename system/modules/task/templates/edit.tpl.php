@@ -51,6 +51,7 @@
             <?php endif;?>
         <?php endif; ?>
     </div>
+</div>
 <script language="javascript">
     // Force an ajax request initially, because if the group id is provided
     // and this doesn't exist then the user would have to reselect the taskgroup
