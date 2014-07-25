@@ -27,19 +27,21 @@
         <?php if (!empty($task->id)) : ?>
             <div id="timelog">
                 <?php 
-                    if (!empty($task->assignee_id) && ($task->assignee_id == $w->Auth->user()->id)) {
+                    if (!empty($task->assignee_id) && ($task->assignee_id == $w->Auth->user()->id)) :
 			echo Html::box(WEBROOT."/task/addtime/".$task->id," Add Time Log entry ",true);
-                    }
+                    else : ?>
+                        <p>Note: you can add time logs when you're assigned to this task</p>
+                    <?php endif;
                     if (!empty($timelog)) {
                         echo $timelog;
                     }
                 ?>
             </div>
             <div id="comments">
-                <?php echo $w->partial("listcomments",array("object"=>$task,"redirect"=>"task/viewtask/{$task->id}#comments"), "admin"); ?>
+                <?php echo $w->partial("listcomments",array("object"=>$task,"redirect"=>"task/edit/{$task->id}#comments"), "admin"); ?>
             </div>
             <div id="attachments">
-                <?php echo $w->partial("listattachments",array("object"=>$task,"redirect"=>"task/viewtask/{$task->id}#attachments"), "file"); ?>
+                <?php echo $w->partial("listattachments",array("object"=>$task,"redirect"=>"task/edit/{$task->id}#attachments"), "file"); ?>
             </div>
             <?php if ($task->getCanINotify()):?>
             <div id="notification" class="clearfix">

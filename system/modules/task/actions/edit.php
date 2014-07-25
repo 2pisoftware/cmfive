@@ -39,7 +39,7 @@ function edit_GET($w) {
                 array("Date Due", "date", "dt_due", formatDate($task->dt_due))
             ),
             array(array("Description", "textarea", "description", $task->description)),
-            array(array("Assigned To", "select", "first_assignee_id", $task->first_assignee_id, $members)),
+            array(array("Assigned To", "select", "assignee_id", $task->assignee_id, $members)),
         )
     );
     
@@ -49,6 +49,13 @@ function edit_GET($w) {
     //////////////////////////
     // Build time log table //
     //////////////////////////
+    // Add "Add time log button"
+    $addtime = "";
+    if ($task->assignee_id == $w->Auth->user()->id) {		
+        $addtime = Html::box(WEBROOT."/task/addtime/".$task->id," Add Time Log entry ",true);
+    }
+    $w->ctx("addtime",$addtime);
+    
     $timelog = $task->getTimeLog();
     $total_seconds = 0;
     
@@ -149,6 +156,7 @@ function edit_POST($w) {
     }
     
     $task->fill($_POST);
+    $task->assignee_id = intval($w->request("assignee_id"));
     if (empty($task->dt_due)) {
         $task->dt_due = $w->Task->getNextMonth();
     }

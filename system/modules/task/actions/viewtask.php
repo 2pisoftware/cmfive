@@ -141,7 +141,7 @@ function viewtask_GET(Web &$w) {
 		// provide button to add time entry
 		$addtime = "";
 		if ($task->assignee_id == $w->Auth->user()->id) {		
-			$addtime = Html::box(WEBROOT."/task/addtime/".$task->id," Add Time Log entry ",true);
+                    $addtime = Html::box(WEBROOT."/task/addtime/".$task->id," Add Time Log entry ",true);
 		}
 		$w->ctx("addtime",$addtime);
 
