@@ -58,22 +58,23 @@ class MailService extends DbService {
     private function initTransport() {
         $layer = Config::get('email.layer');
         switch ($layer) {
-        	case "smtp": 
-        		$this->transport = Swift_SmtpTransport::newInstance(Config::get('email.host'), Config::get('email.port'), 'ssl')
+            case "smtp":
+            case "swiftmailer":
+                    $this->transport = Swift_SmtpTransport::newInstance(Config::get('email.host'), Config::get('email.port'), 'ssl')
                 ->setUsername(Config::get('email.username'))
                 ->setPassword(Config::get('email.password'));
-                break;
-        	case "sendmail":
-        		$command = Config::get('email.command');
-        		//
-        		// empty() is a language construct and cannot deal with return values from functions!
-        		//
-        		if (!empty($command)) {
-        			$this->transport = Swift_SendmailTransport::newInstance(Config::get('email.command'));
-        		} else {
-        			$this->transport = Swift_SendmailTransport::newInstance();
-        		}
-        		break;
+            break;
+            case "sendmail":
+                $command = Config::get('email.command');
+                //
+                // empty() is a language construct and cannot deal with return values from functions!
+                //
+                if (!empty($command)) {
+                    $this->transport = Swift_SendmailTransport::newInstance(Config::get('email.command'));
+                } else {
+                    $this->transport = Swift_SendmailTransport::newInstance();
+                }
+            break;
         }
     }
 
