@@ -178,18 +178,6 @@ class Html {
         }
         
         return $tag_start."{$confirm_str}modal_history.push('{$href}'); \$('#cmfive-modal').foundation('reveal', 'open', '{$href}');return false;" . ($confirm ? "}" : "").$tag_end;
-        
-//        $parameters = "transition: 'elastic', href:'{$href}', iframe: {$iframe}";
-//        if (!empty($width)) {
-//            $parameters .= ", " . ($iframe ? "innerWidth:" : "") . "'{$width}'";
-//        } else {
-//            $parameters .= "," . ($iframe ? "innerWidth:" : "") . "'800px'";
-//        }
-//        $parameters .= ", " . ($iframe ? "innerHeight:" : "") . "'{$height}'";
-
-//        return " onclick=\"{$confirm_str}\$.colorbox({onComplete:function(){\$(this).colorbox.resize()}, {$parameters}});return false;" . (!empty($confirm) ? "}" : "") . "\" ";
-        
-//        return " onclick=\"{$confirm_str}\$.colorbox({onComplete:function(){\$(this).colorbox.resize()}, transition:'elastic', href:'" . $href . "', iframe:" . $iframe . $width . $height . "});return false;" . (!empty($confirm) ? "}" : "") . "\" ";
     }
 
     /**
@@ -1107,4 +1095,14 @@ class Html {
         return $buffer;
     }
     
+    public static function breadcrumbs($data = array()) {
+        if (!empty($data)) {
+            $buffer = "<ul class='breadcrumbs'>";
+            foreach($data as $entry) {
+                $buffer .= "<li" . ($entry !== end($data) ? "><a href='" . $entry['link'] . "'>" . $entry['name'] . "</a>" : " class='current'>" . $entry['name']) . "</li>";
+            }
+            $buffer .= "</ul>";
+            return $buffer;
+        }
+    }
 }

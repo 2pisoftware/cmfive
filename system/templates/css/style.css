@@ -5,6 +5,8 @@ body {
 
 .body {
     overflow: hidden;
+    padding: 10px;
+/*    display: inline-block;*/
 }
 
 span[class^='fi-'], span[class*=' fi-'] {

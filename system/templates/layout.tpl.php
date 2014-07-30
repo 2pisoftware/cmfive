@@ -130,11 +130,11 @@
                                     if (method_exists($module . "Service", "navigation")) : ?>
                                         <li class="has-dropdown <?php echo $w->_module == $module ? 'active' : ''; ?>" id="topnav_<?php echo $module; ?>">
                                             <?php // Try and get a badge count for the menu item
-                                            echo $w->menuLink($module . "/index", ucfirst($module));
+                                            echo $w->menuLink($module, ucfirst($module));
                                             echo Html::ul($w->service($module)->navigation($w), null, "dropdown"); ?>
                                         </li>
                                     <?php else: ?>
-                                        <li <?php echo $w->_module == $module ? 'class="active"' : ''; ?>><?php echo $w->menuLink($module . "/index", ucfirst($module)); ?></li>
+                                        <li <?php echo $w->_module == $module ? 'class="active"' : ''; ?>><?php echo $w->menuLink($module, ucfirst($module)); ?></li>
                                     <?php endif; ?>
                                     <li class="divider"></li>
                                 <?php endif;
@@ -149,10 +149,25 @@
             </nav>
         </div>
 
-        <div class="row-fluid" style="overflow: hidden; padding: 10px;">
+        <div class="row-fluid body">
             <?php // Body section w/ message and body from template ?>
-            <div class="body row-fluid <?php // if(!empty($boxes)) echo "medium-10 small-12 "; ?>">
-                <h3 class="header"><?php echo !empty($title) ? $title : ucfirst($w->currentModule()); ?></h3>
+            <div class="row-fluid <?php // if(!empty($boxes)) echo "medium-10 small-12 "; ?>">
+                <div class="row-fluid small-12">
+                    <h3 class="header"><?php echo !empty($title) ? $title : ucfirst($w->currentModule()); ?></h3>
+                    <div class="small-12 medium-5">
+                        <?php 
+                        if (!empty($w->_action) && (("/" . $w->_module . (!empty($w->_submodule) ? "-" . $w->_submodule : "")) !== $_SERVER['REQUEST_URI'])) {
+                            // Check that action is not empty, and the current uri isn't the module + submodule
+                            $breadcrumbs = array(array("name" => $w->_module, "link" => "/" . $w->_module));
+                            if (!empty($w->_submodule)) {
+                                $breadcrumbs[] = array("name" => $w->_submodule, "link" => "/" . $w->_module . "-" . $w->_submodule);
+                            }
+                            $breadcrumbs[] = array("name" => $w->_action, "link" => $_SERVER['REQUEST_URI']);
+                            echo Html::breadcrumbs($breadcrumbs);
+                        }
+                        ?>
+                    </div>
+                </div>
                 <?php if (!empty($error) || !empty($msg)) : ?>
                     <?php $type = !empty($error) ? array("name" => "error", "class" => "warning") : array("name" => "msg", "class" => "info"); ?>
                     <div data-alert class="alert-box <?php echo $type["class"]; ?>">
@@ -166,7 +181,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="row-fluid">
             <div id="footer">
                 Copyright &#169; <?php echo date('Y'); ?>&nbsp;&nbsp;&nbsp;<a href="<?php echo $w->moduleConf('main', 'company_url'); ?>"><?php echo $w->moduleConf('main', 'company_name'); ?></a>
