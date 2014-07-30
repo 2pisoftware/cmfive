@@ -102,23 +102,6 @@ table .section {
     font-weight: lighter;
 }
 
-.section-header {
-    margin-bottom: 10px;
-    padding: 5px;
-    font-weight: bolder;
-    /*background-color: #4D88A5;*/
-    border-bottom: 1px solid black;
-}
-
-.section-body {
-    
-}
-
-.section-body li {
-    padding-bottom: 0.5rem;
-    /*border-bottom: 1px #cacaca solid;*/
-}
-
 .widget_buttons { opacity: 0; }
 .widget_config { padding-left: 40px; }
 .widget_remove { float: right; padding-right: 40px; }
@@ -204,6 +187,22 @@ button.button {
     margin: 0;
 }
 
+.section-body {
+    padding: 0px 10px;
+    display: inline;
+}
+
+.section-body li {
+    padding: 0px 5px;
+    vertical-align: top;
+    float: left;
+    display: inline;
+}
+
+.section-body table {
+    width: 100%;
+}
+
 /* Task group styling */
 table.taskgroup_summary {
     margin-bottom: 0px !important;
@@ -214,7 +213,7 @@ button.button + button {
     margin-left: 5px !important;
 }
 
-/* Loading Indicator - from: http://www.alessioatzeni.com/blog/css3-loading-animation-loop/*/
+/* Loading Indicator - from: http://www.alessioatzeni.com/blog/css3-loading-animation-loop/ */
 .loading_overlay {
     position: fixed;
     _position: absolute;
