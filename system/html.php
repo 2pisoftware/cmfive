@@ -313,11 +313,11 @@ class Html {
                 case "textarea":
                     $c = !empty($field[4]) ? $field[4] : null;
                     $r = !empty($field[5]) ? $field[5] : null;
-                    $useCKEditor = true;
+                    $custom_class = true;
                     if (isset($field[6])) {
-                        $useCKEditor = $field[6];
+                        $custom_class = $field[6];
                     }
-                    $buffer .= '<textarea' . $readonly . ' style="width:100%;" name="' . $name . '" rows="' . $r . '" cols="' . $c . '" ' . ($useCKEditor ? 'class="ckeditor" ' : '') . ' id="' . $name . '">' . $value . '</textarea>';
+                    $buffer .= '<textarea' . $readonly . ' style="width:100%;" name="' . $name . '" rows="' . $r . '" cols="' . $c . '" ' . (!empty($custom_class) ? ($custom_class === true ? "class='ckeditor'" : "class='$custom_class' ") : '') . ' id="' . $name . '">' . $value . '</textarea>';
                 break;
                 case "select":
                     $items = !empty($field[4]) ? $field[4] : null;
@@ -359,6 +359,9 @@ class Html {
             $buffer .= "</label></div></div>";
         }
         $buffer .= "</div>";
+        $buffer .= "<script>$(function(){try{\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})}catch(err){}});</script>";
+        // $buffer .= "<script>$(function(){try{\$('textarea.codemirror').each(function(){CodeMirror.fromTextArea(this, {lineNumbers: true, mode: 'text/html', matchBrackets: true})})}catch(err){}});</script>";
+  
         if (null !== $action) {
             $buffer .= $form->close($submitTitle);
         }
@@ -572,11 +575,11 @@ class Html {
                         case "textarea":
                             $c = !empty($field[4]) ? $field[4] : null;
                             $r = !empty($field[5]) ? $field[5] : null;
-                            $useCKEditor = true;
+                            $custom_class = true;
                             if (isset($field[6])) {
-                                $useCKEditor = $field[6];
+                                $custom_class = $field[6];
                             }
-                            $buffer .= '<textarea' . $readonly . ' style="width:100%;" name="' . $name . '" rows="' . $r . '" cols="' . $c . '" ' . ($useCKEditor ? 'class="ckeditor" ' : '') . ' id="' . $name . '" ' . $required . '>' . $value . '</textarea>';
+                            $buffer .= '<textarea' . $readonly . ' style="width:100%;" name="' . $name . '" rows="' . $r . '" cols="' . $c . '" ' . (!empty($custom_class) ? ($custom_class === true ? "class='ckeditor'" : "class='$custom_class' ") : '') . ' id="' . $name . '" ' . $required . '>' . $value . '</textarea>';
                         break;
                         case "select":
                             $items = !empty($field[4]) ? $field[4] : null;
@@ -622,7 +625,8 @@ class Html {
             $buffer .= "</div>";
         }
         $buffer .= "<script>$(function(){try{\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})}catch(err){}});</script>";
-       
+        $buffer .= "<script>$(function(){try{\$('textarea.codemirror').each(function(){CodeMirror.fromTextArea(this, {lineNumbers: true, mode: 'text/html', matchBrackets: true})})}catch(err){}});</script>";
+  
         // Finish shell div tag
         $buffer .= "</div>";
         
@@ -920,7 +924,7 @@ class Html {
         $buffer .= "<fieldset style=\"padding: 0; padding-top: 10px; padding-left: 10px;\">\n";
         $buffer .= "<legend>" . $legend . "</legend>\n";
         // $buffer .= "<div class=\"row-fluid\">\n";
-        $buffer .= "<ul id='filter-grid' class='small-block-grid-2 medium-block-grid-3'>";
+        $buffer .= "<ul id='filter-grid' class='small-block-grid-2 medium-block-grid-4'>";
         
         // Loop through data
         foreach ($data as $row) {

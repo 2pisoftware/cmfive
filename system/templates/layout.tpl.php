@@ -21,6 +21,7 @@
         $w->enqueueStyle(array("name" => "pickadate.classic.css", "uri" => "/system/templates/js/pickadate.js-3.5.2/lib/compressed/themes/classic.css", "weight" => 920));
         $w->enqueueStyle(array("name" => "pickadate.classic.date.css", "uri" => "/system/templates/js/pickadate.js-3.5.2/lib/compressed/themes/classic.date.css", "weight" => 919));
         $w->enqueueStyle(array("name" => "pickadate.classic.time.css", "uri" => "/system/templates/js/pickadate.js-3.5.2/lib/compressed/themes/classic.time.css", "weight" => 918));
+        $w->enqueueStyle(array("name" => "codemirror.css", "uri" => "/system/templates/js/codemirror-4.4/lib/codemirror.css", "weight" => 900));
         
         $w->enqueueScript(array("name" => "modernizr.js", "uri" => "/system/templates/js/foundation-5.2.2/js/vendor/modernizr.js", "weight" => 1010));
         $w->enqueueScript(array("name" => "jquery.js", "uri" => "/system/templates/js/foundation-5.2.2/js/vendor/jquery.js", "weight" => 1000));
@@ -39,7 +40,10 @@
         $w->enqueueScript(array("name" => "boxover.js", "uri" => "/system/templates/js/boxover.js", "weight" => 910));
         $w->enqueueScript(array("name" => "ckeditor.js", "uri" => "/system/templates/js/ckeditor/ckeditor.js", "weight" => 900));
         $w->enqueueScript(array("name" => "Chart.js", "uri" => "/system/templates/js/chart-js/Chart.js", "weight" => 890));
-
+        
+        // Code mirror
+        $w->enqueueScript(array("name" => "codemirror.js", "uri" => "/system/templates/js/codemirror-4.4/codemirror-compressed.js", "weight" => 880));
+        
         $w->outputStyles();
         $w->outputScripts();
         ?>
@@ -62,6 +66,9 @@
                 } else {
                     $(".tab-head > a:first").trigger("click");
                 }
+                
+                // Set up CodeMirror instances if any
+                bindCodeMirror();
             });
 
             // Try and prevent multiple form submissions

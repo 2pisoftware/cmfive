@@ -80,6 +80,10 @@ button {
 }
 
 /* Grid List */
+.grid-list-panel {
+    clear: none !important;
+}
+
 .grid-list-panel .panel {
     padding: 10px 0px;
     margin-bottom: 0px;
