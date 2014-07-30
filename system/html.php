@@ -391,9 +391,9 @@ class Html {
 
         // Set up shell layout
         $buffer .= "<div class='row-fluid small-12 multicolform'>";
-        $buffer .= "<ul class='small-block-grid-1 medium-block-grid-2 large-block-grid-3 section-body'>";
+        $buffer .= "<div class='row-fluid'>";// "<ul class='small-block-grid-1 medium-block-grid-2 large-block-grid-3 section-body'>";
         foreach ($data as $section => $rows) {
-            $buffer .= "<li><h4>{$section}</h4><table class='panel'>";
+            $buffer .= "<div class='item'><div class='panel'><h4>{$section}</h4><table>";
             foreach($rows as $row) {
                 
                 foreach($row as $field) {
@@ -420,15 +420,15 @@ class Html {
                     // Add title field
                     $buffer .= "<tr>";
                     if (!empty($title)) {
-                        $buffer .= "<td class='small-12 medium-6 large-4'><b>{$title}</b></td>";
+                        $buffer .= "<td class='small-6 large-4'><b>{$title}</b></td>";
                     }
 
-                    $buffer .= "<td class='small-12 medium-6 large-8'>{$value}</td></tr>";
+                    $buffer .= "<td class='small-6 large-8'>{$value}</td></tr>";
                 }
             }
-            $buffer .= "</table></li>";
+            $buffer .= "</table></div></div>";
         }
-        $buffer .= "</ul></div>";
+        $buffer .= "</div></div>";
         // Print internals
 //        foreach ($data as $section => $rows) {
 //            

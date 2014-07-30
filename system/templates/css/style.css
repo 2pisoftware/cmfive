@@ -1,3 +1,28 @@
+*, *:before, *:after {box-sizing:  border-box !important;}
+
+.multicolform > .row-fluid {
+    -moz-column-width: 24em;
+    -webkit-column-width: 24em;
+    -moz-column-gap: 1em;
+    -webkit-column-gap:1em; 
+}
+
+.item {
+    display: inline-block;
+    padding:  .25rem;
+    width:  100%;
+}
+
+.multicolform .panel {
+    position:relative;
+    display: block;
+    padding: 10px;
+}
+
+.multicolform .panel table {
+    width: 100%;
+}
+
 body {
     background-color: #fdfefe;
     font-family: "Open Sans", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
@@ -190,6 +215,13 @@ button.button {
 .section-body {
     padding: 0px 10px;
     display: inline;
+}
+
+.section-body ul {
+    -moz-column-width: 18em;
+    -webkit-column-width: 18em;
+    -moz-column-gap: 1em;
+    -webkit-column-gap:1em;
 }
 
 .section-body li {
