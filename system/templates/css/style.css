@@ -1,4 +1,4 @@
-*, *:before, *:after {box-sizing:  border-box !important;}
+*, *:before, *:after {box-sizing:  border-box;}
 
 .multicolform > .row-fluid {
     -moz-column-width: 24em;
@@ -34,13 +34,38 @@ body {
 /*    display: inline-block;*/
 }
 
-span[class^='fi-'], span[class*=' fi-'] {
+nav span[class^='fi-'], nav span[class*=' fi-'] {
     margin-top: 200px !important;
     font-size: 18pt;
 }
 
 .top-bar-section li:not(.has-form) a:not(.button) {
     height: 45px;
+}
+
+.form_section {
+    border: 1px solid #adadad;
+    background-color: #efefef;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+.form_section_header {
+    padding: 30px;
+}
+
+.form_section .panel {
+    margin-bottom: 0px;
+}
+
+.form_section .icon-bar a.item {
+    padding: 5px 20px;
+}
+
+.form_section_description {
+    padding: 10px;
+    background-color: #dedede;
+    border: 1px solid #cfcfcf;
 }
 
 /* Search */
