@@ -18,7 +18,7 @@ function edit_GET(Web &$w) {
         array("Title", "text", "title", $report->title),
         array("Module", "select", "module", $report->module, $w->Report->getModules()),
         array("Description", "textarea", "description", $report->description, "110", "2"),
-        array("Code", "textarea", "report_code", $report->report_code, "110", "22", false),
+        array("Code", "textarea", "report_code", $report->report_code, "110", "22", "codemirror"),
         array("Connection", "select", "report_connection_id", $report->report_connection_id, $w->Report->getConnections())
     );
 

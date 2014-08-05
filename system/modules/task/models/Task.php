@@ -82,10 +82,14 @@ class Task extends DbObject {
 	
 	// get my membership object and compare my role with that required to view tasks given a task group ID
 	function getCanIView() {
-		$me = $this->Task->getMemberGroupById($this->task_group_id, $_SESSION['user_id']);
-		$group = $this->Task->getTaskGroup($this->task_group_id);
+            if ($this->w->Auth->user()->is_admin == 1) {
+                return true;
+            }
+            
+            $me = $this->Task->getMemberGroupById($this->task_group_id, $this->w->Auth->user()->id);
+            $group = $this->Task->getTaskGroup($this->task_group_id);
 
-		return ($_SESSION['user_id'] == $this->getTaskCreatorId()) ? true : $this->Task->getMyPerms($me->role, $group->can_view);
+            return ($this->w->Auth->user()->id == $this->getTaskCreatorId()) ? true : $this->Task->getMyPerms($me->role, $group->can_view);
 	}
 	
 	/**
@@ -106,24 +110,38 @@ class Task extends DbObject {
 	
 	// get my membership object and check i am better than GUEST of a task group given a task group ID
 	function getCanIEdit() {
-		if (($_SESSION['user_id'] == $this->assignee_id) || ($_SESSION['user_id'] == $this->getTaskCreatorId()))
-				return true;
+            if ($this->w->Auth->user()->is_admin == 1) {
+                return true;
+            }
+            if (($this->w->Auth->user()->id == $this->assignee_id) || ($this->w->Auth->user()->id == $this->getTaskCreatorId())) {
+                return true;
+            }
 	}
 	
 	// get my membership object and compare my role with that required to assigne tasks given a task group ID
 	function getCanIAssign() {
-		$me = $this->Task->getMemberGroupById($this->task_group_id, $_SESSION['user_id']);
-		$group = $this->Task->getTaskGroup($this->task_group_id);
-	
-		return $this->Task->getMyPerms($me->role, $group->can_assign); 
+            if ($this->w->Auth->user()->is_admin == 1) {
+                return true;
+            }
+            $me = $this->Task->getMemberGroupById($this->task_group_id, $_SESSION['user_id']);
+            $group = $this->Task->getTaskGroup($this->task_group_id);
+
+            return $this->Task->getMyPerms($me->role, $group->can_assign); 
 	}
 
 	// if i am assignee, creator or task group owner, i can set notifications for this Task
 	function getCanINotify() {
-		$me = $this->Task->getMemberGroupById($this->task_group_id, $_SESSION['user_id']);
+            if ($this->w->Auth->user()->is_admin == 1) {
+                return true;
+            }
+            
+            $logged_in_user_id = $this->w->Auth->user()->id;
+            $me = $this->Task->getMemberGroupById($this->task_group_id, $logged_in_user_id);
 		
-		if (($_SESSION['user_id'] == $this->assignee_id) || ($_SESSION['user_id'] == $this->getTaskCreatorId()) || ($this->Task->getMyPerms($me->role, "OWNER")))
-				return true;
+            if (($logged_in_user_id == $this->assignee_id) || ($logged_in_user_id == $this->getTaskCreatorId()) || (!empty($me->role) && $this->Task->getMyPerms($me->role, "OWNER"))){
+                return true;
+            }
+            return false;
 	}	
 		
 	// return the ID of the task creator given a task ID
@@ -309,7 +327,7 @@ class Task extends DbObject {
 	}
 	
 	function printSearchUrl() {
-		return "task/viewtask/".$this->id;
+		return "task/edit/".$this->id;
 	}
 	
 	function getAssignee() {

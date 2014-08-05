@@ -8,8 +8,8 @@
 <!--        <link rel="icon" href="<?php // echo WEBROOT; ?>/templates/img/favicon.png" type="image/png"/>-->
 
         <?php
-        $w->enqueueStyle(array("name" => "normalize.css", "uri" => "/system/templates/js/foundation-5.2.2/css/normalize.css", "weight" => 1010));
-        $w->enqueueStyle(array("name" => "foundation.css", "uri" => "/system/templates/js/foundation-5.2.2/css/foundation.css", "weight" => 1005));
+        $w->enqueueStyle(array("name" => "normalize.css", "uri" => "/system/templates/js/foundation-5.3.1/css/normalize.css", "weight" => 1010));
+        $w->enqueueStyle(array("name" => "foundation.css", "uri" => "/system/templates/js/foundation-5.3.1/css/foundation.css", "weight" => 1005));
         $w->enqueueStyle(array("name" => "style.css", "uri" => "/system/templates/css/style.css", "weight" => 1000));
         $w->enqueueStyle(array("name" => "tablesorter.css", "uri" => "/system/templates/css/tablesorter.css", "weight" => 990));
         $w->enqueueStyle(array("name" => "datePicker.css", "uri" => "/system/templates/css/datePicker.css", "weight" => 980));
@@ -21,9 +21,10 @@
         $w->enqueueStyle(array("name" => "pickadate.classic.css", "uri" => "/system/templates/js/pickadate.js-3.5.2/lib/compressed/themes/classic.css", "weight" => 920));
         $w->enqueueStyle(array("name" => "pickadate.classic.date.css", "uri" => "/system/templates/js/pickadate.js-3.5.2/lib/compressed/themes/classic.date.css", "weight" => 919));
         $w->enqueueStyle(array("name" => "pickadate.classic.time.css", "uri" => "/system/templates/js/pickadate.js-3.5.2/lib/compressed/themes/classic.time.css", "weight" => 918));
+        $w->enqueueStyle(array("name" => "codemirror.css", "uri" => "/system/templates/js/codemirror-4.4/lib/codemirror.css", "weight" => 900));
         
-        $w->enqueueScript(array("name" => "modernizr.js", "uri" => "/system/templates/js/foundation-5.2.2/js/vendor/modernizr.js", "weight" => 1010));
-        $w->enqueueScript(array("name" => "jquery.js", "uri" => "/system/templates/js/foundation-5.2.2/js/vendor/jquery.js", "weight" => 1000));
+        $w->enqueueScript(array("name" => "modernizr.js", "uri" => "/system/templates/js/foundation-5.3.1/js/vendor/modernizr.js", "weight" => 1010));
+        $w->enqueueScript(array("name" => "jquery.js", "uri" => "/system/templates/js/foundation-5.3.1/js/vendor/jquery.js", "weight" => 1000));
         $w->enqueueScript(array("name" => "jquery.tablesorter.js", "uri" => "/system/templates/js/tablesorter/jquery.tablesorter.js", "weight" => 990));
         $w->enqueueScript(array("name" => "jquery.tablesorter.pager.js", "uri" => "/system/templates/js/tablesorter/addons/pager/jquery.tablesorter.pager.js", "weight" => 980));
         $w->enqueueScript(array("name" => "jquery.colorbox-min.js", "uri" => "/system/templates/js/colorbox/colorbox/jquery.colorbox-min.js", "weight" => 970));
@@ -39,7 +40,10 @@
         $w->enqueueScript(array("name" => "boxover.js", "uri" => "/system/templates/js/boxover.js", "weight" => 910));
         $w->enqueueScript(array("name" => "ckeditor.js", "uri" => "/system/templates/js/ckeditor/ckeditor.js", "weight" => 900));
         $w->enqueueScript(array("name" => "Chart.js", "uri" => "/system/templates/js/chart-js/Chart.js", "weight" => 890));
-
+        
+        // Code mirror
+        $w->enqueueScript(array("name" => "codemirror.js", "uri" => "/system/templates/js/codemirror-4.4/codemirror-compressed.js", "weight" => 880));
+        
         $w->outputStyles();
         $w->outputScripts();
         ?>
@@ -62,6 +66,9 @@
                 } else {
                     $(".tab-head > a:first").trigger("click");
                 }
+                
+                // Set up CodeMirror instances if any
+                bindCodeMirror();
             });
 
             // Try and prevent multiple form submissions
@@ -73,10 +80,14 @@
                     $(this).hide();
                 });
             });
-
         </script>
     </head>
     <body>
+        <div class="loading_overlay" style="display:none;">
+            <div class="circle"></div>
+            <div class="circle_inner"></div>
+            <h4 class="subheader">Please wait...</h4>
+        </div>
         <div class="row-fluid">
             <nav class="top-bar" data-topbar><!-- To make it that you need to click to activate dropdown use  data-options="is_hover: false" -->
                 <ul class="title-area">
@@ -119,11 +130,11 @@
                                     if (method_exists($module . "Service", "navigation")) : ?>
                                         <li class="has-dropdown <?php echo $w->_module == $module ? 'active' : ''; ?>" id="topnav_<?php echo $module; ?>">
                                             <?php // Try and get a badge count for the menu item
-                                            echo $w->menuLink($module . "/index", ucfirst($module));
+                                            echo $w->menuLink($module, ucfirst($module));
                                             echo Html::ul($w->service($module)->navigation($w), null, "dropdown"); ?>
                                         </li>
                                     <?php else: ?>
-                                        <li <?php echo $w->_module == $module ? 'class="active"' : ''; ?>><?php echo $w->menuLink($module . "/index", ucfirst($module)); ?></li>
+                                        <li <?php echo $w->_module == $module ? 'class="active"' : ''; ?>><?php echo $w->menuLink($module, ucfirst($module)); ?></li>
                                     <?php endif; ?>
                                     <li class="divider"></li>
                                 <?php endif;
@@ -138,22 +149,25 @@
             </nav>
         </div>
 
-        <div class="row-fluid" style="overflow: hidden; padding: 10px;">
-         <!--<?php /* Check if there are side boxes defined */
-            // if (!empty($boxes)) : ?>
-                <div class="small-12 medium-2 left">
-                    <?php // foreach ($boxes as $btitle => $box) : ?>
-                        <div class="row boxes">
-                            <h5><?php // echo ucfirst($btitle); ?></h5>
-                            <?php // echo $box; ?>
-                        </div>
-                    <?php // endforeach; ?>
-                </div>
-            <?php // endif; ?>-->
-
+        <div class="row-fluid body">
             <?php // Body section w/ message and body from template ?>
-            <div class="body row-fluid <?php // if(!empty($boxes)) echo "medium-10 small-12 "; ?>">
-                <h3 class="header"><?php echo !empty($title) ? $title : ucfirst($w->currentModule()); ?></h3>
+            <div class="row-fluid <?php // if(!empty($boxes)) echo "medium-10 small-12 "; ?>">
+                <div class="row-fluid small-12">
+                    <h3 class="header"><?php echo !empty($title) ? $title : ucfirst($w->currentModule()); ?></h3>
+                    <div class="small-12 medium-5">
+                        <?php 
+                        if (!empty($w->_action) && (("/" . $w->_module . (!empty($w->_submodule) ? "-" . $w->_submodule : "")) !== $_SERVER['REQUEST_URI'])) {
+                            // Check that action is not empty, and the current uri isn't the module + submodule
+                            $breadcrumbs = array(array("name" => $w->_module, "link" => "/" . $w->_module));
+                            if (!empty($w->_submodule)) {
+                                $breadcrumbs[] = array("name" => $w->_submodule, "link" => "/" . $w->_module . "-" . $w->_submodule);
+                            }
+                            $breadcrumbs[] = array("name" => $w->_action, "link" => $_SERVER['REQUEST_URI']);
+                            echo Html::breadcrumbs($breadcrumbs);
+                        }
+                        ?>
+                    </div>
+                </div>
                 <?php if (!empty($error) || !empty($msg)) : ?>
                     <?php $type = !empty($error) ? array("name" => "error", "class" => "warning") : array("name" => "msg", "class" => "info"); ?>
                     <div data-alert class="alert-box <?php echo $type["class"]; ?>">
@@ -167,7 +181,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="row-fluid">
             <div id="footer">
                 Copyright &#169; <?php echo date('Y'); ?>&nbsp;&nbsp;&nbsp;<a href="<?php echo $w->moduleConf('main', 'company_url'); ?>"><?php echo $w->moduleConf('main', 'company_name'); ?></a>
@@ -176,7 +190,7 @@
 
         <div id="cmfive-modal" class="reveal-modal xlarge" data-reveal></div>
         
-        <script type="text/javascript" src="/system/templates/js/foundation-5.2.2/js/foundation.min.js"></script>
+        <script type="text/javascript" src="/system/templates/js/foundation-5.3.1/js/foundation.min.js"></script>
         <script>
             $(document).foundation({
                 reveal : {
@@ -244,6 +258,5 @@
                 });
             }
         </script>
-
     </body>
 </html>

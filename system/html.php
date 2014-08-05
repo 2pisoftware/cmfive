@@ -178,18 +178,6 @@ class Html {
         }
         
         return $tag_start."{$confirm_str}modal_history.push('{$href}'); \$('#cmfive-modal').foundation('reveal', 'open', '{$href}');return false;" . ($confirm ? "}" : "").$tag_end;
-        
-//        $parameters = "transition: 'elastic', href:'{$href}', iframe: {$iframe}";
-//        if (!empty($width)) {
-//            $parameters .= ", " . ($iframe ? "innerWidth:" : "") . "'{$width}'";
-//        } else {
-//            $parameters .= "," . ($iframe ? "innerWidth:" : "") . "'800px'";
-//        }
-//        $parameters .= ", " . ($iframe ? "innerHeight:" : "") . "'{$height}'";
-
-//        return " onclick=\"{$confirm_str}\$.colorbox({onComplete:function(){\$(this).colorbox.resize()}, {$parameters}});return false;" . (!empty($confirm) ? "}" : "") . "\" ";
-        
-//        return " onclick=\"{$confirm_str}\$.colorbox({onComplete:function(){\$(this).colorbox.resize()}, transition:'elastic', href:'" . $href . "', iframe:" . $iframe . $width . $height . "});return false;" . (!empty($confirm) ? "}" : "") . "\" ";
     }
 
     /**
@@ -313,11 +301,11 @@ class Html {
                 case "textarea":
                     $c = !empty($field[4]) ? $field[4] : null;
                     $r = !empty($field[5]) ? $field[5] : null;
-                    $useCKEditor = true;
+                    $custom_class = true;
                     if (isset($field[6])) {
-                        $useCKEditor = $field[6];
+                        $custom_class = $field[6];
                     }
-                    $buffer .= '<textarea' . $readonly . ' style="width:100%;" name="' . $name . '" rows="' . $r . '" cols="' . $c . '" ' . ($useCKEditor ? 'class="ckeditor" ' : '') . ' id="' . $name . '">' . $value . '</textarea>';
+                    $buffer .= '<textarea' . $readonly . ' style="width:100%;" name="' . $name . '" rows="' . $r . '" cols="' . $c . '" ' . (!empty($custom_class) ? ($custom_class === true ? "class='ckeditor'" : "class='$custom_class' ") : '') . ' id="' . $name . '">' . $value . '</textarea>';
                 break;
                 case "select":
                     $items = !empty($field[4]) ? $field[4] : null;
@@ -359,6 +347,9 @@ class Html {
             $buffer .= "</label></div></div>";
         }
         $buffer .= "</div>";
+        $buffer .= "<script>$(function(){try{\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})}catch(err){}});</script>";
+        // $buffer .= "<script>$(function(){try{\$('textarea.codemirror').each(function(){CodeMirror.fromTextArea(this, {lineNumbers: true, mode: 'text/html', matchBrackets: true})})}catch(err){}});</script>";
+  
         if (null !== $action) {
             $buffer .= $form->close($submitTitle);
         }
@@ -394,39 +385,28 @@ class Html {
      * @return String html
      */
     public static function multiColTable($data) {
-//      public static function multiColForm($data, $action = null, $method = "POST", $submitTitle = "Save", $id = null, $class = null, $extrabuttons = null, $target = "_self", $includeFormTag = true, $validation = null) {
-     
         if (empty($data)) return;
         
         $buffer = "";
 
         // Set up shell layout
         $buffer .= "<div class='row-fluid small-12 multicolform'>";
-        
-        // Print internals
+        $buffer .= "<div class='row-fluid'>";// "<ul class='small-block-grid-1 medium-block-grid-2 large-block-grid-3 section-body'>";
         foreach ($data as $section => $rows) {
-            
-            // Print section header
-            $buffer .= "<div class='panel'>";
-            $buffer .= "<div class='row-fluid section-header'><h4>{$section}</h4></div>";
-            
-            // Loop through each row
-            foreach ($rows as $row) {
-                
-                // Print each field
-                $fieldCount = count($row);
-                $buffer .= "<ul class='small-block-grid-1 medium-block-grid-{$fieldCount} section-body'>";
+            $buffer .= "<div class='item'><div class='panel'><h4>{$section}</h4><table>";
+            foreach($rows as $row) {
                 
                 foreach($row as $field) {
-                    
                     $title = !empty($field[0]) ? $field[0] : null;
                     $type = !empty($field[1]) ? $field[1] : null;
                     $name = !empty($field[2]) ? $field[2] : null;
                     $value = !empty($field[3]) ? $field[3] : null;
 
                     // Can I do this?
-                    if (empty($title) and empty($value)) continue;
-                                        
+                    if (empty($title) and empty($value)) {
+                        continue;
+                    }
+
                     // Exploit HTML5s inbuilt form validation
                     $required = null;
                     if (!empty($validation[$name])) {
@@ -435,23 +415,71 @@ class Html {
                         }
                     }
 
-                    $buffer .= "<li>";
-                    
-                    // Add title field
-                    if (!empty($title)) {
-                        $buffer .= "<b class='small-6 columns'>{$title}</b>";
-                    }
-                    
-                    $buffer .= "<div class='small-6 columns'>" . $value . "</div></li>";
-                }
-                
-                $buffer .= "</ul>";
-            }
-            $buffer .= "</div>";
-        }
+    //                $buffer .= "<li class='display-row'>";
 
-        // Finish shell div tag
-        $buffer .= "</div>";        
+                    // Add title field
+                    $buffer .= "<tr>";
+                    if (!empty($title)) {
+                        $buffer .= "<td class='small-6 large-4'><b>{$title}</b></td>";
+                    }
+
+                    $buffer .= "<td class='small-6 large-8'>{$value}</td></tr>";
+                }
+            }
+            $buffer .= "</table></div></div>";
+        }
+        $buffer .= "</div></div>";
+        // Print internals
+//        foreach ($data as $section => $rows) {
+//            
+//            // Print section header
+//            $buffer .= "<div class='panel'>";
+//            $buffer .= "<div class='row-fluid section-header'>{$section}</div>";
+//            
+//            // Loop through each row
+//            foreach ($rows as $row) {
+//                
+//                // Print each field
+//                $fieldCount = count($row);
+//                $buffer .= "<ul class='small-block-grid-1 medium-block-grid-{$fieldCount} section-body'>";
+//                
+//                foreach($row as $field) {
+//                    
+//                    $title = !empty($field[0]) ? $field[0] : null;
+//                    $type = !empty($field[1]) ? $field[1] : null;
+//                    $name = !empty($field[2]) ? $field[2] : null;
+//                    $value = !empty($field[3]) ? $field[3] : null;
+//
+//                    // Can I do this?
+//                    if (empty($title) and empty($value)) {
+//                        continue;
+//                    }
+//                                        
+//                    // Exploit HTML5s inbuilt form validation
+//                    $required = null;
+//                    if (!empty($validation[$name])) {
+//                        if (in_array("required", $validation[$name])) {
+//                            $required = "required";
+//                        }
+//                    }
+//
+//                    $buffer .= "<li class='display-row'>";
+//                    
+//                    // Add title field
+//                    if (!empty($title)) {
+//                        $buffer .= "<b class='small-5 medium-3 columns'>{$title}</b>";
+//                    }
+//                    
+//                    $buffer .= "<div class='small-7 medium-9 columns'>" . $value . "</div></li>";
+//                }
+//                
+//                $buffer .= "</ul>";
+//            }
+//            $buffer .= "</div>";
+//        }
+//
+//        // Finish shell div tag
+//        $buffer .= "</div>";        
         return $buffer;
     }
 
@@ -572,11 +600,11 @@ class Html {
                         case "textarea":
                             $c = !empty($field[4]) ? $field[4] : null;
                             $r = !empty($field[5]) ? $field[5] : null;
-                            $useCKEditor = true;
+                            $custom_class = true;
                             if (isset($field[6])) {
-                                $useCKEditor = $field[6];
+                                $custom_class = $field[6];
                             }
-                            $buffer .= '<textarea' . $readonly . ' style="width:100%;" name="' . $name . '" rows="' . $r . '" cols="' . $c . '" ' . ($useCKEditor ? 'class="ckeditor" ' : '') . ' id="' . $name . '" ' . $required . '>' . $value . '</textarea>';
+                            $buffer .= '<textarea' . $readonly . ' style="width:100%;" name="' . $name . '" rows="' . $r . '" cols="' . $c . '" ' . (!empty($custom_class) ? ($custom_class === true ? "class='ckeditor'" : "class='$custom_class' ") : '') . ' id="' . $name . '" ' . $required . '>' . $value . '</textarea>';
                         break;
                         case "select":
                             $items = !empty($field[4]) ? $field[4] : null;
@@ -621,8 +649,9 @@ class Html {
             }
             $buffer .= "</div>";
         }
-        $buffer .= "<script>$(function(){\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})});</script>";
-       
+        $buffer .= "<script>$(function(){try{\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})}catch(err){}});</script>";
+        $buffer .= "<script>$(function(){try{\$('textarea.codemirror').each(function(){CodeMirror.fromTextArea(this, {lineNumbers: true, mode: 'text/html', matchBrackets: true})})}catch(err){}});</script>";
+  
         // Finish shell div tag
         $buffer .= "</div>";
         
@@ -920,7 +949,7 @@ class Html {
         $buffer .= "<fieldset style=\"padding: 0; padding-top: 10px; padding-left: 10px;\">\n";
         $buffer .= "<legend>" . $legend . "</legend>\n";
         // $buffer .= "<div class=\"row-fluid\">\n";
-        $buffer .= "<ul id='filter-grid' class='small-block-grid-2 medium-block-grid-3'>";
+        $buffer .= "<ul id='filter-grid' class='small-block-grid-2 medium-block-grid-4'>";
         
         // Loop through data
         foreach ($data as $row) {
@@ -1103,4 +1132,14 @@ class Html {
         return $buffer;
     }
     
+    public static function breadcrumbs($data = array()) {
+        if (!empty($data)) {
+            $buffer = "<ul class='breadcrumbs'>";
+            foreach($data as $entry) {
+                $buffer .= "<li" . ($entry !== end($data) ? "><a href='" . $entry['link'] . "'>" . $entry['name'] . "</a>" : " class='current'>" . $entry['name']) . "</li>";
+            }
+            $buffer .= "</ul>";
+            return $buffer;
+        }
+    }
 }

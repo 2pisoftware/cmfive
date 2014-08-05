@@ -1,5 +1,5 @@
 <?php
-    echo Html::box(WEBROOT."/file/attach/".get_class($object)."/{$object->id}/".(str_replace("/", "+", $redirect)), "Attach a File", true) . "<br/><br/>";
+    echo Html::box(WEBROOT."/file/attach/".get_class($object)."/{$object->id}/".(str_replace("/", "+", $redirect)), "Attach a File", true);
     $notImages = array();
     if (!empty($attachments)) {
         echo "<div class='attachments_container'>";

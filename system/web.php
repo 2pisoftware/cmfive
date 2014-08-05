@@ -90,6 +90,13 @@ class Web {
                 if (file_exists($file)) {
                     include $file;
                     return true;
+                } else {
+                    // Try a lower case version
+                    $file = $this->getModuleDir($model) . 'models/' . $className . ".php";
+                    if (file_exists($file)) {
+                        include $file;
+                        return true;
+                    }
                 }
             }
         }

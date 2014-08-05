@@ -1,20 +1,71 @@
+*, *:before, *:after {box-sizing:  border-box;}
+
+.multicolform > .row-fluid {
+    -moz-column-width: 24em;
+    -webkit-column-width: 24em;
+    -moz-column-gap: 1em;
+    -webkit-column-gap:1em; 
+}
+
+.item {
+    display: inline-block;
+    padding:  .25rem;
+    width:  100%;
+}
+
+.multicolform .panel {
+    position:relative;
+    display: block;
+    padding: 10px;
+}
+
+.multicolform .panel table {
+    width: 100%;
+}
+
 body {
     background-color: #fdfefe;
     font-family: "Open Sans", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
 }
 
 .body {
-    padding-left: 10px; 
     overflow: hidden;
+    padding: 10px;
+/*    display: inline-block;*/
 }
 
-span[class^='fi-'], span[class*=' fi-'] {
+nav span[class^='fi-'], nav span[class*=' fi-'] {
     margin-top: 200px !important;
     font-size: 18pt;
 }
 
 .top-bar-section li:not(.has-form) a:not(.button) {
     height: 45px;
+}
+
+.form_section {
+    border: 1px solid #adadad;
+    background-color: #efefef;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+.form_section_header {
+    padding: 30px;
+}
+
+.form_section .panel {
+    margin-bottom: 0px;
+}
+
+.form_section .icon-bar a.item {
+    padding: 5px 20px;
+}
+
+.form_section_description {
+    padding: 10px;
+    background-color: #dedede;
+    border: 1px solid #cfcfcf;
 }
 
 /* Search */
@@ -81,6 +132,10 @@ button {
 }
 
 /* Grid List */
+.grid-list-panel {
+    clear: none !important;
+}
+
 .grid-list-panel .panel {
     padding: 10px 0px;
     margin-bottom: 0px;
@@ -95,23 +150,6 @@ table .section {
     background-color: #074e68;
     color: #fcfcfc;
     font-weight: lighter;
-}
-
-.section-header {
-    margin-bottom: 10px;
-    padding: 5px;
-    font-weight: bolder;
-    /*background-color: #4D88A5;*/
-    border-bottom: 1px solid black;
-}
-
-.section-body {
-    
-}
-
-.section-body li {
-    padding-bottom: 0.5rem;
-    /*border-bottom: 1px #cacaca solid;*/
 }
 
 .widget_buttons { opacity: 0; }
@@ -199,7 +237,151 @@ button.button {
     margin: 0;
 }
 
+.section-body {
+    padding: 0px 10px;
+    display: inline;
+}
+
+.section-body ul {
+    -moz-column-width: 18em;
+    -webkit-column-width: 18em;
+    -moz-column-gap: 1em;
+    -webkit-column-gap:1em;
+}
+
+.section-body li {
+    padding: 0px 5px;
+    vertical-align: top;
+    float: left;
+    display: inline;
+}
+
+.section-body table {
+    width: 100%;
+}
+
+/* Task group styling */
+table.taskgroup_summary {
+    margin-bottom: 0px !important;
+}
+
 /* Should be supported in IE7+ */
 button.button + button {
     margin-left: 5px !important;
+}
+
+/* Loading Indicator - from: http://www.alessioatzeni.com/blog/css3-loading-animation-loop/ */
+.loading_overlay {
+    position: fixed;
+    _position: absolute;
+    z-index: 99;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.loading_overlay .circle {
+    background-color: rgba(0,0,0,0);
+    border: 5px solid rgba(0,183,229,0.9);
+    opacity: .9;
+    border-right: 5px solid rgba(0,0,0,0);
+    border-left: 5px solid rgba(0,0,0,0);
+    border-radius: 50px;
+    box-shadow: 0 0 35px #008cba;
+    width: 50px;
+    height: 50px;
+    margin: auto;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    -moz-animation: spinPulse 1s infinite ease-in-out;
+    -webkit-animation: spinPulse 1s infinite linear;
+}
+
+.loading_overlay .circle_inner {
+    background-color: rgba(0,0,0,0);
+    border: 5px solid rgba(0,183,229,0.9);
+    opacity: .9;
+    border-left: 5px solid rgba(0,0,0,0);
+    border-right: 5px solid rgba(0,0,0,0);
+    border-radius: 50px;
+    box-shadow: 0 0 15px #008cba;
+    width: 30px;
+    height: 30px;
+    position: relative;
+    margin: auto;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    -moz-animation: spinoffPulse 1s infinite linear;
+    -webkit-animation: spinoffPulse 1s infinite linear;
+}
+
+.loading_overlay h4 {
+    color: white;
+    font-weight: lighter;
+    padding-top: 100px;
+    text-align: center;
+    width: 200px;
+    height: 60px;
+    margin: auto;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+}
+
+@-moz-keyframes spinPulse {
+    0% {
+        -moz-transform: rotate(160deg);
+        opacity: 0;
+        box-shadow: 0 0 1px #2187e7;
+    }
+
+    50% {
+        -moz-transform: rotate(145deg);
+        opacity: 1;
+    }
+
+    100% {
+        -moz-transform: rotate(-320deg);
+        opacity: 0;
+    };
+}
+
+@-moz-keyframes spinoffPulse {
+    0% {
+        -moz-transform: rotate(0deg);
+    }
+
+    100% {
+        -moz-transform: rotate(360deg);
+    };
+}
+
+@-webkit-keyframes spinPulse {
+    0% {
+        -webkit-transform: rotate(160deg);
+        opacity: 0;
+        box-shadow: 0 0 1px #2187e7;
+    }
+
+    50% {
+        -webkit-transform: rotate(145deg);
+        opacity: 1;
+    }
+
+    100% {
+        -webkit-transform: rotate(-320deg);
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes spinoffPulse {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
 }

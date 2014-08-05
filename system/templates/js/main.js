@@ -21,6 +21,38 @@ function changeTab(hash) {
     }
 }
 
+function toggleModalLoading() {
+    if ($(".loading_overlay").is(":visible")) {
+        $(".loading_overlay").fadeOut();
+    } else {
+        $(".loading_overlay").fadeIn();
+    }
+}
+
+function bindCodeMirror() {
+    var _codeMirror = [];
+    //setup code-mirror
+    var maxCodeInstances = $(".codemirror").length;
+    var codeInstanceCount = 0;
+    $('textarea.codemirror').each(function() {
+//        $(this).click(function() {
+            var textarea = $(this)[0];
+            if (!_codeMirror[codeInstanceCount]) {
+                _codeMirror[codeInstanceCount] = CodeMirror.fromTextArea(textarea, {
+                    lineNumbers: true,
+                    mode: 'text/html',
+                    matchBrackets: true,
+                    autoCloseTags: true,
+                    wordWrap: true
+                });
+                if (codeInstanceCount < (maxCodeInstances - 1)) {
+                    codeInstanceCount++;
+                }
+            }
+//        });
+    });
+}
+    
 /**
  * Clears all elements of a form
  */
