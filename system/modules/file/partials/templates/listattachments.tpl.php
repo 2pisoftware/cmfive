@@ -6,11 +6,11 @@
         foreach ($attachments as $att) {
             if ($att->isImage()) { ?>
                 <div class="image_attachment">
-                    <?php echo $att->getThumb(); ?>
-                    <!--<a target="_blank" href='/file/path/<?php echo $att->fullpath; ?>'><img src='/file/path/<?php echo $att->fullpath; ?>' height="200" width="200" /></a>-->
+                    <?php // echo $att->getThumb(); ?>
+                    <a target="_blank" href='/file/path/<?php echo $att->fullpath; ?>'><?php echo $w->File->getThumbImg($att->fullpath); ?></a>
                     <div class="image_attachment_text"><?php echo $att->title; ?></div>
                     <?php if (!empty($att->description)) : ?><div class="image_attachment_text"><?php echo $att->description; ?></div><?php endif; ?>
-                    <?php echo Html::a(WEBROOT . "/file/atdel/" . $att->id . "/" . (str_replace("/", "+", $redirect)), "Delete", null, null, "Do you want to delete this attachment?"); ?>
+                    <?php echo Html::a(WEBROOT . "/file/atdel/" . $att->id . "/" . (str_replace("/", "+", $redirect)), "Delete", null, "button tiny small-12", "Do you want to delete this attachment?"); ?>
                 </div>
       <?php } else {
                 $notImages[] = $att;
