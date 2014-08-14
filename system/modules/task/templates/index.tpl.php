@@ -1,12 +1,10 @@
-<p>
-    <?php echo !empty($grouptasks) ? $grouptasks : ''; ?>
-<p>
-
+<?php echo $w->partial("listtaskgroups", array("taskgroups" => $taskgroups, "redirect" => "/tasks"), "task"); ?>
+    
 <script language="javascript">
 
 	$.ajaxSetup ({
 	    cache: false
-		});
+        });
 
 	var task_url = "/task/taskAjaxSelectbyTaskGroup?id="; 
 	$("select[id='task_group_id'] option").click(function() {

@@ -6,7 +6,7 @@
 
 function index_ALL(Web $w) {
     $w->Task->navigation($w, "Task Dashboard");
-   
+    $taskgroups_array = array();
     //tab: tasks
     // get list of groups of which i am a member
     $mygroups = $w->Task->getMemberGroups($_SESSION['user_id']);
@@ -27,6 +27,7 @@ function index_ALL(Web $w) {
 
             // get current group title for display
             $taskgroup = $w->Task->getTaskGroup($grpid);
+            $taskgroups_array[] = $taskgroup;
             $grouptitle = $taskgroup->title;
 
             // if i can create tasks in this group, provide link with group stats
@@ -123,4 +124,5 @@ function index_ALL(Web $w) {
 
     // close accordian and display
     $w->ctx("grouptasks", $strOut);
+    $w->ctx("taskgroups", $taskgroups_array);
 }

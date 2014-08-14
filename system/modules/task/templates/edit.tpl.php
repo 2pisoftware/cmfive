@@ -11,15 +11,23 @@
     <div class="tab-body">
         <div id="details" class="clearfix">
             <div class="row-fluid clearfix">
-                <div class="small-12 large-9">
-                    <?php echo $form; ?>
+                <div class="row-fluid">
+                    <?php $tasktypeobject = $task->getTaskTypeObject(); echo !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null; ?>
                 </div>
-                <div class="small-12 large-3 right">
-                    <div class="small-12 panel" id="tasktext" style="display: none;">
-
+                <div class="row-fluid clearfix">
+                    <div class="small-12 large-9">
+                        <?php echo $form; ?>
                     </div>
-                    <div class="small-12 panel" id="form_fields" style="display: none;">
+                    <div class="small-12 large-3 right">
+                        <div class="small-12 panel" id="tasktext" style="display: none;">
 
+                        </div>
+                        <div class="small-12 panel" id="formfields" style="display: none;">
+
+                        </div>
+                        <div class="small-12 panel" id="formdetails" style="display: none;">
+                            
+                        </div>
                     </div>
                 </div>
             </div>
@@ -61,13 +69,13 @@
     var initialChange = <?php echo (!empty($task->id) ? "false" : "true"); ?>;
 
     $(document).ready(function() {
+        bindTypeChangeEvent();
         $("select[id='task_group_id']").trigger("change");
-        $("select[id='task_type']").trigger("change");
+        $("#task_type").trigger("change");
     });
-
+    
     $("select[id='task_group_id']").on("change", function() {
-        $.getJSON(
-            "/task/taskAjaxSelectbyTaskGroup?id=" + $(this).val(),
+        $.getJSON("/task/taskAjaxSelectbyTaskGroup?id=" + $(this).val(),
             function(result) {
                 if (initialChange) {
                     $('#task_type').parent().html(result[0]);
@@ -77,21 +85,38 @@
                 initialChange = true;
                 $('#tasktext').html(result[3]);
                 $("#tasktext").fadeIn();
+                
+                bindTypeChangeEvent();  
             }
         );
     });
     
-    $("select[id='task_type']").on("change", function() {
-        $.getJSON(
-            "/task/ajaxGetTaskTypeFormFields?task_type=" + $("#task_type").val() + "&task_group_id=" + $("#task_group_id").val(),
-            function(result) {
-                if (result) {
-                    $("#form_fields").html(result);
-                    $("#form_fields").fadeIn();
+    function bindTypeChangeEvent() {
+        $("#task_type").on("change", function(event) {
+            console.log("Change event triggered");
+            $.getJSON("/task/ajaxGetTaskTypeFormFields?task_type=" + $("#task_type").val() + "&task_group_id=" + $("#task_group_id").val(),
+                function(result) {
+                    if (result.length > 0) {
+                        $("#formfields").html(result);
+                        $("#formfields").fadeIn();
+                    }
                 }
-            }
-        );
-    });
+            );
+            <?php if (!empty($task->id)) : ?>
+                var task_type_value = document.getElementById("task_type").value;
+                console.log("Task type: " + task_type_value);
+                if (task_type_value.length > 0) {
+                    $("#formdetails").hide();
+                    $.getJSON("/task/ajaxGetExtraDetails/<?php echo $task->id; ?>/" + task_type_value, function(result) {
+                        if (result.length > 0) {
+                            $("#formdetails").html(result);
+                            $("#formdetails").fadeIn();
+                        }
+                    });
+                }
+            <?php endif; ?>
+        });
+    }
     
     // Submit both forms 
     $("#edit_form, #form_fields_form").submit(function() {
