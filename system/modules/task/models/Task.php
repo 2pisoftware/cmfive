@@ -26,7 +26,10 @@ class Task extends DbObject {
 	
 	// TODO add TaskData and TaskComments
 	function addToIndex() {
-		
+		$ttype = $this->getTaskTypeObject();
+		if ($ttype) {
+			return $ttype->addToIndex($this);
+		}		
 	}
 
 	

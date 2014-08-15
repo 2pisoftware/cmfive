@@ -14,6 +14,11 @@ abstract class TaskType {
 	function getTaskTypeDescription() {}
 	
 	/**
+	 * return a value that should be added to the search index for this task
+	 */
+	function addToIndex(Task $task) {}
+	
+	/**
 	 * return an array similar to the Html::form
 	 * which describes the fields available for this
 	 * task type and the way they should be presented in
