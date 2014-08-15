@@ -45,9 +45,26 @@ abstract class TaskGroupType {
 	 * available stati for tasks in 
 	 * this group
 	 * 
+         * So as a revolutionary update to Tasks, we were challenged with the task
+         * of having user definable Task statuses, which makes a lot of sense in
+         * a Taskgroup that has requirements constantly changing.
+         * 
+         * So for this the syntax is:
+         *    lookup type => get_class($this) . "_status" (e,g, TaskGroupType_TaskTodo_status)
+         *    lookup code => Anything, logically it should be "status"
+         *    lookup title => <Name of Status>|<true:false> (Of which the boolean value
+         *        after the pipe is whether or not the status is a completion status)
 	 */
 	function getStatusArray() {
-		
+            // Check the lookup table
+            $lookup_results = $this->w->Lookup->getLookupByType((get_class($this)) . "_status");
+            if (!empty($lookup_results)) {
+                $data = array();
+                foreach($lookup_results as $lookup) {
+                    $data[] = explode("|", $lookup->title);
+                }
+                return $data;
+            }	
 	}
 	
 	/**

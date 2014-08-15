@@ -201,7 +201,7 @@ class Task extends DbObject {
 			foreach ($statlist as $stat) {
 				$status[$stat[0]] = $stat[1]; 
 			}
-			return $status[$this->status];
+			return (!empty($status[$this->status]) ? $status[$this->status] : null);
 		}
 	}
 	

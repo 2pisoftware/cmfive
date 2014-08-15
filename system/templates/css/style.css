@@ -162,7 +162,7 @@ table .section {
     text-decoration: none;
     padding: 5px;
     border: 1px solid #a9a9a9;
-    line-height: 40px;
+    line-height: 38px;
 }
 .tab-head a.active {
     background: #074e68;
@@ -216,15 +216,19 @@ ul.ui-autocomplete {
     border: 1px solid grey;
     width: 200px;
     float: left;
-    margin: 10px;
-    margin-top: 0px;
+    margin: 10px 5px 0px 0px;
+    /*margin-top: 0px;*/
     padding: 5px;
     background-color: #eee;
 }
 
+.image_attachment > a {
+    margin-bottom: 0px;
+}
+
 .image_attachment_text {
     width: 200px;
-    padding-top: 5px;
+    padding: 5px 0px;
 }
 
 .close-reveal-modal {
