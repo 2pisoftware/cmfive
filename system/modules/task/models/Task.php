@@ -38,6 +38,7 @@ class Task extends DbObject {
     // preload taskgroup if its called for
         if ($name === "_taskgroup") {
             $this->_taskgroup = $this->getTaskGroup();
+            return $this->_taskgroup;
         } else {
             parent::__get($name);
         }
@@ -108,7 +109,7 @@ class Task extends DbObject {
      * @see DbObject::canView()
      */
     function canView(User $user) {
-        return $this->getCanIView($user);
+        return $this->getCanIView();
     }
 
     /**
@@ -116,7 +117,7 @@ class Task extends DbObject {
      * @see DbObject::canList()
      */
     function canList(User $user) {
-        return $this->getCanIView();
+        return $this->getCanIList();
     }
 
     // get my membership object and check i am better than GUEST of a task group given a task group ID
@@ -182,26 +183,26 @@ class Task extends DbObject {
 
     // return the task group title given a task group ID
     function getTaskGroupTypeTitle() {
-        return (!empty($this->_taskgroup) ? $this->_taskgroup->title : null);
+        return (!empty($this->_taskgroup->id) ? $this->_taskgroup->title : null);
     }
 
     // return the task types as array for a task group given a task group ID
     // return 'unknown' if unknown
     function getTaskGroupTypes() {
-        return (!empty($this->_taskgroup) ? $this->_taskgroup->getTypes() : null);
+        return (!empty($this->_taskgroup->id) ? $this->_taskgroup->getTypes() : null);
     }
 
     // return the task statuses as array for a task group given a task group ID
     // return 'unknown' if unknown
     function getTaskGroupStatus() {
-        return (!empty($this->_taskgroup) ? $this->_taskgroup->getTypeStatus() : null);
+        return (!empty($this->_taskgroup->id) ? $this->_taskgroup->getTypeStatus() : null);
     }
 
     // status array has the form array(<status>,true|false);
     // get status types for a task group given a task group ID
     // given a status, return true| false ... $c[<status>] = true|false
     function getisTaskClosed() {
-        if (!empty($this->_taskgroup)) {
+        if (!empty($this->_taskgroup->id)) {
             $statlist = $this->_taskgroup->getStatus(); //Task->getTaskStatus($this->Task->getTaskGroupTypeById($this->task_group_id));
             if ($statlist) {
                 foreach ($statlist as $stat) {
@@ -214,7 +215,7 @@ class Task extends DbObject {
 
     // return the task priorities as array given a task group ID
     function getTaskGroupPriority() {
-        return (!empty($this->_taskgroup) ? $this->_taskgroup->getPriority() : null); //Task->getTaskPriority($this->Task->getTaskGroupTypeById($this->task_group_id));
+        return (!empty($this->_taskgroup->id) ? $this->_taskgroup->getPriority() : null); //Task->getTaskPriority($this->Task->getTaskGroupTypeById($this->task_group_id));
     }
 
     // return list of time log entries for a task given task ID

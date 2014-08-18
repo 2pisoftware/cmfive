@@ -29,10 +29,10 @@ class TaskGroup extends DbObject {
             return true;
         }
         
-        $me = $this->Task->getMemberGroupById($this->id, $this->w->Auth->user()->id);
+        $me = $this->w->Task->getMemberGroupById($this->id, $this->w->Auth->user()->id);
         if (empty($me))
             return false;
-        return ($this->can_view == "ALL") ? true : $this->Task->getMyPerms($me->role, $this->can_view);
+        return ($this->can_view == "ALL") ? true : $this->w->Task->getMyPerms($me->role, $this->can_view);
     }
 
     // get my member object. compare my role with group role required to create tasks in this group
@@ -41,10 +41,10 @@ class TaskGroup extends DbObject {
             return true;
         }
         
-        $me = $this->Task->getMemberGroupById($this->id, $this->w->Auth->user()->id);
+        $me = $this->w->Task->getMemberGroupById($this->id, $this->w->Auth->user()->id);
         if (empty($me))
             return false;
-        return ($this->can_create == "ALL") ? true : $this->Task->getMyPerms($me->role, $this->can_create);
+        return ($this->can_create == "ALL") ? true : $this->w->Task->getMyPerms($me->role, $this->can_create);
     }
 
     // get my member object. compare my role with group role required to assign tasks in this group
@@ -53,21 +53,21 @@ class TaskGroup extends DbObject {
             return true;
         }
         
-        $me = $this->Task->getMemberGroupById($this->id, $this->w->Auth->user()->id);
+        $me = $this->w->Task->getMemberGroupById($this->id, $this->w->Auth->user()->id);
         if (empty($me))
             return false;
-        return ($this->can_assign == "ALL") ? true : $this->Task->getMyPerms($me->role, $this->can_assign);
+        return ($this->can_assign == "ALL") ? true : $this->w->Task->getMyPerms($me->role, $this->can_assign);
     }
 
     // get task group title given task group type
     function getTypeTitle() {
-        $c = $this->Task->getTaskGroupTypeObject($this->task_group_type);
+        $c = $this->w->Task->getTaskGroupTypeObject($this->task_group_type);
         return $c ? $c->getTaskGroupTypeTitle() : "unknown";
     }
 
     // get task group description given task group type
     function getTypeDescription() {
-        $c = $this->Task->getTaskGroupTypeObject($this->task_group_type);
+        $c = $this->w->Task->getTaskGroupTypeObject($this->task_group_type);
         return $c ? $c->getTaskGroupTypeDescription() : "unknown";
     }
 
@@ -89,24 +89,28 @@ class TaskGroup extends DbObject {
         return $this->id;
     }
     
-    // Task replacement function
+    // Task replacement functions
     public function getTypes() {
-        return $this->Task->getTaskTypes($this);
+        return $this->w->Task->getTaskTypes($this);
     }
     
     public function getTypeStatus() {
-        return $this->Task->getTaskTypeStatus($this);
+        return $this->w->Task->getTaskTypeStatus($this->task_group_type);
     }
     
     public function getTaskGroupTypeObject() {
-        return $this->Task->getTaskGroupTypeObject($this);
+        return $this->w->Task->getTaskGroupTypeObject($this->task_group_type);
     }
     
     public function getTaskReopen() {
-        return $this->Task->getCanTaskRepoen($this->task_group_type);
+        return $this->w->Task->getCanTaskRepoen($this->task_group_type);
     }
     
     public function getStatus() {
-        return $this->Task->getTaskStatus($this);
+        return $this->w->Task->getTaskStatus($this->task_group_type);
+    }
+    
+    public function getPriority() {
+        return $this->w->Task->getTaskPriority($this->task_group_type);
     }
 }

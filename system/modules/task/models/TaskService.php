@@ -390,7 +390,7 @@ class TaskService extends DbService {
     // returns an array of statuses of a task group defined in our tasks file
     function getTaskStatus($taskgroup) {
         $this->_loadTaskFiles();
-        if (class_exists($taskgroup)) {
+        if (is_string($taskgroup) && class_exists($taskgroup)) {
             $c = new $taskgroup($this->w);
             if (is_a($c, "TaskGroupType")) {
                 return $c->getStatusArray();

@@ -81,6 +81,7 @@
                     $('#task_type').parent().html(result[0]);
                     $('#priority').parent().html(result[1]);
                     $('#first_assignee_id').parent().html(result[2]);
+                    $('#status').html(result[4])
                 }
                 initialChange = true;
                 $('#tasktext').html(result[3]);
@@ -103,7 +104,6 @@
             );
             <?php if (!empty($task->id)) : ?>
                 var task_type_value = document.getElementById("task_type").value;
-                console.log("Task type: " + task_type_value);
                 if (task_type_value.length > 0) {
                     $("#formdetails").hide();
                     $.getJSON("/task/ajaxGetExtraDetails/<?php echo $task->id; ?>/" + task_type_value, function(result) {
