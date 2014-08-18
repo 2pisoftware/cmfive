@@ -8,7 +8,7 @@ function humanReadableBytes($input, $rounding = 2, $bytesValue = true) {
         $barrier = 1000;
     }
 
-    while($input > $barrier) {
+    while ($input > $barrier) {
         $input /= $barrier;
         array_shift($ext);
         if ($ext[0] === end($ext)) {
@@ -22,16 +22,16 @@ function humanReadableBytes($input, $rounding = 2, $bytesValue = true) {
 
 function getFileExtension($contentType) {
     $map = array(
-        'application/pdf'   => '.pdf',
-        'application/zip'   => '.zip',
-        'image/gif'         => '.gif',
-        'image/jpeg'        => '.jpg',
-        'image/png'         => '.png',
-        'text/css'          => '.css',
-        'text/html'         => '.html',
-        'text/javascript'   => '.js',
-        'text/plain'        => '.txt',
-        'text/xml'          => '.xml',
+        'application/pdf' => '.pdf',
+        'application/zip' => '.zip',
+        'image/gif' => '.gif',
+        'image/jpeg' => '.jpg',
+        'image/png' => '.png',
+        'text/css' => '.css',
+        'text/html' => '.html',
+        'text/javascript' => '.js',
+        'text/plain' => '.txt',
+        'text/xml' => '.xml',
     );
 
     if (isset($map[$contentType])) {
@@ -54,26 +54,26 @@ function isNumber($var) {
     return is_numeric($var);
 }
 
-function defaultVal($val,$default = null,$forceNull = false) {
-        // Experiment to see if we can easily remove the strict standards
-        // errors with a small function      
-        if (empty($default)){
-            if (empty($val)){
-                return null;
-            } else {
-                return $val;
-            }
-        } else if (empty($val)) {
-            return $default;
+function defaultVal($val, $default = null, $forceNull = false) {
+    // Experiment to see if we can easily remove the strict standards
+    // errors with a small function      
+    if (empty($default)) {
+        if (empty($val)) {
+            return null;
+        } else {
+            return $val;
         }
+    } else if (empty($val)) {
+        return $default;
+    }
 
-        // The above more of less emulates below but using empty we can test
-        // for isset, which below doesn't and is the cause of most of the strict
-        // standards errors
-	if ($forceNull) {
-		return $val === null ? $default : $val;
-	}
-	return $val ? $val : $default;
+    // The above more of less emulates below but using empty we can test
+    // for isset, which below doesn't and is the cause of most of the strict
+    // standards errors
+    if ($forceNull) {
+        return $val === null ? $default : $val;
+    }
+    return $val ? $val : $default;
 }
 
 /**
@@ -83,8 +83,8 @@ function defaultVal($val,$default = null,$forceNull = false) {
  * @param string $title
  */
 function toSlug($title) {
-	$slug = str_replace(array(" ","_",",",".","/"), "-", $title);
-	return strtolower($slug);
+    $slug = str_replace(array(" ", "_", ",", ".", "/"), "-", $title);
+    return strtolower($slug);
 }
 
 /**
@@ -97,7 +97,7 @@ function toSlug($title) {
  * ((1,2,3),(4,5,6),(7,8,9),(10,11))
  */
 function paginate($array, $pageSize) {
-	return array_chunk($array, $pageSize);
+    return array_chunk($array, $pageSize);
 }
 
 /**
@@ -115,7 +115,7 @@ function paginate($array, $pageSize) {
  * but the last column can be shorter
  */
 function columnize($array, $noOfColumns) {
-	return array_chunk($array, sizeof($array) / $noOfColumns);
+    return array_chunk($array, sizeof($array) / $noOfColumns);
 }
 
 /**
@@ -129,53 +129,62 @@ function columnize($array, $noOfColumns) {
  * @param $rotation (90, 180, 270, 0, 360)
  */
 function rotateImage($img, $rotation) {
-  $width = imagesx($img);
-  $height = imagesy($img);
-  switch($rotation) {
-    case 90: $newimg= @imagecreatetruecolor($height , $width );break;
-    case 180: $newimg= @imagecreatetruecolor($width , $height );break;
-    case 270: $newimg= @imagecreatetruecolor($height , $width );break;
-    case 0: return $img;break;
-    case 360: return $img;break;
-  }
-  if($newimg) {
-    for($i = 0;$i < $width ; $i++) {
-      for($j = 0;$j < $height ; $j++) {
-        $reference = imagecolorat($img,$i,$j);
-        switch($rotation) {
-          case 90: if(!@imagesetpixel($newimg, ($height - 1) - $j, $i, $reference )){return false;}break;
-          case 180: if(!@imagesetpixel($newimg, $width - $i, ($height - 1) - $j, $reference )){return false;}break;
-          case 270: if(!@imagesetpixel($newimg, $j, $width - $i, $reference )){return false;}break;
-        }
-      }
-    } return $newimg;
-  }
-  return false;
+    $width = imagesx($img);
+    $height = imagesy($img);
+    switch ($rotation) {
+        case 90: $newimg = @imagecreatetruecolor($height, $width);
+            break;
+        case 180: $newimg = @imagecreatetruecolor($width, $height);
+            break;
+        case 270: $newimg = @imagecreatetruecolor($height, $width);
+            break;
+        case 0: return $img;
+            break;
+        case 360: return $img;
+            break;
+    }
+    if ($newimg) {
+        for ($i = 0; $i < $width; $i++) {
+            for ($j = 0; $j < $height; $j++) {
+                $reference = imagecolorat($img, $i, $j);
+                switch ($rotation) {
+                    case 90: if (!@imagesetpixel($newimg, ($height - 1) - $j, $i, $reference)) {
+                            return false;
+                        }break;
+                    case 180: if (!@imagesetpixel($newimg, $width - $i, ($height - 1) - $j, $reference)) {
+                            return false;
+                        }break;
+                    case 270: if (!@imagesetpixel($newimg, $j, $width - $i, $reference)) {
+                            return false;
+                        }break;
+                }
+            }
+        } return $newimg;
+    }
+    return false;
 }
 
-function lookupForSelect(&$w,$type) {
+function lookupForSelect(&$w, $type) {
     $select = array();
-    $rows = $w->db->get("lookup")->where("type",$type)->fetch_all();
+    $rows = $w->db->get("lookup")->where("type", $type)->fetch_all();
     if ($rows) {
-	    foreach ($rows as $row) {
-	        $select[]=array($row['title'],$row['code']);
-	    }
+        foreach ($rows as $row) {
+            $select[] = array($row['title'], $row['code']);
+        }
     }
     return $select;
 }
 
-
-
 function getStateSelectArray() {
     return array(
-            array("ACT", "ACT"),
-            array("NSW", "NSW"),
-            array("NT", "NT"),
-            array("QLD", "QLD"),
-            array("SA", "SA"),
-            array("TAS", "TAS"),
-            array("VIC", "VIC"),
-            array("WA", "WA"));
+        array("ACT", "ACT"),
+        array("NSW", "NSW"),
+        array("NT", "NT"),
+        array("QLD", "QLD"),
+        array("SA", "SA"),
+        array("TAS", "TAS"),
+        array("VIC", "VIC"),
+        array("WA", "WA"));
 }
 
 /**
@@ -186,11 +195,11 @@ function getStateSelectArray() {
  * @param unknown_type $needles
  */
 function strcontains($haystack, $needle_array) {
-	foreach ($needle_array as $needle) {
-		if (stripos($haystack, $needle) !== false)
-			return true;
-	}
-	return false;
+    foreach ($needle_array as $needle) {
+        if (stripos($haystack, $needle) !== false)
+            return true;
+    }
+    return false;
 }
 
 /**
@@ -203,27 +212,33 @@ function strcontains($haystack, $needle_array) {
  * @param unknown $needle
  * @return boolean
  */
-function startsWith($haystack,$needle) {
-	if (is_scalar($needle)) {
-    	return strpos($haystack, $needle) === 0;
-	} else if (is_array($needle) && sizeof($needle) > 0) {
-		foreach ($needle as $pref) {
-			if (strpos($haystack, $pref) === 0) return true;
-		}
-	}
-	return false;
+function startsWith($haystack, $needle) {
+    // This could cause problems, we'll see
+    if (empty($haystack) || empty($needle)) {
+        return false;
+    }
+    
+    if (is_scalar($needle)) {
+        return strpos($haystack, $needle) === 0;
+    } else if (is_array($needle) && sizeof($needle) > 0) {
+        foreach ($needle as $pref) {
+            if (strpos($haystack, $pref) === 0) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
-
-function str_whitelist($dirty_data, $limit=0) {
+function str_whitelist($dirty_data, $limit = 0) {
     if ($limit > 0) {
         $dirty_data = substr($dirty_data, 0, $limit);
     }
     $dirty_array = str_split($dirty_data);
     $clean_data = "";
-    foreach($dirty_array as $char) {
+    foreach ($dirty_array as $char) {
         $clean_char = preg_replace("/[^a-zA-Z0-9 ,.'\"-\/]/", "", $char);
-        $clean_data = $clean_data.$clean_char;
+        $clean_data = $clean_data . $clean_char;
     }
     return $clean_data;
 }
@@ -231,9 +246,9 @@ function str_whitelist($dirty_data, $limit=0) {
 function phone_whitelist($dirty_data) {
     $dirty_array = str_split($dirty_data);
     $clean_data = "";
-    foreach($dirty_array as $char) {
+    foreach ($dirty_array as $char) {
         $clean_char = preg_replace("/[^0-9 ()+-]/", "", $char);
-        $clean_data = $clean_data.$clean_char;
+        $clean_data = $clean_data . $clean_char;
     }
     return $clean_data;
 }
@@ -242,47 +257,48 @@ function int_whitelist($dirty_data, $limit) {
     $dirty_data = substr($dirty_data, 0, $limit);
     $dirty_array = str_split($dirty_data);
     $clean_data = "";
-    foreach($dirty_array as $char) {
+    foreach ($dirty_array as $char) {
         $clean_char = preg_replace("/[^0-9]/", "", $char);
-        $clean_data = $clean_data.$clean_char;
+        $clean_data = $clean_data . $clean_char;
     }
     return $clean_data;
 }
 
-function getTimeSelect($start=8, $end=19) {
-    for($i=$start;$i<=$end;$i++) {
+function getTimeSelect($start = 8, $end = 19) {
+    for ($i = $start; $i <= $end; $i++) {
         $m = " am";
         $t = $i;
-        if ($i>=12) {
+        if ($i >= 12) {
             $m = " pm";
-            if ($i>12){
-                $t = $i-12;
+            if ($i > 12) {
+                $t = $i - 12;
             }
         }
         $t = sprintf("%02d", $t);
-        $select[]=array($t.":00".$m,$i.":00");
-        $select[]=array($t.":30".$m,$i.":30");
+        $select[] = array($t . ":00" . $m, $i . ":00");
+        $select[] = array($t . ":30" . $m, $i . ":30");
     }
     return $select;
 }
 
-function formatDate($date,$format="d/m/Y",$usetimezone = true) {
-    if (!$date) return null;
+function formatDate($date, $format = "d/m/Y", $usetimezone = true) {
+    if (!$date)
+        return null;
     if (!is_long($date)) {
-    	$date = strtotime(str_replace("/","-",$date)); 
+        $date = strtotime(str_replace("/", "-", $date));
     }
-	/*
-    $timezone = new DateTimeZone( "Australia/Sydney" );
-	$d = new DateTime();
-	$d->setTimestamp( $date);
-	$d->setTimezone( $timezone );
-    return $d->format($format);
-	*/
-    return date($format,$date);     
+    /*
+      $timezone = new DateTimeZone( "Australia/Sydney" );
+      $d = new DateTime();
+      $d->setTimestamp( $date);
+      $d->setTimezone( $timezone );
+      return $d->format($format);
+     */
+    return date($format, $date);
 }
 
-function formatDateTime($date,$format="d/m/Y h:i a",$usetimezone = true) {
-    return formatDate($date,$format);
+function formatDateTime($date, $format = "d/m/Y h:i a", $usetimezone = true) {
+    return formatDate($date, $format);
 }
 
 /**
@@ -291,14 +307,13 @@ function formatDateTime($date,$format="d/m/Y h:i a",$usetimezone = true) {
  * 
  * For those that do not (Windows), then the function is imitated with code.
  */
-function formatMoney($format, $number)
-{
-    if (function_exists('money_format')){
+function formatMoney($format, $number) {
+    if (function_exists('money_format')) {
         return money_format($format, $number);
     }
-    
-    $regex  = '/%((?:[\^!\-]|\+|\(|\=.)*)([0-9]+)?'.
-              '(?:#([0-9]+))?(?:\.([0-9]+))?([in%])/';
+
+    $regex = '/%((?:[\^!\-]|\+|\(|\=.)*)([0-9]+)?' .
+            '(?:#([0-9]+))?(?:\.([0-9]+))?([in%])/';
     if (setlocale(LC_MONETARY, 0) == 'C') {
         setlocale(LC_MONETARY, '');
     }
@@ -307,27 +322,27 @@ function formatMoney($format, $number)
         $locale['mon_decimal_point'] = ".";
     }
     preg_match_all($regex, $format, $matches, PREG_SET_ORDER);
-    
+
     foreach ($matches as $fmatch) {
         $value = floatval($number);
         $flags = array(
-            'fillchar'  => preg_match('/\=(.)/', $fmatch[1], $match) ?
-                           $match[1] : ' ',
-            'nogroup'   => preg_match('/\^/', $fmatch[1]) > 0,
+            'fillchar' => preg_match('/\=(.)/', $fmatch[1], $match) ?
+                    $match[1] : ' ',
+            'nogroup' => preg_match('/\^/', $fmatch[1]) > 0,
             'usesignal' => preg_match('/\+|\(/', $fmatch[1], $match) ?
-                           $match[0] : '+',
-            'nosimbol'  => preg_match('/\!/', $fmatch[1]) > 0,
-            'isleft'    => preg_match('/\-/', $fmatch[1]) > 0
+                    $match[0] : '+',
+            'nosimbol' => preg_match('/\!/', $fmatch[1]) > 0,
+            'isleft' => preg_match('/\-/', $fmatch[1]) > 0
         );
-        $width      = trim($fmatch[2]) ? (int)$fmatch[2] : 0;
-        $left       = trim($fmatch[3]) ? (int)$fmatch[3] : 0;
-        $right      = trim($fmatch[4]) ? (int)$fmatch[4] : $locale['int_frac_digits'];
+        $width = trim($fmatch[2]) ? (int) $fmatch[2] : 0;
+        $left = trim($fmatch[3]) ? (int) $fmatch[3] : 0;
+        $right = trim($fmatch[4]) ? (int) $fmatch[4] : $locale['int_frac_digits'];
         $conversion = $fmatch[5];
 
         $positive = true;
         if ($value < 0) {
             $positive = false;
-            $value  *= -1;
+            $value *= -1;
         }
         $letter = $positive ? 'p' : 'n';
 
@@ -355,21 +370,20 @@ function formatMoney($format, $number)
         }
         if (!$flags['nosimbol']) {
             $currency = $cprefix .
-                        ($conversion == 'i' ? $locale['int_curr_symbol'] : $locale['currency_symbol']) .
-                        $csuffix;
+                    ($conversion == 'i' ? $locale['int_curr_symbol'] : $locale['currency_symbol']) .
+                    $csuffix;
         } else {
             $currency = '';
         }
-        $space  = $locale["{$letter}_sep_by_space"] ? ' ' : '';
-        $value = number_format($value, $right, $locale['mon_decimal_point'],
-                 $flags['nogroup'] ? '' : $locale['mon_thousands_sep']);        
+        $space = $locale["{$letter}_sep_by_space"] ? ' ' : '';
+        $value = number_format($value, $right, $locale['mon_decimal_point'], $flags['nogroup'] ? '' : $locale['mon_thousands_sep']);
         $value = @explode($locale['mon_decimal_point'], $value);
-        
+
         $n = strlen($prefix) + strlen($currency) + strlen($value[0]);
         if ($left > 0 && $left > $n) {
             $value[0] = str_repeat($flags['fillchar'], $left - $n) . $value[0];
         }
-        
+
         if (!empty($value)) {
             $value = implode($locale['mon_decimal_point'], $value);
         }
@@ -380,7 +394,7 @@ function formatMoney($format, $number)
         }
         if ($width > 0) {
             $value = str_pad($value, $width, $flags['fillchar'], $flags['isleft'] ?
-                     STR_PAD_RIGHT : STR_PAD_LEFT);
+                            STR_PAD_RIGHT : STR_PAD_LEFT);
         }
 
         $format = str_replace($fmatch[0], $value, $format);
@@ -388,14 +402,12 @@ function formatMoney($format, $number)
     return trim($format);
 }
 
-function recursiveArraySearch($haystack, $needle, $index = null)
-{
-    $aIt     = new RecursiveArrayIterator($haystack);
-    $it    = new RecursiveIteratorIterator($aIt);
+function recursiveArraySearch($haystack, $needle, $index = null) {
+    $aIt = new RecursiveArrayIterator($haystack);
+    $it = new RecursiveIteratorIterator($aIt);
 
-    while($it->valid())
-    {
-        if (((isset($index) AND ($it->key() == $index)) OR (!isset($index))) AND ($it->current() == $needle)) {
+    while ($it->valid()) {
+        if (((isset($index) AND ( $it->key() == $index)) OR ( !isset($index))) AND ( $it->current() == $needle)) {
             return $aIt->key();
         }
 
@@ -420,35 +432,34 @@ function recursiveArraySearch($haystack, $needle, $index = null)
  * @param string $from_date
  * @param string $to_date
  */
-
-function returncorrectdates(Web &$w, $dm_var, $from_date, $to_date){
-	if ($dm_var == 'm'){
-		$from_date = strtotime(str_replace("/","-",$from_date));
-		$to_date = strtotime(str_replace("/","-",$to_date));
-		$accepted_date = getDate($to_date);
-		$month_number = $accepted_date['mon'];
-		$accepted_year = $accepted_date['year'];
-		if (date('I')){
-			$minus_var = "3601";
-		} else {
-			$minus_var = '1';
-		}
-		if ($to_date){
-			$to_date = $to_date + ((60 * 60 * 24 * cal_days_in_month(CAL_GREGORIAN, $month_number, $accepted_year))-$minus_var);
-		}	
-		return array($from_date, $to_date);
-	}
-	if ($dm_var == 'd'){
-		$from_date = strtotime(str_replace("/","-",$_GET['from_date']));
-		$to_date = strtotime(str_replace("/","-",$_GET['to_date']));
-		$accepted_date = getDate($to_date);
-		$month_number = $accepted_date['mon'];
-		$accepted_year = $accepted_date['year'];
-		if ($to_date){
-			$to_date = $to_date + 86399;
-		}		
-		return array($from_date, $to_date);
-	}
+function returncorrectdates(Web &$w, $dm_var, $from_date, $to_date) {
+    if ($dm_var == 'm') {
+        $from_date = strtotime(str_replace("/", "-", $from_date));
+        $to_date = strtotime(str_replace("/", "-", $to_date));
+        $accepted_date = getDate($to_date);
+        $month_number = $accepted_date['mon'];
+        $accepted_year = $accepted_date['year'];
+        if (date('I')) {
+            $minus_var = "3601";
+        } else {
+            $minus_var = '1';
+        }
+        if ($to_date) {
+            $to_date = $to_date + ((60 * 60 * 24 * cal_days_in_month(CAL_GREGORIAN, $month_number, $accepted_year)) - $minus_var);
+        }
+        return array($from_date, $to_date);
+    }
+    if ($dm_var == 'd') {
+        $from_date = strtotime(str_replace("/", "-", $_GET['from_date']));
+        $to_date = strtotime(str_replace("/", "-", $_GET['to_date']));
+        $accepted_date = getDate($to_date);
+        $month_number = $accepted_date['mon'];
+        $accepted_year = $accepted_date['year'];
+        if ($to_date) {
+            $to_date = $to_date + 86399;
+        }
+        return array($from_date, $to_date);
+    }
 }
 
 // find a value in a multidimension array
@@ -478,14 +489,15 @@ function in_multiarray($value, $array) {
 // Find a value in a multidimension array
 // Modified to only look at the keys, this will always return true in instances like:
 // Look for file in form array, will be true is the values in the select is file (like get all modules)
-function in_modified_multiarray($value, $array, $levels = 3) {    
+function in_modified_multiarray($value, $array, $levels = 3) {
     if (is_array($array)) {
         if (in_array($value, $array)) {
             return true;
         } else {
             --$levels;
-            if ($levels <= 0) return false;
-    
+            if ($levels <= 0)
+                return false;
+
             foreach ($array as $key => $arr_value) {
                 if (in_multiarray($value, $key, $levels)) {
                     return true;
@@ -501,13 +513,13 @@ function in_modified_multiarray($value, $array, $levels = 3) {
 }
 
 function AESencrypt($text, $password) {
-	require_once("phpAES/AES.class.php");
-	$aes = new AES($password);
-	return base64_encode($aes->encrypt($text));
+    require_once("phpAES/AES.class.php");
+    $aes = new AES($password);
+    return base64_encode($aes->encrypt($text));
 }
 
 function AESdecrypt($text, $password) {
-	require_once("phpAES/AES.class.php");
-	$aes = new AES($password);
-	return $aes->decrypt(base64_decode($text));
+    require_once("phpAES/AES.class.php");
+    $aes = new AES($password);
+    return $aes->decrypt(base64_decode($text));
 }

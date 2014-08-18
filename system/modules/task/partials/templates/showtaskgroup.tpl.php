@@ -13,22 +13,23 @@
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($taskgroup->statuses as $status => $val) : ?>
-                <tr>
-                    <td><?php echo $val[0]; ?></td>
-                    <td>
-                        <?php
-                            if (!empty($taskgroup->tasks)) {
-                                echo count(array_filter($taskgroup->tasks, function ($var) use (&$val) {
-                                    return (strcasecmp($var->status, $val[0]) == 0);
-                                }));
-                            } else {
-                                echo 0;
-                            }
-                        ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
+            <?php if (!empty($taskgroup->statuses)) : ?>
+                <?php foreach ($taskgroup->statuses as $status => $val) : ?>
+                <?php 
+                    $task_count = 0;
+                    if (!empty($taskgroup->tasks)) {
+                        $task_count = count(array_filter($taskgroup->tasks, function ($var) use (&$val) {
+                            return (strcasecmp($var->status, $val[0]) == 0);
+                        }));
+                    }
+                    if ($task_count > 0) : ?>
+                        <tr>
+                            <td><?php echo $val[0]; ?></td>
+                            <td><?php echo $task_count; ?></td>
+                        </tr>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </tbody>
     </table>
 <?php endif; ?>

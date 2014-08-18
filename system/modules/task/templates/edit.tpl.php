@@ -75,7 +75,7 @@
     });
     
     $("select[id='task_group_id']").on("change", function() {
-        $.getJSON("/task/taskAjaxSelectbyTaskGroup?id=" + $(this).val(),
+        $.getJSON("/task/taskAjaxSelectbyTaskGroup/" + $(this).val() + "/<?php echo !empty($task->id) ? $task->id : null; ?>",
             function(result) {
                 if (initialChange) {
                     $('#task_type').parent().html(result[0]);
@@ -93,7 +93,6 @@
     
     function bindTypeChangeEvent() {
         $("#task_type").on("change", function(event) {
-            console.log("Change event triggered");
             $.getJSON("/task/ajaxGetTaskTypeFormFields?task_type=" + $("#task_type").val() + "&task_group_id=" + $("#task_group_id").val(),
                 function(result) {
                     if (result.length > 0) {

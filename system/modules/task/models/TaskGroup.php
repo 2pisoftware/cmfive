@@ -88,5 +88,25 @@ class TaskGroup extends DbObject {
     public function getSelectOptionValue() {
         return $this->id;
     }
-
+    
+    // Task replacement function
+    public function getTypes() {
+        return $this->Task->getTaskTypes($this);
+    }
+    
+    public function getTypeStatus() {
+        return $this->Task->getTaskTypeStatus($this);
+    }
+    
+    public function getTaskGroupTypeObject() {
+        return $this->Task->getTaskGroupTypeObject($this);
+    }
+    
+    public function getTaskReopen() {
+        return $this->Task->getCanTaskRepoen($this->task_group_type);
+    }
+    
+    public function getStatus() {
+        return $this->Task->getTaskStatus($this);
+    }
 }

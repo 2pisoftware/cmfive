@@ -370,6 +370,10 @@ class TaskService extends DbService {
 
     // return an array for display of task type for a task group defined in our tasks file.
     function getTaskTypes($taskgroup) {
+        if (empty($taskgroup)) {
+            return null;
+        }
+        
         $tasktypes = array();
         $this->_loadTaskFiles();
         foreach (get_declared_classes() as $class) {
