@@ -21,6 +21,18 @@ class TaskGroup extends DbObject {
     public $default_assignee_id; // can be null
     public $task_group_type; // php class name of concrete TaskGroupType implementation
     public $_modifiable;
+    
+    
+    public $_validation = array(
+        "title" => array("required"),
+        "can_assign" => array("required"),
+        "can_view" => array("required"),
+        "can_create" => array("required"),
+        "is_active" => array("required"),
+        "default_assignee_id" => array("required"),
+        "task_group_type" => array("required"),
+    );
+    
     public static $_db_table = "task_group";
 
     // get my member object. compare my role with group role required to view task group

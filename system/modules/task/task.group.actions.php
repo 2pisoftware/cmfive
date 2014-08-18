@@ -46,7 +46,7 @@ function viewtaskgrouptypes_ALL(Web &$w) {
 	// build form to create a new task group within the target group type
 	$f = Html::form(array(
 	array("Task Group Attributes","section"),
-	array("Task Group","select","task_group_type",null,$grouptypes),
+	array("Task Group Type","select","task_group_type",null,$grouptypes),
 	array("Title","text","title"),
 	array("Who Can Assign","select","can_assign",null,$arrassign),
 	array("Who Can View","select","can_view",null,$w->Task->getTaskGroupPermissions()),
@@ -98,38 +98,20 @@ function viewtaskgroup_GET(Web &$w) {
 }
 
 function createtaskgroup_POST(Web &$w) {
-	/*
-	 $errors = $w->validate(array(
-	 array("title","^$","Please enter a Title"),
-	 array("can_assign","^$","Please select Who Can Assign"),
-	 array("can_view","^$","Please select Who Can View"),
-	 array("can_create","^$","Please select Who Can Create Tasks"),
-	 array("is_active","^$","Please select if Task is Active"),
-	 array("is_deleted","^$","Please select if Task is Deleted"),
-	 array("description","^$","Please enter a Description"),
-	 array("default_assignee_id","^$","Please enter an Assignee"),
-	 array("task_group_type","^$","Please select a Task Type"),
-	 ));
+    $taskgroup = $w->Task->createTaskGroup(
+        $w->request('task_group_type'),
+        $w->request('title'),
+        $w->request('description'),
+        $w->request('default_assignee_id'),
+        $w->request('can_assign'),
+        $w->request('can_view'),
+        $w->request('can_create'),
+        $w->request('is_active'),
+        $w->request('is_deleted')
+    );
 
-	 if (sizeof($errors) != 0) {
-	 $w->error(implode("<br/>\n",$errors),"/task-group/creategroup");
-	 }
-	 */
-
-	$taskgroup = $w->Task->createTaskGroup(
-			$_REQUEST['task_group_type'],
-			$_REQUEST['title'],
-			$_REQUEST['description'],
-			$_REQUEST['default_assignee_id'],
-			$_REQUEST['can_assign'],
-			$_REQUEST['can_view'],
-			$_REQUEST['can_create'],
-			$_REQUEST['is_active'],
-			$_REQUEST['is_deleted']
-		);
-	
-	// return
-	$w->msg("Task Group ".$taskgroup->title." added","/task-group/viewmembergroup/".$taskgroup->id);
+    // return
+    $w->msg("Task Group ".$taskgroup->title." added", "/task/tasklist/?taskgroups=".$taskgroup->id);
 }
 
 function updatetaskgroup_POST(Web &$w) {
@@ -204,25 +186,23 @@ function deletetaskgroup_GET(Web &$w) {
 }
 
 function deletetaskgroup_POST(Web &$w) {
-	$p = $w->pathMatch("id");
-	// get details of task group to be deleted
-	$group_details = $w->Task->getTaskGroup($p['id']);
+    // Get path ID and check that it exists
+    $p = $w->pathMatch("id");
+    if (empty($p['id'])) {
+        $w->error("Taskgroup could not be found", "/task-group/viewtaskgrouptypes");
+    }
 
-	// set 'is_deleted' flag to 1
-	$_REQUEST['is_deleted'] = 1;
+    // Get taskgroup by given ID and make sure a taskgroup exists with that ID
+    $taskgroup = $w->Task->getTaskGroup($p['id']);
 
-	// if gorup exists, update setting is_deleted to 1
-	if ($group_details) {
-		$group_details->fill($_REQUEST);
-		$group_details->update();
+    if (empty($taskgroup->id)) {
+        $w->error("Taskgroup could not be found with ID: " . $p['id'], "/task-group/viewtaskgrouptypes");
+    }
 
-		// return message
-		$w->msg("Task Group " . $group_details->title . " deleted.","/task-group/viewtaskgroups/".$group_details->task_group_type);
-	}
-	else {
-		// if group somehow no longer exists, say as much
-		$w->msg("Group: " . $_REQUEST['title'] . " no longer exists?","/task-group/viewtaskgroups/".$group_details->task_group_type);
-	}
+    // Delete and return
+    $taskgroup->delete();
+
+    $w->msg("Task Group " . $group_details->title . " deleted.","/task-group/viewtaskgrouptypes");
 }
 
 ////////////////////////////////////////////////////

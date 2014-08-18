@@ -619,8 +619,13 @@ class TaskService extends DbService {
         $taskgroup->is_active = $is_active;
         $taskgroup->is_deleted = $is_deleted;
         $taskgroup->default_assignee_id = $default_assignee_id;
-        $taskgroup->insert();
-
+        $response = $taskgroup->insert();
+        
+        // Check the validation
+        if ($response !== true) {
+            $this->w->errorMessage($taskgroup, "Taskgroup", $response, false, "/task-group/viewtaskgrouptypes#create");
+        }
+        
         // if created succcessfully, create default notify matrix: all on
         if ($taskgroup->id) {
             $arr['guest']['creator'] = 1;

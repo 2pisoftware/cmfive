@@ -26,6 +26,8 @@ class Task extends DbObject {
     public $_modifiable;  // Modifiable Aspect
     public $_searchable;
 
+    public static $_db_table = "task";
+    
     // @TODO: add TaskData and TaskComments
     function addToIndex() {
         $ttype = $this->getTaskTypeObject();
@@ -78,7 +80,7 @@ class Task extends DbObject {
      */
     function setDataValue($key, $value) {
         if ($this->id) {
-            $c = $this->Task->getObject("TaskData", array("task_id" => $this->id, "data_key" => $key));
+            $c = $this->w->Task->getObject("TaskData", array("task_id" => $this->id, "data_key" => $key));
             if ($c) {
                 $c->value = $value;
                 $c->update();
@@ -150,7 +152,7 @@ class Task extends DbObject {
         $logged_in_user_id = $this->w->Auth->user()->id;
         $me = $this->w->Task->getMemberGroupById($this->task_group_id, $logged_in_user_id);
 
-        if (($logged_in_user_id == $this->assignee_id) || ($logged_in_user_id == $this->getTaskCreatorId()) || (!empty($me->role) && $this->Task->getMyPerms($me->role, "OWNER"))) {
+        if (($logged_in_user_id == $this->assignee_id) || ($logged_in_user_id == $this->getTaskCreatorId()) || (!empty($me->role) && $this->w->Task->getMyPerms($me->role, "OWNER"))) {
             return true;
         }
         return false;
@@ -201,7 +203,7 @@ class Task extends DbObject {
     // given a status, return true| false ... $c[<status>] = true|false
     function getisTaskClosed() {
         if (!empty($this->_taskgroup->id)) {
-            $statlist = $this->_taskgroup->getStatus(); //Task->getTaskStatus($this->Task->getTaskGroupTypeById($this->task_group_id));
+            $statlist = $this->_taskgroup->getStatus(); //Task->getTaskStatus($this->w->Task->getTaskGroupTypeById($this->task_group_id));
             if ($statlist) {
                 foreach ($statlist as $stat) {
                     $status[$stat[0]] = $stat[1];
@@ -213,7 +215,7 @@ class Task extends DbObject {
 
     // return the task priorities as array given a task group ID
     function getTaskGroupPriority() {
-        return (!empty($this->_taskgroup->id) ? $this->_taskgroup->getPriority() : null); //Task->getTaskPriority($this->Task->getTaskGroupTypeById($this->task_group_id));
+        return (!empty($this->_taskgroup->id) ? $this->_taskgroup->getPriority() : null); //Task->getTaskPriority($this->w->Task->getTaskGroupTypeById($this->task_group_id));
     }
 
     // return list of time log entries for a task given task ID
@@ -259,7 +261,7 @@ class Task extends DbObject {
     }
 
     function printSearchListing() {
-        $tg = $this->Task->getTaskGroup($this->task_group_id);
+        $tg = $this->w->Task->getTaskGroup($this->task_group_id);
         $assignee = $this->getAssignee();
         $buf = $tg->title;
         if ($assignee) {
@@ -293,11 +295,11 @@ class Task extends DbObject {
     function insert($force_validation = false) {
         if ($this->task_group_id) {
             // set default status for newly created tasks
-            $this->status = $this->getTaskGroupTypeObject()->get_default_status($this);
+            $this->status = $this->_taskgroup->getTaskGroupTypeObject()->get_default_status($this);
 
             // if no assignee selected for newly created task, use task group default assignee
             if ($this->first_assignee_id == "") {
-                $tg = $this->Task->getTaskGroup($this->task_group_id);
+                $tg = $this->w->Task->getTaskGroup($this->task_group_id);
                 $this->first_assignee_id = $this->assignee_id = $tg->default_assignee_id;
             } else {
                 $this->assignee_id = $this->first_assignee_id;
