@@ -187,13 +187,11 @@ class Task extends DbObject {
     }
 
     // return the task types as array for a task group given a task group ID
-    // return 'unknown' if unknown
     function getTaskGroupTypes() {
         return (!empty($this->_taskgroup->id) ? $this->_taskgroup->getTypes() : null);
     }
 
     // return the task statuses as array for a task group given a task group ID
-    // return 'unknown' if unknown
     function getTaskGroupStatus() {
         return (!empty($this->_taskgroup->id) ? $this->_taskgroup->getTypeStatus() : null);
     }
@@ -251,7 +249,7 @@ class Task extends DbObject {
     // return a task type object given a task type
     function getTaskTypeObject() {
         if ($this->task_type) {
-            return $this->Task->getTaskTypeObject($this->task_type);
+            return $this->w->Task->getTaskTypeObject($this->task_type);
         }
     }
 

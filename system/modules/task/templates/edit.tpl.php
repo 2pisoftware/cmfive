@@ -11,23 +11,21 @@
     <div class="tab-body">
         <div id="details" class="clearfix">
             <div class="row-fluid clearfix">
-                <div class="row-fluid">
-                    <?php $tasktypeobject = $task->getTaskTypeObject(); echo !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null; ?>
+                <div class="row-fluid columns">
+                    <?php 
+                        // Note the extra buttons only show when the task_type object
+                        $tasktypeobject = $task->getTaskTypeObject(); 
+                        echo !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null; 
+                    ?>
                 </div>
                 <div class="row-fluid clearfix">
                     <div class="small-12 large-9">
                         <?php echo $form; ?>
                     </div>
                     <div class="small-12 large-3 right">
-                        <div class="small-12 panel" id="tasktext" style="display: none;">
-
-                        </div>
-                        <div class="small-12 panel" id="formfields" style="display: none;">
-
-                        </div>
-                        <div class="small-12 panel" id="formdetails" style="display: none;">
-                            
-                        </div>
+                        <div class="small-12 panel" id="tasktext" style="display: none;"></div>
+                        <div class="small-12 panel clearfix" id="formfields" style="display: none;"></div>
+                        <div class="small-12 panel clearfix" id="formdetails" style="display: none;"></div>
                     </div>
                 </div>
             </div>
@@ -107,9 +105,13 @@
                 if (task_type_value.length > 0) {
                     $("#formdetails").hide();
                     $.getJSON("/task/ajaxGetExtraDetails/<?php echo $task->id; ?>/" + task_type_value, function(result) {
-                        if (result.length > 0) {
-                            $("#formdetails").html(result);
+                        if (result[0].length > 0) {
+                            $("#formdetails").html(result[0]);
                             $("#formdetails").fadeIn();
+                            if (result[1].length > 0) {
+                                $("#formfields").html(result[1]);
+                                $("#formfields").fadeIn();
+                            }
                         }
                     });
                 }

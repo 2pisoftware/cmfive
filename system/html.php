@@ -429,57 +429,7 @@ class Html {
             $buffer .= "</table></div></div>";
         }
         $buffer .= "</div></div>";
-        // Print internals
-//        foreach ($data as $section => $rows) {
-//            
-//            // Print section header
-//            $buffer .= "<div class='panel'>";
-//            $buffer .= "<div class='row-fluid section-header'>{$section}</div>";
-//            
-//            // Loop through each row
-//            foreach ($rows as $row) {
-//                
-//                // Print each field
-//                $fieldCount = count($row);
-//                $buffer .= "<ul class='small-block-grid-1 medium-block-grid-{$fieldCount} section-body'>";
-//                
-//                foreach($row as $field) {
-//                    
-//                    $title = !empty($field[0]) ? $field[0] : null;
-//                    $type = !empty($field[1]) ? $field[1] : null;
-//                    $name = !empty($field[2]) ? $field[2] : null;
-//                    $value = !empty($field[3]) ? $field[3] : null;
-//
-//                    // Can I do this?
-//                    if (empty($title) and empty($value)) {
-//                        continue;
-//                    }
-//                                        
-//                    // Exploit HTML5s inbuilt form validation
-//                    $required = null;
-//                    if (!empty($validation[$name])) {
-//                        if (in_array("required", $validation[$name])) {
-//                            $required = "required";
-//                        }
-//                    }
-//
-//                    $buffer .= "<li class='display-row'>";
-//                    
-//                    // Add title field
-//                    if (!empty($title)) {
-//                        $buffer .= "<b class='small-5 medium-3 columns'>{$title}</b>";
-//                    }
-//                    
-//                    $buffer .= "<div class='small-7 medium-9 columns'>" . $value . "</div></li>";
-//                }
-//                
-//                $buffer .= "</ul>";
-//            }
-//            $buffer .= "</div>";
-//        }
-//
-//        // Finish shell div tag
-//        $buffer .= "</div>";        
+        
         return $buffer;
     }
 
