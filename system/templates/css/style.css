@@ -1,6 +1,6 @@
 *, *:before, *:after {box-sizing:  border-box;}
 
-.listgrid > .row-fluid, .multicolform > .row-fluid {
+.multicolform > .row-fluid {
     -moz-column-width: 24em;
     -webkit-column-width: 24em;
     -moz-column-gap: 1em;
@@ -134,13 +134,11 @@ button {
 /* Grid List */
 .grid-list-panel {
     clear: none !important;
-    height: 180px !important;
 }
 
 .grid-list-panel .panel {
     padding: 10px 0px;
     margin-bottom: 0px;
-    height: 130px !important;
 }
 
 #filter-grid > li {
@@ -274,17 +272,6 @@ table.taskgroup_summary {
 /* Should be supported in IE7+ */
 button.button + button {
     margin-left: 5px !important;
-}
-
-@media(max-width: 640px) {
-    .grid-list-panel {
-        height: 220px !important;
-        margin-bottom: 20px;
-    }
-    
-    .grid-list-panel .panel {
-        height: 160px !important;
-    }
 }
 
 /* Loading Indicator - from: http://www.alessioatzeni.com/blog/css3-loading-animation-loop/ */
