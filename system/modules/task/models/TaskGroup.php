@@ -115,7 +115,7 @@ class TaskGroup extends DbObject {
     }
     
     public function getTaskReopen() {
-        return $this->w->Task->getCanTaskRepoen($this->task_group_type);
+        return $this->w->Task->getCanTaskReopen($this->task_group_type);
     }
     
     public function getStatus() {
