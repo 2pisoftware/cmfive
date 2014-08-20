@@ -74,13 +74,13 @@ class TaskGroup extends DbObject {
     // get task group title given task group type
     function getTypeTitle() {
         $c = $this->w->Task->getTaskGroupTypeObject($this->task_group_type);
-        return $c ? $c->getTaskGroupTypeTitle() : "unknown";
+        return $c ? $c->getTaskGroupTypeTitle() : null;
     }
 
     // get task group description given task group type
     function getTypeDescription() {
         $c = $this->w->Task->getTaskGroupTypeObject($this->task_group_type);
-        return $c ? $c->getTaskGroupTypeDescription() : "unknown";
+        return $c ? $c->getTaskGroupTypeDescription() : null;
     }
 
     // get fullname of default assignee for this task group

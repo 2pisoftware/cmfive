@@ -4,6 +4,41 @@ class TaskService extends DbService {
 
     public $_tasks_loaded;
 
+    public function getTaskGroupDetailsForUser() {
+        $user_id = $this->w->Auth->user()->id;
+        $taskgroups = $this->getTaskGroupsForMember($user_id);
+        
+        $taskgroup_details = array("taskgroups" => array(), "statuses" => array(), "priorities" => array(), "members" => array(), "types" => array());
+        if (!empty($taskgroups)) {
+            foreach($taskgroups as $taskgroup) {
+                $taskgroup_details["taskgroups"][] = $taskgroup;
+                $taskgroup_details["statuses"] = array_merge($taskgroup_details["statuses"], $taskgroup->getStatus());
+                $taskgroup_details["priorities"] = array_merge($taskgroup_details["priorities"], $taskgroup->getPriority());
+                $taskgroup_details["members"] = array_merge($taskgroup_details["members"], $this->getMembersInGroup($taskgroup->id));
+                $task_type_array = $taskgroup->getTaskGroupTypeObject()->getTaskTypeArray();
+                
+                $taskgroup_details["types"][key($task_type_array)] = array($task_type_array[key($task_type_array)], key($task_type_array));
+            }
+        }
+        
+        // Flatten arrays
+        $taskgroup_details["statuses"] = array_unique($this->flattenTaskGroupStatusArray($taskgroup_details["statuses"]));
+        $taskgroup_details["priorities"] = array_unique($this->flattenTaskGroupStatusArray($taskgroup_details["priorities"]));
+//        $taskgroup_details["types"] = array_unique($taskgroup_details["types"]);
+        return $taskgroup_details;
+    }
+    
+    public function flattenTaskGroupStatusArray($statuses) {
+        $result_array = array();
+        if (!empty($statuses)) {
+            foreach($statuses as $status) {
+                $result_array[$status[1]] = $status[0];
+            }
+        }
+        
+        return $result_array;
+    }
+    
     // function to sort lists by date created
     static function sortByCreated($a, $b) {
         if ($a->dt_created == $b->dt_created) {
@@ -476,15 +511,29 @@ class TaskService extends DbService {
 
     // return all groups from the database of which a user is a member, given user ID. else, return all groups
     function getMemberGroups($id = null) {
-//		$where = ($id) ? array("user_id"=>$id) : null;
-//		return $this->getObjects("TaskGroupMember",$where);
-        // check if task group is active and not deleted
-        $where = "where m.user_id = " . $id . " and m.is_active = 1 and g.is_active = 1 and g.is_deleted = 0";
-        $rows = $this->_db->sql("SELECT m.* from " . TaskGroupMember::$_db_table . " as m inner join " . TaskGroup::$_db_table . " as g on m.task_group_id = g.id " . $where . " order by m.task_group_id")->fetch_all();
-        $rows = $this->fillObjects("TaskGroupMember", $rows);
-        return $rows;
+        if (empty($id)) {
+            return null;
+        }
+        
+        $query = $this->_db->get("task_group_member")
+                ->leftJoin("task_group")
+                ->where("task_group_member.user_id", $id)->and("task_group_member.is_active", 1)
+                ->and("task_group.is_active", 1)->and("task_group.is_deleted", 0);
+        return $this->getObjectsFromRows("TaskGroupMember", $query->fetch_all());
     }
 
+    function getTaskGroupsForMember($id = null) {
+        if (empty($id)) {
+            return null;
+        }
+        
+        $query = $this->_db->get("task_group_member")
+                ->leftJoin("task_group")->select("task_group.*")
+                ->where("task_group_member.user_id", $id)->and("task_group_member.is_active", 1)
+                ->and("task_group.is_active", 1)->and("task_group.is_deleted", 0);
+        return $this->getObjectsFromRows("TaskGroup", $query->fetch_all());
+    }
+    
     // return all members of a task group from the database, given the task group ID
     function getMemberGroup($id) {
         return $this->getObjects("TaskGroupMember", array("task_group_id" => $id, "is_active" => 1));

@@ -9,4 +9,7 @@ class TaskGroupMember extends DbObject {
 
 	public static $_db_table = "task_group_member";
 
+        public function getTaskGroup() {
+            return $this->getObject("TaskGroup", $this->task_group_id);
+        }
 }

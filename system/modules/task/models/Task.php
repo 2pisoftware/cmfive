@@ -166,8 +166,15 @@ class Task extends DbObject {
 
     // return the name for display of the task creator given a task ID
     function getTaskCreatorName() {
-        $c = $this->w->Task->getObject("ObjectModification", array("object_id" => $this->id, "table_name" => $this->getDbTableName()));
-        $creator = $this->w->Auth->getUser($c->creator_id);
+        // I've moved the creator_id to tasks but this is for backwards compatability
+        $creator = null;
+        if (empty($this->creator_id)) {
+            $c = $this->w->Task->getObject("ObjectModification", array("object_id" => $this->id, "table_name" => $this->getDbTableName()));
+            $creator = $this->w->Auth->getUser($c->creator_id);
+        } else {
+            $creator = $this->w->Auth->getUser($this->creator_id);
+        }
+        
         return $creator ? $creator->getFullName() : "";
     }
 

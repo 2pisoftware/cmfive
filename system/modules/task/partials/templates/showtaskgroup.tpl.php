@@ -3,7 +3,7 @@
         <thead>
             <tr>
                 <th colspan='2'>
-                    <a  target="_blank" href="/task/tasklist/?taskgroups=<?php echo $taskgroup->id; ?>">
+                    <a  target="_blank" href="/task/tasklist/?task_group_id=<?php echo $taskgroup->id; ?>">
                         <?php echo $taskgroup->title; ?>
                     </a>
                     <?php if ($taskgroup->getCanICreate()) : ?>
