@@ -22,21 +22,34 @@ class TaskService extends DbService {
         }
         
         // Flatten arrays
-        $taskgroup_details["statuses"] = array_unique($this->flattenTaskGroupStatusArray($taskgroup_details["statuses"]));
-        $taskgroup_details["priorities"] = array_unique($this->flattenTaskGroupStatusArray($taskgroup_details["priorities"]));
+        $taskgroup_details["statuses"] = array_unique($this->flattenTaskGroupArray($taskgroup_details["statuses"]));
+        $taskgroup_details["priorities"] = array_unique($this->flattenTaskGroupArray($taskgroup_details["priorities"]));
 //        $taskgroup_details["types"] = array_unique($taskgroup_details["types"]);
         return $taskgroup_details;
     }
     
-    public function flattenTaskGroupStatusArray($statuses) {
+    public function flattenTaskGroupArray($statuses) {
         $result_array = array();
         if (!empty($statuses)) {
             foreach($statuses as $status) {
-                $result_array[$status[1]] = $status[0];
+                if (!is_bool($status[1])) {
+                    $result_array[$status[1]] = $status[0];
+                } else {
+                    $result_array[] = $status[0];
+                }
             }
         }
         
         return $result_array;
+    }
+    
+    public function getSelectArrayForTaskGroupType($class) {
+        $taskgroup_type_object = $this->getTaskGroupTypeObject($class);
+        if (!empty($taskgroup_type_object)) {
+            $status_array = $taskgroup_type_object->getStatusArray();
+            return $this->flattenTaskGroupArray($status_array);
+        }
+        return null;
     }
     
     // function to sort lists by date created
