@@ -119,7 +119,7 @@ class Task extends DbObject {
      * @see DbObject::canList()
      */
     function canList(User $user) {
-        return $this->getCanIList();
+        return $this->getCanIView();
     }
 
     // get my membership object and check i am better than GUEST of a task group given a task group ID
