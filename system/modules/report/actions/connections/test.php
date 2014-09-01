@@ -11,7 +11,9 @@ function test_ALL(Web $w) {
         $w->error("Connection could not be found", "/report-connections");
     }
     
-    $connection->decrypt();
+    // Decrypt is called in getDb(), which reencrypts it
+//    $connection->decrypt();
+//    var_dumP($connection);
     try {
         $dbo = $connection->getDb();
         echo "Connected to DB<br/>Fetching databases to test connection...<br/>";
@@ -19,10 +21,10 @@ function test_ALL(Web $w) {
         $results;
         switch ($connection->db_driver) {
             case "pgsql":
-                $results = $dbo->sql("SELECT datname FROM pg_database")->fetch_all();
+                $results = $dbo->query("SELECT datname FROM pg_database")->fetchAll();
                 break;
             case "mysql":
-                $results = $dbo->sql("show databases")->fetch_all();
+                $results = $dbo->query("show databases")->fetchAll();
                 break;
         }
         
