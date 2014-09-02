@@ -1,8 +1,8 @@
 --
 -- Database: `cmfive`
 --
-CREATE DATABASE IF NOT EXISTS `cmfive` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-USE `cmfive`;
+-- CREATE DATABASE IF NOT EXISTS `cmfive` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+-- USE `cmfive`;
 
 -- --------------------------------------------------------
 
