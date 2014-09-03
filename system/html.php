@@ -110,7 +110,7 @@ class Html {
             default:
                 $buffer .= "Line";
         }
-        $buffer .= "(" . json_encode($data) . ", " . json_encode($options) . ");";
+        $buffer .= "(" . json_encode($data) . ", " . (!empty($options) ? json_encode($options) : "{}") . ");";
         $buffer .= "</script>";
         return $buffer;
     }
@@ -761,9 +761,11 @@ class Html {
             $source = "[";
             foreach ($options as $option) {
                 if (is_array($option)) {
-                    $source .= '{"id":"' . $option[1] . '","value":"' . $option[0] . '"},';
-                    if ($value == $option[1]) {
-                        $acp_value = $option[0];
+                    $array_id = (!empty($option[1]) ? $option[1] : $option[0]);
+                    $array_value = $option[0];
+                    $source .= '{"id":"' . $array_id . '","value":"' . $array_value . '"},';
+                    if ($value == $array_id) {
+                        $acp_value = $array_value;
                     }
                 } elseif (is_a($option, "DbObject")) {
                     $source .= '{"id":"' . htmlentities($option->getSelectOptionValue()) . '","value":"' . htmlentities($option->getSelectOptionTitle()) . '"},';
@@ -788,6 +790,7 @@ class Html {
         $buf.='<input type="text" id="acp_' . $name . '"  name="acp_' . $name . '" value="' . $acp_value . '" class="' . $class . '" style="' . $style . '" ' . $required . ' />';
         $buf.="<script type='text/javascript'>";
         $buf.='$(function(){
+                    $("#acp_' . $name . '").keyup(function(){$("#' . $name . '").val("")});
                     $("#acp_' . $name . '").autocomplete({
                         minLength:' . $minLength . ', 
                         source: ' . $source . ',
@@ -912,6 +915,7 @@ class Html {
             $type = !empty($row[1]) ? $row[1] : null;
             $name = !empty($row[2]) ? $row[2] : null;
             $value = !empty($row[3]) ? $row[3] : null;
+            
             $readonly = "";
 
             $required = null;
@@ -949,7 +953,8 @@ class Html {
                     $buffer .= '<input' . $readonly . ' style="width:100%;"  type="' . $type . '" name="' . $name . '" value="' . htmlspecialchars($value) . '" size="' . (!empty($row[4]) ? $row[4] : null) . '" id="' . $name . '"/>';
                     break;
                 case "autocomplete":
-                    $buffer .= Html::autocomplete($name, $size, $value, null, "width: 100%;", 1, $required);
+                    $minlength = !empty($row[5]) ? $row[5] : null;
+                    $buffer .= Html::autocomplete($name, $size, $value, null, "width: 100%;", !empty($minlength) ? $minlength : 1, $required);
                     break;
                 case "date":
                     $buffer .= Html::datePicker($name, $value, $size, $required);
