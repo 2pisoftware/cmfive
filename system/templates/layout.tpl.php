@@ -86,6 +86,7 @@
         <div class="loading_overlay" <?php echo $w->request('show_overlay') == null ? 'style="display:none;"' : ''; ?>>
             <div class="circle"></div>
             <div class="circle_inner"></div>
+            <div class="circle_center"></div>
             <h4 class="subheader">Please wait...</h4>
         </div>
         <div class="row-fluid">
