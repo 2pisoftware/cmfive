@@ -29,7 +29,7 @@ function edit_GET($w) {
     
     // Create form
     $form = array(
-        (!empty($p["id"]) ? "Edit task" : "Createa new task") => array(
+        (!empty($p["id"]) ? "Edit task" : "Create a new task") => array(
             array(
                 array("Task Group", "select", "task_group_id", !empty($task->task_group_id) ? $task->task_group_id : $taskgroup_id, $taskgroups),
                 array("Status", "select", "status", $task->status, $task->getTaskGroupStatus())
