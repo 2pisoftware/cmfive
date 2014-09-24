@@ -4,7 +4,7 @@
 *
 * @param <type> $w
 */
-function groupedit_GET(Web &$w)
+function groupedit_GET(Web $w)
 {
 	$option = $w->pathMatch("group_id");
 
@@ -17,7 +17,7 @@ function groupedit_GET(Web &$w)
 	$w->setLayout(null);
 }
 
-function groupedit_POST(Web &$w)
+function groupedit_POST(Web $w)
 {
 	$option = $w->pathMatch("group_id");
 

@@ -79,7 +79,7 @@ class User extends DbObject {
 				}
 				
 				$usr = $this->Auth->getUser ( $member->user_id );
-				if ($usr->is_group == 1 && $this->inGroup ( $usr )) {
+				if (!empty($usr) && $usr->is_group == 1 && $this->inGroup ( $usr )) {
 					return true;
 				}
 			}

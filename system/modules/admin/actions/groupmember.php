@@ -4,7 +4,7 @@
 *
 * @param <type> $w
 */
-function groupmember_GET(Web &$w)
+function groupmember_GET(Web $w)
 {
 	$option = $w->pathMatch("group_id");
 
@@ -19,22 +19,26 @@ function groupmember_GET(Web &$w)
 	ksort($select[0]);
 	ksort($select[1]);
 
-	$template['New Member'] = array(array(array("Select Member: ","multiSelect","title",null,array_merge($select[0],$select[1])),
-	array("","hidden","group_id",$option['group_id'])));
+	$template['New Member'] = array(array(array("Select Member: ","select","member_id",null,array_merge($select[0],$select[1]))));
 	if ($w->Auth->user()->is_admin)
 	{
 		$template['New Member'][0][] = array("Owner","checkbox","is_owner");
 	}
 		
-	$w->out(Html::multiColForm($template,"/admin/groupmember","POST","Save"));
+	$w->out(Html::multiColForm($template,"/admin/groupmember/".$option['group_id'],"POST","Save"));
 
 	$w->setLayout(null);
 }
 
-function groupmember_POST(Web &$w)
+function groupmember_POST(Web $w)
 {
-	$groupUsers = $w->Auth->getUser($_REQUEST['group_id'])->isInGroups();
-
+	$p = $w->pathMatch("group_id");
+	$member_id = $w->request('member_id');
+	$group_id = $p['group_id'];
+	$is_owner = $w->request('is_owner');
+	
+	// store all parent groups in session
+	$groupUsers = $w->Auth->getUser($group_id)->isInGroups();
 	if ($groupUsers)
 	{
 		foreach ($groupUsers as $groupUser)
@@ -43,37 +47,37 @@ function groupmember_POST(Web &$w)
 		}
 	}
 
-	foreach ($_REQUEST['title'] as $member_id)
+	// add member to the group only if it isn't already in there
+	// this logic should move to the model!
+	$existUser = $w->Auth->getUser($member_id)->isInGroups($group_id);
+	if (!$existUser)
 	{
-		$existUser = $w->Auth->getUser($member_id)->isInGroups($_REQUEST['group_id']);
-
-		if (!$existUser)
+		if (!$w->session('parents') || !in_array($member_id, $w->session('parents')))
 		{
-			if (!$w->session('parents') || !in_array($member_id, $w->session('parents')))
-			{
-				$groupMember = new GroupUser($w);
-				$groupMember->group_id = $_REQUEST['group_id'];
-				$groupMember->user_id = $member_id;
-				$groupMember->role = ($_REQUEST['is_owner'] && $_REQUEST['is_owner'] == 1) ? "owner" : "member";
-				$groupMember->insert();
-			}
-				
-			if ($w->session('parents') && in_array($member_id, $w->session('parents')))
-			{
-				$exceptions[] = $w->Auth->getUser($member_id)->login;
-			}
+			$groupMember = new GroupUser($w);
+			$groupMember->group_id = $group_id;
+			$groupMember->user_id = $member_id;
+			$groupMember->role = ($is_owner && $is_owner == 1) ? "owner" : "member";
+			$groupMember->insert();
 		}
-		else
+			
+		if ($w->session('parents') && in_array($member_id, $w->session('parents')))
 		{
-			$user = $existUser[0]->getUser();
-				
-			$exceptions[] = $user->is_group == 1 ? $user->login : $user->getContact()->getFullName();
+			$exceptions[] = $w->Auth->getUser($member_id)->login;
 		}
 	}
+	else
+	{
+		$user = $existUser[0]->getUser();
+			
+		$exceptions[] = $user->is_group == 1 ? $user->login : $user->getContact()->getFullName();
+	}
+
 	$w->sessionUnset('parents');
 
-	if ($exceptions)
-	$w->error(implode(", ", $exceptions)." can not be added!", "/admin/moreInfo/".$_REQUEST['group_id']);
-	else
-	$w->msg("New members are added!", "/admin/moreInfo/".$_REQUEST['group_id']);
+	if ($exceptions) {
+		$w->error(implode(", ", $exceptions)." can not be added!", "/admin/moreInfo/".$group_id);
+	} else {
+		$w->msg("New members are added!", "/admin/moreInfo/".$group_id);
+	}
 }
