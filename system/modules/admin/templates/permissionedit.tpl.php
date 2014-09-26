@@ -1,4 +1,4 @@
-<div id="permissions_list" style="width:100%;"><?php echo $permission?></div>
+<div id="permissions_list" style="width:70%;"><?php echo $permission?></div>
 
 <script type="text/javascript">
 	$("#goBack").click(function(){
