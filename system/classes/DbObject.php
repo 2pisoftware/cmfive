@@ -534,7 +534,8 @@ class DbObject extends DbService {
             $this->_db->execute();
         } catch (Exception $e) {
             echo $e->getMessage();
-            $this->w->Log->error($e->getMessage());
+            $this->w->Log->error("SQL ERROR: " . $e->getMessage());
+            $this->w->Log->error("SQL: " . $this->_db->getSql());
             return NULL;
         }
         

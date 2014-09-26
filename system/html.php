@@ -267,7 +267,7 @@ class Html {
                 continue;
             }
             
-            if (!empty($title) && "static" !== $type) {
+            if (!empty($title) && "static" !== $type && "hidden" !== $type) {
                 $buffer .= "<label class='small-12 columns'>$title";
             }
             
@@ -343,8 +343,10 @@ class Html {
                     $buffer .= '<input style="width:100%;"  type="' . $type . '" name="' . $name . '" size="' . $size . '" id="' . $name . '"/>';
                 break;
             }
-            
-            $buffer .= "</label></div></div>";
+            if (!empty($title) && "static" !== $type && "hidden" !== $type) {
+                $buffer .= "</label>";
+            }
+            $buffer .= "</div></div>";
         }
         $buffer .= "</div>";
         $buffer .= "<script>$(function(){try{\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})}catch(err){}});</script>";

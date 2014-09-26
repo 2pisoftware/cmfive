@@ -151,7 +151,7 @@ function edit_GET($w) {
     }
 }
 
-function edit_POST($w) {
+function edit_POST($w) {   
     $p = $w->pathMatch("id");
     $task = (!empty($p["id"]) ? $w->Task->getTask($p["id"]) : new Task($w));
     $taskdata = null;
@@ -159,24 +159,50 @@ function edit_POST($w) {
         $taskdata = $w->Task->getTaskData($p['id']);
     }
     
-    $task->fill($_POST);
-    $task->assignee_id = intval($w->request("assignee_id"));
+    $w->Log->info(print_r($_POST, JSON_PRETTY_PRINT));
+    
+    $task->fill($_POST['edit']);
+    $task->assignee_id = intval($_POST['edit']['assignee_id']);
     if (empty($task->dt_due)) {
         $task->dt_due = $w->Task->getNextMonth();
     }
     
     $response = $task->insertOrUpdate();
-//    if (!empty($task->id)) {
-//        foreach ($_POST as $name => $value) {
-//            if (($name != "formone") && ($name != "FLOW_SID") && ($name != "task_id") && ($name !== CSRF::getTokenID())) {
-//                $tdata = new TaskData($w);
-//                $arr = array("task_id"=>$task->id,"key"=>$name,"value"=>$value);
-//                $tdata->fill($arr);
-//                $tdata->insert();
-//                unset($arr);
-//            }
-//        }
-//    }
+    
+    $existing_task_data = $w->Task->getTaskData($task->id);
+    if (!empty($existing_task_data)) {
+        foreach($existing_task_data as $e_task_data) {
+            foreach($_POST["extra"] as $key => $data) {
+                if ($data["name"] == \CSRF::getTokenId()) {
+                    unset($_POST["extra"][$key]);
+                    continue;
+                }
+                
+                if ($data["name"] == $e_task_data->data_key) {
+                    $e_task_data->value = $data["value"];
+                    $e_task_data->update();
+                    
+                    unset($_POST["extra"][$key]);
+                    continue;
+                }
+                
+                // If we get here then remove the existing data?
+                // $e_task_data->delete();
+            }
+        }
+    }
+    
+    if (!empty($_POST["extra"])) {
+        foreach ($_POST["extra"] as $data) {
+            if ($data["name"] !== \CSRF::getTokenId()) {
+                $tdata = new TaskData($w);
+                $tdata->task_id = $task->id;
+                $tdata->data_key = $data["name"];
+                $tdata->value = $data["value"];
+                $tdata->insert();
+            }
+        }
+    }
     
     $w->msg("Task " . (!empty($p['id']) ? "updated" : "created"), "/task/edit/{$task->id}");
 }

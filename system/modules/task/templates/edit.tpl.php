@@ -34,7 +34,7 @@
             <div id="timelog">
                 <?php 
                     if (!empty($task->assignee_id) && ($task->assignee_id == $w->Auth->user()->id)) :
-			echo Html::box(WEBROOT."/task/addtime/".$task->id," Add Time Log entry ",true);
+			             echo Html::box(WEBROOT."/task/addtime/".$task->id," Add Time Log entry ",true);
                     else : ?>
                         <p>Note: you can add time logs when you're assigned to this task</p>
                     <?php endif;
@@ -73,6 +73,9 @@
     });
     
     $("select[id='task_group_id']").on("change", function() {
+        $("#formfields").hide().html("");
+        $("#tasktext").hide().html("");
+        
         $.getJSON("/task/taskAjaxSelectbyTaskGroup/" + $(this).val() + "/<?php echo !empty($task->id) ? $task->id : null; ?>",
             function(result) {
                 if (initialChange) {
@@ -92,10 +95,19 @@
     
     function bindTypeChangeEvent() {
         $("#task_type").on("change", function(event) {
-            $.getJSON("/task/ajaxGetTaskTypeFormFields?task_type=" + $("#task_type").val() + "&task_group_id=" + $("#task_group_id").val(),
+//            $.getJSON("/task/ajaxGetTaskTypeFormFields?task_type=" + $("#task_type").val() + "&task_group_id=" + $("#task_group_id").val(),
+//                function(result) {
+//                    if (result.length > 0) {
+//                        $("#formfields").html(result);
+//                        $("#formfields").fadeIn();
+//                    }
+//                }
+//            );
+            $.getJSON("/task/ajaxGetFieldForm/" + $("#task_type").val() + "/" + $("#task_group_id").val() + "/<?php echo !empty($task->id) ? $task->id : ''; ?>",
                 function(result) {
-                    if (result.length > 0) {
-                        $("#formfields").html(result);
+                    console.log("Extra details callback: " + result);
+                    if (result[0]) {
+                        $("#formfields").html(result[0]);
                         $("#formfields").fadeIn();
                     }
                 }
@@ -105,13 +117,10 @@
                 if (task_type_value.length > 0) {
                     $("#formdetails").hide();
                     $.getJSON("/task/ajaxGetExtraDetails/<?php echo $task->id; ?>/" + task_type_value, function(result) {
-                        if (result[0].length > 0) {
+                        
+                        if (result[0]) {
                             $("#formdetails").html(result[0]);
                             $("#formdetails").fadeIn();
-                            if (result[1].length > 0) {
-                                $("#formfields").html(result[1]);
-                                $("#formfields").fadeIn();
-                            }
                         }
                     });
                 }
@@ -122,13 +131,29 @@
     // Submit both forms 
     $("#edit_form, #form_fields_form").submit(function() {
         toggleModalLoading();
+        var edit_form = {};
+        var extras_form = {};
+        $.each($('#edit_form').serializeArray(), function(){
+            edit_form[this.name] = this.value;
+        });
+        $.each($('#form_fields_form').serializeArray(), function(){
+            extras_form[this.name] = this.value;
+        });
+        
         var action = $(this).attr('action');
         $.ajax({
             url  : action,
             type : 'POST',
-            data : $('#edit_form, #form_fields_form').serialize()
+            data : {
+                '<?php echo \CSRF::getTokenId(); ?>': '<?php echo \CSRF::getTokenValue(); ?>', 
+                'edit': edit_form, 
+                'extra': extras_form
+            },
+            complete: function() {
+               window.location.reload(); 
+            }
         });
-        return true; 
+        return false;
     });
     
 </script>

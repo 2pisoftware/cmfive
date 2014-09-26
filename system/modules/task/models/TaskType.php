@@ -25,7 +25,7 @@ abstract class TaskType {
 	 * task details.
 	 * 
 	 */
-	function getFieldFormArray(TaskGroup $taskgroup) {}
+	function getFieldFormArray(TaskGroup $taskgroup, Task $task = null) {}
 	/**
 	 * Executed before a task is inserted into DB
 	 * 
