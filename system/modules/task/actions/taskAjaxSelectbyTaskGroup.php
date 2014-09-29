@@ -2,7 +2,7 @@
 // Create Task: selecting Task Type dynamically loads the related task types, proprity and assignee's
 
 function taskAjaxSelectbyTaskGroup_ALL(Web $w) {
-    $p = $w->pathMatch("taskgroup_id", "task_id");
+    $p = $w->pathMatch("taskgroup_id");
     $taskgroup = $w->Task->getTaskGroup($p['taskgroup_id']);
 
     if (empty($taskgroup->id)) {
@@ -22,7 +22,7 @@ function taskAjaxSelectbyTaskGroup_ALL(Web $w) {
     // create dropdowns loaded with respective data
     $ttype = Html::select("task_type",$tasktypes,null);
     $prior = Html::select("priority",$priority,null);
-    $mem = Html::select("first_assignee_id",$members,null);
+    $mem = Html::select("assignee_id",$members,null); // first_
     $tasktext = "<table style='width: 100%;'>" .
         "<tr><td class=section colspan=2>Task Group Description</td></tr>" . 
         "<tr><td><b>Task Group</td><td>" . $taskgroup->title . "</td></tr>" . 
