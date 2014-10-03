@@ -73,7 +73,7 @@ class FileService extends DbService {
 	}
 
 	function isImage($path) {
-            	if (file_exists(str_replace("'","\\'",FILE_ROOT."/".$path))) {
+        if (file_exists(str_replace("'","\\'",FILE_ROOT."/".$path))) {
 			list($width, $height, $type, $attr) = getimagesize(str_replace("'","\\'",FILE_ROOT."/".$path));
 			return $attr !== null;
 		} else {
