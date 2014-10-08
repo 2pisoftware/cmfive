@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `example_data` (
   `title` varchar(255) NOT NULL,
   `data` varchar(255) NOT NULL,
   `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
-  `dt_created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `dt_created` datetime NOT NULL,
   `creator_id` bigint(20) NOT NULL,
   `dt_modified` datetime NOT NULL,
   `modifier_id` bigint(20) NOT NULL,
