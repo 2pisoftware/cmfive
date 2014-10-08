@@ -14,7 +14,7 @@
                 <div class="row-fluid columns">
                     <?php 
                         // Note the extra buttons only show when the task_type object
-                        $tasktypeobject = $task->getTaskTypeObject(); 
+                        $tasktypeobject = $task->getTaskTypeObject();
                         echo !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null; 
                     ?>
                 </div>
@@ -81,7 +81,7 @@
                 if (initialChange) {
                     $('#task_type').parent().html(result[0]);
                     $('#priority').parent().html(result[1]);
-                    $('#first_assignee_id').parent().html(result[2]);
+                    $('#assignee_id').parent().html(result[2]);
                     $('#status').html(result[4])
                 }
                 initialChange = true;
@@ -95,14 +95,11 @@
     
     function bindTypeChangeEvent() {
         $("#task_type").on("change", function(event) {
-//            $.getJSON("/task/ajaxGetTaskTypeFormFields?task_type=" + $("#task_type").val() + "&task_group_id=" + $("#task_group_id").val(),
-//                function(result) {
-//                    if (result.length > 0) {
-//                        $("#formfields").html(result);
-//                        $("#formfields").fadeIn();
-//                    }
-//                }
-//            );
+            // Reset custom fields
+            $("#formfields").fadeOut();
+            $("#formfields").html("");
+            
+            // Get/check for extra form fields
             $.getJSON("/task/ajaxGetFieldForm/" + $("#task_type").val() + "/" + $("#task_group_id").val() + "/<?php echo !empty($task->id) ? $task->id : ''; ?>",
                 function(result) {
                     console.log("Extra details callback: " + result);
@@ -117,7 +114,6 @@
                 if (task_type_value.length > 0) {
                     $("#formdetails").hide();
                     $.getJSON("/task/ajaxGetExtraDetails/<?php echo $task->id; ?>/" + task_type_value, function(result) {
-                        
                         if (result[0]) {
                             $("#formdetails").html(result[0]);
                             $("#formdetails").fadeIn();

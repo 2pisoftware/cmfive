@@ -151,7 +151,7 @@ function edit_GET($w) {
     }
 }
 
-function edit_POST($w) {   
+function edit_POST($w) {
     $p = $w->pathMatch("id");
     $task = (!empty($p["id"]) ? $w->Task->getTask($p["id"]) : new Task($w));
     $taskdata = null;
@@ -159,27 +159,26 @@ function edit_POST($w) {
         $taskdata = $w->Task->getTaskData($p['id']);
     }
     
-    $w->Log->info(print_r($_POST, JSON_PRETTY_PRINT));
-    
     $task->fill($_POST['edit']);
     $task->assignee_id = intval($_POST['edit']['assignee_id']);
     if (empty($task->dt_due)) {
         $task->dt_due = $w->Task->getNextMonth();
     }
     
-    $response = $task->insertOrUpdate();
+    $task->insertOrUpdate();
     
+    // Get existing task_data objects for this task and update them
     $existing_task_data = $w->Task->getTaskData($task->id);
     if (!empty($existing_task_data)) {
         foreach($existing_task_data as $e_task_data) {
             foreach($_POST["extra"] as $key => $data) {
-                if ($data["name"] == \CSRF::getTokenId()) {
-                    unset($_POST["extra"][$key]);
+                if ($key == \CSRF::getTokenId()) {
+                    unset($_POST["extra"][\CSRF::getTokenID()]);
                     continue;
                 }
                 
-                if ($data["name"] == $e_task_data->data_key) {
-                    $e_task_data->value = $data["value"];
+                if ($e_task_data->data_key == $key) {
+                    $e_task_data->value = $data;
                     $e_task_data->update();
                     
                     unset($_POST["extra"][$key]);
@@ -192,13 +191,14 @@ function edit_POST($w) {
         }
     }
     
+    // Insert data that didn't exist above as new task_data objects
     if (!empty($_POST["extra"])) {
-        foreach ($_POST["extra"] as $data) {
+        foreach ($_POST["extra"] as $key => $data) {
             if ($data["name"] !== \CSRF::getTokenId()) {
                 $tdata = new TaskData($w);
                 $tdata->task_id = $task->id;
-                $tdata->data_key = $data["name"];
-                $tdata->value = $data["value"];
+                $tdata->data_key = $key;
+                $tdata->value = $data;
                 $tdata->insert();
             }
         }

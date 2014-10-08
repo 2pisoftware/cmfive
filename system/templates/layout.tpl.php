@@ -189,9 +189,10 @@
             </div>
         </div>
 
-        <div id="cmfive-modal" class="reveal-modal xlarge" data-reveal></div>
+        <div id="cmfive-modal" class="reveal-modal xlarge" data-reveal style="top: 30px !important;"></div>
         
         <script type="text/javascript" src="/system/templates/js/foundation-5.3.1/js/foundation.min.js"></script>
+        <script type="text/javascript" src="/system/templates/js/foundation-5.3.1/js/foundation/foundation.clearing.js"></script>
         <script>
             $(document).foundation({
                 reveal : {
