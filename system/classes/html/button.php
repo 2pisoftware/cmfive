@@ -21,7 +21,7 @@ class button {
     public $type;
     public $text;
     public $value;
-    
+    public $js;
     // Non standard button attributes
     public $confirm;
     public $newtab = false;
@@ -47,16 +47,20 @@ class button {
     }
 
     public function __toString() {
-        $js = "";
-        if (!empty($this->confirm)) { $js .= "if(confirm('" . $this->confirm . "')) {"; }
-        if (!empty($this->href)){
-            if (!$this->newtab) {
-                $js .= "parent.location='" . $this->href . "'; return false;";
-            } else {
-                $js .= "window.open('" . $this->href . "', '_blank').focus(); return false;";
+        if (empty($this->js)) {
+            $js = "";
+            if (!empty($this->confirm)) { $js .= "if(confirm('" . $this->confirm . "')) {"; }
+            if (!empty($this->href)){
+                if (!$this->newtab) {
+                    $js .= "parent.location='" . $this->href . "'; return false;";
+                } else {
+                    $js .= "window.open('" . $this->href . "', '_blank').focus(); return false;";
+                }
             }
+            if (!empty($this->confirm)) { $js .= "}"; }
+        } else {
+            $js = $this->js;
         }
-        if (!empty($this->confirm)) { $js .= "}"; }
         $buffer = "";
         $buffer .= "<button ";
         if ($this->autofocus === true) $buffer .= "autofocus=true ";
@@ -125,6 +129,11 @@ class button {
     
     public function id($id) {
         $this->id = $id;
+        return $this;
+    }
+    
+    public function js($js) {
+        $this->js = $js;
         return $this;
     }
         

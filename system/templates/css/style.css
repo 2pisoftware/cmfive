@@ -1,5 +1,20 @@
 *, *:before, *:after {box-sizing:  border-box;}
 
+/* Override Foundation padding for inputs */
+input[type="text"], input[type="password"], 
+input[type="date"], input[type="datetime"], 
+input[type="datetime-local"], input[type="month"], 
+input[type="week"], input[type="email"], 
+input[type="number"], input[type="search"], 
+input[type="tel"], input[type="time"], 
+input[type="url"], textarea, select {
+    margin-bottom: 0px;
+}
+
+form {
+    margin: 1rem 0 1rem;
+}
+
 .multicolform > .row-fluid {
     -moz-column-width: 24em;
     -webkit-column-width: 24em;
