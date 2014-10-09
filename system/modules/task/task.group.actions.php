@@ -440,13 +440,12 @@ function deletegroupmember_POST(Web &$w) {
 	$tgid = $member->task_group_id;
 
 	// if member exists, delete them
-	if ($member) {
+	if (!empty($member)) {
 		// set is_active = 1
-		$member->fill($_REQUEST);
-		$member->update();
+		$member->delete();
 
 		// get group details, if person being deleted is the task group default assignee
-		// set default_assigne_id = 0, ie noone. owners can edit task group as assign default assignee at any time
+		// set default_assigne_id = 0, ie noone. owners can edit task group and assign default assignee at any time
 		$group = $w->Task->getTaskGroup($tgid);
 		if ($member->user_id == $group->default_assignee_id) {
 			$group->default_assignee_id = 0;
