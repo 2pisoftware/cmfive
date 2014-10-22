@@ -26,5 +26,3 @@ foreach ($roles as $r) {
 }
 
 print Html::multiColForm($form,$w->localUrl("/admin/useradd"),"POST","Save");
-
-?>
