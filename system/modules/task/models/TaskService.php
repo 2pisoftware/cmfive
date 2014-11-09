@@ -611,16 +611,16 @@ class TaskService extends DbService {
         return $this->getObject("TaskGroup", array("title" => $title, "is_deleted" => 0));
     }
 
-    function addMemberToProject($taskgroup_id, $user_id, $role = "GUEST") {
-        if (empty($project_id) || empty($user_id))
+    function addMemberToTaskGroup($taskgroup_id, $user_id, $role = "GUEST") {
+        if (empty($taskgroup_id) || empty($user_id))
             return;
 
         // Check that they're not already a member
         $member = $this->getObject("TaskGroupMember", array("task_group_id" => $taskgroup_id, "user_id" => $user_id));
-        if (!empty($member->id))
+        if (!empty($member))
             return;
 
-        $taskgroupmember = new TaskGroupMember($w);
+        $taskgroupmember = new TaskGroupMember($this->w);
         $taskgroupmember->task_group_id = $taskgroup_id;
         $taskgroupmember->user_id = $user_id;
         $taskgroupmember->role = $role;
@@ -628,6 +628,15 @@ class TaskService extends DbService {
         $taskgroupmember->insert();
     }
 
+    function removeMemberFromTaskGroup($taskgroup_id, $user_id) {
+    	$this->Log->debug("before delete Taskgroupmember(".$taskgroup_id."), user({$user_id})");
+    	$tgm = $this->getObject("TaskGroupMember", array("task_group_id"=>$taskgroup_id, "user_id"=>$user_id));
+    	if (!empty($tgm)) {
+    		$this->Log->debug("delete Taskgroupmember(".$tgm->id."), user({$user_id})");
+    		$tgm->delete();
+    	}
+    }
+    
     /**
      * Create a new Task
      * 

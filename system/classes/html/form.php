@@ -124,8 +124,15 @@ class form {
     }
     
     public function close($button_title = 'Save', $extrabuttons = null) {
-        $button = new \Html\button();
-        $button->type("submit")->text($button_title);
-        return "<div class='row small-12 columns'>{$button->__toString()}{$extrabuttons}</div></form>";
+        if (!empty($button_title)) {
+            $button = new \Html\button();
+            $button->type("submit")->text($button_title);
+            $cancel_button = new \Html\button();
+            $cancel_button->type("button")->text("Cancel")->js("if($('#cmfive-modal').is(':visible')){ $('#cmfive-modal').foundation('reveal', 'close'); } else { window.history.back(); }");
+                    
+            return "<div class='row small-12 columns'>{$button->__toString()}{$cancel_button->__toString()}{$extrabuttons}</div></form>";
+        } else {
+            return "</form>";
+        }
     }
 }

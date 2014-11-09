@@ -1,6 +1,4 @@
-<?php
-
-namespace Html;
+<?php namespace Html;
 
 /**
  * \Html\a class for generation and tight control of "a" links within cmfive

@@ -271,7 +271,7 @@ class DbService {
 
 
 	function lookupArray($type) {
-		$rows = $this->_db->select("code,title")->from("lookup")->where("type",$type)->fetch_all();
+		$rows = $this->_db->get("lookup")->where("type",$type)->fetch_all(); // select("code,title")->from
 		foreach ($rows as $row) {
 			$select[$row['code']]=$row['title'];
 		}

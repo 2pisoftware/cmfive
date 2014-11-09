@@ -72,16 +72,16 @@ class Html {
      * @param mixed $width
      * @return string
      */
-    public static function chart($id = "chartjs", $type = "line", $data = array(), $options = array(), $height = null, $width = null) {
+    public static function chart($id = "chartjs", $type = "line", $data = array(), $options = array(), $height = null, $width = null, $class = null) {
         // Set default values
         if (empty($height)) {
             $height = "300px";
         }
         if (empty($width)) {
-            $width = "400px";
+            $width = "300px";
         }
         // Create the canvas
-        $buffer = "<canvas id='{$id}' width='{$width}' height='{$height}'></canvas>\n";
+        $buffer = "<canvas id='{$id}' class='{$class}' width='{$width}' height='{$height}' style='display: block; margin: 0 auto; height: {$height}; width: {$width};'></canvas>\n";
         $buffer .= "<script type='text/javascript'>\n";
         // Get canvas context via jQuery
         $buffer .= "\tvar ctx = jQuery(\"#{$id}\").get(0).getContext(\"2d\");\n";
@@ -110,7 +110,7 @@ class Html {
             default:
                 $buffer .= "Line";
         }
-        $buffer .= "(" . json_encode($data) . ", " . json_encode($options) . ");";
+        $buffer .= "(" . json_encode($data) . ", " . (!empty($options) ? json_encode($options) : "{}") . ");";
         $buffer .= "</script>";
         return $buffer;
     }
@@ -267,7 +267,7 @@ class Html {
                 continue;
             }
             
-            if (!empty($title) && "static" !== $type) {
+            if (!empty($title) && "static" !== $type && "hidden" !== $type) {
                 $buffer .= "<label class='small-12 columns'>$title";
             }
             
@@ -343,8 +343,10 @@ class Html {
                     $buffer .= '<input style="width:100%;"  type="' . $type . '" name="' . $name . '" size="' . $size . '" id="' . $name . '"/>';
                 break;
             }
-            
-            $buffer .= "</label></div></div>";
+            if (!empty($title) && "static" !== $type && "hidden" !== $type) {
+                $buffer .= "</label>";
+            }
+            $buffer .= "</div></div>";
         }
         $buffer .= "</div>";
         $buffer .= "<script>$(function(){try{\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})}catch(err){}});</script>";
@@ -761,9 +763,11 @@ class Html {
             $source = "[";
             foreach ($options as $option) {
                 if (is_array($option)) {
-                    $source .= '{"id":"' . $option[1] . '","value":"' . $option[0] . '"},';
-                    if ($value == $option[1]) {
-                        $acp_value = $option[0];
+                    $array_id = (!empty($option[1]) ? $option[1] : $option[0]);
+                    $array_value = $option[0];
+                    $source .= '{"id":"' . $array_id . '","value":"' . $array_value . '"},';
+                    if ($value == $array_id) {
+                        $acp_value = $array_value;
                     }
                 } elseif (is_a($option, "DbObject")) {
                     $source .= '{"id":"' . htmlentities($option->getSelectOptionValue()) . '","value":"' . htmlentities($option->getSelectOptionTitle()) . '"},';
@@ -788,6 +792,7 @@ class Html {
         $buf.='<input type="text" id="acp_' . $name . '"  name="acp_' . $name . '" value="' . $acp_value . '" class="' . $class . '" style="' . $style . '" ' . $required . ' />';
         $buf.="<script type='text/javascript'>";
         $buf.='$(function(){
+                    $("#acp_' . $name . '").keyup(function(){$("#' . $name . '").val("")});
                     $("#acp_' . $name . '").autocomplete({
                         minLength:' . $minLength . ', 
                         source: ' . $source . ',
@@ -899,7 +904,7 @@ class Html {
         $buffer .= "<fieldset style=\"padding: 0; padding-top: 10px; padding-left: 10px;\">\n";
         $buffer .= "<legend>" . $legend . "</legend>\n";
         // $buffer .= "<div class=\"row-fluid\">\n";
-        $buffer .= "<ul id='filter-grid' class='small-block-grid-2 medium-block-grid-4'>";
+        $buffer .= "<ul id='filter-grid' class='small-block-grid-1 medium-block-grid-3 large-block-grid-4'>";
         
         // Loop through data
         foreach ($data as $row) {
@@ -912,6 +917,7 @@ class Html {
             $type = !empty($row[1]) ? $row[1] : null;
             $name = !empty($row[2]) ? $row[2] : null;
             $value = !empty($row[3]) ? $row[3] : null;
+            
             $readonly = "";
 
             $required = null;
@@ -933,8 +939,8 @@ class Html {
                 if ($type == "checkbox") {
                     $mediumCols = 6;
                 }
-                $buffer .= "<div class='small-12 medium-" . (12 - $mediumCols) . " columns'><label class='inline'>{$title}</label></div>";
-                $buffer .= "<div class='small-12 medium-{$mediumCols} columns'>";
+                $buffer .= "<div class='small-12 columns'><label>{$title}"; // medium-" . (12 - $mediumCols) . " 
+//                $buffer .= "<div class='small-12 medium-{$mediumCols} columns'>";
             } else {
                 $buffer .= "<div class='small-12'>";
             }
@@ -949,7 +955,8 @@ class Html {
                     $buffer .= '<input' . $readonly . ' style="width:100%;"  type="' . $type . '" name="' . $name . '" value="' . htmlspecialchars($value) . '" size="' . (!empty($row[4]) ? $row[4] : null) . '" id="' . $name . '"/>';
                     break;
                 case "autocomplete":
-                    $buffer .= Html::autocomplete($name, $size, $value, null, "width: 100%;", 1, $required);
+                    $minlength = !empty($row[5]) ? $row[5] : null;
+                    $buffer .= Html::autocomplete($name, $size, $value, null, "width: 100%;", !empty($minlength) ? $minlength : 1, $required);
                     break;
                 case "date":
                     $buffer .= Html::datePicker($name, $value, $size, $required);
@@ -1003,17 +1010,17 @@ class Html {
                     break;
             }
 
-            $buffer .= "</div></li>"; // </div>
+            $buffer .= "</label></div></li>"; // </div>
         }
         
         // Filter button (optional... though optional is pointless)
         if (!empty($action)) {
             $button = new \Html\button();
-            $buffer .= "<li>";
+            $buffer .= "<li><div class='small-12 columns'><label>Actions<br/>";
             if ($submitTitle !== NULL) {
                 $buffer .= $button->type("submit")->text($submitTitle)->__toString();
             }
-            $buffer .= $button->text("Reset")->id("filter_reset")->name("reset")->value("reset")->__toString() . "</li>";
+            $buffer .= $button->text("Reset")->id("filter_reset")->name("reset")->value("reset")->__toString() . "</label></div></li>";
         }
         $buffer .= "</ul>"; // </div>
         $buffer .= "\n</fieldset>\n";

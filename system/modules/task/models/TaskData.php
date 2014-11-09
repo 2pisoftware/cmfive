@@ -9,5 +9,4 @@ class TaskData extends DbObject {
 	public $data_key;
 	public $value;	
 	
-	public static $_db_table = "task_data";
 }

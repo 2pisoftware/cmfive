@@ -29,7 +29,7 @@ function edit_GET($w) {
     
     // Create form
     $form = array(
-        (!empty($p["id"]) ? "Edit task" : "Createa new task") => array(
+        (!empty($p["id"]) ? "Edit task" : "Create a new task") => array(
             array(
                 array("Task Group", "select", "task_group_id", !empty($task->task_group_id) ? $task->task_group_id : $taskgroup_id, $taskgroups),
                 array("Status", "select", "status", $task->status, $task->getTaskGroupStatus())
@@ -159,24 +159,50 @@ function edit_POST($w) {
         $taskdata = $w->Task->getTaskData($p['id']);
     }
     
-    $task->fill($_POST);
-    $task->assignee_id = intval($w->request("assignee_id"));
+    $task->fill($_POST['edit']);
+    $task->assignee_id = intval($_POST['edit']['assignee_id']);
     if (empty($task->dt_due)) {
         $task->dt_due = $w->Task->getNextMonth();
     }
     
-    $response = $task->insertOrUpdate();
-//    if (!empty($task->id)) {
-//        foreach ($_POST as $name => $value) {
-//            if (($name != "formone") && ($name != "FLOW_SID") && ($name != "task_id") && ($name !== CSRF::getTokenID())) {
-//                $tdata = new TaskData($w);
-//                $arr = array("task_id"=>$task->id,"key"=>$name,"value"=>$value);
-//                $tdata->fill($arr);
-//                $tdata->insert();
-//                unset($arr);
-//            }
-//        }
-//    }
+    $task->insertOrUpdate();
+    
+    // Get existing task_data objects for this task and update them
+    $existing_task_data = $w->Task->getTaskData($task->id);
+    if (!empty($existing_task_data)) {
+        foreach($existing_task_data as $e_task_data) {
+            foreach($_POST["extra"] as $key => $data) {
+                if ($key == \CSRF::getTokenId()) {
+                    unset($_POST["extra"][\CSRF::getTokenID()]);
+                    continue;
+                }
+                
+                if ($e_task_data->data_key == $key) {
+                    $e_task_data->value = $data;
+                    $e_task_data->update();
+                    
+                    unset($_POST["extra"][$key]);
+                    continue;
+                }
+                
+                // If we get here then remove the existing data?
+                // $e_task_data->delete();
+            }
+        }
+    }
+    
+    // Insert data that didn't exist above as new task_data objects
+    if (!empty($_POST["extra"])) {
+        foreach ($_POST["extra"] as $key => $data) {
+            if ($data["name"] !== \CSRF::getTokenId()) {
+                $tdata = new TaskData($w);
+                $tdata->task_id = $task->id;
+                $tdata->data_key = $key;
+                $tdata->value = $data;
+                $tdata->insert();
+            }
+        }
+    }
     
     $w->msg("Task " . (!empty($p['id']) ? "updated" : "created"), "/task/edit/{$task->id}");
 }

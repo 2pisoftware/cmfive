@@ -123,15 +123,38 @@ class TaskType_ProgrammingTicket extends TaskType {
 		return "Use this to report any issue or feature request.";
 	}
 
-	function getFieldFormArray(TaskGroup $taskgroup) {
+	function getFieldFormArray(TaskGroup $taskgroup, Task $task = null) {
+        $taskdata = null;
+        if (!empty($task)) {
+            $taskdata = $this->w->Task->getTaskData($task->id);
+        }
+//        $this->w->Log->info("Task data: " . print_r($taskdata));
+        
 		return array(
-		array($this->getTaskTypeTitle(),"section"),
-		array("Module","select","module",null,$this->getModulesSelect($taskgroup)),
-		array("Ticket Type","select","b_or_f",null,array("Issue","Feature","Task")),
-		array("Identifier","hidden","ident",null),
+            array($this->getTaskTypeTitle(),"section"),
+            array("Module", "select", "module", $this->getTaskDataValueForKey($taskdata, "module"), $this->w->modules()), // getModulesSelect($taskgroup)),
+            array("Ticket Type", "select", "b_or_f", $this->getTaskDataValueForKey($taskdata, "b_or_f"), array("Issue","Feature","Task")),
+            array("Identifier", "hidden", "ident", $this->getTaskDataValueForKey($taskdata, "ident")),
 		);
 	}
 
+    private function getTaskDataValueForKey($taskdata, $key) {
+        if (empty($taskdata) || empty($key)) {
+            return null;
+        }
+        
+        if (!is_array($taskdata)) {
+            return null;
+        }
+        
+        foreach($taskdata as $data) {
+            if ($data->data_key == $key) {
+//                $this->w->Log->info("Returning {$data->value} for key: {$data->data_key}");
+                return $data->value;
+            }
+        }
+    }
+    
 	function on_before_insert(Task $task) {
 		// Get REQUEST object instead
 		if ($_REQUEST["b_or_f"]=='Issue' || $_REQUEST["b_or_f"]=='Task') {
@@ -145,11 +168,12 @@ class TaskType_ProgrammingTicket extends TaskType {
 	 * @see TaskType::on_after_insert()
 	 */
 	function on_after_insert(Task $task) {
-		$modules = $this->getModules($task);
-		$ident = $modules[$_REQUEST["module"]].sprintf("%03d",$task->id);
-		$task->setDataValue("ident",$ident);
-		$task->title = $ident." ".$task->title;
-		$task->update();
+        // What is the point of this?
+//		$modules = $this->getModules($task);
+//		$ident = $modules[$_REQUEST["module"]].sprintf("%03d",$task->id);
+//		$task->setDataValue("ident",$ident);
+//		$task->title = $ident." ".$task->title;
+//		$task->update();
 	}
 	
 	private function getModulesSelect(TaskGroup $taskgroup) {
