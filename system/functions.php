@@ -408,7 +408,7 @@ function recursiveArraySearch($haystack, $needle, $index = null) {
     $it = new RecursiveIteratorIterator($aIt);
 
     while ($it->valid()) {
-        if (((isset($index) AND ( $it->key() == $index)) OR ( !isset($index))) AND ( $it->current() == $needle)) {
+        if (((isset($index) && ( $it->key() == $index)) || ( !isset($index))) && ( $it->current() == $needle)) {
             return $aIt->key();
         }
 
