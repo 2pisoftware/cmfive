@@ -46,6 +46,7 @@ Config::set('system.allow_action', array(
     "auth/resetpassword",
     //"admin/datamigration"
 ));
+
 //========= REST Configuration ==============================
 // check the following configuration carefully to secure
 // access to the REST infrastructure.
@@ -53,10 +54,7 @@ Config::set('system.allow_action', array(
 // use the API_KEY to authenticate with username and password
 Config::set('system.rest_api_key', "abcdefghijklmnopqrstuvwxyz1234567890");
 
-// exclude any objects that you do NOT want available via REST
-// note: only DbObjects which have the $_rest; property are 
-// accessible via REST anyway!
-Config::set('system.rest_exclude', array(
-    "User",
-    "Contact",
+// include class of objects that you want available via REST
+Config::set('system.rest_include', array(
+	// "Contact"
 ));
