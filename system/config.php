@@ -22,6 +22,9 @@ set_include_path(get_include_path() . PATH_SEPARATOR . SYSTEM_LIBPATH);
 require_once "system/db.php";
 require_once "system/web.php";
 
+//========= Check CSRF Token ================================
+Config::set("system.checkCSRF", true);
+
 //========= Anonymous Access ================================
 
 // bypass authentication if sent from the following IP addresses
