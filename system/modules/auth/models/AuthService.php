@@ -89,13 +89,12 @@ class AuthService extends DbService {
         if (!in_array($module, $this->w->modules())) {
             return false;
         }
-        if ($this->user()) {
-            if ($this->user()->allowed($this->w, $path)) {
-                return $url ? $url : true;
-            }
-        } else {
-            return function_exists("anonymous_allowed") && anonymous_allowed($this->w, $path);
+        
+        if ((function_exists("anonymous_allowed") && anonymous_allowed($this->w, $path)) || 
+        	($this->user() && $this->user()->allowed($this->w, $path))) {
+        	return $url ? $url : true;
         }
+        
         return false;
     }
 

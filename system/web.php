@@ -537,7 +537,7 @@ class Web {
                 } else {
                     // Logout user
                     $this->sessionDestroy();
-                    $this->error($msg, "/auth/login");
+                    $this->error($msg, $this->_loginpath);
                 }
             }
         } else if ($this->Auth && !$this->Auth->loggedIn() && $path != $this->_loginpath && !$this->Auth->allowed($path)) {
