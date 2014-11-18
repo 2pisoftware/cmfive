@@ -20,6 +20,18 @@ class RestService extends DbService {
 	}
 	
 	/**
+	 * Check whether rest access to objects of this class is allowed at all
+	 * 
+	 * @param unknown $classname
+	 * @return boolean
+	 */
+	function checkClassAccessAllowed($classname) {
+		if (!array_search($classname, Config::get("system.rest_include"))) {
+			return $this->errorJson("restful access to {$classname} not allowed");
+		}
+	}
+	
+	/**
 	 * Will check if token exists and set the REST user
 	 * in the authentication service to facilitate all
 	 * normal permission checks

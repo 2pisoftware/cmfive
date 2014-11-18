@@ -482,7 +482,7 @@ class Web {
 
     private function validateCSRF() {
         // Check for CSRF token and that we have a valid request method
-        if (!CSRF::isValid($this->_requestMethod)) {
+        if (Config::get("system.checkCSRF") == true && !CSRF::isValid($this->_requestMethod)) {
             @$this->service('log')->error("System: CSRF Detected from " . $this->requestIpAddress());
             header("HTTP/1.0 403 Forbidden");
             echo "Cross site request forgery detected. Your IP has been logged";
@@ -537,7 +537,7 @@ class Web {
                 } else {
                     // Logout user
                     $this->sessionDestroy();
-                    $this->error($msg, "/auth/login");
+                    $this->error($msg, $this->_loginpath);
                 }
             }
         } else if ($this->Auth && !$this->Auth->loggedIn() && $path != $this->_loginpath && !$this->Auth->allowed($path)) {

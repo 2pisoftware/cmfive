@@ -90,13 +90,12 @@ class AuthService extends DbService {
             $w->Log->error("Denied access: module '". urlencode($module). "' doesn't exist");
             return false;
         }
-        if ($this->user()) {
-            if ($this->user()->allowed($this->w, $path)) {
-                return $url ? $url : true;
-            }
-        } else {
-            return function_exists("anonymous_allowed") && anonymous_allowed($this->w, $path);
+        
+        if ((function_exists("anonymous_allowed") && anonymous_allowed($this->w, $path)) || 
+        	($this->user() && $this->user()->allowed($this->w, $path))) {
+        	return $url ? $url : true;
         }
+        
         return false;
     }
 

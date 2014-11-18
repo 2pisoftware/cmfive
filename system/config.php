@@ -22,6 +22,9 @@ set_include_path(get_include_path() . PATH_SEPARATOR . SYSTEM_LIBPATH);
 require_once "system/db.php";
 require_once "system/web.php";
 
+//========= Check CSRF Token ================================
+Config::set("system.checkCSRF", true);
+
 //========= Anonymous Access ================================
 
 // bypass authentication if sent from the following IP addresses
@@ -41,15 +44,12 @@ Config::set('system.allow_action', array(
 
 //========= REST Configuration ==============================
 // check the following configuration carefully to secure
-// access to the REST ifnrastructure.
+// access to the REST infrastructure.
 
 // use the API_KEY to authenticate with username and password
 Config::set('system.rest_api_key', "abcdefghijklmnopqrstuvwxyz1234567890");
 
-// exclude any objects that you do NOT want available via REST
-// note: only DbObjects which have the $_rest; property are 
-// accessible via REST anyway!
-Config::set('system.rest_exclude', array(
-    "User",
-    "Contact",
+// include class of objects that you want available via REST
+Config::set('system.rest_include', array(
+	// "Contact"
 ));
