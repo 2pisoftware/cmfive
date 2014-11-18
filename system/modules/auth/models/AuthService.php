@@ -87,6 +87,7 @@ class AuthService extends DbService {
         $hsplit = explode("-", $module);
         $module = array_shift($hsplit);
         if (!in_array($module, $this->w->modules())) {
+            $w->Log->error("Denied access: module '". urlencode($module). "' doesn't exist");
             return false;
         }
         if ($this->user()) {

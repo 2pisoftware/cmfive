@@ -542,6 +542,7 @@ class Web {
             }
         } else if ($this->Auth && !$this->Auth->loggedIn() && $path != $this->_loginpath && !$this->Auth->allowed($path)) {
             $_SESSION['orig_path'] = $_SERVER['REQUEST_URI'];
+            $this->Log->info("Redirecting to login, user not logged in or not allowed");
             $this->redirect($this->localUrl($this->_loginpath));
         }
         // Saving the last allowed uri so we can
