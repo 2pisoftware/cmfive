@@ -951,7 +951,14 @@ class Web {
         $this->_context = array();
 
         // try to find the partial action and execute
-        $partial_action_file = implode("/", array($this->getModuleDir($module), $this->_partialsdir, "actions", $name . ".php"));
+        
+        // getModuleDir can return path with trailing '/' but we dont want that
+        $moduleDir = $this->getModuleDir($module);
+        if ($moduleDir[strlen($moduleDir) - 1] === '/') {
+            $moduleDir = substr($moduleDir, 0, strlen($moduleDir) - 1);
+        }
+        $partial_action_file = implode("/", array($moduleDir, $this->_partialsdir, "actions", $name . ".php"));
+
         if (file_exists($partial_action_file)) {
             require_once($partial_action_file);
 
@@ -960,6 +967,8 @@ class Web {
             if (function_exists($partial_action)) {
                 $partial_action($this, $params);
             }
+        } else {
+            $w->Log->error("Could not find partial file at: {$partial_action_file}");
         }
 
         $currentbuf = $this->_buffer;
