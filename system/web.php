@@ -1267,11 +1267,11 @@ class Web {
      * Call all PRE ACTION listeners
      */
     function _callPreListeners() {
-        foreach ($this->modules() as $h) {
-            $lfile = $this->getModuleDir($h) . $h . ".listeners.php";
-            if (file_exists($lfile)) {
+        foreach ($this->modules() as $module) {
+            $lfile = $this->getModuleDir($module) . $module . ".listeners.php";
+            if (Config::get("{$module}.active") === true && file_exists($lfile)) {
                 require_once $lfile;
-                $action = $h . "_listener_PRE_ACTION";
+                $action = $module . "_listener_PRE_ACTION";
                 if (function_exists($action)) {
                     $action($this);
                 }
