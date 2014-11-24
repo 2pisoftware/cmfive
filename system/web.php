@@ -482,7 +482,7 @@ class Web {
 
     private function validateCSRF() {
         // Check for CSRF token and that we have a valid request method
-        if (!CSRF::isValid($this->_requestMethod)) {
+        if (Config::get("system.checkCSRF") == true && !CSRF::isValid($this->_requestMethod)) {
             @$this->service('log')->error("System: CSRF Detected from " . $this->requestIpAddress());
             header("HTTP/1.0 403 Forbidden");
             echo "Cross site request forgery detected. Your IP has been logged";
@@ -537,11 +537,12 @@ class Web {
                 } else {
                     // Logout user
                     $this->sessionDestroy();
-                    $this->error($msg, "/auth/login");
+                    $this->error($msg, $this->_loginpath);
                 }
             }
         } else if ($this->Auth && !$this->Auth->loggedIn() && $path != $this->_loginpath && !$this->Auth->allowed($path)) {
             $_SESSION['orig_path'] = $_SERVER['REQUEST_URI'];
+            $this->Log->info("Redirecting to login, user not logged in or not allowed");
             $this->redirect($this->localUrl($this->_loginpath));
         }
         // Saving the last allowed uri so we can
@@ -950,7 +951,14 @@ class Web {
         $this->_context = array();
 
         // try to find the partial action and execute
-        $partial_action_file = implode("/", array($this->getModuleDir($module), $this->_partialsdir, "actions", $name . ".php"));
+        
+        // getModuleDir can return path with trailing '/' but we dont want that
+        $moduleDir = $this->getModuleDir($module);
+        if ($moduleDir[strlen($moduleDir) - 1] === '/') {
+            $moduleDir = substr($moduleDir, 0, strlen($moduleDir) - 1);
+        }
+        $partial_action_file = implode("/", array($moduleDir, $this->_partialsdir, "actions", $name . ".php"));
+
         if (file_exists($partial_action_file)) {
             require_once($partial_action_file);
 
@@ -959,6 +967,8 @@ class Web {
             if (function_exists($partial_action)) {
                 $partial_action($this, $params);
             }
+        } else {
+            $w->Log->error("Could not find partial file at: {$partial_action_file}");
         }
 
         $currentbuf = $this->_buffer;

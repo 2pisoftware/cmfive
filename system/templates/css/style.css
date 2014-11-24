@@ -16,16 +16,22 @@ form {
 }
 
 .multicolform > .row-fluid {
-    -moz-column-width: 24em;
-    -webkit-column-width: 24em;
-    -moz-column-gap: 1em;
-    -webkit-column-gap:1em; 
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    -webkit-flex-grow: 1;
+    flex-grow: 1;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    align-content: stretch;
+    flex-flow: row wrap;
 }
 
 .item {
-    display: inline-block;
     padding:  .25rem;
-    width:  100%;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
 }
 
 .multicolform .panel {

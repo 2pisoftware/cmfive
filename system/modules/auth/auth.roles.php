@@ -28,8 +28,7 @@ function anonymous_allowed(Web $w,$path) {
 
 	$path_explode = explode("/", $path);
 	$module = $path_explode[0];
-	$action = $path_explode[1];
+	// $action = $path_explode[1];
 	$allowed = in_array($module,Config::get('system.allow_module'));
-
 	return $allowed || $in_path;
 }
