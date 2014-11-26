@@ -94,6 +94,45 @@ class Config {
         return array_keys($modules);
     }
     
+    /**
+     * A function to append a value to an array, if target is not an array this function 
+     * will overwrite the current targets value so use with caution!
+     * 
+     * If value to write is also an array, this function will merge the target with the value
+     * 
+     * @param string $key
+     * @param mixed $value
+     * @return null
+     */
+    public static function append($key, $value) {
+        $target_value = self::get($key);
+        
+        // If target isn't set then set it
+        if (empty($target_value)) {
+            if (is_array($value)) {
+                self::set($key, $value);
+            } else {
+                self::set($key, array($value));
+            }
+        } else {
+            if (is_array($target_value)) {
+                if (is_array($value)) {
+                    self::set($key, array_merge($target_value, $value));
+                } else {
+                    $target_value[] = $value;
+                    self::set($key, $target_value);
+                }
+            } else {
+                // Overwrite target value
+                if (is_array($value)) {
+                    self::set($key, $value);
+                } else {
+                    self::set($key, array($value));
+                }
+            }
+        }
+    }
+    
     // Sanity checking
     public static function dump() {
         var_dump(self::$register);
