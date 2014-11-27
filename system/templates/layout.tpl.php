@@ -128,17 +128,20 @@
                                 // Check if config is set to display on topmenu
                                 if (Config::get("{$module}.topmenu") && Config::get("{$module}.active")) :
                                     // Check for navigation
-                                    if (method_exists($module . "Service", "navigation")) : ?>
-                                        <li class="has-dropdown <?php echo $w->_module == $module ? 'active' : ''; ?>" id="topnav_<?php echo $module; ?>">
+                                    $menu_link = $w->menuLink($module, ucfirst($module));
+                                    if ($menu_link !== false) :
+                                        if (method_exists($module . "Service", "navigation")) : ?>
+                                            <li class="has-dropdown <?php echo $w->_module == $module ? 'active' : ''; ?>" id="topnav_<?php echo $module; ?>">
                                             <?php // Try and get a badge count for the menu item
-                                            echo $w->menuLink($module, ucfirst($module));
-                                            echo Html::ul($w->service($module)->navigation($w), null, "dropdown"); ?>
-                                        </li>
-                                    <?php else: ?>
-                                        <li <?php echo $w->_module == $module ? 'class="active"' : ''; ?>><?php echo $w->menuLink($module, ucfirst($module)); ?></li>
-                                    <?php endif; ?>
-                                    <li class="divider"></li>
-                                <?php endif;
+                                                echo $menu_link;
+                                                echo Html::ul($w->service($module)->navigation($w), null, "dropdown"); ?>
+                                            </li>
+                                        <?php else: ?>
+                                            <li <?php echo $w->_module == $module ? 'class="active"' : ''; ?>><?php echo $menu_link; ?></li>
+                                        <?php endif; ?>
+                                        <li class="divider"></li>
+                                    <?php endif;
+                                endif;
                             }
                         
                             if ($w->Auth->allowed('help/view')) : ?>
