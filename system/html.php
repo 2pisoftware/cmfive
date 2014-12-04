@@ -1036,7 +1036,7 @@ class Html {
         
         $buffer = "";
         $mediumPerRow = ($perRow > 1 ? $perRow - 1 : 1);
-        $buffer .= "<ul class='small-block-grid-1 medium-block-grid-$mediumPerRow large-block-grid-$perRow'>";
+        $buffer .= "<ul class='listGrid small-block-grid-1 medium-block-grid-$mediumPerRow large-block-grid-$perRow'>";
         
         // List data items
         foreach($data as $id => $d) {
@@ -1044,7 +1044,7 @@ class Html {
             $buffer .= "<div class='panel clearfix'><div class='small-12'>";
             
             if (!empty($d)) {
-                // Loop through each lione
+                // Loop through each line
                 foreach($d as $line) {
                     $buffer .= "<div class='row'><div class='small-12'>";
                     if (!empty($line)) {
