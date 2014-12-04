@@ -226,19 +226,21 @@ class Web {
         $domainmodule = isset($routing[$_SERVER['HTTP_HOST']]) ? $routing[$_SERVER['HTTP_HOST']] : null;
         
         if (!empty($domainmodule)) {
-        	// now we have to decide whether the path points to
-        	// a) a single top level action
-        	// b) an action on a submodule
-        	// but we need to make sure not to mistake a path paramater for a submodule or an action!
-        	$domainsubmodules = $this->getSubmodules($domainmodule);
-        	$action_or_module = !empty($this->_paths[0]) ? $this->_paths[0] : null;
-        	if (!empty($domainsubmodules) && !empty($action_or_module) && array_search($action_or_module, $domainsubmodules) !== false) {
-        			// just add the module to the first path entry, eg. frontend-page/1
-        			$this->_paths[0] = $domainmodule."-".$this->_paths[0];
-        	} else {
-        		// add the module as an entry to the front of paths, eg. frontent/index
-        		array_unshift($this->_paths, $domainmodule);
-        	}
+            $this->_loginpath = "auth";
+            $this->_isFrontend = true;
+            // now we have to decide whether the path points to
+            // a) a single top level action
+            // b) an action on a submodule
+            // but we need to make sure not to mistake a path paramater for a submodule or an action!
+            $domainsubmodules = $this->getSubmodules($domainmodule);
+            $action_or_module = !empty($this->_paths[0]) ? $this->_paths[0] : null;
+            if (!empty($domainsubmodules) && !empty($action_or_module) && array_search($action_or_module, $domainsubmodules) !== false) {
+                // just add the module to the first path entry, eg. frontend-page/1
+                $this->_paths[0] = $domainmodule."-".$this->_paths[0];
+            } else {
+                // add the module as an entry to the front of paths, eg. frontent/index
+                array_unshift($this->_paths, $domainmodule);
+            }
         }
         
         // continue as usual
@@ -526,6 +528,11 @@ class Web {
     function checkAccess($msg = "Access Restricted") {
         $submodule = $this->_submodule ? "-" . $this->_submodule : "";
         $path = $this->_module . $submodule . "/" . $this->_action;
+        $actual_path = $path;
+        // Check for frontend modules
+        if ($this->_isFrontend) {
+            $actual_path = $this->_action;
+        }
         if ($this->Auth && $this->Auth->user()) {
             $user = $this->Auth->user();
             $usrmsg = $user ? " for " . $user->login : "";
@@ -540,7 +547,7 @@ class Web {
                     $this->error($msg, $this->_loginpath);
                 }
             }
-        } else if ($this->Auth && !$this->Auth->loggedIn() && $path != $this->_loginpath && !$this->Auth->allowed($path)) {
+        } else if ($this->Auth && !$this->Auth->loggedIn() && $actual_path != $this->_loginpath && !$this->Auth->allowed($path)) {
             $_SESSION['orig_path'] = $_SERVER['REQUEST_URI'];
             $this->Log->info("Redirecting to login, user not logged in or not allowed");
             $this->redirect($this->localUrl($this->_loginpath));
