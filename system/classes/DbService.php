@@ -115,7 +115,7 @@ class DbService {
 		$table = $o->getDbTableName();
 
 		if (is_scalar($idOrWhere)) {
-			$this->_db->get($table)->where('id',$idOrWhere);
+			$this->_db->get($table)->where($o->getDbColumnName('id'),$idOrWhere);
 		} elseif (is_array($idOrWhere)) {
 			$this->_db->get($table)->where($idOrWhere);
 		}
@@ -125,7 +125,7 @@ class DbService {
         
         $result = $this->_db->fetch_row();
 		if ($result) {
-			$obj = $this->getObjectFromRow($class, $result);
+			$obj = $this->getObjectFromRow($class, $result,true);
 			if ($usecache) {
 				self::$_cache[$class][$key]=$obj;
 				if ($obj->id != $key && !empty(self::$_cache[$class][$obj->id])) {
@@ -182,7 +182,7 @@ class DbService {
 		// echo $this->_db->getSql();
 		$result = $this->_db->fetch_all();
 		if ($result) {
-			$objects = $this->fillObjects($class, $result);
+			$objects = $this->getObjectsFromRows($class, $result, true);
 			if ($objects) {
 				 
 				// store the complete list
@@ -211,26 +211,26 @@ class DbService {
 	 * @param <type> $id
 	 * @return <type>
 	 */
-	function getObjectFromRow($class, $row) {
+	function getObjectFromRow($class, $row, $from_db = false) {
 		if (!$row || !$class) return null;
 		$o = new $class($this->w);
-		$o->fill($row);
+		$o->fill($row, $from_db);
 		return $o;
 	}
 
-	function getObjectsFromRows($class, $rows) {
+	function getObjectsFromRows($class, $rows, $from_db = false) {
 		$list = array();
 		if (!empty($class) && !empty($rows) && class_exists($class)) {
 			foreach($rows as &$row) {
-				$list[] = $this->getObjectFromRow($class, $row);
+				$list[] = $this->getObjectFromRow($class, $row, $from_db);
 			}
 		}
 		return $list;
 	}
 
 	// DEPRECATED AS OF 0.7.0
-	function fillObjects($class, $rows) {
-		return $this->getObjectsFromRows($class, $rows);
+	function fillObjects($class, $rows, $from_db = false) {
+		return $this->getObjectsFromRows($class, $rows, $from_db);
 	}
 
 	/**
