@@ -215,6 +215,12 @@ class DbService {
 		if (!$row || !$class) return null;
 		$o = new $class($this->w);
 		$o->fill($row, $from_db);
+                
+                // Test implementation for a post fill callback
+                if (method_exists($o, "afterConstruct")) {
+                    $o->afterConstruct();
+                }
+                
 		return $o;
 	}
 
