@@ -1097,6 +1097,25 @@ class Html {
             }
             $buffer .= "</ul>";
             return $buffer;
+        } else {
+            // Try and make breadcrumbs from the history class
+            if (class_exists("History")) {
+                $breadcrumbs = History::get();
+                $buffer = "<ul class='cmfive_breadcrumbs '>";
+                $buffer .= "<li><i class='fi-clock'></i></li>";
+                if (!empty($breadcrumbs)) {
+                    $isFirst = true;
+                    foreach ($breadcrumbs as $path => $value) {
+                        $buffer .= "<li" . (!$isFirst ? "><a href='" . $path . "'>" . $value['name'] . "</a>" : " class='current'>" . $value['name']) . "</li>";
+                        $isFirst = false;
+                    }
+                } else {
+                    $buffer .= "<li>Your history will appear here</li>";
+                }
+                
+                $buffer .= "</ul>";
+                return $buffer;
+            }
         }
     }
 }
