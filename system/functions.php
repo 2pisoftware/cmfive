@@ -322,6 +322,10 @@ function formatMoney($format, $number) {
     if (empty($locale['mon_decimal_point'])) {
         $locale['mon_decimal_point'] = ".";
     }
+    if (empty($locale['mon_thousands_sep'])) {
+        $locale['mon_thousands_sep'] = ",";
+    }
+    
     preg_match_all($regex, $format, $matches, PREG_SET_ORDER);
 
     foreach ($matches as $fmatch) {
