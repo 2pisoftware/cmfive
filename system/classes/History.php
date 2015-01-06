@@ -24,12 +24,10 @@ class History {
         if (!empty($name)) {
             $name = trim(htmlspecialchars(strip_tags($name)));
         }
-        
-        $register = array();
+
         if (!empty($_SESSION[self::$cookie_key])) {
             // Get history form session and sort ($register is by reference)
-            $history = &$_SESSION[self::$cookie_key];
-            uasort($history, array('History', 'sort'));
+            uasort($_SESSION[self::$cookie_key], array('History', 'sort'));
         }
 
         // Prepend module name to current name
@@ -38,7 +36,7 @@ class History {
         }
         
         // Store array in SESSION
-        $history[parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)] = array('name' => $name, 'time' => time());
+        $_SESSION[self::$cookie_key][parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)] = array('name' => $name, 'time' => time());
     }
     
     /**

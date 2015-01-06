@@ -408,7 +408,7 @@ ul.cmfive_breadcrumbs {
 }
 
 .cmfive_breadcrumbs > *:before {
-    content: "";
+    content: "/";
     color: #aaaaaa;
     margin: 0 0.75rem;
     position: relative;
@@ -421,6 +421,9 @@ ul.cmfive_breadcrumbs > li {
     display: inline-block;
     margin-top: 3px;
 }
+.cmfive_breadcrumbs li:first-child:before {
+    content: "";
+}
 
 .cmfive_breadcrumbs li.current {
     color: rgb(200, 200, 200);
@@ -428,7 +431,7 @@ ul.cmfive_breadcrumbs > li {
 }
 
 .cmfive_breadcrumbs li > a {
-    padding: 10px 10px;
+    padding: 10px 0px;
 }
 
 .cmfive_breadcrumbs li > a:hover {
