@@ -655,7 +655,7 @@ class Html {
     public static function select($name, $items, $value = null, $class = null, $style = null, $allmsg = "-- Select --", $required = null) {
         $buf = '<select id="' . $name . '"  name="' . $name . '" class="' . $class . '" style="' . $style . '" ' . $required . '>';
         $buf.= $allmsg ? "<option value=''>" . $allmsg . "</option>" : '';
-        if ($items) {
+        if (!empty($items) && is_array($items)) {
             foreach ($items as $item) {
                 if (is_scalar($item)) {
                     $selected = $value == $item ? ' selected = "true" ' : "";

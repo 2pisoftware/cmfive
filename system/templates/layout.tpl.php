@@ -163,19 +163,6 @@
             <div class="row-fluid <?php // if(!empty($boxes)) echo "medium-10 small-12 "; ?>">
                 <div class="row-fluid small-12">
                     <h3 class="header"><?php echo !empty($title) ? $title : ucfirst($w->currentModule()); ?></h3>
-                    <div class="small-12 medium-5">
-                        <?php 
-                        if (!empty($w->_action) && (("/" . $w->_module . (!empty($w->_submodule) ? "-" . $w->_submodule : "")) !== $_SERVER['REQUEST_URI'])) {
-                            // Check that action is not empty, and the current uri isn't the module + submodule
-                            $breadcrumbs = array(array("name" => $w->_module, "link" => "/" . $w->_module));
-                            if (!empty($w->_submodule)) {
-                                $breadcrumbs[] = array("name" => $w->_submodule, "link" => "/" . $w->_module . "-" . $w->_submodule);
-                            }
-                            $breadcrumbs[] = array("name" => $w->_action, "link" => $_SERVER['REQUEST_URI']);
-                            echo Html::breadcrumbs($breadcrumbs);
-                        }
-                        ?>
-                    </div>
                 </div>
                 <?php if (!empty($error) || !empty($msg)) : ?>
                     <?php $type = !empty($error) ? array("name" => "error", "class" => "warning") : array("name" => "msg", "class" => "info"); ?>
