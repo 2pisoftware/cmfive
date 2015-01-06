@@ -9,6 +9,7 @@ require_once "html.php";
 require_once "functions.php";
 require_once "classes/CSRF.php";
 require_once "classes/Config.php";
+require_once "classes/History.php";
 
 class PermissionDeniedException extends Exception {
     
@@ -382,7 +383,7 @@ class Web {
             $this->notFoundPage();
         }
         
-        exit(); // nothing comes after start()!!!
+        exit();
     }
 
     /**

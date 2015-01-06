@@ -153,6 +153,11 @@
             </nav>
         </div>
 
+        <!-- Breadcrumbs -->
+        <div class="row-fluid">
+            <?php echo Html::breadcrumbs(); ?>
+        </div>
+        
         <div class="row-fluid body">
             <?php // Body section w/ message and body from template ?>
             <div class="row-fluid <?php // if(!empty($boxes)) echo "medium-10 small-12 "; ?>">
