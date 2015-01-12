@@ -36,7 +36,32 @@ class TemplateService extends DbService {
 		}
 		return $this->getObjects("Template",$where);
 	}
-	
+        
+	/**
+	 * Get the first Template object for module and category.
+	 * 
+	 * @param string $module default null
+	 * @param string $category default null
+	 * @param string $includeInactive default false
+	 * @param string $includeDeleted default false
+	 * @return <<Template>>
+	 */
+	function findTemplate($module = null, $category = null, $includeInactive = false, $includeDeleted = false) {
+		if ($module) {
+			$where['module']=$module;
+		}
+		if ($category) {
+			$where['category']=$category;
+		}
+		if (!$includeInactive) {
+			$where['is_active']=1;
+		}
+		if (!$includeDeleted) {
+			$where['is_deleted']=0;
+		}
+		return $this->getObject("Template",$where);
+	}
+        
 	/**
 	 * Merging a template with data.
 	 * 
@@ -52,7 +77,9 @@ class TemplateService extends DbService {
 	 * @return string
 	 */
 	function render($template, array $data) {
-		if (empty($template)) return;
+		if (empty($template)) {
+                    return;
+                }
 		
 		// falling through the options:
 		

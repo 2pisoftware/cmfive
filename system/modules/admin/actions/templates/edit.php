@@ -30,7 +30,7 @@ function edit_GET(Web $w) {
 			array(array("", "textarea", "template_title",$t->template_title,100,1, false))
 	);
 	$newForm["Template Body"] = array(
-			array(array("", "textarea", "template_body",$t->template_body,100,30, false))
+			array(array("", "textarea", "template_body",$t->template_body,100,30, "codemirror"))
 	);
 
 	$w->ctx("templateform", Html::multiColForm($newForm, $w->localUrl('/admin-templates/edit/'.$t->id)));
