@@ -7,6 +7,10 @@ function listtasks_ALL(Web $w, $params = array()) {
         $task_group_id = $params['task_group_id'];
     }
     
+    if (!empty($params['task_status'])) {
+        $task_status = $params['task_status'];
+    }
+    
     // Look for reset
     $reset = $w->request("filter_reset_task_list");
     if (empty($reset)) {
@@ -21,7 +25,12 @@ function listtasks_ALL(Web $w, $params = array()) {
         
         $task_type = $w->request('task_type');
         $task_priority = $w->request('task_priority');
-        $task_status = $w->request('task_status');
+        
+        $request_task_status = $w->request('task_status');
+        if (!empty($request_task_status)) {
+            $task_status = $request_task_status;
+        }
+        
         $is_closed = $w->request("is_closed");
         $dt_from = $w->request('dt_from');
         $dt_to = $w->request('dt_to');
