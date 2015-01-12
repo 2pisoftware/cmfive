@@ -1020,7 +1020,11 @@ class Html {
             if ($submitTitle !== NULL) {
                 $buffer .= $button->type("submit")->text($submitTitle)->__toString();
             }
-            $buffer .= $button->text("Reset")->id("filter_reset")->name("reset")->value("reset")->__toString() . "</label></div></li>";
+            if (!empty($id)) {
+                $buffer .= $button->text("Reset")->id("filter_reset_{$id}")->name("filter_reset_{$id}")->value("reset")->__toString() . "</label></div></li>";
+            } else {
+                $buffer .= $button->text("Reset")->name("reset")->value("reset")->__toString() . "</label></div></li>";
+            }
         }
         $buffer .= "</ul>"; // </div>
         $buffer .= "\n</fieldset>\n";
