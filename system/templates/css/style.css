@@ -32,6 +32,14 @@ form {
     position : fixed;
 }
 
+ul.accordion {
+    margin-left: 0px;
+}
+
+.accordion .accordion-navigation > .content {
+    padding: 0px;
+}
+
 .item {
     padding:  .25rem;
     -webkit-flex: 1 1 auto;
