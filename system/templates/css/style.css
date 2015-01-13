@@ -28,9 +28,9 @@ form {
     flex-flow: row wrap;
 }
 
-.reveal-modal{
+/*.reveal-modal{
     position : fixed;
-}
+}*/
 
 ul.accordion {
     margin-left: 0px;
