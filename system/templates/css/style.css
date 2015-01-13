@@ -28,6 +28,10 @@ form {
     flex-flow: row wrap;
 }
 
+.reveal-modal{
+    position : fixed;
+}
+
 .item {
     padding:  .25rem;
     -webkit-flex: 1 1 auto;
