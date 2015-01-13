@@ -71,7 +71,7 @@ function viewreport_GET(Web &$w) {
                             array("Description", "textarea", "description", $rep->description, 100, 2, true),
                             array("Code", "textarea", "report_code", $rep->report_code, 100, 22, false),
                             array("", "hidden", "is_approved", "0"),
-                                ), $w->localUrl("/report/editreport/" . $rep->id), "POST", " Update Report ");
+                                ), $w->localUrl("/report/edit/" . $rep->id), "POST", " Update Report ");
 
                 // create form providing view of tables and fields
                 $t = Html::form(array(

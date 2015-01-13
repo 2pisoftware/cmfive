@@ -60,6 +60,32 @@ class Html {
         return $buffer;
     }
 
+    public static function dataTable($data = array()) {
+        if (empty($data)) {
+            return '';
+        }
+        
+        $row_count = 0;
+        $buffer = '<dl class="accordion" data-accordion>';
+        foreach($data as $row) {
+            $buffer .= '<dd class="accordion-navigation">';
+            $buffer .= '<a href="#panel' . (++$row_count) . '">' . $row[0] . '</a>';
+            $buffer .= '<div id="panel' . $row_count . '" class="content">';
+            
+            // Content here
+            foreach($row[1] as $entry) {
+                $buffer .= '<div class="row-fluid">' . $entry . '</div>';
+            }
+            
+            // End content
+            
+            $buffer .= '</div></dd>';
+        }
+        $buffer .= "</dl>";
+        
+        return $buffer;
+    }
+    
     /**
      * Html function to draw a chart, see: http://www.chartjs.org/docs/ for how
      * the data structure and options should be put together for each
@@ -146,11 +172,10 @@ class Html {
         if ($button) {
             // $tag = "button";
             $element = new \Html\button();
-            $element->id($id)->setClass($class)->onclick($onclick)->text($title);
         } else {
             $element = new \Html\a();
-            $element->id($id)->setClass($class)->onclick($onclick)->text($title);
         }
+        $element->id($id)->setClass($class)->onclick($onclick)->text($title);
         return $element->__toString();
 //        return "<" . $tag . (!empty($id) ? " id=$id " : "") . (!empty($class) ? " class=$class " : "") . ($tag == 'a' ? ' href="#" ' : '') . $onclick . "><span>" . $title . "</span></" . $tag . ">";
     }

@@ -41,12 +41,12 @@ function index_ALL(Web &$w) {
             // editor & admin get EDIT button
             //			if (($w->Auth->user()->hasRole("report_editor")) || ($w->Auth->user()->hasRole("report_admin"))) {
             if ((!empty($member->role) && $member->role == "EDITOR") || ($w->Auth->user()->hasRole("report_admin"))) {
-                $btnedit = Html::b(!empty($webroot) ? $webroot : '' . "/report/viewreport/" . $rep->id, " Edit ");
+                $btnedit = Html::b(!empty($webroot) ? $webroot : '' . "/report/edit/" . $rep->id, "Edit");
             }
 
             // admin also gets DELETE button
             if ($w->Auth->user()->hasRole("report_admin")) {
-                $btndelete = Html::b(!empty($webroot) ? $webroot : '' . "/report/deletereport/" . $rep->id, " Delete ", "Are you sure you want to delete this Report?");
+                $btndelete = Html::b(!empty($webroot) ? $webroot : '' . "/report/deletereport/" . $rep->id, "Delete", "Are you sure you want to delete this Report?");
             } else {
                 $btndelete = "";
             }
