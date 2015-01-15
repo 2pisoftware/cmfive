@@ -8,8 +8,8 @@
 <!--        <link rel="icon" href="<?php // echo WEBROOT; ?>/templates/img/favicon.png" type="image/png"/>-->
 
         <?php
-        $w->enqueueStyle(array("name" => "normalize.css", "uri" => "/system/templates/js/foundation-5.3.1/css/normalize.css", "weight" => 1010));
-        $w->enqueueStyle(array("name" => "foundation.css", "uri" => "/system/templates/js/foundation-5.3.1/css/foundation.css", "weight" => 1005));
+        $w->enqueueStyle(array("name" => "normalize.css", "uri" => "/system/templates/js/foundation-5.5.0/css/normalize.css", "weight" => 1010));
+        $w->enqueueStyle(array("name" => "foundation.css", "uri" => "/system/templates/js/foundation-5.5.0/css/foundation.css", "weight" => 1005));
         $w->enqueueStyle(array("name" => "style.css", "uri" => "/system/templates/css/style.css", "weight" => 1000));
         $w->enqueueStyle(array("name" => "tablesorter.css", "uri" => "/system/templates/css/tablesorter.css", "weight" => 990));
         $w->enqueueStyle(array("name" => "datePicker.css", "uri" => "/system/templates/css/datePicker.css", "weight" => 980));
@@ -23,8 +23,8 @@
         $w->enqueueStyle(array("name" => "pickadate.classic.time.css", "uri" => "/system/templates/js/pickadate.js-3.5.2/lib/compressed/themes/classic.time.css", "weight" => 918));
         $w->enqueueStyle(array("name" => "codemirror.css", "uri" => "/system/templates/js/codemirror-4.4/lib/codemirror.css", "weight" => 900));
         
-        $w->enqueueScript(array("name" => "modernizr.js", "uri" => "/system/templates/js/foundation-5.3.1/js/vendor/modernizr.js", "weight" => 1010));
-        $w->enqueueScript(array("name" => "jquery.js", "uri" => "/system/templates/js/foundation-5.3.1/js/vendor/jquery.js", "weight" => 1000));
+        $w->enqueueScript(array("name" => "modernizr.js", "uri" => "/system/templates/js/foundation-5.5.0/js/vendor/modernizr.js", "weight" => 1010));
+        $w->enqueueScript(array("name" => "jquery.js", "uri" => "/system/templates/js/foundation-5.5.0/js/vendor/jquery.js", "weight" => 1000));
         $w->enqueueScript(array("name" => "jquery.tablesorter.js", "uri" => "/system/templates/js/tablesorter/jquery.tablesorter.js", "weight" => 990));
         $w->enqueueScript(array("name" => "jquery.tablesorter.pager.js", "uri" => "/system/templates/js/tablesorter/addons/pager/jquery.tablesorter.pager.js", "weight" => 980));
         $w->enqueueScript(array("name" => "jquery.colorbox-min.js", "uri" => "/system/templates/js/colorbox/colorbox/jquery.colorbox-min.js", "weight" => 970));
@@ -186,8 +186,8 @@
 
         <div id="cmfive-modal" class="reveal-modal xlarge" data-reveal style="top: 30px !important;"></div>
         
-        <script type="text/javascript" src="/system/templates/js/foundation-5.3.1/js/foundation.min.js"></script>
-        <script type="text/javascript" src="/system/templates/js/foundation-5.3.1/js/foundation/foundation.clearing.js"></script>
+        <script type="text/javascript" src="/system/templates/js/foundation-5.5.0/js/foundation.min.js"></script>
+        <script type="text/javascript" src="/system/templates/js/foundation-5.5.0/js/foundation/foundation.clearing.js"></script>
         <script>
             $(document).foundation({
                 reveal : {

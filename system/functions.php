@@ -528,3 +528,21 @@ function AESdecrypt($text, $password) {
     $aes = new AES($password);
     return $aes->decrypt(base64_decode($text));
 }
+
+/**
+ * Gets content between two different strings
+ * (Source: http://tonyspiro.com/using-php-to-get-a-string-between-two-strings/)
+ * 
+ * @param String $content
+ * @param String $start
+ * @param String $end
+ * @return string
+ */
+function getBetween($content, $start, $end){
+    $r = explode($start, $content);
+    if (isset($r[1])){
+        $r = explode($end, $r[1]);
+        return $r[0];
+    }
+    return '';
+}

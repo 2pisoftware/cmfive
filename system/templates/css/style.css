@@ -28,6 +28,18 @@ form {
     flex-flow: row wrap;
 }
 
+/*.reveal-modal{
+    position : fixed;
+}*/
+
+ul.accordion {
+    margin-left: 0px;
+}
+
+.accordion .accordion-navigation > .content {
+    padding: 0px;
+}
+
 .item {
     padding:  .25rem;
     -webkit-flex: 1 1 auto;
@@ -392,12 +404,12 @@ ul.cmfive_breadcrumbs {
     background-color: rgb(48, 48, 48);
     
     width:100%;
-    overflow-x: scroll;
+    overflow-x: auto;
     overflow-y: hidden;
     white-space: nowrap;
     box-sizing:border-box;
     display: inline-block;
-    height: 50px;
+    height: 35px;
     margin-left: 0px;
     padding-right: 20px;
 }
@@ -423,6 +435,7 @@ ul.cmfive_breadcrumbs > li {
 }
 .cmfive_breadcrumbs li:first-child:before {
     content: "";
+    margin: 0 0.5rem;
 }
 
 .cmfive_breadcrumbs li.current {
@@ -481,5 +494,13 @@ ul.cmfive_breadcrumbs > li {
 
     100% {
         -webkit-transform: rotate(360deg);
+    }
+}
+
+
+@media screen and (max-width: 640px) {
+    .responsive-icon-bar .item {
+        width: 100% !important;
+        float: left;
     }
 }

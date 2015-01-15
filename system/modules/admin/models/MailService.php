@@ -3,7 +3,8 @@
 class MailService extends DbService {
 	
 	private $transport;
-	
+	private static $logger = 'MAIL';
+        
 	public function __construct(Web $w) {
 		parent::__construct($w);
 		$this->initTransport();
@@ -52,11 +53,22 @@ class MailService extends DbService {
             }
         }
 
-        return $mailer->send($message, $failures);
+        $this->w->Log->setLogger(MailService::$logger)->info("Sending email to {$to} with {$subject} (" . count($attachments) . " attachments");
+        $mailer_status = $mailer->send($message, $failures);
+        if (!empty($failures)) {
+            $this->w->Log->setLogger(MailService::$logger)->error("Failed to send email: " . serialize($failures));
+        }
+        return $mailer_status;
     }
 
     private function initTransport() {
         $layer = Config::get('email.layer');
+        
+        // Set default layer if it doesn't exist
+        if (empty($layer)) {
+            $layer = "sendmail";
+        }
+        
         switch ($layer) {
             case "smtp":
             case "swiftmailer":
@@ -66,9 +78,6 @@ class MailService extends DbService {
             break;
             case "sendmail":
                 $command = Config::get('email.command');
-                //
-                // empty() is a language construct and cannot deal with return values from functions!
-                //
                 if (!empty($command)) {
                     $this->transport = Swift_SendmailTransport::newInstance(Config::get('email.command'));
                 } else {
