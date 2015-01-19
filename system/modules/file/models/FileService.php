@@ -121,38 +121,86 @@ class FileService extends DbService {
 		if (!is_a($parentObject, "DbObject")) {
 			$this->w->error("Parent not found.");
 		}
-		// we could check if the attach id actually exists
-		// but will leave this for later
-		// $uploaddir = FILE_ROOT. 'attachments/'.$parentObject->getDbTableName().'/'.date('Y/m/d').'/'.$parentObject->id.'/';
-		// if (!file_exists($uploaddir)) {
-		// 	mkdir($uploaddir,0770,true);
-		// }
+
 		$rpl_nil = array("..","'",'"',",","\\","/");
 		$rpl_ws = array(" ","&","+","$","?","|","%","@","#","(",")","{","}","[","]",",",";",":");
-		$filename = str_replace($rpl_nil, "", basename($_FILES[$requestkey]['name']));
-		$filename = str_replace($rpl_ws, "_", $filename);
-		// $uploadfile = $uploaddir . $filename;
+                
+                $rpl_nil = array("..","'",'"',",","\\","/");
+		$rpl_ws = array(" ","&","+","$","?","|","%","@","#","(",")","{","}","[","]",",",";",":");
+		$filename = str_replace($rpl_ws, "_", str_replace($rpl_nil, "", basename($_FILES[$requestkey]['name'])));
 
-		// if (move_uploaded_file($_FILES[$requestkey]['tmp_name'], $uploadfile)) {
-		$filesystemPath = $parentObject->getDbTableName().'/'.date('Y/m/d').'/'.$parentObject->id;
-		$filesystem = $this->getFilesystem($filesystemPath);
-		$file = new File($filename, $filesystem);
-		$file->setContent(file_get_contents($_FILES[$requestkey]['tmp_name']));
+                $att = new Attachment($this->w);
+                $att->filename = $filename;
+                $att->fullpath = null;
+                $att->parent_table = $parentObject->getDbTableName();
+                $att->parent_id = $parentObject->id;
+                $att->title = $title;
+                $att->description = $description;
+                $att->type_code = $type_code;
+                $att->insert();
 
-		$att = new Attachment($this->w);
-		$att->filename = $filename;
-		$att->fullpath = str_replace(FILE_ROOT, "", $this->getFilePath($filesystemPath) . "/" . $filename);
-		$att->parent_table = $parentObject->getDbTableName();
-		$att->parent_id = $parentObject->id;
-		$att->title = $title;
-		$att->description = $description;
-		$att->type_code = $type_code;
-		$att->insert();
+                $filesystemPath = FILE_ROOT . "attachments/" . $parentObject->getDbTableName().'/'.date('Y/m/d').'/'.$att->id . '/';
+                $filesystem = $this->getFilesystem($filesystemPath);
+                $file = new File($filename, $filesystem);
+                $file->setContent(file_get_contents($_FILES[$requestkey]['tmp_name']));
+
+                $att->fullpath = str_replace(FILE_ROOT, "", $filesystemPath . $filename);
+                $att->update();
 		return $att->id;
-		// } else {
-		// 	$this->w->error("Possible file upload attack.");
-		// }
-		// return null;
+	}
+        
+        /**
+	 * Uploads multiple attachments at once (Using the Html::multiFileUpload function
+	 *
+	 *  Stores in /uploads/attachments/<ObjectTableName>/<year>/<month>/<day>/<attachId>/<filename>
+	 *
+         * @param <string> $requestKey
+         * @param <DbObject> $parentObject
+	 * @param <Array> $titles
+	 * @param <Array> $descriptions
+         * @param <Array> $type_codes
+	 * @return <bool> if upload was successful
+	 */
+	function uploadMultiAttachment($requestkey, $parentObject, $titles = null, $descriptions = null, $type_codes = null) {
+		if (!is_a($parentObject, "DbObject")) {
+                    $this->w->error("Parent object not found.");
+                    return false;
+		}
+		
+                $rpl_nil = array("..","'",'"',",","\\","/");
+		$rpl_ws = array(" ","&","+","$","?","|","%","@","#","(",")","{","}","[","]",",",";",":");
+                
+                if (!empty($_FILES[$requestkey]['name']) && is_array($_FILES[$requestkey]['name'])) {
+                    $file_index = 0;
+                    foreach ($_FILES[$requestkey]['name'] as $FILE_filename) {
+                        // Files can be empty
+                        if (!empty($FILE_filename['file'])) {
+                            $filename = str_replace($rpl_ws, "_", str_replace($rpl_nil, "", basename($FILE_filename['file'])));
+
+                            $att = new Attachment($this->w);
+                            $att->filename = $filename;
+                            $att->fullpath = null;
+                            $att->parent_table = $parentObject->getDbTableName();
+                            $att->parent_id = $parentObject->id;
+                            $att->title = (!empty($titles[$file_index]) ? $titles[$file_index] : '');
+                            $att->description = (!empty($descriptions[$file_index]) ? $descriptions[$file_index] : '');
+                            $att->type_code = (!empty($type_codes) ? $type_codes[$file_index] : '');
+                            $att->insert();
+                            
+                            $filesystemPath = FILE_ROOT . "attachments/" . $parentObject->getDbTableName().'/'.date('Y/m/d').'/'.$att->id . '/';
+                            $filesystem = $this->getFilesystem($filesystemPath);
+                            $file = new File($filename, $filesystem);
+                            $file->setContent(file_get_contents($_FILES[$requestkey]['tmp_name'][$file_index]['file']));
+
+                            $att->fullpath = str_replace(FILE_ROOT, "", $filesystemPath . $filename);
+                            $att->update();
+                        }
+                        
+                        $file_index++;
+                    }
+                }
+                
+		return true;
 	}
 
 	function saveFileContent($object, $content, $name = null, $type_code = null, $content_type = null) {

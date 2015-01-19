@@ -5,6 +5,27 @@ require_once "classes/html/form.php";
 
 class Html {
 
+    public static function multiFileUpload($name) {
+        $buffer=<<<UPLOAD
+            <div id='multiFileUpload_{$name}'>
+                <div id='{$name}_file_0'>
+                    <input type='file' name='{$name}[0][file]' id='{$name}[0][file]' />
+                    <input type='text' name='{$name}[0][description]' id='{$name}[0][description]' placeholder='Description' />
+                    <button onclick='$(this).parent().remove(); return false;' type='button'>Remove</button>
+                </div>
+            </div>
+            <button type='button' id='{$name}_addNewFile'>Add another file</button>
+            <script type='text/javascript'>
+                var {$name}_total_files = 1;
+                $("#{$name}_addNewFile").click(function() {
+                    $("#multiFileUpload_{$name}").append("<div id='{$name}_file_" + {$name}_total_files + "'><input type='file' name='{$name}[" + {$name}_total_files + "][file]' id='{$name}[" + {$name}_total_files + "][file]' /><input type='text' name='{$name}[" + {$name}_total_files + "][description]' id='{$name}[" + {$name}_total_files + "][description]' placeholder='Description' /><button onclick='$(this).parent().remove(); return false;' type='button'>Remove</button></div>");
+                    {$name}_total_files++;
+                });
+            </script>
+UPLOAD;
+        return $buffer;
+    }
+    
     /**
      * Creates an html table from an array like
      * (
@@ -330,7 +351,7 @@ class Html {
                     if (isset($field[6])) {
                         $custom_class = $field[6];
                     }
-                    $buffer .= '<textarea' . $readonly . ' style="width:100%;" name="' . $name . '" rows="' . $r . '" cols="' . $c . '" ' . (!empty($custom_class) ? ($custom_class === true ? "class='ckeditor'" : "class='$custom_class' ") : '') . ' id="' . $name . '">' . $value . '</textarea>';
+                    $buffer .= '<textarea' . $readonly . ' style="width:100%; height:auto; " name="' . $name . '" rows="' . $r . '" cols="' . $c . '" ' . (!empty($custom_class) ? ($custom_class === true ? "class='ckeditor'" : "class='$custom_class' ") : '') . ' id="' . $name . '">' . $value . '</textarea>';
                 break;
                 case "select":
                     $items = !empty($field[4]) ? $field[4] : null;
@@ -375,7 +396,7 @@ class Html {
         }
         $buffer .= "</div>";
         $buffer .= "<script>$(function(){try{\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})}catch(err){}});</script>";
-        // $buffer .= "<script>$(function(){try{\$('textarea.codemirror').each(function(){CodeMirror.fromTextArea(this, {lineNumbers: true, mode: 'text/html', matchBrackets: true})})}catch(err){}});</script>";
+        // $buffer .= "<script>$(function(){try{\$('textarea.codemirror').each(function(){CodeMirror.fromTextArea(this, {lineNumbers: true, mode: 'text/html', matchBrackets: true, viewportMargin: Infinity})})}catch(err){}});</script>";
   
         if (null !== $action) {
             $buffer .= $form->close($submitTitle);
@@ -581,7 +602,7 @@ class Html {
                             if (isset($field[6])) {
                                 $custom_class = $field[6];
                             }
-                            $buffer .= '<textarea' . $readonly . ' style="width:100%;" name="' . $name . '" rows="' . $r . '" cols="' . $c . '" ' . (!empty($custom_class) ? ($custom_class === true ? "class='ckeditor'" : "class='$custom_class' ") : '') . ' id="' . $name . '" ' . $required . '>' . $value . '</textarea>';
+                            $buffer .= '<textarea' . $readonly . ' style="width:100%; height: auto; " name="' . $name . '" rows="' . $r . '" cols="' . $c . '" ' . (!empty($custom_class) ? ($custom_class === true ? "class='ckeditor'" : "class='$custom_class' ") : '') . ' id="' . $name . '" ' . $required . '>' . $value . '</textarea>';
                         break;
                         case "select":
                             $items = !empty($field[4]) ? $field[4] : null;
@@ -626,8 +647,8 @@ class Html {
             }
             $buffer .= "</div>";
         }
-        $buffer .= "<script>$(function(){try{\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})}catch(err){}});</script>";
-        $buffer .= "<script>$(function(){try{\$('textarea.codemirror').each(function(){CodeMirror.fromTextArea(this, {lineNumbers: true, mode: 'text/html', matchBrackets: true})})}catch(err){}});</script>";
+        $buffer .= "<script>$(function(){try{\$('.ckeditor').each(function(){CKEDITOR.replace(this)})}catch(err){}});</script>";
+        $buffer .= "<script>$(function(){try{\$('.codemirror').each(function(){var editor = CodeMirror.fromTextArea($(this), {lineNumbers: true, mode: 'text/html', matchBrackets: true, viewportMargin: Infinity}); editor.refresh()})}catch(err){}});</script>";
   
         // Finish shell div tag
         $buffer .= "</div>";

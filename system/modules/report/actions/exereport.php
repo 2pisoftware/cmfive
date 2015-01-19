@@ -161,7 +161,7 @@ function exereport_ALL(Web &$w) {
                         
                             $results .= "<h3 class='subheader'>" . $title . "</h3>" . $w->Template->render(
                                     !empty($report_template->template_id) ? $report_template->template_id : ($template->id), 
-                                    array("data" => $t)
+                                    array("data" => $t, "w" => $w, "POST" => $_POST)
                                 );
                         }
                         // build results table
