@@ -271,6 +271,26 @@ class DbObject extends DbService {
     }
 
     /**
+     * Apply value conversions from database values
+     * 
+     * @param string $k
+     * @param mixed $v
+     * @return mixed
+     */
+    function readConvert($k,$v) {
+    	if (strpos($k, "dt_") === 0) {
+    		if ($v) {
+    			return $this->dt2Time($v);
+    		}
+    	} else if (strpos($k, "d_") === 0) {
+    		if ($v) {
+    			return $this->d2Time($v);
+    		}
+    	}
+    	return $v;
+    }
+    
+    /**
      * fill this object from an array where the keys correspond to the
      * variable of this object.
      *
@@ -283,18 +303,10 @@ class DbObject extends DbService {
                 if ($from_db) {
                     $dbk = $this->getDbColumnName($k);
                 }
+
                 if (array_key_exists($dbk, $row)) {
                     $v = $row[$dbk];
-                    if (strpos($k, "dt_") === 0) {
-                        if ($v) {
-                            $v = $this->dt2Time($v);
-                        }
-                    } else if (strpos($k, "d_") === 0) {
-                        if ($v) {
-                            $v = $this->d2Time($v);
-                        }
-                    }
-                    $this->$k = $v;
+                    $this->$k = $from_db ? $this->readConvert($k,$v) : $v;
                 }
             }
         }
@@ -613,30 +625,11 @@ class DbObject extends DbService {
         foreach (get_object_vars($this) as $k => $v) {
             if ($k{0} != "_" && $k != "w") { // ignore volatile vars
                 $dbk = $this->getDbColumnName($k);
-                if (strpos($k, "dt_") === 0) {
-                    if ($v) {
-                        $v = $this->time2Dt($v);
-                        $data[$dbk] = $v;
-                    }
-                } else if (strpos($k, "d_") === 0) {
-                    if ($v) {
-                        $v = $this->time2D($v);
-                        $data[$dbk] = $v;
-                    }
-                } else if (strpos($k, "t_") === 0) {
-                    if ($v) {
-                        $v = $this->time2T($v);
-                        $data[$dbk] = $v;
-                    }
-                } else if (strpos($k, "s_") === 0) {
-                    if ($v) {
-                        $v = AESencrypt($v, $this->__password);
-                        $data[$dbk] = $v;
-                    }
-                } else {
-                    if ($v !== null) {
-                        $data[$dbk] = $v;
-                    }
+                
+                // call update conversions
+                $v = $this->updateConvert($k,$v);
+                if ($v !== null) {
+                   $data[$dbk] = $v;
                 }
                 // if $force_null_values is TRUE and $v is NULL, then set fields in DB to NULL
                 // otherwise ignore NULL values
@@ -1100,4 +1093,32 @@ class DbObject extends DbService {
 // 		}
     }
 
+    /**
+     * Convert data values before sending to database
+     *
+     * @param string $k
+     * @param mixed $v
+     * @return mixed
+     */
+    function updateConvert($k, $v) {
+    	if (strpos($k, "dt_") === 0) {
+    		if (!empty($v)) {
+    			return $this->time2Dt($v);
+    		}
+    	} else if (strpos($k, "d_") === 0) {
+    		if (!empty($v)) {
+    			return $this->time2D($v);
+    		}
+    	} else if (strpos($k, "t_") === 0) {
+    		if (!empty($v)) {
+    			return $this->time2T($v);
+    		}
+    	} else if (strpos($k, "s_") === 0) {
+    		if (!empty($v)) {
+    			return AESencrypt($v, $this->__password);
+    		}
+    	}
+    	return $v;
+    }
+    
 }

@@ -976,7 +976,7 @@ class Web {
                 $partial_action($this, $params);
             }
         } else {
-            $w->Log->error("Could not find partial file at: {$partial_action_file}");
+            $this->Log->error("Could not find partial file at: {$partial_action_file}");
         }
 
         $currentbuf = $this->_buffer;
