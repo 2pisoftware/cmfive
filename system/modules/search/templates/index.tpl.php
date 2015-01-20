@@ -22,7 +22,7 @@
     <div data-alert class="alert-box warning" id="message_box"></div>
 </div>
 
-<div id="result" class="row hide">
+<div id="result" class="row" style="display: none;">
 
 </div>
         

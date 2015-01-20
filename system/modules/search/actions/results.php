@@ -24,7 +24,7 @@ function results_GET(Web $w) {
                     foreach($filter_results as $class => $objects) {
                         // Transform class into readable text
                         $t_class = preg_replace('/(?<=\\w)(?=[A-Z])/', " $1", $class);
-                        $buffer .= "<div class='row search-class'><h4 style='padding-left: 30px; font-weight: lighter;'>{$t_class}</h4>";
+                        $buffer .= "<div class='row search-class'><h4 style='padding-top: 10px; font-weight: lighter;'>{$t_class}</h4>";
                         
                         if (!empty($objects)) {
                             foreach($objects as $object) {

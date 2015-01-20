@@ -69,6 +69,14 @@
                 
                 // Set up CodeMirror instances if any
                 bindCodeMirror();
+                
+                // Adjust the breadcrumbs div if it's content is longer than the viewport
+                var breadcrumbs = $('.cmfive_breadcrumbs');
+                if (breadcrumbs.length) {
+                    if (breadcrumbs[0].scrollWidth > $(window).width()) {
+                        breadcrumbs.css('height', (breadcrumbs.height() + 20) + "px");
+                    }
+                }
             });
 
             // Try and prevent multiple form submissions
