@@ -230,6 +230,17 @@ class DbObject extends DbService {
     }
 
     /**
+     * print a view link to this object
+     * 
+     * @param string $class
+     * @param string $target
+     * @return string
+     */
+    function toLink($class = null, $target = null) {
+    	return Html::a($this->printSearchUrl(), $this->printSearchTitle(),null, $class, null, $target);	
+    }
+    
+    /**
      * used by the search display function to check whether the user has
      * permission to see this result item.
      *
