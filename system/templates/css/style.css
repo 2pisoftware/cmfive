@@ -457,6 +457,16 @@ ul.cmfive_breadcrumbs > li {
     font-size: 160%;
 }
 
+.multiFileUploadRow {
+    padding: 5px;
+    border: 1px solid grey;
+}
+
+.multiFileUploadRow input[type=file] {
+    padding-top: 10px;
+    margin-bottom: 0px;
+}
+
 @-moz-keyframes spinPulse {
     0% {
         -webkit-transform: rotate(360deg);
@@ -502,5 +512,15 @@ ul.cmfive_breadcrumbs > li {
     .responsive-icon-bar .item {
         width: 100% !important;
         float: left;
+    }
+    
+    .reveal-modal, dialog {
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-bottom: 5px;
+    }
+    
+    .column, .columns {
+        padding: 0px 5px;
     }
 }

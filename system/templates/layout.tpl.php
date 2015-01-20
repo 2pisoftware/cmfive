@@ -77,6 +77,14 @@
                         breadcrumbs.css('height', (breadcrumbs.height() + 20) + "px");
                     }
                 }
+                
+                // Search function shortcut listener
+                $(document).on('keydown', function ( e ) {
+                    if ((e.ctrlKey || e.metaKey) && e.which === 70) {
+                        $('#cmfive_search_button').click();
+                        return false;
+                    }
+                });
             });
 
             // Try and prevent multiple form submissions
@@ -110,7 +118,7 @@
                     <!-- Right Nav Section -->
                     <ul class="right">
                         <!-- Search bar -->
-                        <li><?php echo Html::box("/search", "<span class='fi-magnifying-glass'></span>", false); ?></li>
+                        <li><?php echo Html::box("/search", "<span class='fi-magnifying-glass'></span>", false, false, null, null, null, "cmfive_search_button"); ?></li>
                         
                         <!-- User Profile drop down -->
                         <?php if ($w->Auth->user()): ?>

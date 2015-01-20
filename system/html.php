@@ -5,27 +5,6 @@ require_once "classes/html/form.php";
 
 class Html {
 
-    public static function multiFileUpload($name) {
-        $buffer=<<<UPLOAD
-            <div id='multiFileUpload_{$name}'>
-                <div id='{$name}_file_0'>
-                    <input type='file' name='{$name}[0][file]' id='{$name}[0][file]' />
-                    <input type='text' name='{$name}[0][description]' id='{$name}[0][description]' placeholder='Description' />
-                    <button onclick='$(this).parent().remove(); return false;' type='button'>Remove</button>
-                </div>
-            </div>
-            <button type='button' id='{$name}_addNewFile'>Add another file</button>
-            <script type='text/javascript'>
-                var {$name}_total_files = 1;
-                $("#{$name}_addNewFile").click(function() {
-                    $("#multiFileUpload_{$name}").append("<div id='{$name}_file_" + {$name}_total_files + "'><input type='file' name='{$name}[" + {$name}_total_files + "][file]' id='{$name}[" + {$name}_total_files + "][file]' /><input type='text' name='{$name}[" + {$name}_total_files + "][description]' id='{$name}[" + {$name}_total_files + "][description]' placeholder='Description' /><button onclick='$(this).parent().remove(); return false;' type='button'>Remove</button></div>");
-                    {$name}_total_files++;
-                });
-            </script>
-UPLOAD;
-        return $buffer;
-    }
-    
     /**
      * Creates an html table from an array like
      * (
@@ -388,6 +367,9 @@ UPLOAD;
                     $size = !empty($field[4]) ? $field[4] : null;
                     $buffer .= '<input style="width:100%;"  type="' . $type . '" name="' . $name . '" size="' . $size . '" id="' . $name . '"/>';
                 break;
+                case "multifile":
+                    $buffer .= Html::multiFileUpload($name);
+                break;
             }
             if (!empty($title) && "static" !== $type && "hidden" !== $type) {
                 $buffer .= "</label>";
@@ -639,6 +621,9 @@ UPLOAD;
                         case "file":
                             $size = !empty($row[4]) ? $row[4] : null;
                             $buffer .= '<input style="width:100%;"  type="' . $type . '" name="' . $name . '" size="' . $size . '" id="' . $name . '"/>';
+                        break;
+                        case "multifile":
+                            $buffer .= Html::multiFileUpload($name);
                         break;
                     }
                     $buffer .= ($type !== "hidden" ? "</div></label></li>" : "");
@@ -1168,4 +1153,46 @@ UPLOAD;
             }
         }
     }
+    
+    /**
+     * Creates a view for uploading multiple files at the same time
+     * Uses the $name parameter to distinguish between multiple 
+     * instances on one page.
+     * 
+     * @param <String> $name
+     * @return <String> buffer
+     */
+    public static function multiFileUpload($name) {
+        $buffer=<<<UPLOAD
+            <div id='multiFileUpload_{$name}'>
+                <div id='{$name}_file_0' class='row-fluid clearfix multiFileUploadRow'>
+                    <div class="medium-4 columns">
+                        <label>
+                            <input type='file' name='{$name}[0][file]' id='{$name}[0][file]' />
+                        </label>
+                    </div>
+                    <div class="medium-6 columns">
+                        <label>
+                            <input type='text' name='{$name}[0][description]' id='{$name}[0][description]' placeholder='Description' />
+                        </label>
+                    </div>
+                    <div class="medium-2 columns">
+                        <label>
+                            <button class='button tiny' onclick='$(this).parent().remove(); return false;' type='button'>Remove</button>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <button type='button' class='button tiny' style='margin-top: 10px;' id='{$name}_addNewFile'>Add another file</button>
+            <script type='text/javascript'>
+                var {$name}_total_files = 1;
+                $("#{$name}_addNewFile").click(function() {
+                    $("#multiFileUpload_{$name}").append("<div id='{$name}_file_" + {$name}_total_files + "' class='row-fluid clearfix multiFileUploadRow'><div class='medium-4 columns'><label><input type='file' name='{$name}[" + {$name}_total_files + "][file]' id='{$name}[" + {$name}_total_files + "][file]' /></label></div><div class='medium-6 columns'><label><input type='text' name='{$name}[" + {$name}_total_files + "][description]' id='{$name}[" + {$name}_total_files + "][description]' placeholder='Description' /></label></div><div class='medium-2 columns'><label><button onclick='$(this).parent().remove(); return false;' type='button' class='button tiny'>Remove</button></label></div></div>");
+                    {$name}_total_files++;
+                });
+            </script>
+UPLOAD;
+        return $buffer;
+    }
+    
 }
