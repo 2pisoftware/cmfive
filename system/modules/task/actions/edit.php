@@ -47,6 +47,11 @@ function edit_GET($w) {
         )
     );
     
+    if (empty($p['id'])) {
+    	History::add("New Task");
+    } else {
+    	History::add("Task: {$task->title}");
+    }
     $w->ctx("task", $task);
     $w->ctx("form", Html::multiColForm($form, $w->localUrl("/task/edit/{$task->id}"), "POST", "Save", "edit_form"));
     

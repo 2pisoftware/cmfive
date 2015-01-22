@@ -10,6 +10,12 @@ function edit_GET(Web &$w) {
         $w->error("Report not found", "/report");
     }
     
+    if (empty($report)) {
+    	History::add("Create Report");
+    } else {
+    	History::add("Edit Report: ".$report->title);
+    }
+    
     $w->ctx("report", $report);
     
     // If we're creating this is the table

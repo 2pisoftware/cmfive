@@ -1,6 +1,7 @@
 <?php
 
 function tasklist_ALL(Web $w) {
+	History::add("List Tasks");
     // Look for reset
     $reset = $w->request("reset");
     if (empty($reset)) {
@@ -111,9 +112,9 @@ function tasklist_ALL(Web $w) {
                 $line[] = array(
                     $title,
                     ucfirst($role),
-                    $value_array[$role]["creator"],
-                    $value_array[$role]["assignee"],
-                    $value_array[$role]["other"],
+                    @$value_array[$role]["creator"],
+                    @$value_array[$role]["assignee"],
+                    @$value_array[$role]["other"],
                     Html::box(WEBROOT . "/task/updateusergroupnotify/" . $member->task_group_id, " Edit ", true)
                 );
             }

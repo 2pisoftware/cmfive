@@ -9,7 +9,7 @@ function runreport_ALL(Web &$w) {
 	$p = $w->pathMatch("id");
 
 	// if there is a report ID in the URL ...
-	if ($p['id']) {
+	if ($p['id']) {		
 		// get member
 		$member = $w->Report->getReportMember($p['id'],$w->session('user_id'));
 
@@ -24,6 +24,8 @@ function runreport_ALL(Web &$w) {
 			else {
 				// display form
 				$w->Report->navigation($w, $rep->title);
+				History::add("Run Report: ".$rep->title);
+				
 
 				if ((!empty($member->role) && $member->role == "EDITOR") || ($w->Auth->user()->hasRole("report_admin"))) {
 					$btnedit = Html::b("/report/viewreport/".$rep->id," Edit Report ");

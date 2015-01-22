@@ -19,6 +19,7 @@ function viewtask_GET(Web &$w) {
 	}
 	// check if i can view the task: my role in group Vs group can_view value
 	elseif ($task->getCanIView()) {
+		History::add("Task: {$task->title}");
 		// tab: Task Details
 
 		// if I can assign tasks, provide dropdown of group members else display current assignee.

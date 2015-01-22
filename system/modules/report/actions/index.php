@@ -6,7 +6,7 @@
 
 function index_ALL(Web &$w) {
     $w->Report->navigation($w, "Reports");
-
+    History::add("List Reports");
     // report approval flag: display appropriate image
     $app[0] = "<img alt=\"No\" src=\"/system/templates/img/no.gif\" style=\"display: block; margin-left: auto; margin-right: auto;\">";
     $app[1] = "<img alt=\"Yes\" src=\"/system/templates/img/yes.gif\" style=\"display: block; margin-left: auto; margin-right: auto;\">";

@@ -6,6 +6,7 @@
 
 function viewtaskgrouptypes_ALL(Web &$w) {
 	$w->Task->navigation($w, "Manage Task Groups");
+	History::add("Manage Task Groups");
     $task_groups = $w->Task->getTaskGroups();
     if ($task_groups) {
     	usort($task_groups, array("TaskService","sortbyGroup"));
@@ -67,6 +68,9 @@ function viewtaskgroup_GET(Web &$w) {
 	// return task group details given a task group ID
 	$group_details = $w->Task->getTaskGroup($p['id']);
 
+	if (!empty($group_details)) {
+		History::add("Taskgroup: ".$group_details->title);
+	}
 	// if is_active is set to '0', display 'Yes', else display 'No'
 	$isactive = $group_details->is_active == "1" ? "Yes" : "No";
 
