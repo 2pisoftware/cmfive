@@ -17,9 +17,9 @@ function editsettings_GET(Web $w) {
 	// Instantiate processor
 	$class = new $processor->class($w);
 	if (method_exists($class, "getSettingsForm")) {
-
 		// Call getSettingsForm
 		$form = $class->getSettingsForm($processor->settings);
+                
 		if (!empty($form)) {
 			$w->out(Html::multiColForm($form, "/channels-processor/editsettings/{$processor->id}"));
 		} else {

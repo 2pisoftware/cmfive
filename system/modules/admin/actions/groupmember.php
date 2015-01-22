@@ -36,7 +36,7 @@ function groupmember_POST(Web $w)
 	$member_id = $w->request('member_id');
 	$group_id = $p['group_id'];
 	$is_owner = $w->request('is_owner');
-	
+	$exceptions = array();
 	// store all parent groups in session
 	$groupUsers = $w->Auth->getUser($group_id)->isInGroups();
 	if ($groupUsers)
@@ -75,7 +75,7 @@ function groupmember_POST(Web $w)
 
 	$w->sessionUnset('parents');
 
-	if ($exceptions) {
+	if (!empty($exceptions)) {
 		$w->error(implode(", ", $exceptions)." can not be added!", "/admin/moreInfo/".$group_id);
 	} else {
 		$w->msg("New members are added!", "/admin/moreInfo/".$group_id);
