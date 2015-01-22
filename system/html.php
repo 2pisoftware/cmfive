@@ -937,6 +937,11 @@ class Html {
         // $buffer .= "<div class=\"row-fluid\">\n";
         $buffer .= "<ul id='filter-grid' class='small-block-grid-1 medium-block-grid-3 large-block-grid-4'>";
         
+        $should_autosubmit = false;
+        if (count($data) === 1 && $data[0][1] === "select") {
+            $should_autosubmit = true;
+        }
+        
         // Loop through data
         foreach ($data as $row) {
 
@@ -1044,11 +1049,15 @@ class Html {
             $buffer .= "</label></div></li>"; // </div>
         }
         
+        // This is only true when the filter has one element and its a select field
+        if ($should_autosubmit) {
+            $buffer .= "<script>$('form" . ($id ? "#" . $id : "") . ' select\').change(function(){this.form.submit()});</script>';
+        }
         // Filter button (optional... though optional is pointless)
         if (!empty($action)) {
             $button = new \Html\button();
             $buffer .= "<li><div class='small-12 columns'><label>Actions<br/>";
-            if ($submitTitle !== NULL) {
+            if ($submitTitle !== NULL && !$should_autosubmit) {
                 $buffer .= $button->type("submit")->text($submitTitle)->__toString();
             }
             if (!empty($id)) {
