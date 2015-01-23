@@ -12,4 +12,5 @@ class Audit extends DbObject {
 	public $db_id;
 	public $message;
 
+	public $__use_auditing = false;
 }

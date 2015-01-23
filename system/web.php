@@ -329,10 +329,6 @@ class Web {
             $this->ctx("w", $this);
 
             try {
-                // Load all listeners and call PRE ACTION listeners
-                // phase this out! Hooks are better and faster
-                $this->_callPreListeners();
-
                 // call hooks, generic to specific
                 $this->_callWebHooks("before");
 
@@ -343,12 +339,6 @@ class Web {
 
                 // call hooks, generic to specific
                 $this->_callWebHooks("after");
-
-                // Call all POST ACTION listeners
-                // INFO: These will also be called in the
-                // redirect method!
-                // phase this out!
-                $this->_callPostListeners();
             } catch (PermissionDeniedException $ex) {
                 $this->error($ex->getMessage());
             }
@@ -389,6 +379,8 @@ class Web {
     /**
      * This creates and calls the following hooks:
      * 
+     * core_web_before
+     * core_web_after
      * core_web_before_get
      * core_web_before_get_[module]
      * core_web_before_get_[module]_[action]
@@ -416,6 +408,7 @@ class Web {
         $request_method = strtolower($this->_requestMethod);
         
         // call hooks, generic to specific
+        $this->callHook("core_web", $type); // anything
         $this->callHook("core_web", $type . "_" . $request_method); // GET /*
         $this->callHook("core_web", $type . "_" . $request_method . "_" . $this->_module); // GET /module
         

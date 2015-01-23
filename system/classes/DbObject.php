@@ -579,18 +579,13 @@ class DbObject extends DbService {
             $this->_searchable->insert();
         }
 
-        // store this id in the context for listeners
+        // store this id in the context for hooks etc.
         $inserts = $this->w->ctx('db_inserts');
         if (!$inserts) {
             $inserts = array();
         }
         $inserts[get_class($this)][] = $this->id;
         $this->w->ctx('db_inserts', $inserts);
-
-        if (property_exists($this, "__use_auditing")) {
-            // TODO remove dependency to user code!
-            $this->w->Admin->addDbAuditLogEntry("insert", get_class($this), $this->id);
-        }
         
         return true;
     }
@@ -670,18 +665,13 @@ class DbObject extends DbService {
             $this->_searchable->update();
         }
 
-        // store this id in the context for listeners
+        // store this id in the context for hooks
         $updates = $this->w->ctx('db_updates');
         if (!$updates) {
             $updates = array();
         }
         $updates[get_class($this)][] = $this->id;
         $this->w->ctx('db_updates', $updates);
-
-        if (property_exists($this, "__use_auditing")) {
-            // TODO remove dependency to modules code!
-            $this->w->Admin->addDbAuditLogEntry("update", get_class($this), $this->id);
-        }
 
         return true;
     }
@@ -709,7 +699,7 @@ class DbObject extends DbService {
             $this->_db->delete($t)->where($this->_cn('id'), $this->id)->execute();
         }
 
-        // calling hooks BEFORE deleting the object
+        // calling hooks AFTER deleting the object
         $this->_callHooks("after", "delete");
 
         // store this id in the context for listeners
@@ -725,9 +715,6 @@ class DbObject extends DbService {
         	$this->_searchable->delete();
         }
 
-        // with hooks in place this can go!
-        // TODO remove dependency to user code!
-        $this->w->Admin->addDbAuditLogEntry("delete", get_class($this), $this->id);
     }
 
     /**

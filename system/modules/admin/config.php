@@ -6,17 +6,18 @@ Config::set('admin', array(
     'path' => 'system/modules',
     'topmenu' => true,
     'audit_ignore' => array("index"),
+    'hooks' => array('core_dbobject'),
     'printing' => array(
         'command' => array(
             'unix' => 'lpr $filename',
-            'windows' => 'C:\Users\adam\Desktop\SumatraPDF-2.4\SumatraPDF.exe -print-to $printername $filename'
+            // 'windows' => 'C:\Users\adam\Desktop\SumatraPDF-2.4\SumatraPDF.exe -print-to $printername $filename'
         )
     ),
     'database' => array(
         'output' => 'sql',
         'command' => array(
             'unix' => 'mysqldump -u $username -p$password $dbname | gzip > $filename.gz',
-            'windows' => 'J:\\xampp\\mysql\\bin\\mysqldump.exe -u $username -p$password $dbname > $filename'
+            // 'windows' => 'J:\\xampp\\mysql\\bin\\mysqldump.exe -u $username -p$password $dbname > $filename'
         )
     ),
     "dependencies" => array(

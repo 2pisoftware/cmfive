@@ -18,7 +18,10 @@ function results_GET(Web $w) {
                     // Group results by class_name
                     $filter_results = array();
                     foreach($results[0] as $res) {
-                        $filter_results[$res['class_name']][] = $w->Search->getObject($res['class_name'], $res['object_id']);
+                    	$searchobject = $w->Search->getObject($res['class_name'], $res['object_id']);
+                    	if (!empty($searchobject)) {
+                        	$filter_results[$res['class_name']][] = $searchobject;
+                    	} 
                     }
                     
                     foreach($filter_results as $class => $objects) {
