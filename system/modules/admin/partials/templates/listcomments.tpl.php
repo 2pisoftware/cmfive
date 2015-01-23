@@ -8,7 +8,7 @@
         <div class="comment_container">
             <?php foreach($comments as $c) : ?>
                 <div class="comment_section">
-                    <div class="comment_body"><?php echo $c->comment; ?></div>
+                    <div class="comment_body"><?php echo $w->Comment->renderComment($c->comment); ?></div>
                     <div class="comment_meta">
                         Posted <?php echo !empty($c->dt_created) ? "on " . formatDate($c->dt_created, "d M \a\\t H:i") : ""; ?><b><?php echo !empty($c->creator_id) ? " by " . @$c->w->Auth->getUser($c->creator_id)->getFullName() : ""; ?></b>
                         <?php if ($c->w->Auth->user()->id == $c->creator_id) {

@@ -25,5 +25,12 @@ class CommentService extends DbService {
         }
         return null;
     }
+    
+    public function renderComment($text) {
+    	require_once 'creole/creole.php';
+    	$creole = new creole();
+    	$options = null;
+    	return $creole->parse($text);
+    }
 
 }
