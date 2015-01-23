@@ -1005,12 +1005,6 @@ class Web {
             return;
         }
 
-        // Check if the module if active or not
-//        if (!Config::get("{$module}.active") && $module !== "main") {
-//            // Do we want to do something else?
-//            return NULL;
-//        }
-        
         // Build _hook registry if empty
         if (empty($this->_hooks)) {
             foreach ($this->modules() as $modulename) {
@@ -1035,26 +1029,31 @@ class Web {
         
         // Loop through each registered module to try and invoke the function
         foreach ($this->_hooks[$module] as $toInvoke) {
+        	
             // Check that the hook impl module that we are invoking is a module
             if (!in_array($toInvoke, $this->modules())) {
                 continue;
             }
 
-            // Check if the file exits
-            if (!file_exists($this->getModuleDir($toInvoke) . "$toInvoke.hooks.php")) {
-                continue;
+            $hook_function_name = $toInvoke . "_" . $module . "_" . $function;
+            
+            // if this function is already loaded from an earlier call, execute now
+            if (function_exists($hook_function_name)) {
+            	$hook_function_name($this, $data);
+            } else {            
+	            // Check if the file exists and load
+	            if (!file_exists($this->getModuleDir($toInvoke) . $toInvoke.".hooks.php")) {
+	                continue;
+	            }
+	
+	            // Include and check if function exists
+	            include_once ($this->getModuleDir($toInvoke) . $toInvoke.".hooks.php");
+	
+	            if (function_exists($hook_function_name)) {
+	                // Call function
+	            	$hook_function_name($this, $data);	
+	            }
             }
-
-            // Include and check if function exists
-            include_once ($this->getModuleDir($toInvoke) . "$toInvoke.hooks.php");
-
-            $hook_function_name = ($toInvoke . "_" . $module . "_" . $function);
-            if (!function_exists($hook_function_name)) {
-                continue;
-            }
-
-            // Call function
-            return $hook_function_name($this, $data);
         }
     }
 

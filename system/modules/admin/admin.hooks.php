@@ -35,3 +35,12 @@ function admin_core_dbobject_after_insert(Web $w, DbObject $object) {
 		$w->Audit->addDbAuditLogEntry("insert", get_class($object), $object->id);
 	}
 }
+
+/**
+ * Log all web access
+ * 
+ * @param Web $w
+ */
+function admin_core_web_before(Web $w) {
+	$w->Audit->addAuditLogEntry();
+}

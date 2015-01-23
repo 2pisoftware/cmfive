@@ -5,5 +5,6 @@ Config::set('task', array(
     'active' => true,
     'path' => 'system/modules',
     'topmenu' => true,
-    'search' => array('Tasks' => "Task")
+    'search' => array('Tasks' => "Task"),
+    'hooks' => array('core_web'),
 ));
