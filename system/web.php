@@ -109,8 +109,8 @@ class Web {
      * Thanks to:
      * http://www.phpaddiction.com/tags/axial/url-routing-with-php-part-one/
      */
-    private function _getCommandPath() {    	
-        $uri = explode('?', $_SERVER['REQUEST_URI']); // get rid of parameters
+    private function _getCommandPath($url = null) {    	
+        $uri = explode('?', empty($url) ? $_SERVER['REQUEST_URI'] : $url); // get rid of parameters
         $uri = $uri[0];
         // get rid of trailing slashes
         if (substr($uri, -1) == "/") {
@@ -1459,6 +1459,75 @@ class Web {
         $this->ctx("title", $title);
     }
 
+    /**
+     * parse a url and return and array like:
+     * 
+     * array['module'] = <module>
+     * array['submodule'] = <submodule> (or null)
+     * array['action'] = <action>
+     * array['tail'] = (the rest of the url)
+     * 
+     * @param array 
+     */
+    function parseUrl($url) {
+    	if (empty($url)) {
+    		return null;
+    	}
+    	
+    	$split = $this->_getCommandPath($url);
+    	
+    	/* 
+    	 * Not sure yet how to handle frontend urls here
+    	 * 
+    	// based on request domain we can route everything to a frontend module
+    	// look into the domain routing and prepend the module
+    	$routing = Config::get('domain.route');
+    	$domainmodule = isset($routing[$_SERVER['HTTP_HOST']]) ? $routing[$_SERVER['HTTP_HOST']] : null;
+    	
+    	if (!empty($domainmodule)) {
+    		$this->_loginpath = "auth";
+    		$this->_isFrontend = true;
+    		// now we have to decide whether the path points to
+    		// a) a single top level action
+    		// b) an action on a submodule
+    		// but we need to make sure not to mistake a path paramater for a submodule or an action!
+    		$domainsubmodules = $this->getSubmodules($domainmodule);
+    		$action_or_module = !empty($this->_paths[0]) ? $this->_paths[0] : null;
+    		if (!empty($domainsubmodules) && !empty($action_or_module) && array_search($action_or_module, $domainsubmodules) !== false) {
+    			// just add the module to the first path entry, eg. frontend-page/1
+    			$this->_paths[0] = $domainmodule."-".$this->_paths[0];
+    		} else {
+    			// add the module as an entry to the front of paths, eg. frontent/index
+    			array_unshift($this->_paths, $domainmodule);
+    		}
+    	}
+    	*/
+    	
+    	// first find the module
+    	$paths['module']=null;
+    	$paths['submodule']=null;
+    	
+    	if (!empty($split)) {
+    		$paths['module'] = array_shift($split);
+    		// see if the module is a sub module
+    		// eg. /sales-report/showreport/1..
+    		$hsplit = explode("-", $paths['module']);
+    		if (sizeof($hsplit) == 2) {
+    			$paths['module'] = array_shift($hsplit);
+    			$paths['submodule'] = array_shift($hsplit);
+    		}
+    		
+    	}
+    	 
+    	// then find the action
+    	$paths['action']=null;
+    	if (!empty($split)) {
+    		$paths['action'] = array_shift($split);
+    	}   	    
+
+    	$paths['tail'] = $split;
+    	return $paths;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
