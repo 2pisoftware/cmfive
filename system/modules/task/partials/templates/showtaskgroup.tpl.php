@@ -24,7 +24,7 @@
                     }
                     if ($task_count > 0) : ?>
                         <tr>
-                            <td><?php echo $val[0]; ?></td>
+                            <td><a target="_blank" href="/task/tasklist/?task_group_id=<?php echo $taskgroup->id; ?>&task_status=<?php echo $val[0]; ?>"><?php echo $val[0]; ?></a></td>
                             <td><?php echo $task_count; ?></td>
                         </tr>
                     <?php endif; ?>
