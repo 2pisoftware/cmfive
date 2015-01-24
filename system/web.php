@@ -531,7 +531,7 @@ class Web {
             $user = $this->Auth->user();
             $usrmsg = $user ? " for " . $user->login : "";
             if (!$this->Auth->allowed($path)) {
-                $this->service('log')->info("System: Access Denied to " . $path . $usrmsg . " from " . $this->requestIpAddress());
+                $this->Log->info("System: Access Denied to " . $path . $usrmsg . " from " . $this->requestIpAddress());
                 // redirect to the last allowed page 
                 if ($this->Auth->allowed($_SESSION['LAST_ALLOWED_URI'])) {
                     $this->error($msg, $_SESSION['LAST_ALLOWED_URI']);
@@ -546,10 +546,10 @@ class Web {
             $this->Log->info("Redirecting to login, user not logged in or not allowed");
             $this->redirect($this->localUrl($this->_loginpath));
         }
-        // Saving the last allowed uri so we can
+        // Saving the last allowed path so we can
         // redirect to it from a failed call
         if (!$this->isAjax()) {
-            $_SESSION['LAST_ALLOWED_URI'] = $_SERVER['REQUEST_URI'];
+            $_SESSION['LAST_ALLOWED_URI'] = $actual_path;
         }
         return true;
     }
@@ -1523,10 +1523,42 @@ class Web {
     	$paths['action']=null;
     	if (!empty($split)) {
     		$paths['action'] = array_shift($split);
-    	}   	    
+    	} 
+
+    	if (empty($paths['action'])) {
+    		$paths['action']=$this->_defaultAction;
+    	}
 
     	$paths['tail'] = $split;
     	return $paths;
+    }
+    
+	/**
+	 * Test whether a url contains the passed values for
+	 * module, submodule and action
+	 * 
+	 * Passing "*" to module, submodule or action allows any.
+	 * 
+	 * @param string $url
+	 * @param string $module 
+	 * @param string $submodule
+	 * @param string $action
+	 */
+    function checkUrl($url,$module,$submodule,$action) {
+    	$p=$this->parseUrl($url);
+    	if (empty($p) || empty($module)) {
+    		return false;
+    	}
+    	if ($action != $p['action'] && $action != "*") {
+    		return false;
+    	}
+       	if ($submodule != $p['submodule'] && $submodule != "*") {
+    		return false;
+    	}
+        if ($module != $p['module'] && $module != "*") {
+    		return false;
+    	}
+    	return true;
     }
 }
 
