@@ -25,6 +25,8 @@ class TaskService extends DbService {
         $taskgroup_details["statuses"] = array_unique($this->flattenTaskGroupArray($taskgroup_details["statuses"]));
         $taskgroup_details["priorities"] = array_unique($this->flattenTaskGroupArray($taskgroup_details["priorities"]));
 //        $taskgroup_details["types"] = array_unique($taskgroup_details["types"]);
+        $taskgroup_details["members"] = array_unique_multidimensional($taskgroup_details["members"]);
+        
         return $taskgroup_details;
     }
     

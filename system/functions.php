@@ -1,4 +1,18 @@
 <?php
+/**
+ * deduplicates arrays of arrays, something that array_unique can't do.
+ * 
+ * Thanks to http://stackoverflow.com/a/308955/1082633
+ * 
+ * @param unknown $input
+ * @return multitype:
+ */
+function array_unique_multidimensional($input)
+{
+	$serialized = array_map('serialize', $input);
+	$unique = array_unique($serialized);
+	return array_intersect_key($input, $unique);
+}
 
 function humanReadableBytes($input, $rounding = 2, $bytesValue = true) {
     $ext = array("B", "KB", "MB", "GB", "TB");
@@ -44,8 +58,9 @@ function getFileExtension($contentType) {
     return '.' . array_pop($pieces);
 }
 
-// Small helper function to test for isset and is_numeric
-// wihtout having to write
+/** Small helper function to test for isset and is_numeric
+ * wihtout having to write
+ */
 function isNumber($var) {
     if (!isset($var))
         return false;
