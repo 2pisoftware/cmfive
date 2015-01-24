@@ -153,7 +153,7 @@ function viewtask_GET(Web &$w) {
 		$totseconds = 0;
 
 		// set headings
-		$line = array(array("Assignee", "Created By", "Start", "End", "Period (hours)", ""));
+		$line = array(array("Assignee", "Start", "End", "Period (hours)", "Comment", ""));
 		// if log exists, display ...
 		if ($timelog) {
 			// for each entry display, calculate period and display total time on task
@@ -183,6 +183,7 @@ function viewtask_GET(Web &$w) {
 				formatDateTime($log->dt_start),
 				formatDateTime($log->dt_end),
 				$period,
+				!empty($w->Comment->getComment($log->comment_id)) ? $w->Comment->getComment($log->comment_id)->comment:"",					
 				$bedit .
 								 
 				Html::b($w->localUrl("/task/deletetime/".$task->id."/".$log->id)," Delete ","Are you sure you wish to DELETE this Time Log Entry?") .

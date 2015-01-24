@@ -65,7 +65,7 @@ class TaskService extends DbService {
         if ($a->dt_start == $b->dt_start) {
             return 0;
         }
-        return ($a->dt_start < $b->dt_start) ? +1 : -1;
+        return ($a->dt_start > $b->dt_start) ? +1 : -1;
     }
 
     // function to sort task group list by task type

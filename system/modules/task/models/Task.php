@@ -237,8 +237,9 @@ class Task extends DbObject {
     function getTimeLog() {
         $timelog = $this->getTimeLogEntries($this->id);
 
-        if ($timelog)
+        if ($timelog) {
             usort($timelog, array("TaskService", "sortByStarted"));
+        }
 
         return $timelog;
     }

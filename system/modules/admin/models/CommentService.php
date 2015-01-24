@@ -30,7 +30,7 @@ class CommentService extends DbService {
     	require_once 'creole/creole.php';
     	$creole = new creole();
     	$options = null;
-    	return $creole->parse($text);
+    	return $creole->parse(strip_tags($text));
     }
 
 }

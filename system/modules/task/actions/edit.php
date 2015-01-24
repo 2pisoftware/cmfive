@@ -68,7 +68,7 @@ function edit_GET($w) {
     $timelog = $task->getTimeLog();
     $total_seconds = 0;
     
-    $table_header = array("Assignee", "Created By", "Start", "End", "Period (hours)", "Actions");
+    $table_header = array("Assignee", "Start", "Period (hours)", "Comment","Actions");
     $table_data = array();
     if (!empty($timelog)) {
         // for each entry display, calculate period and display total time on task
@@ -76,13 +76,13 @@ function edit_GET($w) {
             // get time difference, start to end
             $seconds = $log->dt_end - $log->dt_start;
             $period = $w->Task->getFormatPeriod($seconds);
-
+			$comment = $w->Comment->getComment($log->comment_id);
+			$comment = !empty($comment) ? $comment->comment : "";
             $table_row = array(
                 $w->Task->getUserById($log->user_id),
-                $w->Task->getUserById($log->creator_id),
                 formatDateTime($log->dt_start),
-                formatDateTime($log->dt_end),
-                $period
+                $period,
+            	!empty($comment) ? $w->Comment->renderComment($comment) : "",
             );
             
             // Build list of buttons
@@ -97,12 +97,12 @@ function edit_GET($w) {
             }
             
             $buttons .= Html::b($w->localUrl("/task/deletetime/".$task->id."/".$log->id), "Delete", "Are you sure you wish to DELETE this Time Log Entry?");
-            $buttons .= Html::box($w->localUrl("/task/popComment/".$task->id."/".$log->comment_id)," Comment ",true);
+            
             $table_row[] = $buttons;
             
             $table_data[] = $table_row;
         }
-        $table_data[] = array("","","","<b>Total</b>", "<b>".$w->Task->getFormatPeriod($total_seconds)."</b>","");
+        $table_data[] = array("<b>Total</b>", "","<b>".$w->Task->getFormatPeriod($total_seconds)."</b>","","");
     }
     // display the task time log
     $w->ctx("timelog",Html::table($table_data, null, "tablesorter", $table_header));
