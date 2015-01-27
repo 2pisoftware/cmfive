@@ -561,3 +561,23 @@ function getBetween($content, $start, $end){
     }
     return '';
 }
+
+/**
+ * Returns true if array is associative, i.e. at least one key index is a string type
+ * http://stackoverflow.com/questions/173400/how-to-check-if-php-array-is-associative-or-sequential/4254008#4254008
+ * 
+ * @param <Array> $array
+ * @return <Boolean>
+ */
+function is_associative_array($array) {
+    return (bool) count(array_filter(array_keys($array), 'is_string'));
+}
+
+/**
+ * Similar to above, except it checks that ALL keys are strings
+ * @param <Array> $array
+ * @return <Boolean>
+ */
+function is_complete_associative_array($array) {
+    return (bool) (count(array_filter(array_keys($array), 'is_string')) == count($array));
+}

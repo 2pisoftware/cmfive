@@ -24,7 +24,7 @@ function forgotpassword_POST(Web $w) {
 	
 	// Generate password reset token 
 	// We can use the cstrong to check that a cryptographically secure token was generated
-	$token = sha1(openssl_random_pseudo_bytes(32, $cstrong));
+	$token = sha1(openssl_random_pseudo_bytes(40, $cstrong));
 	$user->password_reset_token = $token;
 	$user->dt_password_reset_at = $user->time2Dt();
 	$user->update();

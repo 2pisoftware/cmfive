@@ -54,7 +54,7 @@ class AuthService extends DbService {
     }
 
     function getUserForToken($token) {
-        return $this->getObject("User", array("password_reset_token", $token));
+        return $this->getObject("User", array("password_reset_token" => $token));
     }
 
     function setRestUser($user) {
