@@ -25,5 +25,5 @@ function editmember_POST(Web &$w) {
 	$member->fill($_REQUEST);
 	$member->update();
 
-	$w->msg("Member updated","/report/viewreport/".$_POST['report_id']."?tab=2");
+	$w->msg("Member updated","/report/edit/".$_POST['report_id']."#members");
 }

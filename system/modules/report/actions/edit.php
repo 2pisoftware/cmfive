@@ -36,7 +36,7 @@ function edit_GET(Web &$w) {
         array("Site URL", "static", "webroot", "{{webroot}}"),
         array("View Database", "section"),
         array("Tables", "select", "dbtables", null, $w->Report->getAllDBTables()),
-        array(" ", "static", "dbfields", "<span id=dbfields></span>")
+        array("Fields", "static", "dbfields", "<span id=\"dbfields\"></span>")
     ));
     
     $w->ctx("dbform", $db_table);
@@ -65,13 +65,13 @@ function edit_GET(Web &$w) {
     }
     
     $w->ctx("report_form", Html::form($form, $w->localUrl("/report/edit/{$report->id}"), "POST", "Save Report"));
-    
-    // Members tab
-    // generate only when editing a report
-    
+       
     if (!empty($report->id)) {
-        // return list of members of given report
+    	
+    	// ============= Members tab ===================
+
         $members = $w->Report->getReportMembers($report->id);
+        
         // set columns headings for display of members
         $line[] = array("Member","Role","");
 
@@ -92,6 +92,31 @@ function edit_GET(Web &$w) {
 
         // display list of group members
         $w->ctx("viewmembers",Html::table($line,null,"tablesorter",true));
+
+        // =========== template tab ======================
+        
+        $report_templates = $report->getTemplates();
+        
+        // Build table
+        $table_header = array("Title", "Category", "Type", "Actions");
+        $table_data = array();
+        
+        if (!empty($report_templates)) {
+        
+        	// Add data to table layout
+        	foreach($report_templates as $report_template) {
+        		$template = $report_template->getTemplate();
+        		$table_data[] = array(
+        				$template->title,
+        				$template->category,
+        				$report_template->type,
+        				Html::box("/report-templates/edit/{$report->id}/{$report_template->id}", "Edit", true) .
+        				Html::b("/report-templates/delete/{$report_template->id}", "Delete", "Are you sure you want to delete this Report template entry?")
+        		);
+        	}
+        }
+        // Render table
+        $w->ctx("templates_table", Html::table($table_data, null, "tablesorter", $table_header));        
     }
 }
 
@@ -151,7 +176,7 @@ function edit_POST(Web $w) {
         
         
         // OLD CODE - REDUNDANT, KEEPING FOR FEED REFERENCE
-        
+/*        
         
 	if (!array_key_exists("is_approved",$_REQUEST))
 	$_REQUEST['is_approved'] = 0;
@@ -202,4 +227,6 @@ function edit_POST(Web $w) {
 
 	// return
 	$w->msg($repmsg,"/report/viewreport/".$rep->id);
+	
+*/
 }

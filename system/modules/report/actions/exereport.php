@@ -11,21 +11,17 @@ function exereport_ALL(Web &$w) {
         $arrreq[] = $name . "=" . urlencode($value);
     }
 
-    $viewurl = "/report/viewreport/" . $p['id'];
+    $viewurl = "/report/edit/" . $p['id'];
     $runurl = "/report/runreport/" . $p['id'] . "/?" . implode("&", $arrreq);
     $repurl = "/report/exereport/" . $p['id'] . "?";
     $strREQ = $arrreq ? implode("&", $arrreq) : "";
     $urlcsv = $repurl . $strREQ . "&format=csv";
-    $urlpdf = $repurl . $strREQ . "&format=pdf";
-    $urlxml = $repurl . $strREQ . "&format=xml";
     $btncsv = Html::b($urlcsv, "Export as CSV");
-    $btnpdf = Html::b($urlpdf, "Export as PDF");
-    $btnxml = Html::b($urlxml, "Export as XML");
     $btnrun = Html::b($runurl, "Edit Report Parameters");
     $btnview = Html::b($viewurl, "Edit Report");
     $results = "";
     // if there is a report ID in the URL ...
-    if ($p['id']) {
+    if (!empty($p['id'])) {
         // get member
         $member = $w->Report->getReportMember($p['id'], $w->session('user_id'));
 
@@ -33,9 +29,9 @@ function exereport_ALL(Web &$w) {
         $rep = $w->Report->getReportInfo($p['id']);
 
         // if report exists, execute it
-        if ($rep) {
+        if (!empty($rep)) {
             $w->Report->navigation($w, $rep->title);
-
+			History::add("Run: ".$rep->title);
             // prepare and execute the report
             $tbl = $rep->getReportData();
 
@@ -174,14 +170,12 @@ function exereport_ALL(Web &$w) {
                     }
 
                     // display export and function buttons
-//                    $w->ctx("exportxml", $btnxml);
-//                    $w->ctx("exportcsv", $btncsv);
-//                    $w->ctx("exportpdf", $btnpdf);
+                    $w->ctx("exportcsv", $btncsv);
                     $w->ctx("btnrun", $btnrun);
                     $w->ctx("showreport", $results);
 
                     // allow editor/admin to edit the report
-                    if ((!empty($member->role) && $member->role == "EDITOR") || ($w->Auth->user()->hasRole("report_admin"))) {
+                    if ((!empty($member->role) && $member->role == "EDITOR") || ($w->Auth->hasRole("report_admin"))) {
                         $w->ctx("btnview", $btnview);
                     }
                 }
