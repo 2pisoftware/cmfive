@@ -290,11 +290,11 @@ class DbObject extends DbService {
      */
     function readConvert($k,$v) {
     	if (strpos($k, "dt_") === 0) {
-    		if ($v) {
+    		if (!empty($v)) {
     			return $this->dt2Time($v);
     		}
     	} else if (strpos($k, "d_") === 0) {
-    		if ($v) {
+    		if (!empty($v)) {
     			return $this->d2Time($v);
     		}
     	}
@@ -1102,19 +1102,19 @@ class DbObject extends DbService {
     	if (strpos($k, "dt_") === 0) {
     		if (!empty($v)) {
     			return $this->time2Dt($v);
-    		}
+    		} else return null;
     	} else if (strpos($k, "d_") === 0) {
     		if (!empty($v)) {
     			return $this->time2D($v);
-    		}
+    		} else return null;
     	} else if (strpos($k, "t_") === 0) {
     		if (!empty($v)) {
     			return $this->time2T($v);
-    		}
+    		} else return null;
     	} else if (strpos($k, "s_") === 0) {
     		if (!empty($v)) {
     			return AESencrypt($v, $this->__password);
-    		}
+    		} 
     	}
     	return $v;
     }
