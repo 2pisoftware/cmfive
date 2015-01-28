@@ -532,7 +532,7 @@ class ReportService extends DbService {
     }
 
     // function to check syntax of report SQL statememnt
-    function getcheckSQL($sql, $connection = null) {
+    function getcheckSQL($sql, PDO $connection = null) {
         // checking for rows will return false if no data is returned, even if SQL is ok
         // so let's just run the statement and try to catch any exceptions otherwise SQL runs ok
         try {
@@ -540,12 +540,11 @@ class ReportService extends DbService {
                 $this->startTransaction();
                 $rows = $this->getExefromSQL($sql);
                 $this->rollbackTransaction();
-
                 return true;
             } else {
-                $connection->query("START TRANSACTION")->execute();
+                $connection->beginTransaction();
                 $rows = $connection->query($sql)->execute();
-                $connection->query("ROLLBACK")->execute();
+                $connection->rollBack();
                 return true;
             }
         } catch (Exception $e) {
@@ -553,11 +552,9 @@ class ReportService extends DbService {
             // SQL returns errors so clean up and return false
             if (empty($connection)) {
                 $this->rollbackTransaction();
-                $this->_db->clear_sql();
                 return false;
             } else {
-                $connection->query("ROLLBACK")->execute();
-                // $connection->clear_sql();
+                $connection->rollBack();
                 return false;
             }
         }

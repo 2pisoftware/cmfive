@@ -34,9 +34,10 @@
     });
 
     var report_url = "/report/taskAjaxSelectbyTable?id=";
-    $("select[id='dbtables'] option").click(function() {
+    $("#dbtables").change(function() {
+    	var field = $("#dbtables option:selected").val();
         $.getJSON(
-                report_url + $(this).val(),
+                report_url + field,
                 function(result) {
                     $('#dbfields').html(result);
                 }

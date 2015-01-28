@@ -28,5 +28,5 @@ function edit_POST(Web $w) {
     $report_template->fill($_POST);
     $response = $report_template->insertOrUpdate();
     
-    $w->msg("Report template " . (!empty($p['id']) ? "updated" : "created"), "/report/viewreport/{$report_template->report_id}");
+    $w->msg("Report template " . (!empty($p['id']) ? "updated" : "created"), "/report/edit/{$report_template->report_id}#templates");
 }

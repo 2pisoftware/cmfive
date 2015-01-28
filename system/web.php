@@ -1008,12 +1008,15 @@ class Web {
         // Build _hook registry if empty
         if (empty($this->_hooks)) {
             foreach ($this->modules() as $modulename) {
-                $hooks = Config::get("{$modulename}.hooks");
-                if (!empty($hooks)) {
-                    foreach ($hooks as $hook) {
-                        $this->_hooks[$hook][] = $modulename;
-                    }
-                }
+            	// only include active modules!
+            	if (Config::get("$modulename.active") !== false) {
+	                $hooks = Config::get("{$modulename}.hooks");
+	                if (!empty($hooks)) {
+	                    foreach ($hooks as $hook) {
+	                        $this->_hooks[$hook][] = $modulename;
+	                    }
+	                }
+            	}
             }
         }
         

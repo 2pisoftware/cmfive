@@ -36,6 +36,6 @@ function deletemember_POST(Web &$w) {
 	}
 	else {
 		// if member somehow no longer exists, say as much
-		$w->msg("Member no longer exists?","/report/viewreport/".$p['report_id']."?tab=2");
+		$w->msg("Member no longer exists?","/report/edit/".$p['report_id']."?tab=2");
 	}
 }
