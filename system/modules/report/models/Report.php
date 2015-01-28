@@ -239,7 +239,6 @@ class Report extends DbObject {
                                     } catch (Exception $e) {
                                         // SQL returns errors so clean up and return error
                                         $this->rollbackTransaction();
-                                        $this->_db->clear_sql();
                                         $line = array(array("ERROR", "A SQL error was encountered: " . $e->getMessage()));
                                     }
                                     $tbl = array_merge($crumbs, $title, $hds, $line);

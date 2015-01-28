@@ -14,6 +14,8 @@ class DbPDO extends PDO {
     public $sql = null;
     public $total_results = 0;
     
+    private static $trx_token = 0;
+    
     private $config;
     
     public function __construct($config = array()) {
@@ -294,4 +296,58 @@ class DbPDO extends PDO {
         }
         return null;
     }
+    
+    /**
+     * Start a transaction
+     */
+    public function startTransaction() {
+    	// start if there is no current transaction
+    	if (self::$trx_token == 0) {
+    		$this->beginTransaction();
+    	}
+    	// raise the transaction counter by one
+    	self::$trx_token++;
+    }
+    
+    /**
+     * Commit a transaction
+     */
+    public function commitTransaction() {
+    	// only do anything if there is an active transaction
+    	if (self::$trx_token == 0) {
+    		return;
+    	}
+    	// only the first transaction will be committed
+    	if (self::$trx_token == 1) {
+	    	$this->commit();
+    	}
+    	// decrease the transaction counter
+    	self::$trx_token--;
+    }
+    
+    /**
+     * Rollback a transaction!
+     * This includes a clear_sql()!
+     * 
+     * A transaction can be rolled back any time ..
+     */
+    public function rollbackTransaction() {
+        // only do anything if there is an active transaction
+    	if (self::$trx_token == 0) {
+    		return;
+    	}
+    	$this->clear_sql();
+    	$this->rollBack();
+    	self::$trx_token = 0;
+	}    
+	
+	/**
+	 * Returns true if there is an active transaction
+	 * 
+	 * @return boolean
+	 */
+	public function activeTransaction() {
+		return self::$trx_token > 0;
+	} 
+    
 }

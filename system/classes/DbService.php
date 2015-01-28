@@ -264,38 +264,30 @@ class DbService {
 
     /**
      * Start a transaction
-     *
      */
-    function startTransaction() {
-        $this->_db->sql("START TRANSACTION")->execute();
-        self::$_active_trx = true;
+    public function startTransaction() {
+        $this->_db->startTransaction();
     }
 
     /**
      * Commit a transaction
-     *
      */
-    function commitTransaction() {
-        $this->_db->sql("COMMIT")->execute();
-        self::$_active_trx = false;
+    public function commitTransaction($trx) {
+        $this->_db->commitTransaction($trx);
     }
 
     /**
      * Rollback a transaction!
-     * This includes a clear_sql()!
      */
-    function rollbackTransaction() {
-        $this->_db->clear_sql();
-        $this->_db->sql("ROLLBACK")->execute();
-        self::$_active_trx = false;
+    public function rollbackTransaction() {
+        $this->_db->rollbackTransaction();
     }
 
     /**
      * Returns true if a transaction is currently active!
-     *
      */
-    function isActiveTransaction() {
-        return self::$_active_trx;
+    public function isActiveTransaction() {
+        return $this->_db->activeTransaction();
     }
 
     function lookupArray($type) {
