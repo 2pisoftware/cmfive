@@ -33,14 +33,26 @@ class MailService extends DbService {
 
         $mailer = Swift_Mailer::newInstance($this->transport);
 
+        // To, cc, bcc need to be given as arrays when sending to more than one person
+        // Ie you separate them by a comma, this will split them into arrays as expected by Swift
+        if (strpos($to, ",") !== FALSE) {
+            $to = array_map("trim", explode(',', $to));
+        }
+        
         // Create message
         $message = Swift_Message::newInstance($subject)
                         ->setFrom($from)->setTo($to)
                         ->setBody($body)->addPart($body, 'text/html');
         if (!empty($cc)) {
+            if (strpos($cc, ",") !== FALSE) {
+                $cc = array_map("trim", explode(',', $cc));
+            }
             $message->setCc($cc);
         }
         if (!empty($bcc)) {
+            if (strpos($bcc, ",") !== FALSE) {
+                $bcc = array_map("trim", explode(',', $bcc));
+            }
             $message->setBcc($bcc);
         }
 
