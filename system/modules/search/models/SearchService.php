@@ -26,7 +26,7 @@ class SearchService extends DbService {
 			$sql = "DELETE FROM object_index WHERE class_name = '{$index}'";
 			$this->_db->sql ( $sql )->execute ();
 			
-			$objects = $this->getObjects ( $index, array ("is_deleted",0) );
+			$objects = $this->getObjects ( $index, array ("is_deleted" => 0) );
 			if (! empty ( $objects )) {
 				foreach ( $objects as $object ) {
 					$object->_searchable->insert ();
@@ -41,7 +41,7 @@ class SearchService extends DbService {
 		
 		// go over each index and reindex
 		foreach ( $this->getIndexes () as $index ) {
-			$objects = $this->getObjects ( $index, array ("is_deleted",0 ) );
+			$objects = $this->getObjects ( $index, array ("is_deleted" => 0 ) );
 			if (! empty ( $objects )) {
 				foreach ( $objects as $object ) {
 					$object->_searchable->insert ();
