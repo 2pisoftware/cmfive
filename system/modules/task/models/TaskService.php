@@ -29,6 +29,22 @@ class TaskService extends DbService {
         
         return $taskgroup_details;
     }
+
+    public function getTaskGroupDetailsForTaskGroup($taskgroup_id) {
+    	$taskgroup = $this->Task->getTaskGroup($taskgroup_id);
+    
+    	$taskgroup_details = array("taskgroups" => array(), "statuses" => array(), "priorities" => array(), "members" => array(), "types" => array());
+    	if (!empty($taskgroup)) {
+    			$taskgroup_details["taskgroups"][] = $taskgroup;
+    			$taskgroup_details["statuses"] = $taskgroup->getStatus();
+    			$taskgroup_details["priorities"] = $taskgroup->getPriority();
+    			$taskgroup_details["members"] = $this->getMembersInGroup($taskgroup->id);
+    			$task_type_array = $taskgroup->getTaskGroupTypeObject()->getTaskTypeArray();
+    			$taskgroup_details["types"][key($task_type_array)] = array($task_type_array[key($task_type_array)], key($task_type_array));
+    	}
+    
+    	return $taskgroup_details;
+    }
     
     public function flattenTaskGroupArray($statuses) {
         $result_array = array();

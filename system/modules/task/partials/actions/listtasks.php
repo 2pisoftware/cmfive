@@ -3,8 +3,10 @@
 function listtasks_ALL(Web $w, $params = array()) {
     $w->ctx("redirect", $params['redirect']);
     
+    $taskgroup = null;
     if (!empty($params['task_group_id'])) {
         $task_group_id = $params['task_group_id'];
+        $taskgroup = $w->Task->getTaskGroup($task_group_id);
     }
     
     if (!empty($params['task_status'])) {
@@ -18,9 +20,11 @@ function listtasks_ALL(Web $w, $params = array()) {
         $assignee_id = $w->request("assignee_id");
         $creator_id = $w->request("creator_id");
 
-        $request_task_group_id = $w->request("task_group_id");
-        if (!empty($request_task_group_id)) {
-            $task_group_id = $request_task_group_id;
+        if (empty($taskgroup)) {
+	        $request_task_group_id = $w->request("task_group_id");
+	        if (!empty($request_task_group_id)) {
+	            $task_group_id = $request_task_group_id;
+	        }
         }
         
         $task_type = $w->request('task_type');
@@ -83,16 +87,26 @@ function listtasks_ALL(Web $w, $params = array()) {
     $w->ctx("tasks", $task_objects);
     
     // Build the filter and its data
-    $taskgroup_data = $w->Task->getTaskGroupDetailsForUser();
-    $filter_data = array(
-        array("Assignee", "select", "assignee_id", !empty($assignee_id) ? $assignee_id : null, $taskgroup_data["members"]),
-        array("Creator", "select", "creator_id", !empty($creator_id) ? $creator_id : null, $taskgroup_data["members"]),
-        array("Task Group", "select", "task_group_id", !empty($task_group_id) ? $task_group_id : null, $taskgroup_data["taskgroups"]),
-        array("Task Type", "select", "task_type", !empty($task_type) ? $task_type : null, $taskgroup_data["types"]),
-        array("Task Priority", "select", "task_priority", !empty($task_priority) ? $task_priority : null, $taskgroup_data["priorities"]),
-        array("Task Status", "select", "task_status", !empty($task_status) ? $task_status : null, $taskgroup_data["statuses"]),
-        array("Closed", "checkbox", "is_closed", !empty($is_closed) ? $is_closed : null)
-    );
+    $taskgroup_data = null;
+    if (empty($taskgroup)) {
+    	$taskgroup_data = $w->Task->getTaskGroupDetailsForUser();
+    } else {
+    	$taskgroup_data = $w->Task->getTaskGroupDetailsForTaskGroup($task_group_id);
+    }
+    $filter_data = array();
+    $filter_data[] = array("Assignee", "select", "assignee_id", !empty($assignee_id) ? $assignee_id : null, $taskgroup_data["members"]);
+    $filter_data[] = array("Creator", "select", "creator_id", !empty($creator_id) ? $creator_id : null, $taskgroup_data["members"]);
+    
+    if (empty($taskgroup)) {
+    	$filter_data[] = array("Task Group", "select", "task_group_id", !empty($task_group_id) ? $task_group_id : null, $taskgroup_data["taskgroups"]);
+    } else {
+    	$filter_data[] = array("Task Group", "static", "taskgroupname", $taskgroup->title);
+    	$filter_data[] = array("", "hidden", "task_group_id", !empty($task_group_id) ? $task_group_id : null);
+    }
+    $filter_data[] = array("Task Type", "select", "task_type", !empty($task_type) ? $task_type : null, $taskgroup_data["types"]);
+    $filter_data[] = array("Task Priority", "select", "task_priority", !empty($task_priority) ? $task_priority : null, $taskgroup_data["priorities"]);
+    $filter_data[] = array("Task Status", "select", "task_status", !empty($task_status) ? $task_status : null, $taskgroup_data["statuses"]);
+    $filter_data[] = array("Closed", "checkbox", "is_closed", !empty($is_closed) ? $is_closed : null);
     
     $w->ctx("filter_data", $filter_data);
     
@@ -130,9 +144,9 @@ function listtasks_ALL(Web $w, $params = array()) {
                 $line[] = array(
                     $title,
                     ucfirst($role),
-                    $value_array[$role]["creator"],
-                    $value_array[$role]["assignee"],
-                    $value_array[$role]["other"],
+                    !empty($value_array[$role]["creator"]) ? $value_array[$role]["creator"] : null,
+                    !empty($value_array[$role]["assignee"]) ? $value_array[$role]["assignee"] : null,
+                    !empty($value_array[$role]["other"]) ? $value_array[$role]["other"] : null,
                     Html::box(WEBROOT . "/task/updateusergroupnotify/" . $member->task_group_id, " Edit ", true)
                 );
             }
