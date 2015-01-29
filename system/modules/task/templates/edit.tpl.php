@@ -68,30 +68,31 @@
 
     $(document).ready(function() {
         bindTypeChangeEvent();
-        $("select[id='task_group_id']").trigger("change");
         $("#task_type").trigger("change");
     });
     
-    $("select[id='task_group_id']").on("change", function() {
-        $("#formfields").hide().html("");
-        $("#tasktext").hide().html("");
+    function selectAutocompleteCallback(event, ui) {
+    	if (event.target.id == "acp_task_group_id") {
+            $("#formfields").hide().html("");
+        	$("#tasktext").hide().html("");
         
-        $.getJSON("/task/taskAjaxSelectbyTaskGroup/" + $(this).val() + "/<?php echo !empty($task->id) ? $task->id : null; ?>",
-            function(result) {
-                if (initialChange) {
-                    $('#task_type').parent().html(result[0]);
-                    $('#priority').parent().html(result[1]);
-                    $('#assignee_id').parent().html(result[2]);
-                    $('#status').html(result[4])
-                }
-                initialChange = true;
-                $('#tasktext').html(result[3]);
-                $("#tasktext").fadeIn();
-                
-                bindTypeChangeEvent();  
-            }
-        );
-    });
+	        $.getJSON("/task/taskAjaxSelectbyTaskGroup/" + ui.item.id + "/<?php echo !empty($task->id) ? $task->id : null; ?>",
+	            function(result) {
+	                if (initialChange) {
+	                    $('#task_type').parent().html(result[0]);
+	                    $('#priority').parent().html(result[1]);
+	                    $('#assignee_id').parent().html(result[2]);
+	                    $('#status').html(result[4])
+	                }
+	                initialChange = true;
+	                $('#tasktext').html(result[3]);
+	                $("#tasktext").fadeIn();
+	                
+	                bindTypeChangeEvent();  
+	            }
+	        );
+    	}
+    }
     
     function bindTypeChangeEvent() {
         $("#task_type").on("change", function(event) {
