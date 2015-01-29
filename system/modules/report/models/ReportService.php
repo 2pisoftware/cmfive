@@ -140,18 +140,24 @@ class ReportService extends DbService {
             }
         }
         // list of IDs to check for report membership, my ID and my group IDs
-//        $id = implode(",", $myid);
+        $theid = implode(",", $myid);
         
-        $results = $this->_db->get("report_member")->select("report.*")
-                    ->leftJoin("report on report_member.report_id = report.id")
+        // the sql statement below return duplicate reports if they have multiple members
+        
+        /*
+        $results = $this->_db->get("report")->select("report.*")
+                    ->leftJoin("report_member on report_member.report_id = report.id")
                     ->where("report_member.user_id", $myid)->where($where)
                     ->where("report.is_deleted", 0)->where("report_member.is_deleted", 0)
                     ->order_by("report.is_approved desc, report.title")->fetch_all();
+        */
         
-//        $rows = $this->_db->sql("SELECT distinct r.* from " . ReportMember::$_db_table . " as m inner join " . 
-//                Report::$_db_table . " as r on m.report_id = r.id where m.user_id in (" . $id . ") " . $where . 
-//                " order by r.is_approved desc,r.title")->fetch_all();
-        return $this->fillObjects("Report", $results);
+        // this sql below statement may not be as nifty as the above .. but it works!
+        
+        $rows = $this->_db->sql("SELECT distinct r.* from " . ReportMember::$_db_table . " as m inner join " . 
+                Report::$_db_table . " as r on m.report_id = r.id where m.user_id in (" . $theid . ") " . $where . 
+                " order by r.is_approved desc,r.title")->fetch_all();
+        return $this->fillObjects("Report", $rows);
     }
 
     // return list of APPROVED and NOT DELETED report IDs for a given a user ID as member

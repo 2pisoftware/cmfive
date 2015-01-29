@@ -18,9 +18,10 @@ function index_ALL(Web &$w) {
     $module = $w->request("module");
     $reset = $w->request("reset");
     
+    $where = '';
     if (empty($reset)){
         if (!empty($module)) {
-            $where['report.module'] = $module;
+			$where .= " and r.module = " . $w->_db->quote($module);        	
             $w->ctx("reqModule", $module);
         }
     }
