@@ -82,12 +82,10 @@ class AuthService extends DbService {
     }
 
     function allowed($path, $url = null) {
-        $p = explode("/", $path);
-        $module = $p[0];
-        $hsplit = explode("-", $module);
-        $module = array_shift($hsplit);
-        if (!in_array($module, $this->w->modules())) {
-            $this->Log->error("Denied access: module '". urlencode($module). "' doesn't exist");
+
+        $parts = $this->w->parseUrl($path);
+        if (!in_array($parts['module'], $this->w->modules())) {
+            $this->Log->error("Denied access: module '". urlencode($parts['module']). "' doesn't exist");
             return false;
         }
 
