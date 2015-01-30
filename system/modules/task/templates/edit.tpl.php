@@ -146,8 +146,8 @@
                 'edit': edit_form, 
                 'extra': extras_form
             },
-            complete: function() {
-               window.location.reload(); 
+            complete: function(response) {
+                window.location.href = "/task/edit/" + response.responseText;
             }
         });
         return false;

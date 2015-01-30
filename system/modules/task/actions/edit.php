@@ -172,6 +172,10 @@ function edit_POST($w) {
     
     $task->insertOrUpdate();
     
+    // Tell the template what the task id is (this post action is being called via ajax)
+    $w->setLayout(null);
+    $w->out($task->id);
+    
     // Get existing task_data objects for this task and update them
     $existing_task_data = $w->Task->getTaskData($task->id);
     if (!empty($existing_task_data)) {
@@ -209,5 +213,4 @@ function edit_POST($w) {
         }
     }
     
-    $w->msg("Task " . (!empty($p['id']) ? "updated" : "created"), "/task/edit/{$task->id}");
 }
