@@ -1,4 +1,4 @@
-<?php echo $w->partial("listtaskgroups", array("taskgroups" => $taskgroups, "redirect" => "/tasks"), "task"); ?>
+<?php echo $w->partial("listtaskgroups", array("taskgroups" => $taskgroups, "redirect" => "/tasks", "should_filter" => true), "task"); ?>
     
 <script language="javascript">
 
