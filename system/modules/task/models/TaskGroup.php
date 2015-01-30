@@ -42,8 +42,9 @@ class TaskGroup extends DbObject {
         }
         
         $me = $this->w->Task->getMemberGroupById($this->id, $this->w->Auth->user()->id);
-        if (empty($me))
+        if (empty($me)) {
             return false;
+        }
         return ($this->can_view == "ALL") ? true : $this->w->Task->getMyPerms($me->role, $this->can_view);
     }
 
@@ -54,8 +55,9 @@ class TaskGroup extends DbObject {
         }
         
         $me = $this->w->Task->getMemberGroupById($this->id, $this->w->Auth->user()->id);
-        if (empty($me))
+        if (empty($me)) {
             return false;
+        }
         return ($this->can_create == "ALL") ? true : $this->w->Task->getMyPerms($me->role, $this->can_create);
     }
 
@@ -66,8 +68,9 @@ class TaskGroup extends DbObject {
         }
         
         $me = $this->w->Task->getMemberGroupById($this->id, $this->w->Auth->user()->id);
-        if (empty($me))
+        if (empty($me)) {
             return false;
+        }
         return ($this->can_assign == "ALL") ? true : $this->w->Task->getMyPerms($me->role, $this->can_assign);
     }
 

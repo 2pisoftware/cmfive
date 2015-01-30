@@ -96,14 +96,23 @@ class Task extends DbObject {
 
     // get my membership object and compare my role with that required to view tasks given a task group ID
     function getCanIView() {
-        if ($this->w->Auth->user()->is_admin == 1) {
+        $loggedin_user = $this->w->Auth->user();
+        if ($loggedin_user->is_admin == 1) {
             return true;
         }
 
-        $me = $this->w->Task->getMemberGroupById($this->task_group_id, $this->w->Auth->user()->id);
+        $me = $this->w->Task->getMemberGroupById($this->task_group_id, $loggedin_user->id);
         $group = $this->w->Task->getTaskGroup($this->task_group_id);
-
-        return ($this->w->Auth->user()->id == $this->getTaskCreatorId()) ? true : $this->w->Task->getMyPerms($me->role, $group->can_view);
+        
+        if ($loggedin_user->id == $this->assignee_id) {
+            return true;
+        }
+        
+        if ($loggedin_user->id == $this->getTaskCreatorId()) {
+            return true;
+        }
+        
+        return $this->w->Task->getMyPerms($me->role, $group->can_view);
     }
 
     /**

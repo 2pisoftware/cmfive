@@ -26,6 +26,19 @@ class CommentService extends DbService {
         return null;
     }
     
+    /**
+     * An easy way to save a comment against an object
+     * @param <DbObject> $object
+     * @param <String> $message
+     */
+    public function addComment($object, $message) {
+        $comment = new Comment($this->w);
+        $comment->obj_table = $object->getDbTableName();
+        $comment->obj_id = $object->id;
+        $comment->comment = strip_tags($message);
+        $comment->insert();
+    }
+    
     public function renderComment($text) {
     	require_once 'creole/creole.php';
     	$creole = new creole();
