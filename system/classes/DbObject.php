@@ -1003,11 +1003,14 @@ class DbObject extends DbService {
 
                 switch ($rule) {
                     case "required":
-                        if (empty($this->$vr_key)) {
-                            $response["invalid"]["$vr_key"][] = "Required Field";
-                        } else {
-                            $response["valid"][] = $vr_key;
+                        if (!isset($this->$vr_key) || is_null($this->$vr_key)) {
+                            if (!is_numeric($this->$vr_key) && empty($this->$vr_key)) {
+                                $response["invalid"]["$vr_key"][] = "Required Field";
+                                break;
+                            }
                         }
+                        
+                        $response["valid"][] = $vr_key;
                         break;
                     case "number":
                         // $this->$vr_key = filter_var($this->$vr_key, FILTER_SANITIZE_NUMBER_FLOAT);
