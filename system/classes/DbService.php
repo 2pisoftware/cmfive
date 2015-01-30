@@ -272,8 +272,8 @@ class DbService {
     /**
      * Commit a transaction
      */
-    public function commitTransaction($trx) {
-        $this->_db->commitTransaction($trx);
+    public function commitTransaction() {
+        $this->_db->commitTransaction();
     }
 
     /**
