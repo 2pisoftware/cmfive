@@ -93,7 +93,14 @@ class DbPDO extends PDO {
         }
         return $this;
     }
-    
+
+    public function innerJoin($innerJoin){
+    	if ($this->query !== NULL && !empty($innerJoin)){
+    		$this->query = $this->query->innerJoin($innerJoin);
+    	}
+    	return $this;
+    }
+        
     /**
      * This function appends where clauses to the query, the where part of the
      * statement can be reset by passing NULL as the first parameter

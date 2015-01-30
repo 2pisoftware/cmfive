@@ -33,7 +33,7 @@ function index_ALL(Web $w) {
             // if i can create tasks in this group, provide link with group stats
             $newtasklink = "";
             if ($taskgroup->getCanICreate()) {
-                $newtasklink = "&nbsp;&nbsp;<a href=\"/task/createtask/?gid=" . $grpid . "\">Create Task</a>";
+                $newtasklink = "&nbsp;&nbsp;<a href=\"/task/edit/?gid=" . $grpid . "\">Create Task</a>";
             }
 
             $taskweek = "&nbsp;&nbsp;<a href=\"/task/taskweek/?taskgroup=" . $grpid . "\">Group Activity</a>";

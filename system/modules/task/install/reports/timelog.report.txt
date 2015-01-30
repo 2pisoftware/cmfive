@@ -97,7 +97,7 @@ order by tg.title
 select 
 tg.title as 'Task Group',
 t.title as Task,
-concat('{{webroot}}task/viewtask/',t.id) as Task_link,
+concat('{{webroot}}task/edit/',t.id) as Task_link,
 sec_to_time(sum(unix_timestamp(dt_end) - unix_timestamp(dt_start))) 'Hours'
 
 from task_time tt
@@ -135,7 +135,7 @@ select
 concat(c.firstname,' ',c.lastname) as User,
 tg.title as 'Group',
 t.title as Task,
-concat('{{webroot}}task/viewtask/',t.id) as Task_link,
+concat('{{webroot}}task/edit/',t.id) as Task_link,
 dt_start as 'Start Time',
 dt_end as 'End Time',
 sec_to_time(unix_timestamp(dt_end) - unix_timestamp(dt_start)) as 'Hours'
