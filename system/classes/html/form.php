@@ -116,7 +116,7 @@ class form {
         $buffer .= " >";
         
         // Automatically print CSRF token
-        if (class_exists("CSRF")) {
+        if (class_exists("CSRF") && !empty($this->method) && ($this->method == "POST")) {
             $buffer .= "<input type='hidden' name='" . \CSRF::getTokenID() . "' value='" . \CSRF::getTokenValue() . "' />";
         }
         

@@ -134,6 +134,10 @@
     
     // Submit both forms 
     $("#edit_form, #form_fields_form").submit(function() {
+        for(var instanceName in CKEDITOR.instances) {
+            CKEDITOR.instances[instanceName].updateElement();
+        }
+        
         toggleModalLoading();
         var edit_form = {};
         var extras_form = {};
