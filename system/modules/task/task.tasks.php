@@ -128,11 +128,8 @@ class TaskType_ProgrammingTicket extends TaskType {
         if (!empty($task)) {
             $taskdata = $this->w->Task->getTaskData($task->id);
         }
-//        $this->w->Log->info("Task data: " . print_r($taskdata));
-        
 		return array(
             array($this->getTaskTypeTitle(),"section"),
-            array("Module", "select", "module", $this->getTaskDataValueForKey($taskdata, "module"), $this->w->modules()), // getModulesSelect($taskgroup)),
             array("Ticket Type", "select", "b_or_f", $this->getTaskDataValueForKey($taskdata, "b_or_f"), array("Issue","Feature","Task")),
             array("Identifier", "hidden", "ident", $this->getTaskDataValueForKey($taskdata, "ident")),
 		);
@@ -149,7 +146,6 @@ class TaskType_ProgrammingTicket extends TaskType {
         
         foreach($taskdata as $data) {
             if ($data->data_key == $key) {
-//                $this->w->Log->info("Returning {$data->value} for key: {$data->data_key}");
                 return $data->value;
             }
         }
@@ -168,21 +164,7 @@ class TaskType_ProgrammingTicket extends TaskType {
 	 * @see TaskType::on_after_insert()
 	 */
 	function on_after_insert(Task $task) {
-        // What is the point of this?
-//		$modules = $this->getModules($task);
-//		$ident = $modules[$_REQUEST["module"]].sprintf("%03d",$task->id);
-//		$task->setDataValue("ident",$ident);
-//		$task->title = $ident." ".$task->title;
-//		$task->update();
 	}
 	
-	private function getModulesSelect(TaskGroup $taskgroup) {
-		return lookupForSelect($this->w, $taskgroup->title.' Modules');
-	}
-	
-	private function getModules(Task $task) {
-		$taskgroup = $task->getTaskGroup();
-		return $this->w->Auth->lookupArray($taskgroup->title.' Modules');
-	}
 	
 }
