@@ -292,7 +292,10 @@ class Web {
 
         // Check/validate CSRF token 
         $this->validateCSRF();
-        CSRF::regenerate();
+        // Taking out the CSRF regeneration until more testing can be done
+        // if ($this->_requestMethod == 'post') {
+        //     CSRF::regenerate();
+        // }
         
         //
         // if a module file for this url exists, then start processing
@@ -358,8 +361,6 @@ class Web {
                 $body = $this->_buffer;
             }
 
-//            $this->Log->error($body);
-//            die();
             // but always check for layout
             // if ajax call don't do the layout
             if ($this->_layout && !$this->isAjax()) {

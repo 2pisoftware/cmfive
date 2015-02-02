@@ -32,7 +32,7 @@ class CSRF {
      */
     public static function getTokenValue() {
         if(!isset($_SESSION[self::$token_value_name])) { 
-            $_SESSION[self::$token_value_name] = hash('sha256', self::random(64));
+            $_SESSION[self::$token_value_name] = self::random(64);
         }
 
         return $_SESSION[self::$token_value_name];
@@ -82,7 +82,7 @@ class CSRF {
             $get = $_GET; $post = $_POST;
 
             if(isset(${$method}[self::getTokenID()])) {
-                return (${$method}[self::getTokenID()] == self::getTokenValue());
+                return (${$method}[self::getTokenID()] === self::getTokenValue());
             }
         }
 
@@ -94,7 +94,7 @@ class CSRF {
             $post = $_POST;
             foreach($_SESSION[self::$token_history_name] as $history_key => $history_value) {
                 if (isset($_POST[$history_key])) {
-                    if  ($_POST[$history_key] == $history_value) {
+                    if  ($_POST[$history_key] === $history_value) {
                         return true;
                     }
                 }
