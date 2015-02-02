@@ -312,7 +312,7 @@ class Task extends DbObject {
     function insert($force_validation = false) {
         if ($this->task_group_id) {
             // set default status for newly created tasks
-            $this->status = $this->_taskgroup->getTaskGroupTypeObject()->get_default_status($this);
+//            $this->status = $this->_taskgroup->getTaskGroupTypeObject()->get_default_status($this);
 
             // if no assignee selected for newly created task, use task group default assignee
             if ($this->first_assignee_id == "") {

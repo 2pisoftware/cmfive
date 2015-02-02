@@ -68,6 +68,10 @@
 
     $(document).ready(function() {
         bindTypeChangeEvent();
+        
+        if (initialChange == false) {
+            getTaskGroupData(<?php echo $task->task_group_id; ?>);
+        }
         $("#task_type").trigger("change");
     });
     
@@ -76,22 +80,26 @@
             $("#formfields").hide().html("");
         	$("#tasktext").hide().html("");
         
-	        $.getJSON("/task/taskAjaxSelectbyTaskGroup/" + ui.item.id + "/<?php echo !empty($task->id) ? $task->id : null; ?>",
-	            function(result) {
-	                if (initialChange) {
-	                    $('#task_type').parent().html(result[0]);
-	                    $('#priority').parent().html(result[1]);
-	                    $('#assignee_id').parent().html(result[2]);
-	                    $('#status').html(result[4])
-	                }
-	                initialChange = true;
-	                $('#tasktext').html(result[3]);
-	                $("#tasktext").fadeIn();
-	                
-	                bindTypeChangeEvent();  
-	            }
-	        );
+	        getTaskGroupData(ui.item.id);
     	}
+    }
+    
+    function getTaskGroupData(taskgroup_id) {
+        $.getJSON("/task/taskAjaxSelectbyTaskGroup/" + taskgroup_id + "/<?php echo !empty($task->id) ? $task->id : null; ?>",
+            function(result) {
+                if (initialChange) {
+                    $('#task_type').parent().html(result[0]);
+                    $('#priority').parent().html(result[1]);
+                    $('#assignee_id').parent().html(result[2]);
+                    $('#status').html(result[4])
+                }
+                initialChange = true;
+                $('#tasktext').html(result[3]);
+                $("#tasktext").fadeIn();
+
+                bindTypeChangeEvent();  
+            }
+        );
     }
     
     function bindTypeChangeEvent() {
@@ -103,7 +111,6 @@
             // Get/check for extra form fields
             $.getJSON("/task/ajaxGetFieldForm/" + $("#task_type").val() + "/" + $("#task_group_id").val() + "/<?php echo !empty($task->id) ? $task->id : ''; ?>",
                 function(result) {
-                    console.log("Extra details callback: " + result);
                     if (result[0]) {
                         $("#formfields").html(result[0]);
                         $("#formfields").fadeIn();

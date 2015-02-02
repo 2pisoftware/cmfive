@@ -31,7 +31,7 @@ function taskAjaxSelectbyTaskGroup_ALL(Web $w) {
     "</table>";
 
     // return as array of arrays
-    $result = array($ttype, $prior , $mem, $tasktext, Html::select("status", $taskgroup->getTypeStatus()));
+    $result = array($ttype, $prior , $mem, $tasktext, Html::select("status", $taskgroup->getTypeStatus(), null, null, null, null));
 
     $w->setLayout(null);
     $w->out(json_encode($result));
