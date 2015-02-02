@@ -6,7 +6,8 @@
 class CSRF {
     private static $token_id_name = "token_id";
     private static $token_value_name = "token_value";
-
+    private static $token_history_name = "csrf_history";
+    
     /**
      * Generates new CSRF token_id and store it in the $_SESSION.
      * 
@@ -31,7 +32,7 @@ class CSRF {
      */
     public static function getTokenValue() {
         if(!isset($_SESSION[self::$token_value_name])) { 
-            $_SESSION[self::$token_value_name] = hash('sha256', self::random(500));
+            $_SESSION[self::$token_value_name] = hash('sha256', self::random(64));
         }
 
         return $_SESSION[self::$token_value_name];
@@ -44,6 +45,7 @@ class CSRF {
     public static function regenerate() {
         // Unset session variables
         if (isset($_SESSION[self::$token_id_name])) {
+            $_SESSION[self::$token_history_name][$_SESSION[self::$token_id_name]] = $_SESSION[self::$token_value_name];
             unset($_SESSION[self::$token_id_name]);
         }
         if (isset($_SESSION[self::$token_value_name])) {
@@ -67,6 +69,11 @@ class CSRF {
         
         // Allow get through for now
         if ($method === "get") {
+            // Destory the CSRF history on GET
+            if (isset($_SESSION[self::$token_history_name])) {
+                unset($_SESSION[self::$token_history_name]);
+            }
+            
             return true;
         }
 
@@ -80,7 +87,21 @@ class CSRF {
         }
 
         return false;
-    } 
+    }
+    
+    public static function inHistory($method) {
+        if (!empty($_SESSION[self::$token_history_name])) {
+            $post = $_POST;
+            foreach($_SESSION[self::$token_history_name] as $history_key => $history_value) {
+                if (isset($_POST[$history_key])) {
+                    if  ($_POST[$history_key] == $history_value) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     /**
      * A better random function?
@@ -89,25 +110,11 @@ class CSRF {
      * @return string
      */
     private static function random($len) {
-        if (@is_readable('/dev/urandom')) {
-            $f=fopen('/dev/urandom', 'r');
-            $urandom=fread($f, $len);
-            fclose($f);
+        $cstrong = false;
+        $bytes = openssl_random_pseudo_bytes($len, $cstrong);
+        while ($cstrong == false) {
+            $bytes = openssl_random_pseudo_bytes($len, $cstrong);
         }
-
-        $return='';
-        for ($i=0;$i<$len;++$i) {
-            if (!isset($urandom)) {
-                if ($i%2==0) mt_srand(time()%2147 * 1000000 + (double)microtime() * 1000000);
-                $rand=48+mt_rand()%64;
-            } else $rand=48+ord($urandom[$i])%64;
-
-            if ($rand>57) $rand+=7;
-            if ($rand>90) $rand+=6;
-            if ($rand==123) $rand=52;
-            if ($rand==124) $rand=53;
-            $return.=chr($rand);
-        }
-        return $return;
+        return bin2hex($bytes);
     }
 }

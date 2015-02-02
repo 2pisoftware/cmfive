@@ -292,7 +292,8 @@ class Web {
 
         // Check/validate CSRF token 
         $this->validateCSRF();
-
+        CSRF::regenerate();
+        
         //
         // if a module file for this url exists, then start processing
         //
@@ -479,10 +480,14 @@ class Web {
     private function validateCSRF() {
         // Check for CSRF token and that we have a valid request method
         if (Config::get("system.checkCSRF") == true && !CSRF::isValid($this->_requestMethod)) {
-            @$this->service('log')->error("System: CSRF Detected from " . $this->requestIpAddress());
-            header("HTTP/1.0 403 Forbidden");
-            echo "Cross site request forgery detected. Your IP has been logged";
-            die();
+            if (!CSRF::inHistory($this->_requestMethod)) {
+                @$this->service('log')->error("System: CSRF Detected from " . $this->requestIpAddress());
+                header("HTTP/1.0 403 Forbidden");
+                echo "Cross site request forgery detected. Your IP has been logged";
+                die();
+            } else {
+                $this->msg("Duplicate form submission detected, make sure you only click buttons once");
+            }
         }
     }
 
