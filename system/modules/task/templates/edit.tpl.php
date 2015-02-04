@@ -64,14 +64,12 @@
     // Force an ajax request initially, because if the group id is provided
     // and this doesn't exist then the user would have to reselect the taskgroup
     // manually, which is bad.
-    var initialChange = <?php echo (!empty($task->id) ? "false" : "true"); ?>;
+    var initialChange = <?php echo (empty($task->id) ? "false" : "true"); ?>;
 
     $(document).ready(function() {
         bindTypeChangeEvent();
         
-        if (initialChange == false) {
-            getTaskGroupData(<?php echo $task->task_group_id; ?>);
-        }
+        getTaskGroupData(<?php echo !empty($task->task_group_id) ? $task->task_group_id : $w->request('gid'); ?>);
         $("#task_type").trigger("change");
     });
     
@@ -87,7 +85,7 @@
     function getTaskGroupData(taskgroup_id) {
         $.getJSON("/task/taskAjaxSelectbyTaskGroup/" + taskgroup_id + "/<?php echo !empty($task->id) ? $task->id : null; ?>",
             function(result) {
-                if (initialChange) {
+                if (initialChange == false) {
                     $('#task_type').parent().html(result[0]);
                     $('#priority').parent().html(result[1]);
                     $('#assignee_id').parent().html(result[2]);

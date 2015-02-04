@@ -16,7 +16,7 @@ function edit_GET($w) {
     // Try and prefetch the taskgroup by given id
     $taskgroup = null;
     $taskgroup_id = $w->request("gid");
-    if (!empty($taskgroup_id) or !empty($task->task_group_id)) {
+    if (!empty($taskgroup_id) || !empty($task->task_group_id)) {
         $taskgroup = $w->Task->getTaskGroup(!empty($task->task_group_id) ? $task->task_group_id : $taskgroup_id);
         
         if (!empty($taskgroup->id)) {
