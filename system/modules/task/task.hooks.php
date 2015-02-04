@@ -6,12 +6,14 @@
  * @param Web $w
  */
 function task_core_web_after_post_task(Web $w) {
+	return;
 	// listening to Task module for adding comments
 	if ($w->ctx("TaskComment") != null && $w->ctx("TaskEvent") != null) {
 		// the task event type
 		$event = $w->ctx("TaskEvent");
 		// the task comment
 		$comm = $w->ctx("TaskComment");
+		
 		// the task
 		$task = $w->Task->getTask($comm->obj_id);
 		
@@ -45,31 +47,33 @@ function task_core_web_after_post_task(Web $w) {
 
 			// this user may be any or all of the 'types'
 			// need to check each 'type' for a notification
-			if ($assignee)
+			if (!empty($assignee)) {
 				$types[] = "assignee";
-			if ($creator)
+			}
+			if (!empty($creator)) {
 				$types[] = "creator";
-			if ($owner)
+			}
+			if (!empty($owner)) {
 				$types[] = "other";
+			}
 
 			// if they have a type ... look for notifications
-			if ($types) {
+			if (!empty($types)) {
 				// check user task notifications
 				$notify = $w->Task->getTaskUserNotify($i->user_id,$task->id);
 
 				// if there is a record, get notification flag
-				if ($notify) {
+				if (!empty($notify)) {
 					$value = $notify->$event;
 				}
-
 				// if no user task notification present, check user task group notification for role and type
-				if (!$notify) {
+				else {
 					// for each type, check the User defined notification table 
 					foreach ($types as $type) {
 						$notify = $w->Task->getTaskGroupUserNotifyType($i->user_id,$task->task_group_id,$role,$type);
 
 						// if there is a notification flag and it equals 1, no need to go further, a notification will be sent
-						if ($notify) {
+						if (!empty($notify)) {
 							if ($notify->value == "1") {
 								$value = $notify->$event;
 								break;
@@ -79,30 +83,33 @@ function task_core_web_after_post_task(Web $w) {
 				}
 					
 				// if no user task group notification present, check task group default notification for role and type
-				if (!$notify) {
+				if (empty($notify)) {
 					foreach ($types as $type) {
 						$notify = $w->Task->getTaskGroupNotifyType($task->task_group_id,$role,$type);
 					
 						// if notification exists, set its value
-						if ($notify)
+						if (!empty($notify)) {
 							$value = $notify->value;
+						}
 						
 						// if its value is 1, no need to go further, a notification will be sent
-						if ($value == "1")
+						if ($value == "1") {
 							break;
+						}
 					}
 				}
 
 				// if somewhere we have found a positive notification, add user_id to our send list
-				if ($value == "1")
+				if ($value == "1") {
 					$notifyusers[$i->user_id] = $i->user_id;
+				}
 			}
 			unset($types);
 		}
 
 		// if we have a list of user_id's to send to ...
 		
-		if ($notifyusers) {
+		if (!empty($notifyusers)) {
 			// use the task event as a title. want some formatting
 			$cap = array();
 			$arr = preg_split("/_/",$event);

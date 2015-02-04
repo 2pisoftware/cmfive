@@ -153,7 +153,7 @@ class TaskType_ProgrammingTicket extends TaskType {
     
 	function on_before_insert(Task $task) {
 		// Get REQUEST object instead
-		if ($_REQUEST["b_or_f"]=='Issue' || $_REQUEST["b_or_f"]=='Task') {
+		if (!empty($_REQUEST["b_or_f"]) && ($_REQUEST["b_or_f"] =='Issue' || $_REQUEST["b_or_f"]=='Task')) {
 			$task->status = "Todo";
 		}
 	}
