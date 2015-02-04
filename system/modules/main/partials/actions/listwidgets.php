@@ -8,7 +8,7 @@ function listwidgets_ALL(Web $w, $params) {
         $module = $w->_module;
     }
 
-    $widgets = $w->Widget->getWidgetsForModule($module);
+    $widgets = $w->Widget->getWidgetsForModule($module, $w->Auth->user()->id);
     $filter_widgets = array();
     
     if (!empty($widgets)) {

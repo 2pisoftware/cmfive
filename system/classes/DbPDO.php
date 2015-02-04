@@ -125,6 +125,13 @@ class DbPDO extends PDO {
         return $this;
     }
     
+    public function orderBy($orderby){
+        if ($this->query !== null && !empty($orderby)){
+            $this->query = $this->query->orderBy($orderby);
+        }
+        return $this;
+    }
+    
     public function order_by($orderby){
         if ($this->query !== null && !empty($orderby)){
             $this->query = $this->query->orderBy($orderby);
@@ -135,6 +142,13 @@ class DbPDO extends PDO {
     public function limit($limit){
         if ($this->query !== null and !is_null($limit)){
             $this->query = $this->query->limit($limit);
+        }
+        return $this;
+    }
+    
+    public function groupBy($grouping) {
+        if ($this->query !== null and !is_null($grouping)){
+            $this->query = $this->query->groupBy($grouping);
         }
         return $this;
     }

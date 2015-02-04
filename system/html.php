@@ -356,8 +356,9 @@ class Html {
                     $buffer .= Html::checkbox($name, $value, $defaultValue, $class);
                 break;
                 case "radio":
-                    $defaultValue = !empty($field[4]) ? $field[4] : null;
-                    $class = !empty($field[5]) ? $field[5] : null;
+                    $group = !empty($field[4]) ? $field[4] : null;
+                    $defaultValue = !empty($field[5]) ? $field[5] : null;
+                    $class = !empty($field[6]) ? $field[6] : null;
                     $buffer .= Html::radio($name, $group, $value, $defaultValue, $class) . "&nbsp;" . htmlentities($title);
                 break;
                 case "hidden":
@@ -611,8 +612,9 @@ class Html {
                             $buffer .= Html::checkbox($name, $value, $defaultValue, $class);
                         break;
                         case "radio":
-                            $defaultValue = !empty($field[4]) ? $field[4] : null;
-                            $class = !empty($field[5]) ? $field[5] : null;
+                            $group = !empty($field[4]) ? $field[4] : null;
+                            $defaultValue = !empty($field[5]) ? $field[5] : null;
+                            $class = !empty($field[6]) ? $field[6] : null;
                             $buffer .= Html::radio($name, $group, $value, $defaultValue, $class) . "&nbsp;" . htmlentities($title);
                         break;
                         case "hidden":
@@ -1037,6 +1039,12 @@ class Html {
                     break;
                 case "checkbox":
                     $buffer .= Html::checkbox($name, $value, $value, $class);
+                    break;
+                case "radio":
+                    $group = !empty($field[4]) ? $field[4] : null;
+                    $defaultValue = !empty($field[5]) ? $field[5] : null;
+                    $class = !empty($field[6]) ? $field[6] : null;
+                    $buffer .= Html::radio($name, $group, $value, $defaultValue, $class) . "&nbsp;" . htmlentities($title);
                     break;
                 case "hidden":
                     $hidden .= "<input type=\"hidden\" name=\"" . $name . "\" value=\"" . htmlspecialchars($value) . "\"/>\n";

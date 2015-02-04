@@ -15,8 +15,8 @@ class WidgetService extends DbService {
 		return $this->getObjects("WidgetConfig", array("is_deleted" => 0));
 	}
 
-	public function getWidgetsForModule($destination_module) {
-		return $this->getObjects("WidgetConfig", array("destination_module" => $destination_module, "is_deleted" => 0));
+	public function getWidgetsForModule($destination_module, $user_id) {
+		return $this->getObjects("WidgetConfig", array("user_id" => $user_id, "destination_module" => $destination_module, "is_deleted" => 0));
 	}
 
 	public function getWidgetNamesForModule($module) {
