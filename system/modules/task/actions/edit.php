@@ -131,7 +131,7 @@ function edit_GET($w) {
                 $type = "other";
             }
 
-            if (!empty($type)) {
+            if (!empty($type) && !empty($me)) {
                 $notify = $w->Task->getTaskGroupUserNotifyType($logged_in_user_id, $task->task_group_id, strtolower($me->role), $type);
             }
         }
