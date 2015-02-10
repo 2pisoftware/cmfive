@@ -79,9 +79,9 @@ abstract class TaskGroupType {
 	 * status array if defined. Otherwise "".
 	 */
 	function getDefaultStatus() {
-		if (!empty($this->getStatusArray()) && sizeof($this->getStatusArray()) > 0) {
-			$ar = $this->getStatusArray();
-			return $ar[0][0];
+		$statusarray = $this->getStatusArray();
+		if (!empty($statusarray) && sizeof($statusarray) > 0) {
+			return $statusarray[0][0];
 		} else {
 			return "";
 		}
