@@ -319,14 +319,19 @@ class Task extends DbObject {
         	if (!empty($tg)) {
         		
         		// if no assignee selected for newly created task, use task group default assignee
-        		if ($this->first_assignee_id == "") {
-        			$tg = $this->w->Task->getTaskGroup($this->task_group_id);
+        		if (empty($this->first_assignee_id)) {
         			$this->first_assignee_id = $this->assignee_id = $tg->default_assignee_id;
         		} else {
         			$this->assignee_id = $this->first_assignee_id;
         		}
         		
         		$tg_type = $tg->getTaskGroupTypeObject();
+        		
+        		// check for and set default status
+        		if (empty($this->status)) {
+        			$this->status = $tg_type->getDefaultStatus();
+        		}
+        		
         		$tg_type->on_before_insert($this);
         	}
         

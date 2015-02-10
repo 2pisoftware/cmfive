@@ -1008,7 +1008,7 @@ class Web {
      */
     public function callHook($module, $function, $data = null) {
         if (empty($module) or empty($function)) {
-            return;
+            return null;
         }
 
         // Build _hook registry if empty
@@ -1028,15 +1028,16 @@ class Web {
         
         // Check that the module calling has subscribed to hooks
         if (!array_key_exists($module, $this->_hooks)) {
-            return;
+            return null;
         }
         
         // If module inactive, continue
         if (Config::get("$module.active") === false) {
-            return;
+            return null;
         }
         
         // Loop through each registered module to try and invoke the function
+        $buffer = array();
         foreach ($this->_hooks[$module] as $toInvoke) {
         	
             // Check that the hook impl module that we are invoking is a module
@@ -1048,7 +1049,7 @@ class Web {
             
             // if this function is already loaded from an earlier call, execute now
             if (function_exists($hook_function_name)) {
-            	$hook_function_name($this, $data);
+            	$buffer[]= $hook_function_name($this, $data);
             } else {            
 	            // Check if the file exists and load
 	            if (!file_exists($this->getModuleDir($toInvoke) . $toInvoke.".hooks.php")) {
@@ -1060,10 +1061,11 @@ class Web {
 	
 	            if (function_exists($hook_function_name)) {
 	                // Call function
-	            	$hook_function_name($this, $data);	
+	            	$buffer[]= $hook_function_name($this, $data);	
 	            }
             }
         }
+        return $buffer;
     }
 
     /////////////////////////////////// Template stuff /////////////////////////

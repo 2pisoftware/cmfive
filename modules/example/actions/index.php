@@ -1,6 +1,7 @@
 <?php
-/*
- * @author Carsten Eckelmann, carsten@2pisystems.com, 2014
+/**
+ * @hook example_add_row_action(array(<ExampleData> 'data', <String> 'actions')
+ * @param Web $w
  */
 function index_ALL(Web $w) {
 	// adding data to the template context

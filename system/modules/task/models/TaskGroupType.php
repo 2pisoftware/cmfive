@@ -68,16 +68,24 @@ abstract class TaskGroupType {
 	/**
 	 * By default returns the very first status of the
 	 * status array if defined. Otherwise "".
-	 * 
+	 * @deprecated use getDefaultStatus instead
 	 */
 	function get_default_status() {
-		if ($this->getStatusArray() && sizeof($this->getStatusArray())) {
-			$ar = $this->getStatusArray();
-			return $ar[0][0];
+		return $this->getDefaultStatus();
+	}	
+	
+	/**
+	 * By default returns the very first status of the
+	 * status array if defined. Otherwise "".
+	 */
+	function getDefaultStatus() {
+		$statusarray = $this->getStatusArray();
+		if (!empty($statusarray) && sizeof($statusarray) > 0) {
+			return $statusarray[0][0];
 		} else {
 			return "";
 		}
-	}	
+	}
 	/**
 	 * Executed before a task is inserted into DB
 	 *
