@@ -116,6 +116,10 @@ class User extends DbObject {
 		return $this->getFullName ();
 	}
 	
+        
+        public function getSelectOptionValue() {
+            return $this->id;
+        }
 	/**
 	 * @return string, either the login or first name
 	 */
