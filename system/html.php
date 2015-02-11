@@ -592,11 +592,7 @@ class Html {
 
                             $default = !empty($field[5]) ? ($field[5] == "null" ? null : $field[5]) : "-- Select --";
                             $class = !empty($field[6]) ? $field[6] : null;
-                            if ($readonly == "") {
-                                $buffer .= Html::select($name, $items, $value, $class, "width: 100%;", $default, $readonly != "", $required);
-                            } else {
-                                $buffer .= $value;
-                            }
+                            $buffer .= Html::select($name, $items, $value, $class, "width: 100%;", $default, $readonly ? ' disabled="disabled" ' : null, $required);
                         break;
                         case "multiSelect":
                             $items = !empty($field[4]) ? $field[4] : null;

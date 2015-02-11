@@ -18,6 +18,11 @@ function changeTab(hash) {
         
         $(".tab-body > div#" + hash).show().addClass("active");
         $('.tab-head > a[href$="' + hash + '"]').addClass("active");
+        
+        // Update codemirror instances
+        $('.CodeMirror').each(function(){
+           this.CodeMirror.refresh();
+        }); 
     }
 }
 
