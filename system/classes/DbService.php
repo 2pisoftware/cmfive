@@ -238,7 +238,11 @@ class DbService {
             return null;
         $o = new $class($this->w);
         $o->fill($row, $from_db);
-
+		 
+        // test implementation for preserving original database values
+        if ($from_db == true) {
+        	$o->__old = $row;
+        }
         // Test implementation for a post fill callback
         if (method_exists($o, "afterConstruct")) {
             $o->afterConstruct();
