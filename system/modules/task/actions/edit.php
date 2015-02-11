@@ -203,13 +203,11 @@ function edit_POST($w) {
     // Insert data that didn't exist above as new task_data objects
     if (!empty($_POST["extra"])) {
         foreach ($_POST["extra"] as $key => $data) {
-            if (isset($data["name"]) && $data['name'] !== \CSRF::getTokenId()) {
-                $tdata = new TaskData($w);
-                $tdata->task_id = $task->id;
-                $tdata->data_key = $key;
-                $tdata->value = $data;
-                $tdata->insert();
-            }
+            $tdata = new TaskData($w);
+            $tdata->task_id = $task->id;
+            $tdata->data_key = $key;
+            $tdata->value = $data;
+            $tdata->insert();
         }
     }
     

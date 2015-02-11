@@ -151,9 +151,9 @@ class Html {
         return $a->__toString();
     }
 
-    public static function b($href, $title, $confirm = null, $id = null, $newtab = false, $class = null) {
+    public static function b($href, $title, $confirm = null, $id = null, $newtab = false, $class = null, $type = null) {
         $button = new \Html\button();
-        $button->href($href)->text($title)->confirm($confirm)->id($id)->setClass($class)->newtab($newtab);
+        $button->href($href)->text($title)->confirm($confirm)->id($id)->setClass($class)->newtab($newtab)->type($type);
         return $button->__toString();
     }
 
