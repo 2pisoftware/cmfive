@@ -16,6 +16,12 @@ function changeTab(hash) {
             hash = hash.substr(1);
         }
         
+        if(history.replaceState) {
+            history.replaceState(null, null, '#' + hash);
+        } else {
+            location.hash = '#' + hash;
+        }
+        
         $(".tab-body > div#" + hash).show().addClass("active");
         $('.tab-head > a[href$="' + hash + '"]').addClass("active");
         
