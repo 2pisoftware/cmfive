@@ -440,7 +440,7 @@ ul.cmfive_breadcrumbs > li {
 
 .cmfive_breadcrumbs li.current {
     color: rgb(200, 200, 200);
-    padding-left: 10px;   
+    /*padding-left: 10px;*/   
 }
 
 .cmfive_breadcrumbs li > a {
