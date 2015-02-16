@@ -821,7 +821,11 @@ class Html {
         $buf.='<input type="text" id="acp_' . $name . '"  name="acp_' . $name . '" value="' . $acp_value . '" class="' . $class . '" style="' . $style . '" ' . $required . ' />';
         $buf.="<script type='text/javascript'>";
         $buf.='$(function(){
-                    $("#acp_' . $name . '").keyup(function(){$("#' . $name . '").val("")});
+                    $("#acp_' . $name . '").keyup(function(e){
+                    	if (e.which != 13) { 	
+                            $("#' . $name . '").val("");
+                        }
+                    });
                     $("#acp_' . $name . '").autocomplete({
                         minLength:' . $minLength . ', 
                         source: ' . $source . ',
