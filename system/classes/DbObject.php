@@ -237,7 +237,10 @@ class DbObject extends DbService {
      * @return string
      */
     function toLink($class = null, $target = null) {
-    	return Html::a($this->w->localUrl($this->printSearchUrl()), $this->printSearchTitle(),null, $class, null, $target);	
+        if ($this->canView($this->w->Auth->user())) {
+            return Html::a($this->w->localUrl($this->printSearchUrl()), $this->printSearchTitle(),null, $class, null, $target);	
+        }
+        return $this->printSearchTitle();
     }
     
     /**

@@ -102,7 +102,10 @@ class Task extends DbObject {
         }
 
         $me = $this->w->Task->getMemberGroupById($this->task_group_id, $loggedin_user->id);
-        $group = $this->w->Task->getTaskGroup($this->task_group_id);
+        
+        if (empty($me)) {
+            return false;
+        }
         
         if ($loggedin_user->id == $this->assignee_id) {
             return true;
@@ -112,6 +115,7 @@ class Task extends DbObject {
             return true;
         }
         
+        $group = $this->w->Task->getTaskGroup($this->task_group_id);
         return $this->w->Task->getMyPerms($me->role, $group->can_view);
     }
 
