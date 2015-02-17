@@ -1141,7 +1141,7 @@ class Html {
         return $buffer;
     }
     
-    public static function breadcrumbs($data = array()) {
+    public static function breadcrumbs($data = array(), $w = null) {
         if (!empty($data)) {
             $buffer = "<ul class='breadcrumbs'>";
             foreach($data as $entry) {
@@ -1158,6 +1158,11 @@ class Html {
                 if (!empty($breadcrumbs)) {
                     $isFirst = true && ($_SERVER['REQUEST_URI'] === key($breadcrumbs));
                     foreach ($breadcrumbs as $path => $value) {
+                        if (!empty($w) && $w instanceof Web) {
+                            if (!$w->Auth->allowed($path)) {
+                                continue;
+                            }
+                        }
                         $buffer .= "<li" . (!$isFirst ? "><a href='" . $path . "'>" . $value['name'] . "</a>" : " class='current'>" . $value['name']) . "</li>";
                         $isFirst = false;
                     }

@@ -7,7 +7,11 @@ function role_task_admin_allowed(Web $w,$path) {
 function role_task_user_allowed(Web $w,$path) {
     return 
         $w->checkUrl($path, "task", null, "index") || 
-        $w->checkUrl($path, "task", null, "tasklist");
+        $w->checkUrl($path, "task", null, "tasklist") ||
+        $w->checkUrl($path, "task", null, "edit") ||
+        $w->checkUrl($path, "task", null, "ajaxGetExtraDetails") ||
+        $w->checkUrl($path, "task", null, "ajaxGetFieldForm") || 
+        $w->checkUrl($path, "task", null, "taskAjaxSelectbyTaskGroup");
 }
 
 function role_task_group_allowed(Web $w,$path) {

@@ -25,9 +25,14 @@ class Task extends DbObject {
     public $is_deleted;  // is_deleted flag
     public $_modifiable;  // Modifiable Aspect
     public $_searchable;
-
+    public $_validation = array(
+        "title" => array('required'),
+        "task_group_id" => array('required'),
+        "status" => array('required'),
+        "task_type" => array('required')
+    );
     public static $_db_table = "task";
-    
+
     // @TODO: add TaskData and TaskComments
     function addToIndex() {
         $ttype = $this->getTaskTypeObject();
@@ -37,7 +42,7 @@ class Task extends DbObject {
     }
 
     public function __get($name) {
-    // preload taskgroup if its called for
+        // preload taskgroup if its called for
         if ($name === "_taskgroup") {
             $this->_taskgroup = $this->getTaskGroup();
             return $this->_taskgroup;
@@ -102,19 +107,19 @@ class Task extends DbObject {
         }
 
         $me = $this->w->Task->getMemberGroupById($this->task_group_id, $loggedin_user->id);
-        
+
         if (empty($me)) {
             return false;
         }
-        
+
         if ($loggedin_user->id == $this->assignee_id) {
             return true;
         }
-        
+
         if ($loggedin_user->id == $this->getTaskCreatorId()) {
             return true;
         }
-        
+
         $group = $this->w->Task->getTaskGroup($this->task_group_id);
         return $this->w->Task->getMyPerms($me->role, $group->can_view);
     }
@@ -187,7 +192,7 @@ class Task extends DbObject {
         } else {
             $creator = $this->w->Auth->getUser($this->creator_id);
         }
-        
+
         return $creator ? $creator->getFullName() : "";
     }
 
@@ -314,70 +319,73 @@ class Task extends DbObject {
      * @see DbObject::insert()
      */
     function insert($force_validation = false) {
-    	try {
-    		$this->startTransaction();
+        try {
+            $this->startTransaction();
 
-        	// 1. Call on_before_insert of the TaskGroupType
-        
-        	$tg = $this->getTaskGroup();
-        	if (!empty($tg)) {
-        		
-        		// if no assignee selected for newly created task, use task group default assignee
-        		if (empty($this->first_assignee_id)) {
-        			$this->first_assignee_id = $this->assignee_id = $tg->default_assignee_id;
-        		} else {
-        			$this->assignee_id = $this->first_assignee_id;
-        		}
-        		
-        		$tg_type = $tg->getTaskGroupTypeObject();
-        		
-        		// check for and set default status
-        		if (empty($this->status)) {
-        			$this->status = $tg_type->getDefaultStatus();
-        		}
-        		
-        		$tg_type->on_before_insert($this);
-        	}
-        
-        	// 2. Call on_before_update of the Tasktype
-        
-        	if ($this->task_type) {
-        		$this->getTaskTypeObject()->on_before_insert($this);
-        	}
-        
-	        // 3. insert task into database
-	        parent::insert();
-	
-	        // run any post-insert routines
-	        // add a comment upon task creation
-	        $comm = new TaskComment($this->w);
-	        $comm->obj_table = $this->getDbTableName();
-	        $comm->obj_id = $this->id;
-	        $comm->comment = "Task Created";
-	        $comm->insert();
-	
-	        // add to context for notifications post listener
-	        $this->w->ctx("TaskComment", $comm);
-	        $this->w->ctx("TaskEvent", "task_creation");
-	
-	        // 4. Call on_after_insert of TaskType
-	        
-	        if ($this->task_type) {
-	            $this->getTaskTypeObject()->on_after_insert($this);
-	        }
-	        
-	        // 5. Call on_after_update of the TaskGroupType
-	         
-	        if (!empty($tg_type)) {
-	        	$tg_type->on_after_insert($this);
-	        }
-	         
-	        $this->commitTransaction();
+            // 1. Call on_before_insert of the TaskGroupType
+
+            $tg = $this->getTaskGroup();
+            if (!empty($tg)) {
+
+                // if no assignee selected for newly created task, use task group default assignee
+                if (empty($this->first_assignee_id)) {
+                    $this->first_assignee_id = $this->assignee_id = $tg->default_assignee_id;
+                } else {
+                    $this->assignee_id = $this->first_assignee_id;
+                }
+
+                $tg_type = $tg->getTaskGroupTypeObject();
+
+                // check for and set default status
+                if (empty($this->status)) {
+                    $this->status = $tg_type->getDefaultStatus();
+                }
+
+                $tg_type->on_before_insert($this);
+            }
+
+            // 2. Call on_before_update of the Tasktype
+
+            if ($this->task_type) {
+                $this->getTaskTypeObject()->on_before_insert($this);
+            }
+
+            // 3. insert task into database
+            $validation_response = parent::insert($force_validation);
+            if ($validation_response !== true) {
+                $this->rollbackTransaction();
+                $this->w->errorMessage($this, "Task", true, false, "/tasks/edit");
+            }
+
+            // run any post-insert routines
+            // add a comment upon task creation
+            $comm = new TaskComment($this->w);
+            $comm->obj_table = $this->getDbTableName();
+            $comm->obj_id = $this->id;
+            $comm->comment = "Task Created";
+            $comm->insert();
+
+            // add to context for notifications post listener
+            $this->w->ctx("TaskComment", $comm);
+            $this->w->ctx("TaskEvent", "task_creation");
+
+            // 4. Call on_after_insert of TaskType
+
+            if ($this->task_type) {
+                $this->getTaskTypeObject()->on_after_insert($this);
+            }
+
+            // 5. Call on_after_update of the TaskGroupType
+
+            if (!empty($tg_type)) {
+                $tg_type->on_after_insert($this);
+            }
+
+            $this->commitTransaction();
         } catch (Exception $ex) {
-        	$this->Log->error("Inserting Task: ".$ex);
-        	$this->rollbackTransaction();
+            $this->Log->error("Inserting Task: " . $ex->getMessage());
+            $this->rollbackTransaction();
         }
-	         
     }
 
     /**
@@ -385,45 +393,49 @@ class Task extends DbObject {
      * @see DbObject::update()
      */
     function update($force = false, $force_validation = false) {
-    	
-    	try {
-    		$this->startTransaction();
-    		
-    		// 1. Call on_before_update of the TaskGroupType
-    		
-    		$tg = $this->getTaskGroup();
-    		if (!empty($tg)) {
-				$tg_type = $tg->getTaskGroupTypeObject();
-				$tg_type->on_before_update($this);    			
-    		}
-    		
-    		// 2. Call on_before_update of the Tasktype
-    		
-	        if ($this->task_type) {
-	            $this->getTaskTypeObject()->on_before_update($this);
-	        }
 
-	        // 3. update the task
-	        
-	        parent::update($force, $force_validation);
-	
-	        // 4. Call on_after_update of the TaskType
-	        
-	        if ($this->task_type) {
-	            $this->getTaskTypeObject()->on_after_update($this);
-	        }
-	        
-	        // 5. Call on_after_update of the TaskGroupType
-	        
-	        if (!empty($tg_type)) {
-	        	$tg_type->on_after_update($this);
-	        }
-	        
-	        $this->commitTransaction();
-    	} catch (Exception $ex) {
-    		$this->Log->error("Updating Task(".$this->id."): ".$ex);
-    		$this->rollbackTransaction();
-    	}
+        try {
+            $this->startTransaction();
+
+            // 1. Call on_before_update of the TaskGroupType
+
+            $tg = $this->getTaskGroup();
+            if (!empty($tg)) {
+                $tg_type = $tg->getTaskGroupTypeObject();
+                $tg_type->on_before_update($this);
+            }
+
+            // 2. Call on_before_update of the Tasktype
+
+            if ($this->task_type) {
+                $this->getTaskTypeObject()->on_before_update($this);
+            }
+
+            // 3. update the task
+
+            $validation_response = parent::update($force, $force_validation);
+            if ($validation_response !== true) {
+                $this->rollbackTransaction();
+                $this->w->errorMessage($this, "Task", true, false, "/tasks/edit/" . $this->id);
+            }
+
+            // 4. Call on_after_update of the TaskType
+
+            if ($this->task_type) {
+                $this->getTaskTypeObject()->on_after_update($this);
+            }
+
+            // 5. Call on_after_update of the TaskGroupType
+
+            if (!empty($tg_type)) {
+                $tg_type->on_after_update($this);
+            }
+
+            $this->commitTransaction();
+        } catch (Exception $ex) {
+            $this->Log->error("Updating Task(" . $this->id . "): " . $ex->getMessage());
+            $this->rollbackTransaction();
+        }
     }
 
     /**
@@ -431,44 +443,44 @@ class Task extends DbObject {
      * @see DbObject::delete()
      */
     function delete($force = false) {
-    	try {
-    		$this->startTransaction();
-    	
-    		// 1. Call on_before_delete of the TaskGroupType
-    	
-    		$tg = $this->getTaskGroup();
-    		if (!empty($tg)) {
-    			$tg_type = $tg->getTaskGroupTypeObject();
-    			$tg_type->on_before_delete($this);
-    		}
+        try {
+            $this->startTransaction();
 
-    		// 2. Call on_before_delete of the TaskType
-    		
-	        if ($this->task_type) {
-	            $this->getTaskTypeObject()->on_before_delete($this);
-	        }
-	
-	        // 3. Delete the task
-	        
-	        parent::delete($force);
-	
-	        // 4. Call on_after_delete of the TaskType
-	        	    
-	        if ($this->task_type) {
-	            $this->getTaskTypeObject()->on_after_delete($this);
-	        }
-    		
-    		// 5. Call on_after_delete of the TaskGroupType
-	        
-	        if (!empty($tg_type)) {
-	        	$tg_type->on_after_delete($this);
-	        }
-	        
-	        $this->commitTransaction();
-    	} catch (Exception $ex) {
-    		$this->Log->error("Deleting Task(".$this->id."): ".$ex);
-    		$this->rollbackTransaction();
-    	}
+            // 1. Call on_before_delete of the TaskGroupType
+
+            $tg = $this->getTaskGroup();
+            if (!empty($tg)) {
+                $tg_type = $tg->getTaskGroupTypeObject();
+                $tg_type->on_before_delete($this);
+            }
+
+            // 2. Call on_before_delete of the TaskType
+
+            if ($this->task_type) {
+                $this->getTaskTypeObject()->on_before_delete($this);
+            }
+
+            // 3. Delete the task
+
+            parent::delete($force);
+
+            // 4. Call on_after_delete of the TaskType
+
+            if ($this->task_type) {
+                $this->getTaskTypeObject()->on_after_delete($this);
+            }
+
+            // 5. Call on_after_delete of the TaskGroupType
+
+            if (!empty($tg_type)) {
+                $tg_type->on_after_delete($this);
+            }
+
+            $this->commitTransaction();
+        } catch (Exception $ex) {
+            $this->Log->error("Deleting Task(" . $this->id . "): " . $ex->getMessage());
+            $this->rollbackTransaction();
+        }
     }
 
     function getTaskGroup() {

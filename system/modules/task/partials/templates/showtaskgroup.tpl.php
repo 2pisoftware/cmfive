@@ -18,8 +18,8 @@
                 <?php 
                     $task_count = 0;
                     if (!empty($taskgroup->tasks)) {
-                        $task_count = count(array_filter($taskgroup->tasks, function ($var) use (&$val) {
-                            return (strcasecmp($var->status, $val[0]) == 0);
+                        $task_count = count(array_filter($taskgroup->tasks, function ($var) use (&$val, $w) {
+                            return ((strcasecmp($var->status, $val[0]) == 0) && $var->canView($w->Auth->user()));
                         }));
                     }
                     if ($task_count > 0) : ?>

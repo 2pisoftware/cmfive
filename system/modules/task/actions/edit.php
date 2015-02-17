@@ -4,6 +4,10 @@ function edit_GET($w) {
     $p = $w->pathMatch("id");
     $task = (!empty($p["id"]) ? $w->Task->getTask($p["id"]) : new Task($w));
     
+    if (!empty($task->id) && !$task->getCanIEdit()) {
+        $w->error("You do not have permission to edit this Task", "/task/tasklist");
+    }
+    
     // Get a list of the taskgroups and filter by what can be used
     $taskgroups = array_filter($w->Task->getTaskGroups(), function($taskgroup){
         return $taskgroup->getCanICreate();

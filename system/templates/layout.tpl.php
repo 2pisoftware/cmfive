@@ -171,7 +171,7 @@
 
         <!-- Breadcrumbs -->
         <div class="row-fluid">
-            <?php echo Html::breadcrumbs(); ?>
+            <?php echo Html::breadcrumbs(array(), $w); ?>
         </div>
         
         <div class="row-fluid body">

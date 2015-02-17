@@ -35,6 +35,32 @@ class TaskGroup extends DbObject {
     
     public static $_db_table = "task_group";
 
+    public function canList(\User $user) {
+        return $this->getCanIView();
+    }
+    
+    public function canView(\User $user) {
+        return $this->getCanIView();
+    }
+    
+    // Only owner of taskgroup or admin can edit
+    public function canEdit(\User $user) {
+        if ($this->w->Auth->user()->is_admin == 1) {
+            return true;
+        }
+        
+        return ($this->creator_id == $w->Auth->user()->id);
+    }
+    
+    // Only owner of taskgroup or admin can delete
+    public function canDelete(\User $user) {
+        if ($this->w->Auth->user()->is_admin == 1) {
+            return true;
+        }
+        
+        return ($this->creator_id == $w->Auth->user()->id);
+    }
+    
     // get my member object. compare my role with group role required to view task group
     function getCanIView() {
         if ($this->w->Auth->user()->is_admin == 1) {
