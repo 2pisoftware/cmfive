@@ -354,7 +354,7 @@ class Task extends DbObject {
             $validation_response = parent::insert($force_validation);
             if ($validation_response !== true) {
                 $this->rollbackTransaction();
-                $this->w->errorMessage($this, "Task", true, false, "/tasks/edit");
+                $this->w->errorMessage($this, "Task", $validation_response, false, "/tasks/edit");
             }
 
             // run any post-insert routines
@@ -416,7 +416,8 @@ class Task extends DbObject {
             $validation_response = parent::update($force, $force_validation);
             if ($validation_response !== true) {
                 $this->rollbackTransaction();
-                $this->w->errorMessage($this, "Task", true, false, "/tasks/edit/" . $this->id);
+                $this->w->Log->error("Task update failed validation, rolling back transaction");
+                $this->w->errorMessage($this, "Task", $validation_response, false, "/tasks/edit/" . $this->id);
             }
 
             // 4. Call on_after_update of the TaskType

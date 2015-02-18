@@ -156,7 +156,11 @@
                 'extra': extras_form
             },
             complete: function(response) {
-                window.location.href = "/task/edit/" + response.responseText;
+                if ($.isNumeric(response.responseText)) {
+                    window.location.href = "/task/edit/" + response.responseText;
+                } else {
+                    window.location.reload();
+                }
             }
         });
         return false;
