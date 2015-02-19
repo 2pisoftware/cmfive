@@ -1,6 +1,7 @@
 <?php
 
 use Monolog\Logger as Logger;
+use Monolog\Formatter\LineFormatter as LineFormatter;
 use Monolog\Handler\RotatingFileHandler as RotatingFileHandler;
 use Monolog\Processor\WebProcessor as WebProcessor;
 use Monolog\Processor\IntrospectionProcessor as IntrospectionProcessor;
@@ -10,11 +11,21 @@ class LogService extends \DbService {
     private $loggers = array();
     private $logger;
     private static $system_logger = 'cmfive';
+    private $formatter = null;
     
     public function __construct(\Web $w) {
         parent::__construct($w);
         
         $this->addLogger(LogService::$system_logger);
+    }
+    
+    public function setFormatter() {
+        if (empty($this->formatter)) {
+            // Add millisecond precision to logs
+            $dateFormat = "Y-m-d H:i:s.u";
+            $output = "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\n";
+            $this->formatter = new LineFormatter($output, $dateFormat);
+        }
     }
     
     public function logger() { return $this->loggers['cmfive']; }
@@ -32,6 +43,7 @@ class LogService extends \DbService {
             return;
         }
         
+        $this->setFormatter();
         $this->loggers[$name] = new Logger($name);
         
         if ($logToSystemFile === true) {
@@ -40,6 +52,7 @@ class LogService extends \DbService {
             $filename = ROOT_PATH . "/log/{$name}.log";
         }
         $handler = new RotatingFileHandler($filename);
+        $handler->setFormatter($this->formatter);
         // $handler->setFormatter(new JsonFormatter());
         $this->loggers[$name]->pushHandler($handler);
     }

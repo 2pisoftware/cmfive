@@ -40,7 +40,7 @@ class Comment extends DbObject {
      * By serg_admin-Manager Ops Manager,18/02/2011 03:10 pm
      * */
 
-    function __toString() {
+    public function __toString() {
         $str = $this->comment;
         $u = $this->w->Auth->getUser($this->creator_id);
         if ($u) {
@@ -59,6 +59,13 @@ class Comment extends DbObject {
             return 0;
         }
         return ($a->dt_created < $b->dt_created) ? +1 : -1;
+    }
+    
+    public function insert($force_validation = true) {
+        parent::insert($force_validation);
+                
+        // Call Hook
+        $this->w->callHook("comment", "comment_added_" . $this->obj_table, $this);
     }
 
 }

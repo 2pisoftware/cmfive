@@ -1073,7 +1073,7 @@ class Web {
 	            // Include and check if function exists
 	            include_once ($this->getModuleDir($toInvoke) . $toInvoke.".hooks.php");
 	
-	            if (function_exists($hook_function_name)) {
+	            if (function_exists($hook_function_name)) {            
 	                // Call function
 	            	$buffer[]= $hook_function_name($this, $data);	
 	            }

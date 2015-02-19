@@ -762,6 +762,104 @@ class TaskService extends DbService {
         return $taskgroup;
     }
 
+    public function getNotifyUsersForTask($task, $event) {
+        if (empty($task)) {
+            return array();
+        }
+        
+        $me = array($this->getMemberGroupById($task->task_group_id, $_SESSION['user_id']));
+        // get member object for task creator
+        $creator_id = $task->getTaskCreatorId();
+        $creator = array($this->getMemberGroupById($task->task_group_id, $creator_id));
+        // get member object(s) for task group owner(s)
+        $owners = $this->getTaskGroupOwners($task->task_group_id);
+
+        // us is everyone
+        $us = (object) array_merge($me, $creator, $owners);
+
+        if (empty($us)) {
+            return array();
+        }
+        
+        $notifyUsers = array();
+        
+        // foreach relavent member
+        foreach ($us as $i) {
+            if (empty($i)) {
+                continue;
+            }
+            
+            // set default notification value. 0 = no notification
+            $shouldNotify = false; // $value = "0";
+            // set current user's role
+            $role = strtolower($i->role);
+            // determine current user's 'type' for this task
+            $assignee = ($task->assignee_id == $i->user_id);
+            $creator = ($creator_id == $i->user_id);
+            $owner = $this->getIsOwner($task->task_group_id, $i->user_id);
+
+            // this user may be any or all of the 'types'
+            // need to check each 'type' for a notification
+            $types = array();
+            if (!empty($assignee)) {
+                $types[] = "assignee";
+            }
+            if (!empty($creator)) {
+                $types[] = "creator";
+            }
+            if (!empty($owner)) {
+                $types[] = "other";
+            }
+
+            // if they have a type ... look for notifications
+            if (!empty($types)) {
+                // check user task notifications
+                $notify = $this->getTaskUserNotify($i->user_id, $task->id);
+                // if there is a record, get notification flag
+                if (!empty($notify)) {
+                    $shouldNotify = (bool) $notify->$event; // $value = $notify->$event;
+                }
+                // if no user task notification present, check user task group notification for role and type
+                else {
+
+                    // for each type, check the User defined notification table 
+                    foreach ($types as $type) {
+                        $notify = $this->getTaskGroupUserNotifyType($i->user_id, $task->task_group_id, $role, $type);
+                        // if there is a notification flag and it equals 1, no need to go further, a notification will be sent
+                        if (!empty($notify)) {
+                            if ($notify->value == "1") {
+                                $shouldNotify = (bool) $notify->$event;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // if no user task group notification present, check task group default notification for role and type
+                if (empty($notify)) {
+                    foreach ($types as $type) {
+                        $notify = $this->getTaskGroupNotifyType($task->task_group_id, $role, $type);
+                        // if notification exists, set its value
+                        if (!empty($notify)) {
+                            $shouldNotify = (bool) $notify->value;
+                        }
+                        // if its value is 1, no need to go further, a notification will be sent
+                        if ($shouldNotify) {
+                            break;
+                        }
+                    }
+                }
+                // if somewhere we have found a positive notification, add user_id to our send list
+                if ($shouldNotify) {
+                    $notifyUsers[$i->user_id] = $i->user_id;
+                }
+            }
+            unset($types);
+        }
+        return $notifyUsers;
+    }
+    
+    
     public function navigation(Web $w, $title = null, $nav = null) {
         if ($title) {
             $w->ctx("title", $title);

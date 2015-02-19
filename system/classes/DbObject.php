@@ -236,8 +236,11 @@ class DbObject extends DbService {
      * @param string $target
      * @return string
      */
-    function toLink($class = null, $target = null) {
-        if ($this->canView($this->w->Auth->user())) {
+    function toLink($class = null, $target = null, $user = null) {
+        if (empty($user)) {
+            $user = $this->w->Auth->user();
+        }
+        if ($this->canView($user)) {
             return Html::a($this->w->localUrl($this->printSearchUrl()), $this->printSearchTitle(),null, $class, null, $target);	
         }
         return $this->printSearchTitle();
@@ -482,7 +485,7 @@ class DbObject extends DbService {
      * core_dbobject_after_delete
      * core_dbobject_after_delete_[classname]
      * 
-     * @param unknown $type eg. pre / post
+     * @param unknown $type eg. before / after
      * @param unknown $action eg. insert / update / delete
      */
     private function _callHooks($type, $action) {
@@ -562,11 +565,11 @@ class DbObject extends DbService {
             echo $e->getMessage();
             $this->w->Log->error("SQL ERROR: " . $e->getMessage());
             $this->w->Log->error("SQL: " . $this->_db->getSql());
-            return NULL;
+            return false;
         }
         
         $this->id = $this->_db->last_insert_id();
-        
+
         // calling hooks AFTER inserting the object
         $this->_callHooks("after", "insert");
 

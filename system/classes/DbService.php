@@ -4,7 +4,8 @@
  * General Service class for subclassing in modules.
  *
  * @author carsten
- *
+ * @property DbPDO $_db
+ * @property Web $w
  */
 class DbService {
 

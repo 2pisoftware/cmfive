@@ -6,5 +6,10 @@ Config::set('task', array(
     'path' => 'system/modules',
     'topmenu' => true,
     'search' => array('Tasks' => "Task"),
-    'hooks' => array('core_web'),
+    'hooks' => array(
+        'core_web',
+        'core_dbobject',
+        'comment',
+        'attachment'
+    ),
 ));

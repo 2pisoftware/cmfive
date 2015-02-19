@@ -23,4 +23,8 @@ class TaskTime extends  DbObject {
             return $this->w->Comment->getComment($this->comment_id);
         }
     }
+    
+    public function getTask() {
+        return $this->getObject("Task", $this->task_id);
+    }
 }

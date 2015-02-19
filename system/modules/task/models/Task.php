@@ -188,7 +188,9 @@ class Task extends DbObject {
         $creator = null;
         if (empty($this->creator_id)) {
             $c = $this->w->Task->getObject("ObjectModification", array("object_id" => $this->id, "table_name" => $this->getDbTableName()));
-            $creator = $this->w->Auth->getUser($c->creator_id);
+            if (!empty($c->creator_id)) {
+                $creator = $this->w->Auth->getUser($c->creator_id);
+            }
         } else {
             $creator = $this->w->Auth->getUser($this->creator_id);
         }
