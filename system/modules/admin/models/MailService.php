@@ -16,7 +16,7 @@ class MailService extends DbService {
      * 
      * @global Array $EMAIL_CONFIG
      * @param string $to
-     * @param string $from
+     * @param string $replyto
      * @param string $subject
      * @param string $body
      * @param string $cc (optional)
@@ -24,10 +24,10 @@ class MailService extends DbService {
      * @param Array $attachments (optional)
      * @return int
      */
-    public function sendMail($to, $from, $subject, $body, $cc = null, $bcc = null, $attachments = array()) {
+    public function sendMail($to, $replyto, $subject, $body, $cc = null, $bcc = null, $attachments = array()) {
         
         if ($this->transport === NULL) {
-        	$this->w->Log->error("Could not send mail to {$to} from {$from} about {$subject} no email transport defined!");
+        	$this->w->Log->error("Could not send mail to {$to} from {$replyto} about {$subject} no email transport defined!");
         	return;
         }
 
@@ -41,8 +41,9 @@ class MailService extends DbService {
         
         // Create message
         $message = Swift_Message::newInstance($subject)
-                        ->setFrom($from)->setTo($to)
-                        ->setBody($body)->addPart($body, 'text/html');
+                        ->setFrom($replyto)->setReplyTo(array($replyto))
+                        ->setTo($to)->setBody($body)
+                        ->addPart($body, 'text/html');
         if (!empty($cc)) {
             if (strpos($cc, ",") !== FALSE) {
                 $cc = array_map("trim", explode(',', $cc));
@@ -65,7 +66,7 @@ class MailService extends DbService {
             }
         }
 
-        $this->w->Log->setLogger(MailService::$logger)->info("Sending email to {$to} with {$subject} (" . count($attachments) . " attachments");
+        $this->w->Log->setLogger(MailService::$logger)->info("Sending email to {$to} from {$replyto} with {$subject} (" . count($attachments) . " attachments");
         $mailer_status = $mailer->send($message, $failures);
         if (!empty($failures)) {
             $this->w->Log->setLogger(MailService::$logger)->error("Failed to send email: " . serialize($failures));

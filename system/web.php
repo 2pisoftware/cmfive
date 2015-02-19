@@ -423,10 +423,15 @@ class Web {
         }
     }
 
+    /**
+     * Returns a service class instance that matches the name given,
+     * E.g. $w->Inbox->... would return an InboxService class instance.
+     * 
+     * @param <String> $name
+     * @return <Object>
+     */
     public function __get($name) {
-        if ($name == ucfirst($name)) {
-            return $this->service($name);
-        }
+        return $this->service($name);
     }
 
     private function initDB() {
@@ -752,13 +757,22 @@ class Web {
         $this->redirect($this->localUrl($url));
     }
 
-    // This function generates an error message based on whats returned from the DbObject validation method
-    // $w is for the error() function
-    // $object is the object that one is saving/updating whatever
-    // $type is for the message returned, i.e. "Updating this $type failed"
-    // $response is the reponse array from the validation method
-    // $isUpdating is a helper for the message i.e. creating/updating
-    // $returnUrl is where the redirection in error() will go
+    /**
+     * This function generates an error message based on whats returned from the DbObject validation method
+     * $w is for the error() function
+     * $object is the object that one is saving/updating whatever
+     * $type is for the message returned, i.e. "Updating this $type failed"
+     * $response is the reponse array from the validation method
+     * $isUpdating is a helper for the message i.e. creating/updating
+     * $returnUrl is where the redirection in error() will go
+     * 
+     * @param <Object> $object
+     * @param <String> $type
+     * @param <Array|Boolean> $response
+     * @param <Boolean> $isUpdating
+     * @param <String> $returnUrl
+     * @return null
+     */
     function errorMessage($object, $type = null, $response = true, $isUpdating = false, $returnUrl = "/") {
         if ($response === true || empty($type)) {
             return;

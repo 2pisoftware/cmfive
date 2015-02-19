@@ -90,7 +90,7 @@ class AuthService extends DbService {
         }
 
         if ((function_exists("anonymous_allowed") && anonymous_allowed($this->w, $path)) || 
-        	($this->user() && $this->user()->allowed($this->w, $path))) {
+        	($this->user() && $this->user()->allowed($path))) {
         	return $url ? $url : true;
         }
         

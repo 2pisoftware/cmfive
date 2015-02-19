@@ -260,7 +260,7 @@ class User extends DbObject {
      * @param string $path
      * @return true if one role function returned true
      */
-    public function allowed(Web $w, $path) {
+    public function allowed($path) {
         if (!$this->is_active) {
             return false;
         }
@@ -271,11 +271,11 @@ class User extends DbObject {
             foreach ($this->getRoles() as $rn) {
                 $rolefunc = "role_" . $rn . "_allowed";
                 if (function_exists($rolefunc)) {
-                    if ($rolefunc($w, $path)) {
+                    if ($rolefunc($this->w, $path)) {
                         return true;
                     }
                 } else {
-                    $w->Log->error("Role '" . $rn . "' does not exist!");
+                    $this->w->Log->error("Role '" . $rn . "' does not exist!");
                 }
             }
         }
@@ -290,10 +290,10 @@ class User extends DbObject {
      */
     public function encryptPassword($password) {
         if (empty($this->password_salt)) {
+            // Salt hash is generated per user
             $this->password_salt = md5(uniqid(rand(), TRUE));
             $this->update();
         }
-        // global $PASSWORD_SALT;
         return sha1($this->password_salt . $password);
     }
 

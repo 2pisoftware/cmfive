@@ -1,5 +1,5 @@
 <?php
-    if ($w->Auth->user()->allowed($w,"/inbox/send")) {
+    if ($w->Auth->user()->allowed("/inbox/send")) {
         echo $w->menuButton("inbox/send/"."$message->id","Reply");
     }
     echo $w->menuButton("inbox/archive/".$type."/".$message->id,"Archive");
