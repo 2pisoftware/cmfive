@@ -41,9 +41,14 @@ class MailService extends DbService {
         
         // Create message
         $message = Swift_Message::newInstance($subject)
-                        ->setFrom($replyto)->setReplyTo(array($replyto))
+                        ->setFrom($replyto)
                         ->setTo($to)->setBody($body)
                         ->addPart($body, 'text/html');
+        if (is_array($replyto)) {
+            $message->setReplyTo($replyto);
+        } else {
+            $message->setReplyTo(array($replyto));
+        }
         if (!empty($cc)) {
             if (strpos($cc, ",") !== FALSE) {
                 $cc = array_map("trim", explode(',', $cc));
