@@ -49,6 +49,7 @@ class TaskGroup extends DbObject {
             return true;
         }
         
+        // @TODO: Wrong, the user who is an OWNER can edit or delete
         return ($this->creator_id == $w->Auth->user()->id);
     }
     

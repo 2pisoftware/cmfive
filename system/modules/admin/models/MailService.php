@@ -85,7 +85,7 @@ class MailService extends DbService {
         switch ($layer) {
             case "smtp":
             case "swiftmailer":
-                    $this->transport = Swift_SmtpTransport::newInstance(Config::get('email.host'), Config::get('email.port'), 'ssl')
+                    $this->transport = Swift_SmtpTransport::newInstance(Config::get('email.host'), Config::get('email.port'), Config::get('email.auth') == true ? 'ssl' : null)
                 ->setUsername(Config::get('email.username'))
                 ->setPassword(Config::get('email.password'));
             break;

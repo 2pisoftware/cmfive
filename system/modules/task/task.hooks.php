@@ -141,7 +141,6 @@ function task_core_dbobject_after_insert_TaskTime(Web $w, $object) {
 function task_attachment_attachment_added_task(Web $w, $object) {
     $w->Log->setLogger("TASK")->debug("task_attachment_attachment_added_task");
     
-    $w->Log->setLogger("TASK")->debug("Table: {$object->parent_table} ID: {$object->parent_id}");
     $task = $w->Task->getTask($object->parent_id);
     
     if (empty($task->id)) {
