@@ -18,7 +18,7 @@ class DbTest extends \PHPUnit_Framework_TestCase
         $this->module = new \Codeception\Module\Db();
         $this->module->_setConfig($this->config);
         $this->module->_initialize();
-        // $this->loadDump(); enable this when you want to change fixtures
+//        $this->loadDump(); // enable this when you want to change fixtures
     }
 
     protected function loadDump()
@@ -26,7 +26,7 @@ class DbTest extends \PHPUnit_Framework_TestCase
         $sql = file_get_contents(\Codeception\Configuration::dataDir() . '/dumps/sqlite.sql');
         $sql = preg_replace('%/\*(?:(?!\*/).)*\*/%s', "", $sql);
         $sql = explode("\n", $sql);
-        $sqlite = \Codeception\Util\Driver\Db::create($this->config['dsn'], $this->config['user'], $this->config['password']);
+        $sqlite = \Codeception\Lib\Driver\Db::create($this->config['dsn'], $this->config['user'], $this->config['password']);
         $sqlite->load($sql);
     }
 
@@ -49,9 +49,12 @@ class DbTest extends \PHPUnit_Framework_TestCase
 
     public function testHaveAndSeeInDatabase()
     {
+        $this->module->_before(\Codeception\Util\Stub::make('\Codeception\TestCase'));
         $user_id = $this->module->haveInDatabase('users', array('name' => 'john', 'email' => 'john@jon.com'));
+        $group_id = $this->module->haveInDatabase('groups', array('name' => 'john', 'enabled' => false));
         $this->assertInternalType('integer', $user_id);
         $this->module->seeInDatabase('users', array('name' => 'john', 'email' => 'john@jon.com'));
+        $this->module->dontSeeInDatabase('users', array('name' => 'john', 'email' => null));
         $this->module->_after(\Codeception\Util\Stub::make('\Codeception\TestCase'));
         $this->module->dontSeeInDatabase('users', array('name' => 'john'));
     }

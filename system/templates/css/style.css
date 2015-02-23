@@ -220,9 +220,30 @@ ul.ui-autocomplete {
 
 /* Comment section */
 .comment_section {
-    border-bottom: 1px #ddd solid;
+    clear: both;
+    display: block;
     margin: 5px;
     padding: 10px;
+}
+
+.comment_section .comment_section > .comment_body {
+    border-left: 10px solid white;
+}
+
+.comment_section .comment_section {
+    padding: 0px 0px 0px 20px;
+    margin-top: 0px;
+    margin-right: 0px;
+}
+
+.comment_section:hover {
+    background-color: #efefef;
+}
+
+.comment_avatar {
+    /*border-radius: 50%;*/
+    border: 3px solid #074E68;
+    
 }
 
 .comment_header {
@@ -232,11 +253,26 @@ ul.ui-autocomplete {
 }
 
 .comment_body {
+    
+    position: relative;
     padding: 10px 0px;
 }
 
+.comment_body > div > p {
+    margin-bottom: 5px;
+}
+
 .comment_meta {
+    position: relative;
     color: #797979;
+}
+
+.comment_reply {
+    padding: 0px 10px;
+}
+
+#comment_reply_form {
+    margin-top: 0px;
 }
 
 .comment_meta a {

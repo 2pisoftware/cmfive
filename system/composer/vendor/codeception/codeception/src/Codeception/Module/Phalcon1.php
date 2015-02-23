@@ -1,10 +1,11 @@
 <?php
-
 namespace Codeception\Module;
 
 use Codeception\Exception\ModuleConfig;
 use Codeception\Step;
-use Codeception\Util\Connector\PhalconMemorySession;
+use Codeception\Lib\Framework;
+use Codeception\Lib\Interfaces\ActiveRecord;
+use Codeception\LIb\Connector\PhalconMemorySession;
 
 /**
  * This module provides integration with [Phalcon framework](http://www.phalconphp.com/) (1.x).
@@ -54,7 +55,7 @@ use Codeception\Util\Connector\PhalconMemorySession;
  *
  *
  */
-class Phalcon1 extends \Codeception\Util\Framework implements \Codeception\Util\ActiveRecordInterface
+class Phalcon1 extends Framework implements ActiveRecord
 {
     protected $config = array(
         'bootstrap' => 'app/config/bootstrap.php',
@@ -72,8 +73,8 @@ class Phalcon1 extends \Codeception\Util\Framework implements \Codeception\Util\
     {
         if (!file_exists(\Codeception\Configuration::projectDir() . $this->config['bootstrap'])) {
             throw new ModuleConfig(__CLASS__,
-                "Bootstrap file does not exists in ".$this->config['bootstrap']."\n".
-                "Please create the bootstrap file that return Application object\n".
+                "Bootstrap file does not exist in ".$this->config['bootstrap']."\n".
+                "Please create the bootstrap file that returns Application object\n".
                 "And specify path to it with 'bootstrap' config\n\n".
                 "Sample bootstrap: \n\n<?php\n".
                 '$config = include __DIR__ . "/config.php";'."\n".
@@ -83,7 +84,7 @@ class Phalcon1 extends \Codeception\Util\Framework implements \Codeception\Util\
                 'return new \Phalcon\Mvc\Application($di);'
             );
         }
-        $this->client = new \Codeception\Util\Connector\Phalcon1();
+        $this->client = new \Codeception\Lib\Connector\Phalcon1();
 
     }
 

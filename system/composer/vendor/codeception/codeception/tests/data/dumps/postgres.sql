@@ -18,9 +18,9 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: empty_table; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: empty_table; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
-
+DROP TABLE IF EXISTS empty_table CASCADE;
 CREATE TABLE empty_table (
     id integer NOT NULL,
     field character varying
@@ -47,11 +47,13 @@ ALTER SEQUENCE empty_table_id_seq OWNED BY empty_table.id;
 
 
 --
--- Name: groups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: groups; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
+DROP TABLE IF EXISTS groups CASCADE;
 CREATE TABLE groups (
     name character varying(50),
+    enabled boolean,
     created_at timestamp without time zone DEFAULT now(),
     id integer NOT NULL
 );
@@ -77,9 +79,10 @@ ALTER SEQUENCE groups_id_seq OWNED BY groups.id;
 
 
 --
--- Name: permissions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: permissions; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
+DROP TABLE IF EXISTS permissions CASCADE;
 CREATE TABLE permissions (
     user_id integer,
     group_id integer,
@@ -108,9 +111,10 @@ ALTER SEQUENCE permissions_id_seq OWNED BY permissions.id;
 
 
 --
--- Name: users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: users; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
+DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
     name character varying(30),
     email character varying(50),
@@ -185,9 +189,9 @@ SELECT pg_catalog.setval('empty_table_id_seq', 1, false);
 -- Data for Name: groups; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY groups (name, created_at, id) FROM stdin;
-coders	2012-02-02 22:33:30.807	1
-jazzman	2012-02-02 22:33:35.271	2
+COPY groups (name, enabled, created_at, id) FROM stdin;
+coders	t	2012-02-02 22:33:30.807	1
+jazzman	f	2012-02-02 22:33:35.271	2
 \.
 
 
@@ -237,7 +241,7 @@ SELECT pg_catalog.setval('users_id_seq', 4, true);
 
 
 --
--- Name: g1; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: g1; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY groups
@@ -245,7 +249,7 @@ ALTER TABLE ONLY groups
 
 
 --
--- Name: p1; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: p1; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY permissions
@@ -253,7 +257,7 @@ ALTER TABLE ONLY permissions
 
 
 --
--- Name: u1; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: u1; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY users
@@ -275,6 +279,25 @@ ALTER TABLE ONLY permissions
 ALTER TABLE ONLY permissions
     ADD CONSTRAINT pg1 FOREIGN KEY (group_id) REFERENCES groups(id);
 
+
+--
+-- start test for triggers with $$ syntax
+--
+INSERT INTO users (name, email) VALUES ('This $$ should work', 'user@example.org');
+CREATE OR REPLACE FUNCTION upd_timestamp() RETURNS TRIGGER
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+    NEW.created_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+  $$;
+
+INSERT INTO users (name, email) VALUES ('This should work as well', 'user2@example.org');
+--
+-- end test for triggers with $$ syntax
+--
 
 --
 -- PostgreSQL database dump complete
