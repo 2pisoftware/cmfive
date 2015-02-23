@@ -80,6 +80,8 @@
                     },
                     complete: function(comment_response) {
                         cancelReply(replyForm);
+                        replyForm.remove();
+                        
                         comment_section.append(comment_response.responseText);
                         applyColours(true);
                         // Rebind reply links
