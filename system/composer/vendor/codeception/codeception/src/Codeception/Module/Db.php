@@ -10,7 +10,7 @@ namespace Codeception\Module;
  * Also provides actions to perform checks in database.
  *
  * In order to have your database populated with data you need a raw SQL dump.
- * Just put it in ``` tests/_data ``` dir (by default) and specify path to it in config.
+ * Just put it in `tests/_data` dir (by default) and specify path to it in config.
  * Next time after database is cleared all your data will be restored from dump.
  * Don't forget to include CREATE TABLE statements into it.
  *
@@ -25,7 +25,7 @@ namespace Codeception\Module;
  * * MSSQL
  * * Oracle
  *
- * Connection is done by database Drivers, which are stored in Codeception\Util\Driver namespace.
+ * Connection is done by database Drivers, which are stored in Codeception\Lib\Driver namespace.
  * Check out drivers if you get problems loading dumps and cleaning databases.
  *
  * ## Status
@@ -69,12 +69,12 @@ namespace Codeception\Module;
  *
  */
 
-use Codeception\Util\Driver\Db as Driver;
+use Codeception\Lib\Driver\Db as Driver;
 use Codeception\Exception\Module as ModuleException;
 use Codeception\Exception\ModuleConfig as ModuleConfigException;
 use Codeception\Configuration as Configuration;
 
-class Db extends \Codeception\Module implements \Codeception\Util\DbInterface
+class Db extends \Codeception\Module implements \Codeception\Lib\Interfaces\Db
 {
 
     /**
@@ -96,7 +96,7 @@ class Db extends \Codeception\Module implements \Codeception\Util\DbInterface
 	protected $populated = false;
 
     /**
-     * @var \Codeception\Util\Driver\Db
+     * @var \Codeception\Lib\Driver\Db
      */
     public $driver;
     protected $insertedIds = array();
@@ -116,7 +116,9 @@ class Db extends \Codeception\Module implements \Codeception\Util\DbInterface
             }
             $sql = file_get_contents(Configuration::projectDir() . $this->config['dump']);
             $sql = preg_replace('%/\*(?!!\d+)(?:(?!\*/).)*\*/%s', "", $sql);
-            $this->sql = explode("\n", $sql);
+            if( ! empty($sql)) {
+                $this->sql = explode("\n", $sql);
+            }
         }
 
         try {
@@ -160,6 +162,7 @@ class Db extends \Codeception\Module implements \Codeception\Util\DbInterface
                 $this->debug("coudn\'t delete record {$insertId['id']} from {$insertId['table']}");
             }
         }
+        $this->insertedIds = array();
     }
 
     protected function cleanup()
@@ -216,18 +219,26 @@ class Db extends \Codeception\Module implements \Codeception\Util\DbInterface
         $this->debugSection('Query', $query);
 
         $sth = $this->driver->getDbh()->prepare($query);
-        if (!$sth) \PHPUnit_Framework_Assert::fail("Query '$query' can't be executed.");
-
+        if (!$sth) {
+            $this->fail("Query '$query' can't be executed.");
+        }
 	    $i = 1;
         foreach ($data as $val) {
             $sth->bindValue($i, $val);
             $i++;
         }
         $res = $sth->execute();
-        if (!$res) $this->fail(sprintf("Record with %s couldn't be inserted into %s", json_encode($data), $table));
+        if (!$res) {
+            $this->fail(sprintf("Record with %s couldn't be inserted into %s", json_encode($data), $table));
+        }
 
-        $lastInsertId = (int) $this->driver->lastInsertId($table);
-
+        try {
+            $lastInsertId = (int) $this->driver->lastInsertId($table);
+        } catch (\PDOException $e) {
+            // ignore errors due to uncommon DB structure,
+            // such as tables without _id_seq in PGSQL
+            $lastInsertId = 0;
+        }
         $this->insertedIds[] = array('table' => $table, 'id' => $lastInsertId);
 
         return $lastInsertId;
@@ -251,7 +262,9 @@ class Db extends \Codeception\Module implements \Codeception\Util\DbInterface
         $this->debugSection('Query', $query, json_encode($criteria));
 
         $sth = $this->driver->getDbh()->prepare($query);
-        if (!$sth) \PHPUnit_Framework_Assert::fail("Query '$query' can't be executed.");
+        if (!$sth) {
+            $this->fail("Query '$query' can't be executed.");
+        }
 
         $sth->execute(array_values($criteria));
         return $sth->fetchColumn();
