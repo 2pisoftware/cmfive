@@ -497,190 +497,203 @@ class DbObject extends DbService {
      * create and execute a sql insert statement for this object.
      *
      * @param <type> $table
+     * @throws Exception e
      */
     function insert($force_validation = true) {
-        if ($force_validation && property_exists($this, "_validation")) {
-            $valid_response = $this->validate();
-            if (!$valid_response['success']) {
-                return $valid_response;
-            }
-        }
-
-        // calling hooks BEFORE inserting the object
-        $this->_callHooks("before", "insert");
-
-        $t = $this->getDbTableName();
-        $columns = $this->getDbTableColumnNames();
-        
-        // set some default attributes
-        if (!property_exists($this, "_modifiable")) { //$this->_modifiable) {
-            // for backwards compatibility
-            if (in_array("dt_created", $columns))
-                $this->dt_created = time();
-
-            if (in_array("creator_id", $columns) && $this->w->Auth->loggedIn())
-                $this->creator_id = $this->w->Auth->user()->id;
-
-            if (in_array("dt_modified", $columns))
-                $this->dt_modified = time();
-
-            if (in_array("modifier_id", $columns) && $this->w->Auth->loggedIn())
-                $this->modifier_id = $this->w->Auth->user()->id;
-        }
-        
-        $data = array();
-        foreach (get_object_vars($this) as $k => $v) {
-            if ($k{0} != "_" && $k != "w" && $v !== null) {
-                $dbk = $this->getDbColumnName($k);
-                if (strpos($k, "dt_") === 0) {
-                    if ($v) {
-                        $v = $this->time2Dt($v);
-                        $data[$dbk] = $v;
-                    }
-                } else if (strpos($k, "d_") === 0) {
-                    if ($v) {
-                        $v = $this->time2D($v);
-                        $data[$dbk] = $v;
-                    }
-                } else if (strpos($k, "t_") === 0) {
-                    if ($v) {
-                        $v = $this->time2T($v);
-                        $data[$dbk] = $v;
-                    }
-                } else if (strpos($k, "s_") === 0) {
-                    if ($v) {
-                        $v = AESencrypt($v, $this->__password);
-                        $data[$dbk] = $v;
-                    }
-                } else {
-                    $data[$dbk] = $v;
-                }
-            }
-        }
-        
-        $this->_db->insert($t, $data);
-        try {
-            $this->_db->execute();
-        } catch (Exception $e) {
-            echo $e->getMessage();
-            $this->w->Log->error("SQL ERROR: " . $e->getMessage());
-            $this->w->Log->error("SQL: " . $this->_db->getSql());
-            return false;
-        }
-        
-        $this->id = $this->_db->last_insert_id();
-
-        // calling hooks AFTER inserting the object
-        $this->_callHooks("after", "insert");
-
-        // call standard aspect methods
-        
-        if (property_exists($this, "_modifiable") && (null !== $this->_modifiable)) {
-            $this->_modifiable->insert();
-        }
-        if (property_exists($this, "_versionable") && (null !== $this->_versionable)) {
-            $this->_versionable->insert();
-        }
-        if (property_exists($this, "_searchable") && (null !== $this->_searchable)) {
-            $this->_searchable->insert();
-        }
-
-        // store this id in the context for hooks etc.
-        $inserts = $this->w->ctx('db_inserts');
-        if (!$inserts) {
-            $inserts = array();
-        }
-        $inserts[get_class($this)][] = $this->id;
-        $this->w->ctx('db_inserts', $inserts);
-        
-        return true;
-    }
-
-    /**
-     * Update an object
-     *
-     * if $force_null_values is true set null values in db, if false, null values in object will be ignored.
-     * 
-     * @param boolean $force_null_values
-     * @param boolean $force_validation
-     * @return true or array("success"=>false,"invalid"=>array()) if validation failed
-     */
-    function update($force_null_values = false, $force_validation = true) {
-        if ($force_validation && property_exists($this, "_validation")) {
-            $valid_response = $this->validate();
-            if (!$valid_response['success']) {
-                return $valid_response;
-            }
-        }
-
-        // calling hooks BEFORE updating the object
-        $this->_callHooks("before", "update");
-
-        $t = $this->getDbTableName();
-        $columns = $this->getDbTableColumnNames();
-        // check delete attribute
-        if (in_array("is_deleted", $columns) && $this->is_deleted === null) {
-            $this->is_deleted = 0;
-        }
-
-        // set default attributes the old way
-        if (!property_exists($this, "_modifiable")) {//$this->_modifiable) {
-            //if (property_exists($this, "dt_modified")) {
-            if (in_array("dt_modified", $columns)) {
-                $this->dt_modified = time();
-            }
-            if (in_array("modifier_id", $columns) && $this->w->Auth->user()) {
-                $this->modifier_id = $this->w->Auth->user()->id;
-            }
-        }
-        $data = array();
-        foreach (get_object_vars($this) as $k => $v) {
-            if ($k{0} != "_" && $k != "w") { // ignore volatile vars
-                $dbk = $this->getDbColumnName($k);
-                
-                // call update conversions
-                $v = $this->updateConvert($k,$v);
-                if ($v !== null) {
-                   $data[$dbk] = $v;
-                }
-                // if $force_null_values is TRUE and $v is NULL, then set fields in DB to NULL
-                // otherwise ignore NULL values
-                if ($v === null && $force_null_values == true) {
-                    $data[$dbk] = null;
-                }
-            }
-        }
-
-        $this->_db->update($t, $data)->where($this->_cn('id'), $this->id);
-        try {
-            $this->_db->execute();
-        } catch (Exception $e) {
-            echo $t . " " . $e->getMessage() . "<br/>";
-        }
-        // calling hooks AFTER updating the object
-        $this->_callHooks("after", "update");
-
-        // call standard aspect methods
-        if (property_exists($this, "_modifiable") && (null !== $this->_modifiable)) {
-            $this->_modifiable->update();
-        }
-        if (property_exists($this, "_versionable") && (null !== $this->_versionable)) {
-            $this->_versionable->update();
-        }
-        if (property_exists($this, "_searchable") && (null !== $this->_searchable)) {
-            $this->_searchable->update();
-        }
-
-        // store this id in the context for hooks
-        $updates = $this->w->ctx('db_updates');
-        if (!$updates) {
-            $updates = array();
-        }
-        $updates[get_class($this)][] = $this->id;
-        $this->w->ctx('db_updates', $updates);
-
-        return true;
-    }
+		try {
+			$this->startTransaction ();
+			
+			if ($force_validation && property_exists ( $this, "_validation" )) {
+				$valid_response = $this->validate ();
+				if (! $valid_response ['success']) {
+					return $valid_response;
+				}
+			}
+			
+			// calling hooks BEFORE inserting the object
+			$this->_callHooks ( "before", "insert" );
+			
+			$t = $this->getDbTableName ();
+			$columns = $this->getDbTableColumnNames ();
+			
+			// set some default attributes
+			if (! property_exists ( $this, "_modifiable" )) { // $this->_modifiable) {
+			                                              // for backwards compatibility
+				if (in_array ( "dt_created", $columns ))
+					$this->dt_created = time ();
+				
+				if (in_array ( "creator_id", $columns ) && $this->w->Auth->loggedIn ())
+					$this->creator_id = $this->w->Auth->user ()->id;
+				
+				if (in_array ( "dt_modified", $columns ))
+					$this->dt_modified = time ();
+				
+				if (in_array ( "modifier_id", $columns ) && $this->w->Auth->loggedIn ())
+					$this->modifier_id = $this->w->Auth->user ()->id;
+			}
+			
+			$data = array ();
+			foreach ( get_object_vars ( $this ) as $k => $v ) {
+				if ($k {0} != "_" && $k != "w" && $v !== null) {
+					$dbk = $this->getDbColumnName ( $k );
+					if (strpos ( $k, "dt_" ) === 0) {
+						if ($v) {
+							$v = $this->time2Dt ( $v );
+							$data [$dbk] = $v;
+						}
+					} else if (strpos ( $k, "d_" ) === 0) {
+						if ($v) {
+							$v = $this->time2D ( $v );
+							$data [$dbk] = $v;
+						}
+					} else if (strpos ( $k, "t_" ) === 0) {
+						if ($v) {
+							$v = $this->time2T ( $v );
+							$data [$dbk] = $v;
+						}
+					} else if (strpos ( $k, "s_" ) === 0) {
+						if ($v) {
+							$v = AESencrypt ( $v, $this->__password );
+							$data [$dbk] = $v;
+						}
+					} else {
+						$data [$dbk] = $v;
+					}
+				}
+			}
+			
+			$this->_db->insert ( $t, $data );
+			$this->_db->execute ();
+			
+			$this->id = $this->_db->last_insert_id ();
+			
+			// calling hooks AFTER inserting the object
+			$this->_callHooks ( "after", "insert" );
+			
+			// call standard aspect methods
+			
+			if (property_exists ( $this, "_modifiable" ) && (null !== $this->_modifiable)) {
+				$this->_modifiable->insert ();
+			}
+			if (property_exists ( $this, "_versionable" ) && (null !== $this->_versionable)) {
+				$this->_versionable->insert ();
+			}
+			if (property_exists ( $this, "_searchable" ) && (null !== $this->_searchable)) {
+				$this->_searchable->insert ();
+			}
+			
+			// store this id in the context for hooks etc.
+			$inserts = $this->w->ctx ( 'db_inserts' );
+			if (! $inserts) {
+				$inserts = array ();
+			}
+			$inserts [get_class ( $this )] [] = $this->id;
+			$this->w->ctx ( 'db_inserts', $inserts );
+			
+			$this->commitTransaction ();
+		} catch ( Exception $e ) {
+			// echo $e->getMessage();
+			$this->w->Log->error ( "SQL ERROR: " . $e->getMessage () );
+			$this->w->Log->error ( "SQL: " . $this->_db->getSql () );
+			$this->rollbackTransaction();
+			throw $e;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Update an object
+	 *
+	 * if $force_null_values is true set null values in db, if false, null values in object will be ignored.
+	 *
+	 * @param boolean $force_null_values        	
+	 * @param boolean $force_validation        	
+	 * @return true or array("success"=>false,"invalid"=>array()) if validation failed
+	 */
+	function update($force_null_values = false, $force_validation = true) {
+		try {
+			$this->startTransaction ();
+			
+			if ($force_validation && property_exists ( $this, "_validation" )) {
+				$valid_response = $this->validate ();
+				if (! $valid_response ['success']) {
+					return $valid_response;
+				}
+			}
+			
+			// calling hooks BEFORE updating the object
+			$this->_callHooks ( "before", "update" );
+			
+			$t = $this->getDbTableName ();
+			$columns = $this->getDbTableColumnNames ();
+			// check delete attribute
+			if (in_array ( "is_deleted", $columns ) && $this->is_deleted === null) {
+				$this->is_deleted = 0;
+			}
+			
+			// set default attributes the old way
+			if (! property_exists ( $this, "_modifiable" )) { // $this->_modifiable) {
+			                                              // if (property_exists($this, "dt_modified")) {
+				if (in_array ( "dt_modified", $columns )) {
+					$this->dt_modified = time ();
+				}
+				if (in_array ( "modifier_id", $columns ) && $this->w->Auth->user ()) {
+					$this->modifier_id = $this->w->Auth->user ()->id;
+				}
+			}
+			$data = array ();
+			foreach ( get_object_vars ( $this ) as $k => $v ) {
+				if ($k {0} != "_" && $k != "w") { // ignore volatile vars
+					$dbk = $this->getDbColumnName ( $k );
+					
+					// call update conversions
+					$v = $this->updateConvert ( $k, $v );
+					if ($v !== null) {
+						$data [$dbk] = $v;
+					}
+					// if $force_null_values is TRUE and $v is NULL, then set fields in DB to NULL
+					// otherwise ignore NULL values
+					if ($v === null && $force_null_values == true) {
+						$data [$dbk] = null;
+					}
+				}
+			}
+			
+			$this->_db->update ( $t, $data )->where ( $this->_cn ( 'id' ), $this->id );
+			$this->_db->execute ();
+			
+			// calling hooks AFTER updating the object
+			$this->_callHooks ( "after", "update" );
+			
+			// call standard aspect methods
+			if (property_exists ( $this, "_modifiable" ) && (null !== $this->_modifiable)) {
+				$this->_modifiable->update ();
+			}
+			if (property_exists ( $this, "_versionable" ) && (null !== $this->_versionable)) {
+				$this->_versionable->update ();
+			}
+			if (property_exists ( $this, "_searchable" ) && (null !== $this->_searchable)) {
+				$this->_searchable->update ();
+			}
+			
+			// store this id in the context for hooks
+			$updates = $this->w->ctx ( 'db_updates' );
+			if (! $updates) {
+				$updates = array ();
+			}
+			$updates [get_class ( $this )] [] = $this->id;
+			$this->w->ctx ( 'db_updates', $updates );
+			$this->commitTransaction ();
+		} catch ( Exception $e ) {
+			// echo $e->getMessage();
+			$this->w->Log->error ( "SQL ERROR: " . $e->getMessage () );
+			$this->w->Log->error ( "SQL: " . $this->_db->getSql () );
+			$this->rollbackTransaction();
+			throw $e;
+		}
+		return true;
+	}
 
     /**
      * create and execute a sql delete statement to delete this object from
@@ -689,38 +702,49 @@ class DbObject extends DbService {
      * @param $force
      */
     function delete($force = false) {
-        // calling hooks BEFORE deleting the object
-        $this->_callHooks("before", "delete");
-
-        $t = $this->getDbTableName();
-        $columns = $this->getDbTableColumnNames();
-
-        // if an is_deleted property exists, then only set it to 1
-        // and update instead of delete!
-        if ((property_exists(get_class($this), "is_deleted") || (in_array("is_deleted", $columns))) && !$force) {
-            $this->is_deleted = 1;
-            // Hard code to NOT validate soft deletes
-            $this->update(false, false);
-        } else {
-            $this->_db->delete($t)->where($this->_cn('id'), $this->id)->execute();
-        }
-
-        // calling hooks AFTER deleting the object
-        $this->_callHooks("after", "delete");
-
-        // store this id in the context for listeners
-        $deletes = $this->w->ctx('db_deletes');
-        if (!$deletes) {
-            $deletes = array();
-        }
-        $deletes[get_class($this)][] = $this->id;
-        $this->w->ctx('db_deletes', $deletes);
-
-        // delete from search index
-        if (property_exists($this, "_searchable") && (null !== $this->_searchable)) {
-        	$this->_searchable->delete();
-        }
-
+    	try {
+    		$this->startTransaction();
+    		
+	        // calling hooks BEFORE deleting the object
+	        $this->_callHooks("before", "delete");
+	
+	        $t = $this->getDbTableName();
+	        $columns = $this->getDbTableColumnNames();
+	
+	        // if an is_deleted property exists, then only set it to 1
+	        // and update instead of delete!
+	        if ((property_exists(get_class($this), "is_deleted") || (in_array("is_deleted", $columns))) && !$force) {
+	            $this->is_deleted = 1;
+	            // Hard code to NOT validate soft deletes
+	            $this->update(false, false);
+	        } else {
+	            $this->_db->delete($t)->where($this->_cn('id'), $this->id)->execute();
+	        }
+	
+	        // calling hooks AFTER deleting the object
+	        $this->_callHooks("after", "delete");
+	
+	        // store this id in the context for listeners
+	        $deletes = $this->w->ctx('db_deletes');
+	        if (!$deletes) {
+	            $deletes = array();
+	        }
+	        $deletes[get_class($this)][] = $this->id;
+	        $this->w->ctx('db_deletes', $deletes);
+	
+	        // delete from search index
+	        if (property_exists($this, "_searchable") && (null !== $this->_searchable)) {
+	        	$this->_searchable->delete();
+	        }
+	        $this->commitTransaction();
+    	} catch (Exception $e) {
+    		// echo $e->getMessage();
+    		$this->w->Log->error ( "SQL ERROR: " . $e->getMessage () );
+    		$this->w->Log->error ( "SQL: " . $this->_db->getSql () );
+    		$this->rollbackTransaction();
+    		throw $e;
+    	}
+		return true;
     }
 
     /**
