@@ -5,7 +5,7 @@ php-webdriver -- WebDriver bindings for PHP
 
 This WebDriver client aims to be as close as possible to bindings in other languages. The concepts are very similar to the Java, .NET, Python and Ruby bindings for WebDriver.
 
-Looking for documentation about Selenium WebDriver? See http://docs.seleniumhq.org/docs/ and https://code.google.com/p/selenium/wiki
+Looking for documentation about php-webdriver? See http://facebook.github.io/php-webdriver/
 
 The PHP client was rewritten from scratch. Using the old version? Check out Adam Goucher's fork of it at https://github.com/Element-34/php-webdriver
 
@@ -13,20 +13,31 @@ Any complaint, question, idea? You can post it on the user group https://www.fac
 
 ##  GETTING THE CODE
 
-*   git clone git@github.com:facebook/php-webdriver.git
+### Github
+    git clone git@github.com:facebook/php-webdriver.git
 
-*   If you are using Packagist, add the dependency. https://packagist.org/packages/facebook/webdriver
+### Packagist
+Add the dependency. https://packagist.org/packages/facebook/webdriver
 
-        {
-          "require": {
-            "facebook/webdriver": "dev-master"
-          }
-        }
+    {
+      "require": {
+        "facebook/webdriver": "dev-master"
+      }
+    }
+    
+Download the composer.phar
+
+    curl -sS https://getcomposer.org/installer | php
+
+Install the library.
+
+    php composer.phar install
+        
    
 
 ##  GETTING STARTED
 
-*   All you need as the server for this client is the selenium-server-standalone-#.jar file provided here:  http://code.google.com/p/selenium/downloads/list
+*   All you need as the server for this client is the selenium-server-standalone-#.jar file provided here: http://selenium-release.storage.googleapis.com/index.html
 
 *   Download and run that file, replacing # with the current server version.
 
@@ -36,10 +47,30 @@ Any complaint, question, idea? You can post it on the user group https://www.fac
 
         // This would be the url of the host running the server-standalone.jar
         $host = 'http://localhost:4444/wd/hub'; // this is the default
-        $capabilities = array(WebDriverCapabilityType::BROWSER_NAME => 'firefox');
-        $driver = RemoteWebDriver::create($host, $capabilities);
 
-*   The $capabilities array lets you specify (among other things) which browser to use. See https://code.google.com/p/selenium/wiki/DesiredCapabilities for more details.
+*   Launch Firefox
+
+        $driver = RemoteWebDriver::create($host, DesiredCapabilities::firefox());
+        
+*   Launch Chrome
+
+        $driver = RemoteWebDriver::create($host, DesiredCapabilities::chrome());
+
+*   You can also customize the desired capabilities. 
+
+        $desired_capabilities = DesiredCapabilities::firefox();
+        $desired_capabilities->setJavascriptEnabled(false);
+        RemoteWebDriver::create($host, $desired_capabilities);
+
+*   See https://code.google.com/p/selenium/wiki/DesiredCapabilities for more details.
+
+## RUN UNIT TESTS
+
+To run unit tests simply run:
+
+    ./vendor/bin/phpunit -c ./tests
+
+Note: For the functional test suite, a running selenium server is required.
 
 ## MORE INFORMATION
 

@@ -1,0 +1,6 @@
+<?php
+
+function displaycomment_ALL(Web $w, $params) {
+    $w->ctx("redirect", $params['redirect']);
+    $w->ctx("c", $params['object']);
+}

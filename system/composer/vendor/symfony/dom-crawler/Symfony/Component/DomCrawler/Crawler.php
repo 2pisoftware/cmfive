@@ -23,7 +23,7 @@ use Symfony\Component\CssSelector\CssSelector;
 class Crawler extends \SplObjectStorage
 {
     /**
-     * @var string The current URI or the base href value
+     * @var string The current URI
      */
     protected $uri;
 
@@ -38,16 +38,22 @@ class Crawler extends \SplObjectStorage
     private $namespaces = array();
 
     /**
+     * @var string The base href value
+     */
+    private $baseHref;
+
+    /**
      * Constructor.
      *
      * @param mixed  $node A Node to use as the base for the crawling
-     * @param string $uri  The current URI or the base href value
-     *
+     * @param string $currentUri The current URI
+     * @param string $baseHref The base href value
      * @api
      */
-    public function __construct($node = null, $uri = null)
+    public function __construct($node = null, $currentUri = null, $baseHref = null)
     {
-        $this->uri = $uri;
+        $this->uri = $currentUri;
+        $this->baseHref = $baseHref ?: $currentUri;
 
         $this->add($node);
     }
@@ -186,13 +192,13 @@ class Crawler extends \SplObjectStorage
 
         $baseHref = current($base);
         if (count($base) && !empty($baseHref)) {
-            if ($this->uri) {
+            if ($this->baseHref) {
                 $linkNode = $dom->createElement('a');
                 $linkNode->setAttribute('href', $baseHref);
-                $link = new Link($linkNode, $this->uri);
-                $this->uri = $link->getUri();
+                $link = new Link($linkNode, $this->baseHref);
+                $this->baseHref = $link->getUri();
             } else {
-                $this->uri = $baseHref;
+                $this->baseHref = $baseHref;
             }
         }
     }
@@ -259,7 +265,9 @@ class Crawler extends \SplObjectStorage
     public function addNodeList(\DOMNodeList $nodes)
     {
         foreach ($nodes as $node) {
-            $this->addNode($node);
+            if ($node instanceof \DOMNode) {
+                $this->addNode($node);
+            }
         }
     }
 
@@ -296,7 +304,7 @@ class Crawler extends \SplObjectStorage
     /**
      * Returns a node given its position in the node list.
      *
-     * @param int     $position The position
+     * @param int $position The position
      *
      * @return Crawler A new instance of the Crawler with the selected node, or an empty Crawler if it does not exist.
      *
@@ -306,11 +314,11 @@ class Crawler extends \SplObjectStorage
     {
         foreach ($this as $i => $node) {
             if ($i == $position) {
-                return new static($node, $this->uri);
+                return new static($node, $this->uri, $this->baseHref);
             }
         }
 
-        return new static(null, $this->uri);
+        return new static(null, $this->uri, $this->baseHref);
     }
 
     /**
@@ -335,10 +343,23 @@ class Crawler extends \SplObjectStorage
     {
         $data = array();
         foreach ($this as $i => $node) {
-            $data[] = $closure(new static($node, $this->uri), $i);
+            $data[] = $closure(new static($node, $this->uri, $this->baseHref), $i);
         }
 
         return $data;
+    }
+
+    /**
+     * Slices the list of nodes by $offset and $length.
+     *
+     * @param int $offset
+     * @param int $length
+     *
+     * @return Crawler A Crawler instance with the sliced nodes
+     */
+    public function slice($offset = 0, $length = -1)
+    {
+        return new static(iterator_to_array(new \LimitIterator($this, $offset, $length)), $this->uri);
     }
 
     /**
@@ -356,16 +377,16 @@ class Crawler extends \SplObjectStorage
     {
         $nodes = array();
         foreach ($this as $i => $node) {
-            if (false !== $closure(new static($node, $this->uri), $i)) {
+            if (false !== $closure(new static($node, $this->uri, $this->baseHref), $i)) {
                 $nodes[] = $node;
             }
         }
 
-        return new static($nodes, $this->uri);
+        return new static($nodes, $this->uri, $this->baseHref);
     }
 
     /**
-     * Returns the first node of the current selection
+     * Returns the first node of the current selection.
      *
      * @return Crawler A Crawler instance with the first selected node
      *
@@ -377,7 +398,7 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * Returns the last node of the current selection
+     * Returns the last node of the current selection.
      *
      * @return Crawler A Crawler instance with the last selected node
      *
@@ -389,7 +410,7 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * Returns the siblings nodes of the current selection
+     * Returns the siblings nodes of the current selection.
      *
      * @return Crawler A Crawler instance with the sibling nodes
      *
@@ -403,11 +424,11 @@ class Crawler extends \SplObjectStorage
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        return new static($this->sibling($this->getNode(0)->parentNode->firstChild), $this->uri);
+        return new static($this->sibling($this->getNode(0)->parentNode->firstChild), $this->uri, $this->baseHref);
     }
 
     /**
-     * Returns the next siblings nodes of the current selection
+     * Returns the next siblings nodes of the current selection.
      *
      * @return Crawler A Crawler instance with the next sibling nodes
      *
@@ -421,11 +442,11 @@ class Crawler extends \SplObjectStorage
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        return new static($this->sibling($this->getNode(0)), $this->uri);
+        return new static($this->sibling($this->getNode(0)), $this->uri, $this->baseHref);
     }
 
     /**
-     * Returns the previous sibling nodes of the current selection
+     * Returns the previous sibling nodes of the current selection.
      *
      * @return Crawler A Crawler instance with the previous sibling nodes
      *
@@ -439,11 +460,11 @@ class Crawler extends \SplObjectStorage
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        return new static($this->sibling($this->getNode(0), 'previousSibling'), $this->uri);
+        return new static($this->sibling($this->getNode(0), 'previousSibling'), $this->uri, $this->baseHref);
     }
 
     /**
-     * Returns the parents nodes of the current selection
+     * Returns the parents nodes of the current selection.
      *
      * @return Crawler A Crawler instance with the parents nodes of the current selection
      *
@@ -466,11 +487,11 @@ class Crawler extends \SplObjectStorage
             }
         }
 
-        return new static($nodes, $this->uri);
+        return new static($nodes, $this->uri, $this->baseHref);
     }
 
     /**
-     * Returns the children nodes of the current selection
+     * Returns the children nodes of the current selection.
      *
      * @return Crawler A Crawler instance with the children nodes
      *
@@ -486,7 +507,7 @@ class Crawler extends \SplObjectStorage
 
         $node = $this->getNode(0)->firstChild;
 
-        return new static($node ? $this->sibling($node) : array(), $this->uri);
+        return new static($node ? $this->sibling($node) : array(), $this->uri, $this->baseHref);
     }
 
     /**
@@ -509,6 +530,22 @@ class Crawler extends \SplObjectStorage
         $node = $this->getNode(0);
 
         return $node->hasAttribute($attribute) ? $node->getAttribute($attribute) : null;
+    }
+
+    /**
+     * Returns the node name of the first node of the list.
+     *
+     * @return string The node name
+     *
+     * @throws \InvalidArgumentException When current node is empty
+     */
+    public function nodeName()
+    {
+        if (!count($this)) {
+            throw new \InvalidArgumentException('The current node list is empty.');
+        }
+
+        return $this->getNode(0)->nodeName;
     }
 
     /**
@@ -544,7 +581,7 @@ class Crawler extends \SplObjectStorage
 
         $html = '';
         foreach ($this->getNode(0)->childNodes as $child) {
-            if (version_compare(PHP_VERSION, '5.3.6', '>=')) {
+            if (PHP_VERSION_ID >= 50306) {
                 // node parameter was added to the saveHTML() method in PHP 5.3.6
                 // @see http://php.net/manual/en/domdocument.savehtml.php
                 $html .= $child->ownerDocument->saveHTML($child);
@@ -615,7 +652,7 @@ class Crawler extends \SplObjectStorage
 
         // If we dropped all expressions in the XPath while preparing it, there would be no match
         if ('' === $xpath) {
-            return new static(null, $this->uri);
+            return new static(null, $this->uri, $this->baseHref);
         }
 
         return $this->filterRelativeXPath($xpath);
@@ -674,8 +711,8 @@ class Crawler extends \SplObjectStorage
     {
         $translate = 'translate(@type, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz")';
         $xpath = sprintf('descendant-or-self::input[((contains(%s, "submit") or contains(%s, "button")) and contains(concat(\' \', normalize-space(string(@value)), \' \'), %s)) ', $translate, $translate, static::xpathLiteral(' '.$value.' ')).
-                         sprintf('or (contains(%s, "image") and contains(concat(\' \', normalize-space(string(@alt)), \' \'), %s)) or @id="%s" or @name="%s"] ', $translate, static::xpathLiteral(' '.$value.' '), $value, $value).
-                         sprintf('| descendant-or-self::button[contains(concat(\' \', normalize-space(string(.)), \' \'), %s) or @id="%s" or @name="%s"]', static::xpathLiteral(' '.$value.' '), $value, $value);
+                         sprintf('or (contains(%s, "image") and contains(concat(\' \', normalize-space(string(@alt)), \' \'), %s)) or @id=%s or @name=%s] ', $translate, static::xpathLiteral(' '.$value.' '), static::xpathLiteral($value), static::xpathLiteral($value)).
+                         sprintf('| descendant-or-self::button[contains(concat(\' \', normalize-space(string(.)), \' \'), %s) or @id=%s or @name=%s]', static::xpathLiteral(' '.$value.' '), static::xpathLiteral($value), static::xpathLiteral($value));
 
         return $this->filterRelativeXPath($xpath);
     }
@@ -699,7 +736,7 @@ class Crawler extends \SplObjectStorage
 
         $node = $this->getNode(0);
 
-        return new Link($node, $this->uri, $method);
+        return new Link($node, $this->baseHref, $method);
     }
 
     /**
@@ -713,7 +750,7 @@ class Crawler extends \SplObjectStorage
     {
         $links = array();
         foreach ($this as $node) {
-            $links[] = new Link($node, $this->uri, 'get');
+            $links[] = new Link($node, $this->baseHref, 'get');
         }
 
         return $links;
@@ -825,7 +862,7 @@ class Crawler extends \SplObjectStorage
     {
         $prefixes = $this->findNamespacePrefixes($xpath);
 
-        $crawler = new static(null, $this->uri);
+        $crawler = new static(null, $this->uri, $this->baseHref);
 
         foreach ($this as $node) {
             $domxpath = $this->createDOMXPath($node->ownerDocument, $prefixes);
@@ -869,18 +906,22 @@ class Crawler extends \SplObjectStorage
             // BC for Symfony 2.4 and lower were elements were adding in a fake _root parent
             if (0 === strpos($expression, '/_root/')) {
                 $expression = './'.substr($expression, 7);
+            } elseif (0 === strpos($expression, 'self::*/')) {
+                $expression = './'.substr($expression, 8);
             }
 
             // add prefix before absolute element selector
             if (empty($expression)) {
                 $expression = $nonMatchingExpression;
             } elseif (0 === strpos($expression, '//')) {
-                $expression = 'descendant-or-self::' . substr($expression, 2);
+                $expression = 'descendant-or-self::'.substr($expression, 2);
             } elseif (0 === strpos($expression, './/')) {
-                $expression = 'descendant-or-self::' . substr($expression, 3);
+                $expression = 'descendant-or-self::'.substr($expression, 3);
             } elseif (0 === strpos($expression, './')) {
-                $expression = 'self::' . substr($expression, 2);
-            } elseif ('/' === $expression[0]) {
+                $expression = 'self::'.substr($expression, 2);
+            } elseif (0 === strpos($expression, 'child::')) {
+                $expression = 'self::'.substr($expression, 7);
+            } elseif ('/' === $expression[0] || 0 === strpos($expression, 'self::')) {
                 // the only direct child in Symfony 2.4 and lower is _root, which is already handled previously
                 // so let's drop the expression entirely
                 $expression = $nonMatchingExpression;
@@ -888,9 +929,12 @@ class Crawler extends \SplObjectStorage
                 // '.' is the fake root element in Symfony 2.4 and lower, which is excluded from results
                 $expression = $nonMatchingExpression;
             } elseif (0 === strpos($expression, 'descendant::')) {
-                $expression = 'descendant-or-self::' . substr($expression, strlen('descendant::'));
+                $expression = 'descendant-or-self::'.substr($expression, strlen('descendant::'));
+            } elseif (preg_match('/^(ancestor|ancestor-or-self|attribute|following|following-sibling|namespace|parent|preceding|preceding-sibling)::/', $expression)) {
+                // the fake root has no parent, preceding or following nodes and also no attributes (even no namespace attributes)
+                $expression = $nonMatchingExpression;
             } elseif (0 !== strpos($expression, 'descendant-or-self::')) {
-                $expression = 'self::' .$expression;
+                $expression = 'self::'.$expression;
             }
             $expressions[] = $parenthesis.$expression;
         }
@@ -899,7 +943,7 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * @param int     $position
+     * @param int $position
      *
      * @return \DOMElement|null
      */

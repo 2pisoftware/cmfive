@@ -86,6 +86,18 @@ class LinkTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $link->getUri());
     }
 
+    /**
+     * @dataProvider getGetUriTests
+     */
+    public function testGetUriOnLink($url, $currentUri, $expected)
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML(sprintf('<html><head><link href="%s" /></head></html>', $url));
+        $link = new Link($dom->getElementsByTagName('link')->item(0), $currentUri);
+
+        $this->assertEquals($expected, $link->getUri());
+    }
+
     public function getGetUriTests()
     {
         return array(
@@ -101,7 +113,9 @@ class LinkTest extends \PHPUnit_Framework_TestCase
 
             array('', 'http://localhost/bar/', 'http://localhost/bar/'),
             array('#', 'http://localhost/bar/', 'http://localhost/bar/#'),
+            array('#bar', 'http://localhost/bar?a=b', 'http://localhost/bar?a=b#bar'),
             array('#bar', 'http://localhost/bar/#foo', 'http://localhost/bar/#bar'),
+            array('?a=b', 'http://localhost/bar#foo', 'http://localhost/bar?a=b'),
             array('?a=b', 'http://localhost/bar/', 'http://localhost/bar/?a=b'),
 
             array('http://login.foo.com/foo', 'http://localhost/bar/', 'http://login.foo.com/foo'),
@@ -135,6 +149,8 @@ class LinkTest extends \PHPUnit_Framework_TestCase
             array('../../', 'http://localhost/', 'http://localhost/'),
             array('../../', 'http://localhost', 'http://localhost/'),
 
+            array('/foo', 'http://localhost?bar=1', 'http://localhost/foo'),
+            array('/foo', 'http://localhost#bar', 'http://localhost/foo'),
             array('/foo', 'file:///', 'file:///foo'),
             array('/foo', 'file:///bar/baz', 'file:///foo'),
             array('foo', 'file:///', 'file:///foo'),

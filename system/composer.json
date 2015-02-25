@@ -12,6 +12,7 @@
         "zendframework/zend-mail": "2.2.5",
         "zendframework/zend-serializer": "2.2.5",
         "swiftmailer/swiftmailer": "@stable",
-        "twig/twig": "1.*"
+        "twig/twig": "1.*",
+        "nesbot/carbon": "~1.14"
     }
 }

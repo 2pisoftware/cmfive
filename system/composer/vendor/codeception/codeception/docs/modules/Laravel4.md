@@ -1,5 +1,6 @@
 # Laravel4 Module
-**For additional reference, please review the [source](https://github.com/Codeception/Codeception/tree/master/src/Codeception/Module/Laravel4.php)**
+
+**For additional reference, please review the [source](https://github.com/Codeception/Codeception/tree/2.0/src/Codeception/Module/Laravel4.php)**
 
 
 
@@ -15,54 +16,61 @@ Uses 'bootstrap/start.php' to launch.
 
 ## Status
 
-* Maintainer: **Jon Phipps, Davert**
-* Stability: **alpha**
+* Maintainer: **Davert**
+* Stability: **stable**
 * Contact: davert.codeception@mailican.com
 
 ## Config
-* cleanup: true - all db queries will be run in transaction, which will be rolled back at the end of test.
 
+* cleanup: `boolean`, default `true` - all db queries will be run in transaction, which will be rolled back at the end of test.
+* unit: `boolean`, default `true` - Laravel will run in unit testing mode.
+* environment: `string`, default `testing` - When running in unit testing mode, we will set a different environment.
+* start: `string`, default `bootstrap/start.php` - Relative path to start.php config file.
+* root: `string`, default ` ` - Root path of our application.
+* filters: `boolean`, default: `false` - enable or disable filters for testing.
 
 ## API
 
 * kernel - `Illuminate\Foundation\Application` instance
 * client - `BrowserKit` client
 
-## Known Issues
-
-When submitting form do not use `Input::all` to pass to store (hope you won't do this anyway).
-Codeception creates internal form fields, so you get exception trying to save them.
-
-
-## Actions
 
 
 ### amHttpAuthenticated
+ 
+Authenticates user for HTTP_AUTH
 
-
-Authenticates user for HTTP_AUTH 
-
- * param $username
- * param $password
+ * `param` $username
+ * `param` $password
 
 
 ### amLoggedAs
-
-
+ 
 Set the currently logged in user for the application.
+Takes either `UserInterface` instance or array of credentials.
 
- * param  \Illuminate\Auth\UserInterface $user
- * param  string $driver
- * return void
+ * `param`  \Illuminate\Auth\UserInterface|array $user
+ * `param`  string $driver
+@return void
+
+
+### amOnAction
+ 
+Opens web page by action name
+
+```php
+<?php
+$I->amOnAction('PostsController@index');
+?>
+```
+
+ * `param` $action
+ * `param array` $params
 
 
 ### amOnPage
-
-
-Opens the page.
-Requires relative uri as parameter
-
-Example:
+ 
+Opens the page for the given relative URI.
 
 ``` php
 <?php
@@ -73,15 +81,26 @@ $I->amOnPage('/register');
 ?>
 ```
 
- * param $page
+ * `param` $page
+
+
+### amOnRoute
+ 
+Opens web page using route name and parameters.
+
+```php
+<?php
+$I->amOnRoute('posts.create');
+?>
+```
+
+ * `param` $route
+ * `param array` $params
 
 
 ### attachFile
-
-
-Attaches file from Codeception data directory to upload field.
-
-Example:
+ 
+Attaches a file relative to the Codeception data directory to the given file upload field.
 
 ``` php
 <?php
@@ -90,17 +109,13 @@ $I->attachFile('input[@type="file"]', 'prices.xls');
 ?>
 ```
 
- * param $field
- * param $filename
+ * `param` $field
+ * `param` $filename
 
 
 ### checkOption
-
-
-Ticks a checkbox.
-For radio buttons use `selectOption` method.
-
-Example:
+ 
+Ticks a checkbox. For radio buttons, use the `selectOption` method instead.
 
 ``` php
 <?php
@@ -108,23 +123,20 @@ $I->checkOption('#agree');
 ?>
 ```
 
- * param $option
+ * `param` $option
 
 
 ### click
+ 
+Perform a click on a link or a button, given by a locator.
+If a fuzzy locator is given, the page will be searched for a button, link, or image matching the locator string.
+For buttons, the "value" attribute, "name" attribute, and inner text are searched.
+For links, the link text is searched.
+For images, the "alt" attribute and inner text of any parent links are searched.
 
+The second parameter is a context (CSS or XPath locator) to narrow the search.
 
-Perform a click on link or button.
-Link or button are found by their names or CSS selector.
-Submits a form if button is a submit type.
-
-If link is an image it's found by alt attribute value of image.
-If button is image button is found by it's value
-If link or button can't be found by name they are searched by CSS selector.
-
-The second parameter is a context: CSS or XPath locator to narrow the search.
-
-Examples:
+Note that if the locator matches a button of type `submit`, the form will be submitted.
 
 ``` php
 <?php
@@ -135,22 +147,22 @@ $I->click('Submit');
 // CSS button
 $I->click('#form input[type=submit]');
 // XPath
-$I->click('//form/*[@type=submit]')
+$I->click('//form/*[@type=submit]');
 // link in context
 $I->click('Logout', '#nav');
+// using strict locator
+$I->click(['link' => 'Login']);
 ?>
 ```
- * param $link
- * param $context
+
+ * `param` $link
+ * `param` $context
 
 
 ### dontSee
-
-
-Check if current page doesn't contain the text specified.
-Specify the css selector to match only specific region.
-
-Examples:
+ 
+Checks that the current page doesn't contain the text specified.
+Give a locator as the second parameter to match a specific region.
 
 ```php
 <?php
@@ -160,17 +172,18 @@ $I->dontSee('Sign Up','//body/h1'); // with XPath
 ?>
 ```
 
- * param $text
- * param null $selector
+ * `param`      $text
+ * `param null` $selector
+
+
+### dontSeeAuthentication
+ 
+Check that user is not authenticated
 
 
 ### dontSeeCheckboxIsChecked
-
-
-Assert if the specified checkbox is unchecked.
-Use css selector or xpath to match.
-
-Example:
+ 
+Check that the specified checkbox is unchecked.
 
 ``` php
 <?php
@@ -179,14 +192,23 @@ $I->seeCheckboxIsChecked('#signup_form input[type=checkbox]'); // I suppose user
 ?>
 ```
 
- * param $checkbox
+ * `param` $checkbox
+
+
+### dontSeeCookie
+ 
+Checks that there isn't a cookie with the given name.
+You can set additional cookie params like `domain`, `path` as array passed in last argument.
+
+ * `param` $cookie
+
+ * `param array` $params
 
 
 ### dontSeeCurrentUrlEquals
-
-
-Checks that current url is not equal to value.
-Unlike `dontSeeInCurrentUrl` performs a strict check.
+ 
+Checks that the current URL doesn't equal the given string.
+Unlike `dontSeeInCurrentUrl`, this only matches the full URL.
 
 ``` php
 <?php
@@ -195,13 +217,12 @@ $I->dontSeeCurrentUrlEquals('/');
 ?>
 ```
 
- * param $uri
+ * `param` $uri
 
 
 ### dontSeeCurrentUrlMatches
-
-
-Checks that current url does not match a RegEx value
+ 
+Checks that current url doesn't match the given regular expression.
 
 ``` php
 <?php
@@ -210,29 +231,30 @@ $I->dontSeeCurrentUrlMatches('~$/users/(\d+)~');
 ?>
 ```
 
- * param $uri
+ * `param` $uri
 
 
 ### dontSeeElement
-
-
-Checks if element does not exist (or is visible) on a page, matching it by CSS or XPath
-
-Example:
+ 
+Checks that the given element is invisible or not present on the page.
+You can also specify expected attributes of this element.
 
 ``` php
 <?php
 $I->dontSeeElement('.error');
 $I->dontSeeElement('//form/input[1]');
+$I->dontSeeElement('input', ['name' => 'login']);
+$I->dontSeeElement('input', ['value' => '123456']);
 ?>
 ```
- * param $selector
+
+ * `param` $selector
+ * `param array` $attributes
 
 
 ### dontSeeInCurrentUrl
-
-
-Checks that current uri does not contain a value
+ 
+Checks that the current URI doesn't contain the given string.
 
 ``` php
 <?php
@@ -240,15 +262,13 @@ $I->dontSeeInCurrentUrl('/users/');
 ?>
 ```
 
- * param $uri
+ * `param` $uri
 
 
 ### dontSeeInField
-
-
-Checks that an input field or textarea doesn't contain value.
-Field is matched either by label or CSS or Xpath
-Example:
+ 
+Checks that an input field or textarea doesn't contain the given value.
+For fuzzy locators, the field is matched by label text, CSS and XPath.
 
 ``` php
 <?php
@@ -257,44 +277,41 @@ $I->dontSeeInField('form textarea[name=body]','Type your comment here');
 $I->dontSeeInField('form input[type=hidden]','hidden_value');
 $I->dontSeeInField('#searchform input','Search');
 $I->dontSeeInField('//form/*[@name=search]','Search');
+$I->dontSeeInField(['name' => 'search'], 'Search');
 ?>
 ```
 
- * param $field
- * param $value
+ * `param` $field
+ * `param` $value
 
 
 ### dontSeeInTitle
+ 
+Checks that the page title does not contain the given string.
 
+ * `param` $title
 
-Checks that page title does not contain text.
-
- * param $title
- * return mixed
 
 
 ### dontSeeLink
-
-
-Checks if page doesn't contain the link with text specified.
-Specify url to narrow the results.
-
-Examples:
+ 
+Checks that the page doesn't contain a link with the given string.
+If the second parameter is given, only links with a matching "href" attribute will be checked.
 
 ``` php
 <?php
 $I->dontSeeLink('Logout'); // I suppose user is not logged in
+$I->dontSeeLink('Checkout now', '/store/cart.php');
 ?>
 ```
 
- * param $text
- * param null $url
+ * `param` $text
+ * `param null` $url
 
 
 ### dontSeeOptionIsSelected
-
-
-Checks if option is not selected in select field.
+ 
+Checks that the given option is not selected.
 
 ``` php
 <?php
@@ -302,51 +319,71 @@ $I->dontSeeOptionIsSelected('#form input[name=payment]', 'Visa');
 ?>
 ```
 
- * param $selector
- * param $optionText
- * return mixed
+ * `param` $selector
+ * `param` $optionText
+
 
 
 ### dontSeeRecord
-
-
+ 
 Checks that record does not exist in database.
 
 ``` php
+<?php
 $I->dontSeeRecord('users', array('name' => 'davert'));
+?>
 ```
 
- * param $model
- * param array $attributes
+ * `param` $model
+ * `param array` $attributes
 
 
 ### fillField
-
-
-Fills a text field or textarea with value.
-
-Example:
+ 
+Fills a text field or textarea with the given string.
 
 ``` php
 <?php
 $I->fillField("//input[@type='text']", "Hello World!");
+$I->fillField(['name' => 'email'], 'jon@mail.com');
 ?>
 ```
 
- * param $field
- * param $value
+ * `param` $field
+ * `param` $value
 
 
-### getName
+### grabAttributeFrom
+ 
+Grabs the value of the given attribute value from the given element.
+Fails if element is not found.
 
-__not documented__
+``` php
+<?php
+$I->grabAttributeFrom('#tooltip', 'title');
+?>
+```
+
+
+ * `param` $cssOrXpath
+ * `param` $attribute
+ * `internal param` $element
+
+
+### grabCookie
+ 
+Grabs a cookie value.
+You can set additional cookie params like `domain`, `path` in array passed as last argument.
+
+ * `param` $cookie
+
+ * `param array` $params
 
 
 ### grabFromCurrentUrl
-
-
-Takes a parameters from current URI by RegEx.
-If no url provided returns full URI.
+ 
+Executes the given regular expression against the current URI and returns the first match.
+If no parameters are provided, the full URI is returned.
 
 ``` php
 <?php
@@ -355,28 +392,27 @@ $uri = $I->grabFromCurrentUrl();
 ?>
 ```
 
- * param null $uri
- * internal param $url
- * return mixed
+ * `param null` $uri
+
+ * `internal param` $url
 
 
 ### grabRecord
-
-
+ 
 Retrieves record from database
 
 ``` php
+<?php
 $category = $I->grabRecord('users', array('name' => 'davert'));
+?>
 ```
 
- * param $model
- * param array $attributes
- * return mixed
+ * `param` $model
+ * `param array` $attributes
 
 
 ### grabService
-
-
+ 
 Return an instance of a class from the IoC Container.
 (http://laravel.com/docs/ioc)
 
@@ -396,53 +432,45 @@ $service = $I->grabService('foo');
 ?>
 ```
 
- * param  string $class
- * return mixed
+ * `param`  string $class
 
 
 ### grabTextFrom
-
-
-Finds and returns text contents of element.
-Element is searched by CSS selector, XPath or matcher by regex.
-
-Example:
+ 
+Finds and returns the text contents of the given element.
+If a fuzzy locator is used, the element is found using CSS, XPath, and by matching the full page source by regular expression.
 
 ``` php
 <?php
 $heading = $I->grabTextFrom('h1');
 $heading = $I->grabTextFrom('descendant-or-self::h1');
-$value = $I->grabTextFrom('~<input value=(.*?)]~sgi');
+$value = $I->grabTextFrom('~<input value=(.*?)]~sgi'); // match with a regex
 ?>
 ```
 
- * param $cssOrXPathOrRegex
- * return mixed
+ * `param` $cssOrXPathOrRegex
+
 
 
 ### grabValueFrom
+ 
+ * `param` $field
+
+@return array|mixed|null|string
 
 
-Finds and returns field and returns it's value.
-Searches by field name, then by CSS, then by XPath
+### haveDisabledFilters
+ 
+Disable Laravel filters for next requests.
 
-Example:
 
-``` php
-<?php
-$name = $I->grabValueFrom('Name');
-$name = $I->grabValueFrom('input[name=username]');
-$name = $I->grabValueFrom('descendant-or-self::form/descendant::input[@name = 'username']');
-?>
-```
-
- * param $field
- * return mixed
+### haveEnabledFilters
+ 
+Enable Laravel filters for next requests.
 
 
 ### haveRecord
-
-
+ 
 Inserts record into the database.
 
 ``` php
@@ -451,18 +479,29 @@ $user_id = $I->haveRecord('users', array('name' => 'Davert'));
 ?>
 ```
 
- * param $model
- * param array $attributes
- * return mixed
+ * `param` $model
+ * `param array` $attributes
+
+
+### logout
+ 
+Logs user out
+
+
+### resetCookie
+ 
+Unsets cookie with the given name.
+You can set additional cookie params like `domain`, `path` in array passed as last argument.
+
+ * `param` $cookie
+
+ * `param array` $params
 
 
 ### see
-
-
-Check if current page contains the text specified.
-Specify the css selector to match only specific region.
-
-Examples:
+ 
+Checks that the current page contains the given string.
+Specify a locator as the second parameter to match a specific region.
 
 ``` php
 <?php
@@ -472,34 +511,76 @@ $I->see('Sign Up','//body/h1'); // with XPath
 ?>
 ```
 
- * param $text
- * param null $selector
+ * `param`      $text
+ * `param null` $selector
+
+
+### seeAuthentication
+ 
+Checks that user is authenticated
 
 
 ### seeCheckboxIsChecked
-
-
-Assert if the specified checkbox is checked.
-Use css selector or xpath to match.
-
-Example:
+ 
+Checks that the specified checkbox is checked.
 
 ``` php
 <?php
 $I->seeCheckboxIsChecked('#agree'); // I suppose user agreed to terms
 $I->seeCheckboxIsChecked('#signup_form input[type=checkbox]'); // I suppose user agreed to terms, If there is only one checkbox in form.
-$I->seeCheckboxIsChecked('//form/input[@type=checkbox and  * name=agree]');
+$I->seeCheckboxIsChecked('//form/input[@type=checkbox and @name=agree]');
 ?>
 ```
 
- * param $checkbox
+ * `param` $checkbox
+
+
+### seeCookie
+ 
+Checks that a cookie with the given name is set.
+You can set additional cookie params like `domain`, `path` as array passed in last argument.
+
+``` php
+<?php
+$I->seeCookie('PHPSESSID');
+?>
+```
+
+ * `param` $cookie
+ * `param array` $params
+
+
+### seeCurrentActionIs
+ 
+Checks that current url matches action
+
+```php
+<?php
+$I->seeCurrentActionIs('PostsController@index');
+?>
+```
+
+ * `param` $action
+ * `param array` $params
+
+
+### seeCurrentRouteIs
+ 
+Checks that current url matches route
+
+```php
+<?php
+$I->seeCurrentRouteIs('posts.index');
+?>
+```
+ * `param` $route
+ * `param array` $params
 
 
 ### seeCurrentUrlEquals
-
-
-Checks that current url is equal to value.
-Unlike `seeInCurrentUrl` performs a strict check.
+ 
+Checks that the current URL is equal to the given string.
+Unlike `seeInCurrentUrl`, this only matches the full URL.
 
 ``` php
 <?php
@@ -508,13 +589,12 @@ $I->seeCurrentUrlEquals('/');
 ?>
 ```
 
- * param $uri
+ * `param` $uri
 
 
 ### seeCurrentUrlMatches
-
-
-Checks that current url is matches a RegEx value
+ 
+Checks that the current URL matches the given regular expression.
 
 ``` php
 <?php
@@ -523,27 +603,34 @@ $I->seeCurrentUrlMatches('~$/users/(\d+)~');
 ?>
 ```
 
- * param $uri
+ * `param` $uri
 
 
 ### seeElement
-
-
-Checks if element exists on a page, matching it by CSS or XPath
+ 
+Checks that the given element exists on the page and is visible.
+You can also specify expected attributes of this element.
 
 ``` php
 <?php
 $I->seeElement('.error');
 $I->seeElement('//form/input[1]');
+$I->seeElement('input', ['name' => 'login']);
+$I->seeElement('input', ['value' => '123456']);
+
+// strict locator in first arg, attributes in second
+$I->seeElement(['css' => 'form input'], ['name' => 'login']);
 ?>
 ```
- * param $selector
+
+ * `param` $selector
+ * `param array` $attributes
+@return
 
 
 ### seeInCurrentUrl
-
-
-Checks that current uri contains a value
+ 
+Checks that current URI contains the given string.
 
 ``` php
 <?php
@@ -554,16 +641,13 @@ $I->seeInCurrentUrl('/users/');
 ?>
 ```
 
- * param $uri
+ * `param` $uri
 
 
 ### seeInField
-
-
-Checks that an input field or textarea contains value.
-Field is matched either by label or CSS or Xpath
-
-Example:
+ 
+Checks that the given input field or textarea contains the given value. 
+For fuzzy locators, fields are matched by label text, the "name" attribute, CSS, and XPath.
 
 ``` php
 <?php
@@ -572,27 +656,26 @@ $I->seeInField('form textarea[name=body]','Type your comment here');
 $I->seeInField('form input[type=hidden]','hidden_value');
 $I->seeInField('#searchform input','Search');
 $I->seeInField('//form/*[@name=search]','Search');
+$I->seeInField(['name' => 'search'], 'Search');
 ?>
 ```
 
- * param $field
- * param $value
+ * `param` $field
+ * `param` $value
 
 
 ### seeInSession
-
-
+ 
 Assert that the session has a given list of values.
 
- * param  string|array $key
- * param  mixed $value
- * return void
+ * `param`  string|array $key
+ * `param`  mixed $value
+@return void
 
 
 ### seeInTitle
-
-
-Checks that page title contains text.
+ 
+Checks that the page title contains the given string.
 
 ``` php
 <?php
@@ -600,17 +683,14 @@ $I->seeInTitle('Blog - Post #1');
 ?>
 ```
 
- * param $title
- * return mixed
+ * `param` $title
+
 
 
 ### seeLink
-
-
-Checks if there is a link with text specified.
-Specify url to match link with exact this url.
-
-Examples:
+ 
+Checks that there's a link with the specified text.
+Give a full URL as the second parameter to match links with that exact URL.
 
 ``` php
 <?php
@@ -619,14 +699,29 @@ $I->seeLink('Logout','/logout'); // matches <a href="/logout">Logout</a>
 ?>
 ```
 
- * param $text
- * param null $url
+ * `param`      $text
+ * `param null` $url
+
+
+### seeNumberOfElements
+ 
+Checks that there are a certain number of elements matched by the given locator on the page.
+
+``` php
+<?php
+$I->seeNumberOfElements('tr', 10);
+$I->seeNumberOfElements('tr', [0,10]); //between 0 and 10 elements
+?>
+```
+ * `param` $selector
+ * `param mixed` $expected:
+- string: strict number
+- array: range of numbers [0,10]  
 
 
 ### seeOptionIsSelected
-
-
-Checks if option is selected in select field.
+ 
+Checks that the given option is selected.
 
 ``` php
 <?php
@@ -634,42 +729,38 @@ $I->seeOptionIsSelected('#form input[name=payment]', 'Visa');
 ?>
 ```
 
- * param $selector
- * param $optionText
- * return mixed
+ * `param` $selector
+ * `param` $optionText
+
 
 
 ### seePageNotFound
-
-
+ 
 Asserts that current page has 404 response status code.
 
 
 ### seeRecord
-
-
+ 
 Checks that record exists in database.
 
 ``` php
 $I->seeRecord('users', array('name' => 'davert'));
 ```
 
- * param $model
- * param array $attributes
+ * `param` $model
+ * `param array` $attributes
 
 
 ### seeResponseCodeIs
-
-
+ 
 Checks that response code is equal to value provided.
 
- * param $code
- * return mixed
+ * `param` $code
+
 
 
 ### seeSessionErrorMessage
-
-
+ 
 Assert that Session has error messages
 The seeSessionHasValues cannot be used, as Message bag Object is returned by Laravel4
 
@@ -684,32 +775,27 @@ Example of Usage
 $I->seeSessionErrorMessage(array('username'=>'Invalid Username'));
 ?>
 ```
- * param array $bindings
+ * `param array` $bindings
 
 
 ### seeSessionHasErrors
-
-
+ 
 Assert that the session has errors bound.
 
- * return bool
+@return bool
 
 
 ### seeSessionHasValues
-
-
+ 
 Assert that the session has a given list of values.
 
- * param  array $bindings
- * return void
+ * `param`  array $bindings
+@return void
 
 
 ### selectOption
-
-
-Selects an option in select tag or in radio button group.
-
-Example:
+ 
+Selects an option in a select tag or in radio button group.
 
 ``` php
 <?php
@@ -719,7 +805,7 @@ $I->selectOption('//form/select[@name=account]', 'Monthly');
 ?>
 ```
 
-Can select multiple options if second argument is array:
+Provide an array for the second argument to select multiple options:
 
 ``` php
 <?php
@@ -727,25 +813,23 @@ $I->selectOption('Which OS do you use?', array('Windows','Linux'));
 ?>
 ```
 
- * param $select
- * param $option
+ * `param` $select
+ * `param` $option
 
 
 ### sendAjaxGetRequest
-
-
+ 
 If your page triggers an ajax request, you can perform it manually.
 This action sends a GET ajax request with specified params.
 
 See ->sendAjaxPostRequest for examples.
 
- * param $uri
- * param $params
+ * `param` $uri
+ * `param` $params
 
 
 ### sendAjaxPostRequest
-
-
+ 
 If your page triggers an ajax request, you can perform it manually.
 This action sends a POST ajax request with specified params.
 Additional params can be passed as array.
@@ -762,13 +846,12 @@ $I->sendAjaxGetRequest('/updateSettings', array('notifications' => true)); // GE
 
 ```
 
- * param $uri
- * param $params
+ * `param` $uri
+ * `param` $params
 
 
 ### sendAjaxRequest
-
-
+ 
 If your page triggers an ajax request, you can perform it manually.
 This action sends an ajax request with specified method and params.
 
@@ -778,35 +861,59 @@ You need to perform an ajax request specifying the HTTP method.
 
 ``` php
 <?php
-$I->sendAjaxRequest('PUT', /posts/7', array('title' => 'new title');
+$I->sendAjaxRequest('PUT', '/posts/7', array('title' => 'new title'));
 
 ```
 
- * param $method
- * param $uri
- * param $params
+ * `param` $method
+ * `param` $uri
+ * `param` $params
+
+
+### setCookie
+ 
+Sets a cookie with the given name and value.
+You can set additional cookie params like `domain`, `path`, `expire`, `secure` in array passed as last argument.
+
+``` php
+<?php
+$I->setCookie('PHPSESSID', 'el4ukv0kqbvoirg7nkp4dncpk3');
+?>
+```
+
+ * `param` $name
+ * `param` $val
+ * `param array` $params
+ * `internal param` $cookie
+ * `internal param` $value
+
 
 
 ### submitForm
+ 
+Submits the given form on the page, optionally with the given form values.
+Give the form fields values as an array.
 
-
-Submits a form located on page.
-Specify the form by it's css or xpath selector.
-Fill the form fields values as array.
-
-Skipped fields will be filled by their values from page.
+Skipped fields will be filled by their values from the page.
 You don't need to click the 'Submit' button afterwards.
 This command itself triggers the request to form's action.
+
+You can optionally specify what button's value to include
+in the request with the last parameter as an alternative to
+explicitly setting its value in the second parameter, as
+button values are not otherwise included in the request.
 
 Examples:
 
 ``` php
 <?php
 $I->submitForm('#login', array('login' => 'davert', 'password' => '123456'));
+// or
+$I->submitForm('#login', array('login' => 'davert', 'password' => '123456'), 'submitButtonName');
 
 ```
 
-For sample Sign Up form:
+For example, given this sample "Sign Up" form:
 
 ``` html
 <form action="/sign_up">
@@ -814,28 +921,35 @@ For sample Sign Up form:
     Password: <input type="password" name="user[password]" /><br/>
     Do you agree to out terms? <input type="checkbox" name="user[agree]" /><br/>
     Select pricing plan <select name="plan"><option value="1">Free</option><option value="2" selected="selected">Paid</option></select>
-    <input type="submit" value="Submit" />
+    <input type="submit" name="submitButton" value="Submit" />
 </form>
 ```
-I can write this:
+
+You could write the following to submit it:
 
 ``` php
+<?php
+$I->submitForm('#userForm', array('user' => array('login' => 'Davert', 'password' => '123456', 'agree' => true)), 'submitButton');
+
+```
+Note that "2" will be the submitted value for the "plan" field, as it is the selected option.
+
+You can also emulate a JavaScript submission by not specifying any buttons in the third parameter to submitForm.
+
+```php
 <?php
 $I->submitForm('#userForm', array('user' => array('login' => 'Davert', 'password' => '123456', 'agree' => true)));
 
 ```
-Note, that pricing plan will be set to Paid, as it's selected on page.
 
- * param $selector
- * param $params
+ * `param` $selector
+ * `param` $params
+ * `param` $button
 
 
 ### uncheckOption
-
-
+ 
 Unticks a checkbox.
-
-Example:
 
 ``` php
 <?php
@@ -843,4 +957,6 @@ $I->uncheckOption('#notify');
 ?>
 ```
 
- * param $option
+ * `param` $option
+
+<p>&nbsp;</p><div class="alert alert-warning">Module reference is taken from the source code. <a href="https://github.com/Codeception/Codeception/tree/2.0/src/Codeception/Module/Laravel4.php">Help us to improve documentation. Edit module reference</a></div>

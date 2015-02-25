@@ -17,8 +17,13 @@
 <div id="area2">
     <a href="/form/hidden">Test</a>
 </div>
+<div id="area3">
+    <a href="info">Document-Relative Link</a>
+</div>
 
 A wise man said: "debug!"
+
+<?php print_r($_POST); ?>
 
 </body>
 </html>

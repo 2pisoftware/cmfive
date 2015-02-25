@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DomCrawler;
 
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\DomCrawler\Field\FormField;
 
 /**
@@ -146,9 +147,11 @@ class Form extends Link implements \ArrayAccess
         $values = array();
         foreach ($this->getValues() as $name => $value) {
             $qs = http_build_query(array($name => $value), '', '&');
-            parse_str($qs, $expandedValue);
-            $varName = substr($name, 0, strlen(key($expandedValue)));
-            $values = array_replace_recursive($values, array($varName => current($expandedValue)));
+            if (!empty($qs)) {
+                parse_str($qs, $expandedValue);
+                $varName = substr($name, 0, strlen(key($expandedValue)));
+                $values = array_replace_recursive($values, array($varName => current($expandedValue)));
+            }
         }
 
         return $values;
@@ -169,9 +172,11 @@ class Form extends Link implements \ArrayAccess
         $values = array();
         foreach ($this->getFiles() as $name => $value) {
             $qs = http_build_query(array($name => $value), '', '&');
-            parse_str($qs, $expandedValue);
-            $varName = substr($name, 0, strlen(key($expandedValue)));
-            $values = array_replace_recursive($values, array($varName => current($expandedValue)));
+            if (!empty($qs)) {
+                parse_str($qs, $expandedValue);
+                $varName = substr($name, 0, strlen(key($expandedValue)));
+                $values = array_replace_recursive($values, array($varName => current($expandedValue)));
+            }
         }
 
         return $values;
@@ -228,7 +233,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      *
-     * @return bool    true if the field exists, false otherwise
+     * @return bool true if the field exists, false otherwise
      *
      * @api
      */
@@ -296,7 +301,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      *
-     * @return bool    true if the field exists, false otherwise
+     * @return bool true if the field exists, false otherwise
      */
     public function offsetExists($name)
     {
@@ -456,7 +461,9 @@ class Form extends Link implements \ArrayAccess
         if ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == strtolower($node->getAttribute('type'))) {
             $this->set(new Field\ChoiceFormField($node));
         } elseif ('input' == $nodeName && 'radio' == strtolower($node->getAttribute('type'))) {
-            if ($this->has($node->getAttribute('name'))) {
+            // there may be other fields with the same name that are no choice
+            // fields already registered (see https://github.com/symfony/symfony/issues/11689)
+            if ($this->has($node->getAttribute('name')) && $this->get($node->getAttribute('name')) instanceof ChoiceFormField) {
                 $this->get($node->getAttribute('name'))->addChoice($node);
             } else {
                 $this->set(new Field\ChoiceFormField($node));

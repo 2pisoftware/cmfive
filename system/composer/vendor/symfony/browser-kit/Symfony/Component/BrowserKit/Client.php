@@ -65,7 +65,7 @@ abstract class Client
     /**
      * Sets whether to automatically follow redirects or not.
      *
-     * @param bool    $followRedirect Whether to follow redirects
+     * @param bool $followRedirect Whether to follow redirects
      *
      * @api
      */
@@ -77,7 +77,7 @@ abstract class Client
     /**
      * Sets the maximum number of requests that crawler can follow.
      *
-     * @param int     $maxRedirects
+     * @param int $maxRedirects
      */
     public function setMaxRedirects($maxRedirects)
     {
@@ -88,7 +88,7 @@ abstract class Client
     /**
      * Sets the insulated flag.
      *
-     * @param bool    $insulated Whether to insulate the requests or not
+     * @param bool $insulated Whether to insulate the requests or not
      *
      * @throws \RuntimeException When Symfony Process Component is not installed
      *
@@ -113,7 +113,7 @@ abstract class Client
     public function setServerParameters(array $server)
     {
         $this->server = array_merge(array(
-            'HTTP_HOST'       => 'localhost',
+            'HTTP_HOST' => 'localhost',
             'HTTP_USER_AGENT' => 'Symfony2 BrowserKit',
         ), $server);
     }
@@ -198,7 +198,7 @@ abstract class Client
      *
      * @return object|null A response instance
      *
-     * @see doRequest
+     * @see doRequest()
      *
      * @api
      */
@@ -227,7 +227,7 @@ abstract class Client
      *
      * @return object|null A Request instance
      *
-     * @see doRequest
+     * @see doRequest()
      *
      * @api
      */
@@ -274,13 +274,13 @@ abstract class Client
     /**
      * Calls a URI.
      *
-     * @param string  $method        The request method
-     * @param string  $uri           The URI to fetch
-     * @param array   $parameters    The Request parameters
-     * @param array   $files         The files
-     * @param array   $server        The server parameters (HTTP headers are referenced with a HTTP_ prefix as PHP does)
-     * @param string  $content       The raw body data
-     * @param bool    $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
+     * @param string $method        The request method
+     * @param string $uri           The URI to fetch
+     * @param array  $parameters    The Request parameters
+     * @param array  $files         The files
+     * @param array  $server        The server parameters (HTTP headers are referenced with a HTTP_ prefix as PHP does)
+     * @param string $content       The raw body data
+     * @param bool   $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      *
      * @return Crawler
      *
@@ -296,8 +296,8 @@ abstract class Client
 
         $uri = $this->getAbsoluteUri($uri);
 
-        if (isset($server['HTTP_HOST'])) {
-            $uri = preg_replace('{^(https?\://)'.parse_url($uri, PHP_URL_HOST).'}', '${1}'.$server['HTTP_HOST'], $uri);
+        if (!empty($server['HTTP_HOST'])) {
+            $uri = preg_replace('{^(https?\://)'.preg_quote($this->extractHost($uri)).'}', '${1}'.$server['HTTP_HOST'], $uri);
         }
 
         if (isset($server['HTTPS'])) {
@@ -310,12 +310,7 @@ abstract class Client
             $server['HTTP_REFERER'] = $this->history->current()->getUri();
         }
 
-        $server['HTTP_HOST'] = parse_url($uri, PHP_URL_HOST);
-
-        if ($port = parse_url($uri, PHP_URL_PORT)) {
-            $server['HTTP_HOST'] .= ':'.$port;
-        }
-
+        $server['HTTP_HOST'] = $this->extractHost($uri);
         $server['HTTPS'] = 'https' == parse_url($uri, PHP_URL_SCHEME);
 
         $this->internalRequest = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
@@ -603,11 +598,22 @@ abstract class Client
 
     private function updateServerFromUri($server, $uri)
     {
-        $server['HTTP_HOST'] = parse_url($uri, PHP_URL_HOST);
+        $server['HTTP_HOST'] = $this->extractHost($uri);
         $scheme = parse_url($uri, PHP_URL_SCHEME);
         $server['HTTPS'] = null === $scheme ? $server['HTTPS'] : 'https' == $scheme;
         unset($server['HTTP_IF_NONE_MATCH'], $server['HTTP_IF_MODIFIED_SINCE']);
 
         return $server;
+    }
+
+    private function extractHost($uri)
+    {
+        $host = parse_url($uri, PHP_URL_HOST);
+
+        if ($port = parse_url($uri, PHP_URL_PORT)) {
+            return $host.':'.$port;
+        }
+
+        return $host;
     }
 }

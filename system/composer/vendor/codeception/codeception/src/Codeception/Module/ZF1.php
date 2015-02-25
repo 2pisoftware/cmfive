@@ -59,7 +59,7 @@ namespace Codeception\Module;
  */
 use Codeception\Configuration as Configuration;
 
-class ZF1 extends \Codeception\Util\Framework implements \Codeception\Util\FrameworkInterface
+class ZF1 extends \Codeception\Lib\Framework
 {
     protected $config = array('env' => 'testing', 'config' => 'application/configs/application.ini',
         'app_path' => 'application', 'lib_path' => 'library');
@@ -75,7 +75,7 @@ class ZF1 extends \Codeception\Util\Framework implements \Codeception\Util\Frame
     public $db;
 
     /**
-     * @var \Codeception\Util\Connector\ZF1
+     * @var \Codeception\Lib\Connector\ZF1
      */
     public $client;
 
@@ -95,12 +95,16 @@ class ZF1 extends \Codeception\Util\Framework implements \Codeception\Util\Frame
 
         require_once 'Zend/Loader/Autoloader.php';
         \Zend_Loader_Autoloader::getInstance();
-        $this->client = new \Codeception\Util\Connector\ZF1();
+        $this->client = new \Codeception\Lib\Connector\ZF1();
     }
 
     public function _before(\Codeception\TestCase $test) {
         \Zend_Session::$_unitTestEnabled = true;
-        $this->bootstrap = new \Zend_Application($this->config['env'], Configuration::projectDir() . $this->config['config']);
+        try {
+            $this->bootstrap = new \Zend_Application($this->config['env'], Configuration::projectDir() . $this->config['config']);
+        } catch (\Exception $e) {
+            throw new \Codeception\Exception\Module(__CLASS__, $e->getMessage());
+        }
         $this->bootstrap->bootstrap();
         $this->client->setBootstrap($this->bootstrap);
 
@@ -117,9 +121,11 @@ class ZF1 extends \Codeception\Util\Framework implements \Codeception\Util\Frame
         $_GET     = array();
         $_POST    = array();
         $_COOKIE  = array();
-        $fc = $this->bootstrap->getBootstrap()->getResource('frontcontroller');
-        if ($fc) {
-            $fc->resetInstance();
+        if ($this->bootstrap) {
+            $fc = $this->bootstrap->getBootstrap()->getResource('frontcontroller');
+            if ($fc) {
+                $fc->resetInstance();
+            }
         }
         \Zend_Layout::resetMvcInstance();
         \Zend_Controller_Action_HelperBroker::resetHelpers();
