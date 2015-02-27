@@ -506,6 +506,7 @@ class DbObject extends DbService {
 			if ($force_validation && property_exists ( $this, "_validation" )) {
 				$valid_response = $this->validate ();
 				if (! $valid_response ['success']) {
+					$this->rollbackTransaction();
 					return $valid_response;
 				}
 			}
@@ -589,7 +590,7 @@ class DbObject extends DbService {
 			}
 			$inserts [get_class ( $this )] [] = $this->id;
 			$this->w->ctx ( 'db_inserts', $inserts );
-			
+				
 			$this->commitTransaction ();
 		} catch ( Exception $e ) {
 			// echo $e->getMessage();
@@ -618,6 +619,7 @@ class DbObject extends DbService {
 			if ($force_validation && property_exists ( $this, "_validation" )) {
 				$valid_response = $this->validate ();
 				if (! $valid_response ['success']) {
+					$this->rollbackTransaction();
 					return $valid_response;
 				}
 			}
