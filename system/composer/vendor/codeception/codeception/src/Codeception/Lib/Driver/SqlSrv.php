@@ -43,7 +43,7 @@ class SqlSrv extends Db
             DEALLOCATE tables_cursor;");
     }
     
-    public function select($column, $table, array $criteria)
+    public function select($column, $table, array &$criteria)
     {
         $where  = $criteria ? "where %s" : '';
         $query  = "select %s from " . $this->getQuotedName('%s') . " $where";
@@ -63,11 +63,11 @@ class SqlSrv extends Db
         return '[' . $name . ']';
     }
     
-    public function deleteQuery($table, $id)
+    public function deleteQuery($table, $id, $primaryKey = 'id')
     {
         $query = "delete from " 
             . $this->getQuotedName($table)
-            . " where " . $this->getQuotedName('id') . " = $id";
+            . " where " . $this->getQuotedName($primaryKey) . " = $id";
         
         $this->sqlQuery($query);
     }

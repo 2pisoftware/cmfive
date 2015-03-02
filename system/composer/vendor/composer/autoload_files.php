@@ -7,5 +7,7 @@ $baseDir = dirname(dirname($vendorDir));
 
 return array(
     $vendorDir . '/react/promise/src/functions_include.php',
+    $vendorDir . '/herrera-io/phar-update/src/lib/constants.php',
     $vendorDir . '/swiftmailer/swiftmailer/lib/swift_required.php',
+    $vendorDir . '/herrera-io/json/src/lib/json_version.php',
 );

@@ -1,0 +1,2093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>API Documentation</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <link href="../css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+    <!--[if lt IE 9]>
+    <script src="../js/html5.js"></script>
+    <![endif]-->
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/ui/1.10.4/jquery-ui.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">API Documentation</a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                                        <li class="dropdown">
+                        <a href="../index.html" class="dropdown-toggle" data-toggle="dropdown">
+                            API Documentation <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                                                        <li><a href="../namespaces/Html.html">\Html</a></li>
+                                                    </ul>
+                    </li>
+                                        <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">2458</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">1</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/deprecated.html">
+                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Deprecated <span class="label label-info pull-right">1</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-1390317385"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-1390317385" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1757131491"></a>
+                                <a href="../namespaces/Html.html" style="margin-left: 30px; padding-left: 0">Html</a>
+            </div>
+            <div id="namespace-1757131491" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Html.a.html">a</a></li>
+                                                    <li class="class"><a href="../classes/Html.button.html">button</a></li>
+                                                    <li class="class"><a href="../classes/Html.form.html">form</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/AComment.html">AComment</a></li>
+                                                    <li class="class"><a href="../classes/AdminMigration.html">AdminMigration</a></li>
+                                                    <li class="class"><a href="../classes/AdminService.html">AdminService</a></li>
+                                                    <li class="class"><a href="../classes/AspectModifiable.html">AspectModifiable</a></li>
+                                                    <li class="class"><a href="../classes/AspectSearchable.html">AspectSearchable</a></li>
+                                                    <li class="class"><a href="../classes/AspectVersionable.html">AspectVersionable</a></li>
+                                                    <li class="class"><a href="../classes/Attachment.html">Attachment</a></li>
+                                                    <li class="class"><a href="../classes/AttachmentType.html">AttachmentType</a></li>
+                                                    <li class="class"><a href="../classes/Audit.html">Audit</a></li>
+                                                    <li class="class"><a href="../classes/AuditService.html">AuditService</a></li>
+                                                    <li class="class"><a href="../classes/AuthService.html">AuthService</a></li>
+                                                    <li class="class"><a href="../classes/CachedTemplate.html">CachedTemplate</a></li>
+                                                    <li class="class"><a href="../classes/Channel.html">Channel</a></li>
+                                                    <li class="class"><a href="../classes/ChannelMessage.html">ChannelMessage</a></li>
+                                                    <li class="class"><a href="../classes/ChannelMessageStatus.html">ChannelMessageStatus</a></li>
+                                                    <li class="class"><a href="../classes/ChannelProcessor.html">ChannelProcessor</a></li>
+                                                    <li class="class"><a href="../classes/ChannelService.html">ChannelService</a></li>
+                                                    <li class="class"><a href="../classes/ChannelsService.html">ChannelsService</a></li>
+                                                    <li class="class"><a href="../classes/Comment.html">Comment</a></li>
+                                                    <li class="class"><a href="../classes/CommentService.html">CommentService</a></li>
+                                                    <li class="class"><a href="../classes/Config.html">Config</a></li>
+                                                    <li class="class"><a href="../classes/Contact.html">Contact</a></li>
+                                                    <li class="class"><a href="../classes/CSRF.html">CSRF</a></li>
+                                                    <li class="class"><a href="../classes/DbMigration.html">DbMigration</a></li>
+                                                    <li class="class"><a href="../classes/DbObject.html">DbObject</a></li>
+                                                    <li class="class"><a href="../classes/DbPDO.html">DbPDO</a></li>
+                                                    <li class="class"><a href="../classes/DbService.html">DbService</a></li>
+                                                    <li class="class"><a href="../classes/DbTable.html">DbTable</a></li>
+                                                    <li class="class"><a href="../classes/EmailChannelOption.html">EmailChannelOption</a></li>
+                                                    <li class="class"><a href="../classes/EmailMessage.html">EmailMessage</a></li>
+                                                    <li class="class"><a href="../classes/EmailParser.html">EmailParser</a></li>
+                                                    <li class="class"><a href="../classes/EmailStructure.html">EmailStructure</a></li>
+                                                    <li class="class"><a href="../classes/FileParser.html">FileParser</a></li>
+                                                    <li class="class"><a href="../classes/FileService.html">FileService</a></li>
+                                                    <li class="class"><a href="../classes/GanttChart.html">GanttChart</a></li>
+                                                    <li class="class"><a href="../classes/GanttLineEntry.html">GanttLineEntry</a></li>
+                                                    <li class="class"><a href="../classes/GroupUser.html">GroupUser</a></li>
+                                                    <li class="class"><a href="../classes/HelpLib.html">HelpLib</a></li>
+                                                    <li class="class"><a href="../classes/History.html">History</a></li>
+                                                    <li class="class"><a href="../classes/Html.html">Html</a></li>
+                                                    <li class="class"><a href="../classes/Inbox.html">Inbox</a></li>
+                                                    <li class="class"><a href="../classes/Inbox_message.html">Inbox_message</a></li>
+                                                    <li class="class"><a href="../classes/InboxService.html">InboxService</a></li>
+                                                    <li class="class"><a href="../classes/LogService.html">LogService</a></li>
+                                                    <li class="class"><a href="../classes/Lookup.html">Lookup</a></li>
+                                                    <li class="class"><a href="../classes/LookupService.html">LookupService</a></li>
+                                                    <li class="class"><a href="../classes/MailService.html">MailService</a></li>
+                                                    <li class="class"><a href="../classes/MainService.html">MainService</a></li>
+                                                    <li class="class"><a href="../classes/ModuleWidget.html">ModuleWidget</a></li>
+                                                    <li class="class"><a href="../classes/ObjectHistory.html">ObjectHistory</a></li>
+                                                    <li class="class"><a href="../classes/ObjectHistoryEntry.html">ObjectHistoryEntry</a></li>
+                                                    <li class="class"><a href="../classes/ObjectIndex.html">ObjectIndex</a></li>
+                                                    <li class="class"><a href="../classes/ObjectModification.html">ObjectModification</a></li>
+                                                    <li class="class"><a href="../classes/PermissionDeniedException.html">PermissionDeniedException</a></li>
+                                                    <li class="class"><a href="../classes/Printer.html">Printer</a></li>
+                                                    <li class="class"><a href="../classes/PrinterService.html">PrinterService</a></li>
+                                                    <li class="class"><a href="../classes/ProcessorType.html">ProcessorType</a></li>
+                                                    <li class="class"><a href="../classes/Report.html">Report</a></li>
+                                                    <li class="class"><a href="../classes/ReportConnection.html">ReportConnection</a></li>
+                                                    <li class="class"><a href="../classes/ReportFeed.html">ReportFeed</a></li>
+                                                    <li class="class"><a href="../classes/ReportLib.html">ReportLib</a></li>
+                                                    <li class="class"><a href="../classes/ReportMember.html">ReportMember</a></li>
+                                                    <li class="class"><a href="../classes/ReportService.html">ReportService</a></li>
+                                                    <li class="class"><a href="../classes/ReportTemplate.html">ReportTemplate</a></li>
+                                                    <li class="class"><a href="../classes/RestService.html">RestService</a></li>
+                                                    <li class="class"><a href="../classes/RestSession.html">RestSession</a></li>
+                                                    <li class="class"><a href="../classes/SearchService.html">SearchService</a></li>
+                                                    <li class="class"><a href="../classes/SessionManager.html">SessionManager</a></li>
+                                                    <li class="class"><a href="../classes/Sms.html">Sms</a></li>
+                                                    <li class="class"><a href="../classes/Task.html">Task</a></li>
+                                                    <li class="class"><a href="../classes/TaskComment.html">TaskComment</a></li>
+                                                    <li class="class"><a href="../classes/TaskData.html">TaskData</a></li>
+                                                    <li class="class"><a href="../classes/TaskDependency.html">TaskDependency</a></li>
+                                                    <li class="class"><a href="../classes/TaskEmailPoll.html">TaskEmailPoll</a></li>
+                                                    <li class="class"><a href="../classes/TaskGroup.html">TaskGroup</a></li>
+                                                    <li class="class"><a href="../classes/TaskGroupMember.html">TaskGroupMember</a></li>
+                                                    <li class="class"><a href="../classes/TaskGroupNotify.html">TaskGroupNotify</a></li>
+                                                    <li class="class"><a href="../classes/TaskGroupType.html">TaskGroupType</a></li>
+                                                    <li class="class"><a href="../classes/TaskGroupType_SoftwareDevelopment.html">TaskGroupType_SoftwareDevelopment</a></li>
+                                                    <li class="class"><a href="../classes/TaskGroupType_TaskTodo.html">TaskGroupType_TaskTodo</a></li>
+                                                    <li class="class"><a href="../classes/TaskGroupUserNotify.html">TaskGroupUserNotify</a></li>
+                                                    <li class="class"><a href="../classes/TaskLib.html">TaskLib</a></li>
+                                                    <li class="class"><a href="../classes/TaskObject.html">TaskObject</a></li>
+                                                    <li class="class"><a href="../classes/TaskService.html">TaskService</a></li>
+                                                    <li class="class"><a href="../classes/TaskTime.html">TaskTime</a></li>
+                                                    <li class="class"><a href="../classes/TaskType.html">TaskType</a></li>
+                                                    <li class="class"><a href="../classes/TaskType_ProgrammingTicket.html">TaskType_ProgrammingTicket</a></li>
+                                                    <li class="class"><a href="../classes/TaskType_Todo.html">TaskType_Todo</a></li>
+                                                    <li class="class"><a href="../classes/TaskUserNotify.html">TaskUserNotify</a></li>
+                                                    <li class="class"><a href="../classes/Template.html">Template</a></li>
+                                                    <li class="class"><a href="../classes/TemplateService.html">TemplateService</a></li>
+                                                    <li class="class"><a href="../classes/TestProcessor.html">TestProcessor</a></li>
+                                                    <li class="class"><a href="../classes/User.html">User</a></li>
+                                                    <li class="class"><a href="../classes/UserRole.html">UserRole</a></li>
+                                                    <li class="class"><a href="../classes/Web.html">Web</a></li>
+                                                    <li class="class"><a href="../classes/WebTemplate.html">WebTemplate</a></li>
+                                                    <li class="class"><a href="../classes/WidgetConfig.html">WidgetConfig</a></li>
+                                                    <li class="class"><a href="../classes/WidgetService.html">WidgetService</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/default.html">\</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
+
+                    <h1><small>\</small>Html</h1>
+                    <p><em></em></p>
+                    
+                    
+                                        
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/Html.html#method_table" class="">table()</a><br />
+                                                                    <a href="../classes/Html.html#method_dataTable" class="">dataTable()</a><br />
+                                                                    <a href="../classes/Html.html#method_chart" class="">chart()</a><br />
+                                                                    <a href="../classes/Html.html#method_a" class="">a()</a><br />
+                                                                    <a href="../classes/Html.html#method_b" class="">b()</a><br />
+                                                                    <a href="../classes/Html.html#method_box" class="">box()</a><br />
+                                                                    <a href="../classes/Html.html#method_boxOnClick" class="">boxOnClick()</a><br />
+                                                                    <a href="../classes/Html.html#method_ul" class="">ul()</a><br />
+                                                                    <a href="../classes/Html.html#method_ol" class="">ol()</a><br />
+                                                                    <a href="../classes/Html.html#method_form" class="">form()</a><br />
+                                                                    <a href="../classes/Html.html#method_datePicker" class="">datePicker()</a><br />
+                                                                    <a href="../classes/Html.html#method_datetimePicker" class="">datetimePicker()</a><br />
+                                                                    <a href="../classes/Html.html#method_timePicker" class="">timePicker()</a><br />
+                                                                    <a href="../classes/Html.html#method_multiColTable" class="">multiColTable()</a><br />
+                                                                    <a href="../classes/Html.html#method_multiColForm" class="">multiColForm()</a><br />
+                                                                    <a href="../classes/Html.html#method_checkbox" class="">checkbox()</a><br />
+                                                                    <a href="../classes/Html.html#method_radio" class="">radio()</a><br />
+                                                                    <a href="../classes/Html.html#method_select" class="">select()</a><br />
+                                                                    <a href="../classes/Html.html#method_groupSelect" class="">groupSelect()</a><br />
+                                                                    <a href="../classes/Html.html#method_multiSelect" class="">multiSelect()</a><br />
+                                                                    <a href="../classes/Html.html#method_autocomplete" class="">autocomplete()</a><br />
+                                                                    <a href="../classes/Html.html#method_img" class="">img()</a><br />
+                                                                    <a href="../classes/Html.html#method_validate" class="">validate()</a><br />
+                                                                    <a href="../classes/Html.html#method_pagination" class="">pagination()</a><br />
+                                                                    <a href="../classes/Html.html#method_filter" class="">filter()</a><br />
+                                                                    <a href="../classes/Html.html#method_listGrid" class="">listGrid()</a><br />
+                                                                    <a href="../classes/Html.html#method_breadcrumbs" class="">breadcrumbs()</a><br />
+                                                                    <a href="../classes/Html.html#method_multiFileUpload" class="">multiFileUpload()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No public properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No constants found</em>
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <em>No protected methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No protected properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <em>No private methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No private properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/html.html"><div class="path-wrapper">html.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">Default</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                    <div class="namespace-wrapper">\Html</div>
+                            </dd>
+
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr><td colspan="2"><em>None found</em></td></tr>
+                                        </table>
+                </aside>
+            </div>
+
+                        
+                        
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_table" name="method_table" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">table()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">table(  <span class="argument">$data</span>, string  <span class="argument">$id = null</span>, string  <span class="argument">$class = &quot;tablesorter&quot;</span>, boolean  <span class="argument">$header = null</span>) </pre>
+                <p><em>Creates an html table from an array like
+(
+  (&quot;one&quot;,&quot;two&quot;,&quot;three&quot;),
+	 (&quot;hello&quot;,&quot;world&quot;,&quot;bla&quot;)
+)</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$data </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$id </td>
+                                <td><p>is a css id</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$class </td>
+                                <td><p>is a css class</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$header </td>
+                                <td><p>use first row as <th> if true</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_dataTable" name="method_dataTable" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">dataTable()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">dataTable(  <span class="argument">$data = array()</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$data </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_chart" name="method_chart" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">chart()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">chart(string  <span class="argument">$id = &quot;chartjs&quot;</span>, string  <span class="argument">$type = &quot;line&quot;</span>, array  <span class="argument">$data = array()</span>, array  <span class="argument">$options = array()</span>, mixed  <span class="argument">$height = null</span>, mixed  <span class="argument">$width = null</span>,   <span class="argument">$class = null</span>) : string</pre>
+                <p><em>Html function to draw a chart, see: http://www.chartjs.org/docs/ for how
+the data structure and options should be put together for each</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$id </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$type </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$data </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$options </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>mixed</td>
+                                <td>$height </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>mixed</td>
+                                <td>$width </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$class </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_a" name="method_a" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">a()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">a(  <span class="argument">$href</span>,   <span class="argument">$title</span>,   <span class="argument">$alt = null</span>,   <span class="argument">$class = null</span>,   <span class="argument">$confirm = null</span>,   <span class="argument">$target = null</span>) </pre>
+                <p><em>creates a html link
+Side note: $alt is an &quot;illegal&quot; parameter for a links</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$href </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$title </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$alt </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$class </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$confirm </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$target </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_b" name="method_b" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">b()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">b(  <span class="argument">$href</span>,   <span class="argument">$title</span>,   <span class="argument">$confirm = null</span>,   <span class="argument">$id = null</span>,   <span class="argument">$newtab = false</span>,   <span class="argument">$class = null</span>,   <span class="argument">$type = null</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$href </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$title </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$confirm </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$id </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$newtab </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$class </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$type </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_box" name="method_box" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">box()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">box(\&lt;type&gt;  <span class="argument">$href</span>, \&lt;type&gt;  <span class="argument">$title</span>, \&lt;type&gt;  <span class="argument">$button = false</span>, \&lt;type&gt;  <span class="argument">$iframe = false</span>,   <span class="argument">$width = null</span>,   <span class="argument">$height = null</span>,   <span class="argument">$param = &quot;isbox&quot;</span>,   <span class="argument">$id = null</span>,   <span class="argument">$class = null</span>,   <span class="argument">$confirm = null</span>) </pre>
+                <p><em>Creates a link (or button) which will pop up a colorbox
+containing the contents of the url</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$href </td>
+                                <td><p>(M) the url to display in the colorbox</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$title </td>
+                                <td><p>(M) the link title</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$button </td>
+                                <td><p>(O) if true create a buttin instead of a link</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$iframe </td>
+                                <td><p>(O) whether to use an iframe to display the html contents (default: false)</p></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$width </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$height </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$param </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$id </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$class </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$confirm </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_boxOnClick" name="method_boxOnClick" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">boxOnClick()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">boxOnClick(  <span class="argument">$href</span>,   <span class="argument">$iframe = false</span>,   <span class="argument">$width = null</span>,   <span class="argument">$height = null</span>,   <span class="argument">$param = &quot;isbox&quot;</span>,   <span class="argument">$confirm = null</span>,   <span class="argument">$include_tag = true</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$href </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$iframe </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$width </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$height </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$param </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$confirm </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$include_tag </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_ul" name="method_ul" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">ul()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">ul(  <span class="argument">$array</span>,   <span class="argument">$id = null</span>,   <span class="argument">$class = null</span>,   <span class="argument">$subclass = null</span>,   <span class="argument">$type = &quot;ul&quot;</span>) </pre>
+                <p><em>creates a ul from an array structure:
+(&quot;1&quot;,&quot;2&quot;, array(&quot;2.1&quot;,&quot;2.2&quot;),&quot;3&quot;)</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$array </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$id </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$class </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$subclass </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$type </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_ol" name="method_ol" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">ol()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">ol(  <span class="argument">$array</span>,   <span class="argument">$id = null</span>,   <span class="argument">$class = null</span>,   <span class="argument">$subclass = null</span>) </pre>
+                <p><em>creates a ol from an array structure:
+(&quot;1&quot;,&quot;2&quot;, array(&quot;2.1&quot;,&quot;2.2&quot;),&quot;3&quot;)</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$array </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$id </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$class </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$subclass </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_form" name="method_form" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">form()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">form(  <span class="argument">$data</span>,   <span class="argument">$action = null</span>,   <span class="argument">$method = &quot;POST&quot;</span>,   <span class="argument">$submitTitle = &quot;Save&quot;</span>,   <span class="argument">$id = null</span>,   <span class="argument">$class = null</span>,   <span class="argument">$target = &quot;_self&quot;</span>,   <span class="argument">$enctype = null</span>) </pre>
+                <p><em>creates a simple one column form from the following array:
+array(
+		array(&quot;title&quot;,&quot;type&quot;,&quot;fieldname&quot;,&quot;value&quot;,{size | array(select options) | cols, rows}),
+ 	.</em></p>
+                <p>..
+)</p>
+<p>valid field types are:
+text, password, autocomplete, static, date, textarea, section,
+select, multiselect, checkbox, hidden</p>
+<p>Field type auto uses ui hints from a DbObject.</p>
+<p>when prefixing a fieldname with a minus sign '-' this field will be read-only</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$data </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$action </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$method </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$submitTitle </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$id </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$class </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$target </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$enctype </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_datePicker" name="method_datePicker" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">datePicker()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">datePicker(  <span class="argument">$name</span>,   <span class="argument">$value = null</span>,   <span class="argument">$size = null</span>,   <span class="argument">$required = null</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$name </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$value </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$size </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$required </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_datetimePicker" name="method_datetimePicker" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">datetimePicker()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">datetimePicker(  <span class="argument">$name</span>,   <span class="argument">$value = null</span>,   <span class="argument">$size = null</span>,   <span class="argument">$required = null</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$name </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$value </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$size </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$required </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_timePicker" name="method_timePicker" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">timePicker()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">timePicker(  <span class="argument">$name</span>,   <span class="argument">$value = null</span>,   <span class="argument">$size = null</span>,   <span class="argument">$required = null</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$name </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$value </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$size </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$required </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_multiColTable" name="method_multiColTable" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">multiColTable()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">multiColTable(Array  <span class="argument">$data</span>) : String</pre>
+                <p><em>This function invokes multiColForm with default parameters
+to remove unnecessary html when displaying data</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>Array</td>
+                                <td>$data </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    String
+                                            &mdash; <p>html</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_multiColForm" name="method_multiColForm" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">multiColForm()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">multiColForm(\&lt;type&gt;  <span class="argument">$data</span>, \&lt;type&gt;  <span class="argument">$action = null</span>, \&lt;type&gt;  <span class="argument">$method = &quot;POST&quot;</span>, \&lt;type&gt;  <span class="argument">$submitTitle = &quot;Save&quot;</span>, \&lt;type&gt;  <span class="argument">$id = null</span>, \&lt;type&gt;  <span class="argument">$class = null</span>, \&lt;type&gt;  <span class="argument">$extrabuttons = null</span>,   <span class="argument">$target = &quot;_self&quot;</span>,   <span class="argument">$includeFormTag = true</span>,   <span class="argument">$validation = null</span>) : \&lt;type&gt;</pre>
+                <p><em>Creates a complex form where each section can have
+a different number of columns.</em></p>
+                <p>extrabuttons = array(&quot;id&quot;=&gt;&quot;title&quot;, ..)</p>
+<p>valid field types are:
+text, password, autocomplete, static, date, textarea, section,
+select, multiselect, checkbox, hidden</p>
+<p>when prefixing a fieldname with a minus sign '-' this field will be read-only</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$data </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$action </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$method </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$submitTitle </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$id </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$class </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$extrabuttons </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$target </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$includeFormTag </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$validation </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \<type>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_checkbox" name="method_checkbox" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">checkbox()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">checkbox(\&lt;type&gt;  <span class="argument">$name</span>, \&lt;type&gt;  <span class="argument">$value</span>,   <span class="argument">$default_value = &#039;1&#039;</span>,   <span class="argument">$class = null</span>,   <span class="argument">$required = null</span>) : \&lt;type&gt;</pre>
+                <p><em>Creates a checkbox input element</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$name </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$value </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$default_value </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$class </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$required </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \<type>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_radio" name="method_radio" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">radio()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">radio(\&lt;type&gt;  <span class="argument">$name</span>,   <span class="argument">$group</span>, \&lt;type&gt;  <span class="argument">$value</span>,   <span class="argument">$default_value = &#039;1&#039;</span>,   <span class="argument">$class = null</span>,   <span class="argument">$required = null</span>) : \&lt;type&gt;</pre>
+                <p><em>Creates a radiobutton input element</em></p>
+                <p>@param <type> $id</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$name </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$group </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$value </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$default_value </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$class </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$required </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \<type>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_select" name="method_select" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">select()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">select(  <span class="argument">$name</span>,   <span class="argument">$items</span>, \&lt;type&gt;  <span class="argument">$value = null</span>, \&lt;type&gt;  <span class="argument">$class = null</span>,   <span class="argument">$style = null</span>,   <span class="argument">$allmsg = &quot;-- Select --&quot;</span>,   <span class="argument">$required = null</span>) </pre>
+                <p><em>Create just a single select input widget to be used
+in a custom form.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$name </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$items </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$value </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$class </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$style </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$allmsg </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$required </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_groupSelect" name="method_groupSelect" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">groupSelect()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">groupSelect(  <span class="argument">$name</span>,   <span class="argument">$items</span>,   <span class="argument">$value = null</span>,   <span class="argument">$groupvalue = null</span>,   <span class="argument">$class = null</span>,   <span class="argument">$style = null</span>,   <span class="argument">$allmsg = &quot;-- Select --&quot;</span>) </pre>
+                <p><em>Create a grouped select input widget to be used
+in a custom form.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$name </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$items </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$value </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$groupvalue </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$class </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$style </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$allmsg </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_multiSelect" name="method_multiSelect" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">multiSelect()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">multiSelect(\&lt;type&gt;  <span class="argument">$name</span>, \&lt;type&gt;  <span class="argument">$items</span>, \&lt;type&gt;  <span class="argument">$values = null</span>, \&lt;type&gt;  <span class="argument">$class = null</span>, \&lt;type&gt;  <span class="argument">$style = null</span>, \&lt;type&gt;  <span class="argument">$allmsg = null</span>) : \&lt;type&gt;</pre>
+                <p><em>Create a multi select field using jQuery</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$name </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$items </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$values </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$class </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$style </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$allmsg </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \<type>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_autocomplete" name="method_autocomplete" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">autocomplete()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">autocomplete(  <span class="argument">$name</span>,   <span class="argument">$options</span>, \&lt;type&gt;  <span class="argument">$value = null</span>, \&lt;type&gt;  <span class="argument">$class = null</span>,   <span class="argument">$style = null</span>,   <span class="argument">$minLength = 1</span>,   <span class="argument">$required = null</span>) </pre>
+                <p><em>Create a single select autocomplete widget</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$name </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$options </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$value </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\<type></td>
+                                <td>$class </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$style </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$minLength </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$required </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_img" name="method_img" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">img()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">img(  <span class="argument">$src</span>,   <span class="argument">$alt = &quot;&quot;</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$src </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$alt </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_validate" name="method_validate" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">validate()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">validate(  <span class="argument">$valarray</span>,   <span class="argument">$values = null</span>) </pre>
+                <p><em>validates the request parameters according to
+the rules passed in $valarray. It must be of the
+following form:</em></p>
+                <p>array(
+&quot;<param-name>&quot; =&gt; array(&quot;<regexp>&quot;,&quot;<error message>&quot;),
+&quot;<param-name>&quot; =&gt; array(&quot;<regexp>&quot;,&quot;<error message>&quot;),
+...
+)</p>
+<p>returns an array which contains all produced error
+messages</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$valarray </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$values </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_pagination" name="method_pagination" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">pagination()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">pagination(  <span class="argument">$currentpage</span>,   <span class="argument">$numpages</span>,   <span class="argument">$pagesize</span>,   <span class="argument">$totalresults</span>,   <span class="argument">$baseurl</span>,   <span class="argument">$pageparam = &quot;p&quot;</span>,   <span class="argument">$pagesizeparam = &quot;ps&quot;</span>,   <span class="argument">$totalresultsparam = &quot;tr&quot;</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$currentpage </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$numpages </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$pagesize </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$totalresults </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$baseurl </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$pageparam </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$pagesizeparam </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$totalresultsparam </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_filter" name="method_filter" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">filter()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">filter(  <span class="argument">$legend</span>, Array  <span class="argument">$data</span>,   <span class="argument">$action = null</span>,   <span class="argument">$method = &quot;POST&quot;</span>,   <span class="argument">$submitTitle = &quot;Filter&quot;</span>,   <span class="argument">$id = null</span>,   <span class="argument">$class = null</span>,   <span class="argument">$validation = null</span>) </pre>
+                <p><em>Filter function returns formatted form for declaring filters. Data is the same
+ as how Html::form is used. Filter parameters can be retrieved with $w-&gt;request
+ and it may be a good idea to prefix input names with &#039;filter_&#039; to avoid naming
+ collisions in requests</em></p>
+                <p>@param String $legend</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$legend </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>Array</td>
+                                <td>$data </td>
+                                <td><p>@param String $action
+@param String $method
+@param String $submitTitle
+@param String $id
+@param String $class</p>
+<p>@return String $buf</p></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$action </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$method </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$submitTitle </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$id </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$class </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$validation </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_listGrid" name="method_listGrid" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">listGrid()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">listGrid(  <span class="argument">$data</span>,   <span class="argument">$buttons = array()</span>,   <span class="argument">$perRow = 2</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$data </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$buttons </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$perRow </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_breadcrumbs" name="method_breadcrumbs" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">breadcrumbs()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">breadcrumbs(  <span class="argument">$data = array()</span>,   <span class="argument">$w = null</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$data </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$w </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_multiFileUpload" name="method_multiFileUpload" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">multiFileUpload()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">multiFileUpload(\&lt;String&gt;  <span class="argument">$name</span>) : \&lt;String&gt;</pre>
+                <p><em>Creates a view for uploading multiple files at the same time
+Uses the $name parameter to distinguish between multiple
+instances on one page.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\<String></td>
+                                <td>$name </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \<String>
+                                            &mdash; <p>buffer</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                                    </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">html.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/html.php.txt" class="language-php line-numbers"></pre>
+        </div>
+    </div>
+
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                            <li><a href="../namespaces/Html.html">\Html</a></li>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on 
+Warning: date_default_timezone_get(): It is not safe to rely on the system's timezone settings. You are *required* to use the date.timezone setting or the date_default_timezone_set() function. In case you used any of those methods and you are still getting this warning, you most likely misspelled the timezone identifier. We selected the timezone 'UTC' for now, but please set date.timezone to select your timezone. in /Users/adambuckley/web/cmfive/system/composer/vendor/twig/twig/lib/Twig/Extension/Core.php on line 89
+March 2nd, 2015 at 05:03.
+                </section>
+            </section>
+        </section>
+    </footer>
+</div>
+
+</body>
+</html>

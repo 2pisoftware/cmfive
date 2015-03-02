@@ -217,6 +217,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
                 $this->printer = $arguments['printer'];
             } else {
                 $printerClass = 'PHPUnit_TextUI_ResultPrinter';
+
                 if (isset($arguments['printer']) &&
                     is_string($arguments['printer']) &&
                     class_exists($arguments['printer'], false)) {
@@ -231,7 +232,8 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
                   isset($arguments['stderr']) ? 'php://stderr' : null,
                   $arguments['verbose'],
                   $arguments['colors'],
-                  $arguments['debug']
+                  $arguments['debug'],
+                  $arguments['columns']
                 );
             }
         }
@@ -250,6 +252,14 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
                         $arguments['configuration']->getFilename()
                     )
                 );
+            }
+
+            if (isset($arguments['deprecatedStrictModeOption'])) {
+                print "Deprecated option \"--strict\" used\n\n";
+            }
+
+            if (isset($arguments['deprecatedStrictModeSetting'])) {
+                print "Deprecated configuration setting \"strict\" used\n\n";
             }
         }
 
@@ -562,6 +572,10 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
 
             $phpunitConfiguration = $arguments['configuration']->getPHPUnitConfiguration();
 
+            if (isset($phpunitConfiguration['deprecatedStrictModeSetting'])) {
+                $arguments['deprecatedStrictModeSetting'] = true;
+            }
+
             if (isset($phpunitConfiguration['backupGlobals']) &&
                 !isset($arguments['backupGlobals'])) {
                 $arguments['backupGlobals'] = $phpunitConfiguration['backupGlobals'];
@@ -867,6 +881,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
         $arguments['backupGlobals']                      = isset($arguments['backupGlobals'])                      ? $arguments['backupGlobals']                      : null;
         $arguments['backupStaticAttributes']             = isset($arguments['backupStaticAttributes'])             ? $arguments['backupStaticAttributes']             : null;
         $arguments['cacheTokens']                        = isset($arguments['cacheTokens'])                        ? $arguments['cacheTokens']                        : false;
+        $arguments['columns']                            = isset($arguments['columns'])                            ? $arguments['columns']                            : 80;
         $arguments['colors']                             = isset($arguments['colors'])                             ? $arguments['colors']                             : false;
         $arguments['convertErrorsToExceptions']          = isset($arguments['convertErrorsToExceptions'])          ? $arguments['convertErrorsToExceptions']          : true;
         $arguments['convertNoticesToExceptions']         = isset($arguments['convertNoticesToExceptions'])         ? $arguments['convertNoticesToExceptions']         : true;

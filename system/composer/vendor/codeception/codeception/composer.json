@@ -18,7 +18,7 @@
         "php": ">=5.4.0",
         "ext-json": "*",
         "ext-mbstring": "*",
-        "phpunit/phpunit": "4.4.*",
+        "phpunit/phpunit": "~4.5.0",
         "facebook/webdriver": "~0.4|~0.5",
         "guzzlehttp/guzzle": "~4.0|~5.0",
         "symfony/finder": "~2.4",
@@ -35,7 +35,7 @@
         "videlalvaro/php-amqplib": "~2.4",
         "codeception/specify": "~0.3",
         "pda/pheanstalk": "~2.0",
-        "flow/jsonpath": "~0.1"
+        "flow/jsonpath": "~0.2"
     },
     "suggest": {
         "codeception/phpbuiltinserver": "Extension to start and stop PHP built-in web server for your tests",

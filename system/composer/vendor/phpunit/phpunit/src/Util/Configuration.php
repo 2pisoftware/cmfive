@@ -19,6 +19,7 @@
  *          backupStaticAttributes="false"
  *          bootstrap="/path/to/bootstrap.php"
  *          cacheTokens="false"
+ *          columns="80"
  *          colors="false"
  *          stderr="false"
  *          convertErrorsToExceptions="true"
@@ -543,6 +544,16 @@ class PHPUnit_Util_Configuration
             );
         }
 
+        if ($root->hasAttribute('columns')) {
+            $columns = (string) $root->getAttribute('columns');
+
+            if ($columns == 'max') {
+                $result['columns'] = 'max';
+            } else {
+                $result['columns'] = $this->getInteger($columns, 80);
+            }
+        }
+
         if ($root->hasAttribute('colors')) {
             $result['colors'] = $this->getBoolean(
                 (string) $root->getAttribute('colors'), false
@@ -720,11 +731,12 @@ class PHPUnit_Util_Configuration
                 (string) $root->getAttribute('strict'), false
             );
 
-            $result['reportUselessTests']         = $flag;
-            $result['strictCoverage']             = $flag;
-            $result['disallowTestOutput']         = $flag;
-            $result['enforceTimeLimit']           = $flag;
-            $result['disallowTodoAnnotatedTests'] = $flag;
+            $result['reportUselessTests']          = $flag;
+            $result['strictCoverage']              = $flag;
+            $result['disallowTestOutput']          = $flag;
+            $result['enforceTimeLimit']            = $flag;
+            $result['disallowTodoAnnotatedTests']  = $flag;
+            $result['deprecatedStrictModeSetting'] = true;
         }
 
         if ($root->hasAttribute('verbose')) {

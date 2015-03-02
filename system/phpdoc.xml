@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdoc>
+  <parser>
+    <target>docs/api</target>
+  </parser>
+  <transformer>
+    <target>docs/api</target>
+  </transformer>
+  <files>
+    <directory>.</directory>
+    <ignore>cache/*</ignore>
+    <ignore>composer/*</ignore>
+    <ignore>docs/*</ignore>
+    <ignore>install/*</ignore>
+    <ignore>lib/*</ignore>
+    <ignore>templates/*</ignore>
+    <ignore>.gitignore</ignore>
+    <ignore>.htaccess</ignore>
+    <ignore>composer*</ignore>
+    <ignore>config.php</ignore>
+    <ignore>index.html</ignore>
+  </files>
+</phpdoc>

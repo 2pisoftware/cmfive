@@ -1,0 +1,14 @@
+<?php
+function atthumb_GET(Web &$w) {
+	$p = $w->pathMatch("id",array("w",150),array("h",150));
+
+	$id = str_replace(".jpg", "", $p['id']);
+	$attachment = $w->service("File")->getAttachment($id);
+	require_once 'phpthumb/ThumbLib.inc.php';
+	$thumb = PhpThumbFactory::create(FILE_ROOT.$attachment->fullpath);
+	$thumb->resize($p['w'], $p['h']);
+	//$thumb->adaptiveResize($p['w'], $p['h']);
+	$thumb->show();
+	exit;
+}
+

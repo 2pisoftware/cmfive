@@ -94,38 +94,53 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements PHPUn
     protected $verbose = false;
 
     /**
+     * @var integer
+     */
+    private $numberOfColumns;
+
+    /**
      * Constructor.
      *
      * @param  mixed                       $out
      * @param  boolean                     $verbose
      * @param  boolean                     $colors
      * @param  boolean                     $debug
+     * @param  integer|string              $numberOfColumns
      * @throws PHPUnit_Framework_Exception
      * @since  Method available since Release 3.0.0
      */
-    public function __construct($out = null, $verbose = false, $colors = false, $debug = false)
+    public function __construct($out = null, $verbose = false, $colors = false, $debug = false, $numberOfColumns = 80)
     {
         parent::__construct($out);
 
-        if (is_bool($verbose)) {
-            $this->verbose = $verbose;
-        } else {
+        if (!is_bool($verbose)) {
             throw PHPUnit_Util_InvalidArgumentHelper::factory(2, 'boolean');
         }
 
-        if (is_bool($colors)) {
-            $console = new Console;
-
-            $this->colors = $colors && $console->hasColorSupport();
-        } else {
+        if (!is_bool($colors)) {
             throw PHPUnit_Util_InvalidArgumentHelper::factory(3, 'boolean');
         }
 
-        if (is_bool($debug)) {
-            $this->debug = $debug;
-        } else {
+        if (!is_bool($debug)) {
             throw PHPUnit_Util_InvalidArgumentHelper::factory(4, 'boolean');
         }
+
+        if (!is_int($numberOfColumns) && $numberOfColumns != 'max') {
+            throw PHPUnit_Util_InvalidArgumentHelper::factory(5, 'integer or "max"');
+        }
+
+        $console = new Console;
+
+        $maxNumberOfColumns = $console->getNumberOfColumns();
+
+        if ($numberOfColumns == 'max' || $numberOfColumns > $maxNumberOfColumns) {
+            $numberOfColumns = $maxNumberOfColumns;
+        }
+
+        $this->numberOfColumns = $numberOfColumns;
+        $this->verbose         = $verbose;
+        $this->colors          = $colors && $console->hasColorSupport();
+        $this->debug           = $debug;
     }
 
     /**
@@ -460,7 +475,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements PHPUn
         if ($this->numTests == -1) {
             $this->numTests      = count($suite);
             $this->numTestsWidth = strlen((string) $this->numTests);
-            $this->maxColumn     = 69 - (2 * $this->numTestsWidth);
+            $this->maxColumn     = $this->numberOfColumns - strlen('  /  (XXX%)') - (2 * $this->numTestsWidth);
         }
     }
 
