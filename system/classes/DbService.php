@@ -109,7 +109,7 @@ class DbService {
         // this will eliminate 80% of SQL calls per page view!
         if ($usecache) {
             $obj = !empty(self::$_cache[$class][$key]) ? self::$_cache[$class][$key] : null;
-            if ($obj) {
+            if (!empty($obj)) {
                 return $obj;
             }
         }
@@ -136,7 +136,7 @@ class DbService {
         }
 
 //        $this->w->Log->setLogger("DB_SERVICE")->debug("(getObject) TABLE: " . $table . " WHERE: " . json_encode($idOrWhere));
-//        $this->w->Log->setLogger("DB_SERVICE")->debug("SQL: " . $this->_db->getSql());
+        //$this->w->Log->setLogger("DB_SERVICE")->debug("SQL: " . $this->_db->getSql());
         $result = $this->_db->fetch_row();
 //        $this->w->Log->setLogger("DB_SERVICE")->debug("RESULT: " . json_encode($result));
 
