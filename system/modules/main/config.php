@@ -10,8 +10,6 @@ Config::set('main', array(
     'company_url' => 'http://github.com/careck/cmfive',
     "dependencies" => array(
         "codeception/codeception" => "*",
-        "monolog/monolog" => "1.8.*@dev",
-        "phpdocumentor/phpdocumentor" => "dev-master"
+        "monolog/monolog" => "1.8.*@dev"
     )
-
 ));
