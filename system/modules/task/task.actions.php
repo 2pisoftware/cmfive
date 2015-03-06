@@ -212,7 +212,13 @@ function addtime_GET(Web &$w) {
         $who = $_SESSION["user_id"];
         $s = $e = date("d/m/Y g:i a");
     }
-
+    
+    // picklist of time types from tasktype
+    $timeTypes=array();
+    if (!empty($task->getTaskTypeObject())) {
+    	$timeTypes=$task->getTaskTypeObject()->getTimeTypes();
+    }
+    
     $f = array(
         array("Add Time Log Entry", "section"),
         array("Assignee", "select", "user_id", $who, $w->Task->getMembersBeAssigned($task->task_group_id)),
@@ -223,6 +229,7 @@ function addtime_GET(Web &$w) {
         array("Or Period:", "static", "OR", "<b>Below select the period worked since the Start Date/Time</b>"),
         array("Hours", "select", "per_hour", null, array_slice($hours, 0, 11)),
         array("Min", "select", "per_minute", null, $mins),
+    	array("Time Type", "select", "time_type", (!empty($log)) ? $log->time_type : "", $timeTypes),
         array("Comments", "section"),
         array("Comments", "textarea", "comments", !empty($comment) ? $comment : null, "40", "10"),
     );
@@ -248,6 +255,7 @@ function edittime_POST(Web $w) {
     $arr["creator_id"] = $_SESSION["user_id"];
     $arr["dt_created"] = date("d/m/Y");
     $arr["user_id"] = $_REQUEST["user_id"];
+    $arr["time_type"] = $_REQUEST["time_type"];
 
     list ($date, $time, $ampm) = preg_split("/\s/", $_REQUEST['dt_start']);
     $start = $w->Task->date2db($date) . " " . $time . " " . $ampm;

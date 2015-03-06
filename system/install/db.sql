@@ -662,6 +662,7 @@ CREATE TABLE IF NOT EXISTS `task_time` (
   `comment_id` int(11) NOT NULL,
   `is_suspect` tinyint(4) NOT NULL DEFAULT '0',
   `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `time_type` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
 

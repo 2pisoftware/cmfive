@@ -9,6 +9,7 @@ class TaskTime extends  DbObject {
     public $comment_id; 	// id of comment associated with this log entry
     public $is_suspect;	// suspect/accept toggle
     public $is_deleted;	// is deleted flag
+    public $time_type;
 
     public static $_db_table = "task_time";
 
@@ -27,4 +28,6 @@ class TaskTime extends  DbObject {
     public function getTask() {
         return $this->getObject("Task", $this->task_id);
     }
+
+    
 }

@@ -77,4 +77,12 @@ abstract class TaskType {
 	 */
 	function displayExtraButtons(Task $task) {}
 	
+	/**
+	 * Return an array of options for time types
+	 * @return array:
+	 */
+	function getTimeTypes() {
+		return array();	
+	} 
+	
 }
