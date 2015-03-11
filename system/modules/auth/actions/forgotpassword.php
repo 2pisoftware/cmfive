@@ -13,7 +13,7 @@ function forgotpassword_POST(Web $w) {
     $support_email = Config::get('main.company_support_email');
     if (empty($support_email)) {
         $w->Log->error("Cannot send recovery email. This site has not been configured with a default email address. Th project config needs a main.company_support_email record.");
-        $w->error("Cannot send recovery email. This site has not been configured with a default email address", "/login");
+        $w->error("Cannot send recovery email. This site has not been configured with a default email address", "/auth/login");
     }
 
     $login = $w->request("login");
