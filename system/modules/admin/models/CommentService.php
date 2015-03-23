@@ -45,5 +45,5 @@ class CommentService extends DbService {
     	$options = null;
     	return $creole->parse(strip_tags($text));
     }
-
+    
 }

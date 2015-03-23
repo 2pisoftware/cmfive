@@ -4,7 +4,7 @@ function edit_GET($w) {
     $p = $w->pathMatch("id");
     $task = (!empty($p["id"]) ? $w->Task->getTask($p["id"]) : new Task($w));
     
-    if (!empty($task->id) && !$task->getCanIEdit()) {
+    if (!empty($task->id) && !$task->canView($w->Auth->user())) {
         $w->error("You do not have permission to edit this Task", "/task/tasklist");
     }
     

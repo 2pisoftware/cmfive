@@ -13,8 +13,8 @@
                         Posted <?php echo Carbon::createFromTimeStamp($c->dt_created)->diffForHumans(); ?>
                     </span>
                 <?php endif; ?>
-                <a class="comment_reply">Reply</a>
-                <?php if ($c->w->Auth->user()->id == $c->creator_id) : ?>
+                <?php if (empty($displayOnly)) : ?><a class="comment_reply">Reply</a><?php endif; ?>
+                <?php if ($c->w->Auth->user()->id == $c->creator_id && empty($displayOnly)) : ?>
                     <span style='float: right;'>
                         <?php echo Html::box("/admin/comment/{$c->id}/{$c->obj_table}/{$c->obj_id}?redirect_url=" . $redirect, "Edit", false); ?>
                         or
@@ -24,6 +24,6 @@
             </div>
         </div>    
     </div>
-    <?php echo $w->partial("loopcomments", array("object" => $w->Comment->getCommentsForTable($c->getDbTableName(), $c->id), 
-                                                 "redirect" => $redirect), "admin"); ?>
+    <?php echo empty($displayOnly) ? $w->partial("loopcomments", array("object" => $w->Comment->getCommentsForTable($c->getDbTableName(), $c->id), 
+                                                 "redirect" => $redirect), "admin") : ""; ?>
 </div>

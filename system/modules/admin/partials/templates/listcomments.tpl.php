@@ -29,10 +29,18 @@
             $("a.comment_reply").click(function(e) {
                 return comment_reply_clicked($(this));
             });
+            
+            <?php if (!empty($_GET['scroll_comment_id']) && is_numeric($_GET['scroll_comment_id'])) : ?>
+                // Scroll to comment
+                $('html, body').animate({
+                    scrollTop: $("#comment_<?php echo $_GET['scroll_comment_id']; ?>").offset().top
+                }, 1000);
+            <?php endif; ?>
         });
 
         function comment_reply_clicked(element) {
-    //            e.stopPropigation();
+            console.log("Loading reply form");
+            
             $("a.comment_reply").each(function() {
                $(this).hide(); 
             });
@@ -40,10 +48,12 @@
             var closest = element.closest('.medium-11').siblings('.medium-1').first();
             var comment_section = element.closest(".comment_section");
             var comment_id = comment_section.attr('id').substr(comment_section.attr('id').indexOf('_') + 1);
-
+            
+            
             var replyForm = $('<div></div>').addClass('comment_section')
                 .append($('<div></div>').addClass('comment_body clearfix')
-                    .append(closest[0].outerHTML)
+                    .append($('<div></div>').addClass('medium-1 column')
+                        .append($('<img/>').addClass('comment_avatar').attr('src', 'http://www.gravatar.com/avatar/<?php echo md5(strtolower(trim(@$w->Auth->user()->getContact()->email))); ?>?d=identicon')))
                     .append($('<div></div>').addClass('medium-11 columns')
                         .append($('<form></form>').attr({id: 'comment_reply_form'})
                             .append($('<input>').attr({
@@ -65,8 +75,9 @@
                         )
                     )
                 );
+//            replyForm.closest('.comment_avatar').first().attr('src', 'http://www.gravatar.com/avatar/<?php echo md5(strtolower(trim(@$w->Auth->user()->getContact()->email))); ?>?d=identicon')
             comment_section.append(replyForm);
-
+            
             $("#textarea_comment").focus();
 
             $('#comment_reply_form').submit(function() {
@@ -79,15 +90,19 @@
                         '<?php echo \CSRF::getTokenID(); ?>': '<?php echo \CSRF::getTokenValue(); ?>'
                     },
                     complete: function(comment_response) {
-                        cancelReply(replyForm);
-                        replyForm.remove();
+                        toggleModalLoading();
+                        window.location.reload();
                         
-                        comment_section.append(comment_response.responseText);
-                        applyColours(true);
-                        // Rebind reply links
-                        $("a.comment_reply").click(function(e) {
-                            return comment_reply_clicked($(this));
-                        }); 
+//                        cancelReply(replyForm);
+//                        replyForm.remove();
+//                        delete replyForm;
+//                        
+//                        comment_section.append(comment_response.responseText);
+//                        applyColours(true);
+//                        // Rebind reply links
+//                        $("a.comment_reply").click(function(e) {
+//                            return comment_reply_clicked($(this));
+//                        }); 
                     }
                 });
                 return false;

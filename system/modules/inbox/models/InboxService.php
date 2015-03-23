@@ -2,14 +2,12 @@
 
 class InboxService extends DbService {
 
-    function addMessage($subject, $message, $user_id = null, $sender_id = null, $parent_id = null) {
+    function addMessage($subject, $message, $user_id = null, $sender_id = null, $parent_id = null, $send_email = true) {
         if (!$user_id) {
             $user_id = $this->Auth->user()->id;
         }
         if (!$sender_id) {
-            if ($this->Auth->user()) {
-                $sender_id = $this->Auth->user()->id;
-            }
+            $sender_id = $this->Auth->user()->id;
         }
         if (!is_a($message, "DbObject")) {
             $mso = new Inbox_message($this->w);
@@ -32,7 +30,12 @@ class InboxService extends DbService {
         $msg->insert();
 
         $receiver = $this->Auth->getUser($user_id);
-        $this->sendMail($receiver->getContact()->email, null, null, null, null, $subject, $message);
+        
+        // Notify users via email if specified and the user isn't sending a message to themselves
+        $this->w->Log->debug("IDs: " . var_export($msg->user_id, true) . " - " . var_export($msg->sender_id, true));
+        if ($send_email === true && $msg->user_id !== $msg->sender_id) {
+            $this->w->Mail->sendMail($receiver->getContact()->email, $this->w->Auth->getUser($msg->sender_id)->getContact()->email, $msg->subject, $mso->message);
+        }
     }
 
     function sendMail($to, $cc, $bcc, $from, $replyto, $subject, $message) {
@@ -110,11 +113,7 @@ class InboxService extends DbService {
     function inboxCountMarker() {
         $user_id = $this->w->Auth->user()->id;
         $count_messages = $this->_db->get("inbox")->where("user_id", $user_id)->where("is_new", 1)->count();
-        $count = "";
-        if ($count_messages > 0) {
-            $count = " (" . $count_messages . ")";
-        }
-        return $count;
+        return ($count_messages > 0) ? "<span class='label secondary round' style='margin-left: 5px;'>" . $count_messages . "</span>" : "";
     }
 
     function getMessages($page, $page_size, $user_id, $is_new, $is_arch = 0, $is_del = 0, $has_parent = 0) {
@@ -237,4 +236,10 @@ class InboxService extends DbService {
         return $nav;
     }
 
+    function menuLink() {
+        return $this->w->Auth->allowed("/inbox", 
+            Html::a($this->w->localUrl("/inbox"), "Inbox" . $this->inboxCountMarker(), "Inbox", "current active")
+        );
+    }
+    
 }

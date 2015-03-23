@@ -14,7 +14,6 @@ class MailService extends DbService {
      * Sends an email using config array from /config.php and the swiftmailer lib
      * for transport. 
      * 
-     * @global Array $EMAIL_CONFIG
      * @param string $to
      * @param string $replyto
      * @param string $subject
