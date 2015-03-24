@@ -449,7 +449,7 @@ class TaskService extends DbService {
         $tasktypes = array();
         $this->_loadTaskFiles();
         foreach (get_declared_classes() as $class) {
-            if (startsWith($class, $taskgroup)) {
+            if ($class == $taskgroup) {
                 $tgt = new $class($this->w);
                 foreach ($tgt->getTaskTypeArray() as $short_tasktype => $long_tasktype) {
                     $tasktypes[] = array($long_tasktype, $short_tasktype);
