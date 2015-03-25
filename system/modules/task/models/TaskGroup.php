@@ -45,7 +45,7 @@ class TaskGroup extends DbObject {
     
     // Only owner of taskgroup or admin can edit
     public function canEdit(\User $user) {
-        if ($this->w->Auth->user()->is_admin == 1) {
+        if ($this->Auth->user()->is_admin == 1) {
             return true;
         }
         
@@ -55,7 +55,7 @@ class TaskGroup extends DbObject {
     
     // Only owner of taskgroup or admin can delete
     public function canDelete(\User $user) {
-        if ($this->w->Auth->user()->is_admin == 1) {
+        if ($this->Auth->user()->is_admin == 1) {
             return true;
         }
         
@@ -64,37 +64,37 @@ class TaskGroup extends DbObject {
     
     // get my member object. compare my role with group role required to view task group
     function getCanIView() {
-        if ($this->w->Auth->user()->is_admin == 1) {
+        if ($this->Auth->user()->is_admin == 1) {
             return true;
         }
         
-        $me = $this->w->Task->getMemberGroupById($this->id, $this->w->Auth->user()->id);
+        $me = $this->Task->getMemberGroupById($this->id, $this->Auth->user()->id);
         if (empty($me)) {
             return false;
         }
-        return ($this->can_view == "ALL") ? true : $this->w->Task->getMyPerms($me->role, $this->can_view);
+        return ($this->can_view == "ALL") ? true : $this->Task->getMyPerms($me->role, $this->can_view);
     }
 
     // get my member object. compare my role with group role required to create tasks in this group
     function getCanICreate() {
-        if ($this->w->Auth->user()->is_admin == 1) {
+        if ($this->Auth->user()->is_admin == 1) {
             return true;
         }
         
-        $me = $this->w->Task->getMemberGroupById($this->id, $this->w->Auth->user()->id);
+        $me = $this->Task->getMemberGroupById($this->id, $this->w->Auth->user()->id);
         if (empty($me)) {
             return false;
         }
-        return ($this->can_create == "ALL") ? true : $this->w->Task->getMyPerms($me->role, $this->can_create);
+        return ($this->can_create == "ALL") ? true : $this->Task->getMyPerms($me->role, $this->can_create);
     }
 
     // get my member object. compare my role with group role required to assign tasks in this group
     function getCanIAssign() {
-        if ($this->w->Auth->user()->is_admin == 1) {
+        if ($this->Auth->user()->is_admin == 1) {
             return true;
         }
         
-        $me = $this->w->Task->getMemberGroupById($this->id, $this->w->Auth->user()->id);
+        $me = $this->Task->getMemberGroupById($this->id, $this->w->Auth->user()->id);
         if (empty($me)) {
             return false;
         }
@@ -103,19 +103,19 @@ class TaskGroup extends DbObject {
 
     // get task group title given task group type
     function getTypeTitle() {
-        $c = $this->w->Task->getTaskGroupTypeObject($this->task_group_type);
+        $c = $this->Task->getTaskGroupTypeObject($this->task_group_type);
         return $c ? $c->getTaskGroupTypeTitle() : null;
     }
 
     // get task group description given task group type
     function getTypeDescription() {
-        $c = $this->w->Task->getTaskGroupTypeObject($this->task_group_type);
+        $c = $this->Task->getTaskGroupTypeObject($this->task_group_type);
         return $c ? $c->getTaskGroupTypeDescription() : null;
     }
 
     // get fullname of default assignee for this task group
     function getDefaultAssigneeName() {
-        $assign = $this->w->Auth->getUser($this->default_assignee_id);
+        $assign = $this->Auth->getUser($this->default_assignee_id);
         return $assign ? $assign->getFullName() : "";
     }
 
@@ -131,28 +131,41 @@ class TaskGroup extends DbObject {
         return $this->id;
     }
     
+    /**
+     * Check if a given status is a "closing" status
+     * 
+     * @param unknown $status
+     */
+    public function isStatusClosed($status) {
+    	$stats = $this->getStatus();
+    	foreach ($stats as $sa) {
+    		if ($sa[0]==$status) return $sa[1];
+    	}
+    	return false;
+    }
+    
     // Task replacement functions
     public function getTypes() {
-        return $this->w->Task->getTaskTypes($this);
+        return $this->Task->getTaskTypes($this);
     }
     
     public function getTypeStatus() {
-        return $this->w->Task->getTaskTypeStatus($this->task_group_type);
+        return $this->Task->getTaskTypeStatus($this->task_group_type);
     }
     
     public function getTaskGroupTypeObject() {
-        return $this->w->Task->getTaskGroupTypeObject($this->task_group_type);
+        return $this->Task->getTaskGroupTypeObject($this->task_group_type);
     }
     
     public function getTaskReopen() {
-        return $this->w->Task->getCanTaskReopen($this->task_group_type);
+        return $this->Task->getCanTaskReopen($this->task_group_type);
     }
     
     public function getStatus() {
-        return $this->w->Task->getTaskStatus($this->task_group_type);
+        return $this->Task->getTaskStatus($this->task_group_type);
     }
     
     public function getPriority() {
-        return $this->w->Task->getTaskPriority($this->task_group_type);
+        return $this->Task->getTaskPriority($this->task_group_type);
     }
 }
