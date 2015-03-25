@@ -215,7 +215,8 @@ function addtime_GET(Web &$w) {
     
     // picklist of time types from tasktype
     $timeTypes=array();
-    if (!empty($task->getTaskTypeObject())) {
+    $to = $task->getTaskTypeObject();
+    if (!empty($to)) {
     	$timeTypes=$task->getTaskTypeObject()->getTimeTypes();
     }
     
