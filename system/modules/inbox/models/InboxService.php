@@ -112,7 +112,7 @@ class InboxService extends DbService {
 
     function inboxCountMarker() {
         $user_id = $this->w->Auth->user()->id;
-        $count_messages = $this->_db->get("inbox")->where("user_id", $user_id)->where("is_new", 1)->count();
+        $count_messages = $this->_db->get("inbox")->where("user_id", $user_id)->where("is_new", 1)->where("is_deleted", 0)->count();
         return ($count_messages > 0) ? "<span class='label secondary round' style='margin-left: 5px;'>" . $count_messages . "</span>" : "";
     }
 
