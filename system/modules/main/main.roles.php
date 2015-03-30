@@ -4,6 +4,7 @@ function role_user_allowed(Web $w,$path) {
     $include = array(
         "main",
         "auth",
+    	"search"
     );
     
     $path_explode = explode("/", $path);
