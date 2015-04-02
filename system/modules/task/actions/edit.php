@@ -35,19 +35,26 @@ function edit_GET($w) {
     $form = array(
         (!empty($p["id"]) ? "Edit task" : "Create a new task") => array(
             array(
-                array("Task Group", "autocomplete", "task_group_id", !empty($task->task_group_id) ? $task->task_group_id : $taskgroup_id, $taskgroups),
-                array("Status", "select", "status", $task->status, $task->getTaskGroupStatus())
-            ),
+            	!empty($p["id"]) ?
+            		array("Task Group", "text", "-task_group_id_text", $taskgroup->title) :
+                	array("Task Group", "autocomplete", "task_group_id", !empty($task->task_group_id) ? $task->task_group_id : $taskgroup_id, $taskgroups),
+            	!empty($p["id"]) ?
+                	array("Task Type", "select", "-task_type", $task->task_type, $tasktypes) :
+            		array("Task Type", "select", "task_type", $task->task_type, $tasktypes)
+        	),
             array(
                 array("Task Title", "text", "title", $task->title),
-                array("Task Type", "select", "task_type", $task->task_type, $tasktypes)
+                array("Status", "select", "status", $task->status, $task->getTaskGroupStatus()),
             ),
             array(
                 array("Priority", "select", "priority", $task->priority, $priority),
-                array("Date Due", "date", "dt_due", formatDate($task->dt_due))
+                array("Date Due", "date", "dt_due", formatDate($task->dt_due)),
+                !empty($taskgroup) && $taskgroup->getCanIAssign() ?
+                	array("Assigned To", "select", "assignee_id", $task->assignee_id, $members) :
+                	array("Assigned To", "select", "-assignee_id", $task->assignee_id, $members)
             ),
             array(array("Description", "textarea", "description", $task->description)),
-            array(array("Assigned To", "select", "assignee_id", $task->assignee_id, $members)),
+        		        	
         )
     );
     
@@ -62,13 +69,7 @@ function edit_GET($w) {
     //////////////////////////
     // Build time log table //
     //////////////////////////
-    // Add "Add time log button"
-    $addtime = "";
-    if ($task->assignee_id == $w->Auth->user()->id) {		
-        $addtime = Html::box(WEBROOT."/task/addtime/".$task->id," Add Time Log entry ",true);
-    }
-    $w->ctx("addtime",$addtime);
-    
+
     $timelog = $task->getTimeLog();
     $total_seconds = 0;
     

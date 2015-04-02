@@ -49,8 +49,7 @@ class TaskGroup extends DbObject {
             return true;
         }
         
-        // @TODO: Wrong, the user who is an OWNER can edit or delete
-        return ($this->creator_id == $w->Auth->user()->id);
+        return $this->isOwner($user);
     }
     
     // Only owner of taskgroup or admin can delete
@@ -59,7 +58,7 @@ class TaskGroup extends DbObject {
             return true;
         }
         
-        return ($this->creator_id == $w->Auth->user()->id);
+        return $this->isOwner($user);
     }
     
     // get my member object. compare my role with group role required to view task group
@@ -167,5 +166,15 @@ class TaskGroup extends DbObject {
     
     public function getPriority() {
         return $this->Task->getTaskPriority($this->task_group_type);
+    }
+    
+    /**
+     * Return true if the user is a member of the taskgroup with a role of "OWNER"
+     * 
+     * @param User $user
+     * @return boolean
+     */
+    public function isOwner(User $user) {
+        return null != $this->getObject("TaskGroupMember", array("task_group_id" => $this->id, "is_active" => 1, "user_id" => $user->id, "role" => "OWNER"));
     }
 }

@@ -142,12 +142,7 @@ class Task extends DbObject {
 
     // get my membership object and check i am better than GUEST of a task group given a task group ID
     function getCanIEdit() {
-        if ($this->Auth->user()->is_admin == 1) {
-            return true;
-        }
-        if (($this->Auth->user()->id == $this->assignee_id) || ($this->Auth->user()->id == $this->getTaskCreatorId())) {
-            return true;
-        }
+        return $this->getCanIAssign();
     }
 
     // get my membership object and compare my role with that required to assigne tasks given a task group ID

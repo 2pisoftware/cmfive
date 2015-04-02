@@ -9,7 +9,7 @@
             echo Html::filter("Filter Tasks", $filter_data, "/task/tasklist", "GET");
             
             if (!empty($tasks)) {
-                $table_header = array("Title", "Created By", "Assigned To", "Group", "Type", "Priority", "Status", "Due");
+                $table_header = array("Title", "Group", "Assigned To",  "Type", "Priority", "Status", "Due");
                 $table_data = array();
                 
                 // Build table data
@@ -17,17 +17,13 @@
                 foreach ($tasks as $task) {
                     if ($task->getCanIView()) {
                         $table_line = array();
-                        if ($task->getCanIEdit()) {
-                            $table_line[] = Html::a("/task/edit/" . $task->id, $task->title);
-                        } else {
-                            $table_line[] = $task->title;
-                        }
+                        $table_line[] = Html::a("/task/edit/" . $task->id, $task->title);
+
                         
                         // Append the rest of the data
                         $table_line += array(null,
-                            $task->getTaskCreatorName(),
-                            $w->Task->getUserById($task->assignee_id),
                             $task->getTaskGroupTypeTitle(),
+                            $w->Task->getUserById($task->assignee_id),
                             $task->getTypeTitle(),
                             $task->priority,
                             $task->status,

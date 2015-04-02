@@ -10,11 +10,7 @@ if (!empty($tasks)) {
     foreach ($tasks as $task) {
         if ($task->getCanIView()) {
             $table_line = array();
-            if ($task->getCanIEdit()) {
-                $table_line[] = Html::a("/task/edit/" . $task->id, $task->title);
-            } else {
-                $table_line[] = $task->title;
-            }
+			$table_line[] = Html::a("/task/edit/" . $task->id, $task->title);
 
             // Append the rest of the data
             $table_line += array(null,

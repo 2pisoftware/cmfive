@@ -23,9 +23,11 @@ function taskAjaxSelectbyTaskGroup_ALL(Web $w) {
     $ttype = Html::select("task_type",$tasktypes,null);
     $prior = Html::select("priority",$priority,null);
     $mem = Html::select("assignee_id",$members,null); // first_
+    
+    $taskgroup_link = $taskgroup->isOwner($w->Auth->user()) ? "<a href=\"".$w->localUrl("task-group/viewmembergroup/".$taskgroup->id)."\">".$taskgroup->title."</a>" : $taskgroup->title; 
     $tasktext = "<table style='width: 100%;'>" .
         "<tr><td class=section colspan=2>Task Group Description</td></tr>" . 
-        "<tr><td><b>Task Group</td><td>" . $taskgroup->title . "</td></tr>" . 
+        "<tr><td><b>Task Group</td><td>" . $taskgroup_link . "</td></tr>" . 
         "<tr><td><b>Task Type</b></td><td>" . $typetitle . "</td></tr>" . 
         "<tr valign=top><td><b>Description</b></td><td>" . $typedesc . "</td></tr>" . 
     "</table>";

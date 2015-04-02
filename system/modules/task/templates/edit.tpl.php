@@ -33,10 +33,14 @@
         <?php if (!empty($task->id)) : ?>
             <div id="timelog">
                 <?php 
-                    if (!empty($task->assignee_id) && ($task->assignee_id == $w->Auth->user()->id)) :
+                	$tg = $task->getTaskGroup();
+                	// time log entries can be added by the user who is currently assigned to the task
+                	// OR by any taskgroup member who can assign tasks (depending on member role and taskgroup
+                	// can_assign setting
+                    if (($task->assignee_id == $w->Auth->user()->id) || (!empty($tg) && ($tg->getCanIAssign()))) :
 			             echo Html::box(WEBROOT."/task/addtime/".$task->id," Add Time Log entry ",true);
                     else : ?>
-                        <p>Note: you can add time logs when you're assigned to this task</p>
+                        <p>Note: you can only add time logs when you can assign tasks.</p>
                     <?php endif;
                     if (!empty($timelog)) {
                         echo $timelog;
