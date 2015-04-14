@@ -1,4 +1,4 @@
 <?php
-function role_favorites_admin_allowed($w, $path) {
+function role_favorites_user_allowed($w, $path) {
 	return startsWith($path, "favorites");
 }

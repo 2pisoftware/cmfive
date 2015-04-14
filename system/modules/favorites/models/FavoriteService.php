@@ -39,7 +39,7 @@ class FavoriteService extends DbService {
 	
 	function getFavoriteButton($id,$class) {
 		$response='';
-		$user=!empty($this->w->Auth->user()) ? $this->w->Auth->user()->id : null;
+		$user = $this->w->Auth->user();
 		if (!empty($id) && !empty($class) && !empty($user)){
 			$response.='<script src="/modules/favorites/assets/js/favoriteButton.js"></script>';
 			$favorite = $this->w->Favorite->getDataByObject($id,$class);

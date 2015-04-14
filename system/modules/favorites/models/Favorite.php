@@ -25,19 +25,19 @@ class Favorite extends DbObject {
 	// functions for implementing access restrictions, these are optional
 
 	public function canList(User $user) {
-		return $user !== null && $user->hasAnyRole(array("example_admin"));
+		return $user !== null && $user->hasAnyRole(array("favorites_user"));
 	}
 	
 	public function canView(User $user) {
-		return $user !== null && $user->hasAnyRole(array("example_admin"));
+		return $user !== null && $user->hasAnyRole(array("favorites_user"));
 	}
 	
 	public function canEdit(User $user) {
-		return $user !== null && $user->hasAnyRole(array("example_admin"));
+		return $user !== null && $user->hasAnyRole(array("favorites_user"));
 	}
 	
 	public function canDelete(User $user) {
-		return $user !== null && $user->hasAnyRole(array("example_admin"));
+		return $user !== null && $user->hasAnyRole(array("favorites_user"));
 	}	
 	
 		

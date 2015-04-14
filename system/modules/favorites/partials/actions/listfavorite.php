@@ -1,11 +1,12 @@
 <?php
-/*
- * Partial action that lists leave applications potentially filtered by employee or date range or status
+/**
+ * Partial action that lists favorite objects
  * @author Steve Ryan steve@2pisoftware.com 2015
  */
 function listfavorite_ALL(Web $w,$params) {
-	if (!empty($w->Auth->user()))  {
-		$results = $w->Favorite->getDataByUser($w->Auth->user()->id );
+	$user = $w->Auth->user();
+	if (!empty($user))  {
+		$results = $w->Favorite->getDataByUser($user->id );
 		$favoritesCategorised=array();
 		$service=new DBService($w);
 		if (!empty($results)) {
@@ -17,7 +18,7 @@ function listfavorite_ALL(Web $w,$params) {
 					$templateData['title']=$realObject->printSearchTitle();
 					$templateData['url']=$realObject->printSearchUrl();
 					$templateData['listing']=$realObject->printSearchListing();
-					if ($realObject->canList($w->Auth->user()) && $realObject->canView($w->Auth->user())) array_push($favoritesCategorised[$favorite->object_class],$templateData);
+					if ($realObject->canList($user) && $realObject->canView($user)) array_push($favoritesCategorised[$favorite->object_class],$templateData);
 				}
 			}
 		}

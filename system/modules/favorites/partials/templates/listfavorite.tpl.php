@@ -16,7 +16,7 @@ if (!empty($categorisedFavorites)) {
 				//if ($templateData->canList($w->Auth->user())) {
 					$buffer .= '<div class="panel search-result">';
 					//if ($templateData->canView($w->Auth->user())) {
-					$buffer .= "<a class=\"row search-title\" href=\"/{$templateData['url']}\">{$templateData['listing']}</a>"
+					$buffer .= "<a class=\"row search-title\" href=\"{$w->localUrl($templateData['url'])}\">{$templateData['title']}</a>"
 					. "<div class=\"row search-listing\">{$templateData['listing']}</div>";
 					$buffer .= "</div>";
 				//}
