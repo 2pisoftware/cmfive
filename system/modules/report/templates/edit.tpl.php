@@ -9,7 +9,7 @@
     </div>	
     <div class="tab-body">
         <div id="report" class="clearfix">
-            <?php echo $report_form; ?>
+            <?php echo $btnrun . $report_form; ?>
         </div>
         <?php if (!empty($report->id)) : ?>
             <div id="templates">

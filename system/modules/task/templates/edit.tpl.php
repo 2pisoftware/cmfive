@@ -13,6 +13,7 @@
             <div class="row-fluid clearfix">
                 <div class="row-fluid columns">
                     <?php 
+                    	echo $w->Favorite->getFavoriteButton($task->id,"Task")."&nbsp;";
                         // Note the extra buttons only show when the task_type object
                         $tasktypeobject = $task->getTaskTypeObject();
                         echo !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null; 

@@ -41,6 +41,10 @@ function edit_GET(Web &$w) {
     
     $w->ctx("dbform", $db_table);
     
+    if (!empty($report->id)) {
+    	$btnrun = Html::b("/report/runreport/" . $report->id, "Execute Report");
+    	$w->ctx("btnrun", $btnrun);
+    }    
     
     // Check access rights
     // If user is editing, we need to check multiple things, detailed in the helper function

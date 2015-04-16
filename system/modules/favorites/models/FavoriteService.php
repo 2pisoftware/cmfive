@@ -41,14 +41,14 @@ class FavoriteService extends DbService {
 		$response='';
 		$user = $this->w->Auth->user();
 		if (!empty($id) && !empty($class) && !empty($user)){
-			$response.='<script src="/modules/favorites/assets/js/favoriteButton.js"></script>';
+			$response.='<script src="/system/modules/favorites/assets/js/favoriteButton.js"></script>';
 			$favorite = $this->w->Favorite->getDataByObject($id,$class);
 			$url='/favorites/ajaxEditFavorites?class='.$class;
 			//$.load(function(result) {console.log([\'loaded\',result]);$(this).replace(result);});
 			if (!empty($favorite)) {
-				$response.='<a   class="flagfavorite flagfavoriteon" title="Remove favorite" href="'.$url.'&cmd=remove&id='.$id.'" ><img src="/modules/favorites/assets/img/favorite_on_small.png" ></a>';
+				$response.='<a   class="flagfavorite flagfavoriteon" title="Remove favorite" href="'.$url.'&cmd=remove&id='.$id.'" ><img src="/system/modules/favorites/assets/img/favorite_on_small.png" ></a>';
 			} else {
-				$response.='<a class="flagfavorite flagfavoriteoff" title="Add as favorite" href="'.$url.'&cmd=add&id='.$id.'" ><img src="/modules/favorites/assets/img/favorite_off_small.png" ></a>';
+				$response.='<a class="flagfavorite flagfavoriteoff" title="Add as favorite" href="'.$url.'&cmd=add&id='.$id.'" ><img src="/system/modules/favorites/assets/img/favorite_off_small.png" ></a>';
 			}
 		} else {
 			return ''; 

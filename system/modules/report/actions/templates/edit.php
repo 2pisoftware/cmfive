@@ -7,7 +7,7 @@ function edit_GET(Web $w) {
     $form = array(
       "Add Report Template" => array(
           array(
-              array("Template", "autocomplete", "template_id", $report_template->template_id, $w->Template->findTemplates("report"))
+              array("Template", "select", "template_id", $report_template->template_id, $w->Template->findTemplates("report"))
           ),
           array(
               array("Type", "select", "type", $report_template->type, $report_template->getReportTypes())
