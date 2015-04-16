@@ -1,3 +1,8 @@
+/**
+ * 
+ * @author Steve Ryan, steve@2pisystems.com, 2015
+ **/
+
 $(document).ready(function() {
 	$('.flagfavorite').bind('click',function(e) {
 		var link=$(this); 

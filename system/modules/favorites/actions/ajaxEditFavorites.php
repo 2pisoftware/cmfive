@@ -1,8 +1,9 @@
 <?php
-/*
- * 
+/**
+ * updates or removes favorited item 
+ *
  * @author Steve Ryan, steve@2pisystems.com, 2015
- */
+ **/
 function ajaxEditFavorites_ALL(Web $w) {
 	$id = $w->request("id");
     $class=$w->request("class");

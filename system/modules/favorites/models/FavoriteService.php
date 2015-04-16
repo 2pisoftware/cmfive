@@ -37,6 +37,10 @@ class FavoriteService extends DbService {
 		return $this->getObject("Favorite",$id);
 	}
 	
+	/**
+	* inserts favorite button
+	* $w->Faorite->getFavoriteButton($id,$class);
+	**/
 	function getFavoriteButton($id,$class) {
 		$response='';
 		$user = $this->w->Auth->user();

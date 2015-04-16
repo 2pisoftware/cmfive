@@ -1,6 +1,8 @@
 <?php
-//print_r($categorisedFavorites);
-
+/**
+ * tmaplate for favorites partial
+ * @author Steve Ryan, steve@2pisystems.com, 2015
+ **/
 $tabHead=array();
 $buffer='';	
 if (!empty($categorisedFavorites)) {
