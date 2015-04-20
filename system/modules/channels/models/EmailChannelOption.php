@@ -94,10 +94,6 @@ class EmailChannelOption extends DbObject {
                     $zend_message->setHeaders($message->getHeaders());
                     $zend_message->setBody($message->getContent());
 
-//                     $rawmessage .= $message->getHeaders()->toString();
-//                     // 
-//                     $rawmessage .= "\n\n";
-//                     $rawmessage .= $message->getContent();
                     $email = new EmailStructure();
                     $email->to = $message->to;
                     $email->from = $message->from;

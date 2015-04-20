@@ -16,7 +16,7 @@ class FileService extends DbService {
     	if (strpos($path, FILE_ROOT . "attachments/") !== FALSE){
     		return $path;
     	}
-    	return FILE_ROOT . "attachments/" . dirname($path);
+    	return FILE_ROOT . "attachments/" . $path;
     }
 
     function getFileObject($filesystem, $filename) {
@@ -208,6 +208,7 @@ class FileService extends DbService {
 		$filename = (!empty($name) ? $name : (str_replace(".", "", microtime()) . getFileExtension($content_type)));
 
 		$filesystemPath = $object->getDbTableName().'/'.date('Y/m/d').'/'.$object->id . '/';
+                
 		$filesystem = $this->getFilesystem($filesystemPath);
 		$file = new File($filename, $filesystem);
 		$file->setContent($content);
