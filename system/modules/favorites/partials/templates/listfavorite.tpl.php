@@ -1,6 +1,6 @@
 <?php
 /**
- * tmaplate for favorites partial
+ * template for favorites partial
  * @author Steve Ryan, steve@2pisystems.com, 2015
  **/
 $tabHead=array();
@@ -9,7 +9,7 @@ if (!empty($categorisedFavorites)) {
 	foreach($categorisedFavorites as $className => $objects) {
 		// Transform class into readable text
 		$t_class = preg_replace('/(?<=\\w)(?=[A-Z])/', " $1", $className);
-		$tabHead[$className]='<a href="#'.$className.'">'.$t_class.'</a>';
+		$tabHead[$className]='<a href="#'.$className.'">'.str_replace(' ','&nbsp;',$t_class).'</a>';
 		if (!empty($objects)) {
 			$buffer.='<div id="'.$className.'" >';
 			$buffer .= "<div class='row search-class'><h4 style='padding-left: 30px; font-weight: lighter;'>{$t_class}</h4>";
