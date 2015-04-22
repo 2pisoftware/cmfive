@@ -1,5 +1,4 @@
 <?php
-
 class InboxService extends DbService {
 
     function addMessage($subject, $message, $user_id = null, $sender_id = null, $parent_id = null, $send_email = true) {
@@ -33,7 +32,7 @@ class InboxService extends DbService {
         
         // Notify users via email if specified and the user isn't sending a message to themselves
         $this->w->Log->debug("IDs: " . var_export($msg->user_id, true) . " - " . var_export($msg->sender_id, true));
-        if ($send_email === true && $msg->user_id !== $msg->sender_id) {
+        if ($send_email === true && $msg->user_id !== $msg->sender_id && !empty($receiver->getContact()) && !empty($this->w->Auth->getUser($msg->sender_id)) && !(empty($mso))) {
             $this->w->Mail->sendMail($receiver->getContact()->email, $this->w->Auth->getUser($msg->sender_id)->getContact()->email, $msg->subject, $mso->message);
         }
     }

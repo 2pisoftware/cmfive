@@ -9,8 +9,14 @@ function users_GET(Web &$w) {
         $data = array();
 	foreach ($users as $user) {
             $contact = $user->getContact();
+            $firstName='';
+            $lastName='';
+            if (!empty($contact)) {
+				$firstName=$contact->firstname;
+				$lastName=$contact->lastname;
+			}
             $data[] = array(
-                $user->login, $contact->firstname, $contact->lastname,
+                $user->login, $firstName, $lastName,
                 array($user->is_admin ? "X" : "", true),
                 array($user->is_active ? "X" : "", true),
                 array($w->Admin->time2Dt($user->dt_created), true),
