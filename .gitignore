@@ -2,3 +2,4 @@
 /uploads/*
 .project
 /config.php
+/system/composer/*
