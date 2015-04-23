@@ -768,7 +768,12 @@ class TaskService extends DbService {
             return array();
         }
         
-        $me = array($this->getMemberGroupById($task->task_group_id, $_SESSION['user_id']));
+        $me = array();
+        // This may be called from cron
+        if (!empty($_SESSION['user_id'])) {
+            $me = array($this->getMemberGroupById($task->task_group_id, $_SESSION['user_id']));
+        }
+        
         // get member object for task creator
         $creator_id = $task->getTaskCreatorId();
         $creator = array($this->getMemberGroupById($task->task_group_id, $creator_id));

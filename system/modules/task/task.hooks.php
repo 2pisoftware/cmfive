@@ -94,7 +94,7 @@ function task_comment_comment_added_task(Web $w, $object) {
         // send it to the inbox of the user's on our send list
         foreach ($users_to_notify as $user) {
             // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
-            $subject = $comment_user->getFullName() . ' has commented on a task that you\'re apart of ('.$task->title.')';
+            $subject = (!empty($comment_user->id) ? $comment_user->getFullName() : 'Someone') . ' has commented on a task that you\'re apart of ('.$task->title.')';
 
             $user_object = $w->Auth->getUser($user);
             $message = $task->toLink(null, null, $user_object);

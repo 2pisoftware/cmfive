@@ -88,7 +88,7 @@ class ChannelService extends DbService {
 			$where["channel_id"] = $channel_id;
 		}
 
-		return $this->getObjects("ChannelMessage", $where);
+		return $this->getObjects("ChannelMessage", $where, false, true, "dt_created desc");
 	}
 
 	public function getMessage($id) {

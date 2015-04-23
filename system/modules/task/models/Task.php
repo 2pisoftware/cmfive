@@ -102,6 +102,10 @@ class Task extends DbObject {
     // get my membership object and compare my role with that required to view tasks given a task group ID
     function getCanIView() {
         $loggedin_user = $this->w->Auth->user();
+        if (empty($loggedin_user->id)) {
+            return false;
+        }
+        
         if ($loggedin_user->is_admin == 1) {
             return true;
         }

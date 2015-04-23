@@ -2,11 +2,12 @@
 class InboxService extends DbService {
 
     function addMessage($subject, $message, $user_id = null, $sender_id = null, $parent_id = null, $send_email = true) {
+        $logged_in = !!$this->Auth->loggedIn();
         if (!$user_id) {
-            $user_id = $this->Auth->user()->id;
+            $user_id = $logged_in ? $this->Auth->user()->id : null;
         }
         if (!$sender_id) {
-            $sender_id = $this->Auth->user()->id;
+            $sender_id = $logged_in ? $this->Auth->user()->id : null;
         }
         if (!is_a($message, "DbObject")) {
             $mso = new Inbox_message($this->w);
@@ -33,7 +34,7 @@ class InboxService extends DbService {
         // Notify users via email if specified and the user isn't sending a message to themselves
         $this->w->Log->debug("IDs: " . var_export($msg->user_id, true) . " - " . var_export($msg->sender_id, true));
         if ($send_email === true && $msg->user_id !== $msg->sender_id) {
-            $this->w->Mail->sendMail($receiver->getContact()->email, $this->w->Auth->getUser($msg->sender_id)->getContact()->email, $msg->subject, $mso->message);
+            $this->w->Mail->sendMail($receiver->getContact()->email, $logged_in ? $this->w->Auth->getUser($msg->sender_id)->getContact()->email : "system@crm.2pisoftware.com", $msg->subject, $mso->message);
         }
     }
 
