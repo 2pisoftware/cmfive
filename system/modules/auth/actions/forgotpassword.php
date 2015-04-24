@@ -1,6 +1,11 @@
 <?php
 
 function forgotpassword_GET(Web $w) {
+    // Check if logged in already
+    $user = $w->Auth->user();
+    if ($w->Auth->loggedIn() && $w->Auth->allowed($user->redirect_url)) {
+        $w->redirect($w->localUrl(!empty($user->redirect_url) ? $user->redirect_url : "/main"));
+    }
     // $loginform = Html::form(array(
     // array("Reset Password","section"),
     // array("Your Login","text","login"),

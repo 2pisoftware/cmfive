@@ -18,7 +18,7 @@
                         $tasktypeobject = $task->getTaskTypeObject();
                         echo !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null; 
                     ?>
-                    <?php echo (!empty($task->id) && $task->canDelete($w->Auth->user())) ? Html::b('/task/delete/' . $task->id, "Delete", "Are you sure you want to delete this task?" ) : ''; ?>
+                    <?php echo (!empty($task->id) && $task->canDelete($w->Auth->user())) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), "Delete", "Are you sure you want to delete this task?" ) : ''; ?>
                 </div>
                 <div class="row-fluid clearfix">
                     <div class="small-12 large-9">
