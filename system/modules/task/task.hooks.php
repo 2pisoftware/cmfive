@@ -45,11 +45,6 @@ function task_core_dbobject_after_insert_Task(Web $w, $object) {
  * @param Task $object
  */
 function task_core_dbobject_after_update_Task(Web $w, $object) {
-    // TEST - dont send email notifications when no one logged in
-    if (!$w->Auth->loggedIn()) {
-        return;
-    }
-    
     $w->Log->setLogger("TASK")->debug("task_core_dbobject_after_update_Task");
     
     $users_to_notify = $w->Task->getNotifyUsersForTask($object, TASK_NOTIFICATION_TASK_DETAILS);
@@ -81,11 +76,6 @@ function task_core_dbobject_after_update_Task(Web $w, $object) {
  * @param Task $object
  */
 function task_comment_comment_added_task(Web $w, $object) {
-    // TEST - dont send email notifications when no one logged in
-    if (!$w->Auth->loggedIn()) {
-        return;
-    }
-    
     $w->Log->setLogger("TASK")->debug("task_comment_comment_added_task");
     
     $task = $w->Task->getTask($object->obj_id);
