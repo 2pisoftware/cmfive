@@ -28,6 +28,20 @@ class AuthService extends DbService {
         // }
     }
 
+    function forceLogin($user_id = null) {
+        if (empty($user_id)) {
+            return;
+        }
+        
+        $user = $this->getUser($user_id);
+        if (empty($user->id)) {
+            return null;
+        }
+
+        $user->updateLastLogin();
+        $this->w->session('user_id', $user->id);
+    }
+    
     function loginLocalUser() {
         
     }
