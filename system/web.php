@@ -434,8 +434,16 @@ class Web {
         return $this->service($name);
     }
 
+    /**
+     * Connect to the database
+     */
     private function initDB() {
-        $this->db = new DbPDO(Config::get("database")); // Crystal::db($db_config);
+    	try {
+        	$this->db = new DbPDO(Config::get("database"));
+    	} catch (Exception $ex) {
+    		echo "Error: Can't connect to database.";
+    		die();
+    	}
     }
 
     /**
