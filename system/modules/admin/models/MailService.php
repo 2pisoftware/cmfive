@@ -24,58 +24,64 @@ class MailService extends DbService {
      * @return int
      */
     public function sendMail($to, $replyto, $subject, $body, $cc = null, $bcc = null, $attachments = array()) {
-        
-        if ($this->transport === NULL) {
-        	$this->w->Log->error("Could not send mail to {$to} from {$replyto} about {$subject} no email transport defined!");
-        	return;
-        }
+        if (!empty($to) && strlen($to)>0) {
+			if ($this->transport === NULL) {
+				$this->w->Log->error("Could not send mail to {$to} from {$replyto} about {$subject} no email transport defined!");
+				return;
+			}
 
-        $mailer = Swift_Mailer::newInstance($this->transport);
+			$mailer = Swift_Mailer::newInstance($this->transport);
 
-        // To, cc, bcc need to be given as arrays when sending to more than one person
-        // Ie you separate them by a comma, this will split them into arrays as expected by Swift
-        if (strpos($to, ",") !== FALSE) {
-            $to = array_map("trim", explode(',', $to));
-        }
-        
-        // Create message
-        $message = Swift_Message::newInstance($subject)
-                        ->setFrom($replyto)
-                        ->setTo($to)->setBody($body)
-                        ->addPart($body, 'text/html');
-        if (is_array($replyto)) {
-            $message->setReplyTo($replyto);
-        } else {
-            $message->setReplyTo(array($replyto));
-        }
-        if (!empty($cc)) {
-            if (strpos($cc, ",") !== FALSE) {
-                $cc = array_map("trim", explode(',', $cc));
-            }
-            $message->setCc($cc);
-        }
-        if (!empty($bcc)) {
-            if (strpos($bcc, ",") !== FALSE) {
-                $bcc = array_map("trim", explode(',', $bcc));
-            }
-            $message->setBcc($bcc);
-        }
+			// To, cc, bcc need to be given as arrays when sending to more than one person
+			// Ie you separate them by a comma, this will split them into arrays as expected by Swift
+			if (strpos($to, ",") !== FALSE) {
+				$to = array_map("trim", explode(',', $to));
+			}
+			
+			// Create message
+			$message = Swift_Message::newInstance($subject)
+							->setFrom($replyto)
+							->setTo($to)->setBody($body)
+							->addPart($body, 'text/html');
+			if (is_array($replyto)) {
+				$message->setReplyTo($replyto);
+			} else {
+				$message->setReplyTo(array($replyto));
+			}
+			if (!empty($cc)) {
+				if (strpos($cc, ",") !== FALSE) {
+					$cc = array_map("trim", explode(',', $cc));
+				}
+				$message->setCc($cc);
+			}
+			if (!empty($bcc)) {
+				if (strpos($bcc, ",") !== FALSE) {
+					$bcc = array_map("trim", explode(',', $bcc));
+				}
+				$message->setBcc($bcc);
+			}
 
-        // Add attachments
-        if (!empty($attachments)) {
-            foreach ($attachments as $attachment) {
-            	if (!empty($attachment)) {
-                	$message->attach(Swift_Attachment::fromPath($attachment));
-            	}
-            }
-        }
+			// Add attachments
+			if (!empty($attachments)) {
+				foreach ($attachments as $attachment) {
+					if (!empty($attachment)) {
+						$message->attach(Swift_Attachment::fromPath($attachment));
+					}
+				}
+			}
 
-        $this->w->Log->setLogger(MailService::$logger)->info("Sending email to {$to} from {$replyto} with {$subject} (" . count($attachments) . " attachments");
-        $mailer_status = $mailer->send($message, $failures);
-        if (!empty($failures)) {
-            $this->w->Log->setLogger(MailService::$logger)->error("Failed to send email: " . serialize($failures));
-        }
-        return $mailer_status;
+			$this->w->Log->setLogger(MailService::$logger)->info("Sending email to {$to} from {$replyto} with {$subject} (" . count($attachments) . " attachments");
+			try {
+				$mailer_status = $mailer->send($message, $failures);
+				if (!empty($failures)) {
+					$this->w->Log->setLogger(MailService::$logger)->error("Failed to send email: " . serialize($failures));
+				}
+			} catch (Exception $e) {
+				$this->w->Log->setLogger(MailService::$logger)->error("Failed to send email: " . $e);
+			}
+			// failure to end
+			return 1;
+		}
     }
 
     private function initTransport() {
