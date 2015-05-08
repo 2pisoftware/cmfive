@@ -74,34 +74,6 @@
 class DbObject extends DbService {
 
     public $id;
-    public $__password = 'CHANGEME'; // for encrypted fields change this!!
-
-    /**
-     * Overrride this variable to false to turn off
-     * DB auditing for this table
-     *
-     * @var unknown_type
-     */
-    public $__use_auditing = true;
-
-    //Define this property if you want to use the
-    //ModifiableAspect
-    //  public $_modifiable;
-    //
-	//To remove this from child classes:
-    //  public $_remove_modifiable;
-    //Define this property if you want to use the
-    //VersionableAspect
-    //  public $_versionable;
-    //
-	//To remove this from child classes:
-    //  public $_remove_versionable;
-    //Define this property if you want to use the
-    //SearchableAspect
-    //  public $_searchable;
-    //
-	//To remove this from child classes:
-    //  public $_remove_searchable;
 
     /**
      * Constructor
@@ -136,12 +108,12 @@ class DbObject extends DbService {
                 return $this->_modifiable->getModifiedDate();
             }
         }
-        if(property_exists($this, $name)) {
-	        $reflection = new ReflectionProperty($this, $name);
-	        $reflection->setAccessible($name);
-	        return $reflection->getValue($this);
+        if (property_exists($this, $name)) {
+            $reflection = new ReflectionProperty($this, $name);
+            $reflection->setAccessible($name);
+            return $reflection->getValue($this);
         } else {
-        	return $this->w->$name;
+            return $this->w->$name;
         }
     }
 
@@ -155,7 +127,7 @@ class DbObject extends DbService {
      */
     function setPassword($password) {
         if ($password) {
-            $this->__password = $password;
+            Config::set('system.password_salt', $password);
         }
     }
 
@@ -167,7 +139,7 @@ class DbObject extends DbService {
         foreach (get_object_vars($this) as $k => $v) {
             if (strpos($k, "s_") === 0) {
                 if ($v) {
-                    $this->$k = AESdecrypt($v, $this->__password);
+                    $this->$k = AESdecrypt($v, Config::get('system.password_salt'));
                 }
             }
         }
@@ -241,11 +213,11 @@ class DbObject extends DbService {
             $user = $this->w->Auth->user();
         }
         if ($this->canView($user)) {
-            return Html::a($this->w->localUrl($this->printSearchUrl()), $this->printSearchTitle(),null, $class, null, $target);	
+            return Html::a($this->w->localUrl($this->printSearchUrl()), $this->printSearchTitle(), null, $class, null, $target);
         }
         return $this->printSearchTitle();
     }
-    
+
     /**
      * used by the search display function to check whether the user has
      * permission to see this result item.
@@ -294,19 +266,19 @@ class DbObject extends DbService {
      * @param mixed $v
      * @return mixed
      */
-    function readConvert($k,$v) {
-    	if (strpos($k, "dt_") === 0) {
-    		if (!empty($v)) {
-    			return $this->dt2Time($v);
-    		}
-    	} else if (strpos($k, "d_") === 0) {
-    		if (!empty($v)) {
-    			return $this->d2Time($v);
-    		}
-    	}
-    	return $v;
+    function readConvert($k, $v) {
+        if (strpos($k, "dt_") === 0) {
+            if (!empty($v)) {
+                return $this->dt2Time($v);
+            }
+        } else if (strpos($k, "d_") === 0) {
+            if (!empty($v)) {
+                return $this->d2Time($v);
+            }
+        }
+        return $v;
     }
-    
+
     /**
      * fill this object from an array where the keys correspond to the
      * variable of this object.
@@ -323,7 +295,7 @@ class DbObject extends DbService {
 
                 if (array_key_exists($dbk, $row)) {
                     $v = $row[$dbk];
-                    $this->$k = $from_db ? $this->readConvert($k,$v) : $v;
+                    $this->$k = $from_db ? $this->readConvert($k, $v) : $v;
                 }
             }
         }
@@ -500,202 +472,202 @@ class DbObject extends DbService {
      * @throws Exception e
      */
     function insert($force_validation = true) {
-		try {
-			$this->startTransaction ();
-			
-			if ($force_validation && property_exists ( $this, "_validation" )) {
-				$valid_response = $this->validate ();
-				if (! $valid_response ['success']) {
-					$this->rollbackTransaction();
-					return $valid_response;
-				}
-			}
-			
-			// calling hooks BEFORE inserting the object
-			$this->_callHooks ( "before", "insert" );
-			
-			$t = $this->getDbTableName ();
-			$columns = $this->getDbTableColumnNames ();
-			
-			// set some default attributes
-			if (! property_exists ( $this, "_modifiable" )) { // $this->_modifiable) {
-			                                              // for backwards compatibility
-				if (in_array ( "dt_created", $columns ))
-					$this->dt_created = time ();
-				
-				if (in_array ( "creator_id", $columns ) && $this->w->Auth->loggedIn ())
-					$this->creator_id = $this->w->Auth->user ()->id;
-				
-				if (in_array ( "dt_modified", $columns ))
-					$this->dt_modified = time ();
-				
-				if (in_array ( "modifier_id", $columns ) && $this->w->Auth->loggedIn ())
-					$this->modifier_id = $this->w->Auth->user ()->id;
-			}
-			
-			$data = array ();
-			foreach ( get_object_vars ( $this ) as $k => $v ) {
-				if ($k {0} != "_" && $k != "w" && $v !== null) {
-					$dbk = $this->getDbColumnName ( $k );
-					if (strpos ( $k, "dt_" ) === 0) {
-						if ($v) {
-							$v = $this->time2Dt ( $v );
-							$data [$dbk] = $v;
-						}
-					} else if (strpos ( $k, "d_" ) === 0) {
-						if ($v) {
-							$v = $this->time2D ( $v );
-							$data [$dbk] = $v;
-						}
-					} else if (strpos ( $k, "t_" ) === 0) {
-						if ($v) {
-							$v = $this->time2T ( $v );
-							$data [$dbk] = $v;
-						}
-					} else if (strpos ( $k, "s_" ) === 0) {
-						if ($v) {
-							$v = AESencrypt ( $v, $this->__password );
-							$data [$dbk] = $v;
-						}
-					} else {
-						$data [$dbk] = $v;
-					}
-				}
-			}
-			
-			$this->_db->insert ( $t, $data );
-			$this->_db->execute ();
-			
-			$this->id = $this->_db->last_insert_id ();
-			
-			// calling hooks AFTER inserting the object
-			$this->_callHooks ( "after", "insert" );
-			
-			// call standard aspect methods
-			
-			if (property_exists ( $this, "_modifiable" ) && (null !== $this->_modifiable)) {
-				$this->_modifiable->insert ();
-			}
-			if (property_exists ( $this, "_versionable" ) && (null !== $this->_versionable)) {
-				$this->_versionable->insert ();
-			}
-			if (property_exists ( $this, "_searchable" ) && (null !== $this->_searchable)) {
-				$this->_searchable->insert ();
-			}
-			
-			// store this id in the context for hooks etc.
-			$inserts = $this->w->ctx ( 'db_inserts' );
-			if (! $inserts) {
-				$inserts = array ();
-			}
-			$inserts [get_class ( $this )] [] = $this->id;
-			$this->w->ctx ( 'db_inserts', $inserts );
-				
-			$this->commitTransaction ();
-		} catch ( Exception $e ) {
-			// echo $e->getMessage();
-			$this->w->Log->error ( "SQL ERROR: " . $e->getMessage () );
-			$this->w->Log->error ( "SQL: " . $this->_db->getSql () );
-			$this->rollbackTransaction();
-			throw $e;
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * Update an object
-	 *
-	 * if $force_null_values is true set null values in db, if false, null values in object will be ignored.
-	 *
-	 * @param boolean $force_null_values        	
-	 * @param boolean $force_validation        	
-	 * @return true or array("success"=>false,"invalid"=>array()) if validation failed
-	 */
-	function update($force_null_values = false, $force_validation = true) {
-		try {
-			$this->startTransaction ();
-			
-			if ($force_validation && property_exists ( $this, "_validation" )) {
-				$valid_response = $this->validate ();
-				if (! $valid_response ['success']) {
-					$this->rollbackTransaction();
-					return $valid_response;
-				}
-			}
-			
-			// calling hooks BEFORE updating the object
-			$this->_callHooks ( "before", "update" );
-			
-			$t = $this->getDbTableName ();
-			$columns = $this->getDbTableColumnNames ();
-			// check delete attribute
-			if (in_array ( "is_deleted", $columns ) && $this->is_deleted === null) {
-				$this->is_deleted = 0;
-			}
-			
-			// set default attributes the old way
-			if (! property_exists ( $this, "_modifiable" )) { // $this->_modifiable) {
-			                                              // if (property_exists($this, "dt_modified")) {
-				if (in_array ( "dt_modified", $columns )) {
-					$this->dt_modified = time ();
-				}
-				if (in_array ( "modifier_id", $columns ) && $this->w->Auth->user ()) {
-					$this->modifier_id = $this->w->Auth->user ()->id;
-				}
-			}
-			$data = array ();
-			foreach ( get_object_vars ( $this ) as $k => $v ) {
-				if ($k {0} != "_" && $k != "w") { // ignore volatile vars
-					$dbk = $this->getDbColumnName ( $k );
-					
-					// call update conversions
-					$v = $this->updateConvert ( $k, $v );
-					if ($v !== null) {
-						$data [$dbk] = $v;
-					}
-					// if $force_null_values is TRUE and $v is NULL, then set fields in DB to NULL
-					// otherwise ignore NULL values
-					if ($v === null && $force_null_values == true) {
-						$data [$dbk] = null;
-					}
-				}
-			}
-			
-			$this->_db->update ( $t, $data )->where ( $this->_cn ( 'id' ), $this->id );
-			$this->_db->execute ();
-			
-			// calling hooks AFTER updating the object
-			$this->_callHooks ( "after", "update" );
-			
-			// call standard aspect methods
-			if (property_exists ( $this, "_modifiable" ) && (null !== $this->_modifiable)) {
-				$this->_modifiable->update ();
-			}
-			if (property_exists ( $this, "_versionable" ) && (null !== $this->_versionable)) {
-				$this->_versionable->update ();
-			}
-			if (property_exists ( $this, "_searchable" ) && (null !== $this->_searchable)) {
-				$this->_searchable->update ();
-			}
-			
-			// store this id in the context for hooks
-			$updates = $this->w->ctx ( 'db_updates' );
-			if (! $updates) {
-				$updates = array ();
-			}
-			$updates [get_class ( $this )] [] = $this->id;
-			$this->w->ctx ( 'db_updates', $updates );
-			$this->commitTransaction ();
-		} catch ( Exception $e ) {
-			// echo $e->getMessage();
-			$this->w->Log->error ( "SQL ERROR: " . $e->getMessage () );
-			$this->w->Log->error ( "SQL: " . $this->_db->getSql () );
-			$this->rollbackTransaction();
-			throw $e;
-		}
-		return true;
-	}
+        try {
+            $this->startTransaction();
+
+            if ($force_validation && property_exists($this, "_validation")) {
+                $valid_response = $this->validate();
+                if (!$valid_response ['success']) {
+                    $this->rollbackTransaction();
+                    return $valid_response;
+                }
+            }
+
+            // calling hooks BEFORE inserting the object
+            $this->_callHooks("before", "insert");
+
+            $t = $this->getDbTableName();
+            $columns = $this->getDbTableColumnNames();
+
+            // set some default attributes
+            if (!property_exists($this, "_modifiable")) { // $this->_modifiable) {
+                // for backwards compatibility
+                if (in_array("dt_created", $columns))
+                    $this->dt_created = time();
+
+                if (in_array("creator_id", $columns) && $this->w->Auth->loggedIn())
+                    $this->creator_id = $this->w->Auth->user()->id;
+
+                if (in_array("dt_modified", $columns))
+                    $this->dt_modified = time();
+
+                if (in_array("modifier_id", $columns) && $this->w->Auth->loggedIn())
+                    $this->modifier_id = $this->w->Auth->user()->id;
+            }
+
+            $data = array();
+            foreach (get_object_vars($this) as $k => $v) {
+                if ($k {0} != "_" && $k != "w" && $v !== null) {
+                    $dbk = $this->getDbColumnName($k);
+                    if (strpos($k, "dt_") === 0) {
+                        if ($v) {
+                            $v = $this->time2Dt($v);
+                            $data [$dbk] = $v;
+                        }
+                    } else if (strpos($k, "d_") === 0) {
+                        if ($v) {
+                            $v = $this->time2D($v);
+                            $data [$dbk] = $v;
+                        }
+                    } else if (strpos($k, "t_") === 0) {
+                        if ($v) {
+                            $v = $this->time2T($v);
+                            $data [$dbk] = $v;
+                        }
+                    } else if (strpos($k, "s_") === 0) {
+                        if ($v) {
+                            $v = AESencrypt($v, Config::get('system.password_salt'));
+                            $data [$dbk] = $v;
+                        }
+                    } else {
+                        $data [$dbk] = $v;
+                    }
+                }
+            }
+
+            $this->_db->insert($t, $data);
+            $this->_db->execute();
+
+            $this->id = $this->_db->last_insert_id();
+
+            // calling hooks AFTER inserting the object
+            $this->_callHooks("after", "insert");
+
+            // call standard aspect methods
+
+            if (property_exists($this, "_modifiable") && (null !== $this->_modifiable)) {
+                $this->_modifiable->insert();
+            }
+            if (property_exists($this, "_versionable") && (null !== $this->_versionable)) {
+                $this->_versionable->insert();
+            }
+            if (property_exists($this, "_searchable") && (null !== $this->_searchable)) {
+                $this->_searchable->insert();
+            }
+
+            // store this id in the context for hooks etc.
+            $inserts = $this->w->ctx('db_inserts');
+            if (!$inserts) {
+                $inserts = array();
+            }
+            $inserts [get_class($this)] [] = $this->id;
+            $this->w->ctx('db_inserts', $inserts);
+
+            $this->commitTransaction();
+        } catch (Exception $e) {
+            // echo $e->getMessage();
+            $this->w->Log->error("SQL ERROR: " . $e->getMessage());
+            $this->w->Log->error("SQL: " . $this->_db->getSql());
+            $this->rollbackTransaction();
+            throw $e;
+        }
+
+        return true;
+    }
+
+    /**
+     * Update an object
+     *
+     * if $force_null_values is true set null values in db, if false, null values in object will be ignored.
+     *
+     * @param boolean $force_null_values        	
+     * @param boolean $force_validation        	
+     * @return true or array("success"=>false,"invalid"=>array()) if validation failed
+     */
+    function update($force_null_values = false, $force_validation = true) {
+        try {
+            $this->startTransaction();
+
+            if ($force_validation && property_exists($this, "_validation")) {
+                $valid_response = $this->validate();
+                if (!$valid_response ['success']) {
+                    $this->rollbackTransaction();
+                    return $valid_response;
+                }
+            }
+
+            // calling hooks BEFORE updating the object
+            $this->_callHooks("before", "update");
+
+            $t = $this->getDbTableName();
+            $columns = $this->getDbTableColumnNames();
+            // check delete attribute
+            if (in_array("is_deleted", $columns) && $this->is_deleted === null) {
+                $this->is_deleted = 0;
+            }
+
+            // set default attributes the old way
+            if (!property_exists($this, "_modifiable")) { // $this->_modifiable) {
+                // if (property_exists($this, "dt_modified")) {
+                if (in_array("dt_modified", $columns)) {
+                    $this->dt_modified = time();
+                }
+                if (in_array("modifier_id", $columns) && $this->w->Auth->user()) {
+                    $this->modifier_id = $this->w->Auth->user()->id;
+                }
+            }
+            $data = array();
+            foreach (get_object_vars($this) as $k => $v) {
+                if ($k {0} != "_" && $k != "w") { // ignore volatile vars
+                    $dbk = $this->getDbColumnName($k);
+
+                    // call update conversions
+                    $v = $this->updateConvert($k, $v);
+                    if ($v !== null) {
+                        $data [$dbk] = $v;
+                    }
+                    // if $force_null_values is TRUE and $v is NULL, then set fields in DB to NULL
+                    // otherwise ignore NULL values
+                    if ($v === null && $force_null_values == true) {
+                        $data [$dbk] = null;
+                    }
+                }
+            }
+
+            $this->_db->update($t, $data)->where($this->getDbColumnName('id'), $this->id);
+            $this->_db->execute();
+
+            // calling hooks AFTER updating the object
+            $this->_callHooks("after", "update");
+
+            // call standard aspect methods
+            if (property_exists($this, "_modifiable") && (null !== $this->_modifiable)) {
+                $this->_modifiable->update();
+            }
+            if (property_exists($this, "_versionable") && (null !== $this->_versionable)) {
+                $this->_versionable->update();
+            }
+            if (property_exists($this, "_searchable") && (null !== $this->_searchable)) {
+                $this->_searchable->update();
+            }
+
+            // store this id in the context for hooks
+            $updates = $this->w->ctx('db_updates');
+            if (!$updates) {
+                $updates = array();
+            }
+            $updates [get_class($this)] [] = $this->id;
+            $this->w->ctx('db_updates', $updates);
+            $this->commitTransaction();
+        } catch (Exception $e) {
+            // echo $e->getMessage();
+            $this->w->Log->error("SQL ERROR: " . $e->getMessage());
+            $this->w->Log->error("SQL: " . $this->_db->getSql());
+            $this->rollbackTransaction();
+            throw $e;
+        }
+        return true;
+    }
 
     /**
      * create and execute a sql delete statement to delete this object from
@@ -704,49 +676,49 @@ class DbObject extends DbService {
      * @param $force
      */
     function delete($force = false) {
-    	try {
-    		$this->startTransaction();
-    		
-	        // calling hooks BEFORE deleting the object
-	        $this->_callHooks("before", "delete");
-	
-	        $t = $this->getDbTableName();
-	        $columns = $this->getDbTableColumnNames();
-	
-	        // if an is_deleted property exists, then only set it to 1
-	        // and update instead of delete!
-	        if ((property_exists(get_class($this), "is_deleted") || (in_array("is_deleted", $columns))) && !$force) {
-	            $this->is_deleted = 1;
-	            // Hard code to NOT validate soft deletes
-	            $this->update(false, false);
-	        } else {
-	            $this->_db->delete($t)->where($this->_cn('id'), $this->id)->execute();
-	        }
-	
-	        // calling hooks AFTER deleting the object
-	        $this->_callHooks("after", "delete");
-	
-	        // store this id in the context for listeners
-	        $deletes = $this->w->ctx('db_deletes');
-	        if (!$deletes) {
-	            $deletes = array();
-	        }
-	        $deletes[get_class($this)][] = $this->id;
-	        $this->w->ctx('db_deletes', $deletes);
-	
-	        // delete from search index
-	        if (property_exists($this, "_searchable") && (null !== $this->_searchable)) {
-	        	$this->_searchable->delete();
-	        }
-	        $this->commitTransaction();
-    	} catch (Exception $e) {
-    		// echo $e->getMessage();
-    		$this->w->Log->error ( "SQL ERROR: " . $e->getMessage () );
-    		$this->w->Log->error ( "SQL: " . $this->_db->getSql () );
-    		$this->rollbackTransaction();
-    		throw $e;
-    	}
-		return true;
+        try {
+            $this->startTransaction();
+
+            // calling hooks BEFORE deleting the object
+            $this->_callHooks("before", "delete");
+
+            $t = $this->getDbTableName();
+            $columns = $this->getDbTableColumnNames();
+
+            // if an is_deleted property exists, then only set it to 1
+            // and update instead of delete!
+            if ((property_exists(get_class($this), "is_deleted") || (in_array("is_deleted", $columns))) && !$force) {
+                $this->is_deleted = 1;
+                // Hard code to NOT validate soft deletes
+                $this->update(false, false);
+            } else {
+                $this->_db->delete($t)->where($this->getDbColumnName('id'), $this->id)->execute();
+            }
+
+            // calling hooks AFTER deleting the object
+            $this->_callHooks("after", "delete");
+
+            // store this id in the context for listeners
+            $deletes = $this->w->ctx('db_deletes');
+            if (!$deletes) {
+                $deletes = array();
+            }
+            $deletes[get_class($this)][] = $this->id;
+            $this->w->ctx('db_deletes', $deletes);
+
+            // delete from search index
+            if (property_exists($this, "_searchable") && (null !== $this->_searchable)) {
+                $this->_searchable->delete();
+            }
+            $this->commitTransaction();
+        } catch (Exception $e) {
+            // echo $e->getMessage();
+            $this->w->Log->error("SQL ERROR: " . $e->getMessage());
+            $this->w->Log->error("SQL: " . $this->_db->getSql());
+            $this->rollbackTransaction();
+            throw $e;
+        }
+        return true;
     }
 
     /**
@@ -979,7 +951,7 @@ class DbObject extends DbService {
                 return $this->$prop_string;
             }
         } else if (property_exists($this, $prop_lookup) && $this->$prop_lookup) {
-            return $this->getObjects("Lookup",array("type" => $this->$prop_lookup));
+            return $this->getObjects("Lookup", array("type" => $this->$prop_lookup));
         } else if (property_exists($this, $prop_class) && $this->$prop_class) {
             if (property_exists($this, $prop_filter) && $this->$prop_filter) {
                 return $this->getObjects($this->$prop_class, $this->$prop_filter, true);
@@ -1131,24 +1103,27 @@ class DbObject extends DbService {
      * @return mixed
      */
     function updateConvert($k, $v) {
-    	if (strpos($k, "dt_") === 0) {
-    		if (!empty($v)) {
-    			return $this->time2Dt($v);
-    		} else return null;
-    	} else if (strpos($k, "d_") === 0) {
-    		if (!empty($v)) {
-    			return $this->time2D($v);
-    		} else return null;
-    	} else if (strpos($k, "t_") === 0) {
-    		if (!empty($v)) {
-    			return $this->time2T($v);
-    		} else return null;
-    	} else if (strpos($k, "s_") === 0) {
-    		if (!empty($v)) {
-    			return AESencrypt($v, $this->__password);
-    		} 
-    	}
-    	return $v;
+        if (strpos($k, "dt_") === 0) {
+            if (!empty($v)) {
+                return $this->time2Dt($v);
+            } else
+                return null;
+        } else if (strpos($k, "d_") === 0) {
+            if (!empty($v)) {
+                return $this->time2D($v);
+            } else
+                return null;
+        } else if (strpos($k, "t_") === 0) {
+            if (!empty($v)) {
+                return $this->time2T($v);
+            } else
+                return null;
+        } else if (strpos($k, "s_") === 0) {
+            if (!empty($v)) {
+                return AESencrypt($v, $this->__password);
+            }
+        }
+        return $v;
     }
-    
+
 }
