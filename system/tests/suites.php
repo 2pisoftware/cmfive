@@ -47,6 +47,6 @@ $suites=array(
 	// dev steve
 	'http://2picrm.local'=>$steveCRMDevConfig,
 	// test site
-	'http://cmfive.dev.code.2pisoftware.com/' =>$testCMFIVEConfig
-	'http://crm.dev.code.2pisoftware.com'=>$testCRMConfig,
+	'http://cmfive.dev.code.2pisoftware.com/' =>$testCMFIVEConfig,
+	'http://crm.dev.code.2pisoftware.com'=>$testCRMConfig
 );
