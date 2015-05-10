@@ -210,7 +210,7 @@ function updatePage(latestContent) {
 			}
 			$(document).foundation(); // {'reveal': {'close_on_background_click': true,'close_on_esc': true}});
 		} else if ($(newContent).hasClass('logfile')) {
-			$('#logfiles').append($(newContent).html());
+			$('#logfiles').append($(newContent).find('body').html());
 		}
 	});
 }

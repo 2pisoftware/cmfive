@@ -108,7 +108,7 @@ foreach ($suites as $url =>$suite) {
 						$functionName=$parts2[1];
 						$logFile=file_get_contents($path.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'_log'.DIRECTORY_SEPARATOR.$testName.'.'.$functionName.'.fail.html');
 						
-						echo '<div class="logitem logfile" ><div class="reveal-modal" data-reveal data-options="close_on_background_click:true;close_on_esc:true;" id="logfile-'.$suiteTitle.'___'.strtolower($testType).'___'.$testName.'___'.$functionName.'">'.$logFile.'</div></div>';
+						echo '<div class="logitem logfile" ><div class="reveal-modal" data-reveal data-options="close_on_background_click:true" id="logfile-'.$suiteTitle.'___'.strtolower($testType).'___'.$testName.'___'.$functionName.'">'.$logFile.'</div></div>';
 						$detailsTest=$testName.'___'.$functionName;
 						echo '<div class="logitem"><b>'.$buffer . "</b></div>\n";
 					// test status	

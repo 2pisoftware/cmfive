@@ -1,4 +1,5 @@
 <?php
+define('DS', DIRECTORY_SEPARATOR); 
 include('suites.php');
 // output control
 header('Content-Encoding: none;');
@@ -9,7 +10,43 @@ if (ob_get_level() == 0) {
 // auto match test suite by request url
 $env='';
 
-
+/*****************************8
+ * Recursively copy a folder
+ */
+function copy_r( $path, $dest )
+    {
+        if( is_dir($path) )
+        {
+            @mkdir( $dest );
+            $objects = scandir($path);
+            if( sizeof($objects) > 0 )
+            {
+                foreach( $objects as $file )
+                {
+                    if( $file == "." || $file == ".." )
+                        continue;
+                    // go on
+                    if( is_dir( $path.DS.$file ) )
+                    {
+                        copy_r( $path.DS.$file, $dest.DS.$file );
+                    }
+                    else
+                    {
+                        copy( $path.DS.$file, $dest.DS.$file );
+                    }
+                }
+            }
+            return true;
+        }
+        elseif( is_file($path) )
+        {
+            return copy($path, $dest);
+        }
+        else
+        {
+            return false;
+        }
+    }
 // prep HTML for tabs
 function renderSuitesBlock($suites) {
 	$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
@@ -20,17 +57,22 @@ function renderSuitesBlock($suites) {
 			foreach($suite['paths'] as $suiteName=>$suitePath) {
 				$suiteTests='';
 				$folder='';
-				if (DIRECTORY_SEPARATOR=='/') {
+				if (DS=='/') {
 					$folder=str_replace('\\','/',dirname($_SERVER['SCRIPT_FILENAME']));
 				} else {
 					$folder=str_replace('/','\\',dirname($_SERVER['SCRIPT_FILENAME']));
 				} 
+				// COPY SUITE FILES, CREATE SUITE IF IT DOESN'T EXIST
 				// COPY MASTER CODECEPTION CONFIG FILE TO THIS TEST SUITE
-				copy($folder.DIRECTORY_SEPARATOR.'codeception.master.yml',$suitePath.DIRECTORY_SEPARATOR.'codeception.yml');
-				
+				copy($folder.DS.'codeception.master.yml',$suitePath.DS.'codeception.yml');
+				copy_r($folder.DS.'tests',$suitePath.DS.'tests'.DS);
+				mkdir($folder.DS.'tests'.DS.'_logs')
+				//$contents=file_get_contents($folder.DS.'tests'.DS.'_bootstrap.php');
+				//$bs=str_replace('###BASEPATH###',$folder,$contents);
+				//file_put_contents($folder.DS.'tests'.DS.'_bootstrap.php',$bs);
 				foreach (array('acceptance','unit','functional') as $ttk => $testType) {
 					$count=0;
-					foreach (glob($suitePath.DIRECTORY_SEPARATOR."tests".DIRECTORY_SEPARATOR.$testType.DIRECTORY_SEPARATOR."*Cest.php") as $spv) {
+					foreach (glob($suitePath.DS."tests".DS.$testType.DS."*Cest.php") as $spv) {
 						// foreach public test function inside
 						$file = file_get_contents ($spv);
 						$fileLines=explode("\n",$file);

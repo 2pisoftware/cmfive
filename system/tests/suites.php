@@ -12,6 +12,7 @@ function getSuitePaths($basePath) {
 	return array(
 		'staff'=>$basePath.DIRECTORY_SEPARATOR.'modules'.DIRECTORY_SEPARATOR.'staff' ,
 		'tasks'=>$basePath.''.DIRECTORY_SEPARATOR.'system'.DIRECTORY_SEPARATOR.'modules'.DIRECTORY_SEPARATOR.'task'
+		//'crm'=>$basePath.''.DIRECTORY_SEPARATOR.'modules'.DIRECTORY_SEPARATOR.'crm'
 		/*'staff1'=>$basePath.'\modules\staff',
 		'tasks1'=>$basePath.'\system\modules\tasks',
 		'staff2'=>$basePath.'\modules\staff',
@@ -26,7 +27,7 @@ function getSuitePaths($basePath) {
 $devConfig=array(
 		'basepath' => 'c:\wamp\www\2picrm',
 		'paths' =>getSuitePaths('c:\wamp\www\2picrm'),
-		'codeception' =>'c:\wamp\www\webception\vendor\codeception\codeception\codecept',
+		'codeception' =>'C:\wamp\www\2picrm\system\composer\vendor\codeception\codeception\codecept',
 		'env'=>'dev'
 	);
 // hack from base config here	
