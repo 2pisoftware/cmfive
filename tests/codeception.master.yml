@@ -12,18 +12,18 @@ settings:
 modules:
     config:
         Db:
-            dsn: 'mysql:host=localhost;dbname=2picrm'
+            dsn: 'mysql:host=localhost;dbname=cmfive'
             user: 'root'
             password: ''
             populate: false
             cleanup: false
 
 env:
-    dev:
+    devsteve:
         modules:
             config:
                 Db: 
-                    dsn: 'mysql:host=localhost;dbname=2picrm'
+                    dsn: 'mysql:host=localhost;dbname=cmfive'
                     user: 'root'
                     password: ''
                     populate: false
@@ -32,7 +32,7 @@ env:
         modules:
             config:
                 Db: 
-                    dsn: 'mysql:host=localhost;dbname=2picrm'
+                    dsn: 'mysql:host=localhost;dbname=cmfive'
                     user: 'root'
                     password: 'thisServerWillDoLotsOfWorkTesting4Us'
                     populate: false

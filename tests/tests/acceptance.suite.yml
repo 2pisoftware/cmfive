@@ -19,14 +19,14 @@ modules:
         PhpBrowser:
             url: 'http://2picrm.local'
 env:
-    dev:
+    devsteve:
         modules:
             config:
                 PhpBrowser:
-                    url: 'http://2picrm.local'
+                    url: 'http://cmfive.steve'
     test:
         modules:
             config:
                 PhpBrowser:
-                    url: 'http://crm.dev.code.2pisoftware.com'
+                    url: 'http://cmfive.dev.code.2pisoftware.com'
     

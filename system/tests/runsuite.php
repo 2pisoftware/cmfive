@@ -4,8 +4,16 @@
  * and streams HTML output as test run executes
  */
 // config 
-include('suites.php');
 // output control
+define('DS', DIRECTORY_SEPARATOR); 
+$folder='';
+if (DS=='/') {
+	$folder=str_replace('\\','/',dirname($_SERVER['SCRIPT_FILENAME']));
+} else {
+	$folder=str_replace('/','\\',dirname($_SERVER['SCRIPT_FILENAME']));
+} 
+include(dirname(dirname($folder)).DS.'tests'.DS.'suites.php');
+
 header('Content-Encoding: none;');
 set_time_limit(0);
 if (ob_get_level() == 0) {
@@ -102,10 +110,12 @@ foreach ($suites as $url =>$suite) {
 						}
 					// start of gathering failed test results
 					} else if (strpos($buffer,'Failed to')!==false) {
-						$parts1=explode(' ',$buffer);
-						$parts2=explode('::',$parts1[6]);
-						$testName=$parts2[0];
-						$functionName=$parts2[1];
+						$parts1=explode('(',trim($buffer));
+						//print_r($parts1);
+						$parts2=explode(' ',trim($parts1[0]));
+						$parts3=explode('::',trim($parts2[count($parts2)-1]));
+						$testName=$parts3[0];
+						$functionName=$parts3[1];
 						$logFile=file_get_contents($path.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'_log'.DIRECTORY_SEPARATOR.$testName.'.'.$functionName.'.fail.html');
 						
 						echo '<div class="logitem logfile" ><div class="reveal-modal" data-reveal data-options="close_on_background_click:true" id="logfile-'.$suiteTitle.'___'.strtolower($testType).'___'.$testName.'___'.$functionName.'">'.$logFile.'</div></div>';

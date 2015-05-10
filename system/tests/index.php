@@ -1,6 +1,12 @@
 <?php
 define('DS', DIRECTORY_SEPARATOR); 
-include('suites.php');
+$folder='';
+if (DS=='/') {
+	$folder=str_replace('\\','/',dirname($_SERVER['SCRIPT_FILENAME']));
+} else {
+	$folder=str_replace('/','\\',dirname($_SERVER['SCRIPT_FILENAME']));
+} 
+include(dirname(dirname($folder)).DS.'tests'.DS.'suites.php');
 // output control
 header('Content-Encoding: none;');
 set_time_limit(0);
@@ -64,8 +70,8 @@ function renderSuitesBlock($suites) {
 				} 
 				// COPY SUITE FILES, CREATE SUITE IF IT DOESN'T EXIST
 				// COPY MASTER CODECEPTION CONFIG FILE TO THIS TEST SUITE
-				copy($folder.DS.'codeception.master.yml',$suitePath.DS.'codeception.yml');
-				copy_r($folder.DS.'tests',$suitePath.DS.'tests'.DS);
+				copy(dirname(dirname($folder)).DS.'tests'.DS.'codeception.master.yml',$suitePath.DS.'codeception.yml');
+				copy_r(dirname(dirname($folder)).DS.'tests'.DS.'tests',$suitePath.DS.'tests'.DS);
 				@mkdir($folder.DS.'tests'.DS.'_logs');
 				//$contents=file_get_contents($folder.DS.'tests'.DS.'_bootstrap.php');
 				//$bs=str_replace('###BASEPATH###',$folder,$contents);
