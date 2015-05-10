@@ -66,7 +66,7 @@ function renderSuitesBlock($suites) {
 				// COPY MASTER CODECEPTION CONFIG FILE TO THIS TEST SUITE
 				copy($folder.DS.'codeception.master.yml',$suitePath.DS.'codeception.yml');
 				copy_r($folder.DS.'tests',$suitePath.DS.'tests'.DS);
-				mkdir($folder.DS.'tests'.DS.'_logs')
+				@mkdir($folder.DS.'tests'.DS.'_logs');
 				//$contents=file_get_contents($folder.DS.'tests'.DS.'_bootstrap.php');
 				//$bs=str_replace('###BASEPATH###',$folder,$contents);
 				//file_put_contents($folder.DS.'tests'.DS.'_bootstrap.php',$bs);
