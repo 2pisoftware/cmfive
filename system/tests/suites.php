@@ -24,24 +24,29 @@ function getSuitePaths($basePath) {
 	);
 } 
 // CONFIG TO BE COPIED AND MODIFIED
-$devConfig=array(
-		'basepath' => 'c:\wamp\www\2picrm',
-		'paths' =>getSuitePaths('c:\wamp\www\2picrm'),
-		'codeception' =>'C:\wamp\www\2picrm\system\composer\vendor\codeception\codeception\codecept',
-		'env'=>'dev'
-	);
+$windowsConfig=array(
+	'basepath' => 'c:\wamp\www\2picrm',
+	'paths' =>getSuitePaths('c:\wamp\www\2picrm'),
+	'codeception' =>'C:\wamp\www\2picrm\system\composer\vendor\codeception\codeception\codecept',
+	'env'=>'dev'
+);
+$linuxConfig=array(
+	'basepath'=>'/var/www/projects/crm/dev',
+	'paths' =>getSuitePaths('/var/www/projects/crm/dev'),
+	'codeception' =>'/var/www/webception/webception/vendor/codeception/codeception/codecept',
+	'env'=>'test'
+);
 // hack from base config here	
-$steveDevConfig=array_merge(array('basepath'=>'c:\wamp\www\2picrmplus','paths'=>getSuitePaths('c:\wamp\www\2picrmplus')),$devConfig);
+$steveCRMDevConfig=array_merge(array('basepath'=>'c:\wamp\www\2picrmplus','paths'=>getSuitePaths('c:\wamp\www\2picrmplus')),$windowsConfig);
+
+$testCMFIVEConfig=array_merge(array('basepath'=>'/var/www/projects/cmfive/dev','paths'=>getSuitePaths('/var/www/projects/cmfive/dev')),$linuxConfig);
+$testCRMConfig=array_merge(array('basepath'=>'/var/www/projects/crm/dev','paths'=>getSuitePaths('/var/www/projects/crm/dev')),$linuxConfig);
 
 // MAPPING OF URLS TO TEST CONFIGS
 $suites=array(
 	// dev steve
-	'http://2picrm.local'=>$steveDevConfig,
+	'http://2picrm.local'=>$steveCRMDevConfig,
 	// test site
-	'http://crm.dev.code.2pisoftware.com'=>array(
-		'basepath'=>'/var/www/projects/crm/dev',
-		'paths' =>getSuitePaths('/var/www/projects/crm/dev'),
-		'codeception' =>'/var/www/webception/webception/vendor/codeception/codeception/codecept',
-		'env'=>'test'
-	),
+	'http://cmfive.dev.code.2pisoftware.com/' =>$testCMFIVEConfig
+	'http://crm.dev.code.2pisoftware.com'=>$testCRMConfig,
 );
