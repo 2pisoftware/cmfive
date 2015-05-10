@@ -1,0 +1,6 @@
+#stopbutton {background-color: red;}
+#testsuites .testresult-passed > a {background-color: green; color: white; padding: 0.3em; }
+#testsuites .testresult-failed > a {background-color: red; color: white; padding: 0.3em; }
+#testsuites .testresult-pending > a {background-color: orange; color: white; padding: 0.3em; }
+.suiteselected {float: left;  }
+a.selectset {background-color: blue ! important}
