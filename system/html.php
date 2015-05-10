@@ -424,7 +424,7 @@ class Html {
         $buffer .= "<div class='row-fluid small-12 multicolform'>";
         $buffer .= "<div class='row-fluid'>";// "<ul class='small-block-grid-1 medium-block-grid-2 large-block-grid-3 section-body'>";
         foreach ($data as $section => $rows) {
-            $buffer .= "<div class='item'><div class='panel'><h4>{$section}</h4><table>";
+            $buffer .= "<div class='item ".toSlug($section)."'><div class='panel'><h4>{$section}</h4><table>";
             foreach($rows as $row) {
                 
                 foreach($row as $field) {
@@ -449,12 +449,12 @@ class Html {
     //                $buffer .= "<li class='display-row'>";
 
                     // Add title field
-                    $buffer .= "<tr>";
+                    $buffer .= "<tr class='".toSlug($title)."' >";
                     if (!empty($title)) {
                         $buffer .= "<td class='small-6 large-4'><b>{$title}</b></td>";
                     }
 
-                    $buffer .= "<td class='small-6 large-8'>{$value}</td></tr>";
+                    $buffer .= "<td class='small-6 large-8 type_".toSlug($type)."'>{$value}</td></tr>";
                 }
             }
             $buffer .= "</table></div></div>";
