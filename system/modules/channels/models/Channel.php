@@ -33,7 +33,13 @@ class Channel extends DbObject {
         }
         if ($this->do_processing) {
             // Clear anything in buffer before redirect
-            $this->w->redirect("/channels/process/{$this->id}");
+            $processors = $this->w->Channel->getProcessors($this->id);
+            if (!empty($processors)) {
+                foreach ($processors as $processor) {
+                    $processor_class = $processor->retrieveProcessor();
+                    $processor_class->process($processor);
+                }
+            }
         }
     }
 
