@@ -17,7 +17,7 @@ modules:
         - DbHelper
     config:
         PhpBrowser:
-            url: 'http://2picrm.local'
+            url: 'http://2picrm.steve'
 env:
     devsteve:
         modules:

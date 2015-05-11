@@ -4,6 +4,11 @@ var testsRunning=false;
 window.onbeforeunload = function() {
     return 'You will lose your test results!';
 }
+window.onerror = function(message, url, lineNumber) {  
+  //save error and send to server for example.
+  console.log(message,url,lineNumber);
+  return true;
+};
 
 function initialisePage() {
 	$(document).foundation(); // {'reveal': {'close_on_background_click': true,'close_on_esc': true}}); {'reveal': {'close_on_background_click': true,'close_on_esc': true}});
@@ -77,7 +82,9 @@ function initialisePage() {
 			var lastContent=currentContent;
 			currentContent=e.currentTarget.responseText;
 			newContent=currentContent.substr(lastContent.length);
-			updatePage(newContent);
+			try {
+				updatePage(newContent);
+			} catch (e) {}
 		}
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {
@@ -210,7 +217,9 @@ function updatePage(latestContent) {
 			}
 			$(document).foundation(); // {'reveal': {'close_on_background_click': true,'close_on_esc': true}});
 		} else if ($(newContent).hasClass('logfile')) {
-			$('#logfiles').append($(newContent).find('body').html());
+			try {
+				$('#logfiles').append($(newContent).find('body').html());
+			} catch (e) {}
 		}
 	});
 }

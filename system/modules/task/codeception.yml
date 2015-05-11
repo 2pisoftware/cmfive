@@ -1,0 +1,40 @@
+actor: Tester
+paths:
+    tests: tests
+    log: tests/_log
+    data: tests/_data
+    helpers: tests/_support
+settings:
+    bootstrap: _bootstrap.php
+    colors: false
+    memory_limit: 1024M
+modules:
+    config:
+        Db:
+            dsn: 'mysql:host=localhost;dbname=2picrm'
+            user: 'root'
+            password: ''
+            populate: false
+            cleanup: false
+
+env:
+    devsteve :
+        modules:
+            config:
+                Db: 
+                    dsn: 'mysql:host=localhost;dbname=2picrm'
+                    user: 'root'
+                    password: ''
+                    populate: false
+                    cleanup: false
+    test:
+        modules:
+            config:
+                Db: 
+                    dsn: 'mysql:host=localhost;dbname=2picrm'
+                    user: 'root'
+                    password: 'thisServerWillDoLotsOfWorkTesting4Us'
+                    populate: false
+                    cleanup: false
+
+

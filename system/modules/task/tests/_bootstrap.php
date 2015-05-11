@@ -1,15 +1,13 @@
 <?php
 define('DS', DIRECTORY_SEPARATOR); 
-//include('./tests/Spyc.php');
+include('./tests/Spyc.php');
 /*
  * This is global bootstrap for autoloading 
  * CONFIG
  */
-/* // parse parameters to extract path (not symlinked source path)
+ // parse parameters to extract path (not symlinked source path)
  $env='';
  $basePath='';
- //print_r(array_keys($GLOBALS));
- //die();
  for($i=0; $i< count($GLOBALS['argv']); $i++) {
 	 if (strpos(' '.$GLOBALS['argv'][$i],'--config=')>0) {
 		$pathParts=explode('config=',$GLOBALS['argv'][$i]);
@@ -59,4 +57,3 @@ foreach ($paths as $k=>$path) {
 	
 }
 //echo "done";
-*/
