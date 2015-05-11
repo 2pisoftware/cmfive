@@ -1,11 +1,11 @@
 <?php
 define('DS', DIRECTORY_SEPARATOR); 
-//include('./tests/Spyc.php');
+include('./tests/Spyc.php');
 /*
  * This is global bootstrap for autoloading 
  * CONFIG
  */
-/* // parse parameters to extract path (not symlinked source path)
+// parse parameters to extract path (not symlinked source path)
  $env='';
  $basePath='';
  //print_r(array_keys($GLOBALS));
@@ -40,8 +40,6 @@ $paths=array(
 	$basePath.'system'.DS.'tests'.DS.'droptables.sql',
 	$basePath.'system'.DS.'install'.DS.'db.sql',
 	$basePath.'system'.DS.'install'.DS.'dbseed.sql',
-	$basePath.'modules'.DS.'crm'.DS.'install'.DS.'db.sql',
-	$basePath.'modules'.DS.'staff'.DS.'install'.DS.'db.sql',
 	$basePath.'system'.DS.'modules'.DS.'favorites'.DS.'install'.DS.'install.sql',
 	// shared testing data
 	$basePath.'system'.DS.'tests'.DS.'userscontactsroles.sql'
@@ -59,4 +57,3 @@ foreach ($paths as $k=>$path) {
 	
 }
 //echo "done";
-*/
