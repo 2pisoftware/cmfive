@@ -1,7 +1,7 @@
 <?php
-namespace WebGuy;
+namespace AcceptanceTester;
 
-class CM5WebGuySteps extends \WebGuy
+class CM5WebGuySteps extends \AcceptanceTester
 {
 	/**
 	 * Run all tests 

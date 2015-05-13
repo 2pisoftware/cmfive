@@ -4,3 +4,5 @@
 #testsuites .testresult-pending > a {background-color: orange; color: white; padding: 0.3em; }
 .suiteselected {float: left;  }
 a.selectset {background-color: blue ! important}
+#phperrors {background-color: pink;}
+#phperrorlogpopupbutton {background-color: red; padding: 1em;}

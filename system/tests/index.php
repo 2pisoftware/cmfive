@@ -15,6 +15,8 @@ if (ob_get_level() == 0) {
 }
 // auto match test suite by request url
 $env='';
+$keyid=rand(1000,20000);
+$key=md5('secretfortestingcmfive'.$keyid);
 
 /*****************************8
  * Recursively copy a folder
@@ -54,13 +56,17 @@ function copy_r( $path, $dest )
         }
     }
 // prep HTML for tabs
-function renderSuitesBlock($suites) {
+function renderSuitesBlock($suites,$key,$keyid) {
 	$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+	
 	$suiteMenu='';
 	foreach ($suites as $url =>$suite) {
+		
 		if (strpos($requestUrl,$url)!==false) { 
+
 			$suiteTests='';
 			foreach($suite['paths'] as $suiteName=>$suitePath) {
+				
 				$suiteTests='';
 				$folder='';
 				if (DS=='/') {
@@ -71,6 +77,7 @@ function renderSuitesBlock($suites) {
 				// COPY SUITE FILES, CREATE SUITE IF IT DOESN'T EXIST
 				// COPY MASTER CODECEPTION CONFIG FILE TO THIS TEST SUITE
 				copy(dirname(dirname($folder)).DS.'tests'.DS.'codeception.master.yml',$suitePath.DS.'codeception.yml');
+				copy_r(dirname(dirname($folder)).DS.'system'.DS.'tests'.DS.'tests',$suitePath.DS.'tests'.DS);
 				copy_r(dirname(dirname($folder)).DS.'tests'.DS.'tests',$suitePath.DS.'tests'.DS);
 				//@mkdir($folder.DS.'tests'.DS.'_log');
 				//$contents=file_get_contents($folder.DS.'tests'.DS.'_bootstrap.php');
@@ -135,10 +142,16 @@ function renderSuitesBlock($suites) {
 				<div id='testsuites' >
 					<div class='testresult-pending' >
 						<h3>Test Results</h3>
+						<div id='phperrors' style='display: none;' ></div>
+						<input type='hidden' id='md5keyid' value='<?php echo $keyid; ?>'>
+						<input type='hidden' id='md5key' value='<?php echo $key; ?>'>
+						<div id='resetdatabases' ><a href='#' class='button tiny right' id='resetalldatabasesbutton' >Drop and recreate all tables !!</a></div>
+						<div style='display: none' id='warning' >Running tests will drop and recreate many database tables and destroy existing data.<br/>
+						<b>I understand</b>   <input type='checkbox' id='testsenabled' > </div>
 						<a href='#' class='button tiny' id='stopbutton' style='display: none;'  >Stop Tests</a>
-						<a href='#' class='button tiny testrunner' id='runbutton'  >Run Tests</a>
+						<a href='runsuite.php' class='button testrunner' id='runbutton'  >Run Tests</a>
 						 <br/><a href='#' class='button tiny selectset' id='selectallbutton'  >All</a> <a href='#' class='button tiny selectset' id='selectnonebutton'  >None</a> <a href='#' class='button tiny selectset'  id='selectfailedbutton'  >Failed</a> <a href='#' class='button tiny selectset'  id='selectpendingbutton'  >Pending</a>
-							<?php echo renderSuitesBlock($suites); ?>	
+							<?php echo renderSuitesBlock($suites,$key,$keyid); ?>	
 					</div>
 				</div>
 			</div>

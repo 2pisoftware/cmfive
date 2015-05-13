@@ -4,7 +4,7 @@ RewriteEngine Off
     Allow from all
 </Files>
 
-#AuthUserFile ./.htpasswd
-#AuthName "Please Enter Password"
-#AuthType Basic
+AuthUserFile .htpasswd
+AuthName "Please Enter Password"
+AuthType Basic
 #Require valid-user

@@ -10,9 +10,13 @@ include('./tests/Spyc.php');
  $basePath='';
  //print_r(array_keys($GLOBALS));
  //die();
+ $module='';
+ $modulePath='';
  for($i=0; $i< count($GLOBALS['argv']); $i++) {
 	 if (strpos(' '.$GLOBALS['argv'][$i],'--config=')>0) {
 		$pathParts=explode('config=',$GLOBALS['argv'][$i]);
+		$module=basename($pathParts[1]);
+		$modulePath=$pathParts[1];
 		$basePath=dirname($pathParts[1]).DS;
 		if (!is_dir($basePath.'system')) {
 			$basePath=dirname(dirname($pathParts[1])).DS;
@@ -26,6 +30,10 @@ include('./tests/Spyc.php');
  }
 $codeceptionConfig = Spyc::YAMLLoad('./codeception.yml');
 //print_r($codeceptionConfig);
+
+$dbUser='';
+$dbPass='';
+$dbName='';
 if (strlen($env)>0) {
 	$dbUser=$codeceptionConfig['env'][$env]['modules']['config']['Db']['user'];
 	$dbPass=$codeceptionConfig['env'][$env]['modules']['config']['Db']['password'];
@@ -35,25 +43,32 @@ if (strlen($env)>0) {
 	$dbPass=$codeceptionConfig['modules']['config']['Db']['password'];
 	$dbName=explode("dbname=",$codeceptionConfig['modules']['config']['Db']['dsn'])[1];
 }
-$paths=array(
-	// various install scripts
-	$basePath.'system'.DS.'tests'.DS.'droptables.sql',
-	$basePath.'system'.DS.'install'.DS.'db.sql',
-	$basePath.'system'.DS.'install'.DS.'dbseed.sql',
-	$basePath.'system'.DS.'modules'.DS.'favorites'.DS.'install'.DS.'install.sql',
-	// shared testing data
-	$basePath.'system'.DS.'tests'.DS.'userscontactsroles.sql'
-);
+
+function getModuleTestSql($module,$modulePath) {
+	$paths=array();
+	array_push($paths,$modulePath.DS.'install'.DS.'droptables.sql');
+	array_push($paths,$modulePath.DS.'install'.DS.'db.sql');
+	array_push($paths,$modulePath.DS.'install'.DS.'dbseed.sql');
+	array_push($paths,$modulePath.DS.'tests'.DS.'_data'.DS.'testusers.sql');
+	array_push($paths,$modulePath.DS.'tests'.DS.'_data'.DS.'dump.sql');
+	return $paths;
+}
+$paths=getModuleTestSql($module,$modulePath);
+
 $sql='';
 $mysqli = new mysqli("localhost", $dbUser, $dbPass, $dbName);
 foreach ($paths as $k=>$path) {
-	$output=array();
-	echo "Import ".$path."\n";
-	$sql=file_get_contents($path);
-	$result = mysqli_multi_query($mysqli,$sql); //implode('\n',$sql));
-	
-	while ($mysqli->more_results() && $ir=$mysqli->next_result()) {if (!$ir) echo $mysqli->error;} // flush multi_queries
-	$sql='';
-	
+	if (file_exists($path)) {
+		$output=array();
+		//echo "!=========================================\n";
+		echo "\nImport ".$path."\n";
+		$sql=file_get_contents($path);
+		//echo substr($sql,0,300);
+		//echo "!=========================================\n";
+		$result = mysqli_multi_query($mysqli,$sql); //implode('\n',$sql));
+		while ($mysqli->more_results() && $ir=$mysqli->next_result()) {if (!$ir) echo $mysqli->error;} // flush multi_queries
+		$sql='';
+	}
 }
+//print_r($paths);
 //echo "done";

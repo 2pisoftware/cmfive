@@ -27,7 +27,7 @@ $linuxConfig=array(
 	'env'=>'test'
 );
 // hack from base config here	
-$steveDevConfig=array_merge(array('basepath'=>'c:\wamp\www\cmfiveclean','paths'=>getSuitePaths('c:\wamp\www\cmfiveclean')),$windowsConfig);
+$steveDevConfig=array_merge(array('phpLogFile'=>'c:\wamp\logs\php_error.log','basepath'=>'c:\wamp\www\cmfiveclean','paths'=>getSuitePaths('c:\wamp\www\cmfiveclean')),$windowsConfig);
 $testConfig=array_merge(array('basepath'=>'/var/www/projects/cmfiveclean/dev','paths'=>getSuitePaths('/var/www/projects/cmfiveclean/dev')),$linuxConfig);
 
 // MAPPING OF URLS TO TEST CONFIGS
