@@ -42,6 +42,9 @@ Config::set('system.allow_action', array(
     "admin/datamigration"
 ));
 
+// =========== Pass-through Authentication ========
+Config::set('system.use_passthrough_authentication', FALSE);
+
 //========= REST Configuration ==============================
 // check the following configuration carefully to secure
 // access to the REST infrastructure.

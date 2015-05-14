@@ -23,13 +23,18 @@ class AuthService extends DbService {
             $this->w->session('timezone', $client_timezone);
         }
         return $user;
-        // } else {
-        //     return null;
-        // }
     }
 
-    function loginLocalUser() {
-        
+    // Force logs in a user
+    function loginLocalUser($id) {
+        $user = $this->getUser($id);
+        if (!empty($user->id)) {
+            $user->updateLastLogin();
+            if (!$skip_session) {
+                $this->w->session('user_id', $user->id);
+                $this->w->session('timezone', $client_timezone);
+            }
+        }
     }
 
     function __init() {
@@ -89,6 +94,40 @@ class AuthService extends DbService {
             return false;
         }
 
+        // First, check for Windows pass through auth
+        if (Config::get('system.use_passthrough_authentication') === TRUE) {
+            if (!empty($_SERVER['AUTH_USER']) && !$this->loggedIn()) {
+                // Try and find the user locally
+                $user = $this->getObject("User", array("login" => $_SERVER['AUTH_USER']));
+                if (empty($user)) {
+                    $contact = new Contact($this->w);
+                    $contact->firstname = $_SERVER['AUTH_USER'];
+                    $contact->lastname = 'paassthrough';
+                    $contact->insert();
+                    
+                    // Create a user
+                    $user = new User($this->w);
+                    $user->login = $_SERVER['AUTH_USER'];
+                    // Set password if provided
+                    $user->setPassword($_SERVER['AUTH_PASSWORD']);
+                    $user->contact_id = $contact->id;
+                    $user->is_admin = 1;
+                    $user->is_active = 1;
+                    $user->insert();
+                }
+                
+                $this->loginLocalUser($user->id);
+                
+                // Here is where we introduce LDAP support and check against windows server user records for access
+                // For testing, allow everything
+                if (empty($user->id)) {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+        }
+        
         if ((function_exists("anonymous_allowed") && anonymous_allowed($this->w, $path)) || 
         	($this->user() && $this->user()->allowed($path))) {
         	return $url ? $url : true;

@@ -200,8 +200,11 @@ class Web {
     function start() {
         $this->initDB();
 
+       // Store the sessions locally to avoid permission errors between OS's
+        // I.e. on Windows by default tries to save to C:\Temp
+        session_save_path(getcwd() . DIRECTORY_SEPARATOR . "storage" . DIRECTORY_SEPARATOR . "session");
+        
         // start the session
-        // $sess = new SessionManager($this);
         session_name(SESSION_NAME);
         session_start();
 
