@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>Auth</title>
+        
+        <link rel='stylesheet' href='/system/templates/css/style.css'/><link rel='stylesheet' href='/system/templates/js/foundation-5.0.2/css/normalize.css'/><link rel='stylesheet' href='/system/templates/js/foundation-5.0.2/css/foundation.css'/><script src='/system/templates/js/foundation-5.0.2/js/modernizr.js'></script><script src='/system/templates/js/foundation-5.0.2/js/jquery.js'></script><script src='/system/templates/js/foundation-5.0.2/js/foundation.min.js'></script><script src='/system/templates/js/main.js'></script>            </head>
+    <body>
+        <div class="row">
+            <div class="large-6 small-10 columns small-centered">
+                <div class="row small-6 small-centered">
+                    <h1 style="text-align: center;">Cmfive</h1>
+                </div>
+
+                                                        <div data-alert class="alert-box warning">
+                        Login or Password incorrect                        <a href="#" class="close">&times;</a>
+                    </div>
+                
+                <div class="row">
+                    <form method="POST" action="/auth/login">
+    <input type="hidden" name="201848cb5a8a74627fa1" value="fec9065e7f0e0adf668bbb399c89368ca3bfadbef65a3994a6dcbff80db7f7ab6f2490fd742249cd9bc14bceeb9ef4e987d7cb9d0086417f06e257d411de6724" />
+
+    <label for="login">Login</label>
+    <input id="login" name="login" type="text" placeholder="Your login" />
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" placeholder="Your password" />
+    <button type="submit" class="button large-5 small-12">Login</button>
+    <button type="button" onclick="window.location.href='/auth/forgotpassword';" class="button alert large-5 small-12 right">Forgot Password</button>
+</form>
+                </div>
+            </div>
+        </div>
+        <script>
+            jQuery(document).foundation();
+        </script>
+	</body>
+</html>

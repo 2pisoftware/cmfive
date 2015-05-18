@@ -144,6 +144,11 @@ class Task extends DbObject {
         return $this->getCanIView();
     }
 
+    // Until we know exactly who can delete, restrict it to admin
+    function canDelete(\User $user) {
+        return ($user && $user->is_admin);
+    }
+    
     // get my membership object and check i am better than GUEST of a task group given a task group ID
     function getCanIEdit() {
         return $this->getCanIAssign();

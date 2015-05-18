@@ -33,9 +33,16 @@ class InboxService extends DbService {
         
         // Notify users via email if specified and the user isn't sending a message to themselves
         $this->w->Log->debug("IDs: " . var_export($msg->user_id, true) . " - " . var_export($msg->sender_id, true));
-        if ($send_email === true && $msg->user_id !== $msg->sender_id) {
-            $this->w->Mail->sendMail($receiver->getContact()->email, $logged_in ? $this->w->Auth->getUser($msg->sender_id)->getContact()->email : "system@crm.2pisoftware.com", $msg->subject, $mso->message);
-        }
+        if (!empty($mso) && !empty($msg) && !empty($receiver)) {
+			$rContact=$receiver->getContact();
+			$lSender=$this->w->Auth->getUser($msg->sender_id);
+			if (!empty($rContact) && !empty($lSender)) {
+				$lContact=$lSender->getContact();
+				if (!empty($lContact) && $send_email === true && $msg->user_id !== $msg->sender_id) {
+					$this->w->Mail->sendMail($rContact->email, $logged_in ? $lContact->email : "system@crm.2pisoftware.com", $msg->subject, $mso->message);
+				}
+			}
+		}
     }
 
     function sendMail($to, $cc, $bcc, $from, $replyto, $subject, $message) {

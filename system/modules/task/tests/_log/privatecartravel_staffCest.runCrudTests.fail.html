@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<!--[if IE 9]><html class="lt-ie10" lang="en" > <![endif]-->
+<html class="no-js" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Main - Home</title>
+<!--        <link rel="icon" href="/templates/img/favicon.png" type="image/png"/>-->
+
+        <link rel='stylesheet' href='/system/templates/js/foundation-5.5.0/css/normalize.css'/><link rel='stylesheet' href='/system/templates/js/foundation-5.5.0/css/foundation.css'/><link rel='stylesheet' href='/system/templates/css/style.css'/><link rel='stylesheet' href='/system/templates/css/tablesorter.css'/><link rel='stylesheet' href='/system/templates/css/datePicker.css'/><link rel='stylesheet' href='/system/templates/js/jquery-ui-new/css/custom-theme/jquery-ui-1.8.13.custom.css'/><link rel='stylesheet' href='/system/templates/css/liveValidation.css'/><link rel='stylesheet' href='/system/templates/js/colorbox/colorbox/colorbox.css'/><link rel='stylesheet' href='/system/templates/css/jquery.asmselect.css'/><link rel='stylesheet' href='/system/templates/font/foundation-icons/foundation-icons.css'/><link rel='stylesheet' href='/system/templates/js/pickadate.js-3.5.2/lib/compressed/themes/classic.css'/><link rel='stylesheet' href='/system/templates/js/pickadate.js-3.5.2/lib/compressed/themes/classic.date.css'/><link rel='stylesheet' href='/system/templates/js/pickadate.js-3.5.2/lib/compressed/themes/classic.time.css'/><link rel='stylesheet' href='/system/templates/js/codemirror-4.4/lib/codemirror.css'/><script src='/system/templates/js/foundation-5.5.0/js/vendor/modernizr.js'></script><script src='/system/templates/js/foundation-5.5.0/js/vendor/jquery.js'></script><script src='/system/templates/js/main.js'></script><script src='/system/templates/js/tablesorter/jquery.tablesorter.js'></script><script src='/system/templates/js/tablesorter/addons/pager/jquery.tablesorter.pager.js'></script><script src='/system/templates/js/colorbox/colorbox/jquery.colorbox-min.js'></script><script src='/system/templates/js/jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.min.js'></script><script src='/system/templates/js/pickadate.js-3.5.2/lib/compressed/picker.js'></script><script src='/system/templates/js/pickadate.js-3.5.2/lib/compressed/picker.date.js'></script><script src='/system/templates/js/pickadate.js-3.5.2/lib/compressed/picker.time.js'></script><script src='/system/templates/js/jquery-ui-timepicker-addon.js'></script><script src='/system/templates/js/livevalidation.js'></script><script src='/system/templates/js/jquery.asmselect.js'></script><script src='/system/templates/js/boxover.js'></script><script src='/system/templates/js/ckeditor/ckeditor.js'></script><script src='/system/templates/js/chart-js/Chart.min.js'></script><script src='/system/templates/js/codemirror-4.4/codemirror-compressed.js'></script>        <script type="text/javascript">
+            var $ = jQuery;
+
+            $(document).ready(function() {
+                $("table.tablesorter").tablesorter({dateFormat: "uk", widthFixed: true, widgets: ['zebra']});
+                $(".tab-head").children("a").each(function() {
+                    $(this).bind("click", {alink: this}, function(event) {
+                        changeTab(event.data.alink.hash);
+                        return false;
+                    });
+                });
+
+                // Change tab if hash exists
+                var hash = window.location.hash.split("#")[1];
+                if (hash && hash.length > 0) {
+                    changeTab(hash);
+                } else {
+                    $(".tab-head > a:first").trigger("click");
+                }
+                
+                // Set up CodeMirror instances if any
+                bindCodeMirror();
+                
+                // Adjust the breadcrumbs div if it's content is longer than the viewport
+                var breadcrumbs = $('.cmfive_breadcrumbs');
+                if (breadcrumbs.length) {
+                    if (breadcrumbs[0].scrollWidth > $(window).width()) {
+                        breadcrumbs.css('height', (breadcrumbs.height() + 20) + "px");
+                    }
+                }
+                
+                // Search function shortcut listener
+                $(document).on('keydown', function ( e ) {
+                    if ((e.ctrlKey || e.metaKey) && e.which === 70) {
+                        $('#cmfive_search_button').click();
+                        return false;
+                    }
+                });
+            });
+
+            // Try and prevent multiple form submissions
+            $("input[type=submit]").click(function() {
+                $(this).hide();
+            });
+            $(document).bind('cbox_complete', function() {
+                $("input[type=submit]").click(function() {
+                    $(this).hide();
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div class="loading_overlay" style="display:none;">
+            <div class="circle"></div>
+            <div class="circle_inner"></div>
+            <div class="circle_center"></div>
+            <h4 class="subheader">Please wait...</h4>
+        </div>
+        <div class="row-fluid">
+            <nav class="top-bar" data-topbar><!-- To make it that you need to click to activate dropdown use  data-options="is_hover: false" -->
+                <ul class="title-area">
+                    <li class="name">
+                        <!--<h1><a href="/"></a></h1>-->
+                    </li>
+                    <li class="toggle-topbar"><a href="">Menu</a></li>
+                </ul>
+
+                <section class="top-bar-section">
+                    <!-- Right Nav Section -->
+                    <ul class="right">
+                        <!-- Search bar -->
+                        <li><a onclick="modal_history.push('/search?=1'); $('#cmfive-modal').foundation('reveal', 'open', '/search?=1');return false;"id='cmfive_search_button' ><span class='fi-magnifying-glass'></span></a></li>
+                        
+                        <!-- User Profile drop down -->
+                                                    <li class="has-dropdown">
+                                <a href="#"><span  class="fi-torso"></span></a>
+                                <ul class="dropdown">
+<li><a onclick="modal_history.push('http://2picrm.local/auth/profile/box?isbox=1'); $('#cmfive-modal').foundation('reveal', 'open', 'http://2picrm.local/auth/profile/box?isbox=1');return false;">Staff User</a></li>
+<li><a href='http://2picrm.local/auth/logout' >Logout</a></li>
+</ul>
+    
+                            </li>
+                                            </ul>
+
+                    <!-- Left Nav Section -->
+                    <ul class="left">
+                                                    <li><a href='http://2picrm.local/main/index' class='current active' ><span class='fi-home'></span></a></li>
+                            <li class="divider"></li>
+                                                                        <li class="has-dropdown " id="topnav_inbox">
+                                            <a href='http://2picrm.local/inbox' class='current active' >Inbox</a><ul class="dropdown">
+<li><a href='http://2picrm.local/inbox' >New Messages</a></li>
+<li><a href='http://2picrm.local/inbox/read' >Read Messages</a></li>
+<li><a href='http://2picrm.local/inbox/showarchive' >Archive</a></li>
+<li><a href='http://2picrm.local/inbox/trash' >Bin</a></li>
+</ul>
+                                            </li>
+                                                                                <li class="divider"></li>
+                                                                                <li class="has-dropdown " id="topnav_report">
+                                            <a href='http://2picrm.local/report' >Report</a><ul class="dropdown">
+<li><a href='http://2picrm.local/report/index' >Report Dashboard</a></li>
+<li><a href='http://2picrm.local/report/edit' >Create a Report</a></li>
+<li></li>
+<li><a href='http://2picrm.local/report/listfeed' >Feeds Dashboard</a></li>
+</ul>
+                                            </li>
+                                                                                <li class="divider"></li>
+                                                                                <li class="has-dropdown " id="topnav_task">
+                                            <a href='http://2picrm.local/task' >Task</a><ul class="dropdown">
+<li><a href='http://2picrm.local/task/edit' >New Task</a></li>
+<li><a href='http://2picrm.local/task/index' >Task Dashboard</a></li>
+<li><a href='http://2picrm.local/task/tasklist' >Task List</a></li>
+<li><a href='http://2picrm.local/task/tasklist#notifications' >Notifications</a></li>
+<li><a href='http://2picrm.local/task/taskweek' >Activity</a></li>
+<li><a href='http://2picrm.local/task-group/viewtaskgrouptypes' >Task Groups</a></li>
+</ul>
+                                            </li>
+                                                                                <li class="divider"></li>
+                                                                                <li class="has-dropdown " id="topnav_crm">
+                                            <a href='http://2picrm.local/crm' >Crm</a><ul class="dropdown">
+<li><a href='http://2picrm.local/crm/index' >Home</a></li>
+<li><a href='http://2picrm.local/crm-accounts' >Accounts</a></li>
+<li><a href='http://2picrm.local/crm-contacts' >Contacts</a></li>
+<li><a href='http://2picrm.local/crm-opportunities' >Opportunities</a></li>
+<li><a href='http://2picrm.local/crm-quotes' >Quotes</a></li>
+<li><a href='http://2picrm.local/crm-invoices' >Invoices</a></li>
+<li><a href='http://2picrm.local/crm-projects' >Projects</a></li>
+<li><a href='http://2picrm.local/crm-expenses' >Expenses</a></li>
+<li><a href='http://2picrm.local/crm-helpdesk' >Helpdesk</a></li>
+<li><a href='http://2picrm.local/crm-admin' >Admin</a></li>
+</ul>
+                                            </li>
+                                                                                <li class="divider"></li>
+                                                                                <li class="has-dropdown " id="topnav_staff">
+                                            <a href='http://2picrm.local/staff' >Staff</a><ul class="dropdown">
+<li><a href='http://2picrm.local/staff-leaveapplications' >Leave Applications</a></li>
+<li><a href='http://2picrm.local/staff-privatecartravel' >Private Car Travel</a></li>
+</ul>
+                                            </li>
+                                                                                <li class="divider"></li>
+                                                                    <li><a onclick="modal_history.push('http://2picrm.local/help/view/main/index?isbox=1'); $('#cmfive-modal').foundation('reveal', 'open', 'http://2picrm.local/help/view/main/index?isbox=1');return false;"><span class='fi-q'>?</span></a> </li>
+                                                </ul> <!-- End left nav section -->
+                </section>
+            </nav>
+        </div>
+
+        <!-- Breadcrumbs -->
+        <div class="row-fluid">
+            <ul class='cmfive_breadcrumbs '><li><i class='fi-clock'></i></li><li>Your history will appear here</li></ul>        </div>
+        
+        <div class="row-fluid body">
+                        <div class="row-fluid ">
+                <div class="row-fluid small-12">
+                    <h3 class="header">Home</h3>
+                </div>
+                
+                <div class="row-fluid" style="overflow: hidden;">
+                    <button class="button tiny " onclick="modal_history.push('/main/addwidget/main?isbox=1'); $('#cmfive-modal').foundation('reveal', 'open', '/main/addwidget/main?isbox=1');return false;">Add Widget</button>                </div>
+            </div>
+        </div>
+
+        <div class="row-fluid">
+            <div id="footer">
+                Copyright &#169; 2015&nbsp;&nbsp;&nbsp;<a href="http://2pisoftware.com">2pi Software</a>
+            </div>
+        </div>
+
+        <div id="cmfive-modal" class="reveal-modal xlarge" data-reveal style="top: 30px !important;"></div>
+        
+        <script type="text/javascript" src="/system/templates/js/foundation-5.5.0/js/foundation.min.js"></script>
+        <script type="text/javascript" src="/system/templates/js/foundation-5.5.0/js/foundation/foundation.clearing.js"></script>
+        <script>
+            $(document).foundation({
+                reveal : {
+                    animation_speed: 150,
+                    animation: 'fade'
+                }
+            });
+            
+            var modal_history = [];
+            var modal_history_pop = false;
+            
+            // Automatically append the close 'x' to reveal modals
+            $(document).on('opened', '[data-reveal]', function () {
+                $("#cmfive-modal").append("<a class=\"close-reveal-modal\">&#215;</a>");
+                modal_history.push()
+                bindModalLinks();
+            });
+            
+            function bindModalLinks() {
+                // Stop a links and follow them inside the reveal modal
+                $("#cmfive-modal a:not(#modal-back)").click(function(event) {                    
+                    if ($(this).hasClass("close-reveal-modal")) {
+                        $("#cmfive-modal").foundation("reveal", "close");
+                    } else {
+                        if ($(this).attr('href')[0] === "#") {
+                            return true;
+                        } else {
+                            // Add href to history if the href wasnt the last item in the stack and that we arent the back link
+                            if (modal_history.indexOf($(this).attr('href')) !== modal_history.length) {
+                                modal_history.push($(this).attr('href'));
+                                modal_history_pop = true;
+                            }
+                            changeModalWindow($(this).attr('href'));
+                        }
+                    }
+                    return false;
+                });
+                
+                // Bind back traversal to modal window
+                $("#cmfive-modal #modal-back").click(function(event) {
+                    // event.preventDefault();
+                    if (modal_history.length > 0) {
+                        // When you click a link, THAT link goes onto the stack.
+                        // However we want the one before it.
+                        // The modal_history_pop prevents us from popping twice (if back is pressed twice in a row
+                        // for example)
+                        if (modal_history_pop) {
+                            modal_history.pop();
+                            modal_history_pop = false;
+                        }
+                        if (modal_history.length > 0) {
+                            changeModalWindow(modal_history.pop());
+                        }
+//                        console.log(modal_history);
+                    } 
+                    return false;
+                });
+            }
+            
+            // Updates the modal window by content from ajax request to uri
+            function changeModalWindow(uri) {
+                $.get(uri, function(data) {
+                    $("#cmfive-modal").html(data + "<a class=\"close-reveal-modal\">&#215;</a>");
+                    bindModalLinks();
+                });
+            }
+        </script>
+    </body>
+</html>
