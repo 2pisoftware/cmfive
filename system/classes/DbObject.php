@@ -74,34 +74,6 @@
 class DbObject extends DbService {
 
     public $id;
-    public $__password = 'CHANGEME'; // for encrypted fields change this!!
-
-    /**
-     * Overrride this variable to false to turn off
-     * DB auditing for this table
-     *
-     * @var unknown_type
-     */
-    public $__use_auditing = true;
-
-    //Define this property if you want to use the
-    //ModifiableAspect
-    //  public $_modifiable;
-    //
-	//To remove this from child classes:
-    //  public $_remove_modifiable;
-    //Define this property if you want to use the
-    //VersionableAspect
-    //  public $_versionable;
-    //
-	//To remove this from child classes:
-    //  public $_remove_versionable;
-    //Define this property if you want to use the
-    //SearchableAspect
-    //  public $_searchable;
-    //
-	//To remove this from child classes:
-    //  public $_remove_searchable;
 
     /**
      * Constructor
@@ -155,7 +127,7 @@ class DbObject extends DbService {
      */
     function setPassword($password) {
         if ($password) {
-            $this->__password = $password;
+            Config::set('system.password_salt', $password);
         }
     }
 
@@ -167,7 +139,7 @@ class DbObject extends DbService {
         foreach (get_object_vars($this) as $k => $v) {
             if (strpos($k, "s_") === 0) {
                 if ($v) {
-                    $this->$k = AESdecrypt($v, $this->__password);
+                    $this->$k = AESdecrypt($v, Config::get('system.password_salt'));
                 }
             }
         }
@@ -518,19 +490,19 @@ class DbObject extends DbService {
             $columns = $this->getDbTableColumnNames();
 
             // set some default attributes
-            if (!property_exists($this, "_modifiable")) {
-                if (in_array("dt_created", $columns)) {
+            if (!property_exists($this, "_modifiable")) { // $this->_modifiable) {
+                // for backwards compatibility
+                if (in_array("dt_created", $columns))
                     $this->dt_created = time();
-                }
-                if (in_array("creator_id", $columns) && $this->w->Auth->loggedIn()) {
+
+                if (in_array("creator_id", $columns) && $this->w->Auth->loggedIn())
                     $this->creator_id = $this->w->Auth->user()->id;
-                }
-                if (in_array("dt_modified", $columns)) {
+
+                if (in_array("dt_modified", $columns))
                     $this->dt_modified = time();
-                }
-                if (in_array("modifier_id", $columns) && $this->w->Auth->loggedIn()) {
+
+                if (in_array("modifier_id", $columns) && $this->w->Auth->loggedIn())
                     $this->modifier_id = $this->w->Auth->user()->id;
-                }
             }
 
             $data = array();
@@ -554,7 +526,7 @@ class DbObject extends DbService {
                         }
                     } else if (strpos($k, "s_") === 0) {
                         if ($v) {
-                            $v = AESencrypt($v, $this->__password);
+                            $v = AESencrypt($v, Config::get('system.password_salt'));
                             $data [$dbk] = $v;
                         }
                     } else {
@@ -662,7 +634,7 @@ class DbObject extends DbService {
                 }
             }
 
-            $this->_db->update($t, $data)->where($this->_cn('id'), $this->id);
+            $this->_db->update($t, $data)->where($this->getDbColumnName('id'), $this->id);
             $this->_db->execute();
 
             // calling hooks AFTER updating the object
@@ -720,7 +692,7 @@ class DbObject extends DbService {
                 // Hard code to NOT validate soft deletes
                 $this->update(false, false);
             } else {
-                $this->_db->delete($t)->where($this->_cn('id'), $this->id)->execute();
+                $this->_db->delete($t)->where($this->getDbColumnName('id'), $this->id)->execute();
             }
 
             // calling hooks AFTER deleting the object

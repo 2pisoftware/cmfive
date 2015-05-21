@@ -42,8 +42,7 @@ Config::set('system.allow_action', array(
     "admin/datamigration"
 ));
 
-// =========== Pass-through Authentication ========
-Config::set('system.use_passthrough_authentication', FALSE);
+Config::set('system.password_salt', 'override this in your project config');
 
 //========= REST Configuration ==============================
 // check the following configuration carefully to secure

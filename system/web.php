@@ -200,11 +200,8 @@ class Web {
     function start() {
         $this->initDB();
 
-       // Store the sessions locally to avoid permission errors between OS's
-        // I.e. on Windows by default tries to save to C:\Temp
-        session_save_path(getcwd() . DIRECTORY_SEPARATOR . "storage" . DIRECTORY_SEPARATOR . "session");
-        
         // start the session
+        // $sess = new SessionManager($this);
         session_name(SESSION_NAME);
         session_start();
 
@@ -437,8 +434,16 @@ class Web {
         return $this->service($name);
     }
 
+    /**
+     * Connect to the database
+     */
     private function initDB() {
-        $this->db = new DbPDO(Config::get("database")); // Crystal::db($db_config);
+    	try {
+        	$this->db = new DbPDO(Config::get("database"));
+    	} catch (Exception $ex) {
+    		echo "Error: Can't connect to database.";
+    		die();
+    	}
     }
 
     /**
