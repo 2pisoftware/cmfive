@@ -114,7 +114,7 @@ class EmailChannelOption extends DbObject {
                     $channel_message->insert();
 
                     // Save raw email
-                    $attachment_id = $this->w->File->saveFileContent($channel_message, $rawmessage, str_replace(".", "", microtime()) . ".txt", "channel_email_raw", "text/plain");
+                    $attachment_id = $this->w->File->saveFileContent($channel_message, $rawmessage, "rawemail.txt", "channel_email_raw", "text/plain");
                     if ($message->isMultipart()) {
                         foreach (new RecursiveIteratorIterator($message) as $part) {
                             try {

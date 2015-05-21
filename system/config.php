@@ -42,6 +42,8 @@ Config::set('system.allow_action', array(
     "admin/datamigration"
 ));
 
+Config::set('system.password_salt', 'override this in your project config');
+
 //========= REST Configuration ==============================
 // check the following configuration carefully to secure
 // access to the REST infrastructure.
