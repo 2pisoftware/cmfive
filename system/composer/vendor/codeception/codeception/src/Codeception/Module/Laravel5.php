@@ -30,6 +30,7 @@ use Illuminate\Http\Request;
  * * environment_file: `string`, default `.env` - The .env file to load for the tests.
  * * bootstrap: `string`, default `bootstrap/app.php` - Relative path to app.php config file.
  * * root: `string`, default `` - Root path of our application.
+ * * packages: `string`, default `workbench` - Root path of application packages (if any).
  *
  * ## API
  *
@@ -63,6 +64,7 @@ class Laravel5 extends Framework implements ActiveRecord
                 'environment_file' => '.env',
                 'bootstrap' => 'bootstrap' . DIRECTORY_SEPARATOR . 'app.php',
                 'root' => '',
+                'packages' => 'workbench',
             ),
             (array) $config
         );
@@ -166,7 +168,7 @@ class Laravel5 extends Framework implements ActiveRecord
      */
     protected function bootApplication()
     {
-        $projectDir = \Codeception\Configuration::projectDir();
+        $projectDir = explode($this->config['packages'], \Codeception\Configuration::projectDir())[0];
         $projectDir .= $this->config['root'];
         require $projectDir . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
@@ -186,15 +188,15 @@ class Laravel5 extends Framework implements ActiveRecord
         return $app;
     }
 
-	/**
+   /**
      * Provides access the Laravel application object.
      *
      * @return \Illuminate\Foundation\Application
      */
-	public function getApplication()
-	{
-		return $this->app;
-	}
+    public function getApplication()
+    {
+        return $this->app;
+    }
 
     /**
      * Opens web page using route name and parameters.
@@ -481,15 +483,15 @@ class Laravel5 extends Framework implements ActiveRecord
      * ?>
      * ```
      *
-     * @param $model
+     * @param $tableName
      * @param array $attributes
      * @return mixed
      */
-    public function haveRecord($model, $attributes = array())
+    public function haveRecord($tableName, $attributes = array())
     {
-        $id = $this->app['db']->table($model)->insertGetId($attributes);
+        $id = $this->app['db']->table($tableName)->insertGetId($attributes);
         if (!$id) {
-            $this->fail("Couldn't insert record into table $model");
+            $this->fail("Couldn't insert record into table $tableName");
         }
         return $id;
     }
@@ -501,16 +503,16 @@ class Laravel5 extends Framework implements ActiveRecord
      * $I->seeRecord('users', array('name' => 'davert'));
      * ```
      *
-     * @param $model
+     * @param $tableName
      * @param array $attributes
      */
-    public function seeRecord($model, $attributes = array())
+    public function seeRecord($tableName, $attributes = array())
     {
-        $record = $this->findRecord($model, $attributes);
+        $record = $this->findRecord($tableName, $attributes);
         if (!$record) {
-            $this->fail("Couldn't find $model with " . json_encode($attributes));
+            $this->fail("Couldn't find $tableName with " . json_encode($attributes));
         }
-        $this->debugSection($model, json_encode($record));
+        $this->debugSection($tableName, json_encode($record));
     }
 
     /**
@@ -522,15 +524,15 @@ class Laravel5 extends Framework implements ActiveRecord
      * ?>
      * ```
      *
-     * @param $model
+     * @param $tableName
      * @param array $attributes
      */
-    public function dontSeeRecord($model, $attributes = array())
+    public function dontSeeRecord($tableName, $attributes = array())
     {
-        $record = $this->findRecord($model, $attributes);
-        $this->debugSection($model, json_encode($record));
+        $record = $this->findRecord($tableName, $attributes);
+        $this->debugSection($tableName, json_encode($record));
         if ($record) {
-            $this->fail("Unexpectedly managed to find $model with " . json_encode($attributes));
+            $this->fail("Unexpectedly managed to find $tableName with " . json_encode($attributes));
         }
     }
 
@@ -543,23 +545,23 @@ class Laravel5 extends Framework implements ActiveRecord
      * ?>
      * ```
      *
-     * @param $model
+     * @param $tableName
      * @param array $attributes
      * @return mixed
      */
-    public function grabRecord($model, $attributes = array())
+    public function grabRecord($tableName, $attributes = array())
     {
-        return $this->findRecord($model, $attributes);
+        return $this->findRecord($tableName, $attributes);
     }
 
     /**
-     * @param $model
+     * @param $tableName
      * @param array $attributes
      * @return mixed
      */
-    protected function findRecord($model, $attributes = array())
+    protected function findRecord($tableName, $attributes = array())
     {
-        $query = $this->app['db']->table($model);
+        $query = $this->app['db']->table($tableName);
         foreach ($attributes as $key => $value) {
             $query->where($key, $value);
         }

@@ -23,9 +23,6 @@ class ComposerAutoloaderInit5a7184e9f8c80fb0ba56392e7e7082c7
         self::$loader = $loader = new \Composer\Autoload\ClassLoader();
         spl_autoload_unregister(array('ComposerAutoloaderInit5a7184e9f8c80fb0ba56392e7e7082c7', 'loadClassLoader'));
 
-        $vendorDir = dirname(__DIR__);
-        $baseDir = dirname(dirname($vendorDir));
-
         $includePaths = require __DIR__ . '/include_paths.php';
         array_push($includePaths, get_include_path());
         set_include_path(join(PATH_SEPARATOR, $includePaths));

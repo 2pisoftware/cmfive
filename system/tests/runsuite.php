@@ -200,20 +200,24 @@ if (array_key_exists('key',$_GET) && $_GET['key']==md5('secretfortestingcmfive'.
 				$phpLog=tailCustom($suite,30);
 				$env='';
 				if (array_key_exists('env',$suite) && strlen($suite['env'])>0) {
-					$env=' --env '.$suite['env'];
+					//$env=' --env '.$suite['env'];
 				} 
 				$verbosity=' -v ';
 				if (array_key_exists('v',$_GET)) {
 					//$verbosity=' -vvv ';
 				} 
+				$php='php';
+				if (array_key_exists('php',$suite) && strlen($suite['php'])>0) {
+					$php=$suite['php'];
+				}
 				foreach ($suite['paths'] as $suiteTitle=>$path) {
 					$cmds=array();
 					if ($runAllTests==true) {
-						$cmds=array('cd '.$path.' && php '.$suite['codeception'].' run  '.$verbosity.'--no-colors --config="'.$path.'"'.$env);
+						$cmds=array('cd '.$path.' && "'.$php.'" "'.$suite['codeception'].'" run  '.$verbosity.'--no-colors --config='.$path.''.$env);
 					} else {
 						if (array_key_exists($suiteTitle,$requestedTests)) {
 							foreach($requestedTests[$suiteTitle] as $rtk => $rtv) {
-								array_push($cmds,'cd '.$path.' && php '.$suite['codeception'].' run '.$rtv.' '.$verbosity.'--no-colors --config="'.$path.'"'.$env);
+								array_push($cmds,'cd '.$path.' && "'.$php.'" "'.$suite['codeception'].'" run '.$rtv.' '.$verbosity.'--no-colors --config='.$path.''.$env);
 							}
 						}
 					}

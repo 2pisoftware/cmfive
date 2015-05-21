@@ -40,7 +40,7 @@ class PHPUnit_TextUI_Command
      * @var array
      */
     protected $longOptions = array(
-      'colors' => null,
+      'colors==' => null,
       'bootstrap=' => null,
       'columns=' => null,
       'configuration=' => null,
@@ -75,6 +75,7 @@ class PHPUnit_TextUI_Command
       'disallow-test-output' => null,
       'enforce-time-limit' => null,
       'disallow-todo-tests' => null,
+      'strict-global-state' => null,
       'strict' => null,
       'tap' => null,
       'testdox' => null,
@@ -244,52 +245,44 @@ class PHPUnit_TextUI_Command
 
         foreach ($this->options[0] as $option) {
             switch ($option[0]) {
-                case '--colors': {
-                    $this->arguments['colors'] = true;
-                    }
-                break;
+                case '--colors':
+                    $this->arguments['colors'] = $option[1] ?: PHPUnit_TextUI_ResultPrinter::COLOR_AUTO;
+                    break;
 
-                case '--bootstrap': {
+                case '--bootstrap':
                     $this->arguments['bootstrap'] = $option[1];
-                    }
-                break;
+                    break;
 
-                case '--columns': {
+                case '--columns':
                     if (is_numeric($option[1])) {
                         $this->arguments['columns'] = (int) $option[1];
                     } elseif ($option[1] == 'max') {
                         $this->arguments['columns'] = 'max';
                     }
-                }
-                break;
+                    break;
 
                 case 'c':
-                case '--configuration': {
+                case '--configuration':
                     $this->arguments['configuration'] = $option[1];
-                    }
-                break;
+                    break;
 
-                case '--coverage-clover': {
+                case '--coverage-clover':
                     $this->arguments['coverageClover'] = $option[1];
-                    }
-                break;
+                    break;
 
-                case '--coverage-crap4j': {
+                case '--coverage-crap4j':
                     $this->arguments['coverageCrap4J'] = $option[1];
-                    }
-                break;
+                    break;
 
-                case '--coverage-html': {
+                case '--coverage-html':
                     $this->arguments['coverageHtml'] = $option[1];
-                    }
-                break;
+                    break;
 
-                case '--coverage-php': {
+                case '--coverage-php':
                     $this->arguments['coveragePHP'] = $option[1];
-                    }
-                break;
+                    break;
 
-                case '--coverage-text': {
+                case '--coverage-text':
                     if ($option[1] === null) {
                         $option[1] = 'php://stdout';
                     }
@@ -297,15 +290,13 @@ class PHPUnit_TextUI_Command
                     $this->arguments['coverageText'] = $option[1];
                     $this->arguments['coverageTextShowUncoveredFiles'] = false;
                     $this->arguments['coverageTextShowOnlySummary'] = false;
-                    }
-                break;
+                    break;
 
-                case '--coverage-xml': {
+                case '--coverage-xml':
                     $this->arguments['coverageXml'] = $option[1];
-                    }
-                break;
+                    break;
 
-                case 'd': {
+                case 'd':
                     $ini = explode('=', $option[1]);
 
                     if (isset($ini[0])) {
@@ -315,214 +306,181 @@ class PHPUnit_TextUI_Command
                             ini_set($ini[0], true);
                         }
                     }
-                    }
-                break;
+                    break;
 
-                case '--debug': {
+                case '--debug':
                     $this->arguments['debug'] = true;
-                    }
-                break;
+                    break;
 
                 case 'h':
-                case '--help': {
+                case '--help':
                     $this->showHelp();
                     exit(PHPUnit_TextUI_TestRunner::SUCCESS_EXIT);
-                    }
                 break;
 
-                case '--filter': {
+                case '--filter':
                     $this->arguments['filter'] = $option[1];
-                    }
-                break;
+                    break;
 
-                case '--testsuite': {
+                case '--testsuite':
                     $this->arguments['testsuite'] = $option[1];
-                    }
-                break;
+                    break;
 
-                case '--group': {
+                case '--group':
                     $this->arguments['groups'] = explode(',', $option[1]);
-                    }
-                break;
+                    break;
 
-                case '--exclude-group': {
+                case '--exclude-group':
                     $this->arguments['excludeGroups'] = explode(
-                        ',', $option[1]
+                        ',',
+                        $option[1]
                     );
-                    }
-                break;
+                    break;
 
-                case '--test-suffix': {
+                case '--test-suffix':
                     $this->arguments['testSuffixes'] = explode(
-                        ',', $option[1]
+                        ',',
+                        $option[1]
                     );
-                    }
-                break;
+                    break;
 
-                case '--include-path': {
+                case '--include-path':
                     $includePath = $option[1];
-                    }
-                break;
+                    break;
 
-                case '--list-groups': {
+                case '--list-groups':
                     $this->arguments['listGroups'] = true;
-                    }
-                break;
+                    break;
 
-                case '--printer': {
+                case '--printer':
                     $this->arguments['printer'] = $option[1];
-                    }
-                break;
+                    break;
 
-                case '--loader': {
+                case '--loader':
                     $this->arguments['loader'] = $option[1];
-                    }
-                break;
+                    break;
 
-                case '--log-json': {
+                case '--log-json':
                     $this->arguments['jsonLogfile'] = $option[1];
-                    }
-                break;
+                    break;
 
-                case '--log-junit': {
+                case '--log-junit':
                     $this->arguments['junitLogfile'] = $option[1];
-                    }
-                break;
+                    break;
 
-                case '--log-tap': {
+                case '--log-tap':
                     $this->arguments['tapLogfile'] = $option[1];
-                    }
-                break;
+                    break;
 
-                case '--process-isolation': {
+                case '--process-isolation':
                     $this->arguments['processIsolation'] = true;
-                    }
-                break;
+                    break;
 
-                case '--repeat': {
+                case '--repeat':
                     $this->arguments['repeat'] = (int) $option[1];
-                    }
-                break;
+                    break;
 
-                case '--stderr': {
+                case '--stderr':
                     $this->arguments['stderr'] = true;
-                    }
-                break;
+                    break;
 
-                case '--stop-on-error': {
+                case '--stop-on-error':
                     $this->arguments['stopOnError'] = true;
-                    }
-                break;
+                    break;
 
-                case '--stop-on-failure': {
+                case '--stop-on-failure':
                     $this->arguments['stopOnFailure'] = true;
-                    }
-                break;
+                    break;
 
-                case '--stop-on-incomplete': {
+                case '--stop-on-incomplete':
                     $this->arguments['stopOnIncomplete'] = true;
-                    }
-                break;
+                    break;
 
-                case '--stop-on-risky': {
+                case '--stop-on-risky':
                     $this->arguments['stopOnRisky'] = true;
-                    }
-                break;
+                    break;
 
-                case '--stop-on-skipped': {
+                case '--stop-on-skipped':
                     $this->arguments['stopOnSkipped'] = true;
-                    }
-                break;
+                    break;
 
-                case '--tap': {
+                case '--tap':
                     $this->arguments['printer'] = 'PHPUnit_Util_Log_TAP';
-                    }
-                break;
+                    break;
 
-                case '--testdox': {
+                case '--testdox':
                     $this->arguments['printer'] = 'PHPUnit_Util_TestDox_ResultPrinter_Text';
-                    }
-                break;
+                    break;
 
-                case '--testdox-html': {
+                case '--testdox-html':
                     $this->arguments['testdoxHTMLFile'] = $option[1];
-                    }
-                break;
+                    break;
 
-                case '--testdox-text': {
+                case '--testdox-text':
                     $this->arguments['testdoxTextFile'] = $option[1];
-                    }
-                break;
+                    break;
 
-                case '--no-configuration': {
+                case '--no-configuration':
                     $this->arguments['useDefaultConfiguration'] = false;
-                    }
-                break;
+                    break;
 
-                case '--no-globals-backup': {
+                case '--no-globals-backup':
                     $this->arguments['backupGlobals'] = false;
-                    }
-                break;
+                    break;
 
-                case '--static-backup': {
+                case '--static-backup':
                     $this->arguments['backupStaticAttributes'] = true;
-                    }
-                break;
+                    break;
 
                 case 'v':
-                case '--verbose': {
+                case '--verbose':
                     $this->arguments['verbose'] = true;
-                    }
-                break;
+                    break;
 
-                case '--version': {
+                case '--version':
                     $this->printVersionString();
                     exit(PHPUnit_TextUI_TestRunner::SUCCESS_EXIT);
-                    }
                 break;
 
-                case '--report-useless-tests': {
+                case '--report-useless-tests':
                     $this->arguments['reportUselessTests'] = true;
-                    }
-                break;
+                    break;
 
-                case '--strict-coverage': {
+                case '--strict-coverage':
                     $this->arguments['strictCoverage'] = true;
-                    }
-                break;
+                    break;
 
-                case '--disallow-test-output': {
+                case '--strict-global-state':
+                    $this->arguments['disallowChangesToGlobalState'] = true;
+                    break;
+
+                case '--disallow-test-output':
                     $this->arguments['disallowTestOutput'] = true;
-                    }
-                break;
+                    break;
 
-                case '--enforce-time-limit': {
+                case '--enforce-time-limit':
                     $this->arguments['enforceTimeLimit'] = true;
-                    }
-                break;
+                    break;
 
-                case '--disallow-todo-tests': {
+                case '--disallow-todo-tests':
                     $this->arguments['disallowTodoAnnotatedTests'] = true;
-                    }
-                break;
+                    break;
 
-                case '--strict': {
+                case '--strict':
                     $this->arguments['reportUselessTests']         = true;
                     $this->arguments['strictCoverage']             = true;
                     $this->arguments['disallowTestOutput']         = true;
                     $this->arguments['enforceTimeLimit']           = true;
                     $this->arguments['disallowTodoAnnotatedTests'] = true;
                     $this->arguments['deprecatedStrictModeOption'] = true;
-                    }
-                break;
+                    break;
 
                 case '--selfupdate':
-                case '--self-update': {
+                case '--self-update':
                     $this->handleSelfUpdate();
-                    }
-                break;
+                    break;
 
-                default: {
+                default:
                     $optionName = str_replace('--', '', $option[0]);
 
                     if (isset($this->longOptions[$optionName])) {
@@ -533,7 +491,6 @@ class PHPUnit_TextUI_Command
 
                     if (isset($handler) && is_callable(array($this, $handler))) {
                         $this->$handler($option[1]);
-                    }
                     }
             }
         }
@@ -637,7 +594,8 @@ class PHPUnit_TextUI_Command
                 }
 
                 $this->arguments['printer'] = $this->handlePrinter(
-                    $phpunit['printerClass'], $file
+                    $phpunit['printerClass'],
+                    $file
                 );
             }
 
@@ -649,7 +607,8 @@ class PHPUnit_TextUI_Command
                 }
 
                 $this->arguments['loader'] = $this->handleLoader(
-                    $phpunit['testSuiteLoaderClass'], $file
+                    $phpunit['testSuiteLoaderClass'],
+                    $file
                 );
             }
 
@@ -904,6 +863,7 @@ Test Execution Options:
 
   --report-useless-tests    Be strict about tests that do not test anything.
   --strict-coverage         Be strict about unintentionally covered code.
+  --strict-global-state     Be strict about changes to global state
   --disallow-test-output    Be strict about output during tests.
   --enforce-time-limit      Enforce time limit based on test size.
   --disallow-todo-tests     Disallow @todo-annotated tests.
@@ -912,9 +872,9 @@ Test Execution Options:
   --no-globals-backup       Do not backup and restore \$GLOBALS for each test.
   --static-backup           Backup and restore static attributes for each test.
 
-  --colors                  Use colors in output.
-  --columns <n>             Number of columns to use for progress outout.
-  --columns max             Use maximum number of columns for progress outout.
+  --colors=<flag>           Use colors in output ("never", "auto" or "always").
+  --columns <n>             Number of columns to use for progress output.
+  --columns max             Use maximum number of columns for progress output.
   --stderr                  Write to STDERR instead of STDOUT.
   --stop-on-error           Stop execution upon first error.
   --stop-on-failure         Stop execution upon first error or failure.
