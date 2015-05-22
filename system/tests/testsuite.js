@@ -124,6 +124,18 @@ function initialisePage() {
 			alert('Confirm that you understand before running tests.');
 		}
 	}
+	$('#savesnapshotbutton').click(function() {
+		var keyid=$('#md5keyid').val();
+		var key=$('#md5key').val();
+		var params='&key='+key+'&keyid='+keyid;
+		var saveAs=prompt('Save As?');
+		$.get('runsuite.php?savesnapshot='+saveAs+params,function(res) {
+			alert('Saved database snapshot'+"\n"+res);
+		});
+	});
+	$('#loadsnapshotbutton').click(function() {
+		
+	});
 	$('#resetalldatabasesbutton').click(function() {
 		if ($('#testsenabled:checked').length>0) {
 			if (confirm('Are you really sure?')) {
@@ -306,7 +318,7 @@ function updatePage(latestContent) {
 					showButton='<a href="#" class="showerrorbutton button tiny" data-reveal-id="logfile-'+$(newContent).data('testid')+'">Show</a> ';
 				}
 				
-				test.append($('<span>&nbsp;</span><a href="#" class="detailsbutton tiny" data-reveal-id="testdetails-'+$(newContent).data('testid')+'">Details</a>'+showButton+' <div id="testdetails-'+$(newContent).data('testid')+'" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">'+newContent.html()+'<a class="close-reveal-modal" aria-label="Close">&#215;</a></div>'));
+				test.append($('<span>&nbsp;</span><a href="#" class="detailsbutton button tiny" data-reveal-id="testdetails-'+$(newContent).data('testid')+'">Details</a>&nbsp;&nbsp;&nbsp;'+showButton+' <div id="testdetails-'+$(newContent).data('testid')+'" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">'+newContent.html()+'<a class="close-reveal-modal" aria-label="Close">&#215;</a></div>'));
 			}
 			$(document).foundation(); // {'reveal': {'close_on_background_click': true,'close_on_esc': true}});
 		} else if ($(newContent).hasClass('phperror')) {

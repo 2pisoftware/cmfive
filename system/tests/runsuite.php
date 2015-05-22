@@ -16,6 +16,8 @@ if (DS=='/') {
 include(dirname(dirname($folder)).DS.'tests'.DS.'suites.php');
 include('lib/class.Diff.php');
 
+mkdir(dirname(dirname($folder)).DS.'tests'.DS.'dumps'.DS);
+
 function tailCustom($suite, $lines = 1, $adaptive = true) {
 	if (array_key_exists('phpLogFile',$suite) && file_exists($suite['phpLogFile']))  {
 		$filepath=$suite['phpLogFile'];
@@ -75,12 +77,16 @@ function tailCustom($suite, $lines = 1, $adaptive = true) {
 }
 
 if (array_key_exists('key',$_GET) && $_GET['key']==md5('secretfortestingcmfive'.$_GET['keyid'])) {
+	if (array_key_exists('savesnapshot',$_GET) && strlen($_GET['savesnapshot'])>1) {
+		echo "SAVE:".$_GET['savesnapshot'];
+	} else if (array_key_exists('loadsnapshot',$_GET) && strlen($_GET['loadsnapshot'])>1) {
+		echo "LOAD:".$_GET['loadsnapshot'];
 // RESET DATABASES
-	if (array_key_exists('resetsystemdatabases',$_GET) && $_GET['resetsystemdatabases']=='1') {
+	} else if (array_key_exists('resetsystemdatabases',$_GET) && $_GET['resetsystemdatabases']=='1') {
 		$found=false;
 		foreach ($suites as $url =>$suite) {
 			if (strpos($requestUrl,$url)!==false) { 
-				if (array_key_exists('basepath',$suite) && strlen($suite['basepath'])>0 && count($suite['paths'])>0) {					
+				if (array_key_exists('basepath',$suite) && strlen($suite['basepath'])>0 && count($suite['paths'])>0) {
 					$paths=array();
 					$searchPath=$suite['basepath'].DS.'system'.DS.'modules';
 					foreach (new DirectoryIterator($searchPath) as $fileInfo) {
@@ -362,11 +368,11 @@ if (array_key_exists('key',$_GET) && $_GET['key']==md5('secretfortestingcmfive'.
 				}
 			}
 		}
-		echo "Done";
+		echo "Done</div>";
 		ob_end_flush();
 	}
 } else {
 	echo "Permission denied";
 }
  ?>
-</div>
+

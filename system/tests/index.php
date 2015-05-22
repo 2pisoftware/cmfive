@@ -146,6 +146,8 @@ function renderSuitesBlock($suites,$key,$keyid) {
 						<input type='hidden' id='md5keyid' value='<?php echo $keyid; ?>'>
 						<input type='hidden' id='md5key' value='<?php echo $key; ?>'>
 						<div id='resetdatabases' ><a href='#' class='button tiny right' id='resetalldatabasesbutton' >Drop and recreate all tables !!</a></div>
+						<!--div id='savesnapshot' ><a href='#' class='button tiny right' id='savesnapshotbutton' >Save Database Snapshot</a></div>
+						<div id='loadsnapshot' ><a href='#' class='button tiny right' id='loadsnapshotbutton' >Load Database Snapshot</a></div-->
 						<div style='display: none' id='warning' >Running tests will drop and recreate many database tables and destroy existing data.<br/>
 						<b>I understand</b>   <input type='checkbox' id='testsenabled' > </div>
 						<a href='#' class='button tiny' id='stopbutton' style='display: none;'  >Stop Tests</a>
