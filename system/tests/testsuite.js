@@ -276,17 +276,13 @@ function updateTotalStatus() {
 function updatePage(latestContent) {
 	$('#phperrors').hide();
 	$('#phperrors').html('');
-	//console.log('updatepage',latestContent);
 	var newContentWrapped=$('<div>'+latestContent+'</div>');
-	//console.log('wrapped',newContentWrapped.html());
 	$.each(newContentWrapped.children(),function(nk,newContentp) {
 		var newContent=$(newContentp);
-		//console.log('updatepageitem',newContentp);
 					
 		if ($(newContent).hasClass('testresult')) {
+			var testName=$(newContent).data('test');
 			var listedTest=$('#'+$(newContent).data('title')+'___'+$(newContent).data('suite')+'___'+$(newContent).data('test')+'___'+$(newContent).data('function'));
-			//console.log('testres');
-			//console.log($(newContent));
 			if ($(newContent).hasClass('testresult-passed')) {
 				listedTest.removeClass('testresult-failed');
 				listedTest.removeClass('testresult-pending');
@@ -303,17 +299,12 @@ function updatePage(latestContent) {
 			}
 			//$(newContent).appendTo($('#testsuite-'+$(newContent).data('title')));
 		} else if ($(newContent).hasClass('testdetails')) {
-			//console.log('import test details',$(newContent));
 			var test=$('#'+$(newContent).data('testid'));
-			//console.log($(newContent).data('testid'));
 			if ($('.reveal-modal',test).length>0)  {
-				//console.log('append');
 				var modal=$('.reveal-modal',test);
 				modal.append(newContent.html());
 			} else {
-				//console.log('creates');
 				var showButton='';
-				console.log($('#logfile-'+$(newContent).data('testid')));
 				if ($('#logfile-'+$(newContent).data('testid')).length>0) {
 					showButton='<a href="#" class="showerrorbutton button tiny" data-reveal-id="logfile-'+$(newContent).data('testid')+'">Show</a> ';
 				}
@@ -330,9 +321,9 @@ function updatePage(latestContent) {
 			var popup=$('<div><a id="phperrorlogpopupbutton" href="#" class="button tiny" data-reveal-id="phperrorlogpopup" >New PHP Errors</a> <div id="phperrorlogpopup" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">'+newContent.html()+'<a class="close-reveal-modal" aria-label="Close">&#215;</a></div></div>');
 			$('#phperrors').prepend(popup);
 			$(document).foundation();
-			//$('#phperrorlogpopupbutton').click(function() {
-			//	$('#phperrors').hide();
-			//});
+			$('#phperrorlogpopupbutton').click(function() {
+				$('#phperrors').hide();
+			});
 			
 		
 		} else if ($(newContent).hasClass('logfile')) {
