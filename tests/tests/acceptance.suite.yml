@@ -16,7 +16,7 @@ modules:
         - Db
     config:
         PhpBrowser:
-            url: 'http://2picrm.steve'
+            url: 'http://disabled'
 env:
     devsteve:
         modules:
