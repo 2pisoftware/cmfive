@@ -145,8 +145,13 @@ function renderSuitesBlock($suites,$key,$keyid) {
 						<div id='phperrors' style='display: none;' ></div>
 						<input type='hidden' id='md5keyid' value='<?php echo $keyid; ?>'>
 						<input type='hidden' id='md5key' value='<?php echo $key; ?>'>
-						<div id='resetdatabases' ><a href='#' class='button tiny right' id='resetalldatabasesbutton' >Drop and recreate all tables !!</a></div>
-						<div style='display: none' id='warning' >Running tests will drop and recreate many database tables and destroy existing data.<br/>
+						<a href="#" id='showdbtools' class='button right' data-reveal-id="dbtools">DB Tools</a>
+
+						<div id="dbtools" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+						</div>
+						
+						
+						<div style='display: none' id='warning' >Running tests will modify database structure and data.<br/>
 						<b>I understand</b>   <input type='checkbox' id='testsenabled' > </div>
 						<a href='#' class='button tiny' id='stopbutton' style='display: none;'  >Stop Tests</a>
 						<a href='runsuite.php' class='button testrunner' id='runbutton'  >Run Tests</a>

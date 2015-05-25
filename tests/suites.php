@@ -11,7 +11,8 @@
 function getSuitePaths($basePath) {
 	return array(
 		'tasks'=>$basePath.''.DIRECTORY_SEPARATOR.'system'.DIRECTORY_SEPARATOR.'modules'.DIRECTORY_SEPARATOR.'task',
-		'frontend'=>$basePath.DIRECTORY_SEPARATOR.'modules'.DIRECTORY_SEPARATOR.'frontend'
+		//'frontend'=>$basePath.DIRECTORY_SEPARATOR.'modules'.DIRECTORY_SEPARATOR.'frontend',
+		'admin'=>$basePath.DIRECTORY_SEPARATOR.'system'.DIRECTORY_SEPARATOR.'modules'.DIRECTORY_SEPARATOR.'admin'
 	);
 } 
 function getCodeceptionPath($basePath) {

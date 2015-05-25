@@ -3,7 +3,10 @@
  * This page runs test suites as per request parameters
  * and streams HTML output as test run executes
  */
-// config 
+include('lib/class.Diff.php');
+include('lib/Mysqldump.php');
+include('tests/Spyc.php'); 
+
 // output control
 define('DS', DIRECTORY_SEPARATOR); 
 $requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
@@ -13,8 +16,17 @@ if (DS=='/') {
 } else {
 	$folder=str_replace('/','\\',dirname($_SERVER['SCRIPT_FILENAME']));
 } 
+// config 
 include(dirname(dirname($folder)).DS.'tests'.DS.'suites.php');
-include('lib/class.Diff.php');
+
+
+// MAIN CONTROLLER
+if (array_key_exists('key',$_GET) && $_GET['key']==md5('secretfortestingcmfive'.$_GET['keyid'])) {
+// RUN TESTS	
+		runTests($suites,$requestUrl);
+} else {
+	echo "Permission denied";
+}
 
 function tailCustom($suite, $lines = 1, $adaptive = true) {
 	if (array_key_exists('phpLogFile',$suite) && file_exists($suite['phpLogFile']))  {
@@ -74,85 +86,7 @@ function tailCustom($suite, $lines = 1, $adaptive = true) {
 	}
 }
 
-if (array_key_exists('key',$_GET) && $_GET['key']==md5('secretfortestingcmfive'.$_GET['keyid'])) {
-// RESET DATABASES
-	if (array_key_exists('resetsystemdatabases',$_GET) && $_GET['resetsystemdatabases']=='1') {
-		$found=false;
-		foreach ($suites as $url =>$suite) {
-			if (strpos($requestUrl,$url)!==false) { 
-				if (array_key_exists('basepath',$suite) && strlen($suite['basepath'])>0 && count($suite['paths'])>0) {					
-					$paths=array();
-					$searchPath=$suite['basepath'].DS.'system'.DS.'modules';
-					foreach (new DirectoryIterator($searchPath) as $fileInfo) {
-						if($fileInfo->isDot()) continue;
-						if (is_dir($searchPath.DS.$fileInfo->getFilename()))  {
-							array_push($paths,$searchPath.DS.$fileInfo->getFilename().DS.'install'.DS.'droptables.sql');
-							array_push($paths,$searchPath.DS.$fileInfo->getFilename().DS.'install'.DS.'db.sql');
-							array_push($paths,$searchPath.DS.$fileInfo->getFilename().DS.'install'.DS.'dbseed.sql');
-						}
-					}
-					$searchPath=$suite['basepath'].DS.'modules';
-					foreach (new DirectoryIterator($searchPath) as $fileInfo) {
-						if($fileInfo->isDot()) continue;
-						if (is_dir($searchPath.DS.$fileInfo->getFilename()))  {
-							array_push($paths,$searchPath.DS.$fileInfo->getFilename().DS.'install'.DS.'droptables.sql');
-							array_push($paths,$searchPath.DS.$fileInfo->getFilename().DS.'install'.DS.'db.sql');
-							array_push($paths,$searchPath.DS.$fileInfo->getFilename().DS.'install'.DS.'dbseed.sql');
-						}
-					}
-					//print_r($paths);
-					$suitePath=array_pop($suite['paths']);
-					include($suitePath.'/tests/Spyc.php');
-					$codeceptionConfig = Spyc::YAMLLoad($suitePath.'/codeception.yml');
-					//print_r($codeceptionConfig);
-					$dbUser='';
-					$dbPass='';
-					$dbName='';
-					if (strlen($suite['env'])>0) {
-						$dbUser=$codeceptionConfig['env'][$suite['env']]['modules']['config']['Db']['user'];
-						$dbPass=$codeceptionConfig['env'][$suite['env']]['modules']['config']['Db']['password'];
-						$dbName=explode("dbname=",$codeceptionConfig['env'][$suite['env']]['modules']['config']['Db']['dsn'])[1];
-					} else {
-						$dbUser=$codeceptionConfig['modules']['config']['Db']['user'];
-						$dbPass=$codeceptionConfig['modules']['config']['Db']['password'];
-						$dbName=explode("dbname=",$codeceptionConfig['modules']['config']['Db']['dsn'])[1];
-					}
-					$basePath=$suite['basepath'];
-					$paths=array_merge(array($basePath.DS.'system'.DS.'tests'.DS.'dropsystemtables.sql',$basePath.DS.'system'.DS.'install'.DS.'db.sql',$basePath.DS.'system'.DS.'install'.DS.'dbseed.sql',$basePath.DS.'system'.DS.'tests'.DS.'userscontactsroles.sql'),$paths);
-					$sql='';
-					$mysqli = new mysqli("localhost", $dbUser, $dbPass, $dbName);
-					echo "Imported \n";
-					foreach ($paths as $k=>$path) {
-						//echo $path.'<br>';
-						if (file_exists($path)) {
-						//echo "YES<br>";
-							$output=array();
-							if (file_exists($path)) {
-								$sql=file_get_contents($path);
-								$result = mysqli_multi_query($mysqli,$sql); //implode('\n',$sql));
-								while ($mysqli->more_results() && $ir=$mysqli->next_result()) {if (!$ir) echo $mysqli->error;} // flush multi_queries
-								$sql='';
-								if (mysqli_error($mysqli)) {
-									echo "FAIL ".mysqli_error($mysqli);
-								} else {
-									echo "OK ";
-								}
-								echo $path."\n";
-							}
-						}
-					}
-					$found=true;
-				}
-			}
-		}
-		if (!$found)  {
-			echo "No suites or tests configured for ".$url;
-		} else {
-//s			echo "OK";
-		}
-		die();
-	} else {
-// RUN TESTS	
+function runTests($suites,$requestUrl) {
 		$testSections=array();			
 		header('Content-Encoding: none;');
 		set_time_limit(0);
@@ -195,6 +129,7 @@ if (array_key_exists('key',$_GET) && $_GET['key']==md5('secretfortestingcmfive'.
 		} else {
 			$runAllTests=true;
 		}
+		$phpLog=null;
 		foreach ($suites as $url =>$suite) {
 			if (strpos($requestUrl,$url)!==false) { 
 				$phpLog=tailCustom($suite,30);
@@ -202,7 +137,7 @@ if (array_key_exists('key',$_GET) && $_GET['key']==md5('secretfortestingcmfive'.
 				if (array_key_exists('env',$suite) && strlen($suite['env'])>0) {
 					$env=' --env '.$suite['env'];
 				} 
-				$verbosity=' -v ';
+				$verbosity='';
 				if (array_key_exists('v',$_GET)) {
 					//$verbosity=' -vvv ';
 				} 
@@ -304,6 +239,7 @@ if (array_key_exists('key',$_GET) && $_GET['key']==md5('secretfortestingcmfive'.
 								
 							// test status	
 							} else if ((count($bufferParts)>1 && $lastBufferPart=="Ok") || $lastBufferPart=="Fail" ) {
+								//print_r($bufferParts);
 								$parts1=explode('(',$buffer);
 								if (count($parts1)>1) {
 									$parts2=explode(')',$parts1[1]);
@@ -362,11 +298,9 @@ if (array_key_exists('key',$_GET) && $_GET['key']==md5('secretfortestingcmfive'.
 				}
 			}
 		}
-		echo "Done";
-		ob_end_flush();
-	}
-} else {
-	echo "Permission denied";
-}
- ?>
-</div>
+		echo "Done</div>";
+		ob_end_flush();	
+} ?>
+
+
+ 
