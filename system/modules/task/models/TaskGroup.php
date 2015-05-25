@@ -119,7 +119,7 @@ class TaskGroup extends DbObject {
     }
 
     function getTasks() {
-        return $this->getObjects("Task", array("task_group_id" => $this->id));
+        return $this->getObjects("Task", array("task_group_id" => $this->id, "is_deleted" => 0));
     }
 
     public function getSelectOptionTitle() {
