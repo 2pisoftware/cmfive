@@ -1,4 +1,3 @@
-
 DROP TABLE IF EXISTS   `attachment`;
 DROP TABLE IF EXISTS   `attachment_type` ;
 DROP TABLE IF EXISTS   `audit` ;

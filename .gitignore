@@ -3,11 +3,6 @@
 .project
 /config.php
 /system/composer/*
-/log/*.log
-/uploads/*
-.project
-/config.php
-/system/composer/*
 codeception.yml
 codeception.master.yml
 /tests/dumps
@@ -43,4 +38,3 @@ codeception.master.yml
 /system/modules/*/tests/_support/FunctionalHelper.php
 /system/modules/*/tests/_support/UnitHelper.php
 /system/modules/*/tests/_output/*
-
