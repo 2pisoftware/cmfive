@@ -105,6 +105,8 @@ class AuthService extends DbService {
                 $username = explode('\\', $_SERVER["AUTH_USER"]);
                 $username = end($username);
 
+                $this->w->Log->debug("Username: " . $username);
+
                 // Authenticate agaianst LDAP
                 $ldap = ldap_connect(Config::get("system.ldap.host"), Config::get("system.ldap.port"));
 
@@ -121,12 +123,15 @@ class AuthService extends DbService {
                 $ldap_instance = ldap_bind($ldap, Config::get("system.ldap.username"), Config::get("system.ldap.password"));
 
                 // You may add in any filter part on here. "uid" is a profile data inside the LDAP. You may filter by other columns depends on your LDAP setup.
-                $search_results = ldap_search($ldap, Config::get("system.ldap.auth_ou") . ',' . Config::get("system.ldap.base_dn"), 
+                $search_results = ldap_search($ldap, Config::get("system.ldap.base_dn"), 
                     str_replace("{username}", $username, Config::get("system.ldap.auth_search")), Config::get("system.ldap.search_filter_attribute"), 0, 100);
 
                 $info = ldap_get_entries($ldap, $search_results);
 
-                if (!count($info)) {
+                // var_dump($info); die();
+
+                if ($info['count'] == 0) {
+                    $this->w->Log->error("LDAP Info: " . json_encode($info));
                     $this->w->Log->error("LDAP Error: " . ldap_error($ldap));
                     return false;
                 }
@@ -146,7 +151,7 @@ class AuthService extends DbService {
                 $user = $this->getObject("User", array("login" => $username));
                 if (empty($user)) {
                     $contact = new Contact($this->w);
-                    $contact->firstname = !empty($info[0]["givenName"][0]) ? $info[0]["givenName"][0] : $username;
+                    $contact->firstname = !empty($info[0]["givenname"][0]) ? $info[0]["givenname"][0] : $username;
                     $contact->lastname = !empty($info[0]["sn"][0]) ? $info[0]["sn"][0] : '';
                     $contact->insert();
                     
@@ -167,6 +172,9 @@ class AuthService extends DbService {
                 
                 $this->forceLogin($user->id);
                 
+                // Let modules know that a user successfully authenticated
+                $this->w->callHook("core_auth", "ldap_user_authenticated", $user);
+
                 // Here is where we introduce LDAP support and check against windows server user records for access
                 // For testing, allow everything
                 if (!empty($user->id)) {
