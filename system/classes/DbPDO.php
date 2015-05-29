@@ -19,10 +19,24 @@ class DbPDO extends PDO {
     private $config;
     
     public function __construct($config = array()) {
+		
         // Set up our PDO class
-        $port = isset($config['port']) && !empty($config['port']) ? ";port=".$config['port'] : "";
-        $url = "{$config['driver']}:host={$config['hostname']};dbname={$config['database']}{$port}";
-        parent::__construct($url,$config["username"],$config["password"], null);
+		$port = isset($config['port']) && !empty($config['port']) ? ";port=".$config['port'] : "";
+		//GC: sqlsrv requires a different dsn to mysql.
+        switch ($config['driver']) {
+			case 'sqlsrv':
+				$port = isset($config['port']) && !empty($config['port']) ? $config['port'] : "";
+			//$c = new PDO("sqlsrv:Server=localhost,1521;Database=testdb", "UserName", "Password");
+				$url = "{$config['driver']}:Server={$config['hostname']},{$port};Database={$config['database']}";
+				break;
+			//mysql
+			default:
+				$port = isset($config['port']) && !empty($config['port']) ? ";port=".$config['port'] : "";
+				$url = "{$config['driver']}:host={$config['hostname']};dbname={$config['database']}{$port}";
+		}
+
+		parent::__construct($url,$config["username"],$config["password"], null);
+
         $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
         // Since you cant bind table names, maybe its a good idea to
