@@ -12,14 +12,11 @@ window.onerror = function(message, url, lineNumber) {
 
 function initialisePage() {
 	//localStorage.getItem('enableTesting');
-<<<<<<< HEAD
 	if ($('.testnamewarning').length>0) {
 		$('#runbutton').remove();
 		$('.accordion').remove();
 	}
 	
-=======
->>>>>>> e098177197e4efd21eed5fbbafbfa18dc538b112
 	var activeSuite=localStorage.getItem('activeTestSuite');
 	if (typeof activeSuite=="string" && activeSuite.length>0) {
 		$('.accordion-navigation div.content').removeClass('active');
@@ -94,7 +91,6 @@ function initialisePage() {
 			$(this).parents('li.testsuite').children('.suiteselected')[0].checked=false; //.prop('checked','false');
 		}
 	});
-<<<<<<< HEAD
 	
 	$.get('dbmanager.php?checkmysqldiffs=1&mini=1'+getParams(),function(res) {
 			if (res && res.length>0) {
@@ -105,8 +101,6 @@ function initialisePage() {
 			
 	});
 	
-=======
->>>>>>> e098177197e4efd21eed5fbbafbfa18dc538b112
 	var xhr ;
 	
 	
@@ -145,7 +139,6 @@ function initialisePage() {
 			alert('Confirm that you understand before running tests.');
 		}
 	}
-<<<<<<< HEAD
 	function getParams() {
 		var keyid=$('#md5keyid').val();
 		var key=$('#md5key').val();
@@ -230,23 +223,6 @@ function initialisePage() {
 	});
 	
 	
-=======
-	$('#resetalldatabasesbutton').click(function() {
-		if ($('#testsenabled:checked').length>0) {
-			if (confirm('Are you really sure?')) {
-				var keyid=$('#md5keyid').val();
-				var key=$('#md5key').val();
-				var params='&key='+key+'&keyid='+keyid;
-				$.get('runsuite.php?resetsystemdatabases=1'+params,function(res) {
-					alert('Dropped and created all tables'+"\n"+res);
-				});
-			}
-		} else {
-			alert('Confirm that you understand before continuing.');
-		}
-		return false;
-	});
->>>>>>> e098177197e4efd21eed5fbbafbfa18dc538b112
 	$('.accordion-navigation').click(function() {
 		if ($(this).hasClass('active')) {
 		} else {
@@ -259,14 +235,7 @@ function initialisePage() {
 		e.stopImmediatePropagation();
 		if (testsRunning==false)  {
 			if (e.ctrlKey==true)  {
-<<<<<<< HEAD
-				window.open($(this).attr('href')+getParams());
-=======
-				var keyid=$('#md5keyid').val();
-				var key=$('#md5key').val();
-				var params='&key='+key+'&keyid='+keyid+'&v=1';
-				window.open($(this).attr('href')+params);
->>>>>>> e098177197e4efd21eed5fbbafbfa18dc538b112
+				window.open($(this).attr('href')+getParams()+'&v=1');
 			} else {
 				startTests($(this).attr('href')); //$(this).parent().attr('id'));
 			}
@@ -278,14 +247,7 @@ function initialisePage() {
 		e.stopImmediatePropagation();
 		if (testsRunning==false)  {
 			if (e.ctrlKey==true)  {
-<<<<<<< HEAD
-				window.open($(this).attr('href')+getParams());
-=======
-				var keyid=$('#md5keyid').val();
-				var key=$('#md5key').val();
-				var params='&key='+key+'&keyid='+keyid+'&v=1';
-				window.open($(this).attr('href')+params);
->>>>>>> e098177197e4efd21eed5fbbafbfa18dc538b112
+				window.open($(this).attr('href')+getParams()+'&v=1');
 			} else {
 				startTests($(this).attr('href')); //$(this).parents('li').first().data('suite'));
 			}
@@ -297,18 +259,9 @@ function initialisePage() {
 		e.stopImmediatePropagation();
 		if (testsRunning==false)  {
 			if (e.ctrlKey==true)  {
-<<<<<<< HEAD
-				window.open('dbmanager.php?tests='+getSelectedTests()+getParams());
+				window.open('dbmanager.php?tests='+getSelectedTests()+getParams()+'&v=1');
 			} else {
 				startTests('dbmanager.php?tests='+getSelectedTests());
-=======
-				var keyid=$('#md5keyid').val();
-				var key=$('#md5key').val();
-				var params='&key='+key+'&keyid='+keyid+'&v=1';
-				window.open('runsuite.php?tests='+getSelectedTests()+params);
-			} else {
-				startTests('runsuite.php?tests='+getSelectedTests());
->>>>>>> e098177197e4efd21eed5fbbafbfa18dc538b112
 			}
 		}
 		return false;
@@ -395,17 +348,11 @@ function updatePage(latestContent) {
 					
 		if ($(newContent).hasClass('testresult')) {
 			var listedTest=$('#'+$(newContent).data('title')+'___'+$(newContent).data('suite')+'___'+$(newContent).data('test')+'___'+$(newContent).data('function'));
-<<<<<<< HEAD
 			console.log('testres');
 			//console.log($(newContent));
 			console.log($(listedTest));
 			if ($(newContent).hasClass('testresult-passed')) {
 				console.log('passed');
-=======
-			//console.log('testres');
-			//console.log($(newContent));
-			if ($(newContent).hasClass('testresult-passed')) {
->>>>>>> e098177197e4efd21eed5fbbafbfa18dc538b112
 				listedTest.removeClass('testresult-failed');
 				listedTest.removeClass('testresult-pending');
 				listedTest.addClass('testresult-passed');
@@ -414,10 +361,7 @@ function updatePage(latestContent) {
 				$('#logfile-'+listedTest.attr('id')).remove();
 				updateSuiteStatus(listedTest);
 			} else {
-<<<<<<< HEAD
 				console.log('failed');
-=======
->>>>>>> e098177197e4efd21eed5fbbafbfa18dc538b112
 				listedTest.removeClass('testresult-passed');
 				listedTest.removeClass('testresult-pending');
 				listedTest.addClass('testresult-failed');
@@ -425,11 +369,7 @@ function updatePage(latestContent) {
 			}
 			//$(newContent).appendTo($('#testsuite-'+$(newContent).data('title')));
 		} else if ($(newContent).hasClass('testdetails')) {
-<<<<<<< HEAD
 			console.log('import test details',$(newContent));
-=======
-			//console.log('import test details',$(newContent));
->>>>>>> e098177197e4efd21eed5fbbafbfa18dc538b112
 			var test=$('#'+$(newContent).data('testid'));
 			//console.log($(newContent).data('testid'));
 			if ($('.reveal-modal',test).length>0)  {
@@ -444,11 +384,7 @@ function updatePage(latestContent) {
 					showButton='<a href="#" class="showerrorbutton button tiny" data-reveal-id="logfile-'+$(newContent).data('testid')+'">Show</a> ';
 				}
 				
-<<<<<<< HEAD
 				test.append($('<span>&nbsp;</span><a href="#" class="detailsbutton button tiny" data-reveal-id="testdetails-'+$(newContent).data('testid')+'">Details</a>&nbsp;&nbsp;&nbsp;'+showButton+' <div id="testdetails-'+$(newContent).data('testid')+'" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">'+newContent.html()+'<a class="close-reveal-modal" aria-label="Close">&#215;</a></div>'));
-=======
-				test.append($('<span>&nbsp;</span><a href="#" class="detailsbutton tiny" data-reveal-id="testdetails-'+$(newContent).data('testid')+'">Details</a>'+showButton+' <div id="testdetails-'+$(newContent).data('testid')+'" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">'+newContent.html()+'<a class="close-reveal-modal" aria-label="Close">&#215;</a></div>'));
->>>>>>> e098177197e4efd21eed5fbbafbfa18dc538b112
 			}
 			$(document).foundation(); // {'reveal': {'close_on_background_click': true,'close_on_esc': true}});
 		} else if ($(newContent).hasClass('phperror')) {

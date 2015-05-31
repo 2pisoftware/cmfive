@@ -55,9 +55,24 @@ function copy_r( $path, $dest )
             return false;
         }
     }
+function getRequestUrl() {
+	$requestScheme='http';
+	//  IIS
+	if (array_key_exists('HTTPS',$_SERVER) && $_SERVER['HTTPS']=='on') {
+		$requestScheme='https';
+	// apache
+	} else if (array_key_exists('REQUEST_SCHEME',$_SERVER) && $_SERVER['REQUEST_SCHEME']=='https') {
+		$requestScheme='https';
+	}
+	return $requestScheme.'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+}
+
+    
+    
 // prep HTML for tabs
 function renderSuitesBlock($suites,$key,$keyid) {
-	$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+	$requestUrl=getRequestUrl();
+
 	
 	$suiteMenu='';
 	foreach ($suites as $url =>$suite) {
