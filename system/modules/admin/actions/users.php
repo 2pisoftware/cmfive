@@ -21,10 +21,13 @@ function users_GET(Web &$w) {
                 array($user->is_active ? "X" : "", true),
                 array($w->Admin->time2Dt($user->dt_created), true),
                 array($w->Admin->time2Dt($user->dt_lastlogin), true),
-                Html::box($w->localUrl("/admin/useredit/".$user->id."/box"),"Edit",true) . 
-                Html::b("/admin/permissionedit/".$user->id,"Permissions") . 
-                Html::b($w->localUrl("/admin/userdel/".$user->id),"Delete","Are you sure to delete this user?")
+                Html::abox("/admin/useredit/".$user->id."/box","Edit","editbutton").
+                Html::ab("/admin/permissionedit/".$user->id,"Permissions","permissionsbutton").
+                Html::ab("/admin/userdel/".$user->id,"Delete","deletebutton","","Are you sure to delete this user?")
             );
 	}
 	$w->ctx("table", Html::table($data, null, "tablesorter", $header));
 }
+
+     
+ 

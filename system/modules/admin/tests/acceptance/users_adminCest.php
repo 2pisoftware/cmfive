@@ -26,7 +26,7 @@ class users_adminCest
     var $moduleUrl='/admin/users/';
     
     var $databaseTable='user';    
-    var $validRecord=array('input'=>array('login' => 'auser','password'=>'pojpoj','password2'=>'pojpoj','firstname'=>'Joe','lastname'=>'Bloggs',),'select'=>array(),'checkbox'=>array('is_admin'=>'1','is_active'=>'1'));
+    var $validRecord=array('input'=>array('login' => 'auser','password'=>'pojpoj','password2'=>'pojpoj','firstname'=>'Joe','lastname'=>'Bloggs'),'select'=>array(),'checkbox'=>array('is_admin'=>'1','is_active'=>'1'));
     var $validDBRecord=array('login' => 'auser');
   
     var $updateData=array('input'=>array('login'=>'buser'),'select'=>array());
