@@ -31,7 +31,7 @@ function index_ALL(Web &$w) {
 
     // set headings based on role: 'user' sees only approved reports and no approval status
     $line = ($w->Auth->user()->hasAnyRole("report_editor", "report_admin")) ?
-            array(array("Title", "Approved", "Module", /* "Category", */ "Description", "")) :
+            array(array("Title", /* "Approved" ,*/ "Module", /* "Category", */ "Description", "")) :
             array(array("Title", "Module", /* "Category", */ "Description", ""));
 
     // if i am a member of a list of reports, lets display them
@@ -56,25 +56,22 @@ function index_ALL(Web &$w) {
             if (($w->Auth->user()->hasRole("report_user")) && (!$w->Auth->user()->hasRole("report_editor")) && (!$w->Auth->user()->hasRole("report_admin"))) {
                 if ($rep->is_approved == "1") {
                     $line[] = array(
-                        $rep->title,
+                        Html::a(!empty($webroot) ? $webroot : '' . "/report/runreport/" . $rep->id,$rep->title),
                         ucfirst($rep->module),
                         //$rep->getCategoryTitle(),
                         $rep->description,
-                        (!empty($btnedit) ? $btnedit : "") .
-                        Html::b(!empty($webroot) ? $webroot : '' . "/report/runreport/" . $rep->id, " Execute ")
+                        (!empty($btnedit) ? $btnedit : "")
                     );
                 }
             } else {
                 // if editor or admin, list all active reports of which i have membership and show approval status and buttons
                 $line[] = array(
-                    $rep->title,
-                    $app[$rep->is_approved],
+                    Html::a(!empty($webroot) ? $webroot : '' . "/report/runreport/" . $rep->id,$rep->title),
+                	//$app[$rep->is_approved],
                     ucfirst($rep->module),
                     //$rep->getCategoryTitle(),
                     $rep->description,
-                    $btnedit .
-                    Html::b(!empty($webroot) ? $webroot : '' . "/report/runreport/" . $rep->id, " Execute ") .
-                    $btndelete,
+                    $btnedit.$btndelete,
                 );
             }
         }

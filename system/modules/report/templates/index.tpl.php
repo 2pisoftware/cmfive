@@ -1,4 +1,4 @@
-<?php echo Html::filter("Search Reports", array(array("Modules", "select", "module", !empty($reqModule) ? $reqModule : null, $modules)), "/report/index", "POST", "Search Reports", "leadFilter", null); ?>
+<?php //echo Html::filter("Search Reports", array(array("Modules", "select", "module", !empty($reqModule) ? $reqModule : null, $modules)), "/report/index", "POST", "Search Reports", "leadFilter", null); ?>
 <?php echo $viewreports; ?>
 
 <script>

@@ -2,6 +2,7 @@
     <div class="tab-head">
         <a href="#report"><?php echo !empty($report->id) ? "Edit" : "Create"; ?> Report</a>
         <?php if (!empty($report->id)) : ?>
+        	<a href="#code">SQL</a>
             <a href="#templates">Templates</a>
             <a href="#members">Members</a>
         <?php endif; ?>
@@ -12,7 +13,18 @@
             <?php echo $btnrun . $report_form; ?>
         </div>
         <?php if (!empty($report->id)) : ?>
-            <div id="templates">
+	        <div id="code" class="clearfix">
+	            <?php echo $btnrun . $sql_form; ?>
+	        </div>
+	        <div id="templates">
+	        	<p>You can add special templates to render the data. Create a <a href="/admin-templates">System Template in Admin</a> and set the 
+	        	module to <b>report</b>, it can then be selected here.</p>
+	        	<p>The template processer uses the Twig language, you can find more information about this on
+	        	the <a href="">Twig Website</a>.</p>
+	        	<p>A good first step when creating a new template, is to look at the data. You can use the following
+	        	twig statement in your template to do this:</p>
+	        	<pre>{{dump(data)}}</pre>
+	        	<p></p>
                 <?php echo Html::box("/report-templates/edit/{$report->id}", "Add Template", true); ?>
                 <?php echo !empty($templates_table) ? $templates_table : ""; ?>
             </div>
