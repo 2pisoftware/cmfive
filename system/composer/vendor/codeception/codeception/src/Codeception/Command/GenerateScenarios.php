@@ -77,20 +77,20 @@ class GenerateScenarios extends Command
             if (!($test instanceof ScenarioDriven)) continue;
             $feature = $test->getScenarioText($format);
 
-            $name = $this->underscore(basename($test->getFileName(),'.php'));
+            $name = $this->underscore(basename($test->getFileName(), '.php'));
 
             if ($input->getOption('single-file')) {
                 $scenarios .= $feature;
                 $output->writeln("* $name rendered");
             } else {
                 $feature = $this->decorate($feature, $format);
-                $this->save($path . DIRECTORY_SEPARATOR . $name . $this->formatExtension($format), $feature);
+                $this->save($path . DIRECTORY_SEPARATOR . $name . $this->formatExtension($format), $feature, true);
                 $output->writeln("* $name generated");
             }
         }
 
         if ($input->getOption('single-file')) {
-            $this->save($path . $this->formatExtension($format), $this->decorate($scenarios, $format) . PHP_EOL);
+            $this->save($path . $this->formatExtension($format), $this->decorate($scenarios, $format), true);
         }
     }
 

@@ -33,7 +33,7 @@ function index_ALL(Web $w) {
     // Task breakdown
     if (!empty($tasks)) {
         foreach($tasks as $task) {
-            if (!empty($task->dt_due) && ($task->dt2time($task->dt_due) < time())) {
+            if (!empty($task->dt_due) && ($task->dt_due < time())) {
                 $count_overdue++;
             } else if(!empty($task->dt_due) && ($task->dt2time($task->dt_due) <= (time() + (60 * 60 * 24 * 7)))) {
                 $count_due_soon++;

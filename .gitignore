@@ -37,3 +37,5 @@ system/modules/*/tests/_support/FunctionalHelper.php
 system/modules/*/tests/_support/UnitHelper.php
 system/modules/*/tests/acceptance/_steps/CM5WebGuySteps.php
 system/modules/*/tests/_output/*
+/nbproject/private/
+nbproject/

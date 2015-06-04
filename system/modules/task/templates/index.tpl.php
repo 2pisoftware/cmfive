@@ -20,12 +20,12 @@
     <div class="small-12 medium-6 large-4 columns panel" data-equalizer-watch>
         <div style='position: relative; top: 50%; transform: translateY(-50%);'>
             <?php if ($count_overdue > 0) : ?>
-                <h2 class="text-center"><?php echo Html::a("/task/tasklist?assignee_id=" . $w->Auth->user()->id . "&dt_to=" . time(), $count_overdue . " overdue"); ?></h2>
+            <h2 class="text-center"><?php echo Html::a("/task/tasklist?assignee_id=" . $w->Auth->user()->id . "&dt_to=" . formatDate(time(), "Y-m-d"), $count_overdue . " overdue"); ?></h2>
             <?php endif; ?>
             <?php if ($count_due_soon == 0) : ?>
                 <h4 class='text-center'><b>0 due</b> within 7 days</h4>
             <?php else: ?>
-                <h4 class="text-center"><b><?php echo Html::a("/task/tasklist?assignee_id=" . $w->Auth->user()->id . "&dt_to=" . (time() + (60 * 60 * 24 * 7)), $count_due_soon . " due"); ?></b> within 7 days</h4>
+                <h4 class="text-center"><b><?php echo Html::a("/task/tasklist?assignee_id=" . $w->Auth->user()->id . "&dt_from=" . formatDate(time(), 'Y-m-d') . "&dt_to=" . formatDate((time() + (60 * 60 * 24 * 7)), "Y-m-d"), $count_due_soon . " due"); ?></b> within 7 days</h4>
             <?php endif; ?>
             <?php if ($count_no_due_date > 0) : ?>
                 <hr style="margin: 5px 0px;"/>
