@@ -18,7 +18,6 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\DomCrawler\Field\FileFormField;
-use Symfony\Component\DomCrawler\Field\FormField;
 use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\DomCrawler\Field\TextareaFormField;
 use DOMElement;
@@ -39,7 +38,7 @@ class InnerBrowser extends Module implements Web
     /**
      * @var array|\Symfony\Component\DomCrawler\Form[]
      */
-    protected $forms = array();
+    protected $forms = [];
 
     protected $defaultCookieParameters = ['expires' => null, 'path' => '/', 'domain' => '', 'secure' => false];
 
@@ -56,7 +55,7 @@ class InnerBrowser extends Module implements Web
     {
         $this->client  = null;
         $this->crawler = null;
-        $this->forms   = array();
+        $this->forms   = [];
     }
 
     /**
@@ -102,9 +101,13 @@ class InnerBrowser extends Module implements Web
         $buttonText = str_replace('"',"'", $link);
         $button = $this->crawler->selectButton($buttonText);
         if (count($button)) {
+            $buttonValue = [];
+            if (strval($button->attr('name')) !== '' && $button->attr('value') !== null) {
+                $buttonValue = [$button->attr('name') => $button->attr('value')];
+            }
             $this->proceedSubmitForm(
                 $button->parents()->filter('form')->first(),
-                [$button->attr('name') => $button->attr('value')]
+                $buttonValue
             );
             return;
         }
@@ -128,9 +131,13 @@ class InnerBrowser extends Module implements Web
                 $this->debugResponse();
                 break;
             } elseif (in_array($tag, ['input', 'button']) && in_array($type, ['submit', 'image'])) {
+                $buttonValue = [];
+                if (strval($nodes->first()->attr('name')) !== '' && $nodes->first()->attr('value') !== null) {
+                    $buttonValue = [$nodes->first()->attr('name') => $nodes->first()->attr('value')];
+                }
                 $this->proceedSubmitForm(
                     $nodes->parents()->filter('form')->first(),
-                    [$nodes->first()->attr('name') => $nodes->first()->attr('value')]
+                    $buttonValue
                 );
                 break;
             }
@@ -143,7 +150,7 @@ class InnerBrowser extends Module implements Web
             $this->assertPageContains($text);
         } else {
             $nodes = $this->match($selector);
-            $this->assertDomContains($nodes, $selector, $text);
+            $this->assertDomContains($nodes, $this->stringifySelector($selector), $text);
         }
     }
 
@@ -153,7 +160,7 @@ class InnerBrowser extends Module implements Web
             $this->assertPageNotContains($text);
         } else {
             $nodes = $this->match($selector);
-            $this->assertDomNotContains($nodes, $selector, $text);
+            $this->assertDomNotContains($nodes, $this->stringifySelector($selector), $text);
         }
     }
 
@@ -227,7 +234,7 @@ class InnerBrowser extends Module implements Web
         if (!$uri) {
             return $this->_getCurrentUri();
         }
-        $matches = array();
+        $matches = [];
         $res     = preg_match($uri, $this->_getCurrentUri(), $matches);
         if (!$res) {
             $this->fail("Couldn't match $uri in " . $this->_getCurrentUri());
@@ -300,21 +307,50 @@ class InnerBrowser extends Module implements Web
         }
     }
 
+    /**
+     * Returns an array of values for the field with the passed name.  Usually
+     * the array consists of a single value.  Used by proceedSeeInField
+     * 
+     * @param Form $form
+     * @param string $fieldName
+     * @return array
+     */
+    private function getFormFieldValues(Form $form, $fieldName)
+    {
+        $strField = $this->getSubmissionFormFieldName($fieldName);
+        $values = [];
+        if ($form->has($strField)) {
+            $fields = $form->get($strField);
+            // $form->get returns an array for fields with names ending in []
+            if (!is_array($fields)) {
+                $fields = [$fields];
+            }
+            foreach ($fields as $field) {
+                if (!$field->hasValue()) {
+                    continue;
+                }
+                // $field->getValue may return an array (multi-select for example) or a string value
+                $values = array_merge($values, (array) $field->getValue());
+            }
+        }
+        return $values;
+    }
+    
     protected function proceedSeeInField(Crawler $fields, $value)
     {
         $form = $this->getFormFor($fields);
-        $currentValues = $this->getFormValuesFor($form);
-        $strField = $this->getSubmissionFormFieldName($fields->attr('name'));
-        
-        $testValues = (isset($currentValues[$strField])) ? $currentValues[$strField] : '';
-        if (!is_array($testValues)) {
-            $testValues = [$testValues];
+        $fieldName = $fields->attr('name');
+        $testValues = $this->getFormFieldValues($form, $fieldName);
+        if (is_bool($value) && $value === true && !empty($testValues)) {
+            $value = reset($testValues);
+        } elseif (empty($testValues)) {
+            $testValues = [''];
         }
         return [
             'Contains',
             $value,
             $testValues,
-            "Failed testing for '$value' in $strField's value: " . var_export($currentValues)
+            "Failed testing for '$value' in $fieldName's value: " . var_export($testValues, true)
         ];
     }
 
@@ -401,17 +437,25 @@ class InnerBrowser extends Module implements Web
             }
         }
 
-        $query = '';
-        if (strcasecmp($form->getMethod(), 'GET') === 0) {
-            $query = '?' . http_build_query($requestParams);
+        $urlParts = parse_url($this->getFormUrl($frmCrawl));
+        if ($urlParts === false) {
+            $this->fail("Form url can't be parsed");
+            return;
         }
-        $this->debugSection('Uri', $this->getFormUrl($frmCrawl));
+        if (strcasecmp($form->getMethod(), 'GET') === 0) {
+            $urlParts = $this->mergeUrls($urlParts, ['query' => http_build_query($requestParams)]);
+        }
+        $url = \GuzzleHttp\Url::buildUrl($urlParts);
+        
+        $this->debugSection('Uri', $url);
         $this->debugSection('Method', $form->getMethod());
         $this->debugSection('Parameters', $requestParams);
 
+        $requestParams= $this->getFormPhpValues($requestParams);
+
         $this->crawler = $this->client->request(
             $form->getMethod(),
-            $this->getFormUrl($frmCrawl) . $query,
+            $url,
             $requestParams,
             $form->getPhpFiles()
         );
@@ -422,7 +466,7 @@ class InnerBrowser extends Module implements Web
     {
         $form = $this->match($selector)->first();
         if (!count($form)) {
-            throw new ElementNotFound($selector, 'Form');
+            throw new ElementNotFound($this->stringifySelector($selector), 'Form');
         }
         $this->proceedSubmitForm($form, $params, $button);
     }
@@ -459,7 +503,7 @@ class InnerBrowser extends Module implements Web
      *
      * @param string $uri the absolute or relative URI
      * @return string the absolute URL
-     * @throws Codeception\Exception\TestRuntime if either the current
+     * @throws \Codeception\Exception\TestRuntime if either the current
      *         URL or the passed URI can't be parsed
      */
     protected function getAbsoluteUrlFor($uri)
@@ -485,7 +529,7 @@ class InnerBrowser extends Module implements Web
      * 
      * @param \Symfony\Component\DomCrawler\Crawler $form
      * @return string
-     * @throws Codeception\Exception\TestRuntime if either the current
+     * @throws \Codeception\Exception\TestRuntime if either the current
      *         URL or the URI of the form's action can't be parsed
      */
     protected function getFormUrl(Crawler $form)
@@ -513,10 +557,14 @@ class InnerBrowser extends Module implements Web
      *
      * @param Crawler $form the form
      * @param string $action the form's absolute URL action
+     * @return Form
      */
     private function getFormFromCrawler(Crawler $form, $action)
     {
-        $cloned = new Crawler(clone($form->getNode(0)), $action);
+        $fakeDom = new \DOMDocument();
+        $fakeDom->appendChild($fakeDom->importNode($form->getNode(0), true));
+        $node = $fakeDom->documentElement;
+        $cloned = new Crawler($node, $action);
         $shouldDisable = $cloned->filter('input:disabled:not([disabled]),select option:disabled,select optgroup:disabled option:not([disabled])');
         foreach ($shouldDisable as $field) {
             $field->parentNode->removeChild($field);
@@ -645,7 +693,7 @@ class InnerBrowser extends Module implements Web
         $fieldName = $this->getSubmissionFormFieldName($field->attr('name'));
 
         if (is_array($option)) {
-            $options = array();
+            $options = [];
             foreach ($option as $opt) {
                 $options[] = $this->matchOption($field, $opt);
             }
@@ -670,20 +718,32 @@ class InnerBrowser extends Module implements Web
 
     public function checkOption($option)
     {
-        $form = $this->getFormFor($field = $this->getFieldByLabelOrCss($option));
-        $name = $field->attr('name');
-        // If the name is an array than we compare objects to find right checkbox
-        $formField = $this->matchFormField($name, $form, new ChoiceFormField($field->getNode(0)));
-        $formField->tick();
+        $this->proceedCheckOption($option)->tick();
     }
 
     public function uncheckOption($option)
     {
+        $this->proceedCheckOption($option)->untick();
+    }
+
+    /**
+     * @param $option
+     * @return ChoiceFormField
+     */
+    protected function proceedCheckOption($option)
+    {
         $form = $this->getFormFor($field = $this->getFieldByLabelOrCss($option));
         $name = $field->attr('name');
+
+        if ($field->getNode(0) === null) {
+            throw new TestRuntime("Form field $name is not located");
+        }
         // If the name is an array than we compare objects to find right checkbox
         $formField = $this->matchFormField($name, $form, new ChoiceFormField($field->getNode(0)));
-        $formField->untick();
+        if (!$formField instanceof ChoiceFormField) {
+            throw new TestRuntime("Form field $name is not a checkable");
+        }
+        return $formField;
     }
 
     public function attachFile($field, $filename)
@@ -711,7 +771,7 @@ class InnerBrowser extends Module implements Web
      * @param $uri
      * @param $params
      */
-    public function sendAjaxGetRequest($uri, $params = array())
+    public function sendAjaxGetRequest($uri, $params = [])
     {
         $this->sendAjaxRequest('GET', $uri, $params);
     }
@@ -736,7 +796,7 @@ class InnerBrowser extends Module implements Web
      * @param $uri
      * @param $params
      */
-    public function sendAjaxPostRequest($uri, $params = array())
+    public function sendAjaxPostRequest($uri, $params = [])
     {
         $this->sendAjaxRequest('POST', $uri, $params);
     }
@@ -759,9 +819,9 @@ class InnerBrowser extends Module implements Web
      * @param $uri
      * @param $params
      */
-    public function sendAjaxRequest($method, $uri, $params = array())
+    public function sendAjaxRequest($method, $uri, $params = [])
     {
-        $this->client->request($method, $uri, $params, array(), array('HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'));
+        $this->client->request($method, $uri, $params, [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
         $this->debugResponse();
     }
 
@@ -801,7 +861,6 @@ class InnerBrowser extends Module implements Web
         } catch (ParseException $e) {
         }
         if (!Locator::isXPath($selector)) {
-            codecept_debug("XPath `$selector` is malformed!");
             return new \Symfony\Component\DomCrawler\Crawler;
         }
 
@@ -893,19 +952,19 @@ class InnerBrowser extends Module implements Web
         if ($nodes->filter('select')->count()) {
             /** @var  \Symfony\Component\DomCrawler\Crawler $select */
             $select      = $nodes->filter('select');
-            $is_multiple = $select->attr('multiple');
-            $results     = array();
+            $isMultiple  = (bool)$select->attr('multiple');
+            $results     = [];
             foreach ($select->children() as $option) {
                 /** @var  \DOMElement $option */
                 if ($option->getAttribute('selected') == 'selected') {
                     $val = $option->getAttribute('value');
-                    if (!$is_multiple) {
+                    if (!$isMultiple) {
                         return $val;
                     }
                     $results[] = $val;
                 }
             }
-            if (!$is_multiple) {
+            if (!$isMultiple) {
                 return null;
             }
             return $results;
@@ -917,34 +976,41 @@ class InnerBrowser extends Module implements Web
     {
         $cookies = $this->client->getCookieJar();
         $params = array_merge($this->defaultCookieParameters, $params);
-        extract($params);
-        $cookies->set(new Cookie($name, $val, $expires, $path, $domain, $secure));
+
+        $expires      = isset($params['expires']) ? $params['expires'] : null;
+        $path         = isset($params['path'])    ? $params['path'] : null;
+        $domain       = isset($params['domain'])  ? $params['domain'] : '';
+        $secure       = isset($params['secure'])  ? $params['secure'] : false;
+        $httpOnly     = isset($params['httpOnly'])  ? $params['httpOnly'] : true;
+        $encodedValue = isset($params['encodedValue'])  ? $params['encodedValue'] : false;
+
+        $cookies->set(new Cookie($name, $val, $expires, $path, $domain, $secure, $httpOnly, $encodedValue));
         $this->debugSection('Cookies', $this->client->getCookieJar()->all());
     }
 
-    public function grabCookie($name, array $params = [])
+    public function grabCookie($cookie, array $params = [])
     {
         $params = array_merge($this->defaultCookieParameters, $params);
         $this->debugSection('Cookies', $this->client->getCookieJar()->all());
-        $cookies = $this->client->getCookieJar()->get($name, $params['path'], $params['domain']);
+        $cookies = $this->client->getCookieJar()->get($cookie, $params['path'], $params['domain']);
         if (!$cookies) {
             return null;
         }
         return $cookies->getValue();
     }
 
-    public function seeCookie($name, array $params = [])
+    public function seeCookie($cookie, array $params = [])
     {
         $params = array_merge($this->defaultCookieParameters, $params);
         $this->debugSection('Cookies', $this->client->getCookieJar()->all());
-        $this->assertNotNull($this->client->getCookieJar()->get($name, $params['path'], $params['domain']));
+        $this->assertNotNull($this->client->getCookieJar()->get($cookie, $params['path'], $params['domain']));
     }
 
-    public function dontSeeCookie($name, array $params = [])
+    public function dontSeeCookie($cookie, array $params = [])
     {
         $params = array_merge($this->defaultCookieParameters, $params);
         $this->debugSection('Cookies', $this->client->getCookieJar()->all());
-        $this->assertNull($this->client->getCookieJar()->get($name, $params['path'], $params['domain']));
+        $this->assertNull($this->client->getCookieJar()->get($cookie, $params['path'], $params['domain']));
     }
 
     public function resetCookie($name, array $params = [])
@@ -954,22 +1020,32 @@ class InnerBrowser extends Module implements Web
         $this->debugSection('Cookies', $this->client->getCookieJar()->all());
     }
 
-    public function seeElement($selector, $attributes = array())
+    private function stringifySelector($selector)
+    {
+        if (is_array($selector)) {
+            return trim(json_encode($selector), '{}');
+        }
+        return $selector;
+    }
+
+    public function seeElement($selector, $attributes = [])
     {
         $nodes = $this->match($selector);
+        $selector = $this->stringifySelector($selector);
         if (!empty($attributes)) {
             $nodes = $this->filterByAttributes($nodes, $attributes);
-            $selector .= "' with attribute(s) '" . trim(json_encode($attributes),'{}');
+            $selector .= "' with attribute(s) '" . trim(json_encode($attributes), '{}');
         }
         $this->assertDomContains($nodes, $selector);
     }
 
-    public function dontSeeElement($selector, $attributes = array())
+    public function dontSeeElement($selector, $attributes = [])
     {
         $nodes = $this->match($selector);
+        $selector = $this->stringifySelector($selector);
         if (!empty($attributes)) {
             $nodes = $this->filterByAttributes($nodes, $attributes);
-            $selector .= "' with attribute(s) '" . trim(json_encode($attributes),'{}');
+            $selector .= "' with attribute(s) '" . trim(json_encode($attributes), '{}');
         }
         $this->assertDomNotContains($nodes, $selector);
     }
@@ -987,18 +1063,18 @@ class InnerBrowser extends Module implements Web
         }
     }    
 
-    public function seeOptionIsSelected($select, $optionText)
+    public function seeOptionIsSelected($selector, $optionText)
     {
-        $selected = $this->matchSelectedOption($select);
+        $selected = $this->matchSelectedOption($selector);
         $this->assertDomContains($selected, 'selected option');
         //If element is radio then we need to check value
         $value = $selected->getNode(0)->tagName == 'option' ? $selected->text() : $selected->getNode(0)->getAttribute('value');
         $this->assertEquals($optionText, $value);
     }
 
-    public function dontSeeOptionIsSelected($select, $optionText)
+    public function dontSeeOptionIsSelected($selector, $optionText)
     {
-        $selected = $this->matchSelectedOption($select);
+        $selected = $this->matchSelectedOption($selector);
         if (!$selected->count()) {
             $this->assertEquals(0, $selected->count());
             return;
@@ -1068,20 +1144,28 @@ class InnerBrowser extends Module implements Web
     protected function assertPageContains($needle, $message = '')
     {
         $constraint = new PageConstraint($needle, $this->_getCurrentUri());
-        $this->assertThat($this->client->getInternalResponse()->getContent(), $constraint,$message);
+        $this->assertThat(
+            htmlspecialchars_decode(strip_tags($this->client->getInternalResponse()->getContent())),
+            $constraint,
+            $message
+        );
     }
 
     protected function assertPageNotContains($needle, $message = '')
     {
         $constraint = new PageConstraint($needle, $this->_getCurrentUri());
-        $this->assertThatItsNot($this->client->getInternalResponse()->getContent(), $constraint,$message);
+        $this->assertThatItsNot(
+            htmlspecialchars_decode(strip_tags($this->client->getInternalResponse()->getContent())),
+            $constraint,
+            $message
+        );
     }
 
     /**
      * @param $name
      * @param $form
      * @param $dynamicField
-     * @return FileFormField
+     * @return FormField
      */
     protected function matchFormField($name, $form, $dynamicField)
     {
@@ -1095,6 +1179,23 @@ class InnerBrowser extends Module implements Web
                 return $item;
             }
         }
-        return $item;
+        throw new TestRuntime("None of form fields by {$name}[] were not matched");
+    }
+
+    /**
+     * @param $requestParams
+     * @return array
+     */
+    protected function getFormPhpValues($requestParams)
+    {
+        foreach ($requestParams as $name => $value) {
+            $qs = http_build_query([$name => $value], '', '&');
+            if (!empty($qs)) {
+                parse_str($qs, $expandedValue);
+                $varName = substr($name, 0, strlen(key($expandedValue)));
+                $requestParams = array_replace_recursive($requestParams, [$varName => current($expandedValue)]);
+            }
+        }
+        return $requestParams;
     }
 }
