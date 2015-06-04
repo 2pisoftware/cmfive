@@ -209,9 +209,11 @@ class Web {
         $this->Log->info("info");
         
         // Generate CSRF tokens and store them in the $_SESSION
-        CSRF::getTokenID();
-        CSRF::getTokenValue();
-
+        if (Config::get('system.csrf.enabled') === true) {
+            CSRF::getTokenID();
+            CSRF::getTokenValue();
+        }
+        
         $_SESSION['last_request'] = time();
 
         //$this->debug("Start processing: ".$_SERVER['REQUEST_URI']);        
@@ -291,11 +293,16 @@ class Web {
         $actionmethods[] = $this->_action . '_ALL';
 
         // Check/validate CSRF token 
-        $this->validateCSRF();
-        // Taking out the CSRF regeneration until more testing can be done
-        // if ($this->_requestMethod == 'post') {
-        //     CSRF::regenerate();
-        // }
+        if (Config::get('system.csrf.enabled') === true) {
+            $allowed = Config::get('system.csrf.protected');
+            if (!empty($allowed[$this->_module]) || (!empty($this->_submodule) && !empty($allowed[$this->_module . '-' . $this->_submodule]))) {
+                if (in_array($this->_action, $allowed[$this->_module]) || (!empty($this->_submodule) && in_array($this->_action, $allowed[$this->_module . '-' . $this->_submodule]))) {
+                    // If we get here then we are configured to enforce CSRF checking
+                    $this->Log->debug("Checking CSRF");
+                    $this->validateCSRF();
+                }
+            }
+        }
         
         //
         // if a module file for this url exists, then start processing
@@ -493,7 +500,7 @@ class Web {
 
     private function validateCSRF() {
         // Check for CSRF token and that we have a valid request method
-        if (Config::get("system.checkCSRF") == true && !CSRF::isValid($this->_requestMethod)) {
+        if (Config::get("system.csrf.enabled") == true && !CSRF::isValid($this->_requestMethod)) {
             if (!CSRF::inHistory($this->_requestMethod)) {
                 @$this->service('log')->error("System: CSRF Detected from " . $this->requestIpAddress());
                 header("HTTP/1.0 403 Forbidden");

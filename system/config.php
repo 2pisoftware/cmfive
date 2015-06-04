@@ -22,9 +22,6 @@ set_include_path(get_include_path() . PATH_SEPARATOR . SYSTEM_LIBPATH);
 require_once "system/db.php";
 require_once "system/web.php";
 
-//========= Check CSRF Token ================================
-Config::set("system.checkCSRF", true);
-
 //========= Anonymous Access ================================
 
 // bypass authentication if sent from the following IP addresses
@@ -54,4 +51,17 @@ Config::set('system.rest_api_key', "abcdefghijklmnopqrstuvwxyz1234567890");
 // include class of objects that you want available via REST
 Config::set('system.rest_include', array(
 	// "Contact"
+));
+
+/**
+ * Syntax for csrf config
+ */
+Config::set('system.csrf', array(
+    'enabled' => true,
+    'protected' => array(
+        'auth' => array(
+            'login',
+            'forgotpassword'
+        )
+    )
 ));
