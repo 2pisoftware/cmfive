@@ -50,7 +50,7 @@ class Console implements EventSubscriberInterface
     protected $rawStackTrace = false;
     protected $traceLength = 5;
     protected $columns = array(40, 5);
-
+    protected $output;
 
     public function __construct($options)
     {
@@ -262,7 +262,7 @@ class Console implements EventSubscriberInterface
     {
 
         static $limit = 10;
-//
+
         $class = $e instanceof \PHPUnit_Framework_ExceptionWrapper
             ? $e->getClassname()
             : get_class($e);
@@ -405,6 +405,17 @@ class Console implements EventSubscriberInterface
             }
             $this->columns[0] = max($this->columns[0], 10 + strlen($test->toString()));
         }
+        $cols = $this->columns[0];
+        if ((strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN')
+            and (php_sapi_name() == "cli")
+            and (getenv('TERM'))
+            and (getenv('TERM') != 'unknown')
+        ) {
+            $cols = intval(`command -v tput >> /dev/null 2>&1 && tput cols`);
+        }
+        if ($cols < $this->columns[0]) {
+            $this->columns[0] = $cols-$this->columns[1];
+        }
     }
 
     /**
@@ -415,16 +426,23 @@ class Console implements EventSubscriberInterface
     protected function getTestMessage(\PHPUnit_Framework_TestCase $test, $inProgress = false)
     {
         if (!$test instanceof TestCase) {
-            return $this->message = $this->message($test->toString())
+            return $this->message = $this->message('%s::%s')
+                ->with(get_class($test), $test->getName(true))
+                ->apply(function ($str) { return str_replace('with data set', "|", $str); } )
+                ->cut($inProgress ? $this->columns[0]+$this->columns[1] - 15 : $this->columns[0]-1)
                 ->style('focus')
                 ->prepend($inProgress ? 'Running ' : '');
         }
         $filename = $test->getSignature();
+        $feature = $test->getFeature();
 
-        if ($test->getFeature()) {
-            return $this->message = $this->message("<focus>%s</focus> (%s) ")
+        if ($feature) {
+            return $this->message = $this->message($inProgress ? $feature : ucfirst($feature))
+                ->apply(function ($str) { return str_replace('with data set', "|", $str); } )
+                ->cut($inProgress ? $this->columns[0]+$this->columns[1] - 17 - strlen($filename): $this->columns[0]- 4 - strlen($filename))
+                ->style('focus')
                 ->prepend($inProgress ? 'Trying to ' : '')
-                ->with($inProgress ? $test->getFeature() : ucfirst($test->getFeature()), $filename);
+                ->append(" ($filename)");
         }
         return $this->message = $this->message("<focus>%s</focus> ")
             ->prepend($inProgress ? 'Running ' : '')
@@ -434,8 +452,9 @@ class Console implements EventSubscriberInterface
     protected function writeCurrentTest(\PHPUnit_Framework_TestCase $test)
     {
         if (!$this->isDetailed($test) and $this->output->isInteractive()) {
-            $this->getTestMessage($test, true)->write();
-            $this->message('... ')->append("\x0D")->write();
+            $this->getTestMessage($test, true)
+                ->append('... ')
+                ->write();
             return;
         }
         $this->getTestMessage($test)->write();

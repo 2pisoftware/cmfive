@@ -1,128 +1,91 @@
 <?php
 
 //////////////////////////////////////////
-//			TASK DASHBOARD   			//
+//          TASK DASHBOARD   		//
 //////////////////////////////////////////
 
 function index_ALL(Web $w) {
     $w->Task->navigation($w, "Task Dashboard");
-    $taskgroups_array = array();
-    //tab: tasks
-    // get list of groups of which i am a member
-    $mygroups = $w->Task->getMemberGroups($_SESSION['user_id']);
-    if ($mygroups) {
-        foreach ($mygroups as $mygroup) {
-            $group[$mygroup->task_group_id] = $w->Task->getTaskGroupTypeById($mygroup->task_group_id);
+        
+    // I want to see:
+    //   Number of open tasks assigned to me (out of total open tasks) \/
+    //   My Tasks that are overdue (with tasks with no due date)
+    //   My tasks with urgent status
+    //   Taskgroups that I'm a member of and the amount of tasks in it
+    
+    $total_tasks = $w->db->get("task")->where("is_deleted", 0)->count();
+    $tasks = $w->Task->getTasks(array("assignee_id" => $w->Auth->user()->id));
+    $taskgroups = $w->Task->getTaskGroupsForMember($w->Auth->user()->id);
+    
+    $count_overdue = 0;
+    $count_due_soon = 0;
+    $count_no_due_date = 0;
+    $count_todo_urgent = 0;
+    $count_taskgroup_tasks = 0;
+    
+    // Task group task count
+    if (!empty($taskgroups)) {
+        foreach($taskgroups as $taskgroup) {
+            $count_taskgroup_tasks += count($taskgroup->getTasks());
         }
     }
-
-    // build accordion based on all tasks allocated to groups of which i am a member
-    // drilling down through group > task type > status
-    // if group permissions mean 'i can view' then show count of my tasks / group tasks
-    $strOut = '';
-    if (!empty($group)) {
-
-        foreach ($group as $grpid => $grptype) {
-            $i = 0;
-
-            // get current group title for display
-            $taskgroup = $w->Task->getTaskGroup($grpid);
-            $taskgroups_array[] = $taskgroup;
-            $grouptitle = $taskgroup->title;
-
-            // if i can create tasks in this group, provide link with group stats
-            $newtasklink = "";
-            if ($taskgroup->getCanICreate()) {
-                $newtasklink = "&nbsp;&nbsp;<a href=\"/task/edit/?gid=" . $grpid . "\">Create Task</a>";
+    
+    // Task breakdown
+    if (!empty($tasks)) {
+        foreach($tasks as $task) {
+            if (!empty($task->dt_due) && ($task->dt_due < time())) {
+                $count_overdue++;
+            } else if(!empty($task->dt_due) && ($task->dt2time($task->dt_due) <= (time() + (60 * 60 * 24 * 7)))) {
+                $count_due_soon++;
+            } else if (empty($task->dt_due)) {
+                $count_no_due_date++;
             }
-
-            $taskweek = "&nbsp;&nbsp;<a href=\"/task/taskweek/?taskgroup=" . $grpid . "\">Group Activity</a>";
-
-            // can i view tasks in this group? if not, do not display
-            $caniview = $taskgroup->getCanIView();
-            $opentasks = array();
-            if ($caniview) {
-
-                // get group tasks
-                $tasks = $w->Task->getTasksbyGroupId($grpid);
-                // get group status list
-                $statuses = $w->Task->getTaskTypeStatus($grptype);
-
-                // for each task : is task open or closed? is tasks assigned to me? what is status of task?
-                // build arrays accordingly to give relevant counts of respective status for each group > task type
-                // create appropriate HTML to build accordion with task count tables and any required URLs
-                if ($tasks) {
-                    $mygrptasks = array();
-                    foreach ($tasks as $task) {
-                        if (!$task->getisTaskClosed())
-                            $opentasks[] = $i;
-                        if ($task->assignee_id == $_SESSION['user_id']) {
-                            $mytasks[$task->task_type][$task->status][] = $i;
-                            if (!$task->getisTaskClosed())
-                                $mygrptasks[] = $i;
-                        }
-                        $alltypes[$task->task_type] = $task->getTypeTitle();
-                        $alltasks[$task->task_type][$task->status][] = $i;
-                    }
-
-                    // hds: our list of available statuses for current task group
-                    // iterate through status list looking for task of each status. count tasks.
-                    // foreach task type in current group, list task count per status
-                    $hds = array("Type");
-                    foreach ($alltypes as $type => $typetitle) {
-                        $t[] = $typetitle;
-                        if ($statuses) {
-                            foreach ($statuses as $stat) {
-                                // build URLS with query string to feed task list filter
-                                $msurl = "<a title=\"View your " . $stat[0] . " " . $typetitle . " Tasks\" href=\"" . WEBROOT . "/task/tasklist/?assignee=" . $_SESSION['user_id'] . "&taskgroups=" . $grpid . "&tasktypes=" . $type . "&status=" . $stat[0] . "\">";
-                                $mysurl = isset($mytasks[$type][$stat[0]]) && (count($mytasks[$type][$stat[0]]) > 0) ? $msurl : "";
-                                $nsurl = "<a title=\"View " . $stat[0] . " " . $typetitle . " Tasks\" href=\"" . WEBROOT . "/task/tasklist/?assignee=&taskgroups=" . $grpid . "&tasktypes=" . $type . "&status=" . $stat[0] . "\">";
-                                $nosurl = isset($alltasks[$type][$stat[0]]) && (count($alltasks[$type][$stat[0]]) > 0) ? $nsurl : "";
-                                $eurl = "</a>";
-                                $myeurl = isset($mytasks[$type][$stat[0]]) && (count($mytasks[$type][$stat[0]]) > 0) ? $eurl : "";
-                                $noeurl = isset($alltasks[$type][$stat[0]]) && (count($alltasks[$type][$stat[0]]) > 0) ? $eurl : "";
-                                $hds[$stat[0]] = $stat[0];
-
-                                $left = isset($mytasks[$type][$stat[0]]) ? count($mytasks[$type][$stat[0]]) : 0;
-                                $right = isset($alltasks[$type][$stat[0]]) ? count($alltasks[$type][$stat[0]]) : 0;
-                                if ($left > 0 || $right > 0) {
-                                    $t[] = $mysurl . $left . $myeurl . " : " . $nosurl . $right . $noeurl;
-                                } else {
-                                    $t[] = "&nbsp;";
-                                }
-                            }
-                        }
-                        $line[] = $t;
-                        unset($t);
-                    }
-
-                    // merge status heading with task count for display
-                    $hds = array($hds);
-                    $grouptasks = array_merge($hds, $line);
-                    $showtasks = Html::table($grouptasks, null, "tablesorter", true);
-
-                    // continue building accordion with stats gather for current group > task types > statuses
-                    $strOut .= '<div class="task-group-list">';
-                    $strOut .= "<h3>" . $grouptitle . " " . count($mygrptasks) . "/" . count($opentasks) . "</h3>";
-                    $strOut .= $showtasks;
-                    $strOut .= "<div style=\"text-align:right;margin-top:-8px;\"><a href=\"" . WEBROOT . "/task/tasklist/?assignee=&taskgroups=" . $grpid . "\">List Tasks</a> " . $newtasklink . $taskweek . "</div>";
-                    $strOut .= "</div>";
-
-                    // reset all array used in counts and continue to next group or end
-                    unset($hds);
-                    unset($alltypes);
-                    unset($alltasks);
-                    unset($line);
-                    unset($grouptasks);
-                    unset($mytasks);
-                    unset($mygrptasks);
-                    unset($opentasks);
-                }
+            if (strtolower($task->priority) === "urgent") {
+                $count_todo_urgent++;
             }
         }
     }
-
-    // close accordian and display
-    $w->ctx("grouptasks", $strOut);
-    $w->ctx("taskgroups", $taskgroups_array);
+    
+    // Time log breakdown
+    $beginning_of_today = strtotime("midnight", time());
+    $time_entries = $w->db->get("task_time")
+            ->where("creator_id", $w->Auth->user()->id)
+            ->where("is_deleted", 0)
+            ->where("dt_start >= ?", $w->Task->time2Dt($beginning_of_today - (60 * 60 * 24 * 14)))
+            ->where("dt_start <= ?", $w->Task->time2Dt(strtotime("tomorrow", $beginning_of_today) - 1))
+            ->orderBy("dt_start DESC")->fetch_all();
+    
+    $time_entry_objects = array();
+    if (!empty($time_entries)) {
+        $time_entries = $w->Task->getObjectsFromRows("TaskTime", $time_entries, true);
+    }
+    
+    $time_total_overall = 0;
+    if (!empty($time_entries)) {
+        foreach($time_entries as $time_entry) {
+            
+            $entry_date = date('d/m', $time_entry->dt_start);
+            if (empty($time_entry_objects[$entry_date])) {
+                $time_entry_objects[$entry_date] = array('entries' => array(), "total" => 0);
+            }
+            
+            $time_total_overall += $time_entry->getDuration();
+            $time_entry_objects[$entry_date]['total'] += $time_entry->getDuration();
+            $time_entry_objects[$entry_date]['entries'][] = $time_entry; 
+        }
+        
+//        $time_entry_objects = $w->Task->getObjectsFromRows("TaskTime", $time_entries);
+    }
+    
+    $w->ctx("taskgroups", $taskgroups);
+    $w->ctx("tasks", $tasks);
+    $w->ctx("total_tasks", $total_tasks);
+    $w->ctx("count_overdue", $count_overdue);
+    $w->ctx("count_due_soon", $count_due_soon);
+    $w->ctx("count_no_due_date", $count_no_due_date);
+    $w->ctx("count_todo_urgent", $count_todo_urgent);
+    $w->ctx("count_taskgroup_tasks", $count_taskgroup_tasks);
+    
+    $w->ctx("time_entries", $time_entry_objects);
+    $w->ctx("time_total_overall", $time_total_overall);
 }
