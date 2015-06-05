@@ -828,7 +828,7 @@ class TaskService extends DbService {
 
         if ($w->Auth->loggedIn()) {
             $w->menuLink("task/edit", "New Task", $nav);
-            $w->menuLink("task/index", "Task Dashboard", $nav);
+//            $w->menuLink("task/index", "Task Dashboard", $nav);
             $w->menuLink("task/tasklist", "Task List", $nav);
             $w->menuLink("task/tasklist#notifications", "Notifications", $nav);
             $w->menuLink("task/taskweek", "Activity", $nav);
