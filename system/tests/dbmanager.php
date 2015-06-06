@@ -13,6 +13,19 @@ include_once 'lib/Source.php';
 
 // output control
 define('DS', DIRECTORY_SEPARATOR); 
+function getRequestUrl() {
+	$requestScheme='http';
+	//  IIS
+	if (array_key_exists('HTTPS',$_SERVER) && $_SERVER['HTTPS']=='on') {
+		$requestScheme='https';
+	// apache
+	} else if (array_key_exists('REQUEST_SCHEME',$_SERVER) && $_SERVER['REQUEST_SCHEME']=='https') {
+		$requestScheme='https';
+	}
+	return $requestScheme.'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+}
+$requestUrl=getRequestUrl();
+
 $folder='';
 if (DS=='/') {
 	$folder=str_replace('\\','/',dirname($_SERVER['SCRIPT_FILENAME']));
@@ -26,12 +39,12 @@ include(dirname(dirname($folder)).DS.'tests'.DS.'suites.php');
 // MAIN CONTROLLER
 if (array_key_exists('key',$_GET) && $_GET['key']==md5('secretfortestingcmfive'.$_GET['keyid'])) {
 	if (array_key_exists('savesnapshot',$_GET) ){ 
-		saveSnapshot($suites);
+		saveSnapshot($suites,$_GET['savesnapshot']);
 	} else if (array_key_exists('listsnapshots',$_GET)) {
 		listSnapshots($suites);
 //LOAD
 	} else if (array_key_exists('loadsnapshot',$_GET) && strlen($_GET['loadsnapshot'])>0) {
-		loadSnapshot($suites);
+		loadSnapshot($suites,$_GET['loadsnapshot']);
 //DOWNLOAD
 	} else if (array_key_exists('downloadsnapshot',$_GET) && strlen($_GET['downloadsnapshot'])>0) {
 		downloadSnapshot($suites);
@@ -48,7 +61,7 @@ if (array_key_exists('key',$_GET) && $_GET['key']==md5('secretfortestingcmfive'.
 	} else if (array_key_exists('resetsystemdatabases',$_GET) && $_GET['resetsystemdatabases']=='1') {
 		resetSystemDatabases($suites);
 	} else {
-		echo "NO ReQUest";
+		runTests($suites,$requestUrl);
 	}
 } else {
 	echo "Permission denied";
@@ -141,7 +154,7 @@ function checkMysqlDiffs($suites) {
 	$diffs=array();
 	if (strlen($_GET['checkmysqldiffs'])>0) {
 		foreach ($suites as $url =>$suite) {
-			$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+			$requestUrl=getRequestUrl();
 			if (strpos($requestUrl,$url)!==false) { 
 				if (array_key_exists('basepath',$suite)) {
 					$env=array_key_exists('env',$suite)?$suite['env']:'';
@@ -168,7 +181,7 @@ function listMysqlDiffs($suites) {
 	$diffs=array();
 	if (strlen($_GET['listmysqldiffs'])>0) {
 		foreach ($suites as $url =>$suite) {
-			$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+			$requestUrl=getRequestUrl();
 			if (strpos($requestUrl,$url)!==false) { 
 				if (array_key_exists('basepath',$suite)) {
 					$env=array_key_exists('env',$suite)?$suite['env']:'';
@@ -185,7 +198,7 @@ function runMysqlDiffs($suites) {
 	$diffs=array();
 	if (strlen($_GET['runmysqldiffs'])>0) {
 		foreach ($suites as $url =>$suite) {
-			$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+			$requestUrl=getRequestUrl();
 			if (strpos($requestUrl,$url)!==false) { 
 				if (array_key_exists('basepath',$suite)) {
 					$env=array_key_exists('env',$suite)?$suite['env']:'';
@@ -205,23 +218,22 @@ function runMysqlDiffs($suites) {
 	}
 }
 
-function saveSnapshot($suites) {
-	if (strlen($_GET['savesnapshot'])>0) {
+function saveSnapshot($suites,$snapFile) {
+	if (strlen($snapFile)>0) {
 		try {
 			foreach ($suites as $url =>$suite) {
 				//print_r($suite); //$suite,$requestUrl,$url));
 				//echo $suite['env'];
 				$dumpFolder=$suite['basepath'].DS.'tests'.DS.'dumps'.DS;
 				@mkdir($dumpFolder);
-				$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+				$requestUrl=getRequestUrl();
 				if (strpos($requestUrl,$url)!==false) { 
-					//echo "suite match";
 					if (array_key_exists('env',$suite) && strlen($suite['env'])>0) {
 						$dbConfig=dbConfigFromCodeception($suite['basepath'],$suite['env']);
 						//print_r($dbConfig);
 						$dump = new Ifsnop\Mysqldump\Mysqldump($dbConfig['name'], $dbConfig['user'], $dbConfig['pass'],'localhost','mysql',array('add-drop-table' => true));
-						$dump->start($dumpFolder.$_GET['savesnapshot'].'.sql');
-						echo "Saved dump to ".$dumpFolder.$_GET['savesnapshot'].'.sql';
+						$dump->start($dumpFolder.$snapFile.'.sql');
+						echo "Saved dump to ".$dumpFolder.$snapFile.'.sql';
 					}
 				}
 			}
@@ -239,7 +251,7 @@ function listSnapshots($suites) {
 		foreach ($suites as $url =>$suite) {
 			$dumpFolder=$suite['basepath'].DS.'tests'.DS.'dumps'.DS;
 			@mkdir($dumpFolder);
-			$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+			$requestUrl=getRequestUrl();
 			if (strpos($requestUrl,$url)!==false) { 
 				if (array_key_exists('env',$suite) && strlen($suite['env'])>0) {
 					foreach (new DirectoryIterator($dumpFolder) as $fileInfo) {
@@ -254,17 +266,17 @@ function listSnapshots($suites) {
 	}
 }
 
-function loadSnapshot($suites) {
+function loadSnapshot($suites,$snapFile) {
 	if (strlen($_GET['loadsnapshot'])>0) {
 		foreach ($suites as $url =>$suite) {
 			$dumpFolder=$suite['basepath'].DS.'tests'.DS.'dumps'.DS;
-			$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+			$requestUrl=getRequestUrl();
 			if (strpos($requestUrl,$url)!==false) { 
-				if (is_file($dumpFolder.DS.$_GET['loadsnapshot']))  {
+				if (is_file($dumpFolder.DS.$snapFile))  {
 					$basePath=$suite['basepath'];
 					$dbConfig=dbConfigFromCodeception($basePath,$suite['env']);
 					$mysqli = new mysqli("localhost", $dbConfig['user'], $dbConfig['pass'], $dbConfig['name']);
-					$path=$dumpFolder.$_GET['loadsnapshot'];
+					$path=$dumpFolder.$snapFile;
 					if (file_exists($path)) {
 						$sql=file_get_contents($path);
 						$result = mysqli_multi_query($mysqli,$sql); //implode('\n',$sql));
@@ -284,7 +296,7 @@ function loadSnapshot($suites) {
 function downloadSnapshot($suites) {
 	if (strlen($_GET['downloadsnapshot'])>0) {
 		foreach ($suites as $url =>$suite) {
-			$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+			$requestUrl=getRequestUrl();
 			if (strpos($requestUrl,$url)!==false) { 
 				$dumpFolder=$suite['basepath'].DS.'tests'.DS.'dumps'.DS;
 				$file=$dumpFolder.DS.$_GET['downloadsnapshot'];
@@ -307,7 +319,7 @@ function downloadSnapshot($suites) {
 function deleteSnapshot($suites) {
 	if (strlen($_GET['deletesnapshot'])>0) {
 		foreach ($suites as $url =>$suite) {
-			$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+			$requestUrl=getRequestUrl();
 			if (strpos($requestUrl,$url)!==false) { 
 				$dumpFolder=$suite['basepath'].DS.'tests'.DS.'dumps'.DS;
 				if (is_file($dumpFolder.DS.$_GET['deletesnapshot']))  {
@@ -322,62 +334,46 @@ function deleteSnapshot($suites) {
 function resetSystemDatabases($suites) {
 	$found=false;
 	foreach ($suites as $url =>$suite) {
-		$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+		$requestUrl=getRequestUrl();
 		if (strpos($requestUrl,$url)!==false) { 
-			if (array_key_exists('basepath',$suite) && strlen($suite['basepath'])>0 && count($suite['paths'])>0) {
-				$paths=array();
-				$searchPath=$suite['basepath'].DS.'system'.DS.'modules';
-				foreach (new DirectoryIterator($searchPath) as $fileInfo) {
-					if($fileInfo->isDot()) continue;
-					if (is_dir($searchPath.DS.$fileInfo->getFilename()))  {
-						array_push($paths,$searchPath.DS.$fileInfo->getFilename().DS.'install'.DS.'droptables.sql');
-						array_push($paths,$searchPath.DS.$fileInfo->getFilename().DS.'install'.DS.'db.sql');
-						array_push($paths,$searchPath.DS.$fileInfo->getFilename().DS.'install'.DS.'dbseed.sql');
+			if (array_key_exists('basepath',$suite) && strlen($suite['basepath'])>0) {
+				$env=array_key_exists('env',$suite) ? $suite['env'] : '';
+				$dbConfig=dbConfigFromCodeception($suite['basepath'],$env);
+				$sql=concatenateCmfiveSql($suite['basepath']);
+				
+				$pdo = new PDO('mysql:dbname='.$dbConfig['name'], $dbConfig['user'], $dbConfig['pass']);
+
+				try {
+					$pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
+
+					$query = "SELECT concat('DROP TABLE IF EXISTS ', table_name, ';')
+							  FROM information_schema.tables
+							  WHERE table_schema = '".$dbConfig['name']."'";
+
+					foreach($pdo->query($query) as $row) {
+						//echo $row[0];
+						$pdo->exec($row[0]);
 					}
+
+					$pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
+					$pdo->exec($sql);
+					echo "Database tables dropped and recreated";
+				} catch (Exception $e) {
+					echo "FAIL ";
+					var_dump($e);
 				}
-				$searchPath=$suite['basepath'].DS.'modules';
-				foreach (new DirectoryIterator($searchPath) as $fileInfo) {
-					if($fileInfo->isDot()) continue;
-					if (is_dir($searchPath.DS.$fileInfo->getFilename()))  {
-						array_push($paths,$searchPath.DS.$fileInfo->getFilename().DS.'install'.DS.'droptables.sql');
-						array_push($paths,$searchPath.DS.$fileInfo->getFilename().DS.'install'.DS.'db.sql');
-						array_push($paths,$searchPath.DS.$fileInfo->getFilename().DS.'install'.DS.'dbseed.sql');
-					}
-				}
-				//print_r($paths);
-				$basePath=$suite['basepath'];
-				$dbConfig=dbConfigFromCodeception($basePath,$suite['env']);
-				$paths=array_merge(array($basePath.DS.'system'.DS.'tests'.DS.'dropsystemtables.sql',$basePath.DS.'system'.DS.'install'.DS.'db.sql',$basePath.DS.'system'.DS.'install'.DS.'dbseed.sql',$basePath.DS.'system'.DS.'tests'.DS.'userscontactsroles.sql'),$paths);
+				
+				/*$result = mysqli_multi_query($mysqli,$sql); //implode('\n',$sql));
+				while ($mysqli->more_results() && $ir=$mysqli->next_result()) {if (!$ir) echo $mysqli->error;} // flush multi_queries
 				$sql='';
-				$mysqli = new mysqli("localhost", $dbConfig['user'], $dbConfig['pass'], $dbConfig['name']);
-				echo "Imported \n";
-				foreach ($paths as $k=>$path) {
-					//echo $path.'<br>';
-					if (file_exists($path)) {
-					//echo "YES<br>";
-						$output=array();
-						if (file_exists($path)) {
-							$sql=file_get_contents($path);
-							$result = mysqli_multi_query($mysqli,$sql); //implode('\n',$sql));
-							while ($mysqli->more_results() && $ir=$mysqli->next_result()) {if (!$ir) echo $mysqli->error;} // flush multi_queries
-							$sql='';
-							if (mysqli_error($mysqli)) {
-								echo "FAIL ".mysqli_error($mysqli);
-							} else {
-								echo "OK ";
-							}
-							echo $path."\n";
-						}
-					}
-				}
-				$found=true;
+				if (mysqli_error($mysqli)) {
+					echo "FAIL ".mysqli_error($mysqli);
+				} else {
+					echo "Database tables dropped and recreated";
+				}*/
+//				echo $sql;
 			}
 		}
-	}
-	if (!$found)  {
-		echo "No suites or tests configured for ".$url;
-	} else {
-//s			echo "OK";
 	}
 	die();
 }
@@ -410,3 +406,294 @@ function dbConfigFromCodeception($path,$env)  {
 	//return array('ddd','aaa');
 	return array('host'=>'localhost	','user'=>$dbUser,'pass'=>$dbPass,'name'=>$dbName);
 }
+
+
+
+function tailCustom($suite, $lines = 1, $adaptive = true) {
+	if (array_key_exists('phpLogFile',$suite) && file_exists($suite['phpLogFile']))  {
+		$filepath=$suite['phpLogFile'];
+		// Open file
+		$f = @fopen($filepath, "rb");
+		if ($f === false) return false;
+
+		// Sets buffer size
+		if (!$adaptive) $buffer = 4096;
+		else $buffer = ($lines < 2 ? 64 : ($lines < 10 ? 512 : 4096));
+
+		// Jump to last character
+		fseek($f, -1, SEEK_END);
+
+		// Read it and adjust line number if necessary
+		// (Otherwise the result would be wrong if file doesn't end with a blank line)
+		if (fread($f, 1) != "\n") $lines -= 1;
+		
+		// Start reading
+		$output = '';
+		$chunk = '';
+
+		// While we would like more
+		while (ftell($f) > 0 && $lines >= 0) {
+
+			// Figure out how far back we should jump
+			$seek = min(ftell($f), $buffer);
+
+			// Do the jump (backwards, relative to where we are)
+			fseek($f, -$seek, SEEK_CUR);
+
+			// Read a chunk and prepend it to our output
+			$output = ($chunk = fread($f, $seek)) . $output;
+
+			// Jump back to where we started reading
+			fseek($f, -mb_strlen($chunk, '8bit'), SEEK_CUR);
+
+			// Decrease our line counter
+			$lines -= substr_count($chunk, "\n");
+
+		}
+
+		// While we have too many lines
+		// (Because of buffer size we might have read too many)
+		while ($lines++ < 0) {
+
+			// Find first newline and remove all text before that
+			$output = substr($output, strpos($output, "\n") + 1);
+
+		}
+
+		// Close file and return
+		fclose($f);
+		return trim($output);
+
+	}
+}
+
+function runTests($suites,$requestUrl) {
+		$testSections=array();			
+		header('Content-Encoding: none;');
+		set_time_limit(0);
+		if (ob_get_level() == 0) {
+			ob_start();
+		}
+		?>
+		<script>
+		if (typeof updatePage=='undefined') {
+			var updatePage = function () {};
+		}
+		</script>
+		<div id='output'  >
+
+		<?php
+		
+		$requestedTests=array();
+		$runAllTests=false;
+		if (array_key_exists('tests',$_GET) && strlen($_GET['tests'])>0)  {
+			$testParam=array_key_exists('tests',$_GET) ? $_GET['tests'] : '' ;
+			//echo $testParam;
+			$selectedTests=explode(",",$testParam);
+			foreach($selectedTests as $k=>$testString) {
+				$testParts=explode("___",$testString);
+				if (!array_key_exists($testParts[0],$requestedTests)) {
+					$requestedTests[$testParts[0]]=array();
+				}
+				$testsToRun='';
+				if (array_key_exists(1,$testParts)) {
+					$testsToRun.=' '.$testParts[1];
+				}
+				if (array_key_exists(2,$testParts)) {
+					$testsToRun.=' '.$testParts[2];
+				}
+				if (array_key_exists(3,$testParts)) {
+					$testsToRun.=':'.$testParts[3];
+				}
+				array_push($requestedTests[$testParts[0]],$testsToRun);
+			}
+		} else {
+			$runAllTests=true;
+		}
+		$phpLog=null;
+		$snapFile='tests'.DS.'dumps'.DS.'testrunnerdump-'.rand().'.sql';
+		foreach ($suites as $url =>$suite) {
+			// url match
+			if (strpos($requestUrl,$url)!==false) { 
+				if (array_key_exists('preservedb',$suite) && strlen($suite['preservedb'])>0) {
+					saveSnapshot($suites,$snapfile);
+				}
+				$phpLog=tailCustom($suite,30);
+				$env='';
+				if (array_key_exists('env',$suite) && strlen($suite['env'])>0) {
+					$env=' --env '.$suite['env'];
+				} 
+				$verbosity='';
+				if (array_key_exists('v',$_GET)) {
+					$verbosity=' -vv --steps';
+				} 
+				foreach ($suite['paths'] as $suiteTitle=>$path) {
+					$cmds=array();
+					$php=array_key_exists('php',$suite) ? '"'.$suite['php'].'"' : 'php';
+					
+					if ($runAllTests==true) {
+						$cmds=array('cd '.$path.' && '.$php.' '.$suite['codeception'].' run  --no-colors --config="'.$path.'"'.$env.' '.$verbosity);
+					} else {
+						if (array_key_exists($suiteTitle,$requestedTests)) {
+							foreach($requestedTests[$suiteTitle] as $rtk => $rtv) {
+								array_push($cmds,'cd '.$path.' && '.$php.' '.$suite['codeception'].' run '.$rtv.' --no-colors --config="'.$path.'"'.$env.' '.$verbosity);
+							}
+						}
+					}
+					foreach ($cmds as $cmd) {
+						echo $cmd;
+						$handle = popen($cmd, "r");
+						$detailsTest='';
+						$errorActive=false;
+						$testType='';
+						while(!feof($handle)) {
+							$buffer = fgets($handle);
+							$buffer = trim(htmlspecialchars($buffer));
+							$bufferParts=explode(' ',trim($buffer));
+							$lastBufferPart='';
+							if (count($bufferParts)>0) {
+								$lastBufferPart=$bufferParts[count($bufferParts)-1];
+							}
+							$secondLastBufferPart='';
+							if (count($bufferParts)>1) {
+								$secondLastBufferPart=$bufferParts[count($bufferParts)-2];
+							}
+							if ($errorActive)  {
+								if (strlen(trim($buffer))>0)  {
+									echo "<div class='phperror' >".$buffer."</div>";
+								}
+							// are we starting to run in one of the test type groups - acceptance, init, functional ?
+							} else if (strpos(' '.$buffer,'Acceptance')>0 && strpos(' '.$buffer,'Tests')>0 && strpos(' '.$buffer,'Acceptance') < strpos(' '.$buffer,'Tests')) { 
+								$preTitle=substr($buffer,strpos($buffer,'Acceptance'));
+								$preTitleParts=explode(" ",$preTitle);
+								$envParts=explode("-",$preTitleParts[0]);
+								$testType=$envParts[0];
+								echo '<div class="logitem"><i>'.$buffer . "</i></div>";
+							} else if (strpos(' '.$buffer,'Unit')>0 && strpos(' '.$buffer,'Tests')>0 && strpos(' '.$buffer,'Unit') < strpos(' '.$buffer,'Tests')) {
+								$preTitle=substr($buffer,strpos($buffer,'Unit'));
+								$preTitleParts=explode(" ",$preTitle);
+								$envParts=explode("-",$preTitleParts[0]);
+								$testType=$envParts[0];
+								echo '<div class="logitem"><i>'.$buffer . "</i></div>";
+							} else if (strpos(' '.$buffer,'Functional')>0 && strpos(' '.$buffer,'Tests')>0 && strpos(' '.$buffer,'Functional') < strpos(' '.$buffer,'Tests')) {
+								$preTitle=substr($buffer,strpos($buffer,'Functional'));
+								$preTitleParts=explode(" ",$preTitle);
+								$envParts=explode("-",$preTitleParts[0]);
+								$testType=$envParts[0];
+								echo '<div class="logitem"><i>'.$buffer . "</i></div>";
+							} else if (strpos(' '.$buffer,'Parse error:')>0) { //strpos($buffer,'Call Stack:')!==false || 
+								echo "<div class='phperror' >";
+								echo $buffer;
+								echo "</div>";
+								$errorActive=true;
+							} else if (strpos($buffer,'Call Stack:')!==false) {
+								//$errorActive=false;
+							// are we gathering failed test details
+							} else if (strlen($detailsTest)>0) {
+								if (strpos(' '.$buffer,'---------')==1 ||strpos(' '.$buffer,'FAILURES!')==1 ) {
+									$detailsTest='';
+									echo '<div class="logitem">'.$buffer . "</div>";
+								} else {
+									$thisTestType='';
+									$dtParts=explode('___',$detailsTest);
+									if (count($dtParts)>1) {
+										$testName=$dtParts[0];
+										if (array_key_exists($testName,$testSections)) {
+											$thisTestType=$testSections[$testName];
+											echo '<div class="logitem testdetails" data-testid="'.$suiteTitle.'___'.strtolower($thisTestType).'___'.$detailsTest.'" >';
+											echo '<div>'.$buffer.'</div>';
+											echo '</div>'."\n";
+										}
+									}
+								}
+							// start of gathering failed test results
+							} else if (strpos($buffer,'Failed to')!==false) {
+								$parts1=explode('(',trim($buffer));
+								//print_r($parts1);
+								$parts2=explode(' ',trim($parts1[0]));
+								$parts3=explode('::',trim($parts2[count($parts2)-1]));
+								$testName=$parts3[0];
+								$functionName=$parts3[1];
+								if (file_exists($path.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'_output'.DIRECTORY_SEPARATOR.$testName.'.'.$functionName.'.fail.html')) {
+									$logFile=file_get_contents($path.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'_output'.DIRECTORY_SEPARATOR.$testName.'.'.$functionName.'.fail.html');
+									$thisTestType='';
+									if (array_key_exists($testName,$testSections)) {
+										$thisTestType=$testSections[$testName];
+									}
+									echo '<div class="logitem logfile" ><div class="reveal-modal" data-reveal data-options="close_on_background_click:true" id="logfile-'.$suiteTitle.'___'.strtolower($thisTestType).'___'.$testName.'___'.$functionName.'">'.$logFile.'</div></div>';
+									$detailsTest=$testName.'___'.$functionName;
+								} else {
+									echo '<div class="logitem"><b>'.$buffer . "</b></div>\n";
+								}
+								
+							// test status	
+							} else if ((count($bufferParts)>1 && $lastBufferPart=="Ok") || $lastBufferPart=="Fail"|| $lastBufferPart=="Error" ) {
+								//print_r($bufferParts);
+								$parts1=explode('(',$buffer);
+								if (count($parts1)>1) {
+									$parts2=explode(')',$parts1[1]);
+									$testResult='passed';
+									if (array_search('[F]',$bufferParts)!==false || array_search('Fail',$bufferParts)!==false || array_search('Error',$bufferParts)!==false) {
+										$testResult='failed';
+									}
+									$parts3=explode("::",$parts2[0]);
+									$testName=$parts3[0]; 
+									$functionName='';
+									if (count($parts3)>1) {
+										$functionName=$parts3[1]; 
+									}
+									$testSections[$testName]=$testType;
+									//die();
+									if (count($suiteTitle)>0 && count($testType)>0) {
+										echo '<div class="logitem testresult testresult-'.$testResult.'" data-title="'.$suiteTitle.'" data-suite="'.strtolower($testType).'" data-test="'.$testName.'" data-function="'.$functionName.'" >'.$buffer. "</div>\n";
+										echo '<div class="logitem"><i>'.$buffer . "</i></div>";
+									} else {
+										echo '<div class="logitem"><b><i>'.$buffer . "</i></b)</div>";
+									}
+								} else {
+									echo '<div class="logitem">'.$buffer . "</div>";
+								}
+							// otherwise log it
+							} else {
+								echo '<div class="logitem">'.$buffer . "</div>";
+							}
+						//	echo '<div class="dumpme">'.$buffer . "</div>";
+
+							//echo "<script>updatePage();</script>";
+							echo str_pad('', 4096);    
+							ob_flush();
+							flush();
+							sleep(0.3);
+						}
+						pclose($handle);
+					}
+				}
+				//$acceptanceConfig = Spyc::YAMLLoad($suite['path'].'/tests/acceptance.suite.yml');
+				break;
+			}
+		}
+		$phpLogNow=tailCustom($suite,30);
+		if (strlen($phpLog)>0 && strlen($phpLogNow)>0) {
+			$diff = Diff::compare($phpLog,$phpLogNow);
+			$lines=array();
+			if (count($diff[Diff::INSERTED])>0) {
+				foreach($diff as $dk =>$dv) {
+					if ($dv[1]==Diff::INSERTED) {
+						if (strlen(trim($dv[0]))>0) $lines[]=$dv[0];
+					}
+				}
+				if (count($lines)>0)  {
+					echo "<div class='phperrorlog' >";
+					echo implode("<br>\n",$lines);
+					echo "</div>";
+				}
+			}
+		}
+		echo "Done</div>";
+		if (array_key_exists('preservedb',$suite) && strlen($suite['preservedb'])>0) {
+			loadSnapshot($suites,$snapfile);
+		}
+		
+		ob_end_flush();	
+}
+

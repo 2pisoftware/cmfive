@@ -3,7 +3,7 @@ use \AcceptanceTester;
 /**
  * @guy AcceptanceTester\CM5WebGuySteps
  */
-class users_adminCest
+class templates_adminCest
 {
 
     public function _before()
@@ -37,12 +37,12 @@ class users_adminCest
 			));
 	*/		
 	public function runTests(AcceptanceTester\CM5WebGuySteps $I) {
-		$I->runSQLQueries('all');
-		$I->login($this->username,$this->password);
+		//$I->runSQLQueries('all');
+		//$I->login($this->username,$this->password);
 		//$I->searchRecords($this);
-		$I->createNewRecord($this);
-		$I->editRecord($this);
-		$I->deleteRecord($this);
+		//$I->createNewRecord($this);
+		//$I->editRecord($this);
+		//$I->deleteRecord($this);
 		
 	}
     

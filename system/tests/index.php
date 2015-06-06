@@ -55,9 +55,24 @@ function copy_r( $path, $dest )
             return false;
         }
     }
+function getRequestUrl() {
+	$requestScheme='http';
+	//  IIS
+	if (array_key_exists('HTTPS',$_SERVER) && $_SERVER['HTTPS']=='on') {
+		$requestScheme='https';
+	// apache
+	} else if (array_key_exists('REQUEST_SCHEME',$_SERVER) && $_SERVER['REQUEST_SCHEME']=='https') {
+		$requestScheme='https';
+	}
+	return $requestScheme.'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+}
+
+    
+    
 // prep HTML for tabs
 function renderSuitesBlock($suites,$key,$keyid) {
-	$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+	$requestUrl=getRequestUrl();
+
 	
 	$suiteMenu='';
 	foreach ($suites as $url =>$suite) {
@@ -92,7 +107,17 @@ function renderSuitesBlock($suites,$key,$keyid) {
 						//echo $suiteName.' ' .$suitePath.' '.$testType.' '.$spv."<br>";
 						foreach($fileLines as $flk => $flv) {
 							$lineParts=explode(" ",trim($flv));
-							if (count($lineParts)>2 && $lineParts[0]=='public' && $lineParts[1]=='function') {
+							if (count($lineParts)>1 && $lineParts[0]=='class') {
+								$className=$lineParts[1];
+								$testFileNameParts=explode(".",basename($spv));
+								$testFileName=$testFileNameParts[0];
+								if (substr($className,strlen($className)-4,4)!='Cest') {
+									echo "<div class='testnamewarning' >Class name (".$className.") missing appended Cest </div>";
+								}
+								if ($testFileName!=$className) {
+									echo "<div class='testnamewarning' >Test class name (".$className.") does not match file name in ".$suiteName.' '.$testType."</div>";
+								}
+							} else if (count($lineParts)>2 && $lineParts[0]=='public' && $lineParts[1]=='function') {
 								
 								$functionNameParts=explode('(',$lineParts[2]);
 								$functionName=trim($functionNameParts[0]);
@@ -100,7 +125,7 @@ function renderSuitesBlock($suites,$key,$keyid) {
 									
 									$testName=substr(basename($spv),0,strlen(basename($spv))-4);
 									$status='pending';
-									$suiteTests.='<div class="test testresult-'.$status.'" id="'.$suiteName.'___'.$testType.'___'.$testName.'___'.$functionName.'" >'.'<input class="testselected" type="checkbox" checked="checked" />'." <a class='runtestbutton testrunner button tiny' href='runsuite.php?tests=".$suiteName.'___'.$testType.'___'.$testName.'___'.$functionName."' target='_new' >Run Test</a> ".$testName.' '.$functionName.'</div>';
+									$suiteTests.='<div class="test testresult-'.$status.'" id="'.$suiteName.'___'.$testType.'___'.$testName.'___'.$functionName.'" >'.'<input class="testselected" type="checkbox" checked="checked" />'." <a class='runtestbutton testrunner button tiny' href='dbmanager.php?tests=".$suiteName.'___'.$testType.'___'.$testName.'___'.$functionName."' target='_new' >Run Test</a> ".$testName.' '.$functionName.'</div>';
 									$count++;
 								}
 								
@@ -110,7 +135,7 @@ function renderSuitesBlock($suites,$key,$keyid) {
 					}
 				}
 				$active=''; //($count>0) ? '' : ' active';
-				$suiteMenu.='<li class="accordion-navigation testsuite testresult-pending" data-suite="'.$suiteName.'" >'.'<input class="suiteselected" type="checkbox" checked="checked" /><a href="#testsuite-'.$suiteName.'" > '.$suiteName.'</a><div class="content testresult-pending'.$active.'" id="testsuite-'.$suiteName.'">'."<a class='runtestsuitebutton testrunner button tiny' href='runsuite.php?tests=".$suiteName."___acceptance' target='_new' >Run Test Suite</a>".$suiteTests.'</div></li>';
+				$suiteMenu.='<li class="accordion-navigation testsuite testresult-pending" data-suite="'.$suiteName.'" >'.'<input class="suiteselected" type="checkbox" checked="checked" /><a href="#testsuite-'.$suiteName.'" > '.$suiteName.'</a><div class="content testresult-pending'.$active.'" id="testsuite-'.$suiteName.'">'."<a class='runtestsuitebutton testrunner button tiny' href='dbmanager.php?tests=".$suiteName."___acceptance' target='_new' >Run Test Suite</a>".$suiteTests.'</div></li>';
 			}
 		}
 	}
@@ -145,7 +170,7 @@ function renderSuitesBlock($suites,$key,$keyid) {
 						<div id='phperrors' style='display: none;' ></div>
 						<input type='hidden' id='md5keyid' value='<?php echo $keyid; ?>'>
 						<input type='hidden' id='md5key' value='<?php echo $key; ?>'>
-						<a href="#" id='showdbtools' class='button right' data-reveal-id="dbtools">DB Tools</a>
+						<a href="#" id='showdbtools' class='button right' data-reveal-id="dbtools">DB Tools<b>...</b></a>
 
 						<div id="dbtools" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
 						</div>
@@ -154,7 +179,7 @@ function renderSuitesBlock($suites,$key,$keyid) {
 						<div style='display: none' id='warning' >Running tests will modify database structure and data.<br/>
 						<b>I understand</b>   <input type='checkbox' id='testsenabled' > </div>
 						<a href='#' class='button tiny' id='stopbutton' style='display: none;'  >Stop Tests</a>
-						<a href='runsuite.php' class='button testrunner' id='runbutton'  >Run Tests</a>
+						<a href='dbmanager.php' class='button testrunner' id='runbutton'  >Run Tests</a>
 						 <br/><a href='#' class='button tiny selectset' id='selectallbutton'  >All</a> <a href='#' class='button tiny selectset' id='selectnonebutton'  >None</a> <a href='#' class='button tiny selectset'  id='selectfailedbutton'  >Failed</a> <a href='#' class='button tiny selectset'  id='selectpendingbutton'  >Pending</a>
 							<?php echo renderSuitesBlock($suites,$key,$keyid); ?>	
 					</div>

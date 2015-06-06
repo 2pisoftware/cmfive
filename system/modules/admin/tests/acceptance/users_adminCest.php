@@ -13,37 +13,37 @@ class users_adminCest
     public function _after()
     {
     }
+    // auth details
 	var $username='admin';
 	var $password='admin';
-    var $navSelector='List Users';
+	// label of menu link to this module/submodule
+    var $navSelector='List Users';    
     
-    var $databaseTable='user';
-    var $recordName='User';
-    var $recordLabel='User';
+    var $createdMessage='added';
+    var $updatedMessage='updated';
+    var $deletedMessage='User';
     var $subfolder='';
     var $moduleUrl='/admin/users/';
-    var $validRecord=array('input'=>array('login' => 'auser','password'=>'ca1e51f19afbe6e0fb51dde5bcf01ab73e52c7cd','password_salt'=>'9b618fbc7f9509fc28ebea98becfdd58'),'select'=>array('contact_id'=>'1'),'checkbox'=>array('is_admin'=>'1'));
+    
+    var $databaseTable='user';    
+    var $validRecord=array('input'=>array('login' => 'auser','password'=>'pojpoj','password2'=>'pojpoj','firstname'=>'Joe','lastname'=>'Bloggs'),'select'=>array(),'checkbox'=>array('is_admin'=>'1','is_active'=>'1'));
+    var $validDBRecord=array('login' => 'auser');
+  
     var $updateData=array('input'=>array('login'=>'buser'),'select'=>array());
-    /*var $searches=array(
-			array(
-				'input'=>array('filter_employee'=>'1','filter_date_from'=>'1-1-2013 00:00:00','filter_date_to'=>'1-1-2014 00:00:00'),
-				'select'=>array('filter_status'=>''),
-				'result'=>1
-			),
-			array(
-				'input'=>array('filter_employee'=>'1','filter_date_from'=>'1-1-2012 00:00:00','filter_date_to'=>'1-1-2017 00:00:00'),
-				'select'=>array('filter_status'=>''),
-				'result'=>3
-			));
-	*/		
+    var $updatedDBRecord=array('login' => 'buser');
+    
+
+	
 	public function runTests(AcceptanceTester\CM5WebGuySteps $I) {
-		$I->runSQLQueries('all');
+		$I->runSQLQueries('users');
 		$I->login($this->username,$this->password);
-		//$I->searchRecords($this);
 		$I->createNewRecord($this);
-		$I->editRecord($this);
-		$I->deleteRecord($this);
-		
+		$I->runSQLQueries('users');
+		$I->doEditRecord($this->navSelector,'.editbutton[href="/admin/useredit/{id}/box"]',$this->updatedMessage,$this->databaseTable, $this->validRecord,$this->updateData, $this->validDBRecord,$this->updatedDBRecord);
+		//$I->runSQLQueries('users');
+		//$I->deleteRecord($this);
+		// TODO PERMISSIONS EDIT
+		// TODO IMPLEMENT DELETE
 	}
     
 

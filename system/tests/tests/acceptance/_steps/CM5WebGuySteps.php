@@ -19,6 +19,7 @@ class CM5WebGuySteps extends \AcceptanceTester
 	 */
     public function login($username,$password) {
 		$I=$this;
+		$I->wantTo('Log in');
 		$I->amOnPage('/auth/login');
 		$I->fillField('login',$username);
 		$I->fillField('password',$password);
@@ -31,14 +32,14 @@ class CM5WebGuySteps extends \AcceptanceTester
 	 * Create a new record with default parameters from test object
 	 */
 	public function createNewRecord($test) {
-		$this->doCreateNewRecord($test->navSelector,'.addbutton','Save',$test->recordLabel.' created',$test->databaseTable, $test->validRecord);
+		$this->doCreateNewRecord($test->navSelector,'.addbutton',$test->createdMessage,$test->databaseTable, $test->validRecord, $test->validDBRecord);
 		// TODO return id of new record
 	}
 	
 	/**
 	 * Create a new record
 	 */
-	public function doCreateNewRecord($navSelector,$createButtonSelector,$saveButtonSelector,$saveText,$databaseTable,$record) {
+	public function doCreateNewRecord($navSelector,$createButtonSelector,$saveText,$databaseTable,$record,$dbRecord) {
 		$I=$this;
 		$I->wantTo('Create a new record');
 		$I->click($navSelector);
@@ -67,34 +68,29 @@ class CM5WebGuySteps extends \AcceptanceTester
 			}
 		}
 		
-		$I->click($saveButtonSelector);
+		$I->click('.savebutton');
 		$I->see($saveText);
-		$I->seeInDatabase($databaseTable,$r);
+		$I->seeInDatabase($databaseTable,$dbRecord);
 	}
 	
 	/**
 	 * Edit a record with default parameters from test object
 	 */
 	public function editRecord($test) {
-		$this->doEditRecord($test->navSelector,$test->moduleUrl.'edit/','Update',$test->recordLabel.' updated',$test->databaseTable, $test->validRecord,$test->updateData);
+		$this->doEditRecord($test->navSelector,'.editbutton[href="'.$test->moduleUrl.'edit/{id}/box"]',$test->updatedMessage,$test->databaseTable, $test->validRecord,$test->updateData, $test->validDBRecord,$test->updatedDBRecord);
 	}
 	
 	/**
 	 * Edit a record
 	 */
-	public function doEditRecord($navSelector,$editButtonUrl,$saveButtonSelector,$saveText,$databaseTable,$record,$updateData) {
+	public function doEditRecord($navSelector,$editButtonSelector,$saveText,$databaseTable,$record,$updateData,$dbRecord,$updatedDBRecord) {
 		$I=$this;
-		$r=array();
-		if (array_key_exists('select',$record)) $r=array_merge($r,$record['select']);
-		if (array_key_exists('input',$record)) $r=array_merge($r,$record['input']);
-		if (array_key_exists('checkbox',$record)) $r=array_merge($r,$record['checkbox']);
-		$id=$I->haveInDatabase($databaseTable,$r);
-		if (array_key_exists('select',$updateData)) $r=array_merge($r,$updateData['select']);
-		if (array_key_exists('input',$updateData)) $r=array_merge($r,$updateData['input']);
-		if (array_key_exists('checkbox',$updateData)) $r=array_merge($r,$updateData['checkbox']);
 		$I->wantTo('Edit and save a record');
+		$r=array();
+		$id=$I->haveInDatabase($databaseTable,$dbRecord);
+		$editButtonSelector=str_replace('{id}',$id,$editButtonSelector);
 		$I->click($navSelector);
-		$I->click('.editbutton[href="'.$editButtonUrl.$id.'"]');
+		$I->click($editButtonSelector);
 		if (array_key_exists('input',$updateData)) {
 			foreach($updateData['input'] as $field=>$value) {
 				$I->fillField($field,$value);
@@ -116,9 +112,9 @@ class CM5WebGuySteps extends \AcceptanceTester
 			}
 		}
 		
-		$I->click($saveButtonSelector);
+		$I->click('.savebutton');
 		$I->see($saveText);
-		$I->seeInDatabase($databaseTable, $r); 
+		$I->seeInDatabase($databaseTable, $updatedDBRecord); 
 	}
 	
 	/**
@@ -128,9 +124,9 @@ class CM5WebGuySteps extends \AcceptanceTester
 		$id=$this->doDeleteRecord(
 			$test->navSelector, // nav to page
 			$test->moduleUrl.'delete/',  // delete link base
-			$test->recordLabel.' deleted',  // success message
+			$test->deletedMessage,  // success message
 			$test->databaseTable,  // table 
-			array_merge($test->validRecord['select'],$test->validRecord['input']));  // dummy record
+			$test->validDBRecord);  // dummy record
 	}  
 	
 	/**
@@ -138,8 +134,8 @@ class CM5WebGuySteps extends \AcceptanceTester
 	 */
 	public function doDeleteRecord($navSelector,$deleteButtonUrl,$deletedText,$databaseTable,$record) {
 		$I=$this;
-		$id=$I->haveInDatabase($databaseTable, $record);
 		$I->wantTo('Delete a record');
+		$id=$I->haveInDatabase($databaseTable, $record);
 		$I->click($navSelector);
 		$I->click('.deletebutton[href="'.$deleteButtonUrl.$id.'"]');
 		$I->see($deletedText);

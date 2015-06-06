@@ -12,6 +12,11 @@ window.onerror = function(message, url, lineNumber) {
 
 function initialisePage() {
 	//localStorage.getItem('enableTesting');
+	if ($('.testnamewarning').length>0) {
+		$('#runbutton').remove();
+		$('.accordion').remove();
+	}
+	
 	var activeSuite=localStorage.getItem('activeTestSuite');
 	if (typeof activeSuite=="string" && activeSuite.length>0) {
 		$('.accordion-navigation div.content').removeClass('active');
@@ -88,7 +93,12 @@ function initialisePage() {
 	});
 	
 	$.get('dbmanager.php?checkmysqldiffs=1&mini=1'+getParams(),function(res) {
-			$('#showdbtools').append('<b>'+res+'</b>');
+			if (res && res.length>0) {
+				$('#showdbtools b').text(res);
+			} else {
+				$('#showdbtools b').text('');
+			}
+			
 	});
 	
 	var xhr ;
@@ -96,6 +106,7 @@ function initialisePage() {
 	
 	function startTests(tests) {
 		if ($('#testsenabled:checked').length>0) {
+			$('.errorcontentmessage').html('');
 			UIStartTests();
 			xhr= new XMLHttpRequest();
 			var lastContent='';
@@ -151,7 +162,7 @@ function initialisePage() {
 				$('#dbtools').load('dbmanager.php?listmysqldiffs=1'+getParams());
 			});
 			$('#runmysqldiffsbutton').click(function() {
-				if (confirm('Are you really sure that you want to udpate schema to match source code?')) {
+				if (confirm('Are you really sure that you want to update schema to match source code?')) {
 					$('#mysqldiffs').load('dbmanager.php?runmysqldiffs=1'+getParams());
 				}
 			});
@@ -159,7 +170,8 @@ function initialisePage() {
 				if ($('#testsenabled:checked').length>0) {
 					if (confirm('Are you really sure that you want to DROP ALL DATABASES and reimport schema?')) {
 						$.get('dbmanager.php?resetsystemdatabases=1'+getParams(),function(res) {
-							alert('Dropped and created all tables'+"\n"+res);
+							//$('#dbtools').foundation('reveal','close');
+							flashDialog('resetallresult',res);
 						});
 					}
 				} else {
@@ -224,7 +236,7 @@ function initialisePage() {
 		e.stopImmediatePropagation();
 		if (testsRunning==false)  {
 			if (e.ctrlKey==true)  {
-				window.open($(this).attr('href')+getParams());
+				window.open($(this).attr('href')+getParams()+'&v=1');
 			} else {
 				startTests($(this).attr('href')); //$(this).parent().attr('id'));
 			}
@@ -236,7 +248,7 @@ function initialisePage() {
 		e.stopImmediatePropagation();
 		if (testsRunning==false)  {
 			if (e.ctrlKey==true)  {
-				window.open($(this).attr('href')+getParams());
+				window.open($(this).attr('href')+getParams()+'&v=1');
 			} else {
 				startTests($(this).attr('href')); //$(this).parents('li').first().data('suite'));
 			}
@@ -248,9 +260,9 @@ function initialisePage() {
 		e.stopImmediatePropagation();
 		if (testsRunning==false)  {
 			if (e.ctrlKey==true)  {
-				window.open('runsuite.php?tests='+getSelectedTests()+getParams());
+				window.open('dbmanager.php?tests='+getSelectedTests()+getParams()+'&v=1');
 			} else {
-				startTests('runsuite.php?tests='+getSelectedTests());
+				startTests('dbmanager.php?tests='+getSelectedTests());
 			}
 		}
 		return false;
@@ -373,7 +385,7 @@ function updatePage(latestContent) {
 					showButton='<a href="#" class="showerrorbutton button tiny" data-reveal-id="logfile-'+$(newContent).data('testid')+'">Show</a> ';
 				}
 				
-				test.append($('<span>&nbsp;</span><a href="#" class="detailsbutton button tiny" data-reveal-id="testdetails-'+$(newContent).data('testid')+'">Details</a>&nbsp;&nbsp;&nbsp;'+showButton+' <div id="testdetails-'+$(newContent).data('testid')+'" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">'+newContent.html()+'<a class="close-reveal-modal" aria-label="Close">&#215;</a></div>'));
+				test.append($('<span>&nbsp;</span><a href="#" class="detailsbutton button tiny" data-reveal-id="testdetails-'+$(newContent).data('testid')+'">Details</a>&nbsp;&nbsp;&nbsp;'+showButton+' <div id="testdetails-'+$(newContent).data('testid')+'" class="reveal-modal errorcontentmessage" data-reveal aria-hidden="true" role="dialog">'+newContent.html()+'<a class="close-reveal-modal" aria-label="Close">&#215;</a></div>'));
 			}
 			$(document).foundation(); // {'reveal': {'close_on_background_click': true,'close_on_esc': true}});
 		} else if ($(newContent).hasClass('phperror')) {
