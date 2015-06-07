@@ -3,7 +3,8 @@
 .project
 /config.php
 /system/composer/*
-system/composer/*
+
+/tests/dumps
 codeception.yml
 codeception.master.yml
 /tests/tests/acceptance.suite.yml
@@ -23,6 +24,7 @@ modules/*/tests/_support/FunctionalHelper.php
 modules/*/tests/_support/UnitHelper.php
 modules/*/tests/acceptance/_steps/CM5WebGuySteps.php
 modules/*/tests/_output/*
+modules/*/tests/Spyc.php
 system/modules/*/tests/acceptance.suite.yml
 system/modules/*/tests/functional.suite.yml
 system/modules/*/tests/unit.suite.yml
@@ -37,3 +39,4 @@ system/modules/*/tests/_support/FunctionalHelper.php
 system/modules/*/tests/_support/UnitHelper.php
 system/modules/*/tests/acceptance/_steps/CM5WebGuySteps.php
 system/modules/*/tests/_output/*
+system/modules/*/tests/Spyc.php
