@@ -41,10 +41,6 @@ class AuthService extends DbService {
         $user->updateLastLogin();
         $this->w->session('user_id', $user->id);
     }
-    
-    function loginLocalUser() {
-        
-    }
 
     function __init() {
         $this->_loadRoles();
@@ -96,7 +92,6 @@ class AuthService extends DbService {
     }
 
     function allowed($path, $url = null) {
-
         $parts = $this->w->parseUrl($path);
         if (!in_array($parts['module'], $this->w->modules())) {
             $this->Log->error("Denied access: module '". urlencode($parts['module']). "' doesn't exist");
@@ -106,34 +101,87 @@ class AuthService extends DbService {
                 // First, check for Windows pass through auth
         if (Config::get('system.use_passthrough_authentication') === TRUE) {
             if (!empty($_SERVER['AUTH_USER']) && !$this->loggedIn()) {
+                // Get the username
+                $username = explode('\\', $_SERVER["AUTH_USER"]);
+                $username = end($username);
+
+                $this->w->Log->debug("Username: " . $username);
+
+                // Authenticate agaianst LDAP
+                $ldap = ldap_connect(Config::get("system.ldap.host"), Config::get("system.ldap.port"));
+
+                if (!$ldap) {
+                    $this->w->Log->error("LDAP Server could not be reached");
+                    return false;
+                }
+
+                ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3); // Recommended for AD
+                ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
+
+                //Using the provided user and password to login into LDAP server.
+                //For the dc, normally will be the domain.
+                $ldap_instance = ldap_bind($ldap, Config::get("system.ldap.username"), Config::get("system.ldap.password"));
+
+                // You may add in any filter part on here. "uid" is a profile data inside the LDAP. You may filter by other columns depends on your LDAP setup.
+                $search_results = ldap_search($ldap, Config::get("system.ldap.base_dn"), 
+                    str_replace("{username}", $username, Config::get("system.ldap.auth_search")), Config::get("system.ldap.search_filter_attribute"), 0, 100);
+
+                $info = ldap_get_entries($ldap, $search_results);
+
+                // var_dump($info); die();
+
+                if ($info['count'] == 0) {
+                    $this->w->Log->error("LDAP Info: " . json_encode($info));
+                    $this->w->Log->error("LDAP Error: " . ldap_error($ldap));
+                    return false;
+                }
+
+                // Close LDAP connection
+                ldap_close($ldap);
+
+                // Allow module based validation via hooks
+                $hook_results = $this->w->callHook("core_auth", "ldap_authenticate", $info);
+                foreach($hook_results as $hook_result) {
+                    if ($hook_result === FALSE) {
+                        return false;
+                    }
+                }
+
                 // Try and find the user locally
-                $user = $this->getObject("User", array("login" => $_SERVER['AUTH_USER']));
+                $user = $this->getObject("User", array("login" => $username));
                 if (empty($user)) {
                     $contact = new Contact($this->w);
-                    $contact->firstname = $_SERVER['AUTH_USER'];
-                    $contact->lastname = 'paassthrough';
+                    $contact->firstname = !empty($info[0]["givenname"][0]) ? $info[0]["givenname"][0] : $username;
+                    $contact->lastname = !empty($info[0]["sn"][0]) ? $info[0]["sn"][0] : '';
                     $contact->insert();
                     
                     // Create a user
                     $user = new User($this->w);
-                    $user->login = $_SERVER['AUTH_USER'];
+                    $user->login = $username;
                     // Set password if provided
                     $user->setPassword($_SERVER['AUTH_PASSWORD']);
                     $user->contact_id = $contact->id;
-                    $user->is_admin = 1;
+                    $user->is_admin = 0;
                     $user->is_active = 1;
                     $user->insert();
+
+                    $user->addRole("user");
+                    $user->is_admin = 1;
+                    $user->update();
                 }
                 
-                $this->loginLocalUser($user->id);
+                $this->forceLogin($user->id);
                 
+                // Let modules know that a user successfully authenticated
+                $this->w->callHook("core_auth", "ldap_user_authenticated", $user);
+
                 // Here is where we introduce LDAP support and check against windows server user records for access
                 // For testing, allow everything
-                if (empty($user->id)) {
-                    return true;
+                if (!empty($user->id)) {
+                    return $url ? $url : true;
                 }
             } else {
-                return true;
+                return $url ? $url : true;
             }
         }
         

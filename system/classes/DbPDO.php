@@ -19,6 +19,7 @@ class DbPDO extends PDO {
     private $config;
     
     public function __construct($config = array()) {
+		
         // Set up our PDO class
         //GC: sqlsrv requires a different dsn to mysql.
         switch ($config['driver']) {
@@ -36,7 +37,6 @@ class DbPDO extends PDO {
 				$port = isset($config['port']) && !empty($config['port']) ? ";port=".$config['port'] : "";
 				$url = "{$config['driver']}:host={$config['hostname']};dbname={$config['database']}{$port}";
 		}
-		
 		parent::__construct($url,$config["username"],$config["password"], null);
         $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         

@@ -201,6 +201,48 @@ class Html {
         $button->href($href)->text($title)->confirm($confirm)->id($id)->setClass($class)->newtab($newtab)->type($type);
         return $button->__toString();
     }
+    /**
+     * Create an a link styled as a button
+     * */
+    public static function ab($href, $title, $class = null, $id = null,$confirm = null) {
+		$classParam=' button tiny ';
+		if (strlen($class)>0) {
+			$classParam.=$class;
+		} 
+		$classParam=" class='".$classParam."' ";
+		$idParam='';
+		if (strlen($id)>0)  {
+			$idParam=" id='".$id."' ";
+		}
+		$confirmParam='';
+		if (strlen($confirm)>0)  {
+			$confirmParam=" onclick=\"return confirm('".$confirm."')\" ";
+		}
+		
+        return '<a href="'.$href.'" '.$classParam.' '.$idParam.' '.$confirmParam.'>'.$title.'</a>';
+    }
+    
+    /**
+     * Create an a link styled as a button that pops up a reveal dialog
+     * */
+    public static function abox($href, $title, $class = null, $id = null,$confirm = null) {	
+		$classParam=' button tiny ';
+		if (strlen($class)>0) {
+			$classParam.=$class;
+		} 
+		$classParam=" class='".$classParam."' ";
+		$idParam='';
+		if (strlen($id)>0)  {
+			$idParam=" id='".$id."' ";
+		}
+		$confirmParam='';
+		if (strlen($confirm)>0)  {
+			$confirmParam=" onclick='return(\"".$confirm."\");' ";
+		}
+		
+        return '<a href="'.$href.'" data-reveal-id="cmfive-modal" data-reveal-ajax="true" '.$classParam.' '.$idParam.' '.$confirmParam.'>'.$title.'</a>';
+    }
+    
 
     /**
      * Creates a link (or button) which will pop up a colorbox

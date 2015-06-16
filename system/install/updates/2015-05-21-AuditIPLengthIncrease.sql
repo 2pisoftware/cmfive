@@ -1,0 +1,1 @@
+alter table audit modify ip varchar(255);

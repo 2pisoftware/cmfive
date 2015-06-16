@@ -106,6 +106,7 @@ function initialisePage() {
 	
 	function startTests(tests) {
 		if ($('#testsenabled:checked').length>0) {
+			$('.errorcontentmessage').html('');
 			UIStartTests();
 			xhr= new XMLHttpRequest();
 			var lastContent='';
@@ -384,7 +385,11 @@ function updatePage(latestContent) {
 					showButton='<a href="#" class="showerrorbutton button tiny" data-reveal-id="logfile-'+$(newContent).data('testid')+'">Show</a> ';
 				}
 				
+<<<<<<< HEAD
 				test.append($('<span>&nbsp;</span><a href="#" class="detailsbutton button tiny" data-reveal-id="testdetails-'+$(newContent).data('testid')+'">Details</a>&nbsp;&nbsp;&nbsp;'+showButton+' <div id="testdetails-'+$(newContent).data('testid')+'" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">'+newContent.html()+'<a class="close-reveal-modal" aria-label="Close">&#215;</a></div>'));
+=======
+				test.append($('<span>&nbsp;</span><a href="#" class="detailsbutton button tiny" data-reveal-id="testdetails-'+$(newContent).data('testid')+'">Details</a>&nbsp;&nbsp;&nbsp;'+showButton+' <div id="testdetails-'+$(newContent).data('testid')+'" class="reveal-modal errorcontentmessage" data-reveal aria-hidden="true" role="dialog">'+newContent.html()+'<a class="close-reveal-modal" aria-label="Close">&#215;</a></div>'));
+>>>>>>> origin/windowsAdaptation
 			}
 			$(document).foundation(); // {'reveal': {'close_on_background_click': true,'close_on_esc': true}});
 		} else if ($(newContent).hasClass('phperror')) {

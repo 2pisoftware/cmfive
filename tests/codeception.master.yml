@@ -1,0 +1,41 @@
+paths:
+    tests: tests
+    log: tests/_output
+    data: tests/_data
+    helpers: tests/_support
+settings:
+    bootstrap: _bootstrap.php
+    suite_class: \PHPUnit_Framework_TestSuite
+    colors: true
+    memory_limit: 1024M
+    log: true
+modules:
+    config:
+        Db:
+            dsn: 'mysql:host=localhost;dbname=disabled'
+            user: 'root'
+            password: ''
+            populate: false
+            cleanup: false
+
+env:
+    devsteve:
+        modules:
+            config:
+                Db: 
+                    dsn: 'mysql:host=localhost;dbname=cmfive'
+                    user: 'root'
+                    password: ''
+                    populate: false
+                    cleanup: false
+    test:
+        modules:
+            config:
+                Db: 
+                    dsn: 'mysql:host=localhost;dbname=cmfive'
+                    user: 'root'
+                    password: 'thisServerWillDoLotsOfWorkTesting4Us'
+                    populate: false
+                    cleanup: false
+
+
