@@ -10,13 +10,19 @@
 
 class_name: AcceptanceTester
 modules:
-    enabled:
-        - PhpBrowser
+    enabled: 
+        - WebDriver
         - AcceptanceHelper
         - Db
     config:
-        PhpBrowser:
-            url: 'http://disabled'
+        WebDriver:
+         url: 'http://cmfive.steve/'
+         browser: firefox
+         window_size: 1024x768
+         wait: 1
+         capabilities:
+             unexpectedAlertBehaviour: 'accept'
+
 env:
     devsteve:
         modules:
@@ -27,5 +33,5 @@ env:
         modules:
             config:
                 PhpBrowser:
-                    url: 'http://cmfive.dev.code.2pisoftware.com'
+                    url: 'http://cmfive.steve'
     
