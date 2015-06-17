@@ -11,12 +11,12 @@
         
         <?php
             $w->enqueueStyle(array("name" => "style.css", "uri" => "/system/templates/css/style.css", "weight" => 1000));
-            $w->enqueueStyle(array("name" => "normalize.css", "uri" => "/system/templates/js/foundation-5.0.2/css/normalize.css", "weight" => 990));
-            $w->enqueueStyle(array("name" => "foundation.css", "uri" => "/system/templates/js/foundation-5.0.2/css/foundation.css", "weight" => 980));
+            $w->enqueueStyle(array("name" => "normalize.css", "uri" => "/system/templates/js/foundation-5.5.0/css/normalize.css", "weight" => 990));
+            $w->enqueueStyle(array("name" => "foundation.css", "uri" => "/system/templates/js/foundation-5.5.0/css/foundation.css", "weight" => 980));
             
-            $w->enqueueScript(array("name" => "modernizr.js", "uri" => "/system/templates/js/foundation-5.0.2/js/modernizr.js", "weight" => 1000));
-            $w->enqueueScript(array("name" => "jquery.js", "uri" => "/system/templates/js/foundation-5.0.2/js/jquery.js", "weight" => 990));
-            $w->enqueueScript(array("name" => "foundation.min.js", "uri" => "/system/templates/js/foundation-5.0.2/js/foundation.min.js", "weight" => 980));
+            $w->enqueueScript(array("name" => "modernizr.js", "uri" => "/system/templates/js/foundation-5.5.0/js/vendor/modernizr.js", "weight" => 1000));
+            $w->enqueueScript(array("name" => "jquery.js", "uri" => "/system/templates/js/foundation-5.5.0/js/vendor/jquery.js", "weight" => 990));
+            $w->enqueueScript(array("name" => "foundation.min.js", "uri" => "/system/templates/js/foundation-5.5.0/js/foundation/foundation.js", "weight" => 980));
             $w->enqueueScript(array("name" => "main.js", "uri" => "/system/templates/js/main.js", "weight" => 500));
            
             $w->outputStyles();
@@ -45,7 +45,11 @@
             </div>
         </div>
         <script>
-            jQuery(document).foundation();
+			try {
+				jQuery(document).foundation();
+			} catch (e) {
+				console.log(e);
+			}
         </script>
 	</body>
 </html>
