@@ -714,19 +714,7 @@ include_once 'lib/Source.php';
 
 // output control
 define('DS', DIRECTORY_SEPARATOR); 
-function getRequestUrl() {
-	$requestScheme='http';
-	//  IIS
-	if (array_key_exists('HTTPS',$_SERVER) && $_SERVER['HTTPS']=='on') {
-		$requestScheme='https';
-	// apache
-	} else if (array_key_exists('REQUEST_SCHEME',$_SERVER) && $_SERVER['REQUEST_SCHEME']=='https') {
-		$requestScheme='https';
-	}
-	return $requestScheme.'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
-}
-$requestUrl=getRequestUrl();
-
+$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
 $folder='';
 if (DS=='/') {
 	$folder=str_replace('\\','/',dirname($_SERVER['SCRIPT_FILENAME']));
@@ -855,7 +843,7 @@ function checkMysqlDiffs($suites) {
 	$diffs=array();
 	if (strlen($_GET['checkmysqldiffs'])>0) {
 		foreach ($suites as $url =>$suite) {
-			$requestUrl=getRequestUrl();
+			$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
 			if (strpos($requestUrl,$url)!==false) { 
 				if (array_key_exists('basepath',$suite)) {
 					$env=array_key_exists('env',$suite)?$suite['env']:'';
@@ -882,7 +870,7 @@ function listMysqlDiffs($suites) {
 	$diffs=array();
 	if (strlen($_GET['listmysqldiffs'])>0) {
 		foreach ($suites as $url =>$suite) {
-			$requestUrl=getRequestUrl();
+			$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
 			if (strpos($requestUrl,$url)!==false) { 
 				if (array_key_exists('basepath',$suite)) {
 					$env=array_key_exists('env',$suite)?$suite['env']:'';
@@ -899,7 +887,7 @@ function runMysqlDiffs($suites) {
 	$diffs=array();
 	if (strlen($_GET['runmysqldiffs'])>0) {
 		foreach ($suites as $url =>$suite) {
-			$requestUrl=getRequestUrl();
+			$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
 			if (strpos($requestUrl,$url)!==false) { 
 				if (array_key_exists('basepath',$suite)) {
 					$env=array_key_exists('env',$suite)?$suite['env']:'';
@@ -927,8 +915,9 @@ function saveSnapshot($suites,$snapFile) {
 				//echo $suite['env'];
 				$dumpFolder=$suite['basepath'].DS.'tests'.DS.'dumps'.DS;
 				@mkdir($dumpFolder);
-				$requestUrl=getRequestUrl();
+				$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
 				if (strpos($requestUrl,$url)!==false) { 
+					//echo "suite match";
 					if (array_key_exists('env',$suite) && strlen($suite['env'])>0) {
 						$dbConfig=dbConfigFromCodeception($suite['basepath'],$suite['env']);
 						//print_r($dbConfig);
@@ -952,7 +941,7 @@ function listSnapshots($suites) {
 		foreach ($suites as $url =>$suite) {
 			$dumpFolder=$suite['basepath'].DS.'tests'.DS.'dumps'.DS;
 			@mkdir($dumpFolder);
-			$requestUrl=getRequestUrl();
+			$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
 			if (strpos($requestUrl,$url)!==false) { 
 				if (array_key_exists('env',$suite) && strlen($suite['env'])>0) {
 					foreach (new DirectoryIterator($dumpFolder) as $fileInfo) {
@@ -971,7 +960,7 @@ function loadSnapshot($suites,$snapFile) {
 	if (strlen($_GET['loadsnapshot'])>0) {
 		foreach ($suites as $url =>$suite) {
 			$dumpFolder=$suite['basepath'].DS.'tests'.DS.'dumps'.DS;
-			$requestUrl=getRequestUrl();
+			$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
 			if (strpos($requestUrl,$url)!==false) { 
 				if (is_file($dumpFolder.DS.$snapFile))  {
 					$basePath=$suite['basepath'];
@@ -997,7 +986,7 @@ function loadSnapshot($suites,$snapFile) {
 function downloadSnapshot($suites) {
 	if (strlen($_GET['downloadsnapshot'])>0) {
 		foreach ($suites as $url =>$suite) {
-			$requestUrl=getRequestUrl();
+			$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
 			if (strpos($requestUrl,$url)!==false) { 
 				$dumpFolder=$suite['basepath'].DS.'tests'.DS.'dumps'.DS;
 				$file=$dumpFolder.DS.$_GET['downloadsnapshot'];
@@ -1020,7 +1009,7 @@ function downloadSnapshot($suites) {
 function deleteSnapshot($suites) {
 	if (strlen($_GET['deletesnapshot'])>0) {
 		foreach ($suites as $url =>$suite) {
-			$requestUrl=getRequestUrl();
+			$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
 			if (strpos($requestUrl,$url)!==false) { 
 				$dumpFolder=$suite['basepath'].DS.'tests'.DS.'dumps'.DS;
 				if (is_file($dumpFolder.DS.$_GET['deletesnapshot']))  {
@@ -1035,7 +1024,7 @@ function deleteSnapshot($suites) {
 function resetSystemDatabases($suites) {
 	$found=false;
 	foreach ($suites as $url =>$suite) {
-		$requestUrl=getRequestUrl();
+		$requestUrl=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
 		if (strpos($requestUrl,$url)!==false) { 
 			if (array_key_exists('basepath',$suite) && strlen($suite['basepath'])>0) {
 				$env=array_key_exists('env',$suite) ? $suite['env'] : '';
@@ -1230,14 +1219,12 @@ function runTests($suites,$requestUrl) {
 				} 
 				foreach ($suite['paths'] as $suiteTitle=>$path) {
 					$cmds=array();
-					$php=array_key_exists('php',$suite) ? '"'.$suite['php'].'"' : 'php';
-					
 					if ($runAllTests==true) {
-						$cmds=array('cd '.$path.' && '.$php.' '.$suite['codeception'].' run  --no-colors --config="'.$path.'"'.$env.' '.$verbosity);
+						$cmds=array('cd '.$path.' && php '.$suite['codeception'].' run  --no-colors --config="'.$path.'"'.$env.' '.$verbosity);
 					} else {
 						if (array_key_exists($suiteTitle,$requestedTests)) {
 							foreach($requestedTests[$suiteTitle] as $rtk => $rtv) {
-								array_push($cmds,'cd '.$path.' && '.$php.' '.$suite['codeception'].' run '.$rtv.' --no-colors --config="'.$path.'"'.$env.' '.$verbosity);
+								array_push($cmds,'cd '.$path.' && php '.$suite['codeception'].' run '.$rtv.' --no-colors --config="'.$path.'"'.$env.' '.$verbosity);
 							}
 						}
 					}
