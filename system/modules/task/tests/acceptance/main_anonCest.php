@@ -21,11 +21,11 @@ class main_anonCest
 		$I->login($this->username,$this->password);
 		$I->see($this->navSelector);
 		//$I->executeJS("$('#topnav_example a').get(0).click();");
-		$I->click('Example');
-		$I->executeInSelenium(function(\WebDriver $webDriver) {
-			$element=$webDriver->findElement(WebDriverBy::cssSelector("#topnav_example a"));
-			$element->click();
-		});
+		$I->click('#topnav_example a');
+		//$I->executeInSelenium(function(\WebDriver $webDriver) {
+		//	$element=$webDriver->findElement(WebDriverBy::cssSelector("#topnav_example a"));
+		//	$element->click();
+		//});
 		//$I->click('a','#topnav_example');
 		//$I->click(['link','Example']);
 		//$I->amOnPage('/example');
