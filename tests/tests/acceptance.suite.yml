@@ -14,15 +14,17 @@ modules:
         - WebDriver
         - AcceptanceHelper
         - Db
+        - Codeception\Extension\Phantoman
     config:
         WebDriver:
-         url: 'http://cmfive.steve/'
-         browser: firefox
-         window_size: 1024x768
-         wait: 1
-         capabilities:
-             unexpectedAlertBehaviour: 'accept'
-
+          url: 'http://cmfive.steve/'
+          browser: firefox
+          window_size: 1024x768
+          wait: 1
+          capabilities:
+            unexpectedAlertBehaviour: 'accept'
+        Codeception\Extension\Phantoman:
+          path: '/inetpub/wwwroot/cmfive-windowsAdaptation/system/composer/bin/phantomjs'
 env:
     devsteve:
         modules:

@@ -710,6 +710,10 @@ class PHP_Token_ELLIPSIS extends PHP_Token {}
 class PHP_Token_POW extends PHP_Token {}
 class PHP_Token_POW_EQUAL extends PHP_Token {}
 
+// Tokens introduced in PHP 7.0
+class PHP_Token_COALESCE extends PHP_Token {}
+class PHP_Token_SPACESHIP extends PHP_Token {}
+class PHP_Token_YIELD_FROM extends PHP_Token {}
 
 // Tokens introduced in HackLang
 class PHP_Token_TYPELIST_LT extends PHP_Token {}
@@ -719,3 +723,5 @@ class PHP_Token_SHAPE extends PHP_Token {}
 class PHP_Token_LAMBDA_OP extends PHP_Token {}
 class PHP_Token_LAMBDA_CP extends PHP_Token {}
 class PHP_Token_LAMBDA_ARROW extends PHP_Token {}
+class PHP_Token_IN extends PHP_Token {}
+class PHP_Token_JOIN extends PHP_Token {}

@@ -167,9 +167,9 @@ class PhpBrowserTest extends TestsForBrowsers
 
     public function testHeadersByConfig()
     {
-        $this->mockResponse();
         $this->module->_setConfig(['headers' => ['xxx' => 'yyyy']]);
         $this->module->_initialize();
+        $this->mockResponse();
         $this->module->amOnPage('/form1');
         $this->assertArrayHasKey('xxx', $this->module->guzzle->getDefaultOption('headers'));
         $this->assertEquals('yyyy', $this->module->guzzle->getDefaultOption('headers/xxx'));
@@ -182,12 +182,27 @@ class PhpBrowserTest extends TestsForBrowsers
         $this->assertTrue($this->history->getLastRequest()->hasHeader('xxx'));
     }
 
+    public function testDeleteHeaders()
+    {
+        $this->module->setHeader('xxx', 'yyyy');
+        $this->module->deleteHeader('xxx');
+        $this->module->amOnPage('/');
+        $this->assertFalse($this->history->getLastRequest()->hasHeader('xxx'));
+    }
+
+    public function testDeleteHeadersByEmptyValue()
+    {
+        $this->module->setHeader('xxx', 'yyyy');
+        $this->module->setHeader('xxx', '');
+        $this->module->amOnPage('/');
+        $this->assertFalse($this->history->getLastRequest()->hasHeader('xxx'));
+    }
+
     public function testCurlOptions()
     {
         $this->module->_setConfig(array('url' => 'http://google.com', 'curl' => array('CURLOPT_NOBODY' => true)));
         $this->module->_initialize();
         $this->assertTrue($this->module->guzzle->getDefaultOption('config/curl/'.CURLOPT_NOBODY));
-
     }
 
     public function testHttpAuth()
@@ -264,5 +279,24 @@ class PhpBrowserTest extends TestsForBrowsers
     {
         $this->setExpectedException("\\Codeception\\Exception\\TestRuntime");
         $this->module->fillField('#name', 'Nothing special');
+    }
+    
+    public function testArrayFieldSubmitForm()
+    {
+        $this->module->amOnPage('/form/example17');
+        $this->module->submitForm(
+            'form',
+            [
+                'FooBar' => ['bar' => 'booze'],
+                'Food' => [
+                    'beer' => [
+                        'yum' => ['yeah' => 'crunked']
+                    ]
+                ]
+            ]
+        );
+        $data = data::get('form');
+        $this->assertEquals('booze', $data['FooBar']['bar']);
+        $this->assertEquals('crunked', $data['Food']['beer']['yum']['yeah']);
     }
 }

@@ -7,7 +7,7 @@ use Codeception\Exception\Configuration as ConfigurationException;
 
 class Codecept
 {
-    const VERSION = "2.0.11";
+    const VERSION = "2.0.14";
 
     /**
      * @var \Codeception\PHPUnit\Runner
@@ -46,8 +46,11 @@ class Codecept
         'env' => null,
         'fail-fast' => false,
         'verbosity' => 1,
-        'interactive' => true
+        'interactive' => true,
+        'no-rebuild' => false
     );
+
+    protected $config = [];
 
     /**
      * @var array
@@ -70,7 +73,7 @@ class Codecept
         $this->registerPHPUnitListeners();
 
         $printer = new PHPUnit\ResultPrinter\UI($this->dispatcher, $this->options);
-        $this->runner = new PHPUnit\Runner($this->options);
+        $this->runner = new PHPUnit\Runner();
         $this->runner->setPrinter($printer);
     }
 
@@ -118,11 +121,17 @@ class Codecept
         $this->dispatcher->addSubscriber(new Subscriber\Bootstrap());
         $this->dispatcher->addSubscriber(new Subscriber\Module());
         $this->dispatcher->addSubscriber(new Subscriber\BeforeAfterTest());
-        $this->dispatcher->addSubscriber(new Subscriber\AutoRebuild());
 
         // optional
-        if (!$this->options['silent'])    $this->dispatcher->addSubscriber(new Subscriber\Console($this->options));
-        if ($this->options['fail-fast'])  $this->dispatcher->addSubscriber(new Subscriber\FailFast());
+        if (!$this->options['no-rebuild']) {
+            $this->dispatcher->addSubscriber(new Subscriber\AutoRebuild());
+        }
+        if (!$this->options['silent']) {
+            $this->dispatcher->addSubscriber(new Subscriber\Console($this->options));
+        }
+        if ($this->options['fail-fast']) {
+            $this->dispatcher->addSubscriber(new Subscriber\FailFast());
+        }
 
         if ($this->options['coverage']) {
             $this->dispatcher->addSubscriber(new Coverage\Subscriber\Local($this->options));
