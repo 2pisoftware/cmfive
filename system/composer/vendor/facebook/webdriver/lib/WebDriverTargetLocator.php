@@ -16,15 +16,7 @@
 /**
  * Used to locate a given frame or window.
  */
-class WebDriverTargetLocator {
-
-  protected $executor;
-  protected $driver;
-
-  public function __construct($executor, $driver) {
-    $this->executor = $executor;
-    $this->driver = $driver;
-  }
+interface WebDriverTargetLocator {
 
   /**
    * Switch to the main document if the page contains iframes. Otherwise, switch
@@ -32,31 +24,16 @@ class WebDriverTargetLocator {
    *
    * @return WebDriver The driver focused on the top window or the first frame.
    */
-  public function defaultContent() {
-    $this->executor->execute(DriverCommand::SWITCH_TO_FRAME, array());
-
-    return $this->driver;
-  }
+  public function defaultContent();
 
   /**
    * Switch to the iframe by its id or name.
    *
    * @param WebDriverElement|string $frame The WebDriverElement,
-                                           the id or the name of the frame.
+   *                                       the id or the name of the frame.
    * @return WebDriver The driver focused on the given frame.
    */
-  public function frame($frame) {
-    if ($frame instanceof WebDriverElement) {
-      $id = array('ELEMENT' => $frame->getID());
-    } else {
-      $id = (string)$frame;
-    }
-
-    $params = array('id' => $id);
-    $this->executor->execute(DriverCommand::SWITCH_TO_FRAME, $params);
-
-    return $this->driver;
-  }
+  public function frame($frame);
 
   /**
    * Switch the focus to another window by its handle.
@@ -65,12 +42,7 @@ class WebDriverTargetLocator {
    * @return WebDriver Tge driver focused on the given window.
    * @see WebDriver::getWindowHandles
    */
-  public function window($handle) {
-    $params = array('name' => (string)$handle);
-    $this->executor->execute(DriverCommand::SWITCH_TO_WINDOW, $params);
-
-    return $this->driver;
-  }
+  public function window($handle);
 
   /**
    * Switch to the currently active modal dialog for this particular driver
@@ -78,7 +50,13 @@ class WebDriverTargetLocator {
    *
    * @return WebDriverAlert
    */
-  public function alert() {
-    return new WebDriverAlert($this->executor);
-  }
+  public function alert();
+
+  /**
+   * Switches to the element that currently has focus within the document
+   * currently "switched to", or the body element if this cannot be detected.
+   *
+   * @return WebDriverElement
+   */
+  public function activeElement();
 }

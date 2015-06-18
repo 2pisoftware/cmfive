@@ -45,6 +45,7 @@ class Yii1 extends Client
         $_SERVER        = array_merge($_SERVER, $request->getServer());
         $_FILES         = $this->remapFiles($request->getFiles());
         $_REQUEST       = $this->remapRequestParameters($request->getParameters());
+        $_POST          = $_GET = array();
 
         if (strtoupper($request->getMethod()) == 'GET')
             $_GET = $_REQUEST;
@@ -90,8 +91,10 @@ class Yii1 extends Client
         Yii::createApplication($this->appSettings['class'], $this->appSettings['config']);
 
         // disabling logging. Logs slow down test execution
-        foreach (Yii::app()->log->routes as $route) {
-            $route->enabled = false;
+        if (Yii::app()->hasComponent('log')) {
+            foreach (Yii::app()->getComponent('log')->routes as $route) {
+                $route->enabled = false;
+            }
         }
         Yii::app()->onEndRequest->add(array($this, 'setHeaders'));
         Yii::app()->run();
