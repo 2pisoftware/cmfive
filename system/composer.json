@@ -16,5 +16,13 @@
         "nesbot/carbon": "~1.14",
         "site5/phantoman": "*",
         "jakoch/phantomjs-installer": "*"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "PhantomInstaller\\Installer::installPhantomJS"
+        ],
+        "post-update-cmd": [
+            "PhantomInstaller\\Installer::installPhantomJS"
+        ]
     }
 }
