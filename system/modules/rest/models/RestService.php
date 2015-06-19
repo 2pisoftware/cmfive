@@ -1,33 +1,34 @@
 <?php
-class RestService extends DbService {
+class RestService extends SearchableDbObject {
+
+	private $token;
 	
-	function getTokenJson($username, $password, $api) {
-		global $REST_API_KEY;
-		
-		if ($api && $api == $REST_API_KEY) {
-			$user = $this->w->Auth->login($username,$password,null,true);
-			if ($user) {
-				$session = new RestSession($this->w);
-				$session->setUser($user);
-				$session->insert();
-				return $this->successJson($session->token);
-			} else {
-				return $this->errorJson("authentication failed for ".$username.", ".$password.", ".$api);
-			}
-		} else {
-			return $this->errorJson("wrong API key");
-		}
+	function checkModuleAccess($className) {
+		// STEVER: TODO I am having problems using Config. It is not returning the expected values as per config.php. Changes are not reflected. New values are ??????
+		//if (!in_array('rest',Config::get('system.allow_module'))) return $this->errorJSON('REST module is disabled');
+		//if (!in_array($className,Config::get('system.rest_allow'))) return $this->errorJSON('REST module is not enabled for this type of record');
 	}
 	
-	/**
-	 * Check whether rest access to objects of this class is allowed at all
-	 * 
-	 * @param unknown $classname
-	 * @return boolean
-	 */
-	function checkClassAccessAllowed($classname) {
-		if (!array_search($classname, Config::get("system.rest_include"))) {
-			return $this->errorJson("restful access to {$classname} not allowed");
+	// only require API key if user is not already logged in
+	function getTokenJson($api,$username, $password) {
+		$user=$this->w->Auth->_user;
+		if (intval($user->id) > 0) { 
+			// OK
+		} else {
+			if ($api && trim($api) == trim(Config::get('system.rest_api_key'))) {
+				$user = $this->w->Auth->login($username,$password,null,true);
+			} else {
+				return $this->errorJson("wrong API key");
+			}
+		}
+		// allow for logged in user
+		if ($user) {
+			$session = new RestSession($this->w);
+			$session->setUser($user);
+			$session->insert();
+			return $this->successJson($session->token);
+		} else {
+			return $this->errorJson("authentication failed for ".$username.", ".$password.", ".$api);
 		}
 	}
 	
@@ -43,37 +44,26 @@ class RestService extends DbService {
 	 */
 	function checkTokenJson($token) {
 		if (!$token) {
-			return $this->errorJson("missing token");
+			return $this->errorJson("Missing token");
 		}
+		$this->token=$token;
 		$session = $this->getObject("RestSession", array("token"=>$token));
 		if ($session) {
 			$user = $session->getUser();
 			$this->w->Auth->setRestUser($user); 
 		} else {
-			return $this->errorJson("no session associated with this token");
+			return $this->errorJson("No session associated with this token");
 		}
 		return null;
 	}
-	
-	function getJson($classname, $id, $token) {
-		$error = $this->checkTokenJson($token);
-		if ($error) {
-			return $error;
-		}
-		
-		$o = $this->getObject($classname, $id);
-		if ($o && $o->canView($this->w->Auth->user())) {
-			return $this->successJson($o->toArray());
-		}
-	}
-		
+
 	function listJson($classname, $where, $token) {
 		$error = $this->checkTokenJson($token);
+		if (!$error) $error = $this->checkModuleAccess($classname);
 		if ($error) {
 			return $error;
 		}
-				
-		$os = $this->getObjects($classname, $where);
+		$os = $this->searchObjects($classname, $where);
 		if ($os) {
 			foreach ($os as $o) {
 				if ($o->canView($this->w->Auth->user())) {
@@ -81,54 +71,72 @@ class RestService extends DbService {
 				}
 			}
 			return $this->successJson($ar);
+		} else {
+			return $this->successJson([]);
 		}
 		
 	}
 	
+	private function _saveNew($classname,$record) {
+		$o = new $classname($this->w);
+		$o->fill($record);
+		$o->insert();	
+		$o->id=$this->w->ctx('db_inserts')[$classname][0];
+		http_response_code(201);
+		header('Location: '.$this->w->webroot().'/rest/index/'.$classname.'/id/'.$o->id."/?token=".$this->token);
+		return $this->successJson($o->toArray());
+	} 
 	
-	function findJson($classname, $query, $token) {
+	function saveJson($classname, $id, $record, $token) {
 		$error = $this->checkTokenJson($token);
+		if (!$error) $error = $this->checkModuleAccess($classname);
 		if ($error) {
 			return $error;
 		}
-				
-	}
-	
-	
-	function createJson($classname, $json, $token) {
-		$error = $this->checkTokenJson($token);
-		if ($error) {
-			return $error;
+		if (intval($id)>0) { 
+			$o = $this->getObject($classname, $id);
+			if ($o) {
+				if ($o->canEdit($this->w->Auth->user())) {
+					// convert json into array and update object
+					//$ar = json_decode($json,true);
+					$o->fill($record);
+					$o->update();
+					http_response_code(204);
+					//header('Location: '.$this->w->webroot().'/rest/index/'.$classname.'/id/'.$o->id."/?token=".$this->token);
+					return $this->successJson($o->toArray());
+				} else {
+					http_response_code(403);
+					return $this->errorJson('Not allowed');
+				}
+			} else {
+				return $this->_saveNew($classname,$record);
+			}
+		} else {
+			return $this->_saveNew($classname,$record);
 		}
-				
-	}
-	
-	
-	function updateJson($classname, $id, $json, $token) {
-		$error = $this->checkTokenJson($token);
-		if ($error) {
-			return $error;
-		}
-				
-		$o = $this->getObject($classname, $id);
-		if ($o && $o->canEdit($this->w->Auth->user())) {
-			// convert json into array and update object
-			$ar = json_decode($json,true);
-			$o->fill($ar);
-			$o->update();
-		}		
 	}
 	
 	
 	function deleteJson($classname, $id, $token) {
 		$error = $this->checkTokenJson($token);
+		if (!$error) $error = $this->checkModuleAccess($classname);
 		if ($error) {
 			return $error;
 		}
 				
 		$o = $this->getObject($classname, $id);
-		if ($o && $o->canDelete($this->w->Auth->user())) {
-			$o->delete();
+		if ($o) {
+			if ($o && $o->canDelete($this->w->Auth->user())) {
+				$o->delete();
+				http_response_code(204);
+				return $this->successJSON('deleted');
+			} else {
+				http_response_code(403);
+				return $this->errorJSON('Not allowed to delete this record');
+			}
+		} else {
+			http_response_code(404);
+			return $this->errorJSON('Cannot find record to delete');
 		}
 	}
 	

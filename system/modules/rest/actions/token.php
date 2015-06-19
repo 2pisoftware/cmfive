@@ -4,5 +4,6 @@ function token_GET(Web &$w) {
 	$username = $w->request("username");
 	$password = $w->request("password");
 	$api = $w->request("api");
-	$w->out($w->Rest->getTokenJson($username,$password,$api));
+	$w->out($w->Rest->getTokenJson($api,$username,$password));
 }
+?>
