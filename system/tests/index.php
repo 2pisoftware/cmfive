@@ -55,7 +55,8 @@ function copy_r( $path, $dest )
             return false;
         }
     }
-function getRequestUrl() {
+    
+ function getRequestUrl() {
 	$requestScheme='http';
 	//  IIS
 	if (array_key_exists('HTTPS',$_SERVER) && $_SERVER['HTTPS']=='on') {
@@ -66,13 +67,10 @@ function getRequestUrl() {
 	}
 	return $requestScheme.'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
 }
-
-    
     
 // prep HTML for tabs
 function renderSuitesBlock($suites,$key,$keyid) {
-	$requestUrl=getRequestUrl();
-
+	$requestUrl=getRequestUrl();   
 	
 	$suiteMenu='';
 	foreach ($suites as $url =>$suite) {
@@ -157,7 +155,13 @@ function renderSuitesBlock($suites,$key,$keyid) {
 	<script src='../templates/js/foundation-5.5.0/js/vendor/jquery.js'></script>
 	<script src='../templates/js/foundation-5.5.0/js/foundation.min.js'></script>
 	<script src='testsuite.js' ></script>
-	
+	<style>
+	body.disabled {
+		border:4px solid orange;
+		background-color: lightgrey;
+		opacity: 0.7;
+	}
+	</style>
 </head>	
 
 <body>

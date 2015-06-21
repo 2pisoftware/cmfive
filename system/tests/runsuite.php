@@ -301,6 +301,3 @@ function runTests($suites,$requestUrl) {
 		echo "Done</div>";
 		ob_end_flush();	
 } ?>
-
-
- 

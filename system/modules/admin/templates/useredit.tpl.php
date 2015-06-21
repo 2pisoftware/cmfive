@@ -1,5 +1,5 @@
 <?php if ($user) : ?>
-<?php if ($box) : ?><h1>Edit User</h1><?php endif; ?>
+<?php if (isset($box)) : ?><h1>Edit User</h1><?php endif; ?>
 <?php
     $contact = $user->getContact();
     $form['User Details'][]=array(

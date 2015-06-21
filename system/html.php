@@ -150,7 +150,7 @@ class Html {
         $a->href($href)->text($title)->setClass($class)->confirm($confirm)->target($target);
         return $a->__toString();
     }
-
+    
     public static function b($href, $title, $confirm = null, $id = null, $newtab = false, $class = null, $type = null) {
         $button = new \Html\button();
         $button->href($href)->text($title)->confirm($confirm)->id($id)->setClass($class)->newtab($newtab)->type($type);

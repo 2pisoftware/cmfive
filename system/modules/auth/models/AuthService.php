@@ -168,6 +168,11 @@ class AuthService extends DbService {
                     $user->addRole("user");
                     $user->is_admin = 1;
                     $user->update();
+                } else {
+					$contact=$user->getContact();
+					$contact->firstname = !empty($info[0]["givenname"][0]) ? $info[0]["givenname"][0] : $username;
+                    $contact->lastname = !empty($info[0]["sn"][0]) ? $info[0]["sn"][0] : '';
+                    $contact->update();
                 }
                 
                 $this->forceLogin($user->id);
@@ -181,7 +186,11 @@ class AuthService extends DbService {
                     return $url ? $url : true;
                 }
             } else {
-                return $url ? $url : true;
+                if ($this->loggedIn())  {
+					return $url ? $url : true;
+				} else {
+					return false;
+				}
             }
         }
         

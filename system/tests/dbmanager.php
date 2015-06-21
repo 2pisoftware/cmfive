@@ -3,13 +3,14 @@
  * This page runs test suites as per request parameters
  * and streams HTML output as test run executes
  */
+try {
+
 include('lib/class.Diff.php');
-include('lib/Mysqldump.php');
-include('tests/Spyc.php'); 
-// MYSQLDIFF
+include('lib/Spyc.php'); 
 include_once 'lib/exception.php';
-include_once 'lib/dbStruct.php';
 include_once 'lib/Source.php';
+include_once 'lib/dbStruct.php';
+include('lib/Mysqldump.php');
 
 // output control
 define('DS', DIRECTORY_SEPARATOR); 
@@ -24,47 +25,50 @@ function getRequestUrl() {
 	}
 	return $requestScheme.'://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
 }
-$requestUrl=getRequestUrl();
+	$requestUrl=getRequestUrl();
 
-$folder='';
-if (DS=='/') {
-	$folder=str_replace('\\','/',dirname($_SERVER['SCRIPT_FILENAME']));
-} else {
-	$folder=str_replace('/','\\',dirname($_SERVER['SCRIPT_FILENAME']));
-} 
-// config 
-include(dirname(dirname($folder)).DS.'tests'.DS.'suites.php');
-// ensure dumps folder
-						
-// MAIN CONTROLLER
-if (array_key_exists('key',$_GET) && $_GET['key']==md5('secretfortestingcmfive'.$_GET['keyid'])) {
-	if (array_key_exists('savesnapshot',$_GET) ){ 
-		saveSnapshot($suites,$_GET['savesnapshot']);
-	} else if (array_key_exists('listsnapshots',$_GET)) {
-		listSnapshots($suites);
-//LOAD
-	} else if (array_key_exists('loadsnapshot',$_GET) && strlen($_GET['loadsnapshot'])>0) {
-		loadSnapshot($suites,$_GET['loadsnapshot']);
-//DOWNLOAD
-	} else if (array_key_exists('downloadsnapshot',$_GET) && strlen($_GET['downloadsnapshot'])>0) {
-		downloadSnapshot($suites);
-//DELETE
-	} else if (array_key_exists('deletesnapshot',$_GET) && strlen($_GET['deletesnapshot'])>0) {
-		deleteSnapshot($suites);
-// RESET DATABASES
-	} else if (array_key_exists('checkmysqldiffs',$_GET) && $_GET['checkmysqldiffs']=='1') {
-		checkMysqlDiffs($suites);
-	} else if (array_key_exists('listmysqldiffs',$_GET) && $_GET['listmysqldiffs']=='1') {
-		listMysqlDiffs($suites);
-	} else if (array_key_exists('runmysqldiffs',$_GET) && $_GET['runmysqldiffs']=='1') {
-		runMysqlDiffs($suites);
-	} else if (array_key_exists('resetsystemdatabases',$_GET) && $_GET['resetsystemdatabases']=='1') {
-		resetSystemDatabases($suites);
+	$folder='';
+	if (DS=='/') {
+		$folder=str_replace('\\','/',dirname($_SERVER['SCRIPT_FILENAME']));
 	} else {
-		runTests($suites,$requestUrl);
+		$folder=str_replace('/','\\',dirname($_SERVER['SCRIPT_FILENAME']));
+	} 
+	// config 
+	include(dirname(dirname($folder)).DS.'tests'.DS.'suites.php');
+	// ensure dumps folder
+							
+	// MAIN CONTROLLER
+	if (array_key_exists('key',$_GET) && $_GET['key']==md5('secretfortestingcmfive'.$_GET['keyid'])) {
+		if (array_key_exists('savesnapshot',$_GET) ){ 
+			saveSnapshot($suites,$_GET['savesnapshot']);
+		} else if (array_key_exists('listsnapshots',$_GET)) {
+			listSnapshots($suites);
+	//LOAD
+		} else if (array_key_exists('loadsnapshot',$_GET) && strlen($_GET['loadsnapshot'])>0) {
+			loadSnapshot($suites,$_GET['loadsnapshot']);
+	//DOWNLOAD
+		} else if (array_key_exists('downloadsnapshot',$_GET) && strlen($_GET['downloadsnapshot'])>0) {
+			downloadSnapshot($suites);
+	//DELETE
+		} else if (array_key_exists('deletesnapshot',$_GET) && strlen($_GET['deletesnapshot'])>0) {
+			deleteSnapshot($suites);
+	// RESET DATABASES
+		} else if (array_key_exists('checkmysqldiffs',$_GET) && $_GET['checkmysqldiffs']=='1') {
+			checkMysqlDiffs($suites);
+		} else if (array_key_exists('listmysqldiffs',$_GET) && $_GET['listmysqldiffs']=='1') {
+			listMysqlDiffs($suites);
+		} else if (array_key_exists('runmysqldiffs',$_GET) && $_GET['runmysqldiffs']=='1') {
+			runMysqlDiffs($suites);
+		} else if (array_key_exists('resetsystemdatabases',$_GET) && $_GET['resetsystemdatabases']=='1') {
+			resetSystemDatabases($suites);
+		} else {
+			runTests($suites,$requestUrl);
+		}
+	} else {
+		echo "Permission denied";
 	}
-} else {
-	echo "Permission denied";
+} catch (Exception $e) {
+	var_dump($e);
 }
 
 function getMysqlDiffs($options,$suite,$safeUpdates=true) {
@@ -696,4 +700,3 @@ function runTests($suites,$requestUrl) {
 		
 		ob_end_flush();	
 }
-

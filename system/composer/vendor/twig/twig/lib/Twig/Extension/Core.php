@@ -617,7 +617,7 @@ function twig_urlencode_filter($url)
     return rawurlencode($url);
 }
 
-if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+if (PHP_VERSION_ID < 50300) {
     /**
      * JSON encodes a variable.
      *
@@ -707,7 +707,7 @@ function twig_slice(Twig_Environment $env, $item, $start, $length = null, $prese
             $item = $item->getIterator();
         }
 
-        if ($start >= 0 && $length >= 0) {
+        if ($start >= 0 && $length >= 0 && $item instanceof Iterator) {
             try {
                 return iterator_to_array(new LimitIterator($item, $start, $length === null ? -1 : $length), $preserveKeys);
             } catch (OutOfBoundsException $exception) {
@@ -921,7 +921,9 @@ function twig_reverse_filter(Twig_Environment $env, $item, $preserveKeys = false
 /**
  * Sorts an array.
  *
- * @param array $array An array
+ * @param array $array
+ *
+ * @return array
  */
 function twig_sort_filter($array)
 {
@@ -952,6 +954,8 @@ function twig_in_filter($value, $compare)
  * @param string           $strategy   The escaping strategy
  * @param string           $charset    The charset
  * @param bool             $autoescape Whether the function is called by the auto-escaping feature (true) or by the developer (false)
+ *
+ * @return string
  */
 function twig_escape_filter(Twig_Environment $env, $string, $strategy = 'html', $charset = null, $autoescape = false)
 {
@@ -1073,9 +1077,7 @@ function twig_escape_filter(Twig_Environment $env, $string, $strategy = 'html', 
             return $string;
 
         case 'url':
-            // hackish test to avoid version_compare that is much slower, this works unless PHP releases a 5.10.*
-            // at that point however PHP 5.2.* support can be removed
-            if (PHP_VERSION < '5.3.0') {
+            if (PHP_VERSION_ID < 50300) {
                 return str_replace('%7E', '~', rawurlencode($string));
             }
 
@@ -1400,11 +1402,13 @@ function twig_test_iterable($value)
 /**
  * Renders a template.
  *
- * @param string|array $template       The template to render or an array of templates to try consecutively
- * @param array        $variables      The variables to pass to the template
- * @param bool         $with_context   Whether to pass the current context variables or not
- * @param bool         $ignore_missing Whether to ignore missing templates or not
- * @param bool         $sandboxed      Whether to sandbox the template or not
+ * @param Twig_Environment $env
+ * @param array            $context
+ * @param string|array     $template      The template to render or an array of templates to try consecutively
+ * @param array            $variables     The variables to pass to the template
+ * @param bool             $withContext
+ * @param bool             $ignoreMissing Whether to ignore missing templates or not
+ * @param bool             $sandboxed     Whether to sandbox the template or not
  *
  * @return string The rendered template
  */

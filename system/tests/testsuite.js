@@ -1,9 +1,9 @@
 
 var testsRunning=false;
 // prevent close window losing test results
-window.onbeforeunload = function() {
-    return 'You will lose your test results!';
-}
+//window.onbeforeunload = function() {
+//    return 'You will lose your test results!';
+//}
 window.onerror = function(message, url, lineNumber) {  
   //save error and send to server for example.
   console.log(message,url,lineNumber);
@@ -106,8 +106,8 @@ function initialisePage() {
 	
 	function startTests(tests) {
 		if ($('#testsenabled:checked').length>0) {
-			$('.errorcontentmessage').html('');
 			UIStartTests();
+			$('.testdetailsreveal').html('');
 			xhr= new XMLHttpRequest();
 			var lastContent='';
 			var currentContent='';
@@ -278,12 +278,13 @@ function UIStartTests() {
 	testsRunning=true;
 	$('#runbutton').hide();
 	$('#stopbutton').show();
+	$('body').addClass('disabled');
 }
 function UIStopTests() {
 	testsRunning=false;
 	$('#runbutton').show();
 	$('#stopbutton').hide();
-	
+	$('body').removeClass('disabled');
 }
 
 
@@ -385,7 +386,7 @@ function updatePage(latestContent) {
 					showButton='<a href="#" class="showerrorbutton button tiny" data-reveal-id="logfile-'+$(newContent).data('testid')+'">Show</a> ';
 				}
 				
-				test.append($('<span>&nbsp;</span><a href="#" class="detailsbutton button tiny" data-reveal-id="testdetails-'+$(newContent).data('testid')+'">Details</a>&nbsp;&nbsp;&nbsp;'+showButton+' <div id="testdetails-'+$(newContent).data('testid')+'" class="reveal-modal errorcontentmessage" data-reveal aria-hidden="true" role="dialog">'+newContent.html()+'<a class="close-reveal-modal" aria-label="Close">&#215;</a></div>'));
+				test.append($('<span>&nbsp;</span><a href="#" class="detailsbutton button tiny" data-reveal-id="testdetails-'+$(newContent).data('testid')+'">Details</a>&nbsp;&nbsp;&nbsp;'+showButton+' <div id="testdetails-'+$(newContent).data('testid')+'" class="testdetailsreveal reveal-modal" data-reveal aria-hidden="true" role="dialog">'+newContent.html()+'<a class="close-reveal-modal" aria-label="Close">&#215;</a></div>'));
 			}
 			$(document).foundation(); // {'reveal': {'close_on_background_click': true,'close_on_esc': true}});
 		} else if ($(newContent).hasClass('phperror')) {

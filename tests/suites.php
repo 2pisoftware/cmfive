@@ -11,6 +11,7 @@
 function getSuitePaths($basePath) {
 	return array(
 		'tasks'=>$basePath.''.DIRECTORY_SEPARATOR.'system'.DIRECTORY_SEPARATOR.'modules'.DIRECTORY_SEPARATOR.'task',
+		'rest'=>$basePath.''.DIRECTORY_SEPARATOR.'system'.DIRECTORY_SEPARATOR.'modules'.DIRECTORY_SEPARATOR.'rest',
 		//'frontend'=>$basePath.DIRECTORY_SEPARATOR.'modules'.DIRECTORY_SEPARATOR.'frontend',
 		'admin'=>$basePath.DIRECTORY_SEPARATOR.'system'.DIRECTORY_SEPARATOR.'modules'.DIRECTORY_SEPARATOR.'admin'
 	);
@@ -46,12 +47,24 @@ $steveDevConfig=array_merge(
 	'env'=>'devsteve'
 ),$wampConfig);
 
+$steveIISConfig=array(
+	// base install path
+	'basepath'=>'c:\inetpub\wwwroot\cmfive-windowsAdaptation',
+	// inject paths matching basepath
+	'paths'=>getSuitePaths('c:\inetpub\wwwroot\cmfive-windowsAdaptation'),
+	// location of codeception executable phar
+	'codeception' =>getCodeceptionPath('c:\inetpub\wwwroot\cmfive-windowsAdaptation'),
+	// mapping to codeception environment for variable db connection and site URL.
+	'env'=>'devsteve',
+	'phpLogFile'=>'c:\Windows\Temp\PHP56ForIISExpress_errors.log',
+	'php' => 'C:\Program Files (x86)\PHP\v5.6\php.exe'
 
+);
 
 // MAPPING OF URLS TO TEST CONFIGS
 $suites=array(
 	// dev steve
-	'http://cmfive.steve'=>$steveDevConfig,
+	'http://cmfive.steve'=>$steveIISConfig,
 	// test site
 	//'http://cmfive.dev.code.2pisoftware.com/' =>$testConfig,
 );
