@@ -3,9 +3,17 @@ class RestService extends DbService {
 	
 	function getTokenJson($username, $password, $api) {
 		global $REST_API_KEY;
-		
+		$REST_API_KEY=Config::get('system.rest_api_key');
 		if ($api && $api == $REST_API_KEY) {
-			$user = $this->w->Auth->login($username,$password,null,true);
+			// already logged in ?
+			$user;
+			if ($this->w->Auth->loggedIn()) {
+				$user=$this->w->Auth->user();
+			} else {
+				$user = $this->w->Auth->login($username,$password,null,true);
+			}
+			
+			
 			if ($user) {
 				$session = new RestSession($this->w);
 				$session->setUser($user);
