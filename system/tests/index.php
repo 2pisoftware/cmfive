@@ -155,7 +155,13 @@ function renderSuitesBlock($suites,$key,$keyid) {
 	<script src='../templates/js/foundation-5.5.0/js/vendor/jquery.js'></script>
 	<script src='../templates/js/foundation-5.5.0/js/foundation.min.js'></script>
 	<script src='testsuite.js' ></script>
-	
+	<style>
+	body.disabled {
+		border:4px solid orange;
+		background-color: lightgrey;
+		opacity: 0.7;
+	}
+	</style>
 </head>	
 
 <body>
