@@ -499,4 +499,31 @@ class Task extends DbObject {
         return $this->Task->getTaskGroup($this->task_group_id);
     }
 
+    function getIcal() {
+        if (empty($this->id) || empty($this->dt_due)) {
+            return null;
+        }
+        
+        $date = date("Ymd", strtotime(str_replace('/', '-', $this->dt_due)));
+
+        // Borrowed from here http://stackoverflow.com/questions/1463480/how-can-i-use-php-to-dynamically-publish-an-ical-file-to-be-read-by-google-calen
+        $ical = "BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//hacksw/handcal//NONSGML v1.0//EN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:" . md5(uniqid(mt_rand(), true)) . "@2pisoftware.com
+DTSTAMP:" . gmdate('Ymd').'T'. gmdate('His') . "Z
+DTSTART;VALUE=DATE:" . $date . "
+DTEND;VALUE=DATE:" . $date . "
+SUMMARY:" . $this->title . "
+DESCRIPTION:" . htmlentities($this->description) . "
+SEQUENCE:0
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR";
+        
+        return $ical;
+    }
+    
 }
