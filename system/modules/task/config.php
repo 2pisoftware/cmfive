@@ -12,4 +12,7 @@ Config::set('task', array(
         'comment',
         'attachment'
     ),
+    'ical' => array(
+        'send' => false
+    )
 ));
