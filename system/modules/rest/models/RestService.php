@@ -5,12 +5,22 @@ class RestService extends SearchableDbObject {
 	
 	function checkModuleAccess($className) {
 		// STEVER: TODO I am having problems using Config. It is not returning the expected values as per config.php. Changes are not reflected. New values are ??????
-		//if (!in_array('rest',Config::get('system.allow_module'))) return $this->errorJSON('REST module is disabled');
-		//if (!in_array($className,Config::get('system.rest_allow'))) return $this->errorJSON('REST module is not enabled for this type of record');
+		if (!in_array('rest',Config::get('system.allow_module'))) return $this->errorJSON('REST module is disabled');
+		//var_dump(Config::get('system'));
+		//die();
+		$allowed="None";
+		if (is_array(Config::get('system.rest_allow'))) {
+			$allowed=implode(",",Config::get('system.rest_allow'));
+			if (!in_array($className,Config::get('system.rest_allow'))) {
+				return $this->errorJSON('REST module is not enabled for this type of record('.$className.')- allowed '.$allowed);
+			}
+		} else {
+			return $this->errorJSON('REST module is not enabled for this type of record('.$className.') - allowed '.$allowed);
+		}
 	}
 	
 	// only require API key if user is not already logged in
-	function getTokenJson($api,$username, $password) {
+	function getTokenJson($api='',$username='', $password='') {
 		$user=$this->w->Auth->_user;
 		if (intval($user->id) > 0) { 
 			// OK
@@ -43,16 +53,20 @@ class RestService extends SearchableDbObject {
 	 * @return unknown
 	 */
 	function checkTokenJson($token) {
-		if (!$token) {
-			return $this->errorJson("Missing token");
-		}
-		$this->token=$token;
-		$session = $this->getObject("RestSession", array("token"=>$token));
-		if ($session) {
-			$user = $session->getUser();
-			$this->w->Auth->setRestUser($user); 
-		} else {
-			return $this->errorJson("No session associated with this token");
+		$user=$this->w->Auth->user();
+		// bypass token if user is logged in
+		if (empty($user)) {
+			if (!$token) {
+				return $this->errorJson("Missing token");
+			}
+			$this->token=$token;
+			$session = $this->getObject("RestSession", array("token"=>$token));
+			if ($session) {
+				$user = $session->getUser();
+				$this->w->Auth->setRestUser($user); 
+			} else {
+				return $this->errorJson("No session associated with this token");
+			}
 		}
 		return null;
 	}
