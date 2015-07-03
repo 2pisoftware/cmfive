@@ -10,7 +10,6 @@ class AuthService extends DbService {
 	function login($login, $password, $client_timezone, $skip_session = false) {
 		// $password = User::encryptPassword($password);
 		// $user_data = $this->_db->get("user")->where("login", $login)->and("password", $password)->and("is_active", "1")->and("is_deleted", "0")->fetch_row();
-
 		 
 		$credentials['login']=$login;
 		$credentials['password']=$password;
@@ -25,7 +24,8 @@ class AuthService extends DbService {
 			}
 		}
 
-		//check if credential pass against cmfive user table.
+		//check if credentials pass against cmfive user table
+		//if so set user else abort.
 		if (empty($user)) {
 			echo "empty user";
 			$user = $this->getUserForLogin($login);
@@ -44,9 +44,6 @@ class AuthService extends DbService {
 			$this->w->session('timezone', $client_timezone);
 		}
 		return $user;
-		// } else {
-		//     return null;
-		// }
 	}
 
 	function forceLogin($user_id = null) {
