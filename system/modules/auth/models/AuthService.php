@@ -10,11 +10,11 @@ class AuthService extends DbService {
 	function login($login, $password, $client_timezone, $skip_session = false) {
 		// $password = User::encryptPassword($password);
 		// $user_data = $this->_db->get("user")->where("login", $login)->and("password", $password)->and("is_active", "1")->and("is_deleted", "0")->fetch_row();
-		 
+			
 		$credentials['login']=$login;
 		$credentials['password']=$password;
 		//allow pre login hook for alternative authentications.
-		//this hook returns $hook_results[$module] and $hook_results[0]=$user or null. 
+		//this hook returns $hook_results[$module] and $hook_results[0]=$user or null.
 		$hook_results = $this->w->callHook("core_auth", "prelogin", $credentials);
 		foreach($hook_results as $module => $hook_result) {
 			//@TODO: check config for $module.optional or $module.manditory. default to optional for now.
@@ -33,7 +33,7 @@ class AuthService extends DbService {
 				return null;
 			}
 		}
-		
+
 
 		// if ($user_data != null) {
 		// $user = new User($this->w);
