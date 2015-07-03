@@ -581,3 +581,46 @@ function is_associative_array($array) {
 function is_complete_associative_array($array) {
     return (bool) (count(array_filter(array_keys($array), 'is_string')) == count($array));
 }
+
+/**
+ * Returns whether or not a given number ($subject) is within the bounds
+ * $min and $max. $include is for whether or not to include $min and $max 
+ * in boundary.
+ * 
+ * I.e. If $min = 1, $max = 10 and $subject is 10:
+ *      $include == true will return true (1 <= 10 <= 10 is true)
+ *      $include == false will return false (1 < 10 < 10 is false)
+ * 
+ * @param <float> $subject
+ * @param <float> $min
+ * @param <float> $max
+ * @param <boolean> $include
+ * @return <boolean>
+ */
+function in_numeric_range($subject, $min, $max, $include = true) {
+    // Sanity checks
+    if (!is_numeric($subject) || !is_numeric($min) || !is_numeric($max)) {
+        return false;
+    }
+    
+    // Check if bounds given in wrong order
+    // Has effect of checking outside the boundary
+    if ($max < $min) {
+        if (true === $include) {
+            return ($subject <= $min || $subject >= $max);
+        } else {
+            return ($subject < $min || $subject > $max);
+        }
+    }
+    // For cases where for some reason all given vars are the same
+    if ($min === $max && $min === $subject) {
+        return $include;
+    }
+    
+    // Check
+    if (true === $include) {
+        return ($subject >= $min && $subject <= $max);
+    } else {
+        return $subject > $min && $subject < $max;
+    }
+}
