@@ -137,5 +137,13 @@ class Config {
     public static function dump() {
         var_dump(self::$register);
     }
+    
+    public static function toJson() {
+    	return json_encode(self::$register);
+    }
+    
+    public static function fromJson($string){
+    	self::$register = json_decode($string,true);
+    }
 }
     
