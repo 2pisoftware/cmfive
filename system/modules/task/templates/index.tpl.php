@@ -13,8 +13,6 @@
     <div class="small-12 large-4 columns panel" data-equalizer-watch>
         <div style='position: relative; top: 50%; transform: translateY(-50%);'>
             <h2 class="text-center"><?php echo Html::a($w->localUrl("/task/tasklist?assignee_id=" . $w->Auth->user()->id), (count($tasks) . " Task" . (count($tasks) == 1 ? "" : "s"))); ?> <small>assigned to you</small></h2>
-            <hr style="margin: 5px 0px;"/>
-            <p class="text-center" style="margin-bottom: 0px;">out of <?php echo $total_tasks; ?> total task<?php echo $total_tasks == 1 ? "" : "s"; ?></p>
         </div>
     </div>
     <div class="small-12 large-4 columns panel" data-equalizer-watch>
