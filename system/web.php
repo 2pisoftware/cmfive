@@ -126,8 +126,13 @@ class Web {
     			return true;
     		}
     	}
-    	// 3. classfile has yet to be loaded
+    	// 3. class has to be found the hard way
         $modules = $this->modules();
+        
+        // create the class cache file
+        if (!file_exists($classdirectory_cache_file)) {
+        	file_put_contents($classdirectory_cache_file,"<?php\n");
+        }
         foreach ($modules as $model) {
             // Check if the hosting module is active before we autoload it
             if (Config::get("{$model}.active") === true) {
@@ -135,7 +140,7 @@ class Web {
                 if (file_exists($file)) {
                     require_once $file;
                     // add this class file to the cache file
-                    file_put_contents($classdirectory_cache_file,'<?php $this->_classdirectory["'.$className.'"]="'.$file.'";'."?>\n", FILE_APPEND);
+                    file_put_contents($classdirectory_cache_file,'$this->_classdirectory["'.$className.'"]="'.$file.'";'."\n", FILE_APPEND);
                     return true;
                 } else {
                     // Try a lower case version
@@ -143,7 +148,7 @@ class Web {
                     if (file_exists($file)) {
                         require_once $file;
                         // add this class file to the cache file
-                    	file_put_contents($classdirectory_cache_file,'<?php $this->_classdirectory["'.$className.'"]="'.$file.'";'."?>\n", FILE_APPEND);
+                    	file_put_contents($classdirectory_cache_file,'$this->_classdirectory["'.$className.'"]="'.$file.'";'."\n", FILE_APPEND);
                         return true;
                     }
                 }
