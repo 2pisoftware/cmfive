@@ -14,26 +14,30 @@ class AuthService extends DbService {
 		$credentials['login']=$login;
 		$credentials['password']=$password;
 		//allow pre login hook for alternative authentications.
-		//this hook returns $hook_results[$module] and $hook_results[0]=$user or null.
+		//this hook returns $hook_results[$module][0]=$user or null.
 		$hook_results = $this->w->callHook("core_auth", "prelogin", $credentials);
 		foreach($hook_results as $module => $hook_result) {
-			//@TODO: check config for $module.optional or $module.manditory. default to optional for now.
+			//@TODO: check config for $module.optional or $module.manditory. default to optional for now. if maditory returns nulls then return null.
 			$user = $hook_result[0];
 			if (!empty($user)) {
 				break;
 			}
 		}
 
-		//check if credentials pass against cmfive user table
+		//if no valid user check if credentials pass against cmfive user table
 		//if so set user else abort.
 		if (empty($user)) {
 			echo "empty user";
 			$user = $this->getUserForLogin($login);
+			if (empty($user)) {
+				return null;
+			}
 			if ($user->encryptPassword($password) !== $user->password) {
 				return null;
 			}
 		}
-
+		
+		$hook_results = $this->w->callHook("core_auth", "postlogin", $user);
 
 		// if ($user_data != null) {
 		// $user = new User($this->w);
@@ -115,9 +119,43 @@ class AuthService extends DbService {
 			$this->Log->error("Denied access: module '". urlencode($parts['module']). "' doesn't exist");
 			return false;
 		}
-
-		// First, check for Windows pass through auth
+		if ($this->loggedIn())  {
+			return $url ? $url : true;
+		}
+		
+		if ((function_exists("anonymous_allowed") && anonymous_allowed($this->w, $path)) ||
+		($this->user() && $this->user()->allowed($path))) {
+			return $url ? $url : true;
+		}
+		
 		if (Config::get('system.use_passthrough_authentication') === TRUE) {
+			if (!empty($_SERVER['AUTH_USER'])) {
+				// Get the username
+				$username = explode('\\', $_SERVER["AUTH_USER"]);
+				$username = end($username);
+				$this->w->Log->debug("Passthrough Username: " . $username);
+				
+				//this hook returns $hook_results[$module][0]=$user or null.
+				$hook_results = $this->w->callHook("core_auth", "get_authenticated_user", $username);
+				foreach($hook_results as $module => $hook_result) {
+					$user = $hook_result[0];
+					if (!empty($user)) {
+						break;
+					}
+				}
+			}
+		}
+		if (empty($user)) {
+			return false;
+		}		
+		$this->forceLogin($user->id);
+		if ($this->loggedIn()) {
+			return $url ? $url : true;
+		}
+		return false;
+		// First, check for IIS pass through auth
+		// Warning: cmfive does not yet support ldap auth.
+/*		if (Config::get('system.use_passthrough_authentication') === TRUE) {
 			if (!empty($_SERVER['AUTH_USER']) && !$this->loggedIn()) {
 				// Get the username
 				$username = explode('\\', $_SERVER["AUTH_USER"]);
@@ -125,7 +163,8 @@ class AuthService extends DbService {
 
 				$this->w->Log->debug("Username: " . $username);
 
-				// Authenticate agaianst LDAP
+				//if (Config::get('system.use_passthrough_authentication') === TRUE)
+				// Authendocumentatedticate agaianst LDAP
 				$ldap = ldap_connect(Config::get("system.ldap.host"), Config::get("system.ldap.port"));
 
 				if (!$ldap) {
@@ -146,7 +185,7 @@ class AuthService extends DbService {
 
 				$info = ldap_get_entries($ldap, $search_results);
 
-				// var_dump($info); die();
+				// var_dump($info); diedocumentated();
 
 				if ($info['count'] == 0) {
 					$this->w->Log->error("LDAP Info: " . json_encode($info));
@@ -165,7 +204,7 @@ class AuthService extends DbService {
 					}
 				}
 
-				// Try and find the user locally
+				// Try and find the user locally if not create a user based ldap details.
 				$user = $this->getObject("User", array("login" => $username));
 				if (empty($user)) {
 					$contact = new Contact($this->w);
@@ -192,43 +231,7 @@ class AuthService extends DbService {
 					$contact->lastname = !empty($info[0]["sn"][0]) ? $info[0]["sn"][0] : '';
 					$contact->update();
 				}
-
-				$this->forceLogin($user->id);
-
-				// Let modules know that a user successfully authenticated
-				$this->w->callHook("core_auth", "ldap_user_authenticated", $user);
-
-				// Here is where we introduce LDAP support and check against windows server user records for access
-				// For testing, allow everything
-				if (!empty($user->id)) {
-					return $url ? $url : true;
-				}
-			} else {
-				if ($this->loggedIn())  {
-					return $url ? $url : true;
-				} else {
-					return false;
-				}
-			}
-		}
-		if (Config::get('system.use_passthrough_authentication') === TRUE) {
-			// Allow module based validation via hooks
-			$hook_results = $this->w->callHook("core_auth", "prelogin", $info);
-			foreach($hook_results as $hook_result) {
-				if ($hook_result === FALSE) {
-					return false;
-				}
-			}
-		}
-			
-
-
-		if ((function_exists("anonymous_allowed") && anonymous_allowed($this->w, $path)) ||
-		($this->user() && $this->user()->allowed($path))) {
-			return $url ? $url : true;
-		}
-
-		return false;
+*/
 	}
 
 	/**
