@@ -17,7 +17,7 @@ class AuthService extends DbService {
 		//this hook returns $hook_results[$module][0]=$user or null.
 		$hook_results = $this->w->callHook("core_auth", "prelogin", $credentials);
 		foreach($hook_results as $module => $hook_result) {
-			//@TODO: check config for $module.optional or $module.manditory. default to optional for now. if maditory returns nulls then return null.
+			//@TODO: check config for $module.optional or $module.manditory. default to optional for now. if any manditory returns null then return null.
 			$user = $hook_result[0];
 			if (!empty($user)) {
 				break;
