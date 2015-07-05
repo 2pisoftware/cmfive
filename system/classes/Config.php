@@ -25,6 +25,8 @@ class Config {
     
     // Storage array
     private static $register = array();
+    private static $_config_cache = array();
+    private static $_keys_cache;
     
     /**
      * This function will set a key in an array
@@ -35,16 +37,15 @@ class Config {
      * @return null
      */
     public static function set($key, $value) {
-        $exploded_key = explode('.', $key);
+        $exploded_key = explode('.', strtolower($key));
         if (!empty($exploded_key)) {
             $register = &self::$register;
             // Loop through each key
             foreach($exploded_key as $ekey) {
-                $i_ekey = strtolower($ekey);
-                if (!array_key_exists($i_ekey, $register)) {
-                    $register[$i_ekey] = array();
+                if (!array_key_exists($ekey, $register)) {
+                    $register[$ekey] = array();
                 }
-                $register = &$register[$i_ekey];
+                $register = &$register[$ekey];
             }
             $register = $value;
         }
@@ -58,19 +59,23 @@ class Config {
      * @return Mixed the value
      */
     public static function get($key) {
-        $exploded_key = explode('.', $key);
+         if(!empty(self::$_config_cache[$key])) {
+            return self::$_config_cache[$key];
+        }
+        $exploded_key = explode('.', strtolower($key));
         // Copy the register for processing
-        $value = self::$register;
+        $value = &self::$register;
         if (!empty($exploded_key)) {
             // Loop through each key
             foreach($exploded_key as $ekey) {
-                if (array_key_exists(strtolower($ekey), $value)) {
-                    $value = $value[strtolower($ekey)];
+                if (array_key_exists($ekey, $value)) {
+                    $value = &$value[$ekey];
                 } else {
                     // Return null when we can't find a key
                     return NULL;
                 }
             }
+            self::$_config_cache[$key] = &$value;
             return $value;
         }
         return NULL;
@@ -85,12 +90,15 @@ class Config {
         if ($getAll === true) {
             return array_keys(self::$register);
         }
+        if(!empty(self::$_keys_cache)) {
+            return self::$_keys_cache;
+        }
         $required = array("topmenu", "active", "path");
         $req_count = count($required);
         $modules = array_filter(self::$register, function($var) use ($required, $req_count) {
             return ($req_count === count(array_intersect_key($var, array_flip($required))));
         });
-
+        self::$_keys_cache = array_keys($modules);
         return array_keys($modules);
     }
     
