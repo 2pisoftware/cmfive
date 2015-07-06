@@ -203,6 +203,19 @@ class DbService {
             $this->_db->order_by($order_by);
         }
         // echo $this->_db->getSql();
+        $this->_db->clearSelect();
+        // Move date conversion to SQL.
+        // Automatically converts keys with different database values
+        foreach ($o->getObjectVars() as $k) {
+            if(0 === strpos($k, 'dt_') || 0 === strpos($k, 'd_')) {
+                // This is MySQL specific!
+                $this->_db->select("UNIX_TIMESTAMP($table.`".$o->getDbColumnName($k)."`) AS `$k`");
+            } else if($k != $o->getDbColumnName($k)) {
+                $this->_db->select("`".$o->getDbColumnName($k)."` as `$k`");
+            } else {
+                $this->_db->select($k);
+            }
+        }
         $result = $this->_db->fetch_all();
         if ($result) {
             $objects = $this->getObjectsFromRows($class, $result, true);
