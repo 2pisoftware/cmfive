@@ -62,11 +62,12 @@ function getFileExtension($contentType) {
  * wihtout having to write
  */
 function isNumber($var) {
-    if (!isset($var))
-        return false;
-    if ($var === null)
-        return false;
-    return is_numeric($var);
+    return (!empty($var) && is_numeric($var));
+//    if (!isset($var))
+//        return false;
+//    if ($var === null)
+//        return false;
+//    return is_numeric($var);
 }
 
 function defaultVal($val, $default = null, $forceNull = false) {

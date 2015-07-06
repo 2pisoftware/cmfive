@@ -202,7 +202,7 @@ class Html {
         	$tag_end = "";
         }
         
-        return $tag_start."{$confirm_str}modal_history.push('{$href}'); \$('#cmfive-modal').foundation('reveal', 'open', '{$href}');return false;" . ($confirm ? "}" : "").$tag_end;
+        return $tag_start."{$confirm_str}modal_history.push(&quot;{$href}&quot;); \$(&quot;#cmfive-modal&quot;).foundation(&quot;reveal&quot;, &quot;open&quot;, &quot;{$href}&quot;);return false;" . ($confirm ? "}" : "").$tag_end;
     }
 
     /**
@@ -880,7 +880,7 @@ class Html {
         // See functions.php for implementation of isNumber
         // Prepare buffer
         $buf = "<ul class='pagination'>";
-        if (isNumber($currentpage) and isNumber($numpages) and isNumber($pagesize) and isNumber($totalresults)) {
+        if (isNumber($currentpage) && isNumber($numpages) && isNumber($pagesize) && isNumber($totalresults)) {
             // Check that we're within range
             if ($currentpage > 0 and $currentpage <= $numpages and $numpages > 1) {
 

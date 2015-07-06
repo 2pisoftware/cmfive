@@ -960,7 +960,7 @@ class Web {
      * 
      * This works like an action/template except that it can't be called directly from a url.
      * 
-     * Partials don't have access to the global context and do not store anything in the global context!
+     * Partials don't have access to the global context and do not store anything in the global context
      * 
      * @param string $name
      * @param array $params
@@ -1045,16 +1045,16 @@ class Web {
             foreach ($this->modules() as $modulename) {
             	// only include active modules!
             	if (Config::get("$modulename.active") !== false) {
-	                $hooks = Config::get("{$modulename}.hooks");
-	                if (!empty($hooks)) {
-	                    foreach ($hooks as $hook) {
-	                        $this->_hooks[$hook][] = $modulename;
-	                    }
-	                }
+                    $hooks = Config::get("{$modulename}.hooks");
+                    if (!empty($hooks)) {
+                        foreach ($hooks as $hook) {
+                            $this->_hooks[$hook][] = $modulename;
+                        }
+                    }
             	}
             }
         }
-        
+
         // Check that the module calling has subscribed to hooks
         if (!array_key_exists($module, $this->_hooks)) {
             return null;

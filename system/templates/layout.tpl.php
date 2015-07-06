@@ -117,6 +117,16 @@
                 <section class="top-bar-section">
                     <!-- Right Nav Section -->
                     <ul class="right">
+                        <!-- Module template injection -->
+                        <?php 
+                            $inject = $w->callHook('core_template', 'menu');
+                            if (!empty($inject)) :
+                                foreach($inject as $i) : ?>
+                                    <li><?php echo $i; ?></li>
+                                <?php endforeach;
+                            endif;
+                        ?>
+                        
                         <!-- Search bar -->
                         <li><?php echo Html::box("/search", "<span class='fi-magnifying-glass'></span>", false, false, null, null, null, "cmfive_search_button"); ?></li>
                         

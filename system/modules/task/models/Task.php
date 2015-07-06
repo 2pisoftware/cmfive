@@ -254,7 +254,8 @@ class Task extends DbObject {
         if (empty($id)) {
             $id = $this->id;
         }
-        return $this->getObjects("TaskTime", array("task_id" => $id, "is_deleted" => 0));
+        return $this->getObjects("timelog", array("object_class" => "Task", "object_id" => $id, "is_deleted" => 0));
+            
     }
 
     // return list of task time log entries, sort by start date

@@ -470,10 +470,14 @@ class TaskService extends DbService {
         return $this->w->Auth->getObject("TaskComment", array("obj_table" => Task::$_db_table, "id" => $id));
     }
 
+//    function getTaskTimes() {
+//        return $this->getObjects("TaskTime", array("is_deleted" => 0, "user_id" => $this->w->Auth->user()->id));
+//    }
+    
     // return a time log entry by log entry ID
-    function getTimeLogEntry($id) {
-        return $this->getObject("TaskTime", array("id" => $id, "is_deleted" => 0));
-    }
+//    function getTimeLogEntry($id) {
+//        return $this->getObject("TaskTime", array("id" => $id, "is_deleted" => 0));
+//    }
 
     // return an array of the owners of a task group from the database
     function getTaskGroupOwners($id) {
@@ -828,7 +832,7 @@ class TaskService extends DbService {
 
         if ($w->Auth->loggedIn()) {
             $w->menuLink("task/edit", "New Task", $nav);
-//            $w->menuLink("task/index", "Task Dashboard", $nav);
+//          $w->menuLink("task/index", "Task Dashboard", $nav);
             $w->menuLink("task/tasklist", "Task List", $nav);
             $w->menuLink("task/tasklist#notifications", "Notifications", $nav);
             $w->menuLink("task/taskweek", "Activity", $nav);

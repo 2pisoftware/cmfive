@@ -45,38 +45,36 @@ function index_ALL(Web $w) {
             }
         }
     }
-    
-    // Time log breakdown
-    $beginning_of_today = strtotime("midnight", time());
-    $time_entries = $w->db->get("task_time")
-            ->where("creator_id", $w->Auth->user()->id)
-            ->where("is_deleted", 0)
-            ->where("dt_start >= ?", $w->Task->time2Dt($beginning_of_today - (60 * 60 * 24 * 14)))
-            ->where("dt_start <= ?", $w->Task->time2Dt(strtotime("tomorrow", $beginning_of_today) - 1))
-            ->orderBy("dt_start DESC")->fetch_all();
-    
-    $time_entry_objects = array();
-    if (!empty($time_entries)) {
-        $time_entries = $w->Task->getObjectsFromRows("TaskTime", $time_entries, true);
-    }
-    
-    $time_total_overall = 0;
-    if (!empty($time_entries)) {
-        foreach($time_entries as $time_entry) {
-            
-            $entry_date = date('d/m', $time_entry->dt_start);
-            if (empty($time_entry_objects[$entry_date])) {
-                $time_entry_objects[$entry_date] = array('entries' => array(), "total" => 0);
-            }
-            
-            $time_total_overall += $time_entry->getDuration();
-            $time_entry_objects[$entry_date]['total'] += $time_entry->getDuration();
-            $time_entry_objects[$entry_date]['entries'][] = $time_entry; 
-        }
-        
-//        $time_entry_objects = $w->Task->getObjectsFromRows("TaskTime", $time_entries);
-    }
-    
+//    
+//    // Time log breakdown
+//    $beginning_of_today = strtotime("midnight", time());
+//    $time_entries = $w->db->get("timelog")
+//            ->where("creator_id", $w->Auth->user()->id)
+//            ->where("is_deleted", 0)
+//            ->where("dt_start >= ?", $w->Task->time2Dt($beginning_of_today - (60 * 60 * 24 * 14)))
+//            ->where("dt_start <= ?", $w->Task->time2Dt(strtotime("tomorrow", $beginning_of_today) - 1))
+//            ->orderBy("dt_start DESC")->fetch_all();
+//    
+//    $time_entry_objects = array();
+//    if (!empty($time_entries)) {
+//        $time_entries = $w->Task->getObjectsFromRows("TaskTime", $time_entries, true);
+//    }
+//    
+//    $time_total_overall = 0;
+//    if (!empty($time_entries)) {
+//        foreach($time_entries as $time_entry) {
+//            
+//            $entry_date = date('d/m', $time_entry->dt_start);
+//            if (empty($time_entry_objects[$entry_date])) {
+//                $time_entry_objects[$entry_date] = array('entries' => array(), "total" => 0);
+//            }
+//            
+//            $time_total_overall += $time_entry->getDuration();
+//            $time_entry_objects[$entry_date]['total'] += $time_entry->getDuration();
+//            $time_entry_objects[$entry_date]['entries'][] = $time_entry; 
+//        }
+//    }
+//    
     $w->ctx("taskgroups", $taskgroups);
     $w->ctx("tasks", $tasks);
     $w->ctx("total_tasks", $total_tasks);
@@ -86,6 +84,6 @@ function index_ALL(Web $w) {
     $w->ctx("count_todo_urgent", $count_todo_urgent);
     $w->ctx("count_taskgroup_tasks", $count_taskgroup_tasks);
     
-    $w->ctx("time_entries", $time_entry_objects);
-    $w->ctx("time_total_overall", $time_total_overall);
+//    $w->ctx("time_entries", $time_entry_objects);
+//    $w->ctx("time_total_overall", $time_total_overall);
 }

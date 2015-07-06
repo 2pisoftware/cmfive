@@ -503,6 +503,17 @@ ul.cmfive_breadcrumbs > li {
     margin-bottom: 0px;
 }
 
+div#start_timer, div#stop_timer {
+    display: none;
+}
+
+a > div#active_log_time {
+    color: white;
+    font-size: 1em;
+    min-width: 80px;
+}
+
+
 @-moz-keyframes spinPulse {
     0% {
         -webkit-transform: rotate(360deg);
