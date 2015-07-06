@@ -1,4 +1,5 @@
 <?php
+
 /**
  * deduplicates arrays of arrays, something that array_unique can't do.
  * 
@@ -7,11 +8,10 @@
  * @param unknown $input
  * @return multitype:
  */
-function array_unique_multidimensional($input)
-{
-	$serialized = array_map('serialize', $input);
-	$unique = array_unique($serialized);
-	return array_intersect_key($input, $unique);
+function array_unique_multidimensional($input) {
+    $serialized = array_map('serialize', $input);
+    $unique = array_unique($serialized);
+    return array_intersect_key($input, $unique);
 }
 
 function humanReadableBytes($input, $rounding = 2, $bytesValue = true) {
@@ -232,7 +232,7 @@ function startsWith($haystack, $needle) {
     if (empty($haystack) || empty($needle)) {
         return false;
     }
-    
+
     if (is_scalar($needle)) {
         return strpos($haystack, $needle) === 0;
     } else if (is_array($needle) && sizeof($needle) > 0) {
@@ -340,7 +340,7 @@ function formatMoney($format, $number) {
     if (empty($locale['mon_thousands_sep'])) {
         $locale['mon_thousands_sep'] = ",";
     }
-    
+
     preg_match_all($regex, $format, $matches, PREG_SET_ORDER);
 
     foreach ($matches as $fmatch) {
@@ -427,7 +427,7 @@ function recursiveArraySearch($haystack, $needle, $index = null) {
     $it = new RecursiveIteratorIterator($aIt);
 
     while ($it->valid()) {
-        if (((isset($index) && ( $it->key() == $index)) || ( !isset($index))) && ( $it->current() == $needle)) {
+        if (((isset($index) && ( $it->key() == $index)) || (!isset($index))) && ( $it->current() == $needle)) {
             return $aIt->key();
         }
 
@@ -553,9 +553,9 @@ function AESdecrypt($text, $password) {
  * @param String $end
  * @return string
  */
-function getBetween($content, $start, $end){
+function getBetween($content, $start, $end) {
     $r = explode($start, $content);
-    if (isset($r[1])){
+    if (isset($r[1])) {
         $r = explode($end, $r[1]);
         return $r[0];
     }
@@ -602,7 +602,7 @@ function in_numeric_range($subject, $min, $max, $include = true) {
     if (!is_numeric($subject) || !is_numeric($min) || !is_numeric($max)) {
         return false;
     }
-    
+
     // Check if bounds given in wrong order
     // Has effect of checking outside the boundary
     if ($max < $min) {
@@ -616,7 +616,7 @@ function in_numeric_range($subject, $min, $max, $include = true) {
     if ($min === $max && $min === $subject) {
         return $include;
     }
-    
+
     // Check
     if (true === $include) {
         return ($subject >= $min && $subject <= $max);
