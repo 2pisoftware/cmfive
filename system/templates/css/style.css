@@ -503,6 +503,10 @@ ul.cmfive_breadcrumbs > li {
     margin-bottom: 0px;
 }
 
+.reveal-modal-bg {
+    position: fixed;
+}
+
 @-moz-keyframes spinPulse {
     0% {
         -webkit-transform: rotate(360deg);
