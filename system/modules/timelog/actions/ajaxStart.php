@@ -19,6 +19,10 @@ function ajaxStart_GET(Web $w) {
         $timelog = new Timelog($w);
         $timelog->start($object);
     
+        echo json_encode([
+            'object'    => $p['class'],
+            'title'     => $object->getSelectOptionTitle()
+        ]);
 //        $w->Comment->addComment($timelog, $w->request('description'));
     } else {
         $this->w->Log->debug("object not found");

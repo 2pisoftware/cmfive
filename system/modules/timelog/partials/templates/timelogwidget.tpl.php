@@ -3,11 +3,13 @@
         <?php if ($w->Timelog->hasTrackingObject()) : ?>
             <a onclick="startTimer();">Start Timer</a>
         <?php else : ?>
-            Cannot start timer
+            
         <?php endif; ?>
     </div>
     <div id="stop_timer">
-        <a id="stop_timelog" class="button"><div id="active_log_time"></div></a>
+        <span data-tooltip aria-haspopup="true" class="has-tip tip-bottom radius" title="<?php echo !empty($active_log) ? $active_log->object_class . ": " . $active_log->getLinkedObject()->getSelectOptionTitle() : ''; ?>">
+            <a id="stop_timelog" class="button"><div id="active_log_time"></div></a>
+        </span>
     </div>
         
     <script>    
@@ -48,10 +50,15 @@
             if (_object.class && _object.id) {
                 jQuery.ajax("/timelog/ajaxStart/" + _object.class + "/" + _object.id, {
                     success: function(data) {
+                        var object_data = JSON.parse(data);
+                        
                         start_time = (new Date().getTime() / 1000);
                         timer = countTime();
                         $("#start_timer").hide();
                         $("#stop_timer").fadeIn();
+                        
+                        $('#stop_timer span[data-tooltip]').attr('title', '');
+                        $(document).foundation('tooltip', 'reflow');
                     }
                 });
             }
