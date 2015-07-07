@@ -58,4 +58,18 @@ class TimelogService extends DbService {
         return ($this->hasTrackingObject() || $this->hasActiveLog());
     }
 
+    public function navigation(Web $w, $title = null, $nav = null) {
+        if ($title) {
+            $w->ctx("title", $title);
+        }
+
+        $nav = $nav ? $nav : array();
+
+//        if ($w->Auth->loggedIn()) {
+//            $w->menuLink("timelog/", "Timesheet", $nav);
+//        }
+
+        $w->ctx("navigation", $nav);
+        return $nav;
+    }
 }
