@@ -91,7 +91,7 @@ CREATE TABLE `audit` (
   `module` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
   `action` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
   `path` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `ip` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `ip` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `db_class` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL,
   `db_action` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL,
   `db_id` bigint(20) DEFAULT NULL,
