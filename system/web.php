@@ -496,7 +496,7 @@ class Web {
         	$this->db = new DbPDO(Config::get("database"));
     	} catch (Exception $ex) {
     		echo "Error: Can't connect to database.";
-    		//die();
+    		die();
     	}
     }
 
