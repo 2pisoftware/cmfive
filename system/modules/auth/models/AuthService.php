@@ -15,7 +15,7 @@ class AuthService extends DbService {
 		$credentials['password']=$password;
 		//allow pre login hook for alternative authentications.
 		//this hook returns $hook_results[$module][0]=$user or null.
-		$hook_results = $this->w->callHook("core_auth", "prelogin", $credentials);
+		$hook_results = $this->w->callHook("auth", "prelogin", $credentials);
 		foreach($hook_results as $module => $hook_result) {
 			//@TODO: check config for $module.optional or $module.manditory. default to optional for now. if any manditory returns null then return null.
 			$user = $hook_result[0];
@@ -23,7 +23,7 @@ class AuthService extends DbService {
 				break;
 			}
 		}
-
+//echo "helloworld!";die();
 		//if no valid user check if credentials pass against cmfive user table
 		//if so set user else abort.
 		if (empty($user)) {
@@ -37,7 +37,7 @@ class AuthService extends DbService {
 			}
 		}
 		
-		$hook_results = $this->w->callHook("core_auth", "postlogin", $user);
+		$hook_results = $this->w->callHook("auth", "postlogin", $user);
 
 		// if ($user_data != null) {
 		// $user = new User($this->w);
@@ -119,12 +119,11 @@ class AuthService extends DbService {
 			$this->Log->error("Denied access: module '". urlencode($parts['module']). "' doesn't exist");
 			return false;
 		}
-		if ($this->loggedIn())  {
-			return $url ? $url : true;
-		}
+		//if ($this->loggedIn())  {
+		//	return $url ? $url : true;
+		//}
 		
-		if ((function_exists("anonymous_allowed") && anonymous_allowed($this->w, $path)) ||
-		($this->user() && $this->user()->allowed($path))) {
+		if ((function_exists("anonymous_allowed") && anonymous_allowed($this->w, $path)) || ($this->user() && $this->user()->allowed($path))) {
 			return $url ? $url : true;
 		}
 		
@@ -136,22 +135,21 @@ class AuthService extends DbService {
 				$this->w->Log->debug("Passthrough Username: " . $username);
 				
 				//this hook returns $hook_results[$module][0]=$user or null.
-				$hook_results = $this->w->callHook("core_auth", "get_authenticated_user", $username);
+				$hook_results = $this->w->callHook("auth", "get_authenticated_user", $username);
 				foreach($hook_results as $module => $hook_result) {
 					$user = $hook_result[0];
-					if (!empty($user)) {
-						break;
+					if (!empty($user) && $user instanceof User) {
+						$this->forceLogin($user->id);
+						if ($user->allowed($path)) {
+							return $url ? $url : true;
+						}
+						
+						return false;
 					}
 				}
 			}
 		}
-		if (empty($user)) {
-			return false;
-		}		
-		$this->forceLogin($user->id);
-		if ($this->loggedIn()) {
-			return $url ? $url : true;
-		}
+		
 		return false;
 		// First, check for IIS pass through auth
 		// Warning: cmfive does not yet support ldap auth.
