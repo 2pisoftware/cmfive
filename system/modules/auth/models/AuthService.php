@@ -119,10 +119,7 @@ class AuthService extends DbService {
 			$this->Log->error("Denied access: module '". urlencode($parts['module']). "' doesn't exist");
 			return false;
 		}
-		//if ($this->loggedIn())  {
-		//	return $url ? $url : true;
-		//}
-		
+
 		if ((function_exists("anonymous_allowed") && anonymous_allowed($this->w, $path)) || ($this->user() && $this->user()->allowed($path))) {
 			return $url ? $url : true;
 		}
@@ -136,8 +133,8 @@ class AuthService extends DbService {
 				
 				//this hook returns $hook_results[$module][0]=$user or null.
 				$hook_results = $this->w->callHook("auth", "get_authenticated_user", $username);
-				foreach($hook_results as $module => $hook_result) {
-					$user = $hook_result[0];
+
+				foreach($hook_results as $module => $user) {
 					if (!empty($user) && $user instanceof User) {
 						$this->forceLogin($user->id);
 						if ($user->allowed($path)) {
@@ -151,85 +148,6 @@ class AuthService extends DbService {
 		}
 		
 		return false;
-		// First, check for IIS pass through auth
-		// Warning: cmfive does not yet support ldap auth.
-/*		if (Config::get('system.use_passthrough_authentication') === TRUE) {
-			if (!empty($_SERVER['AUTH_USER']) && !$this->loggedIn()) {
-				// Get the username
-				$username = explode('\\', $_SERVER["AUTH_USER"]);
-				$username = end($username);
-
-				$this->w->Log->debug("Username: " . $username);
-
-				//if (Config::get('system.use_passthrough_authentication') === TRUE)
-				// Authendocumentatedticate agaianst LDAP
-				$ldap = ldap_connect(Config::get("system.ldap.host"), Config::get("system.ldap.port"));
-
-				if (!$ldap) {
-					$this->w->Log->error("LDAP Server could not be reached");
-					return false;
-				}
-
-				ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3); // Recommended for AD
-				ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
-
-				//Using the provided user and password to login into LDAP server.
-				//For the dc, normally will be the domain.
-				$ldap_instance = ldap_bind($ldap, Config::get("system.ldap.username"), Config::get("system.ldap.password"));
-
-				// You may add in any filter part on here. "uid" is a profile data inside the LDAP. You may filter by other columns depends on your LDAP setup.
-				$search_results = ldap_search($ldap, Config::get("system.ldap.base_dn"),
-				str_replace("{username}", $username, Config::get("system.ldap.auth_search")), Config::get("system.ldap.search_filter_attribute"), 0, 100);
-
-				$info = ldap_get_entries($ldap, $search_results);
-
-				// var_dump($info); diedocumentated();
-
-				if ($info['count'] == 0) {
-					$this->w->Log->error("LDAP Info: " . json_encode($info));
-					$this->w->Log->error("LDAP Error: " . ldap_error($ldap));
-					return false;
-				}
-
-				// Close LDAP connection
-				ldap_close($ldap);
-
-				// Allow module based validation via hooks
-				$hook_results = $this->w->callHook("core_auth", "ldap_authenticate", $info);
-				foreach($hook_results as $hook_result) {
-					if ($hook_result === FALSE) {
-						return false;
-					}
-				}
-
-				// Try and find the user locally if not create a user based ldap details.
-				$user = $this->getObject("User", array("login" => $username));
-				if (empty($user)) {
-					$contact = new Contact($this->w);
-					$contact->firstname = !empty($info[0]["givenname"][0]) ? $info[0]["givenname"][0] : $username;
-					$contact->lastname = !empty($info[0]["sn"][0]) ? $info[0]["sn"][0] : '';
-					$contact->insert();
-
-					// Create a user
-					$user = new User($this->w);
-					$user->login = $username;
-					// Set password if provided
-					$user->setPassword($_SERVER['AUTH_PASSWORD']);
-					$user->contact_id = $contact->id;
-					$user->is_admin = 0;
-					$user->is_active = 1;
-					$user->insert();
-
-					$user->addRole("user");
-					$user->is_admin = 1;
-					$user->update();
-				} else {
-					$contact=$user->getContact();
-					$contact->firstname = !empty($info[0]["givenname"][0]) ? $info[0]["givenname"][0] : $username;
-					$contact->lastname = !empty($info[0]["sn"][0]) ? $info[0]["sn"][0] : '';
-					$contact->update();
-				}
-*/
 	}
 
 	/**

@@ -1088,7 +1088,7 @@ class Web {
 	
 	            if (function_exists($hook_function_name)) {            
 	                // Call function
-	            	$buffer[$toInvoke][]= $hook_function_name($this, $data);	
+	            	$buffer[$toInvoke] = $hook_function_name($this, $data);	
 	            }
             }
         }
