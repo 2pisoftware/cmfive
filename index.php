@@ -7,10 +7,10 @@ $web = new Web();
 
 //========= Load Application Modules Configuration ==========
 if (!file_exists("config.php")) {
-	echo "<b>No config.php found. Please copy config.php.example, change parameters as necessary and rename to config.php<b>";
-	die();
+	$web->install();
+} else {
+	require "config.php";
+	
+	//============== start application =============
+	$web->start();
 }
-require "config.php";
-
-//============== start application =============
-$web->start();
