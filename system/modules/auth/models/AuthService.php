@@ -16,14 +16,14 @@ class AuthService extends DbService {
 		//allow pre login hook for alternative authentications.
 		//this hook returns $hook_results[$module][0]=$user or null.
 		$hook_results = $this->w->callHook("auth", "prelogin", $credentials);
-		foreach($hook_results as $module => $hook_result) {
+		foreach($hook_results as $module => $user) {
 			//@TODO: check config for $module.optional or $module.manditory. default to optional for now. if any manditory returns null then return null.
-			$user = $hook_result[0];
 			if (!empty($user)) {
+				$this->w->Log->info($user->getFullName()." authenticated via ".$module." prelogin hook");
 				break;
 			}
 		}
-//echo "helloworld!";die();
+		
 		//if no valid user check if credentials pass against cmfive user table
 		//if so set user else abort.
 		if (empty($user)) {
@@ -47,6 +47,7 @@ class AuthService extends DbService {
 			$this->w->session('user_id', $user->id);
 			$this->w->session('timezone', $client_timezone);
 		}
+		
 		return $user;
 	}
 
@@ -124,24 +125,21 @@ class AuthService extends DbService {
 			return $url ? $url : true;
 		}
 		
-		if (Config::get('system.use_passthrough_authentication') === TRUE) {
-			if (!empty($_SERVER['AUTH_USER'])) {
-				// Get the username
-				$username = explode('\\', $_SERVER["AUTH_USER"]);
-				$username = end($username);
-				$this->w->Log->debug("Passthrough Username: " . $username);
-				
-				//this hook returns $hook_results[$module][0]=$user or null.
-				$hook_results = $this->w->callHook("auth", "get_authenticated_user", $username);
-
-				foreach($hook_results as $module => $user) {
-					if (!empty($user) && $user instanceof User) {
-						$this->forceLogin($user->id);
-						if ($user->allowed($path)) {
-							return $url ? $url : true;
-						}
-						
-						return false;
+		//added empty user test to stop infinte loop ie this function called within this condition.
+		if (empty($user) && Config::get('system.use_passthrough_authentication') === TRUE && !empty($_SERVER['AUTH_USER'])) {
+			
+			// Get the username
+			$username = explode('\\', $_SERVER["AUTH_USER"]);
+			$username = end($username);
+			$this->w->Log->debug("Passthrough Username: " . $username);
+			
+			//this hook returns $hook_results[$module][0]=$user or null.
+			$hook_results = $this->w->callHook("auth", "get_authenticated_user", $username);
+			foreach($hook_results as $module => $user) {
+				if (!empty($user) && $user instanceof User) {
+					$this->forceLogin($user->id);
+					if ($user->allowed($path)) {
+						return $url ? $url : true;
 					}
 				}
 			}
