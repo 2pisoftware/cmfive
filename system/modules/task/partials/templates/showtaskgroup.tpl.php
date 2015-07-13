@@ -18,13 +18,6 @@
 						<td width='60%'><?php echo $w->Auth->getUser($task->assignee_id)->getFullName(); ?></td>
 						<td width='20%'><?php echo $task->status; ?></td>
 					</tr>
-					<tr>
-						<td colspan='3'>
-							<?php if ($taskgroup->getCanICreate()) : ?> 
-								<span style="float: left;"><a target="_blank" href="/task/edit/?gid=<?php echo $taskgroup->id; ?>">New Task</a> </span> 
-							<?php endif; ?>
-						</td>
-					</tr>
 				<?php endforeach; ?>
 			<?php endif; ?>
 		</tbody>
