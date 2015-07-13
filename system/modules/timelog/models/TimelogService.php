@@ -1,8 +1,20 @@
 <?php
 
+/**
+ * This service class aids in the registration and usage of timelog objects
+ * 
+ * @author Adam Buckley <adam@2pisoftware.com>
+ */
 class TimelogService extends DbService {
     private $_trackObject = null;
     
+	/**
+	 * Returns all time logs for a given user
+	 * 
+	 * @param User $user
+	 * @param boolean $includeDeleted
+	 * @return Timelog
+	 */
     public function getTimelogsForUser(User $user = null, $includeDeleted = false) {
         if ($user === null) {
             $user = $this->w->Auth->user();
@@ -16,6 +28,11 @@ class TimelogService extends DbService {
         return $this->getObjects("Timelog", $where);
     }
     
+	/**
+	 * Returns all non deleted timelogs
+	 * 
+	 * @return Array<Timelog>
+	 */
     public function getTimelogs() {
         return $this->getObjects("Timelog", ["is_deleted" => 0]);
     }
