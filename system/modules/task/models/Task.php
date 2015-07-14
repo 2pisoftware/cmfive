@@ -405,6 +405,12 @@ class Task extends DbObject {
      */
     function update($force = false, $force_validation = false) {
 
+    	// 0. set the is_closed flag to make sure the task can be queried easily
+    	
+    	if ($this->isStatusClosed()) {
+    		$this->is_closed = 1;
+    	}
+    	
         try {
             $this->startTransaction();
 
