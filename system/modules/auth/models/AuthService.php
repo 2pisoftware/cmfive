@@ -14,7 +14,7 @@ class AuthService extends DbService {
 		$credentials['login']=$login;
 		$credentials['password']=$password;
 		//allow pre login hook for alternative authentications.
-		//this hook returns $hook_results[$module][0]=$user or null.
+		//this hook returns $hook_results[$module]=$user or null.
 		$hook_results = $this->w->callHook("auth", "prelogin", $credentials);
 		foreach($hook_results as $module => $user) {
 			//@TODO: check config for $module.optional or $module.manditory. default to optional for now. if any manditory returns null then return null.
@@ -27,7 +27,7 @@ class AuthService extends DbService {
 		//if no valid user check if credentials pass against cmfive user table
 		//if so set user else abort.
 		if (empty($user)) {
-			echo "empty user";
+			//echo "empty user";
 			$user = $this->getUserForLogin($login);
 			if (empty($user)) {
 				return null;
@@ -125,11 +125,13 @@ class AuthService extends DbService {
 			return $url ? $url : true;
 		}
 		
+		
+		$server['AUTH_USER']='2pieUser';
+		
 		//added empty user test to stop infinte loop ie this function called within this condition.
-		if (empty($this->user()) && (Config::get('system.use_passthrough_authentication') === TRUE) && !empty($_SERVER['AUTH_USER'])) {
-			
+		if (empty($this->user()) && (Config::get('system.use_passthrough_authentication') === TRUE) && !empty($server['AUTH_USER'])) {
 			// Get the username
-			$username = explode('\\', $_SERVER["AUTH_USER"]);
+			$username = explode('\\', $server["AUTH_USER"]);
 			$username = end($username);
 			$this->w->Log->debug("Passthrough Username: " . $username);
 			
