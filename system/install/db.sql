@@ -1148,7 +1148,7 @@ CREATE TABLE `user` (
   `password` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `password_salt` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `contact_id` bigint(20) DEFAULT NULL,
-  `password_reset_token` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `password_reset_token` varchar(40) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `dt_password_reset_at` timestamp NULL DEFAULT NULL,
   `redirect_url` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'main/index',
   `is_admin` tinyint(1) NOT NULL DEFAULT '0',
