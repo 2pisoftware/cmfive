@@ -61,14 +61,14 @@ Config::set('system.rest_include', array(
 // Passtrough authentication currently only configured to work with LDAP and IIS
 Config::set('system.use_passthrough_authentication', false);
 
-// Config::set("system.ldap", array(
-//     'host'          => '192.168.0.256', // Host name or IP of LDAP server
-//     'port'          => 389, // 389 is default
-//     'username'      => 'DOMAIN\\User',
-//     'password'      => 'password',
-//     'domain'        => 'domain.example.com',
-//     'base_dn'       => 'DC=domain,DC=EXAMPLE,DC=COM',
-//     'auth_ou'       => 'OU=Users',
-//     'auth_search'   => '(cn={$username})', // {username} will be replaced in auth
-//     'search_filter_attribute' => array(), // Here you can specify only certain attributes to get from ldap such as "ou" or "cn" etc
-// ));
+Config::set("system.ldap", array(
+     'host'          => '192.168.0.256', // Host name or IP of LDAP server
+     'port'          => 389, // 389 is default
+     'username'      => 'DOMAIN\\User',
+     'password'      => 'password',
+     'domain'        => 'domain.example.com',
+     'base_dn'       => 'DC=domain,DC=EXAMPLE,DC=COM',
+     'auth_ou'       => 'OU=Users',
+     'auth_search'   => '(cn={$username})', // {username} will be replaced in auth
+     'search_filter_attribute' => array(), // Here you can specify only certain attributes to get from ldap such as "ou" or "cn" etc
+));
