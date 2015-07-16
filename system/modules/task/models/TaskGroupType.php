@@ -15,47 +15,68 @@ abstract class TaskGroupType {
 	
 	/**
 	 * Returns the title for the type
-	 * 
+	 * - override in subclass
+	 * - or specify in config.php using key 'task.<subclassname>.can-task-reopen'
 	 */
 	function getTaskGroupTypeTitle() {
+		$value = Config::get("task.".get_class($this).".title");
+		return !empty($value) ? $value : false;
 	}
 	
+	/**
+	 * Specifies if a closed task can be reopened
+	 * - override in subclass
+	 * - or specify in config.php using key 'task.<subclassname>.can-task-reopen'
+	 * 
+	 * @return boolean
+	 */
 	function getCanTaskGroupReopen() {
-		return false;
+		$value = Config::get("task.".get_class($this).".can-task-reopen");
+		return !empty($value) ? $value : false;
 	}
 	
 	/**
 	 * Return the description for this type
-	 * 
+	 * - override in subclass
+	 * - or specify in config.php with key 'task.<subclassname>.description'
 	 */
 	function getTaskGroupTypeDescription() {
-		
+		$value = Config::get("task.".get_class($this).".description");
+		return !empty($value) ? $value : false;
 	}
 	
 	/**
 	 * Return array of php class names of concrete
 	 * implementations of abstract TaskType
-	 * 
+	 * - override in subclass
+	 * - or specify in config.php with key 'task.<subclassname>.tasktypes'
 	 */
 	function getTaskTypeArray() {
+		$value = Config::get("task.".get_class($this).".tasktypes");
+		return !empty($value) ? $value : false;
 	}
 	
 	/**
 	 * Return array containing all
 	 * available statuses for tasks in 
 	 * this group
-	 * 
-         
+	 * - override in subclass
+	 * - or specify in config.php with key 'task.<subclassname>.statuses'
 	 */
-        function getStatusArray() {}
+	function getStatusArray() {
+		$value = Config::get("task.".get_class($this).".statuses");
+		return !empty($value) ? $value : false;
+	}
 	
 	/**
 	 * Return array of all available
 	 * priorities in this group
-	 * 
+	 * - override in subclass
+	 * - or specify in config.php with key 'task.<subclassname>.priorities'
 	 */
-	function getPriorityArray() {
-		
+	function getTaskPriorityArray() {
+		$value = Config::get("task.".get_class($this).".priorities");
+		return !empty($value) ? $value : false;
 	}
 
 	/**
@@ -77,13 +98,20 @@ abstract class TaskGroupType {
 	/**
 	 * By default returns the very first status of the
 	 * status array if defined. Otherwise "".
+	 * - override in subclass
+	 * - or specify in config.php with key 'task.<subclassname>.default-status'
 	 */
 	function getDefaultStatus() {
-		$statusarray = $this->getStatusArray();
-		if (!empty($statusarray) && sizeof($statusarray) > 0) {
-			return $statusarray[0][0];
+		$value = Config::get("task.".get_class($this).".default-status");
+		if (!empty($value)) {
+			return $value;
 		} else {
-			return "";
+			$statusarray = $this->getStatusArray();
+			if (!empty($statusarray) && sizeof($statusarray) > 0) {
+				return $statusarray[0][0];
+			} else {
+				return "";
+			}
 		}
 	}
 	/**

@@ -8,7 +8,7 @@ Config::set('main.company_url', 'http://2pisoftware.com');
 
 // enter a valid email address
 
-Config::get('main.company_support_email','');
+Config::set('main.company_support_email','');
 
 //=============== Timezone ===================================
 
