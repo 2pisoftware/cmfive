@@ -3,9 +3,9 @@ namespace Codeception\Command;
 
 use Codeception\Lib\Generator\Cept;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -23,15 +23,14 @@ class GenerateCept extends Command
 
     protected function configure()
     {
-        $this->setDefinition([
+        $this->setDefinition(array(
             new InputArgument('suite', InputArgument::REQUIRED, 'suite to be tested'),
             new InputArgument('test', InputArgument::REQUIRED, 'test to be run'),
             new InputOption('config', 'c', InputOption::VALUE_OPTIONAL, 'Use custom path for config'),
-        ]);
+        ));
     }
 
-    public function getDescription()
-    {
+    public function getDescription() {
         return 'Generates empty Cept file in suite';
     }
 
@@ -46,12 +45,12 @@ class GenerateCept extends Command
         $filename = $this->completeSuffix($filename, 'Cept');
         $gen = new Cept($config);
 
-        $full_path = rtrim( $config['path'], DIRECTORY_SEPARATOR ) . DIRECTORY_SEPARATOR . $filename;
-        $res = $this->save($full_path, $gen->produce());
+        $res = $this->save($config['path'].DIRECTORY_SEPARATOR . $filename, $gen->produce());
         if (!$res) {
             $output->writeln("<error>Test $filename already exists</error>");
             return;
         }
-        $output->writeln("<info>Test was created in $full_path</info>");
+        $output->writeln("<info>Test was created in $filename</info>");
     }
+
 }

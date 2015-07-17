@@ -3,8 +3,6 @@ namespace Codeception;
 
 use Codeception\Lib\Actor\Shared\Comment;
 use Codeception\Lib\Actor\Shared\Friend;
-use Codeception\Scenario;
-use Codeception\Step\Executor;
 
 abstract class Actor
 {
@@ -16,19 +14,11 @@ abstract class Actor
      */
     protected $scenario;
 
-    public function __construct(Scenario $scenario)
+    public function __construct(\Codeception\Scenario $scenario)
     {
         $this->scenario = $scenario;
-        $this->scenario->stopIfBlocked();
     }
 
-    /**
-     * @return \Codeception\Scenario
-     */
-    protected function getScenario()
-    {
-        return $this->scenario;
-    }
 
     public function wantToTest($text)
     {
@@ -40,12 +30,16 @@ abstract class Actor
         $this->scenario->setFeature(mb_strtolower($text));
     }
 
-    public function __call($method, $arguments)
-    {
+    public function __call($method, $arguments) {
         $class = get_class($this);
         throw new \RuntimeException("Call to undefined method $class::$method");
     }
     
+    protected function getScenario()
+    {
+        return $this->scenario;
+    }
+
     /**
      * Lazy-execution given anonymous function
      * @param $callable \Closure
@@ -53,7 +47,7 @@ abstract class Actor
      */
     public function execute($callable)
     {
-        $this->scenario->addStep(new Executor($callable, []));
+        $this->scenario->addStep(new \Codeception\Step\Executor($callable, array()));
         $callable();
         return $this;
     }

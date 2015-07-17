@@ -137,7 +137,13 @@
  * </phpunit>
  * </code>
  *
- * @since Class available since Release 3.2.0
+ * @package    PHPUnit
+ * @subpackage Util
+ * @author     Sebastian Bergmann <sebastian@phpunit.de>
+ * @copyright  Sebastian Bergmann <sebastian@phpunit.de>
+ * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
+ * @link       http://www.phpunit.de/
+ * @since      Class available since Release 3.2.0
  */
 class PHPUnit_Util_Configuration
 {
@@ -187,7 +193,7 @@ class PHPUnit_Util_Configuration
         }
 
         if (!isset(self::$instances[$realpath])) {
-            self::$instances[$realpath] = new self($realpath);
+            self::$instances[$realpath] = new PHPUnit_Util_Configuration($realpath);
         }
 
         return self::$instances[$realpath];
@@ -257,9 +263,9 @@ class PHPUnit_Util_Configuration
             )
           ),
           'whitelist' => array(
-            'addUncoveredFilesFromWhitelist'     => $addUncoveredFilesFromWhitelist,
+            'addUncoveredFilesFromWhitelist' => $addUncoveredFilesFromWhitelist,
             'processUncoveredFilesFromWhitelist' => $processUncoveredFilesFromWhitelist,
-            'include'                            => array(
+            'include' => array(
               'directory' => $this->readFilterDirectories(
                   'filter/whitelist/directory'
               ),
@@ -360,7 +366,7 @@ class PHPUnit_Util_Configuration
         $result = array();
 
         foreach ($this->xpath->query('logging/log') as $log) {
-            $type   = (string) $log->getAttribute('type');
+            $type = (string) $log->getAttribute('type');
             $target = (string) $log->getAttribute('target');
 
             if (!$target) {
@@ -371,17 +377,11 @@ class PHPUnit_Util_Configuration
 
             if ($type == 'coverage-html') {
                 if ($log->hasAttribute('lowUpperBound')) {
-                    $result['lowUpperBound'] = $this->getInteger(
-                        (string) $log->getAttribute('lowUpperBound'),
-                        50
-                    );
+                    $result['lowUpperBound'] = (string) $log->getAttribute('lowUpperBound');
                 }
 
                 if ($log->hasAttribute('highLowerBound')) {
-                    $result['highLowerBound'] = $this->getInteger(
-                        (string) $log->getAttribute('highLowerBound'),
-                        90
-                    );
+                    $result['highLowerBound'] = (string) $log->getAttribute('highLowerBound');
                 }
             } elseif ($type == 'junit') {
                 if ($log->hasAttribute('logIncompleteSkipped')) {
@@ -567,12 +567,12 @@ class PHPUnit_Util_Configuration
             }
         }
 
-        /*
+        /**
          * Issue #657
          */
         if ($root->hasAttribute('stderr')) {
             $result['stderr'] = $this->getBoolean(
-                (string) $root->getAttribute('stderr'),
+                (string)$root->getAttribute('stderr'),
                 false
             );
         }
@@ -985,9 +985,9 @@ class PHPUnit_Util_Configuration
     }
 
     /**
-     * @param  string $value
-     * @param  bool   $default
-     * @return bool
+     * @param  string  $value
+     * @param  boolean $default
+     * @return boolean
      * @since  Method available since Release 3.2.3
      */
     protected function getBoolean($value, $default)
@@ -1002,9 +1002,9 @@ class PHPUnit_Util_Configuration
     }
 
     /**
-     * @param  string $value
-     * @param  bool   $default
-     * @return bool
+     * @param  string  $value
+     * @param  boolean $default
+     * @return boolean
      * @since  Method available since Release 3.6.0
      */
     protected function getInteger($value, $default)
@@ -1081,8 +1081,8 @@ class PHPUnit_Util_Configuration
     }
 
     /**
-     * @param  string $path
-     * @param  bool   $useIncludePath
+     * @param  string  $path
+     * @param  boolean $useIncludePath
      * @return string
      * @since  Method available since Release 3.5.0
      */

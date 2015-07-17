@@ -34,6 +34,7 @@ class {{name}}Test extends \Codeception\TestCase\Test
     {
 
     }
+
 }
 EOF;
 
@@ -53,7 +54,7 @@ EOF;
             $actor = $this->settings['namespace'] . '\\' . $actor;
         }
 
-        $ns = $this->getNamespaceHeader($this->settings['namespace'] . '\\' . $this->name);
+        $ns = $this->getNamespaceString($this->settings['namespace'] . '\\' . $this->name);
 
         return (new Template($this->template))
             ->place('namespace', $ns)
@@ -62,4 +63,5 @@ EOF;
             ->place('actor', lcfirst(Configuration::config()['actor']))
             ->produce();
     }
+
 }

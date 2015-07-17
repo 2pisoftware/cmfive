@@ -1,10 +1,7 @@
 <?php
 namespace Codeception;
-
-use Codeception\Exception\TestRuntimeException;
-
-class Scenario
-{
+ 
+class Scenario {
     /**
      * @var    \Codeception\TestCase
      */
@@ -13,28 +10,25 @@ class Scenario
     /**
      * @var    array
      */
-    protected $steps = [];
+    protected $steps = array();
 
     /**
      * @var    string
      */
-    protected $feature;
+	protected $feature;
     protected $running = false;
     protected $blocker = null;
-    protected $groups = [];
-    protected $env = [];
-
-    protected $currents = [];
+    protected $groups = array();
+    protected $env = array();
 
     /**
      * Constructor.
      *
      * @param  \Codeception\TestCase $test
      */
-    public function __construct(\Codeception\TestCase $test, $currents = [])
+    public function __construct(\Codeception\TestCase $test)
     {
-        $this->test = $test;
-        $this->currents = $currents;
+		$this->test = $test;
     }
 
     public function group($group)
@@ -74,19 +68,19 @@ class Scenario
         return $this->env;
     }
 
-    public function setFeature($feature)
+    public function setFeature($feature) 
     {
         $this->feature = $feature;
     }
 
     public function skip($reason = "")
     {
-        $this->blocker = new \Codeception\Step\Skip($reason, []);
+        $this->blocker = new \Codeception\Step\Skip($reason, array());
     }
 
     public function incomplete($reason = "")
     {
-        $this->blocker = new \Codeception\Step\Incomplete($reason, []);
+        $this->blocker = new \Codeception\Step\Incomplete($reason, array());
     }
 
     protected function ignore()
@@ -96,7 +90,6 @@ class Scenario
 
     public function runStep(Step $step)
     {
-        $this->stopIfBlocked();
         $this->steps[] = $step;
         $result = $this->test->runStep($step);
         $step->executed = true;
@@ -119,23 +112,22 @@ class Scenario
         return $this->steps;
     }
 
-    public function getFeature()
-    {
-        return $this->feature;
-    }
+	public function getFeature() {
+	    return $this->feature;
+	}
 
     public function getHtml()
     {
         $text = '';
-        foreach ($this->getSteps() as $step) {
+        foreach($this->getSteps() as $step) {
             /** @var Step $step */
             if ($step->getName() !== 'Comment') {
-                $text .= 'I ' . $step->getHtml() . '<br/>';
+                $text .= 'I ' . $step->getHtmlAction() . '<br/>';
             } else {
                 $text .= trim($step->getHumanizedArguments(), '"') . '<br/>';
             }
         }
-        $text = str_replace(['"\'', '\'"'], ["'", "'"], $text);
+        $text = str_replace(array('"\'','\'"'), array("'","'"), $text);
         $text = "<h3>" . strtoupper('I want to ' . $this->getFeature()) . "</h3>" . $text;
         return $text;
 
@@ -150,24 +142,19 @@ class Scenario
 
     }
 
-    public function comment($comment)
+    public function comment($comment) 
     {
-        $this->runStep(new \Codeception\Step\Comment($comment, []));
+        $this->runStep(new \Codeception\Step\Comment($comment,array()));
     }
 
-    public function stopIfBlocked()
+    public function run() 
     {
         if ($this->isBlocked()) {
             return $this->blocker->run();
         }
-    }
 
-    public function current($key)
-    {
-        if (!isset($this->currents[$key])) {
-            throw new TestRuntimeException("Current $key is not set in this scenario");
-        }
-        return $this->currents[$key];
+        $this->running = true;
+        $this->steps = array();
     }
 
     public function isBlocked()
@@ -175,16 +162,14 @@ class Scenario
         return (bool)$this->blocker;
     }
 
-    public function preload()
-    {
-        \Codeception\Lib\Deprecation::add("Scenario is never preloaded. Please remove \$scenario->preload() call.", $this->getFeature());
-        return false;
-    }
-
     public function running()
     {
-        \Codeception\Lib\Deprecation::add("Scenario is always running. Please remove \$scenario->running() call.", $this->getFeature());
-        return true;
+        return $this->running;
+    }
+
+    public function preload() 
+    {
+        return !$this->running;
     }
 
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeception\Util;
 
 /**
@@ -6,7 +7,7 @@ namespace Codeception\Util;
  */
 class Annotation
 {
-    protected static $reflectedClasses = [];
+    protected static $reflectedClasses = array();
     protected static $regex = '/@%s(?:[ \t]+(.*?))?[ \t]*\r?$/m';
     protected static $lastReflected = null;
 
@@ -59,22 +60,6 @@ class Annotation
         return self::forClass($class)->method($method);
     }
 
-    /**
-     * Parses raw comment for annotations
-     *
-     * @param $comment
-     * @param $annotation
-     * @return array
-     */
-    public static function fetchAllFromComment($annotation, $comment)
-    {
-        if (preg_match_all(sprintf(self::$regex, $annotation), $comment, $matched)) {
-            return $matched[1];
-        }
-        return [];
-
-    }
-
     public function __construct(\ReflectionClass $class)
     {
         $this->currentReflectedItem = $this->reflectedClass = $class;
@@ -115,10 +100,5 @@ class Annotation
             return $matched[1];
         }
         return [];
-    }
-
-    public function raw()
-    {
-        return $this->currentReflectedItem->getDocComment();
     }
 }

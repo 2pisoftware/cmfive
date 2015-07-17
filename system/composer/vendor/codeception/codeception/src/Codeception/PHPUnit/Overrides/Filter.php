@@ -2,15 +2,9 @@
 
 class PHPUnit_Util_Filter
 {
-    protected static $filteredClassesPattern = [
-        'Symfony\Component\Console',
-        'Codeception\Command\\',
-        'Codeception\TestCase\\',
-    ];
-
-    public static function getFilteredStackTrace(Exception $e, $asString = true, $filter = true)
+    public static function getFilteredStackTrace(Exception $e, $asString = true)
     {
-        $stackTrace = $asString ? '' : [];
+        $stackTrace = $asString ? '' : array();
 
         $trace = $e->getPrevious() ? $e->getPrevious()->getTrace() : $e->getTrace();
         if ($e instanceof \PHPUnit_Framework_ExceptionWrapper) {
@@ -19,10 +13,10 @@ class PHPUnit_Util_Filter
 
         foreach ($trace as $step) {
 
-            if (self::classIsFiltered($step) and $filter) {
+            if (self::classIsFiltered($step)) {
                 continue;
             }
-            if (self::fileIsFiltered($step) and $filter) {
+            if (self::fileIsFiltered($step)) {
                 continue;
             }
 
@@ -42,22 +36,26 @@ class PHPUnit_Util_Filter
 
     protected static function classIsFiltered($step)
     {
-        if (!isset($step['class'])) {
+        if (! isset($step['class'])) {
             return false;
         }
+
         $className = $step['class'];
 
-        foreach (self::$filteredClassesPattern as $filteredClassName) {
-            if (strpos($className, $filteredClassName) === 0) {
-                return true;
-            }
+        if (strpos($className, 'Symfony\Component\Console') === 0) {
+            return true;
         }
+
+        if (strpos($className, 'Codeception\Command\\') === 0) {
+            return true;
+        }
+
         return false;
     }
 
     protected static function fileIsFiltered($step)
     {
-        if (!isset($step['file'])) {
+        if (! isset($step['file'])) {
             return false;
         }
 

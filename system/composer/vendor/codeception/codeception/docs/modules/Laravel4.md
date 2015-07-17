@@ -1,26 +1,24 @@
+# Laravel4 Module
 
+**For additional reference, please review the [source](https://github.com/Codeception/Codeception/tree/2.0/src/Codeception/Module/Laravel4.php)**
 
 
 
 This module allows you to run functional tests for Laravel 4.
-Please try it and leave your feedback.
-The original author of this module is Davert.
+Module is very fresh and should be improved with Laravel testing capabilities.
+Please try it and leave your feedbacks. If you want to maintain it - connect Codeception team.
+
+Uses 'bootstrap/start.php' to launch.
 
 ## Demo Project
 
 <https://github.com/Codeception/sample-l4-app>
 
-## Example
-
-    modules:
-        enabled:
-            - Laravel4
-
 ## Status
 
-* Maintainer: **Jan-Henk Gerritsen**
+* Maintainer: **Davert**
 * Stability: **stable**
-* Contact: janhenkgerritsen@gmail.com
+* Contact: davert.codeception@mailican.com
 
 ## Config
 
@@ -33,49 +31,9 @@ The original author of this module is Davert.
 
 ## API
 
-* app - `Illuminate\Foundation\Application` instance
+* kernel - `Illuminate\Foundation\Application` instance
 * client - `BrowserKit` client
 
-## Parts
-
-* ORM - include only haveRecord/grabRecord/seeRecord/dontSeeRecord actions
-
-
-
-### _findElements
-
-*hidden API method, expected to be used from Helper classes*
- 
-Locates element using available Codeception locator types:
-
-* XPath
-* CSS
-* Strict Locator
-
-Use it in Helpers or GroupObject or Extension classes:
-
-```php
-$els = $this->getModule('Laravel4')->_findElements('.items');
-$els = $this->getModule('Laravel4')->_findElements(['name' => 'username']);
-```
-
-WebDriver module returns `Facebook\WebDriver\Remote\RemoteWebElement` instances
-PhpBrowser and Framework modules return `Symfony\Component\DomCrawler\Crawler` instances
-
- * `param` $locator
- * `return` array of interactive elements
-
-
-### _savePageSource
-
-*hidden API method, expected to be used from Helper classes*
- 
-Saves page source of to a file
-
-```php
-$this->getModule('Laravel4')->_savePageSource(codecept_output_dir().'page.html');
-```
- * `param` $filename
 
 
 ### amHttpAuthenticated
@@ -94,14 +52,13 @@ Takes either `UserInterface` instance or array of credentials.
  * `param`  \Illuminate\Auth\UserInterface|array $user
  * `param`  string $driver
 @return void
-@part framework
 
 
 ### amOnAction
  
 Opens web page by action name
 
-``` php
+```php
 <?php
 $I->amOnAction('PostsController@index');
 ?>
@@ -131,7 +88,7 @@ $I->amOnPage('/register');
  
 Opens web page using route name and parameters.
 
-``` php
+```php
 <?php
 $I->amOnRoute('posts.create');
 ?>
@@ -163,7 +120,7 @@ Calls an Artisan command and returns output as a string
  * `param string` $command       The name of the command as displayed in the artisan command list
  * `param array`  $parameters    An associative array of command arguments
 
- * `return` string
+@return string
 
 
 ### checkOption
@@ -177,13 +134,6 @@ $I->checkOption('#agree');
 ```
 
  * `param` $option
-
-
-### checkStartFileExists
- 
-Make sure the Laravel start file exists.
-
-
 
 
 ### click
@@ -439,8 +389,6 @@ $I->dontSeeRecord('users', array('name' => 'davert'));
 
  * `param` $tableName
  * `param array` $attributes
-@part orm
-@part framework
 
 
 ### fillField
@@ -456,13 +404,6 @@ $I->fillField(['name' => 'email'], 'jon@mail.com');
 
  * `param` $field
  * `param` $value
-
-
-### getApplication
- 
-Provides access the Laravel application object.
-
- * `return` \Illuminate\Foundation\Application
 
 
 ### grabAttributeFrom
@@ -509,10 +450,6 @@ $uri = $I->grabFromCurrentUrl();
  * `internal param` $url
 
 
-### grabMultiple
-__not documented__
-
-
 ### grabRecord
  
 Retrieves record from database
@@ -525,8 +462,6 @@ $category = $I->grabRecord('users', array('name' => 'davert'));
 
  * `param` $tableName
  * `param array` $attributes
-@part ORM
-@part framework
 
 
 ### grabService
@@ -551,7 +486,6 @@ $service = $I->grabService('foo');
 ```
 
  * `param`  string $class
-@part framework
 
 
 ### grabTextFrom
@@ -575,7 +509,7 @@ $value = $I->grabTextFrom('~<input value=(.*?)]~sgi'); // match with a regex
  
  * `param` $field
 
- * `return` array|mixed|null|string
+@return array|mixed|null|string
 
 
 ### haveDisabledFilters
@@ -600,14 +534,11 @@ $user_id = $I->haveRecord('users', array('name' => 'Davert'));
 
  * `param` $tableName
  * `param array` $attributes
-@part orm
-@part framework
 
 
 ### logout
  
 Logs user out
-@part framework
 
 
 ### resetCookie
@@ -640,7 +571,6 @@ $I->see('Sign Up','//body/h1'); // with XPath
 ### seeAuthentication
  
 Checks that user is authenticated
-@part framework
 
 
 ### seeCheckboxIsChecked
@@ -677,7 +607,7 @@ $I->seeCookie('PHPSESSID');
  
 Checks that current url matches action
 
-``` php
+```php
 <?php
 $I->seeCurrentActionIs('PostsController@index');
 ?>
@@ -691,7 +621,7 @@ $I->seeCurrentActionIs('PostsController@index');
  
 Checks that current url matches route
 
-``` php
+```php
 <?php
 $I->seeCurrentRouteIs('posts.index');
 ?>
@@ -751,56 +681,6 @@ $I->seeElement(['css' => 'form input'], ['name' => 'login']);
 @return
 
 
-### seeFormErrorMessage
- 
-Assert that specific form error message is set in the view.
-
-Useful for validation messages and generally messages array
- e.g.
- return `Redirect::to('register')->withErrors($validator);`
-
-Example of Usage
-
-``` php
-<?php
-$I->seeFormErrorMessage('username', 'Invalid Username');
-?>
-```
- * `param string` $key
- * `param string` $errorMessage
-
-
-### seeFormErrorMessages
- 
-Assert that specific form error messages are set in the view.
-
-Useful for validation messages and generally messages array
- e.g.
- return `Redirect::to('register')->withErrors($validator);`
-
-Example of Usage
-
-``` php
-<?php
-$I->seeFormErrorMessages(array('username'=>'Invalid Username'));
-?>
-```
- * `param array` $bindings
-
-
-### seeFormHasErrors
- 
-Assert that form errors are bound to the View.
-
-``` php
-<?php
-$I->seeFormHasErrors();
-?>
-```
-
- * `return` bool
-
-
 ### seeInCurrentUrl
  
 Checks that current URI contains the given string.
@@ -819,7 +699,7 @@ $I->seeInCurrentUrl('/users/');
 
 ### seeInField
  
-Checks that the given input field or textarea contains the given value.
+Checks that the given input field or textarea contains the given value. 
 For fuzzy locators, fields are matched by label text, the "name" attribute, CSS, and XPath.
 
 ``` php
@@ -902,18 +782,11 @@ $I->seeInFormFields('//form[@id=my-form]', $form);
 
 ### seeInSession
  
-Assert that a session variable exists.
-
-``` php
-<?php
-$I->seeInSession('key');
-$I->seeInSession('key', 'value');
-?>
-```
+Assert that the session has a given list of values.
 
  * `param`  string|array $key
  * `param`  mixed $value
- * `return` void
+@return void
 
 
 ### seeInTitle
@@ -957,9 +830,9 @@ $I->seeNumberOfElements('tr', [0,10]); //between 0 and 10 elements
 ?>
 ```
  * `param` $selector
- * `param mixed` $expected :
+ * `param mixed` $expected:
 - string: strict number
-- array: range of numbers [0,10]
+- array: range of numbers [0,10]  
 
 
 ### seeOptionIsSelected
@@ -987,15 +860,11 @@ Asserts that current page has 404 response status code.
 Checks that record exists in database.
 
 ``` php
-<?php
 $I->seeRecord('users', array('name' => 'davert'));
-?>
 ```
 
  * `param` $tableName
  * `param array` $attributes
-@part orm
-@part framework
 
 
 ### seeResponseCodeIs
@@ -1023,36 +892,21 @@ $I->seeSessionErrorMessage(array('username'=>'Invalid Username'));
 ?>
 ```
  * `param array` $bindings
-@deprecated
 
 
 ### seeSessionHasErrors
  
 Assert that the session has errors bound.
 
-``` php
-<?php
-$I->seeSessionHasErrors();
-?>
-```
-
 @return bool
-@deprecated
 
 
 ### seeSessionHasValues
  
 Assert that the session has a given list of values.
 
-``` php
-<?php
-$I->seeSessionHasValues(['key1', 'key2']);
-$I->seeSessionHasValues(['key1' => 'value1', 'key2' => 'value2']);
-?>
-```
-
  * `param`  array $bindings
- * `return` void
+@return void
 
 
 ### selectOption
@@ -1132,11 +986,6 @@ $I->sendAjaxRequest('PUT', '/posts/7', array('title' => 'new title'));
  * `param` $params
 
 
-### setApplication
- 
- * `param` $app
-
-
 ### setCookie
  
 Sets a cookie with the given name and value.
@@ -1151,13 +1000,15 @@ $I->setCookie('PHPSESSID', 'el4ukv0kqbvoirg7nkp4dncpk3');
  * `param` $name
  * `param` $val
  * `param array` $params
+ * `internal param` $cookie
+ * `internal param` $value
 
 
 
 ### submitForm
  
-Submits the given form on the page, optionally with the given form
-values.  Give the form fields values as an array.
+Submits the given form on the page, optionally with the given form values.
+Give the form fields values as an array.
 
 Skipped fields will be filled by their values from the page.
 You don't need to click the 'Submit' button afterwards.
@@ -1172,15 +1023,9 @@ Examples:
 
 ``` php
 <?php
-$I->submitForm('#login', [
-    'login' => 'davert',
-    'password' => '123456'
-]);
+$I->submitForm('#login', array('login' => 'davert', 'password' => '123456'));
 // or
-$I->submitForm('#login', [
-    'login' => 'davert',
-    'password' => '123456'
-], 'submitButtonName');
+$I->submitForm('#login', array('login' => 'davert', 'password' => '123456'), 'submitButtonName');
 
 ```
 
@@ -1188,17 +1033,10 @@ For example, given this sample "Sign Up" form:
 
 ``` html
 <form action="/sign_up">
-    Login:
-    <input type="text" name="user[login]" /><br/>
-    Password:
-    <input type="password" name="user[password]" /><br/>
-    Do you agree to our terms?
-    <input type="checkbox" name="user[agree]" /><br/>
-    Select pricing plan:
-    <select name="plan">
-        <option value="1">Free</option>
-        <option value="2" selected="selected">Paid</option>
-    </select>
+    Login: <input type="text" name="user[login]" /><br/>
+    Password: <input type="password" name="user[password]" /><br/>
+    Do you agree to out terms? <input type="checkbox" name="user[agree]" /><br/>
+    Select pricing plan <select name="plan"><option value="1">Free</option><option value="2" selected="selected">Paid</option></select>
     <input type="submit" name="submitButton" value="Submit" />
 </form>
 ```
@@ -1207,36 +1045,17 @@ You could write the following to submit it:
 
 ``` php
 <?php
-$I->submitForm(
-    '#userForm',
-    [
-        'user' => [
-            'login' => 'Davert',
-            'password' => '123456',
-            'agree' => true
-        ]
-    ],
-    'submitButton'
-);
-```
-Note that "2" will be the submitted value for the "plan" field, as it is
-the selected option.
+$I->submitForm('#userForm', array('user' => array('login' => 'Davert', 'password' => '123456', 'agree' => true)), 'submitButton');
 
-You can also emulate a JavaScript submission by not specifying any
-buttons in the third parameter to submitForm.
+```
+Note that "2" will be the submitted value for the "plan" field, as it is the selected option.
+
+You can also emulate a JavaScript submission by not specifying any buttons in the third parameter to submitForm.
 
 ```php
 <?php
-$I->submitForm(
-    '#userForm',
-    [
-        'user' => [
-            'login' => 'Davert',
-            'password' => '123456',
-            'agree' => true
-        ]
-    ]
-);
+$I->submitForm('#userForm', array('user' => array('login' => 'Davert', 'password' => '123456', 'agree' => true)));
+
 ```
 
 Pair this with seeInFormFields for quick testing magic.
@@ -1281,31 +1100,8 @@ $I->submitForm('#my-form', [
 ?>
 ```
 
-Mixing string and boolean values for a checkbox's value is not supported
-and may produce unexpected results.
-
-Field names ending in "[]" must be passed without the trailing square 
-bracket characters, and must contain an array for its value.  This allows
-submitting multiple values with the same name, consider:
-
-```php
-$I->submitForm('#my-form', [
-    'field[]' => 'value',
-    'field[]' => 'another value', // 'field[]' is already a defined key
-]);
-```
-
-The solution is to pass an array value:
-
-```php
-// this way both values are submitted
-$I->submitForm('#my-form', [
-    'field' => [
-        'value',
-        'another value',
-    ]
-]);
-```
+Mixing string and boolean values for a checkbox's value is not
+supported and may produce unexpected results.
 
  * `param` $selector
  * `param` $params
@@ -1324,4 +1120,4 @@ $I->uncheckOption('#notify');
 
  * `param` $option
 
-<p>&nbsp;</p><div class="alert alert-warning">Module reference is taken from the source code. <a href="https://github.com/Codeception/Codeception/tree/2.1/src/Codeception/Module/Laravel4.php">Help us to improve documentation. Edit module reference</a></div>
+<p>&nbsp;</p><div class="alert alert-warning">Module reference is taken from the source code. <a href="https://github.com/Codeception/Codeception/tree/2.0/src/Codeception/Module/Laravel4.php">Help us to improve documentation. Edit module reference</a></div>

@@ -6,25 +6,24 @@
 That's a pretty simple yet powerful class to build XML structures in jQuery-like style. With no XML line actually written!
 Uses DOM extension to manipulate XML data.
 
-
 ```php
 <?php
 $xml = new \Codeception\Util\XmlBuilder();
 $xml->users
-   ->user
-       ->val(1)
-       ->email
-           ->val('davert@mail.ua')
-           ->attr('valid','true')
-           ->parent()
-       ->cart
-           ->attr('empty','false')
-           ->items
-               ->item
-                   ->val('useful item');
-               ->parents('user')
-       ->active
-           ->val(1);
+	->user
+		->val(1)
+		->email
+			->val('davert@mail.ua')
+			->attr('valid','true')
+			->parent()
+		->cart
+			->attr('empty','false')
+			->items
+				->item
+					->val('useful item');
+				->parents('user')
+		->active
+			->val(1);
 echo $xml;
 ```
 
@@ -33,16 +32,16 @@ This will produce this XML
 ```xml
 <?xml version="1.0"?>
 <users>
-   <user>
-       1
-       <email valid="true">davert@mail.ua</email>
-       <cart empty="false">
-           <items>
-               <item>useful item</item>
-           </items>
-       </cart>
-       <active>1</active>
-   </user>
+	<user>
+		1
+		<email valid="true">davert@mail.ua</email>
+		<cart empty="false">
+			<items>
+				<item>useful item</item>
+			</items>
+		</cart>
+		<active>1</active>
+	</user>
 </users>
 ```
 
@@ -66,7 +65,7 @@ Export:
 
 #### *public* __construct() 
 
-[See source](https://github.com/Codeception/Codeception/blob/2.1/src/Codeception/Util/XmlBuilder.php#L78)
+[See source](https://github.com/Codeception/Codeception/blob/2.0/src/Codeception/Util/XmlBuilder.php#L77)
 
 #### *public* __get($tag) 
 
@@ -76,11 +75,11 @@ Appends child node
 
  * `return`  XmlBuilder
 
-[See source](https://github.com/Codeception/Codeception/blob/2.1/src/Codeception/Util/XmlBuilder.php#L91)
+[See source](https://github.com/Codeception/Codeception/blob/2.0/src/Codeception/Util/XmlBuilder.php#L90)
 
 #### *public* __toString() 
 
-[See source](https://github.com/Codeception/Codeception/blob/2.1/src/Codeception/Util/XmlBuilder.php#L163)
+[See source](https://github.com/Codeception/Codeception/blob/2.0/src/Codeception/Util/XmlBuilder.php#L162)
 
 #### *public* attr($attr, $val) 
 
@@ -91,13 +90,13 @@ Sets attribute for current node
 
  * `return`  XmlBuilder
 
-[See source](https://github.com/Codeception/Codeception/blob/2.1/src/Codeception/Util/XmlBuilder.php#L118)
+[See source](https://github.com/Codeception/Codeception/blob/2.0/src/Codeception/Util/XmlBuilder.php#L117)
 
 #### *public* getDom() 
 
  * `return`  \DOMDocument
 
-[See source](https://github.com/Codeception/Codeception/blob/2.1/src/Codeception/Util/XmlBuilder.php#L171)
+[See source](https://github.com/Codeception/Codeception/blob/2.0/src/Codeception/Util/XmlBuilder.php#L170)
 
 #### *public* parent() 
 
@@ -105,7 +104,7 @@ Traverses to parent
 
  * `return`  XmlBuilder
 
-[See source](https://github.com/Codeception/Codeception/blob/2.1/src/Codeception/Util/XmlBuilder.php#L129)
+[See source](https://github.com/Codeception/Codeception/blob/2.0/src/Codeception/Util/XmlBuilder.php#L128)
 
 #### *public* parents($tag) 
 
@@ -116,7 +115,7 @@ Traverses to parent with $name
  * `return`  XmlBuilder
  * `throws`  \Exception
 
-[See source](https://github.com/Codeception/Codeception/blob/2.1/src/Codeception/Util/XmlBuilder.php#L143)
+[See source](https://github.com/Codeception/Codeception/blob/2.0/src/Codeception/Util/XmlBuilder.php#L142)
 
 #### *public* val($val) 
 
@@ -124,6 +123,6 @@ Traverses to parent with $name
 
  * `return`  XmlBuilder
 
-[See source](https://github.com/Codeception/Codeception/blob/2.1/src/Codeception/Util/XmlBuilder.php#L104)
+[See source](https://github.com/Codeception/Codeception/blob/2.0/src/Codeception/Util/XmlBuilder.php#L103)
 
-<p>&nbsp;</p><div class="alert alert-warning">Reference is taken from the source code. <a href="https://github.com/Codeception/Codeception/blob/2.1/src/Codeception/Util/XmlBuilder.php">Help us to improve documentation. Edit module reference</a></div>
+<p>&nbsp;</p><div class="alert alert-warning">Reference is taken from the source code. <a href="https://github.com/Codeception/Codeception/blob/2.0/src/Codeception/Util/XmlBuilder.php">Help us to improve documentation. Edit module reference</a></div>

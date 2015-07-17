@@ -1,14 +1,6 @@
 <?php
 namespace Codeception\Module;
 
-use Codeception\Module as CodeceptionModule;
-use Codeception\Configuration;
-use Codeception\Exception\ModuleException;
-use Codeception\Exception\ModuleConfigException;
-use Codeception\Lib\Interfaces\Db as DbInterface;
-use Codeception\Lib\Driver\Db as Driver;
-use Codeception\TestCase;
-
 /**
  * Works with SQL database.
  *
@@ -57,28 +49,34 @@ use Codeception\TestCase;
  * * dump - path to database dump.
  * * populate: true - should the dump be loaded before test suite is started.
  * * cleanup: true - should the dump be reloaded after each test
- * * reconnect: false - should the module reconnect to database before each test
  *
  * ### Example
  *
  *     modules:
- *        enabled:
- *           - Db:
+ *        enabled: [Db]
+ *        config:
+ *           Db:
  *              dsn: 'mysql:host=localhost;dbname=testdb'
  *              user: 'root'
  *              password: ''
  *              dump: 'tests/_data/dump.sql'
  *              populate: true
  *              cleanup: false
- *              reconnect: true
  *
  * ## Public Properties
  * * dbh - contains PDO connection.
  * * driver - contains Connection Driver. See [list all available drivers](https://github.com/Codeception/Codeception/tree/master/src/Codeception/Util/Driver)
  *
  */
-class Db extends CodeceptionModule implements DbInterface
+
+use Codeception\Lib\Driver\Db as Driver;
+use Codeception\Exception\Module as ModuleException;
+use Codeception\Exception\ModuleConfig as ModuleConfigException;
+use Codeception\Configuration as Configuration;
+
+class Db extends \Codeception\Module implements \Codeception\Lib\Interfaces\Db
 {
+
     /**
      * @api
      * @var
@@ -94,10 +92,9 @@ class Db extends CodeceptionModule implements DbInterface
      * @var array
      */
     protected $config = [
-      'populate'  => true,
-      'cleanup'   => true,
-      'reconnect' => false,
-      'dump'      => null
+      'populate' => true,
+      'cleanup'  => true,
+      'dump'     => null
     ];
 
     /**
@@ -126,10 +123,9 @@ class Db extends CodeceptionModule implements DbInterface
 
             if (!file_exists(Configuration::projectDir() . $this->config['dump'])) {
                 throw new ModuleConfigException(
-                    __CLASS__,
-                    "\nFile with dump doesn't exist.\n"
-                    . "Please, check path for sql file: "
-                    . $this->config['dump']
+                  __CLASS__,
+                  "\nFile with dump doesn't exist.
+                    Please, check path for sql file: " . $this->config['dump']
                 );
             }
             $sql = file_get_contents(Configuration::projectDir() . $this->config['dump']);
@@ -139,46 +135,24 @@ class Db extends CodeceptionModule implements DbInterface
             }
         }
 
-        $this->connect();
+        try {
+            $this->driver = Driver::create($this->config['dsn'], $this->config['user'], $this->config['password']);
+        } catch (\PDOException $e) {
+            throw new ModuleException(__CLASS__, $e->getMessage() . ' while creating PDO connection');
+        }
+
+        $this->dbh = $this->driver->getDbh();
 
         // starting with loading dump
         if ($this->config['populate']) {
-            if ($this->config['cleanup']) {
-                $this->cleanup();
-            }
+            $this->cleanup();
             $this->loadDump();
             $this->populated = true;
         }
     }
 
-    private function connect()
+    public function _before(\Codeception\TestCase $test)
     {
-        try {
-            $this->driver = Driver::create($this->config['dsn'], $this->config['user'], $this->config['password']);
-        } catch (\PDOException $e) {
-            $message = $e->getMessage();
-            if ($message === 'could not find driver') {
-                list ($missingDriver,) = explode(':', $this->config['dsn'],2);
-                $message = "could not find $missingDriver driver";
-            }
-
-            throw new ModuleException(__CLASS__, $message . ' while creating PDO connection');
-        }
-
-        $this->dbh = $this->driver->getDbh();
-    }
-
-    private function disconnect()
-    {
-        $this->dbh = null;
-        $this->driver = null;
-    }
-
-    public function _before(TestCase $test)
-    {
-        if ($this->config['reconnect']) {
-            $this->connect();
-        }
         if ($this->config['cleanup'] && !$this->populated) {
             $this->cleanup();
             $this->loadDump();
@@ -186,13 +160,10 @@ class Db extends CodeceptionModule implements DbInterface
         parent::_before($test);
     }
 
-    public function _after(TestCase $test)
+    public function _after(\Codeception\TestCase $test)
     {
         $this->populated = false;
         $this->removeInserted();
-        if ($this->config['reconnect']) {
-            $this->disconnect();
-        }
         parent::_after($test);
     }
 
@@ -202,7 +173,7 @@ class Db extends CodeceptionModule implements DbInterface
             try {
                 $this->driver->deleteQuery($insertId['table'], $insertId['id'], $insertId['primary']);
             } catch (\Exception $e) {
-                $this->debug("coudn't delete record {$insertId['id']} from {$insertId['table']}");
+                $this->debug("coudn\'t delete record {$insertId['id']} from {$insertId['table']}");
             }
         }
         $this->insertedIds = [];
@@ -214,7 +185,7 @@ class Db extends CodeceptionModule implements DbInterface
         if (!$dbh) {
             throw new ModuleConfigException(
               __CLASS__,
-              'No connection to database. Remove this module from config if you don\'t need database repopulation'
+              "No connection to database. Remove this module from config if you don't need database repopulation"
             );
         }
         try {
@@ -277,7 +248,7 @@ class Db extends CodeceptionModule implements DbInterface
         }
 
         try {
-            $lastInsertId = (int)$this->driver->lastInsertId($table);
+            $lastInsertId = (int) $this->driver->lastInsertId($table);
         } catch (\PDOException $e) {
             // ignore errors due to uncommon DB structure,
             // such as tables without _id_seq in PGSQL
@@ -285,9 +256,9 @@ class Db extends CodeceptionModule implements DbInterface
         }
 
         $this->insertedIds[] = [
-            'table' => $table,
-            'id' => $lastInsertId,
-            'primary' => $this->driver->getPrimaryColumn($table)
+          'table'   => $table,
+          'id'      => $lastInsertId,
+          'primary' => $this->driver->getPrimaryColumn($table)
         ];
 
         return $lastInsertId;
@@ -295,46 +266,14 @@ class Db extends CodeceptionModule implements DbInterface
 
     public function seeInDatabase($table, $criteria = [])
     {
-        $res = $this->countInDatabase($table, $criteria);
+        $res = $this->proceedSeeInDatabase($table, 'count(*)', $criteria);
         $this->assertGreaterThan(0, $res, 'No matching records found');
-    }
-
-    /**
-     * Asserts that found number of records in database
-     *
-     * ``` php
-     * <?php
-     * $I->seeNumRecords(1, 'users', ['name' => 'davert'])
-     * ?>
-     * ```
-     *
-     * @param int    $num      Expected number
-     * @param string $table    Table name
-     * @param array  $criteria Search criteria [Optional]
-     */
-    public function seeNumRecords($num, $table, array $criteria = [])
-    {
-        $res = $this->countInDatabase($table, $criteria);
-        $this->assertEquals($num, $res, 'The number of found rows is not consistent with the asserting');
     }
 
     public function dontSeeInDatabase($table, $criteria = [])
     {
-        $res = $this->countInDatabase($table, $criteria);
+        $res = $this->proceedSeeInDatabase($table, 'count(*)', $criteria);
         $this->assertLessThan(1, $res);
-    }
-
-    /**
-     * Count rows in database
-     *
-     * @param string $table    Table name
-     * @param array  $criteria Search criteria [Optional]
-     *
-     * @return int
-     */
-    protected function countInDatabase($table, array $criteria = [])
-    {
-        return (int) $this->proceedSeeInDatabase($table, 'count(*)', $criteria);
     }
 
     protected function proceedSeeInDatabase($table, $column, $criteria)

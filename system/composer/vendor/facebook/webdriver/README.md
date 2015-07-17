@@ -21,7 +21,7 @@ Add the dependency. https://packagist.org/packages/facebook/webdriver
 
     {
       "require": {
-        "facebook/webdriver": "~1.0"
+        "facebook/webdriver": "dev-master"
       }
     }
     

@@ -18,7 +18,7 @@ class AuthService extends DbService {
 		foreach($hook_results as $module => $user) {
 			//@TODO: check config for $module.optional or $module.manditory. default to optional for now. if any manditory returns null then return null.
 			if (!empty($user)) {
-				$this->w->Log->info($user->login.' authenticated via '.$module.' prelogin hook');
+				$this->w->Log->info($user->getFullName()." authenticated via ".$module." prelogin hook");
 				break;
 			} else {
 				$this->w->Log->info('prelogin hook did not provide authentication: '.$login);
@@ -37,9 +37,8 @@ class AuthService extends DbService {
 				$this->w->Log->info('cmfive pasword mismatch for username: '.$login);
 				return null;
 			}
-			$this->w->Log->info("User cmFive Authenticated for: ".$user->login);
 		}
-		
+		$this->w->Log->info("User logged in: ".$user->getFullName());
 		$hook_results = $this->w->callHook("auth", "postlogin", $user);
 		/*foreach($hook_results as $module => $user) {
 			//
@@ -128,12 +127,12 @@ class AuthService extends DbService {
 		}
 		
 		
-		//$server['AUTH_USER']='2pieUser';
+		$server['AUTH_USER']='2pieUser';
 		
 		//added empty user test to stop infinte loop ie this function called within this condition.
-		if (empty($this->user()) && (Config::get('system.use_passthrough_authentication') === TRUE) && !empty($_SERVER['AUTH_USER'])) {
+		if (empty($this->user()) && (Config::get('system.use_passthrough_authentication') === TRUE) && !empty($server['AUTH_USER'])) {
 			// Get the username
-			$username = explode('\\', $_SERVER["AUTH_USER"]);
+			$username = explode('\\', $server["AUTH_USER"]);
 			$username = end($username);
 			$this->w->Log->debug("Passthrough Username: " . $username);
 			

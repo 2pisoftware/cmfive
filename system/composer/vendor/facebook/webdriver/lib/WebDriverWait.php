@@ -13,11 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Facebook\WebDriver;
-
-use Facebook\WebDriver\Exception\NoSuchElementException;
-use Facebook\WebDriver\Exception\TimeOutException;
-
 /**
  * A utility class, designed to help the user to wait until a condition turns
  * true.
@@ -35,8 +30,9 @@ class WebDriverWait {
       $timeout_in_second = null,
       $interval_in_millisecond = null) {
     $this->driver = $driver;
-    $this->timeout = $timeout_in_second ?: 30;
-    $this->interval = $interval_in_millisecond ?: 250;
+    $this->timeout = ($timeout_in_second) ? $timeout_in_second : 30;
+    $this->interval =
+      ($interval_in_millisecond) ? $interval_in_millisecond : 250;
   }
 
   /**
@@ -45,12 +41,7 @@ class WebDriverWait {
    *
    * @param (closure|WebDriverExpectedCondition)
    * @param string $message
-   *
    * @return mixed The return value of $func_or_ec
-
-   * @throws NoSuchElementException
-   * @throws TimeOutException
-   * @throws \Exception
    */
   public function until($func_or_ec, $message = "") {
     $end = microtime(true) + $this->timeout;

@@ -1,4 +1,5 @@
 <?php
+use \DumbGuy;
 
 class AnotherCest
 {

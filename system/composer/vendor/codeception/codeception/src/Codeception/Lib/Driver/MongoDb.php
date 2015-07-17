@@ -2,9 +2,6 @@
 
 namespace Codeception\Lib\Driver;
 
-use Codeception\Exception\ModuleConfigException;
-use Codeception\Exception\ModuleException;
-
 class MongoDb
 {
     private $dbh;
@@ -13,7 +10,6 @@ class MongoDb
     private $host;
     private $user;
     private $password;
-    private $client;
 
     public static function connect($dsn, $user, $password)
     {
@@ -29,7 +25,7 @@ class MongoDb
      * @param $user
      * @param $password
      *
-     * @throws ModuleConfigException
+     * @return \Mongo
      * @throws \Exception
      */
     public function __construct($dsn, $user, $password)
@@ -37,7 +33,7 @@ class MongoDb
         /* defining DB name */
         $this->dbName = substr($dsn, strrpos($dsn, '/') + 1);
         if (strlen($this->dbName) == 0) {
-            throw new ModuleConfigException($this, 'Please specify valid $dsn with DB name after the host:port');
+            throw new \Exception('Please specify valid $dsn with DB name after the host:port');
         }
 
         /* defining host */
@@ -48,26 +44,26 @@ class MongoDb
         }
         $this->host = rtrim(str_replace($this->dbName, '', $this->host), '/');
 
-        $options = [
+        $options = array(
             'connect' => true
-        ];
+        );
 
         if ($user && $password) {
-            $options += [
+            $options += array(
                 'username' => $user,
                 'password' => $password
-            ];
+            );
         }
 
         try {
-            $this->client = new \MongoClient($dsn, $options);
-            $this->dbh    = $this->client->selectDB($this->dbName);
+            $m         = new \MongoClient($dsn, $options);
+            $this->dbh = $m->selectDB($this->dbName);
         } catch (\MongoConnectionException $e) {
-            throw new ModuleException($this, sprintf('Failed to open Mongo connection: %s', $e->getMessage()));
+            throw new \Exception(sprintf('Failed to open Mongo connection: %s', $e->getMessage()));
         }
 
-        $this->dsn = $dsn;
-        $this->user = $user;
+        $this->dsn      = $dsn;
+        $this->user     = $user;
         $this->password = $password;
     }
 
@@ -115,10 +111,10 @@ class MongoDb
                 $this->host . '/' . $this->dbName,
                 $this->user,
                 $this->password,
-                escapeshellarg($dumpFile)
+                $dumpFile
             );
         } else {
-            $cmd = sprintf('mongo %s %s', $this->host . '/' . $this->dbName, escapeshellarg($dumpFile));
+            $cmd = sprintf('mongo %s %s', $this->host . '/' . $this->dbName, $dumpFile);
         }
         shell_exec($cmd);
     }
@@ -126,10 +122,5 @@ class MongoDb
     public function getDbh()
     {
         return $this->dbh;
-    }
-
-    public function setDatabase($dbName)
-    {
-        $this->dbh = $this->client->selectDB($dbName);
     }
 }

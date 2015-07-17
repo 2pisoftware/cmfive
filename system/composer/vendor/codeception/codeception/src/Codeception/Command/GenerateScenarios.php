@@ -2,12 +2,12 @@
 namespace Codeception\Command;
 
 use Codeception\Configuration;
-use Codeception\Exception\ConfigurationException as ConfigurationException;
-use Codeception\TestCase\Interfaces\ScenarioDriven;
 use Symfony\Component\Console\Command\Command;
+use Codeception\Exception\Configuration as ConfigurationException;
+use Codeception\TestCase\Interfaces\ScenarioDriven;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -25,14 +25,14 @@ class GenerateScenarios extends Command
 
     protected function configure()
     {
-        $this->setDefinition([
+        $this->setDefinition(array(
             new InputArgument('suite', InputArgument::REQUIRED, 'suite from which texts should be generated'),
             new InputOption('config', 'c', InputOption::VALUE_REQUIRED, 'Use specified config instead of default'),
             new InputOption('path', 'p', InputOption::VALUE_REQUIRED, 'Use specified path as destination instead of default'),
             new InputOption('single-file', '', InputOption::VALUE_NONE, 'Render all scenarios to only one file'),
-            new InputOption('format', 'f', InputOption::VALUE_REQUIRED, 'Specify output format: html or text (default)', 'text'),
+            new InputOption('format', 'f', InputOption::VALUE_REQUIRED, 'Specify output format: html or text (default)','text'),
             new InputOption('config', 'c', InputOption::VALUE_REQUIRED, 'Use specified config instead of default'),
-        ]);
+        ));
         parent::configure();
     }
 
@@ -45,7 +45,7 @@ class GenerateScenarios extends Command
     {
         $suite = $input->getArgument('suite');
 
-        $suiteConf = $this->getSuiteConfig($suite, $input->getOption('config'));
+        $suiteconf = $this->getSuiteConfig($suite, $input->getOption('config'));
 
         $path = $input->getOption('path')
             ? $input->getOption('path')
@@ -60,15 +60,13 @@ class GenerateScenarios extends Command
         }
 
         $path = $path . DIRECTORY_SEPARATOR . $suite;
-        if (!$input->getOption('single-file')) {
-            @mkdir($path);
-        }
+        if (!$input->getOption('single-file')) @mkdir($path);
 
-        $suiteManager = new \Codeception\SuiteManager(new EventDispatcher(), $suite, $suiteConf);
+        $suiteManager = new \Codeception\SuiteManager(new EventDispatcher(), $suite, $suiteconf);
 
-        if ($suiteConf['bootstrap']) {
-            if (file_exists($suiteConf['path'] . $suiteConf['bootstrap'])) {
-                require_once $suiteConf['path'] . $suiteConf['bootstrap'];
+        if ($suiteconf['bootstrap']) {
+            if (file_exists($suiteconf['path'] . $suiteconf['bootstrap'])) {
+                require_once $suiteconf['path'] . $suiteconf['bootstrap'];
             }
         }
 
@@ -76,9 +74,7 @@ class GenerateScenarios extends Command
         $scenarios = "";
 
         foreach ($tests as $test) {
-            if (!($test instanceof ScenarioDriven)) {
-                continue;
-            }
+            if (!($test instanceof ScenarioDriven)) continue;
             $feature = $test->getScenarioText($format);
 
             $name = $this->underscore(basename($test->getFileName(), '.php'));
@@ -101,10 +97,8 @@ class GenerateScenarios extends Command
     protected function decorate($text, $format)
     {
         switch ($format) {
-            case 'text':
-                return $text;
-            case 'html':
-                return "<html><body>$text</body></html>";
+            case 'text': return $text;
+            case 'html': return "<html><body>$text</body></html>";
         }
     }
 
@@ -117,10 +111,8 @@ class GenerateScenarios extends Command
     protected function formatExtension($format)
     {
         switch ($format) {
-            case 'text':
-                return '.txt';
-            case 'html':
-                return '.html';
+            case 'text': return '.txt';
+            case 'html': return '.html';
         }
     }
 
@@ -128,7 +120,7 @@ class GenerateScenarios extends Command
     {
         $name = preg_replace('/([A-Z]+)([A-Z][a-z])/', '\\1_\\2', $name);
         $name = preg_replace('/([a-z\d])([A-Z])/', '\\1_\\2', $name);
-        $name = str_replace(['/', '\\'], ['.', '.'], $name);
+        $name = str_replace(array('/','\\'),array('.','.'), $name);
         $name = preg_replace('/_Cept$/', '', $name);
         $name = preg_replace('/_Cest$/', '', $name);
         return $name;

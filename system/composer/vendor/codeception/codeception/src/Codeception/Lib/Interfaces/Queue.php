@@ -1,8 +1,10 @@
 <?php
+
+
 namespace Codeception\Lib\Interfaces;
 
-interface Queue
-{
+
+interface Queue {
 
     /**
      * Connect to the queueing server.
@@ -15,7 +17,7 @@ interface Queue
      * Post/Put a message on to the queue server
      *
      * @param string $message Message Body to be send
-     * @param string $queue Queue Name
+     * @param string $queue   Queue Name
      */
     public function addMessageToQueue($message, $queue);
 
@@ -49,4 +51,5 @@ interface Queue
     public function getRequiredConfig();
 
     public function getDefaultConfig();
+
 }

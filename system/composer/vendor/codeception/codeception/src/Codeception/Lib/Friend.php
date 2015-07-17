@@ -1,27 +1,26 @@
 <?php
 namespace Codeception\Lib;
-
 use Codeception\Actor;
-use Codeception\Exception\TestRuntimeException;
+use Codeception\Exception\TestRuntime;
+use Codeception\SuiteManager;
+use Codeception\Lib\Interfaces\MultiSession;
 
-class Friend
-{
+class Friend {
+
     protected $name;
     protected $actor;
     protected $data = [];
     protected $multiSessionModules = [];
 
-    public function __construct($name, Actor $actor, $modules = [])
+    public function __construct($name, Actor $guy)
     {
         $this->name = $name;
-        $this->actor = $actor;
-
-        $this->multiSessionModules = array_filter($modules, function ($m) {
-            return $m instanceof Interfaces\MultiSession;
+        $this->actor = $guy;
+        $this->multiSessionModules = array_filter(SuiteManager::$modules, function($m) {
+           return $m instanceof Interfaces\MultiSession;
         });
-
         if (empty($this->multiSessionModules)) {
-            throw new TestRuntimeException("No multisession modules used. Can't instantiate friend");
+            throw new TestRuntime("No multisession modules used. Can't instantiate friend");
         }
     }
 
@@ -31,23 +30,23 @@ class Friend
 
         foreach ($this->multiSessionModules as $module) {
             $name = $module->_getName();
-            $currentUserData[$name] = $module->_backupSession();
+            $currentUserData[$name] = $module->_backupSessionData();
             if (empty($this->data[$name])) {
                 $module->_initializeSession();
-                $this->data[$name] = $module->_backupSession();
+                $this->data[$name] = $module->_backupSessionData();
                 continue;
             }
-            $module->_loadSession($this->data[$name]);
+            $module->_loadSessionData($this->data[$name]);
         };
 
-        $this->actor->comment(strtoupper("<info>{$this->name} does --- </info>"));
+        $this->actor->comment(strtoupper("<info>{$this->name} does</info>:"));
         $ret = $closure($this->actor);
-        $this->actor->comment(strtoupper("<info>--- {$this->name} finished</info>"));
+        $this->actor->comment(strtoupper("<info>{$this->name} finished</info>"));
 
         foreach ($this->multiSessionModules as $module) {
             $name = $module->_getName();
-            $this->data[$name] = $module->_backupSession();
-            $module->_loadSession($currentUserData[$name]);
+            $this->data[$name] = $module->_backupSessionData();
+            $module->_loadSessionData($currentUserData[$name]);
         };
         return $ret;
     }
@@ -75,5 +74,6 @@ class Friend
             }
         }
     }
+
 }
  

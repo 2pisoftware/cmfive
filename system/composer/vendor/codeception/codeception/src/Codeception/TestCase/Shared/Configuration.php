@@ -1,7 +1,8 @@
 <?php
 namespace Codeception\TestCase\Shared;
 
-use Codeception\Exception\ConfigurationException;
+use Codeception\Exception\Configuration as ConfigurationException;
+use Codeception\Step;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 
@@ -11,7 +12,6 @@ trait Configuration
      * @var EventDispatcher
      */
     protected $dispatcher;
-
     protected $actor;
     protected $name;
     protected $testFile;
@@ -45,9 +45,11 @@ trait Configuration
         return $this;
     }
 
+
     public function config($property, $value)
     {
         $this->$property = $value;
         return $this;
     }
+
 }

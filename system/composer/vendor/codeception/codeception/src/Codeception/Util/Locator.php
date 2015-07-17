@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeception\Util;
 
 use Symfony\Component\CssSelector\CssSelector;
@@ -135,7 +136,7 @@ class Locator
      */
     public static function find($element, array $attributes)
     {
-        $operands = [];
+        $operands = array();
         foreach ($attributes as $attribute => $value) {
             if (is_int($attribute)) {
                 $operands[] = '@' . $value;
@@ -169,7 +170,7 @@ class Locator
     public static function isXPath($locator)
     {
         $document = new \DOMDocument('1.0', 'UTF-8');
-        $xpath = new \DOMXPath($document);
+        $xpath    = new \DOMXPath($document);
         return @$xpath->evaluate($locator, $document) !== false;
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeception\Lib\Interfaces;
 
 interface Db
@@ -24,7 +25,7 @@ interface Db
      * @param       $table
      * @param array $criteria
      */
-    public function seeInDatabase($table, $criteria = []);
+    public function seeInDatabase($table, $criteria = array());
 
     /**
      * Effect is opposite to ->seeInDatabase
@@ -49,7 +50,7 @@ interface Db
      * @param       $table
      * @param array $criteria
      */
-    public function dontSeeInDatabase($table, $criteria = []);
+    public function dontSeeInDatabase($table, $criteria = array());
 
     /**
      * Fetches a single column value from a database.
@@ -71,5 +72,5 @@ interface Db
      *
      * @return mixed
      */
-    public function grabFromDatabase($table, $column, $criteria = []);
+    public function grabFromDatabase($table, $column, $criteria = array());
 }

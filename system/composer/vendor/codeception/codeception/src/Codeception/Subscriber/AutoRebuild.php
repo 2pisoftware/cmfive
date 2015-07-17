@@ -1,10 +1,10 @@
 <?php
 namespace Codeception\Subscriber;
 
-use Codeception\Configuration;
-use Codeception\Event\SuiteEvent;
 use Codeception\Events;
-use Codeception\Lib\Generator\Actions;
+use Codeception\Event\SuiteEvent;
+use Codeception\Lib\Generator\Actor;
+use Codeception\SuiteManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class AutoRebuild implements EventSubscriberInterface
@@ -12,32 +12,29 @@ class AutoRebuild implements EventSubscriberInterface
     use Shared\StaticEvents;
 
     static $events = [
-        Events::SUITE_INIT => 'updateActor'
+        Events::SUITE_INIT => 'updateGuy'
     ];
 
-    public function updateActor(SuiteEvent $e)
+    public function updateGuy(SuiteEvent $e)
     {
         $settings = $e->getSettings();
-        $modules = $e->getSuite()->getModules();
+        $guyFile = $settings['path'] . $settings['class_name'] . '.php';
 
-        $actorFile = Configuration::supportDir() . '_generated' . DIRECTORY_SEPARATOR
-            . $settings['class_name'] . 'Actions.php';
-        
         // load guy class to see hash
-        $handle = @fopen($actorFile, "r");
-        if ($handle and is_writable($actorFile)) {
+        $handle = @fopen($guyFile, "r");
+        if ($handle and is_writable($guyFile)) {
             $line = @fgets($handle);
             if (preg_match('~\[STAMP\] ([a-f0-9]*)~', $line, $matches)) {
                 $hash = $matches[1];
-                $currentHash = Actions::genHash($modules, $settings);
+                $currentHash = Actor::genHash(SuiteManager::$actions, $settings);
 
                 // regenerate guy class when hashes do not match
                 if ($hash != $currentHash) {
                     codecept_debug("Rebuilding {$settings['class_name']}...");
-                    $actionsGenerator = new Actions($settings);
+                    $guyGenerator = new Actor($settings);
                     @fclose($handle);
-                    $generated = $actionsGenerator->produce();
-                    @file_put_contents($actorFile, $generated);
+                    $generated = $guyGenerator->produce();
+                    @file_put_contents($guyFile, $generated);
                     return;
                 }
             }

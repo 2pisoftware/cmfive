@@ -1,16 +1,15 @@
 <?php
 namespace Codeception\Module;
 
-use Codeception\Module as CodeceptionModule;
-use \Codeception\Util\Shared\Asserts as SharedAsserts;
+use Codeception\Module;
 
 /**
  * Special module for using asserts in your tests.
  *
  */
-class Asserts extends CodeceptionModule
+class Asserts extends Module
 {
-    use SharedAsserts {
+    use \Codeception\Util\Shared\Asserts {
         assertEquals as public;
         assertNotEquals as public;
         assertSame as public;
@@ -23,16 +22,12 @@ class Asserts extends CodeceptionModule
         assertLessThanOrEqual as public;
         assertContains as public;
         assertNotContains as public;
-        assertRegExp as public;
-        assertNotRegExp as public;
         assertEmpty as public;
         assertNotEmpty as public;
         assertNull as public;
         assertNotNull as public;
         assertTrue as public;
         assertFalse as public;
-        assertFileExists as public;
-        assertFileNotExists as public;
         fail as public;
     }
 }

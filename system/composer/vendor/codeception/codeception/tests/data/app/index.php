@@ -23,20 +23,14 @@ $urls = array(
     '/redirect2' => 'redirect2',
     '/redirect3' => 'redirect3',
     '/redirect4' => 'redirect4',
-    '/redirect_params' => 'redirect_params',
     '/redirect_interval' => 'redirect_interval',
     '/redirect_header_interval' => 'redirect_header_interval',
     '/redirect_self' => 'redirect_self',
-    '/relative_redirect' => 'redirect_relative',
-    '/relative/redirect' => 'redirect_relative',
-    '/relative/info' => 'info',
     '/facebook\??.*' => 'facebookController',
     '/form/(.*?)(#|\?.*?)?' => 'form',
     '/articles\??.*' => 'articles',
     '/auth' => 'httpAuth',
-    '/register' => 'register',
-    '/content-iso' => 'contentType1',
-    '/content-cp1251' => 'contentType2',
+    '/register' => 'register'
 );
 
 glue::stick($urls);

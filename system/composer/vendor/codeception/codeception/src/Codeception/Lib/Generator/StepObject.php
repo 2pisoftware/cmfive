@@ -11,21 +11,18 @@ class StepObject
 
     protected $template = <<<EOF
 <?php
-namespace {{namespace}};
-
-class {{name}} extends {{actorClass}}
+{{namespace}}
+class {{name}}Steps extends {{actorClass}}
 {
 {{actions}}
 }
 EOF;
 
     protected $actionTemplate = <<<EOF
-
     public function {{action}}()
     {
         \$I = \$this;
     }
-
 EOF;
 
     protected $settings;
@@ -35,8 +32,7 @@ EOF;
     public function __construct($settings, $name)
     {
         $this->settings = $settings;
-        $this->name = $this->getShortClassName($name);
-        $this->namespace = $this->getNamespaceString($this->settings['namespace'] . '\\Step\\' . $name);
+        $this->name = $this->removeSuffix($name, 'Steps');
     }
 
     public function produce()
@@ -48,7 +44,7 @@ EOF;
         $extended = '\\' . ltrim('\\' . $this->settings['namespace'] . '\\' . $actor, '\\');
 
         return (new Template($this->template))
-            ->place('namespace', $this->namespace)
+            ->place('namespace', $ns)
             ->place('name', $this->name)
             ->place('actorClass', $extended)
             ->place('actions', $this->actions)
@@ -61,4 +57,5 @@ EOF;
             ->place('action', $action)
             ->produce();
     }
+
 }

@@ -1,6 +1,6 @@
 {
   "name": "facebook/webdriver",
-  "description": "A PHP client for WebDriver",
+  "description": "A php client for WebDriver",
   "keywords": ["webdriver", "selenium", "php", "facebook"],
   "homepage": "https://github.com/facebook/php-webdriver",
   "type": "library",
@@ -14,19 +14,10 @@
     "php": ">=5.3.19"
   },
   "require-dev": {
-    "phpunit/phpunit": "4.6.*"
-  },
-  "suggest": {
+    "phpunit/phpunit": "3.7.*",
     "phpdocumentor/phpdocumentor": "2.*"
   },
   "autoload": {
-    "psr-4": {
-      "Facebook\\WebDriver\\": "lib/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Facebook\\WebDriver\\": "tests/functional"
-    }
+    "classmap": ["lib/"]
   }
 }

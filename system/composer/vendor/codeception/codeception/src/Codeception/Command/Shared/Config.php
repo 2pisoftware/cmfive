@@ -1,6 +1,5 @@
 <?php
 namespace Codeception\Command\Shared;
-
 use Codeception\Configuration;
 
 trait Config
@@ -21,4 +20,5 @@ trait Config
         Configuration::config($conf);
         return Configuration::suites();
     }
-}
+
+} 

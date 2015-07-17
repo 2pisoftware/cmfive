@@ -4,34 +4,26 @@ namespace Codeception\PHPUnit\Constraint;
 use Codeception\Exception\ElementNotFound;
 use Codeception\Lib\Console\Message;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
-use SebastianBergmann\Comparator\ComparisonFailure;
 
-class Crawler extends Page
-{
+class Crawler extends Page {
+
     protected function matches($nodes)
     {
-        /** @var $nodes DomCrawler  * */
-        if (!$nodes->count()) {
-            return false;
-        }
-        if ($this->string === '') {
-            return true;
-        }
+        /** @var $nodes DomCrawler  **/
+        if (!$nodes->count()) return false;
+        if ($this->string === '') return true;
 
-        foreach ($nodes as $node) {
-            if (parent::matches($node->nodeValue)) {
-                return true;
-            }
+        foreach ($nodes as $node)
+        {
+            if (parent::matches($node->nodeValue)) return true;
         }
         return false;
     }
 
-    protected function fail($nodes, $selector, ComparisonFailure $comparisonFailure = null)
+    protected function fail($nodes, $selector, \SebastianBergmann\Comparator\ComparisonFailure $comparisonFailure = NULL)
     {
-        /** @var $nodes DomCrawler  * */
-        if (!$nodes->count()) {
-            throw new ElementNotFound($selector, 'Element located either by name, CSS or XPath');
-        }
+        /** @var $nodes DomCrawler  **/
+        if (!$nodes->count()) throw new ElementNotFound($selector, 'Element located either by name, CSS or XPath');
 
         $output = "Failed asserting that any element by '$selector'";
         $output .= $this->uriMessage('on page');
@@ -46,8 +38,8 @@ class Crawler extends Page
         $output .= "\ncontains text '{$this->string}'";
 
         throw new \PHPUnit_Framework_ExpectationFailedException(
-            $output,
-            $comparisonFailure
+          $output,
+          $comparisonFailure
         );
     }
 
@@ -60,15 +52,20 @@ class Crawler extends Page
         return $desc;
     }
 
-    protected function nodesList(DomCrawler $nodes, $contains = null)
+    protected function nodesList(DOMCrawler $nodes, $contains = null)
     {
         $output = "";
-        foreach ($nodes as $node) {
-            if ($contains && strpos($node->nodeValue, $contains) === false) {
-                continue;
+        foreach ($nodes as $node)
+        {
+            if ($contains) {
+                if (strpos($node->nodeValue, $contains) === false) {
+                    continue;
+                }
             }
-            $output .= "\n+ <info>" . $node->C14N() . "</info>";
+            $output .= "\n+ <info>" . $node->C14N()."</info>";
         }
         return $output;
     }
+
+
 }

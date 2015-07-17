@@ -1,23 +1,19 @@
 <?php
 namespace Codeception\Step;
-
-use Codeception\Step as CodeceptionStep;
-use Codeception\Lib\ModuleContainer;
-
-class Executor extends CodeceptionStep
-{
+ 
+class Executor extends \Codeception\Step {
 
     protected $callable = null;
 
-    public function __construct(\Closure $callable, $arguments = [])
+    public function __construct(\Closure $callable, $arguments = array())
     {
         // TODO: add serialization to function http://www.htmlist.com/development/extending-php-5-3-closures-with-serialization-and-reflection/
-        parent::__construct('execute callable function', []);
+        parent::__construct('execute callable function', array());
 
         $this->callable = $callable;
     }
 
-    public function run(ModuleContainer $container = null)
+    public function run()
     {
         $callable = $this->callable;
 

@@ -1,8 +1,6 @@
 <?php
 namespace Codeception\Module;
-
-use Codeception\Module as CodeceptionModule;
-use Codeception\Exception\ModuleException;
+use Codeception\Exception\Module;
 use Codeception\TestCase;
 
 /**
@@ -51,18 +49,18 @@ use Codeception\TestCase;
  * ```
  *
  */
-class Sequence extends CodeceptionModule
-{
+class Sequence extends \Codeception\Module {
+
     public static $hash = array();
 
     public function _after(TestCase $t)
     {
-        self::$hash = [];
+        self::$hash = array();
     }
 }
 
 if (!function_exists('sq')) {
-    require_once __DIR__ . '/../Util/sq.php';
+    require_once __DIR__.'/../Util/sq.php';
 } else {
-    throw new ModuleException('Codeception\Module\Sequence', "function 'sq' already defined");
+    throw new Module('Codeception\Module\Sequence', "function 'sq' already defiend");
 }

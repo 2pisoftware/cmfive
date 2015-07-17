@@ -76,7 +76,7 @@ function renderSuitesBlock($suites,$key,$keyid) {
 	foreach ($suites as $url =>$suite) {
 		
 		if (strpos($requestUrl,$url)!==false) { 
-		
+
 			$suiteTests='';
 			foreach($suite['paths'] as $suiteName=>$suitePath) {
 				

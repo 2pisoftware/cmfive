@@ -8,7 +8,9 @@ class MongoDbTest extends \PHPUnit_Framework_TestCase
      * @var array 
      */
     private $mongoConfig = array(
-        'dsn' => 'mongodb://localhost:27017/test'
+        'dsn' => 'mongodb://localhost:27017/test',
+        'user' => '',
+        'password' => ''
     );
     
     /**
@@ -34,7 +36,7 @@ class MongoDbTest extends \PHPUnit_Framework_TestCase
 
         $mongo = new \MongoClient();
         
-        $this->module = new MongoDb(make_container());
+        $this->module = new MongoDb();
         $this->module->_setConfig($this->mongoConfig);
         $this->module->_initialize();
 
@@ -133,13 +135,5 @@ class MongoDbTest extends \PHPUnit_Framework_TestCase
         $this->userCollection->insert(array('id' => 6, 'trumpet' => $trumpet));
 
         $this->module->seeElementIsObject('users', array(), 'trumpet');
-    }
-
-    public function testUseDatabase()
-    {
-        $this->module->useDatabase('example');
-        $this->module->haveInCollection('stuff', array('name' => 'Ashley', 'email' => 'me@ashleyclarke.me'));
-        $this->module->seeInCollection('stuff', array('name' => 'Ashley', 'email' => 'me@ashleyclarke.me'));
-        $this->module->dontSeeInCollection('users', array('email' => 'miles@davis.com'));
     }
 }

@@ -1,22 +1,21 @@
 <?php
+
 namespace Codeception\TestCase;
 
 use Codeception\Configuration;
-use Codeception\TestCase as CodeceptionTestCase;
-use Codeception\Util\Annotation;
-use Codeception\TestCase\Interfaces\Descriptive;
-use Codeception\TestCase\Interfaces\Reported;
-use Codeception\TestCase\Interfaces\Configurable;
-use Codeception\TestCase\Shared\Actor;
-use Codeception\TestCase\Shared\Dependencies;
+use Codeception\Events;
+use Codeception\Event\TestEvent;
+use Codeception\Exception\TestRuntime;
+use Codeception\SuiteManager;
+use Codeception\TestCase;
 
-class Test extends CodeceptionTestCase implements
-    Descriptive,
-    Configurable,
-    Reported
+class Test extends TestCase implements
+    Interfaces\Descriptive,
+    Interfaces\Configurable,
+    Interfaces\Reported
 {
-    use Actor;
-    use Dependencies;
+    use Shared\Actor;
+    use Shared\Dependencies;
 
     protected function setUp()
     {
@@ -29,8 +28,9 @@ class Test extends CodeceptionTestCase implements
             $actorProperty = lcfirst($actor);
             $this->$actorProperty = $this->$property;
         }
+        $this->getScenario()->run();
+        $this->fire(Events::TEST_BEFORE, new TestEvent($this));
         $this->_before();
-        $this->prepareActorForTest();
     }
 
     /**
@@ -43,6 +43,7 @@ class Test extends CodeceptionTestCase implements
     protected function tearDown()
     {
         $this->_after();
+        $this->fire(Events::TEST_AFTER, new TestEvent($this));
     }
 
     /**
@@ -62,12 +63,7 @@ class Test extends CodeceptionTestCase implements
 
     public function getSignature()
     {
-        return get_class($this) . '::' . $this->getName(false);
-    }
-
-    public function getEnvironment()
-    {
-        return Annotation::forMethod($this, $this->getName(false))->fetchAll('env');
+        return get_class($this).'::'.$this->getName(false);
     }
 
     public function getFileName()
@@ -79,11 +75,15 @@ class Test extends CodeceptionTestCase implements
      * @param $module
      *
      * @return \Codeception\Module
-     * @throws \Codeception\Exception\TestRuntimeException
+     * @throws \Codeception\Exception\TestRuntime
      */
     public function getModule($module)
     {
-        return $this->moduleContainer->getModule($module);
+        if (SuiteManager::hasModule($module)) {
+            return SuiteManager::$modules[$module];
+        }
+
+        throw new TestRuntime("Module $module is not enabled for this test suite");
     }
 
     /**

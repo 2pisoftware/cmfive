@@ -1,15 +1,10 @@
 <?php
 namespace Codeception\Module;
 
-use Codeception\Exception\ModuleConfigException;
-use Codeception\Lib\Framework;
-use Codeception\Configuration;
-use Codeception\TestCase;
-use Codeception\Lib\Interfaces\ActiveRecord;
-use Codeception\Lib\Interfaces\PartedModule;
-use Codeception\Lib\Connector\Yii2 as Yii2Connector;
-use yii\db\ActiveRecordInterface;
 use Yii;
+use Codeception\Lib\Framework;
+use Codeception\Exception\ModuleConfig;
+use Codeception\Lib\Interfaces\ActiveRecord;
 
 /**
  * This module provides integration with [Yii framework](http://www.yiiframework.com/) (2.0).
@@ -25,15 +20,11 @@ use Yii;
  * <pre>
  * class_name: TestGuy
  * modules:
- *     enabled:
- *         - Yii2:
+ *     enabled: [Yii2, TestHelper]
+ *     config:
+ *         Yii2:
  *             configFile: '/path/to/config.php'
  * </pre>
- *
- * ## Parts
- *
- * * ORM - include only haveRecord/grabRecord/seeRecord/dontSeeRecord actions
- *
  *
  * ## Status
  *
@@ -41,65 +32,50 @@ use Yii;
  * Stability: **stable**
  *
  */
-class Yii2 extends Framework implements ActiveRecord, PartedModule
+class Yii2 extends Framework implements ActiveRecord
 {
     /**
      * Application config file must be set.
      * @var array
      */
-    protected $config = ['cleanup' => false];
-    protected $requiredFields = ['configFile'];
+    protected $config = array('cleanup' => false);
+    protected $requiredFields = array('configFile');
     protected $transaction;
 
     public $app;
 
     public function _initialize()
     {
-        if (!is_file(Configuration::projectDir() . $this->config['configFile'])) {
-            throw new ModuleConfigException(
-                __CLASS__,
-                "The application config file does not exist: {$this->config['configFile']}"
-            );
+        if (!is_file(\Codeception\Configuration::projectDir().$this->config['configFile'])) {
+            throw new ModuleConfig(__CLASS__, "The application config file does not exist: {$this->config['configFile']}");
         }
     }
 
-    public function _before(TestCase $test)
+    public function _before(\Codeception\TestCase $test)
     {
-        $this->client = new Yii2Connector();
-        $this->client->configFile = Configuration::projectDir().$this->config['configFile'];
-        $mainConfig = Configuration::config();
+        $this->client = new \Codeception\Lib\Connector\Yii2();
+        $this->client->configFile = \Codeception\Configuration::projectDir().$this->config['configFile'];
+        $mainConfig = \Codeception\Configuration::config();
         if (isset($mainConfig['config']) && isset($mainConfig['config']['test_entry_url'])){
-            $this->client->setServerParameter(
-                'HTTP_HOST',
-                (string) parse_url(
-                    $mainConfig['config']['test_entry_url'],
-                    PHP_URL_HOST
-                )
-            );
-            $this->client->setServerParameter(
-                'HTTPS',
-                ((string) parse_url(
-                    $mainConfig['config']['test_entry_url'],
-                    PHP_URL_SCHEME
-                )) === 'https'
-            );
+            $this->client->setServerParameter('HTTP_HOST', (string) parse_url($mainConfig['config']['test_entry_url'], PHP_URL_HOST));
+            $this->client->setServerParameter('HTTPS', ((string) parse_url($mainConfig['config']['test_entry_url'], PHP_URL_SCHEME)) === 'https');
         }
         $this->app = $this->client->startApp();
 
-        if ($this->config['cleanup'] && isset($this->app->db)) {
+        if ($this->config['cleanup'] and isset($this->app->db)) {
             $this->transaction = $this->app->db->beginTransaction();
         }
     }
 
     public function _after(\Codeception\TestCase $test)
     {
-        $_SESSION = [];
-        $_FILES = [];
-        $_GET = [];
-        $_POST = [];
-        $_COOKIE = [];
-        $_REQUEST = [];
-        if ($this->transaction && $this->config['cleanup']) {
+        $_SESSION = array();
+        $_FILES = array();
+        $_GET = array();
+        $_POST = array();
+        $_COOKIE = array();
+        $_REQUEST = array();
+        if ($this->transaction and $this->config['cleanup']) {
             $this->transaction->rollback();
         }
 
@@ -107,12 +83,8 @@ class Yii2 extends Framework implements ActiveRecord, PartedModule
             Yii::$app->session->destroy();
         }
 
-        parent::_after($test);
-    }
 
-    public function _parts()
-    {
-        return ['orm'];
+        parent::_after($test);
     }
 
     /**
@@ -127,9 +99,8 @@ class Yii2 extends Framework implements ActiveRecord, PartedModule
      * @param $model
      * @param array $attributes
      * @return mixed
-     * @part orm
      */
-    public function haveRecord($model, $attributes = [])
+    public function haveRecord($model, $attributes = array())
     {
         /** @var $record \yii\db\ActiveRecord  * */
         $record = $this->getModelRecord($model);
@@ -151,9 +122,8 @@ class Yii2 extends Framework implements ActiveRecord, PartedModule
      *
      * @param $model
      * @param array $attributes
-     * @part orm
      */
-    public function seeRecord($model, $attributes = [])
+    public function seeRecord($model, $attributes = array())
     {
         $record = $this->findRecord($model, $attributes);
         if (!$record) {
@@ -171,9 +141,8 @@ class Yii2 extends Framework implements ActiveRecord, PartedModule
      *
      * @param $model
      * @param array $attributes
-     * @part orm
      */
-    public function dontSeeRecord($model, $attributes = [])
+    public function dontSeeRecord($model, $attributes = array())
     {
         $record = $this->findRecord($model, $attributes);
         $this->debugSection($model, json_encode($record));
@@ -192,17 +161,16 @@ class Yii2 extends Framework implements ActiveRecord, PartedModule
      * @param $model
      * @param array $attributes
      * @return mixed
-     * @part orm
      */
-    public function grabRecord($model, $attributes = [])
+    public function grabRecord($model, $attributes = array())
     {
         return $this->findRecord($model, $attributes);
     }
 
-    protected function findRecord($model, $attributes = [])
+    protected function findRecord($model, $attributes = array())
     {
         $this->getModelRecord($model);
-        return call_user_func([$model, 'find'])
+        return call_user_func(array($model, 'find'))
             ->where($attributes)
             ->one();
     }
@@ -213,7 +181,7 @@ class Yii2 extends Framework implements ActiveRecord, PartedModule
             throw new \RuntimeException("Model $model does not exist");
         }
         $record = new $model;
-        if (!$record instanceof ActiveRecordInterface) {
+        if (!$record instanceof \yii\db\ActiveRecordInterface) {
             throw new \RuntimeException("Model $model is not implement interface \\yii\\db\\ActiveRecordInterface");
         }
         return $record;
@@ -235,7 +203,7 @@ class Yii2 extends Framework implements ActiveRecord, PartedModule
     public function amOnPage($page)
     {
         if (is_array($page)) {
-            $page = Yii::$app->getUrlManager()->createUrl($page);
+            $page = \Yii::$app->getUrlManager()->createUrl($page);
         }
         parent::amOnPage($page);
     }

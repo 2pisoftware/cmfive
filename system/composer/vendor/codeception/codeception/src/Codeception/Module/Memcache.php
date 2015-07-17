@@ -1,10 +1,6 @@
 <?php
 namespace Codeception\Module;
 
-use Codeception\Module as CodeceptionModule;
-use Codeception\TestCase;
-use Codeception\Exception\ModuleConfigException;
-
 /**
  * Connects to [memcached](http://www.memcached.org/) using either _Memcache_ or _Memcached_ extension.
  *
@@ -28,16 +24,17 @@ use Codeception\Exception\ModuleConfigException;
  * * memcache - instance of Memcache object
  *
  */
-class Memcache extends CodeceptionModule
+
+class Memcache extends \Codeception\Module
 {
     /**
      * @var \Memcache|\Memcached
      */
     public $memcache = null;
 
-    protected $config = ['host' => 'localhost', 'port' => 11211];
+    protected $config = array('host' => 'localhost', 'port' => 11211);
 
-    public function _before(TestCase $test)
+    public function _before(\Codeception\TestCase $test)
     {
         if (class_exists('\Memcache')) {
             $this->memcache = new \Memcache;
@@ -47,11 +44,11 @@ class Memcache extends CodeceptionModule
             $this->memcache = new \Memcached;
             $this->memcache->addServer($this->config['host'], $this->config['port']);
         } else {
-            throw new ModuleConfigException(__CLASS__, 'Memcache classes not loaded');
+            throw new \Codeception\Exception\ModuleConfig(__CLASS__,'Memcache classes not loaded');
         }
     }
 
-    public function _after(TestCase $test)
+    public function _after(\Codeception\TestCase $test)
     {
         $this->memcache->flush();
     }
@@ -110,4 +107,5 @@ class Memcache extends CodeceptionModule
     {
         $this->memcache->flush();
     }
+
 }

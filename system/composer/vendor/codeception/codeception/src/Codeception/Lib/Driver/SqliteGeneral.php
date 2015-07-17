@@ -1,10 +1,9 @@
 <?php
 namespace Codeception\Lib\Driver;
 
-use Codeception\Configuration;
-
 class SqliteGeneral extends Db
 {
+
     protected $hasSnapshot = false;
     protected $filename = '';
     protected $con = null;
@@ -12,8 +11,8 @@ class SqliteGeneral extends Db
     public function __construct($dsn, $user, $password)
     {
         parent::__construct($dsn, $user, $password);
-        $this->filename = Configuration::projectDir() . substr($this->dsn, 7);
-        $this->dsn = 'sqlite:' . $this->filename;
+        $this->filename = \Codeception\Configuration::projectDir() . substr($this->dsn, 7);
+        $this->dsn      = 'sqlite:' . $this->filename;
     }
 
     public function cleanup()

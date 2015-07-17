@@ -3,7 +3,6 @@
 use Codeception\Util\Stub;
 require_once 'tests/data/app/data.php';
 require_once __DIR__ . '/TestsForBrowsers.php';
-use GuzzleHttp\Psr7\Response;
 
 class PhpBrowserTest extends TestsForBrowsers
 {
@@ -12,28 +11,20 @@ class PhpBrowserTest extends TestsForBrowsers
      */
     protected $module;
 
-    protected $history = [];
+    /**
+     * @var \GuzzleHttp\Subscriber\History
+     */
+    protected $history;
 
     protected function setUp() {
-        $this->module = new \Codeception\Module\PhpBrowser(make_container());
+        $this->module = new \Codeception\Module\PhpBrowser();
         $url = 'http://localhost:8000';
         $this->module->_setConfig(array('url' => $url));
         $this->module->_initialize();
         $this->module->_cleanup();
         $this->module->_before($this->makeTest());
-        if (class_exists('GuzzleHttp\Url')) {
-            $this->history = new \GuzzleHttp\Subscriber\History();
-            $this->module->guzzle->getEmitter()->attach($this->history);
-        } else {
-            $this->module->guzzle->getConfig('handler')->push(\GuzzleHttp\Middleware::history($this->history));
-        }
-
-    }
-
-    private function getLastRequest()
-    {
-        $this->skipForOldGuzzle();
-        return end($this->history)['request'];
+        $this->history = new \GuzzleHttp\Subscriber\History();
+        $this->module->guzzle->getEmitter()->attach($this->history);
     }
     
     protected function tearDown() {
@@ -67,7 +58,6 @@ class PhpBrowserTest extends TestsForBrowsers
 
 
 	public function testSetMultipleCookies() {
-        $this->module->amOnPage('/');
         $cookie_name_1  = 'test_cookie';
         $cookie_value_1 = 'this is a test';
         $this->module->setCookie($cookie_name_1, $cookie_value_1);
@@ -110,13 +100,6 @@ class PhpBrowserTest extends TestsForBrowsers
         $this->module->amOnPage('/redirect_interval');
         $this->module->seeCurrentUrlEquals('/redirect_interval');
     }
-
-    public function testHtmlRedirectWithParams()
-    {
-        $this->module->amOnPage('/redirect_params');
-        $this->module->seeResponseCodeIs(200);
-        $this->module->seeCurrentUrlEquals('/search?one=1&two=2'); 
-    }
     
     public function testMetaRefresh()
     {
@@ -143,28 +126,12 @@ class PhpBrowserTest extends TestsForBrowsers
         $this->assertContains('test@gmail.com', $params);
     }
 
-    public function testRelativeRedirect()
-    {
-        // test relative redirects where the effective request URI is in a
-        // subdirectory
-        $this->module->amOnPage('/relative/redirect');
-        $this->module->seeResponseCodeIs(200);
-        $this->module->seeCurrentUrlEquals('/relative/info');
-
-        // also, test relative redirects where the effective request URI is not
-        // in a subdirectory
-        $this->module->amOnPage('/relative_redirect');
-        $this->module->seeResponseCodeIs(200);
-        $this->module->seeCurrentUrlEquals('/info');
-    }
-
     public function testSetCookieByHeader()
     {
         $this->module->amOnPage('/cookies2');
         $this->module->seeResponseCodeIs(200);
         $this->module->seeCookie('a');
         $this->assertEquals('b', $this->module->grabCookie('a'));
-        $this->module->seeCookie('c');
     }
 
     public function testUrlSlashesFormatting()
@@ -173,20 +140,6 @@ class PhpBrowserTest extends TestsForBrowsers
         $this->module->seeCurrentUrlEquals('/somepage.php');
         $this->module->amOnPage('///somepage.php');
         $this->module->seeCurrentUrlEquals('/somepage.php');
-    }
-
-    public function testSettingContentTypeFromHtml()
-    {
-        $this->module->amOnPage('/content-iso');
-        $charset = $this->module->client->getResponse()->getHeader('Content-Type');
-        $this->assertEquals('text/html;charset=ISO-8859-1', $charset);
-    }
-
-    public function testSettingCharsetFromHtml()
-    {
-        $this->module->amOnPage('/content-cp1251');
-        $charset = $this->module->client->getResponse()->getHeader('Content-Type');
-        $this->assertEquals('text/html;charset=windows-1251', $charset);
     }
 
     /**
@@ -204,21 +157,29 @@ class PhpBrowserTest extends TestsForBrowsers
         $this->module->seeCurrentUrlEquals('/form/example3?validate=yes');
     }
 
+    public function testChangeDomains()
+    {
+        $this->mockResponse();
+        $this->module->amOnSubdomain('user');
+        $this->module->amOnPage('/form1');
+        $this->assertEquals('http://user.localhost:8000/form1', $this->module->client->getHistory()->current()->getUri());
+    }
+
     public function testHeadersByConfig()
     {
-        $this->skipForOldGuzzle();
         $this->module->_setConfig(['headers' => ['xxx' => 'yyyy']]);
         $this->module->_initialize();
+        $this->mockResponse();
         $this->module->amOnPage('/form1');
-        $this->assertArrayHasKey('xxx', $this->module->guzzle->getConfig('headers'));
+        $this->assertArrayHasKey('xxx', $this->module->guzzle->getDefaultOption('headers'));
+        $this->assertEquals('yyyy', $this->module->guzzle->getDefaultOption('headers/xxx'));
     }
 
     public function testHeadersBySetHeader()
     {
-
         $this->module->setHeader('xxx', 'yyyy');
         $this->module->amOnPage('/');
-        $this->assertTrue($this->getLastRequest()->hasHeader('xxx'));
+        $this->assertTrue($this->history->getLastRequest()->hasHeader('xxx'));
     }
 
     public function testDeleteHeaders()
@@ -226,7 +187,7 @@ class PhpBrowserTest extends TestsForBrowsers
         $this->module->setHeader('xxx', 'yyyy');
         $this->module->deleteHeader('xxx');
         $this->module->amOnPage('/');
-        $this->assertFalse($this->getLastRequest()->hasHeader('xxx'));
+        $this->assertFalse($this->history->getLastRequest()->hasHeader('xxx'));
     }
 
     public function testDeleteHeadersByEmptyValue()
@@ -234,17 +195,14 @@ class PhpBrowserTest extends TestsForBrowsers
         $this->module->setHeader('xxx', 'yyyy');
         $this->module->setHeader('xxx', '');
         $this->module->amOnPage('/');
-        $this->assertFalse($this->getLastRequest()->hasHeader('xxx'));
+        $this->assertFalse($this->history->getLastRequest()->hasHeader('xxx'));
     }
 
     public function testCurlOptions()
     {
-        $this->skipForOldGuzzle();
         $this->module->_setConfig(array('url' => 'http://google.com', 'curl' => array('CURLOPT_NOBODY' => true)));
         $this->module->_initialize();
-        $config = $this->module->guzzle->getConfig('config');
-        $this->assertArrayHasKey('curl', $config);
-        $this->assertArrayHasKey('CURLOPT_NOBODY', $config['curl']);
+        $this->assertTrue($this->module->guzzle->getDefaultOption('config/curl/'.CURLOPT_NOBODY));
     }
 
     public function testHttpAuth()
@@ -268,6 +226,14 @@ class PhpBrowserTest extends TestsForBrowsers
             return $res->getStatusCode();
         });
         $this->assertEquals(200, $code);
+    }
+
+    protected function mockResponse($body = "hello", $code = 200)
+    {
+        $mock = new \GuzzleHttp\Subscriber\Mock([
+            new \GuzzleHttp\Message\Response($code, [], \GuzzleHttp\Stream\Stream::factory($body))
+        ]);
+        $this->module->guzzle->getEmitter()->attach($mock);
     }
 
     /**
@@ -311,7 +277,7 @@ class PhpBrowserTest extends TestsForBrowsers
 
     public function testFillFieldWithoutPage()
     {
-        $this->setExpectedException("\\Codeception\\Exception\\ModuleException");
+        $this->setExpectedException("\\Codeception\\Exception\\TestRuntime");
         $this->module->fillField('#name', 'Nothing special');
     }
     
@@ -332,33 +298,5 @@ class PhpBrowserTest extends TestsForBrowsers
         $data = data::get('form');
         $this->assertEquals('booze', $data['FooBar']['bar']);
         $this->assertEquals('crunked', $data['Food']['beer']['yum']['yeah']);
-    }
-
-    public function testCookiesForDomain()
-    {
-        $this->skipForOldGuzzle();
-
-        $mock = new \GuzzleHttp\Handler\MockHandler([
-            new Response(200, ['X-Foo' => 'Bar']),
-        ]);
-        $handler = \GuzzleHttp\HandlerStack::create($mock);
-        $handler->push(\GuzzleHttp\Middleware::history($this->history));
-        $client = new \GuzzleHttp\Client(['handler' => $handler, 'base_uri' => 'http://codeception.com']);
-        $guzzleConnector = new \Codeception\Lib\Connector\Guzzle6();
-        $guzzleConnector->setClient($client);
-        $guzzleConnector->getCookieJar()->set(new \Symfony\Component\BrowserKit\Cookie('hello', 'world'));
-        $guzzleConnector->request('GET', 'http://codeception.com/');
-        $this->assertArrayHasKey('cookies', $this->history[0]['options']);
-        /** @var $cookie GuzzleHttp\Cookie\SetCookie  **/
-        $cookies = $this->history[0]['options']['cookies']->toArray();
-        $cookie = reset($cookies);
-        $this->assertEquals('codeception.com', $cookie['Domain']);
-    }
-
-    private function skipForOldGuzzle()
-    {
-        if (class_exists('GuzzleHttp\Url')) {
-            $this->markTestSkipped("Not for Guzzle <6");
-        }
     }
 }

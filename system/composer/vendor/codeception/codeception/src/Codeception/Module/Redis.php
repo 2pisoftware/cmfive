@@ -2,10 +2,8 @@
 
 namespace Codeception\Module;
 
-use Codeception\Module as CodeceptionModule;
-use Codeception\TestCase;
-use Codeception\Exception\ModuleException as ModuleException;
-use Codeception\Lib\Driver\Redis as RedisDriver;
+use Codeception\Exception\Module as ModuleException;
+use \Codeception\Lib\Driver\Redis as RedisDriver;
 
 /**
  * Works with Redis database.
@@ -34,18 +32,18 @@ use Codeception\Lib\Driver\Redis as RedisDriver;
  *
  * @author judgedim
  */
-class Redis extends CodeceptionModule
+class Redis extends \Codeception\Module
 {
-    protected $config = [
+    protected $config = array(
         'cleanup' => true
-    ];
+    );
 
     /**
      * @var RedisDriver
      */
     public $driver;
 
-    protected $requiredFields = ['host', 'port', 'database'];
+    protected $requiredFields = array('host', 'port', 'database');
 
     public function _initialize()
     {
@@ -55,9 +53,10 @@ class Redis extends CodeceptionModule
         } catch (\Exception $e) {
             throw new ModuleException(__CLASS__, $e->getMessage());
         }
+
     }
 
-    public function _before(TestCase $test)
+    public function _before(\Codeception\TestCase $test)
     {
         if ($this->config['cleanup']) {
             $this->cleanup();
@@ -65,7 +64,7 @@ class Redis extends CodeceptionModule
         parent::_before($test);
     }
 
-    public function _after(TestCase $test)
+    public function _after(\Codeception\TestCase $test)
     {
         parent::_after($test);
     }
@@ -73,8 +72,7 @@ class Redis extends CodeceptionModule
     /**
      * Cleans up Redis database.
      */
-    public function cleanupRedis()
-    {
+    public function cleanupRedis() {
         $this->cleanup();
     }
 
@@ -86,4 +84,5 @@ class Redis extends CodeceptionModule
             throw new ModuleException(__CLASS__, $e->getMessage());
         }
     }
+
 }

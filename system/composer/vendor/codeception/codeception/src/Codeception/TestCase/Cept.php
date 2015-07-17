@@ -1,35 +1,30 @@
 <?php
+
 namespace Codeception\TestCase;
 
-use Codeception\Event\TestEvent;
 use Codeception\Events;
-use Codeception\TestCase as CodeceptionTestCase;
-use Codeception\TestCase\Interfaces\ScenarioDriven;
-use Codeception\TestCase\Interfaces\Descriptive;
-use Codeception\TestCase\Interfaces\Reported;
-use Codeception\TestCase\Interfaces\Plain;
-use Codeception\TestCase\Interfaces\Configurable;
-use Codeception\TestCase\Shared\Actor;
-use Codeception\TestCase\Shared\ScenarioPrint;
+use Codeception\Event\TestEvent;
+use Codeception\Step;
+use Codeception\TestCase;
 
-class Cept extends CodeceptionTestCase implements
-    ScenarioDriven,
-    Descriptive,
-    Reported,
-    Plain,
-    Configurable
+class Cept extends TestCase implements
+    Interfaces\ScenarioDriven,
+    Interfaces\Descriptive,
+    Interfaces\Reported,
+    Interfaces\Plain,
+    Interfaces\Configurable
 {
-    use Actor;
-    use ScenarioPrint;
+    use Shared\Actor;
+    use Shared\ScenarioPrint;
 
-    public function __construct(array $data = [], $dataName = '')
+    public function __construct(array $data = array(), $dataName = '')
     {
         parent::__construct('testCodecept', $data, $dataName);
     }
 
     public function getSignature()
     {
-        return ltrim(substr($this->testName, 0, -4), '\\/'); // cut ".php" in end; cut "/" in start
+        return ltrim(substr($this->testName, 0,-4),'\\/'); // cut ".php" in end; cut "/" in start
     }
 
     public function getName($withDataSet = true)
@@ -44,11 +39,11 @@ class Cept extends CodeceptionTestCase implements
 
     public function toString()
     {
-        return $this->getFeature() . " (" . $this->getSignature() . ")";
+        return $this->getFeature(). " (".$this->getSignature().")";
     }
 
     public function preload()
-    {
+    { 
         $this->parser->prepareToRun($this->getRawBody());
         $this->fire(Events::TEST_PARSED, new TestEvent($this));
     }
@@ -60,25 +55,19 @@ class Cept extends CodeceptionTestCase implements
 
     public function testCodecept()
     {
-        $scenario = $this->scenario;
+        $this->fire(Events::TEST_BEFORE, new TestEvent($this));
 
-        $this->prepareActorForTest();
+        $scenario = $this->scenario;
+        $scenario->run();
 
         /** @noinspection PhpIncludeInspection */
         require $this->testFile;
-    }
 
-    public function getEnvironment()
-    {
-        return $this->scenario->getEnv();
+        $this->fire(Events::TEST_AFTER, new TestEvent($this));
     }
 
     public function getReportFields()
     {
-        return [
-            'name' => basename($this->getFileName(), 'Cept.php'),
-            'file' => $this->getFileName(),
-            'feature' => $this->getFeature()
-        ];
+        return ['name' => basename($this->getFileName(),'Cept.php'), 'file' => $this->getFileName(), 'feature' => $this->getFeature()];
     }
 }

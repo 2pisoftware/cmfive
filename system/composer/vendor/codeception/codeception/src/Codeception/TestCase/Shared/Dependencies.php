@@ -1,12 +1,10 @@
 <?php
 namespace Codeception\TestCase\Shared;
 
-use Codeception\TestCase\Cest;
-
 trait Dependencies
 {
     protected $dependencies;
-    protected $dependencyInput = [];
+    protected $dependencyInput = array();
 
     protected function handleDependencies()
     {
@@ -15,14 +13,9 @@ trait Dependencies
         }
 
         $passed = $this->getTestResultObject()->passed();
-        $passedKeys = array_map(
-            function ($testname) {
-                if ($this instanceof Cest) {
-                    $testname = str_replace(
-                        'Codeception\TestCase\Cest::',
-                        get_class($this->getTestClass()) . '::',
-                        $testname
-                    );
+        $passedKeys = array_map(function ($testname) {
+                if ($this instanceof \Codeception\TestCase\Cest) {
+                    $testname = str_replace('Codeception\TestCase\Cest::', get_class($this->getTestClass()).'::', $testname);
                 }
                 return preg_replace('~with data set (.*?)~', '', $testname);
             }, array_keys($passed)
@@ -36,11 +29,7 @@ trait Dependencies
             }
 
             if (!in_array($dependency, $passedKeys)) {
-                $this->getTestResultObject()->addError(
-                    $this,
-                    new \PHPUnit_Framework_SkippedTestError(sprintf("This test depends on '$dependency' to pass.")),
-                    0
-                );
+                $this->getTestResultObject()->addError($this, new \PHPUnit_Framework_SkippedTestError(sprintf("This test depends on '$dependency' to pass.")), 0);
                 return false;
             }
 
@@ -59,4 +48,6 @@ trait Dependencies
     {
         $this->dependencies = $dependencies;
     }
+
+
 }

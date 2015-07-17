@@ -20,12 +20,11 @@ class MySql extends Db
         $this->dbh->exec('SET FOREIGN_KEY_CHECKS=1;');
     }
 
-    public function select($column, $table, array &$criteria)
-    {
+    public function select($column, $table, array &$criteria) {
         $where = $criteria ? "where %s" : '';
         $table = $this->getQuotedName($table);
         $query = "select %s from %s $where";
-        $params = [];
+        $params = array();
         foreach ($criteria as $k => $v) {
             $k = $this->getQuotedName($k);
             if ($v === null) {
@@ -34,9 +33,9 @@ class MySql extends Db
                 $params[] = "$k = ?";
             }
         }
-        $sparams = implode(' AND ', $params);
+        $params = implode(' AND ', $params);
 
-        return sprintf($query, $column, $table, $sparams);
+        return sprintf($query, $column, $table, $params);
     }
 
     public function getQuotedName($name)

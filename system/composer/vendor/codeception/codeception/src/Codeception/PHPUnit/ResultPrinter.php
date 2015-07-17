@@ -1,8 +1,6 @@
 <?php
 namespace Codeception\PHPUnit;
 
-use Codeception\TestCase\Interfaces\ScenarioDriven;
-
 class ResultPrinter extends \PHPUnit_Util_TestDox_ResultPrinter
 {
 
@@ -10,18 +8,18 @@ class ResultPrinter extends \PHPUnit_Util_TestDox_ResultPrinter
      * A test ended.
      *
      * @param  \PHPUnit_Framework_Test $test
-     * @param  float $time
+     * @param  float                  $time
      */
     public function endTest(\PHPUnit_Framework_Test $test, $time)
     {
-        $steps = [];
-        $success = ($this->testStatus == \PHPUnit_Runner_BaseTestRunner::STATUS_PASSED);
-        if ($success) {
+        $steps = array();
+        if ($this->testStatus == \PHPUnit_Runner_BaseTestRunner::STATUS_PASSED) {
             $this->successful++;
-        }
-
-        if ($test instanceof ScenarioDriven) {
-            $steps = $test->getScenario()->getSteps();
+            $success = TRUE;
+            if ($test instanceof \Codeception\TestCase) $steps = $test->getScenario()->getSteps();
+        } else {
+            $success = FALSE;
+            if ($test instanceof \Codeception\TestCase) $steps = $test->getTrace();
         }
 
         $this->onTest($test->toString(), $success, $steps, $time);

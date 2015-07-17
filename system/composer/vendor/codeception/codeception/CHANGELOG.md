@@ -1,73 +1,5 @@
 # Changelog
 
-#### 2.1.1
-
-* [WebDriver] **Upgraded to facebook/webdriver 1.0** *2015-07-11*
-  WebDriver classes were moved to `Facebook\WebDriver` namespace. Please take that into account when using WebDriver API directly.
-  Till 2.2 Codeception will keep non-namespaced aliases of WebDriver classes.
-* Module Reference now contains documentation for hidden API methods which should be used in Helper classes
-* Skipped and Incomplete tests won't fire `test.before` and `test.after` events. For instamce, WebDriver browser with won't be started and Db cleanups won't be executed on skipped tests.
-* Annotations `@skip` and `@incomplete` enabled in Cest files #2131
-* [WebDriver][PhpBrowser][Frameworks] `_findElements($locator)` method added to use in Helper classes *2015-07-11*
-  Now you can use `$this->getModule('WebDriver')->findElements('.user');` in Helpers to match all elements with `user` class using WebDriver module
-* [PhpBrowser] Fixed `amOnUrl` method to open absolute URLs.
-* [PhpBrowser][Frameworks] Fix for `fillField` using values that contain ampersands by @GawainLynch and @zbateson Issue #2132
-* [WebDriver][PhpBrowser][Frameworks] Fixed missing HTTPS when trying to access protected pages #2141
-
-#### 2.1.0
-
-* [Recorder](https://github.com/Codeception/Codeception/tree/master/ext#codeceptionextensionrecorder) extension added. Shows acceptance test progress with a recorded slideshow.
-* **Updated to Guzzle 6**. Codeception can now work both with Guzzle v5 and Guzzle v6. PhpBrowser chooses right connector depending on Guzzle version installed. By @davertmik and @enumag
-* Annotations in Cept files.
-  Instead of calling `$scenario->skip()`, `$scenario->group('firefox')`, etc, it is recommended to set scenario metadata with annotations `// @skip`, `// @group firefox`.
-  Annotations can be parsed from line or block comments. `$scenario->skip()` and `$scenario->incomplete()` are still valid and can be executed inside conditional statements:
-  ```
-  if (!extension_loaded('xdebug')) $scenario->skip('Xdebug required')
-  ```
-* **PSR-4**: all support classes moved to `tests/_support` by default. Actors, Helpers, PageObjects, StepObjects, GroupObjects to follow PSR-4 naming style. Autoloader implemented by @splinter89.
-* **Dependency Injection**: support classes can be injected into tests. Support classes can be injected into each other too. This happens by implementing method `_inject` and explicitly specifying class names as parameters. Implemented by @splinter89.
-* **Actor classes can be extended**, their generated parts were moved to special traits in `_generated` namespace. Each *Tester class can be updated with custom methods.
-* **Module config simplified**: Modules can be configured in `enabled` section of suite config.
-* **Conflicts**: module can define conflicts with each other by implementing `_conflicts` method
-* **Dependencies**: module can explicitly define dependencies and expect their injection by implementing `_inject` and `_depends` methods and relying on dependency injection container.
-* **Current** modules, environment, and test name can be received in scenario. Example: `$scenario->current('env')` returns current environment name. Fixes #1251
-* **Environment Matrix**: environments can be merged. Environment configs can be created in `tests/_envs`, environment generator added. Implemented by By @sjableka. See #1747
-* **Custom Printers**: XML, JSON, TAP, Report printers can be redefined in configuration. See #1425
-* [Db] Added `reconnect` option for long running tests, which will connect to database before the test and disconnect after. By @Naktibalda
-* Module parts. Actions of modules can be loaded partially in order to disable actions which are not used in current tests. For instance, disable web actions of framework modules in unit testsing.
-* **Kohana**, **Symfony1**, **Doctrine1** modules considered deprecated and moved to standalone packages.
-* `shuffle` added to settings. Randomizes order of running tests. See #1504
-* Console output improved: scenario stack traces contain files and lines of fail.
-* [Doctrine2][Symfony2] `symfony_em_service` config option moved from Doctrine2 to Symfony2 module and renamed to `em_service` *2015-06-03*
-* [PhpBrowser][Frameworks] Fixed cloning form nodes `Codeception\Lib\InnerBrowser::getFormFromCrawler(): ID XXX already defined` *2015-05-13*
-* [WebDriver] session snapshot implemented, allows to store cookies and load them, i.e., to keep user session between testss.
-* [WebDriver][PhpBrowser][Frameworks] Malformed XPath locators wil throw an exception #1441
-* `MODULE_INIT` event is fired before initializing modules #1370
-* Graceful tests termination using `pcntl_signal`. See #1286
-* Group classes renamed to GroupObjects; Base GroupObject class renamed to `Codeception\GroupObject`
-* Official extensions moved to `ext` dir; Base Extension class renamed to `Codeception\Extension`
-* Duplicate environment options won't cause Codeception to run environment tests twice
-* [Phalcon1] `haveServiceInDi` method implemented by @sergeyklay
-* [Db] `seeNumRecords` method added by @sergeyklay
-
-#### 2.0.15
-
-* [Phalcon1] Fixed getting has more than one field by @sergeyklay #2010.
-* [PhpBrowser][Frameworks] Compute relative URIs against the effective request URI when there is a redirect. #2058 #2057
-* [PhpBrowser] Fixed Guzzle Connector headers by @valeriyaslovikovskaya #2028
-* [Symfony2] kernel is created for every test by @quaninte #2020
-* [WebDriver] Added WebDriver init settings `connection_timeout` and `request_timeout` by @n8whnp #2065
-* [MongoDb] added ability to change the database by @clarkeash #2015
-* [Doctrine2] Fixed issues after first request is made #2025 @AlexStansfield
-* [REST] Improved JsonArray to compare repeated values correctly by @Naktibalda #2070
-* [MongoDb] Remove not necessary config fields `user` and `password` by @nicklasos
-* `Stub::construct` can be used to set private/protected properties by @Naktibalda #2082
-* Fixed @before and @after hooks in Cest. _before method was executed on each call of method specified in @before annotation *2015-06-15*
-* [Laravel5] Fix for domains in `route()` helper. See #2000. *2015-06-04*
-* [REST] Fixed sending `JsonSerializable` object on POST by @Naktibalda and @andersonamuller. See #1988 #1994
-* [MongoDb] escaped filename shell argument for loading MongoDB by @christoph-hautzinger. #1998 *2015-06-03*
-* [Lumen] **Module added** by @janhenkgerritsen
-
 #### 2.0.14
 
 * Improved output *2015-05-22*
@@ -157,11 +89,6 @@ Modifications to ensure multiple values get sent correctly.
 * [Dbh] Begin transaction only unless transaction is already in progress by @thecatontheflat *2015-02-23*
 * [PhpBrowser][Frameworks] Fix quiet crash when crawler is null by @aivus. See #1714 *2015-02-23*
 * [Yii2] Fixed usage of PUT method by @miroslav-chandler *2015-02-23*
-
-
-#### 2.1.0
-
-* [WebDriver] Saving and restoring session snapshots implemented *2015-03-16*
 
 
 #### 2.0.10

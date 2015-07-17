@@ -1,11 +1,7 @@
 <?php
 namespace Codeception\Module;
-
 use Codeception\Util\FileSystem as Util;
 use Symfony\Component\Finder\Finder;
-use Codeception\Module as CodeceptionModule;
-use Codeception\TestCase;
-use Codeception\Configuration;
 
 /**
  * Module for testing local filesystem.
@@ -19,16 +15,16 @@ use Codeception\Configuration;
  *
  * Module was developed to test Codeception itself.
  */
-class Filesystem extends CodeceptionModule
+class Filesystem extends \Codeception\Module
 {
     protected $file = null;
     protected $filepath = null;
 
     protected $path = '';
 
-    public function _before(TestCase $test)
+    public function _before(\Codeception\TestCase $test)
     {
-        $this->path = Configuration::projectDir();
+        $this->path = \Codeception\Configuration::projectDir();
     }
 
     /**
@@ -46,13 +42,9 @@ class Filesystem extends CodeceptionModule
     protected function absolutizePath($path)
     {
         // *nix way
-        if (strpos($path, '/') === 0) {
-            return $path;
-        }
+        if (strpos($path, '/') === 0) return $path;
         // windows
-        if (strpos($path, ':\\') === 1) {
-            return $path;
-        }
+        if (strpos($path, ':\\') === 1) return $path;
 
         return $this->path . $path;
     }
@@ -89,9 +81,7 @@ class Filesystem extends CodeceptionModule
      */
     public function deleteFile($filename)
     {
-        if (!file_exists($this->absolutizePath($filename))) {
-            \PHPUnit_Framework_Assert::fail('file not found');
-        }
+        if (!file_exists($this->absolutizePath($filename))) \PHPUnit_Framework_Assert::fail('file not found');
         unlink($this->absolutizePath($filename));
     }
 
@@ -124,8 +114,7 @@ class Filesystem extends CodeceptionModule
      * @param $src
      * @param $dst
      */
-    public function copyDir($src, $dst)
-    {
+    public function copyDir($src, $dst) {
         Util::copyDir($src, $dst);
     }
 
@@ -145,7 +134,7 @@ class Filesystem extends CodeceptionModule
      */
     public function seeInThisFile($text)
     {
-        $this->assertContains($text, $this->file, "No text '$text' in currently opened file");
+        $this->assertContains($text, $this->file, "text $text in currently opened file");
     }
 
 
@@ -166,7 +155,7 @@ class Filesystem extends CodeceptionModule
      */
     public function seeFileContentsEqual($text)
     {
-        $file = str_replace("\r", '', $this->file);
+        $file = str_replace("\r",'',$this->file);
         \PHPUnit_Framework_Assert::assertEquals($text, $file);
     }
 
@@ -184,7 +173,7 @@ class Filesystem extends CodeceptionModule
      */
     public function dontSeeInThisFile($text)
     {
-        $this->assertNotContains($text, $this->file, "Found text '$text' in currently opened file");
+        $this->assertNotContains($text, $this->file, "text $text in currently opened file");
     }
 
     /**
@@ -220,9 +209,7 @@ class Filesystem extends CodeceptionModule
 
         $path = $this->absolutizePath($path);
         $this->debug($path);
-        if (!file_exists($path)) {
-            $this->fail("Directory does not exist: $path");
-        }
+        if (!file_exists($path)) \PHPUnit_Framework_Assert::fail("Directory does not exist: $path");
 
         $files = Finder::create()->files()->name($filename)->in($path);
         foreach ($files as $file) {
@@ -233,6 +220,7 @@ class Filesystem extends CodeceptionModule
             \PHPUnit_Framework_Assert::assertFileExists($file);
             return;
         }
+        \Codeception\Util\Debug::pause();
         $this->fail("$filename in $path");
     }
 
@@ -246,6 +234,7 @@ class Filesystem extends CodeceptionModule
     {
         \PHPUnit_Framework_Assert::assertFileNotExists($path . $filename);
     }
+
 
 
     /**
@@ -275,4 +264,6 @@ class Filesystem extends CodeceptionModule
     {
         file_put_contents($filename, $contents);
     }
+
+
 }

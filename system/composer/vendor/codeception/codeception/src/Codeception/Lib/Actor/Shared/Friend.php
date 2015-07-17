@@ -2,7 +2,6 @@
 namespace Codeception\Lib\Actor\Shared;
 
 use Codeception\Scenario;
-use Codeception\Lib\Friend as LibFriend;
 
 trait Friend
 {
@@ -16,14 +15,15 @@ trait Friend
     /**
      * @param $name
      * @param $actorClass
-     * @return \Codeception\Lib\Friend
+     * @return Friend
      */
     public function haveFriend($name, $actorClass = null)
     {
         if (!isset($this->friends[$name])) {
             $actor = $actorClass === null ? $this : new $actorClass($this->getScenario());
-            $this->friends[$name] = new LibFriend($name, $actor, $this->getScenario()->current('modules'));
+            $this->friends[$name] = new \Codeception\Lib\Friend($name, $actor);
         }
         return $this->friends[$name];
     }
+
 }

@@ -3,37 +3,27 @@ namespace Codeception\PHPUnit\Constraint;
 
 use Codeception\Exception\ElementNotFound;
 use Codeception\Lib\Console\Message;
-use SebastianBergmann\Comparator\ComparisonFailure;
+use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
-class WebDriver extends Page
-{
+class WebDriver extends Page {
 
     protected function matches($nodes)
     {
-        if (!count($nodes)) {
-            return false;
-        }
-        if ($this->string === '') {
-            return true;
-        }
+        if (!count($nodes)) return false;
+        if ($this->string === '') return true;
 
-        foreach ($nodes as $node) {
-            /** @var $node \WebDriverElement  * */
-            if (!$node->isDisplayed()) {
-                continue;
-            }
-            if (parent::matches(htmlspecialchars_decode($node->getText()))) {
-                return true;
-            }
+        foreach ($nodes as $node)
+        {
+            /** @var $node \WebDriverElement  **/
+            if (!$node->isDisplayed()) continue;
+            if (parent::matches(htmlspecialchars_decode($node->getText()))) return true;
         }
         return false;
     }
 
-    protected function fail($nodes, $selector, ComparisonFailure $comparisonFailure = null)
+    protected function fail($nodes, $selector, \SebastianBergmann\Comparator\ComparisonFailure $comparisonFailure = NULL)
     {
-        if (!count($nodes)) {
-            throw new ElementNotFound($selector, 'Element located either by name, CSS or XPath');
-        }
+        if (!count($nodes)) throw new ElementNotFound($selector, 'Element located either by name, CSS or XPath');
 
         $output = new Message("Failed asserting that any element by '$selector'");
         $output .= $this->uriMessage('on page');
@@ -45,11 +35,11 @@ class WebDriver extends Page
             $message = new Message("[total %s elements]");
             $output .= $message->with(count($nodes))->style('debug');
         }
-        $output .= "\ncontains text '" . $this->string . "'";
+        $output .= "\ncontains text '".$this->string."'";
 
         throw new \PHPUnit_Framework_ExpectationFailedException(
-            $output,
-            $comparisonFailure
+          $output,
+          $comparisonFailure
         );
     }
 
@@ -65,17 +55,21 @@ class WebDriver extends Page
     protected function nodesList($nodes, $contains = null)
     {
         $output = "";
-        foreach ($nodes as $node) {
-            if ($contains && strpos($node->getText(), $contains) === false) {
-                continue;
+        foreach ($nodes as $node)
+        {
+            if ($contains) {
+                if (strpos($node->getText(), $contains) === false) {
+                    continue;
+                }
             }
-            /** @var $node \WebDriverElement  * */
+            /** @var $node \WebDriverElement  **/
             $message = new Message("<%s> %s");
             $output .= $message->with($node->getTagName(), $node->getText())->style('info')->prepend("\n+ ");
         }
         return $output;
 
     }
+
 
 
 }

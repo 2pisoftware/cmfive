@@ -18,4 +18,5 @@ class FailFast implements EventSubscriberInterface
         $e->getResult()->stopOnError(true);
         $e->getResult()->stopOnFailure(true);
     }
-}
+
+} 

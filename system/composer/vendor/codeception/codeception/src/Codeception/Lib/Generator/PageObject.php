@@ -9,11 +9,10 @@ class PageObject
     use Namespaces;
     use Shared\Classname;
 
-    protected $template = <<<EOF
+    protected $template  = <<<EOF
 <?php
-namespace {{namespace}};
-
-class {{class}}
+{{namespace}}
+class {{class}}Page
 {
     // include url of current page
     public static \$URL = '';
@@ -27,7 +26,7 @@ class {{class}}
     /**
      * Basic route example for your current URL
      * You can append any additional parameter to URL
-     * and use it in tests like: Page\\Edit::route('/123-post');
+     * and use it in tests like: EditPage::route('/123-post');
      */
     public static function route(\$param)
     {
@@ -36,38 +35,44 @@ class {{class}}
 
 {{actions}}
 }
-
 EOF;
 
-    protected $actionsTemplate = <<<EOF
+    protected $actionsTemplate  = <<<EOF
     /**
-     * @var \\{{actorClass}};
+     * @var {{actorClass}};
      */
     protected \${{actor}};
 
-    public function __construct(\\{{actorClass}} \$I)
+    public function __construct({{actorClass}} \$I)
     {
         \$this->{{actor}} = \$I;
     }
 
+    /**
+     * @return {{pageObject}}Page
+     */
+    public static function of({{actorClass}} \$I)
+    {
+        return new static(\$I);
+    }
 EOF;
 
     protected $actions = '';
     protected $settings;
     protected $name;
-    protected $namespace;
 
     public function __construct($settings, $name)
     {
         $this->settings = $settings;
-        $this->name = $this->getShortClassName($name);
-        $this->namespace = $this->getNamespaceString($this->settings['namespace'] . '\\Page\\' . $name);
+        $this->name = $this->getShortClassName($this->removeSuffix($name, 'Page'));
     }
 
     public function produce()
     {
+        $ns = $this->getNamespaceString($this->settings['namespace'].'\\'.$this->name);
+        
         return (new Template($this->template))
-            ->place('namespace', $this->namespace)
+            ->place('namespace', $ns)
             ->place('actions', $this->produceActions())
             ->place('class', $this->name)
             ->produce();
@@ -88,4 +93,5 @@ EOF;
             ->place('pageObject', $this->name)
             ->produce();
     }
+
 }

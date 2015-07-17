@@ -1,15 +1,14 @@
 <?php
 namespace Codeception\Coverage\Subscriber;
 
-use Codeception\Configuration;
-use Codeception\Coverage\Filter;
-use Codeception\Event\PrintResultEvent;
 use Codeception\Events;
+use Codeception\Configuration;
+use Codeception\Event\PrintResultEvent;
 use Codeception\Subscriber\Shared\StaticEvents;
+use Codeception\Coverage\Filter;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class Printer implements EventSubscriberInterface
-{
+class Printer implements EventSubscriberInterface {
     use StaticEvents;
 
     static $events = [
@@ -17,9 +16,9 @@ class Printer implements EventSubscriberInterface
     ];
 
     protected $settings = [
-        'enabled'        => true,
-        'low_limit'      => '35',
-        'high_limit'     => '70',
+        'enabled' => true,
+        'low_limit' => '35',
+        'high_limit' => '70',
         'show_uncovered' => false
     ];
 
@@ -44,7 +43,7 @@ class Printer implements EventSubscriberInterface
 
     protected function absolutePath($path)
     {
-        if ((strpos($path, '/') === 0) || (strpos($path, ':') === 1)) { // absolute path
+        if ((strpos($path, '/') === 0) or (strpos($path, ':') === 1)) { // absolute path
             return $path;
         }
         return $this->logDir . $path;
@@ -83,10 +82,7 @@ class Printer implements EventSubscriberInterface
     protected function printConsole(\PHPUnit_Util_Printer $printer)
     {
         $writer = new \PHP_CodeCoverage_Report_Text(
-            $this->settings['low_limit'],
-            $this->settings['high_limit'],
-            $this->settings['show_uncovered'],
-            false
+            $this->settings['low_limit'], $this->settings['high_limit'], $this->settings['show_uncovered'], false
         );
         $printer->write($writer->process(self::$coverage, $this->options['colors']));
     }

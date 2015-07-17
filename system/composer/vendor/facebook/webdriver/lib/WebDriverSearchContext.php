@@ -13,8 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Facebook\WebDriver;
-
 /**
  * The interface for WebDriver and WebDriverElement which is able to search for
  * WebDriverElement inside.
@@ -36,7 +34,7 @@ interface WebDriverSearchContext {
    * Find all WebDriverElements within this element using the given mechanism.
    *
    * @param WebDriverBy $locator
-   * @return WebDriverElement[] A list of all WebDriverElements, or an empty array if
+   * @return array A list of all WebDriverElements, or an empty array if
    *    nothing matches
    * @see WebDriverBy
    */

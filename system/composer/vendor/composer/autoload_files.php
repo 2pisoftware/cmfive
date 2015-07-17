@@ -6,8 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname(dirname($vendorDir));
 
 return array(
-    $vendorDir . '/guzzlehttp/psr7/src/functions.php',
-    $vendorDir . '/guzzlehttp/promises/src/functions.php',
-    $vendorDir . '/guzzlehttp/guzzle/src/functions_include.php',
+    $vendorDir . '/react/promise/src/functions_include.php',
     $vendorDir . '/swiftmailer/swiftmailer/lib/swift_required.php',
 );

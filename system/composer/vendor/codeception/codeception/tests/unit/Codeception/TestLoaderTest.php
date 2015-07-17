@@ -2,13 +2,13 @@
 class TestLoaderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Codeception\Lib\TestLoader
+     * @var \Codeception\TestLoader
      */
     protected $testLoader;
 
     protected function setUp()
     {
-        $this->testLoader = new \Codeception\Lib\TestLoader(\Codeception\Configuration::dataDir());
+        $this->testLoader = new \Codeception\TestLoader(\Codeception\Configuration::dataDir());
     }
 
     /**
@@ -52,34 +52,24 @@ class TestLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadAllTests()
     {
-        Codeception\Util\Autoload::addNamespace('Math', codecept_data_dir().'claypit/tests/_support/Math'); // to autoload dependencies
-
-        $this->testLoader = new \Codeception\Lib\TestLoader(codecept_data_dir().'claypit/tests');
+        $this->testLoader = new \Codeception\TestLoader(codecept_data_dir().'claypit/tests');
         $this->testLoader->loadTests();
-
-        $testNames = $this->getTestNames($this->testLoader->getTests());
-
-        $this->assertContainsTestName('order/AnotherCept', $testNames);
-        $this->assertContainsTestName('MageGuildCest::darkPower', $testNames);
-        $this->assertContainsTestName('FailingTest::testMe', $testNames);
-        $this->assertContainsTestName('MathCest::testAddition', $testNames);
-        $this->assertContainsTestName('MathTest::testAll', $testNames);
+        $this->assertContainsTestName('order/AnotherCept', $this->testLoader->getTests());
+        $this->assertContainsTestName('MageGuildCest::darkPower', $this->testLoader->getTests());
+        $this->assertContainsTestName('FailingTest::testMe', $this->testLoader->getTests());
     }
 
-    protected function getTestNames($tests)
+    protected function assertContainsTestName($name, $tests)
     {
-        $testNames = [];
         foreach ($tests as $test) {
             if ($test instanceof \PHPUnit_Framework_TestCase) {
-                $testNames[] = \Codeception\TestCase::getTestSignature($test);
+                $testName = \Codeception\TestCase::getTestSignature($test);
+                if ($testName == $name) return;
+                codecept_debug($testName);
             }
         }
-        return $testNames;
-    }
+        $this->fail("$name not found in tests");
 
-    protected function assertContainsTestName($name, $testNames)
-    {
-        $this->assertNotSame(false, array_search($name, $testNames), "$name not found in tests");
     }
 
 }

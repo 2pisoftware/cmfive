@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeception;
 
 /**
@@ -15,16 +16,10 @@ final class Events
     {
     }
 
-    /**
-     * The <b>MODULE_INIT</b> event occurs before modules are initialized.
-     *
-     * The event listener method receives a {@link Codeception\Event\SuiteEvent} instance.
-     */
-    const MODULE_INIT = 'module.init';
 
     /**
      * The <b>SUITE_INIT</b> event occurs when suite is initialized.
-     * Modules are created and initialized, but Actor class is not loaded.
+     * Modules are initialized, but Guy class is not loaded.
      *
      * The event listener method receives a {@link Codeception\Event\SuiteEvent} instance.
      */
@@ -63,6 +58,11 @@ final class Events
      * The event listener method receives a {@link Codeception\Event\StepEvent} instance.
      */
     const STEP_AFTER = 'step.after';
+
+    /**
+     * @deprecated or what ??? can't find any usage
+     */
+    const STEP_FAIL = 'step.fail';
 
     /**
      * The <b>TEST_FAIL</b> event occurs whenever test has failed.

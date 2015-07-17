@@ -3,27 +3,27 @@ namespace Codeception\Coverage;
 
 use Codeception\Configuration;
 use Codeception\Coverage\Subscriber\Printer;
-use Codeception\Lib\Interfaces\Remote;
+use Codeception\Coverage\DummyCodeCoverage;
 use Codeception\Subscriber\Shared\StaticEvents;
+use Codeception\Lib\Interfaces\Remote;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-abstract class SuiteSubscriber implements EventSubscriberInterface
-{
+abstract class SuiteSubscriber implements EventSubscriberInterface {
+
     use StaticEvents;
 
     protected $defaultSettings = [
-        'enabled'        => false,
-        'remote'         => false,
-        'local'          => false,
+        'enabled' => false,
+        'remote' => false,
+        'local' => false,
         'xdebug_session' => 'codeception',
         'remote_config'  => null,
         'show_uncovered' => false,
-        'c3_url'         => null
+        'c3_url' => null
     ];
 
     protected $settings = [];
     protected $filters = [];
-    protected $modules = [];
 
     protected $coverage;
     protected $logDir;
@@ -40,11 +40,10 @@ abstract class SuiteSubscriber implements EventSubscriberInterface
 
     protected function applySettings($settings)
     {
-        try {
-            $this->coverage = new \PHP_CodeCoverage();
-        } catch (\PHP_CodeCoverage_Exception $e) {
+        if (!function_exists('xdebug_is_enabled')) {
             throw new \Exception('XDebug is required to collect CodeCoverage. Please install xdebug extension and enable it in php.ini');
         }
+        $this->coverage = new \PHP_CodeCoverage();
 
         $this->filters = $settings;
         $this->settings = $this->defaultSettings;
@@ -58,12 +57,11 @@ abstract class SuiteSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array $modules
      * @return \Codeception\Lib\Interfaces\Remote|null
      */
-    protected function getServerConnectionModule(array $modules)
+    protected function getServerConnectionModule()
     {
-        foreach ($modules as $module) {
+        foreach (\Codeception\SuiteManager::$modules as $module) {
             if ($module instanceof Remote) {
                 return $module;
             }
@@ -86,4 +84,5 @@ abstract class SuiteSubscriber implements EventSubscriberInterface
     {
         Printer::$coverage->merge($coverage);
     }
+
 }

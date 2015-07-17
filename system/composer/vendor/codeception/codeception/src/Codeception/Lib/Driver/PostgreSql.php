@@ -1,8 +1,6 @@
 <?php
 namespace Codeception\Lib\Driver;
 
-use Codeception\Exception\ModuleException;
-
 class PostgreSql extends Db
 {
     protected $putline = false;
@@ -11,14 +9,14 @@ class PostgreSql extends Db
 
     public function load($sql)
     {
-        $query = '';
-        $delimiter = ';';
+        $query           = '';
+        $delimiter       = ';';
         $delimiterLength = 1;
 
         $dollarsOpen = false;
         foreach ($sql as $sqlLine) {
             if (preg_match('/DELIMITER ([\;\$\|\\\\]+)/i', $sqlLine, $match)) {
-                $delimiter = $match[1];
+                $delimiter       = $match[1];
                 $delimiterLength = strlen($delimiter);
                 continue;
             }
@@ -52,7 +50,7 @@ class PostgreSql extends Db
             ->query("SELECT 'DROP SEQUENCE IF EXISTS \"' || relname || '\" cascade;' FROM pg_class WHERE relkind = 'S';")
             ->fetchAll();
 
-        $types = $this->dbh
+        $types  = $this->dbh
             ->query("SELECT 'DROP TYPE IF EXISTS \"' || pg_type.typname || '\" cascade;' FROM pg_type JOIN pg_enum ON pg_enum.enumtypid = pg_type.oid GROUP BY pg_type.typname;")
             ->fetchAll();
 
@@ -84,11 +82,11 @@ class PostgreSql extends Db
     public function sqlQuery($query)
     {
         if (strpos(trim($query), 'COPY ') === 0) {
-            if (!extension_loaded('pgsql')) {
-                throw new ModuleException(
-                    '\Codeception\Module\Db',
-                    "To run 'COPY' commands 'pgsql' extension should be installed"
-                );
+            if (!extension_loaded(
+                'pgsql'
+            )
+            ) {
+                throw new \Codeception\Exception\Module('\Codeception\Module\Db', "To run 'COPY' commands 'pgsql' extension should be installed");
             }
             $constring = str_replace(';', ' ', substr($this->dsn, 6));
             $constring .= ' user=' . $this->user;
@@ -103,9 +101,9 @@ class PostgreSql extends Db
 
     public function select($column, $table, array &$criteria)
     {
-        $where = $criteria ? "where %s" : '';
-        $query = 'select %s from "%s" ' . $where;
-        $params = [];
+        $where  = $criteria ? "where %s" : '';
+        $query  = 'select %s from "%s" ' . $where;
+        $params = array();
         foreach ($criteria as $k => $v) {
             if ($v === null) {
                 $params[] = "$k IS NULL ";
@@ -114,9 +112,9 @@ class PostgreSql extends Db
                 $params[] = "$k = ? ";
             }
         }
-        $sparams = implode('AND ', $params);
+        $params = implode('AND ', $params);
 
-        return sprintf($query, $column, $table, $sparams);
+        return sprintf($query, $column, $table, $params);
     }
 
     public function lastInsertId($table)
@@ -129,12 +127,7 @@ class PostgreSql extends Db
     public function getQuotedName($name)
     {
         $name = explode('.', $name);
-        $name = array_map(
-            function ($data) {
-                return '"' . $data . '"';
-            },
-            $name
-        );
+        $name = array_map(function($data) { return '"' . $data . '"'; }, $name);
         return implode('.', $name);
     }
     

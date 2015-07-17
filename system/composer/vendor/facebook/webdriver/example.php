@@ -1,12 +1,7 @@
 <?php
 // An example of using php-webdriver.
 
-namespace Facebook\WebDriver;
-
-use Facebook\WebDriver\Remote\DesiredCapabilities;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
-
-require_once('vendor/autoload.php');
+require_once('lib/__init__.php');
 
 // start Firefox with 5 second timeout
 $host = 'http://localhost:4444/wd/hub'; // this is the default

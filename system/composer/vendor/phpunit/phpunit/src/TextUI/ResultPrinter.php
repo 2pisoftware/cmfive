@@ -13,7 +13,13 @@ use SebastianBergmann\Environment\Console;
 /**
  * Prints the result of a TextUI TestRunner run.
  *
- * @since Class available since Release 2.0.0
+ * @package    PHPUnit
+ * @subpackage TextUI
+ * @author     Sebastian Bergmann <sebastian@phpunit.de>
+ * @copyright  Sebastian Bergmann <sebastian@phpunit.de>
+ * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
+ * @link       http://www.phpunit.de/
+ * @since      Class available since Release 2.0.0
  */
 class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements PHPUnit_Framework_TestListener
 {
@@ -34,74 +40,66 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements PHPUn
       'bold'       => 1,
       'fg-black'   => 30,
       'fg-red'     => 31,
-      'fg-green'   => 32,
       'fg-yellow'  => 33,
-      'fg-blue'    => 34,
-      'fg-magenta' => 35,
       'fg-cyan'    => 36,
       'fg-white'   => 37,
-      'bg-black'   => 40,
       'bg-red'     => 41,
       'bg-green'   => 42,
-      'bg-yellow'  => 43,
-      'bg-blue'    => 44,
-      'bg-magenta' => 45,
-      'bg-cyan'    => 46,
-      'bg-white'   => 47
+      'bg-yellow'  => 43
     );
 
     /**
-     * @var int
+     * @var integer
      */
     protected $column = 0;
 
     /**
-     * @var int
+     * @var integer
      */
     protected $maxColumn;
 
     /**
-     * @var bool
+     * @var boolean
      */
     protected $lastTestFailed = false;
 
     /**
-     * @var int
+     * @var integer
      */
     protected $numAssertions = 0;
 
     /**
-     * @var int
+     * @var integer
      */
     protected $numTests = -1;
 
     /**
-     * @var int
+     * @var integer
      */
     protected $numTestsRun = 0;
 
     /**
-     * @var int
+     * @var integer
      */
     protected $numTestsWidth;
 
     /**
-     * @var bool
+     * @var boolean
      */
     protected $colors = false;
 
     /**
-     * @var bool
+     * @var boolean
      */
     protected $debug = false;
 
     /**
-     * @var bool
+     * @var boolean
      */
     protected $verbose = false;
 
     /**
-     * @var int
+     * @var integer
      */
     private $numberOfColumns;
 
@@ -109,10 +107,10 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements PHPUn
      * Constructor.
      *
      * @param  mixed                       $out
-     * @param  bool                        $verbose
+     * @param  boolean                     $verbose
      * @param  string                      $colors
-     * @param  bool                        $debug
-     * @param  int|string                  $numberOfColumns
+     * @param  boolean                     $debug
+     * @param  integer|string              $numberOfColumns
      * @throws PHPUnit_Framework_Exception
      * @since  Method available since Release 3.0.0
      */
@@ -236,7 +234,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements PHPUn
 
     /**
      * @param PHPUnit_Framework_TestFailure $defect
-     * @param int                           $count
+     * @param integer                       $count
      */
     protected function printDefect(PHPUnit_Framework_TestFailure $defect, $count)
     {
@@ -246,7 +244,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements PHPUn
 
     /**
      * @param PHPUnit_Framework_TestFailure $defect
-     * @param int                           $count
+     * @param integer                       $count
      */
     protected function printDefectHeader(PHPUnit_Framework_TestFailure $defect, $count)
     {
@@ -584,9 +582,9 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements PHPUn
     /**
      * Writes a buffer out with a color sequence if colors are enabled.
      *
-     * @param string $color
-     * @param string $buffer
-     * @param bool   $lf
+     * @param string  $color
+     * @param string  $buffer
+     * @param boolean $lf
      * @since  Method available since Release 4.0.0
      */
     protected function writeWithColor($color, $buffer, $lf = true)
@@ -612,10 +610,10 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements PHPUn
     }
 
     /**
-     * @param int    $count
-     * @param string $name
-     * @param string $color
-     * @param bool   $always
+     * @param  integer $count
+     * @param  string  $name
+     * @param  string  $color
+     * @param  boolean $always
      * @since  Method available since Release 4.6.5
      */
     private function writeCountString($count, $name, $color, $always = false)

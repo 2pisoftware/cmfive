@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeception\Exception;
 
 class RemoteException extends \Exception

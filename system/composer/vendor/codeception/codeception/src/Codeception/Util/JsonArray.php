@@ -2,38 +2,17 @@
 namespace Codeception\Util;
 
 use Flow\JSONPath\JSONPath;
-use InvalidArgumentException;
-use DOMDocument;
 
 class JsonArray
 {
-    /**
-     * @var array
-     */
-    protected $jsonArray = [];
-    
-    /**
-     * @var DOMDocument
-     */
-    protected $jsonXml = null;
+    protected $jsonArray;
+    protected $jsonXml;
 
     public function __construct($jsonString)
     {
-        if (!is_string($jsonString)) {
-            throw new InvalidArgumentException('$jsonString param must be a string.');
-        }
-
         $this->jsonArray = json_decode($jsonString, true);
-
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    "Invalid json: %s. System message: %s.",
-                    $jsonString,
-                    json_last_error_msg()
-                ),
-                json_last_error()
-            );
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \InvalidArgumentException("Invalid json: $jsonString");
         }
     }
 
@@ -42,7 +21,7 @@ class JsonArray
         if ($this->jsonXml) {
             return $this->jsonXml;
         }
-
+        
         $root = 'root';
         $jsonArray = $this->jsonArray;
         if (count($jsonArray) == 1) {
@@ -50,7 +29,7 @@ class JsonArray
             $jsonArray = reset($jsonArray);
         }
 
-        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = false;
         $root = $dom->createElement($root);
         $dom->appendChild($root);
@@ -59,9 +38,6 @@ class JsonArray
         return $dom;
     }
 
-    /**
-     * @return array
-     */
     public function toArray()
     {
         return $this->jsonArray;
@@ -104,10 +80,10 @@ class JsonArray
     private function arrayIntersectRecursive($arr1, $arr2)
     {
         if (!is_array($arr1) || !is_array($arr2)) {
-            return false;
+            return null;
         }
         // if it is not an associative array we do not compare keys
-        if ($this->arrayIsSequential($arr1) && $this->arrayIsSequential($arr2)) {
+        if ($this->arrayIsSequential($arr1) and $this->arrayIsSequential($arr2)) {
             return $this->sequentialArrayIntersect($arr1, $arr2);
         }
 
@@ -115,65 +91,53 @@ class JsonArray
     }
 
     /**
-     * This array has sequential keys?
-     *
-     * @param array $array
-     *
+     * @param $arr1
      * @return bool
      */
-    private function arrayIsSequential(array $array)
+    private function arrayIsSequential($arr1)
     {
-        return array_keys($array) === range(0, count($array) - 1);
+        return array_keys($arr1) === range(0, count($arr1) - 1);
     }
 
     /**
-     * @param array $arr1
-     * @param array $arr2
+     * @param $arr1
+     * @param $arr2
      * @return array
      */
-    private function sequentialArrayIntersect(array $arr1, array $arr2)
+    private function sequentialArrayIntersect($arr1, $arr2)
     {
-        $ret = [];
-        
-        // Do not match the same item of $arr2 against multiple items of $arr1
-        $matchedKeys = [];
+        $ret = array();
         foreach ($arr1 as $key1 => $value1) {
             foreach ($arr2 as $key2 => $value2) {
-                $return = $this->arrayIntersectRecursive($value1, $value2);
-                if ($return) {
-                    $ret[$key1] = $return;
+                $_return = $this->arrayIntersectRecursive($value1, $value2);
+                if ($_return) {
+                    $ret[$key1] = $_return;
                     continue;
                 }
-
-                if ($value1 === $value2 && !isset($matchedKeys[$key2])) {
+                if ($value1 === $value2) {
                     $ret[$key1] = $value1;
-                    $matchedKeys[$key2] = true;
-                    break;
                 }
             }
         }
-
         return $ret;
     }
 
     /**
-     * @param array $arr1
-     * @param array $arr2
-     *
+     * @param $arr1
+     * @param $arr2
      * @return array|bool|null
      */
-    private function associativeArrayIntersect(array $arr1, array $arr2)
+    private function associativeArrayIntersect($arr1, $arr2)
     {
         $commonKeys = array_intersect(array_keys($arr1), array_keys($arr2));
 
-        $ret = [];
+        $ret = array();
         foreach ($commonKeys as $key) {
-            $return = $this->arrayIntersectRecursive($arr1[$key], $arr2[$key]);
-            if ($return) {
-                $ret[$key] = $return;
+            $_return = $this->arrayIntersectRecursive($arr1[$key], $arr2[$key]);
+            if ($_return) {
+                $ret[$key] = $_return;
                 continue;
             }
-
             if ($arr1[$key] === $arr2[$key]) {
                 $ret[$key] = $arr1[$key];
             }
@@ -181,9 +145,9 @@ class JsonArray
 
         if (empty($commonKeys)) {
             foreach ($arr2 as $arr) {
-                $return = $this->arrayIntersectRecursive($arr1, $arr);
-                if ($return && $return == $arr1) {
-                    return $return;
+                $_return = $this->arrayIntersectRecursive($arr1, $arr);
+                if ($_return && $_return == $arr1) {
+                    return $_return;
                 }
             }
         }
@@ -197,7 +161,7 @@ class JsonArray
 
     private function arrayToXml(\DOMDocument $doc, \DOMNode $node, $array)
     {
-        foreach ($array as $key => $value) {
+        foreach($array as $key => $value) {
             if (is_numeric($key)) {
                 $subNode = $doc->createElement($node->nodeName);
                 $node->parentNode->appendChild($subNode);
@@ -205,7 +169,7 @@ class JsonArray
                 $subNode = $doc->createElement($key);
                 $node->appendChild($subNode);
             }
-            if (is_array($value)) {
+            if ( is_array($value) ) {
                 $this->arrayToXml($doc, $subNode, $value);
             } else {
                 $subNode->nodeValue = (string)$value;

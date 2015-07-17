@@ -11,7 +11,13 @@
 /**
  * Base class for printers of TestDox documentation.
  *
- * @since Class available since Release 2.1.0
+ * @package    PHPUnit
+ * @subpackage Util_TestDox
+ * @author     Sebastian Bergmann <sebastian@phpunit.de>
+ * @copyright  Sebastian Bergmann <sebastian@phpunit.de>
+ * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
+ * @link       http://www.phpunit.de/
+ * @since      Class available since Release 2.1.0
  */
 abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer implements PHPUnit_Framework_TestListener
 {
@@ -26,7 +32,7 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
     protected $testClass = '';
 
     /**
-     * @var int
+     * @var integer
      */
     protected $testStatus = false;
 
@@ -36,27 +42,27 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
     protected $tests = array();
 
     /**
-     * @var int
+     * @var integer
      */
     protected $successful = 0;
 
     /**
-     * @var int
+     * @var integer
      */
     protected $failed = 0;
 
     /**
-     * @var int
+     * @var integer
      */
     protected $risky = 0;
 
     /**
-     * @var int
+     * @var integer
      */
     protected $skipped = 0;
 
     /**
-     * @var int
+     * @var integer
      */
     protected $incomplete = 0;
 
@@ -85,6 +91,7 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
 
     /**
      * Flush buffer and close output.
+     *
      */
     public function flush()
     {
@@ -288,6 +295,7 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
 
     /**
      * Handler for 'start run' event.
+     *
      */
     protected function startRun()
     {
@@ -305,8 +313,8 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
     /**
      * Handler for 'on test' event.
      *
-     * @param string $name
-     * @param bool   $success
+     * @param string  $name
+     * @param boolean $success
      */
     protected function onTest($name, $success = true)
     {
@@ -323,6 +331,7 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
 
     /**
      * Handler for 'end run' event.
+     *
      */
     protected function endRun()
     {

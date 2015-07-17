@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeception\Util;
 
 use Codeception\Lib\Console\Output;
