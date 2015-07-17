@@ -127,12 +127,12 @@ class AuthService extends DbService {
 		}
 		
 		
-		$server['AUTH_USER']='2pieUser';
+		//$server['AUTH_USER']='2pieUser';
 		
 		//added empty user test to stop infinte loop ie this function called within this condition.
-		if (empty($this->user()) && (Config::get('system.use_passthrough_authentication') === TRUE) && !empty($server['AUTH_USER'])) {
+		if (empty($this->user()) && (Config::get('system.use_passthrough_authentication') === TRUE) && !empty($_SERVER['AUTH_USER'])) {
 			// Get the username
-			$username = explode('\\', $server["AUTH_USER"]);
+			$username = explode('\\', $_SERVER["AUTH_USER"]);
 			$username = end($username);
 			$this->w->Log->debug("Passthrough Username: " . $username);
 			
