@@ -1,6 +1,13 @@
 <?php
 namespace Codeception\Module;
 
+use Codeception\Module as CodeceptionModule;
+use Codeception\Configuration as Configuration;
+use Codeception\Exception\ModuleConfigException;
+use Codeception\Exception\ModuleException;
+use Codeception\Lib\Driver\MongoDb as MongoDbDriver;
+use Codeception\TestCase;
+
 /**
  * Works with MongoDb database.
  *
@@ -36,11 +43,7 @@ namespace Codeception\Module;
  * * cleanup: true - should the dump be reloaded after each test
  *
  */
-
-use \Codeception\Lib\Driver\MongoDb as MongoDbDriver;
-use Codeception\Configuration as Configuration;
-
-class MongoDb extends \Codeception\Module
+class MongoDb extends CodeceptionModule
 {
     /**
      * @api
@@ -55,10 +58,13 @@ class MongoDb extends \Codeception\Module
     protected $dumpFile;
     protected $isDumpFileEmpty = true;
 
-    protected $config = array(
+    protected $config = [
         'populate' => true,
         'cleanup'  => true,
-        'dump'     => null);
+        'dump'     => null,
+        'user'     => null,
+        'password' => null
+    ];
 
     protected $populated = false;
 
@@ -67,16 +73,18 @@ class MongoDb extends \Codeception\Module
      */
     public $driver;
 
-    protected $requiredFields = array('dsn', 'user', 'password');
+    protected $requiredFields = ['dsn'];
 
     public function _initialize()
     {
         if ($this->config['dump'] && ($this->config['cleanup'] or ($this->config['populate']))) {
 
             if (!file_exists(Configuration::projectDir() . $this->config['dump'])) {
-                throw new \Codeception\Exception\ModuleConfig(__CLASS__, "
+                throw new ModuleConfigException(
+                    __CLASS__, "
                     File with dump doesn't exist.\n
-                    Please, check path for dump file: " . $this->config['dump']);
+                    Please, check path for dump file: " . $this->config['dump']
+                );
             }
             $this->dumpFile = Configuration::projectDir() . $this->config['dump'];
             $this->isDumpFileEmpty = false;
@@ -89,9 +97,13 @@ class MongoDb extends \Codeception\Module
         }
 
         try {
-            $this->driver = MongoDbDriver::create($this->config['dsn'], $this->config['user'], $this->config['password']);
+            $this->driver = MongoDbDriver::create(
+                $this->config['dsn'],
+                $this->config['user'],
+                $this->config['password']
+            );
         } catch (\MongoConnectionException $e) {
-            throw new \Codeception\Exception\Module(__CLASS__, $e->getMessage() . ' while creating Mongo connection');
+            throw new ModuleException(__CLASS__, $e->getMessage() . ' while creating Mongo connection');
         }
 
         // starting with loading dump
@@ -102,7 +114,7 @@ class MongoDb extends \Codeception\Module
         }
     }
 
-    public function _before(\Codeception\TestCase $test)
+    public function _before(TestCase $test)
     {
         if ($this->config['cleanup'] && !$this->populated) {
             $this->cleanup();
@@ -110,7 +122,7 @@ class MongoDb extends \Codeception\Module
         }
     }
 
-    public function _after(\Codeception\TestCase $test)
+    public function _after(TestCase $test)
     {
         $this->populated = false;
     }
@@ -119,13 +131,16 @@ class MongoDb extends \Codeception\Module
     {
         $dbh = $this->driver->getDbh();
         if (!$dbh) {
-            throw new \Codeception\Exception\ModuleConfig(__CLASS__, "No connection to database. Remove this module from config if you don't need database repopulation");
+            throw new ModuleConfigException(
+                __CLASS__,
+                "No connection to database. Remove this module from config if you don't need database repopulation"
+            );
         }
         try {
             $this->driver->cleanup();
 
         } catch (\Exception $e) {
-            throw new \Codeception\Exception\Module(__CLASS__, $e->getMessage());
+            throw new ModuleException(__CLASS__, $e->getMessage());
         }
     }
 
@@ -137,7 +152,7 @@ class MongoDb extends \Codeception\Module
         try {
             $this->driver->load($this->dumpFile);
         } catch (\Exception $e) {
-            throw new \Codeception\Exception\Module(__CLASS__, $e->getMessage());
+            throw new ModuleException(__CLASS__, $e->getMessage());
         }
     }
 
@@ -145,6 +160,22 @@ class MongoDb extends \Codeception\Module
      * Inserts data into collection
      *
      * ``` php
+     * <?php
+     * $I->useDatabase('db_1');
+     * ```
+     *
+     * @param $dbName
+     */
+    public function useDatabase($dbName)
+    {
+        $this->driver->setDatabase($dbName);
+    }
+
+    /**
+     * Inserts data into collection
+     *
+     * ``` php
+     * <?php
      * $I->haveInCollection('users', array('name' => 'John', 'email' => 'john@coltrane.com'));
      * $user_id = $I->haveInCollection('users', array('email' => 'john@coltrane.com'));
      * ```
@@ -170,7 +201,7 @@ class MongoDb extends \Codeception\Module
      * @param $collection
      * @param array $criteria
      */
-    public function seeInCollection($collection, $criteria = array())
+    public function seeInCollection($collection, $criteria = [])
     {
         $collection = $this->driver->getDbh()->selectCollection($collection);
         $res = $collection->count($criteria);
@@ -188,7 +219,7 @@ class MongoDb extends \Codeception\Module
      * @param $collection
      * @param array $criteria
      */
-    public function dontSeeInCollection($collection, $criteria = array())
+    public function dontSeeInCollection($collection, $criteria = [])
     {
         $collection = $this->driver->getDbh()->selectCollection($collection);
         $res = $collection->count($criteria);
@@ -207,7 +238,8 @@ class MongoDb extends \Codeception\Module
      * @param array $criteria
      * @return \MongoCursor
      */
-    public function grabFromCollection($collection, $criteria = array()) {
+    public function grabFromCollection($collection, $criteria = [])
+    {
         $collection = $this->driver->getDbh()->selectCollection($collection);
         return $collection->findOne($criteria);
     }
@@ -226,7 +258,8 @@ class MongoDb extends \Codeception\Module
      * @param array $criteria
      * @return integer
      */
-    public function grabCollectionCount($collection, $criteria = array()) {
+    public function grabCollectionCount($collection, $criteria = [])
+    {
         $collection = $this->driver->getDbh()->selectCollection($collection);
         return $collection->count($criteria);
     }
@@ -243,12 +276,24 @@ class MongoDb extends \Codeception\Module
      * @param Array $criteria
      * @param String $elementToCheck
      */
-    public function seeElementIsArray($collection, $criteria = array(), $elementToCheck = null)
+    public function seeElementIsArray($collection, $criteria = [], $elementToCheck = null)
     {
         $collection = $this->driver->getDbh()->selectCollection($collection);
 
-        $res = $collection->count(array_merge($criteria, array($elementToCheck => array('$exists' => true), '$where' =>"Array.isArray(this.{$elementToCheck})")));
-        if ($res > 1) throw new \PHPUnit_Framework_ExpectationFailedException('Error: you should test against a single element criteria when asserting that elementIsArray');
+        $res = $collection->count(
+            array_merge(
+                $criteria,
+                [
+                    $elementToCheck => ['$exists' => true],
+                    '$where' => "Array.isArray(this.{$elementToCheck})"
+                ]
+            )
+        );
+        if ($res > 1) {
+            throw new \PHPUnit_Framework_ExpectationFailedException(
+                'Error: you should test against a single element criteria when asserting that elementIsArray'
+            );
+        }
         \PHPUnit_Framework_Assert::assertEquals(1, $res, 'Specified element is not a Mongo Object');
     }
 
@@ -264,14 +309,27 @@ class MongoDb extends \Codeception\Module
      * @param Array $criteria
      * @param String $elementToCheck
      */
-    public function seeElementIsObject($collection, $criteria = array(), $elementToCheck = null)
+    public function seeElementIsObject($collection, $criteria = [], $elementToCheck = null)
     {
         $collection = $this->driver->getDbh()->selectCollection($collection);
 
-        $res = $collection->count(array_merge($criteria, array($elementToCheck => array('$exists' => true), '$where' =>"! Array.isArray(this.{$elementToCheck}) && isObject(this.{$elementToCheck})")));
-        if ($res > 1) throw new \PHPUnit_Framework_ExpectationFailedException('Error: you should test against a single element criteria when asserting that elementIsObject');
+        $res = $collection->count(
+            array_merge(
+                $criteria,
+                [
+                    $elementToCheck => ['$exists' => true],
+                    '$where' => "! Array.isArray(this.{$elementToCheck}) && isObject(this.{$elementToCheck})"
+                ]
+            )
+        );
+        if ($res > 1) {
+            throw new \PHPUnit_Framework_ExpectationFailedException(
+                'Error: you should test against a single element criteria when asserting that elementIsObject'
+            );
+        }
         \PHPUnit_Framework_Assert::assertEquals(1, $res, 'Specified element is not a Mongo Object');
     }
+
     /**
      * Count number of records in a collection
      *
@@ -285,11 +343,10 @@ class MongoDb extends \Codeception\Module
      * @param integer $expected
      * @param array $criteria
      */
-    public function seeNumElementsInCollection($collection, $expected, $criteria = array())
+    public function seeNumElementsInCollection($collection, $expected, $criteria = [])
     {
         $collection = $this->driver->getDbh()->selectCollection($collection);
         $res = $collection->count($criteria);
         \PHPUnit_Framework_Assert::assertSame($expected, $res);
     }
-
 }

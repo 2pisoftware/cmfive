@@ -15,19 +15,16 @@ class RestTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-
         $connector = new \Codeception\Lib\Connector\Universal();
-        $connector->setIndex(\Codeception\Configuration::dataDir().'/rest/index.php');
+        $connector->setIndex(\Codeception\Configuration::dataDir() . '/rest/index.php');
 
-        $this->module = Stub::make(
-            '\Codeception\Module\REST',
-            [
-                'getModules' => [new \Codeception\Module\PhpBrowser()]
-            ]
-        );
+        $connectionModule = new \Codeception\Module\UniversalFramework(make_container());
+        $connectionModule->client = $connector;
+        $connectionModule->_initialize();
+        $this->module = Stub::make('\Codeception\Module\REST');
+        $this->module->_inject($connectionModule);
         $this->module->_initialize();
         $this->module->_before(Stub::makeEmpty('\Codeception\TestCase\Cest'));
-        $this->module->client = $connector;
         $this->module->client->setServerParameters([
             'SCRIPT_FILENAME' => 'index.php',
             'SCRIPT_NAME' => 'index',
@@ -72,20 +69,6 @@ class RestTest extends \PHPUnit_Framework_TestCase
         $this->module->seeResponseContains('davert@mail.ua');
         $this->module->seeResponseContainsJson(['name' => 'laura']);
         $this->module->dontSeeResponseContainsJson(['name' => 'john']);
-    }
-
-    public function testGrabDataFromJsonResponse()
-    {
-        $this->module->sendGET('/rest/user/');
-        // simple assoc array
-        $this->assertEquals('davert@mail.ua', $this->module->grabDataFromJsonResponse('email'));
-        // nested assoc array
-        $this->assertEquals('Kyiv', $this->module->grabDataFromJsonResponse('address.city'));
-        // nested index array
-        $this->assertEquals('DavertMik', $this->module->grabDataFromJsonResponse('aliases.0'));
-        // fail if data not found
-        $this->setExpectedException('PHPUnit_Framework_AssertionFailedError', 'Response does not have required data');
-        $this->module->grabDataFromJsonResponse('address.street');
     }
 
     public function testGrabDataFromResponseByJsonPath()
@@ -272,6 +255,15 @@ class RestTest extends \PHPUnit_Framework_TestCase
         $this->module->dontSeeResponseJsonMatchesJsonPath('$.store.book.*.invalidField');
     }
 
+    public function testApplicationJsonSubtypeIncludesObjectSerialized()
+    {
+        $this->module->haveHttpHeader('Content-Type', 'application/resource+json');
+        $this->module->sendPOST('/', new JsonSerializedItem());
+        /** @var $request \Symfony\Component\BrowserKit\Request  **/
+        $request = $this->module->client->getRequest();
+        $this->assertContains('application/resource+json', $request->getServer());
+        $this->assertJson($request->getContent());
+    }
 
     protected function shouldFail()
     {
@@ -285,6 +277,6 @@ class JsonSerializedItem implements JsonSerializable
 {
     public function jsonSerialize()
     {
-        return '{"hello": "world"}';
+        return array("hello" => "world");
     }
 }

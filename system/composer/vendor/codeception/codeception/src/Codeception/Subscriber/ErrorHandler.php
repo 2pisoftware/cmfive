@@ -1,9 +1,8 @@
 <?php
-
 namespace Codeception\Subscriber;
 
-use Codeception\Events;
 use Codeception\Event\SuiteEvent;
+use Codeception\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ErrorHandler implements EventSubscriberInterface
@@ -31,8 +30,8 @@ class ErrorHandler implements EventSubscriberInterface
             $this->errorLevel = $settings['error_level'];
         }
         error_reporting(eval("return {$this->errorLevel};"));
-        set_error_handler(array($this, 'errorHandler'));
-        register_shutdown_function(array($this, 'shutdownHandler'));
+        set_error_handler([$this, 'errorHandler']);
+        register_shutdown_function([$this, 'shutdownHandler']);
     }
 
     public function errorHandler($errno, $errstr, $errfile, $errline)
@@ -55,7 +54,7 @@ class ErrorHandler implements EventSubscriberInterface
             return;
         }
         self::$stopped = true;
-        $error         = error_get_last();
+        $error = error_get_last();
         if (!is_array($error)) {
             return;
         }
@@ -70,5 +69,4 @@ class ErrorHandler implements EventSubscriberInterface
         echo "\n\n\nFATAL ERROR. TESTS NOT FINISHED.\n";
         echo sprintf("%s \nin %s:%d\n", $error['message'], $error['file'], $error['line']);
     }
-
 }

@@ -1,11 +1,11 @@
 <?php
-
 namespace Codeception\Module;
 
-use Codeception\Exception\Module as ModuleException;
-use Codeception\Exception\ModuleConfig as ModuleConfigException;
-use Codeception\Module as BaseModule;
+use Codeception\Exception\ModuleException as ModuleException;
+use Codeception\Exception\ModuleConfigException as ModuleConfigException;
 use Codeception\Lib\Driver\Facebook as FacebookDriver;
+use Codeception\Lib\Interfaces\DependsOnModule;
+use Codeception\Module as BaseModule;
 
 /**
  * Provides testing for projects integrated with Facebook API.
@@ -33,9 +33,9 @@ use Codeception\Lib\Driver\Facebook as FacebookDriver;
  * ### Config example
  *
  *     modules:
- *         enabled: [Facebook]
- *         config:
- *             Facebook:
+ *         enabled:
+ *             - Facebook:
+ *                 depends: PhpBrowser
  *                 app_id: 412345678901234
  *                 secret: ccb79c1b0fdff54e4f7c928bf233aea5
  *                 test_user:
@@ -77,9 +77,9 @@ use Codeception\Lib\Driver\Facebook as FacebookDriver;
  * @since 1.6.3
  * @author tiger.seo@gmail.com
  */
-class Facebook extends BaseModule
+class Facebook extends BaseModule implements DependsOnModule
 {
-    protected $requiredFields = array('app_id', 'secret');
+    protected $requiredFields = ['app_id', 'secret'];
 
     /**
      * @var FacebookDriver
@@ -89,32 +89,50 @@ class Facebook extends BaseModule
     /**
      * @var array
      */
-    protected $testUser = array();
+    protected $testUser = [];
+
+    /**
+     * @var PhpBrowser
+     */
+    protected $phpBrowser;
+
+    public function _depends()
+    {
+        return 'Codeception\Module\PhpBrowser';
+    }
+
+    public function _inject(PhpBrowser $browser)
+    {
+        $this->phpBrowser = $browser;
+    }
 
     protected function deleteTestUser()
     {
         if (array_key_exists('id', $this->testUser)) {
             // make api-call for test user deletion
             $this->facebook->deleteTestUser($this->testUser['id']);
-            $this->testUser = array();
+            $this->testUser = [];
         }
     }
 
     public function _initialize()
     {
-        if (! array_key_exists('test_user', $this->config)) {
-            $this->config['test_user'] = array(
-                'permissions' => array()
-            );
-        } elseif (! array_key_exists('permissions', $this->config['test_user'])) {
-            $this->config['test_user']['permissions'] = array();
+        if (!array_key_exists('test_user', $this->config)) {
+            $this->config['test_user'] = [
+                'permissions' => [],
+                'name' => 'Codeception Testuser'
+            ];
+        } elseif (!array_key_exists('permissions', $this->config['test_user'])) {
+            $this->config['test_user']['permissions'] = [];
+        } elseif (!array_key_exists('name', $this->config['test_user'])) {
+            $this->config['test_user']['name'] = "codeception testuser";
         }
 
         $this->facebook = new FacebookDriver(
-            array(
-                 'appId'  => $this->config['app_id'],
-                 'secret' => $this->config['secret'],
-            ),
+            [
+                'app_id' => $this->config['app_id'],
+                'secret' => $this->config['secret'],
+            ],
             function ($title, $message) {
                 if (version_compare(PHP_VERSION, '5.4', '>=')) {
                     $this->debugSection($title, $message);
@@ -142,8 +160,9 @@ class Facebook extends BaseModule
         }
 
         // make api-call for test user creation only if it's not yet created
-        if (! array_key_exists('id', $this->testUser)) {
+        if (!array_key_exists('id', $this->testUser)) {
             $this->testUser = $this->facebook->createTestUser(
+                $this->config['test_user']['name'],
                 $this->config['test_user']['permissions']
             );
         }
@@ -156,27 +175,22 @@ class Facebook extends BaseModule
      */
     public function haveTestUserLoggedInOnFacebook()
     {
-        if (! $this->hasModule('PhpBrowser')) {
-            throw new ModuleConfigException(
-                __CLASS__,
-                'PhpBrowser module has to be enabled to be able to login to Facebook.'
-            );
-        }
-
-        if (! array_key_exists('id', $this->testUser)) {
+        if (!array_key_exists('id', $this->testUser)) {
             throw new ModuleException(
                 __CLASS__,
                 'Facebook test user was not found. Did you forget to create one?'
             );
         }
-
-        /** @var PhpBrowser $phpBrowser */
-        $phpBrowser = $this->getModule('PhpBrowser');
-
         // go to facebook and make login; it work only if you visit facebook.com first
-        $phpBrowser->amOnPage('https://www.facebook.com/');
-        $phpBrowser->amOnPage($this->grabFacebookTestUserLoginUrl());
-        $phpBrowser->seeCurrentUrlMatches('~/profile.php~');
+        $this->phpBrowser->amOnPage('https://www.facebook.com/');
+        $this->phpBrowser->sendAjaxPostRequest(
+            'login.php',
+            [
+                'email' => $this->grabFacebookTestUserEmail(),
+                'pass' => $this->testUser['password']
+            ]
+        );
+        $this->phpBrowser->see($this->grabFacebookTestUserName());
     }
 
     /**
@@ -186,7 +200,7 @@ class Facebook extends BaseModule
      */
     public function grabFacebookTestUserAccessToken()
     {
-        return $this->facebook->getAccessToken();
+        return $this->testUser['access_token'];
     }
 
     /**
@@ -219,29 +233,43 @@ class Facebook extends BaseModule
         return $this->testUser['login_url'];
     }
 
+    public function grabFacebookTestUserPassword()
+    {
+        return $this->testUser['password'];
+    }
+
     /**
-     * Returns the test user first name.
+     * Returns the test user name.
      *
      * @return string
      */
-    public function grabFacebookTestUserFirstName()
+    public function grabFacebookTestUserName()
     {
-        if (! array_key_exists('profile', $this->testUser)) {
-            $this->testUser['profile'] = $this->facebook->api('/me');
+        if (!array_key_exists('profile', $this->testUser)) {
+            $this->testUser['profile'] = $this->facebook->getTestUserInfo($this->grabFacebookTestUserAccessToken());
         }
-        return $this->testUser['profile']['first_name'];
+        return $this->testUser['profile']['name'];
+    }
+
+    /**
+     * Please, note that you must have publish_actions permission to be able to publish to user's feed.
+     *
+     * @param array $params
+     */
+    public function postToFacebookAsTestUser($params)
+    {
+        $this->facebook->sendPostToFacebook($this->grabFacebookTestUserAccessToken(), $params);
     }
 
     /**
      *
-     * Please, note that you must have publish_stream permission to be able to publish to user's feed.
+     * Please, note that you must have publish_actions permission to be able to publish to user's feed.
      *
      * @param string $placeId Place identifier to be verified against user published posts
      */
     public function seePostOnFacebookWithAttachedPlace($placeId)
     {
-        $posts = $this->facebook->getLastPostsForTestUser();
-
+        $posts = $this->facebook->getLastPostsForTestUser($this->grabFacebookTestUserAccessToken());
         if ($posts['data']) {
             foreach ($posts['data'] as $post) {
                 if (array_key_exists('place', $post) && ($post['place']['id'] == $placeId)) {

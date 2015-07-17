@@ -1,20 +1,23 @@
 <?php
 namespace Codeception\Subscriber;
 
-use Codeception\Events;
 use Codeception\Event\FailEvent;
 use Codeception\Event\StepEvent;
 use Codeception\Event\SuiteEvent;
 use Codeception\Event\TestEvent;
+use Codeception\Events;
 use Codeception\Exception\ConditionalAssertionFailed;
-use Codeception\SuiteManager;
-use Codeception\TestCase\Interfaces\ScenarioDriven;
-use Codeception\TestCase;
 use Codeception\Lib\Console\Message;
 use Codeception\Lib\Console\Output;
+use Codeception\Lib\Deprecation;
+use Codeception\Lib\Suite;
+use Codeception\Step;
+use Codeception\Step\Comment;
+use Codeception\TestCase;
+use Codeception\TestCase\Interfaces\ScenarioDriven;
 use Codeception\Util\Debug;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class Console implements EventSubscriberInterface
 {
@@ -23,8 +26,6 @@ class Console implements EventSubscriberInterface
     static $events = [
         Events::SUITE_BEFORE    => 'beforeSuite',
         Events::SUITE_AFTER     => 'afterSuite',
-        Events::TEST_BEFORE     => 'before',
-        Events::TEST_AFTER      => 'afterTest',
         Events::TEST_START      => 'startTest',
         Events::TEST_END        => 'endTest',
         Events::STEP_BEFORE     => 'beforeStep',
@@ -35,7 +36,13 @@ class Console implements EventSubscriberInterface
         Events::TEST_INCOMPLETE => 'testIncomplete',
         Events::TEST_SKIPPED    => 'testSkipped',
         Events::TEST_FAIL_PRINT => 'printFail',
+        Events::RESULT_PRINT_AFTER => 'afterResult'
     ];
+
+    /**
+     * @var Step
+     */
+    protected $metaStep;
 
     /**
      * @var Message
@@ -49,13 +56,17 @@ class Console implements EventSubscriberInterface
     protected $printedTest = null;
     protected $rawStackTrace = false;
     protected $traceLength = 5;
-    protected $columns = array(40, 5);
+    protected $columns = [40, 5];
     protected $output;
+    protected $options;
+    protected $fails = [];
+    protected $namespace = '';
 
     public function __construct($options)
     {
-        $this->debug  = $options['debug'] || $options['verbosity'] >= OutputInterface::VERBOSITY_VERY_VERBOSE;
-        $this->steps  = $this->debug || $options['steps'];
+        $this->options = $options;
+        $this->debug = $options['debug'] || $options['verbosity'] >= OutputInterface::VERBOSITY_VERY_VERBOSE;
+        $this->steps = $this->debug || $options['steps'];
         $this->rawStackTrace = ($options['verbosity'] === OutputInterface::VERBOSITY_DEBUG);
         $this->output = new Output($options);
         if ($this->debug) {
@@ -66,6 +77,11 @@ class Console implements EventSubscriberInterface
     // triggered for scenario based tests: cept, cest
     public function beforeSuite(SuiteEvent $e)
     {
+        $this->namespace = "";
+        $settings = $e->getSettings();
+        if (isset($settings['namespace'])) {
+            $this->namespace = $settings['namespace'];
+        }
         $this->buildResultsTable($e);
 
         $this->message("%s Tests (%d) ")
@@ -75,43 +91,66 @@ class Console implements EventSubscriberInterface
             ->prepend("\n")
             ->writeln();
 
-        $message = $this->message(implode(', ',array_map(function ($module) {
-            return $module->_getName();
-        }, SuiteManager::$modules)));
+        if ($e->getSuite() instanceof Suite) {
+            $message = $this->message(
+                implode(
+                    ', ', array_map(
+                        function ($module) {
+                            return $module->_getName();
+                        }, $e->getSuite()->getModules()
+                    )
+                )
+            );
 
-        $message->style('info')
-            ->prepend('Modules: ')
-            ->writeln(OutputInterface::VERBOSITY_VERBOSE);
+            $message->style('info')
+                ->prepend('Modules: ')
+                ->writeln(OutputInterface::VERBOSITY_VERBOSE);
+        }
 
         $this->message('')->width(array_sum($this->columns), '-')->writeln(OutputInterface::VERBOSITY_VERBOSE);
-
     }
 
     // triggered for all tests
     public function startTest(TestEvent $e)
     {
+        $this->fails = [];
         $test = $e->getTest();
         $this->printedTest = $test;
         $this->message = null;
         $this->output->waitForDebugOutput = true;
 
-        if (!$test instanceof TestCase) {
-            $this->writeCurrentTest($test);
-        }
-    }
-
-    public function before(TestEvent $e)
-    {
-        $test = $e->getTest();
         $this->writeCurrentTest($test);
         if ($this->steps && $this->isDetailed($test)) {
             $this->output->writeln("\nScenario:");
         }
-
     }
 
-    public function afterTest(TestEvent $e)
+    public function afterStep(StepEvent $e)
     {
+        $step = $e->getStep();
+        if ($step->hasFailed() and $step instanceof Step\ConditionalAssertion) {
+            $this->fails[] = $step;
+        }
+    }
+
+    public function afterResult()
+    {
+        if ($this->options['html']) {
+            $path = codecept_output_dir().$this->options['html'];
+            $this->output->writeln("- <bold>HTML</bold> report generated in <comment>file://$path</comment>");
+        }
+        if ($this->options['xml']) {
+            $path = codecept_output_dir().$this->options['xml'];
+            $this->output->writeln("- <bold>XML</bold> report generated in <comment>$path</comment>");
+        }
+        if ($this->options['tap']) {
+            $path = codecept_output_dir().$this->options['tap'];
+            $this->output->writeln("- <bold>TAP</bold> report generated in <comment>$path</comment>");
+        }
+        if ($this->options['json']) {
+            $path = codecept_output_dir().$this->options['json'];
+            $this->output->writeln("- <bold>JSON</bold> report generated in <comment>$path</comment>");
+        }
     }
 
     public function testSuccess(TestEvent $e)
@@ -127,17 +166,14 @@ class Console implements EventSubscriberInterface
     public function endTest(TestEvent $e)
     {
         if (!$this->output->waitForDebugOutput) {
-            $this->message()->width($this->columns[0]+$this->columns[1],'^')->writeln();
+            $this->message()->width($this->columns[0] + $this->columns[1], '^')->writeln();
         }
+        $this->metaStep = null;
         $this->printedTest = null;
     }
 
     public function testFail(FailEvent $e)
     {
-        if (!$this->steps && ($e->getFail() instanceof ConditionalAssertionFailed)) {
-            $this->message('[F]')->style('error')->prepend(' ')->write();
-            return;
-        }
         if ($this->isDetailed($e->getTest())) {
             $this->message('FAIL')->center(' ')->style('error')->append("\n")->writeln();
             return;
@@ -192,53 +228,85 @@ class Console implements EventSubscriberInterface
         if (!$this->steps or !$e->getTest() instanceof ScenarioDriven) {
             return;
         }
-        $this->output->writeln("* " . $e->getStep());
-    }
-
-    public function afterStep(StepEvent $e)
-    {
+        $metaStep = $e->getStep()->getMetaStep();
+        if ($metaStep and $this->metaStep != $metaStep) {
+            $this->output->writeln("* $metaStep");
+        }
+        $this->metaStep = $metaStep;
+        $msg = $this->message($e->getStep()->__toString());
+        $this->metaStep ? $msg->prepend('  ')->style('comment') : $msg->prepend('* ');
+        $msg->writeln();
     }
 
     public function afterSuite(SuiteEvent $e)
     {
         $this->message()->width(array_sum($this->columns), '-')->writeln();
+        $deprecationMessages = Deprecation::all();
+        foreach ($deprecationMessages as $message) {
+            $this->output->deprecate($message);
+        }
     }
 
     public function printFail(FailEvent $e)
     {
         $failedTest = $e->getTest();
         $fail = $e->getFail();
+        
         $this->output->write($e->getCount() . ") ");
 
-        if ($e->getTest() instanceof ScenarioDriven) {
+        if ($failedTest instanceof ScenarioDriven) {
             $this->printScenarioFail($failedTest, $fail);
             return;
         }
-
-        $failToString = \PHPUnit_Framework_TestFailure::exceptionToString($fail);
-        $this->message(get_class($failedTest))
-            ->append('::')
-            ->append($failedTest->getName())
-            ->style('bold')
-            ->append("\n")
-            ->append($failToString)
-            ->writeln();
+        $this->getTestMessage($failedTest)->write();
 
         $this->printException($fail);
+        $this->printExceptionTrace($fail);
+    }
+
+    protected function printException($e, $cause = null)
+    {
+        $class = $e instanceof \PHPUnit_Framework_ExceptionWrapper
+            ? $e->getClassname()
+            : get_class($e);
+
+        if (strpos($class, 'Codeception\Exception') === 0) {
+            $class = substr($class, strlen('Codeception\Exception\\'));
+        }
+
+        $this->output->writeln('');
+        $message = $this->message("%s")->with($e->getMessage());
+        $isFailure = $e instanceof \PHPUnit_Framework_AssertionFailedError
+            || $class == 'PHPUnit_Framework_ExpectationFailedException'
+            || $class == 'PHPUnit_Framework_AssertionFailedError';
+        if (!$isFailure) {
+            $message->prepend("[$class] ")->block("error");
+        }
+        if ($isFailure && $cause) {
+            $message->prepend("<error> Step </error> $cause\n<error> Fail </error> ");
+        }
+        if ($e instanceof \PHPUnit_Framework_ExpectationFailedException) {
+            if ($e->getComparisonFailure()) {
+                $message->append(trim($e->getComparisonFailure()->getDiff()));
+            }
+        }
+        $message->writeln();
+
     }
 
     protected function printScenarioFail(ScenarioDriven $failedTest, $fail)
     {
         $feature = $failedTest->getFeature();
         $failToString = \PHPUnit_Framework_TestFailure::exceptionToString($fail);
+
         $failMessage = $this->message($failedTest->getSignature())
             ->style('bold')
             ->append(' (')
-            ->append($failedTest->getFileName())
+            ->append(codecept_relative_path($failedTest->getFileName()))
             ->append(')');
 
         if ($fail instanceof \PHPUnit_Framework_SkippedTest
-            or $fail instanceof \PHPUnit_Framework_IncompleteTest
+            || $fail instanceof \PHPUnit_Framework_IncompleteTest
         ) {
             $this->printSkippedTest($feature, $failedTest->getFileName(), $failToString);
             return;
@@ -247,37 +315,40 @@ class Console implements EventSubscriberInterface
             $failMessage->prepend("Failed to $feature in ");
         }
         $failMessage->writeln();
+
+        $failedStep = "";
+        foreach ($failedTest->getScenario()->getSteps() as $step) {
+            if ($step->hasFailed()) {
+                $failedStep = (string)$step;
+                break;
+            }
+        }
+        $this->printException($fail,$failedStep);
+
         $this->printScenarioTrace($failedTest, $failToString);
         if ($this->output->getVerbosity() == OutputInterface::VERBOSITY_DEBUG) {
-            $this->printException($fail);
+            $this->printExceptionTrace($fail);
             return;
         }
         if (!$fail instanceof \PHPUnit_Framework_AssertionFailedError) {
-            $this->printException($fail);
+            $this->printExceptionTrace($fail);
             return;
         }
     }
 
-    public function printException(\Exception $e)
+    public function printExceptionTrace(\Exception $e)
     {
-
         static $limit = 10;
 
         $class = $e instanceof \PHPUnit_Framework_ExceptionWrapper
             ? $e->getClassname()
             : get_class($e);
 
-        $this->message("[%s] %s")->with($class, $e->getMessage())->block('error')->writeln(
-            $e instanceof \PHPUnit_Framework_AssertionFailedError
-                ? OutputInterface::VERBOSITY_DEBUG
-                : OutputInterface::VERBOSITY_VERBOSE
-        );
-
         if ($this->rawStackTrace) {
-            $this->message($e->getTraceAsString())->writeln();
+            $this->message(\PHPUnit_Util_Filter::getFilteredStacktrace($e, true, false))->writeln();
             return;
         }
-        
+
         $trace = \PHPUnit_Util_Filter::getFilteredStacktrace($e, false);
 
         $i = 0;
@@ -290,7 +361,7 @@ class Console implements EventSubscriberInterface
             $message = $this->message($i)->prepend('#')->width(4);
 
             if (!isset($step['file'])) {
-                foreach (['class','type','function'] as $info) {
+                foreach (['class', 'type', 'function'] as $info) {
                     if (!isset($step[$info])) {
                         continue;
                     }
@@ -305,7 +376,7 @@ class Console implements EventSubscriberInterface
 
         $prev = $e->getPrevious();
         if ($prev) {
-            $this->printException($prev);
+            $this->printExceptionTrace($prev);
         }
     }
 
@@ -335,41 +406,37 @@ class Console implements EventSubscriberInterface
     }
 
     /**
-     * @param $action
-     * @param $failToString
-     */
-    public function printFailMessage($action, $failToString)
-    {
-        if (strpos($action, "don't") === 0) {
-            $action = substr($action, 6);
-            $this->output->writeln("Unexpectedly managed to $action:\n$failToString");
-        } elseif (strpos($action, 'am ') === 0) {
-            $action = substr($action, 3);
-            $this->output->writeln("Can't be $action:\n$failToString");
-        } else {
-            $this->output->writeln("Couldn't $action:\n$failToString");
-        }
-    }
-
-    /**
      * @param $failedTest
      * @param $fail
      */
-    public function printScenarioTrace($failedTest, $failToString)
+    public function printScenarioTrace(ScenarioDriven $failedTest)
     {
-        $trace = array_reverse($failedTest->getTrace());
+        $trace = array_reverse($failedTest->getScenario()->getSteps());
         $length = $i = count($trace);
-        $last = array_shift($trace);
-        if (!method_exists($last, 'getHumanizedAction')) {
-            return;
-        }
-        $this->printFailMessage($last->getHumanizedAction(), $failToString);
 
-        $this->output->writeln("Scenario Steps:");
-        $this->message($last)->style('error')->prepend("$i. ")->writeln();
+        if (!$length) return;
+
+        $this->message("\nScenario Steps:\n")->style('comment')->writeln();
+
         foreach ($trace as $step) {
+
+            $message = $this
+                ->message($i)
+                ->prepend(' ')
+                ->width(strlen($length))
+                ->append(". " . $step->getPhpCode());
+
+            if ($step->hasFailed()) {
+                $message->append('')->style('bold');
+            }
+
+            $line = $step->getLine();
+            if ($line and (!$step instanceof Comment)) {
+                $message->append(" at <info>$line</info>");
+            }
+
             $i--;
-            $this->message($i)->width(strlen($length))->append(". $step")->writeln();
+            $message->writeln();
             if (($length - $i - 1) >= $this->traceLength) {
                 break;
             }
@@ -382,7 +449,7 @@ class Console implements EventSubscriberInterface
      */
     protected function buildResultsTable(SuiteEvent $e)
     {
-        $this->columns = array(40, 5);
+        $this->columns = [40, 5];
         foreach ($e->getSuite()->tests() as $test) {
             if ($test instanceof TestCase) {
                 $this->columns[0] = max(
@@ -393,13 +460,13 @@ class Console implements EventSubscriberInterface
             }
             if ($test instanceof \PHPUnit_Framework_TestSuite_DataProvider) {
                 $test = $test->testAt(0);
-                $output_length = $test instanceof \Codeception\TestCase
+                $output_length = $test instanceof TestCase
                     ? strlen($test->getFeature()) + strlen($test->getFileName())
                     : $test->toString();
 
                 $this->columns[0] = max(
                     $this->columns[0],
-                    15 +$output_length
+                    15 + $output_length
                 );
                 continue;
             }
@@ -407,9 +474,9 @@ class Console implements EventSubscriberInterface
         }
         $cols = $this->columns[0];
         if ((strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN')
-            and (php_sapi_name() == "cli")
-            and (getenv('TERM'))
-            and (getenv('TERM') != 'unknown')
+            && (php_sapi_name() == "cli")
+            && (getenv('TERM'))
+            && (getenv('TERM') != 'unknown')
         ) {
             $cols = intval(`command -v tput >> /dev/null 2>&1 && tput cols`);
         }
@@ -426,33 +493,52 @@ class Console implements EventSubscriberInterface
     protected function getTestMessage(\PHPUnit_Framework_TestCase $test, $inProgress = false)
     {
         if (!$test instanceof TestCase) {
-            return $this->message = $this->message('%s::%s')
-                ->with(get_class($test), $test->getName(true))
+            $this->message = $this
+                ->message('%s::%s')
+                ->with($this->cutNamespace(get_class($test)), $test->getName(true))
                 ->apply(function ($str) { return str_replace('with data set', "|", $str); } )
-                ->cut($inProgress ? $this->columns[0]+$this->columns[1] - 15 : $this->columns[0]-1)
+                ->cut($inProgress ? $this->columns[0] + $this->columns[1] - 16 : $this->columns[0] - 2)
                 ->style('focus')
                 ->prepend($inProgress ? 'Running ' : '');
+            return $this->message;
         }
-        $filename = $test->getSignature();
+        $filename = $this->cutNamespace($test->getSignature());
         $feature = $test->getFeature();
 
         if ($feature) {
-            return $this->message = $this->message($inProgress ? $feature : ucfirst($feature))
+            $this->message = $this
+                ->message($inProgress ? $feature : ucfirst($feature))
                 ->apply(function ($str) { return str_replace('with data set', "|", $str); } )
-                ->cut($inProgress ? $this->columns[0]+$this->columns[1] - 17 - strlen($filename): $this->columns[0]- 4 - strlen($filename))
+                ->cut($inProgress ? $this->columns[0] + $this->columns[1] - 18 - strlen($filename) : $this->columns[0] - 5 - strlen($filename))
                 ->style('focus')
                 ->prepend($inProgress ? 'Trying to ' : '')
                 ->append(" ($filename)");
+            return $this->message;
         }
-        return $this->message = $this->message("<focus>%s</focus> ")
+        
+        $this->message = $this
+            ->message("<focus>%s</focus> ")
             ->prepend($inProgress ? 'Running ' : '')
             ->with($filename);
+        return $this->message;
     }
-    
+
+    private function cutNamespace($className)
+    {
+        if (!$this->namespace) {
+            return $className;
+        }
+        if (strpos($className, $this->namespace) === 0) {
+            return substr($className, strlen($this->namespace));
+        }
+        return $className;
+    }
+
     protected function writeCurrentTest(\PHPUnit_Framework_TestCase $test)
     {
-        if (!$this->isDetailed($test) and $this->output->isInteractive()) {
-            $this->getTestMessage($test, true)
+        if (!$this->isDetailed($test) && $this->output->isInteractive()) {
+            $this
+                ->getTestMessage($test, true)
                 ->append('... ')
                 ->write();
             return;
@@ -465,13 +551,27 @@ class Console implements EventSubscriberInterface
         if ($this->isDetailed($test)) {
             return;
         }
+
+        $conditionalFails = "";
+        $numFails  = count($this->fails);
+        if ($numFails == 1) {
+            $conditionalFails = "[F]";
+        } elseif ($numFails) {
+            $conditionalFails = "{$numFails}x[F]";
+        }
+        $conditionalLen = strlen($conditionalFails)+1;
+        $conditionalFails = "<error>$conditionalFails</error> ";
+
         if ($this->output->isInteractive()) {
-            $this->getTestMessage($test)->prepend("\x0D")->width($this->columns[0])->write();
+            $msg = $this->getTestMessage($test)->prepend("\x0D");
+            $msg->width($this->columns[0] - $conditionalLen)->append($conditionalFails)->write();
             return;
-        } 
+        }
         if ($this->message) {
-            $this->message('')->width($this->columns[0] - $this->message->apply('strip_tags')->getLength())->write();
+            $this->message('')
+                ->width($this->columns[0] - $this->message->apply('strip_tags')->getLength() - $conditionalLen)
+                ->append($conditionalFails)
+                ->write();
         }
     }
-
 }

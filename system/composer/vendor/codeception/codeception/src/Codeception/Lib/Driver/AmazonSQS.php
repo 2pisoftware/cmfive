@@ -3,10 +3,11 @@ namespace Codeception\Lib\Driver;
 
 use Codeception\Exception\TestRuntime;
 use Codeception\Lib\Interfaces\Queue;
+use Aws\Sqs\SqsClient;
+use Aws\Common\Credentials\Credentials;
 
 class AmazonSQS implements Queue
 {
-
     protected $queue;
 
     /**
@@ -16,14 +17,13 @@ class AmazonSQS implements Queue
      */
     public function openConnection($config)
     {
-        $this->queue = \Aws\Sqs\SqsClient::factory([
-            'credentials' => new \Aws\Common\Credentials\Credentials($config['key'], $config['secret']),
+        $this->queue = SqsClient::factory([
+            'credentials' => new Credentials($config['key'], $config['secret']),
             'region' => $config['region']
         ]);
         if (!$this->queue) {
             throw new TestRuntime('connection failed or timed-out.');
         }
-
     }
 
     /**
@@ -51,7 +51,7 @@ class AmazonSQS implements Queue
         $queues = $this->queue->listQueues(['QueueNamePrefix' => ''])->get('QueueUrls');
         foreach ($queues as $queue) {
             $tokens = explode('/', $queue);
-            $queueNames[] = $tokens[sizeof($tokens)-1];
+            $queueNames[] = $tokens[sizeof($tokens) - 1];
         }
         return $queueNames;
     }
@@ -97,7 +97,7 @@ class AmazonSQS implements Queue
                 return;
             }
             foreach ($res->getPath('Messages') as $msg) {
-                $this->debug("  - delete message: ".$msg['MessageId']);
+                $this->debug("  - delete message: " . $msg['MessageId']);
             }
             // Do something useful with $msg['Body'] here
             $this->queue->deleteMessage([
@@ -119,8 +119,9 @@ class AmazonSQS implements Queue
         $queues = $this->queue->listQueues(['QueueNamePrefix' => ''])->get('QueueUrls');
         foreach ($queues as $queueURL) {
             $tokens = explode('/', $queueURL);
-            if (strtolower($queue) == strtolower($tokens[sizeof($tokens)-1]))
+            if (strtolower($queue) == strtolower($tokens[sizeof($tokens) - 1])) {
                 return $queueURL;
+            }
         }
         throw new TestRuntime('queue [' . $queue . '] not found');
     }

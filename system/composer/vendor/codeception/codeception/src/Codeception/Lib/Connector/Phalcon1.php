@@ -1,5 +1,4 @@
 <?php
-
 namespace Codeception\Lib\Connector;
 
 use Codeception\Lib\Connector\Shared\PhpSuperGlobalsConverter;
@@ -78,8 +77,8 @@ class Phalcon1 extends Client
             throw new RuntimeException('Unsupported application class.');
         }
 
-        $_COOKIE                   = $request->getCookies();
-        $_FILES                    = $this->remapFiles($request->getFiles());
+        $_COOKIE = $request->getCookies();
+        $_FILES = $this->remapFiles($request->getFiles());
         $_SERVER['REQUEST_METHOD'] = strtoupper($request->getMethod());
         $_REQUEST = $this->remapRequestParameters($request->getParameters());
         if ($_SERVER['REQUEST_METHOD'] == 'GET') {
@@ -87,18 +86,18 @@ class Phalcon1 extends Client
         } else {
             $_POST = $_REQUEST;
         }
-        $uri                     = str_replace('http://localhost', '', $request->getUri());
-        $_SERVER['REQUEST_URI']  = $uri;
-        $_GET['_url']            = strtok($uri, '?');
+        $uri = str_replace('http://localhost', '', $request->getUri());
+        $_SERVER['REQUEST_URI'] = $uri;
+        $_GET['_url'] = strtok($uri, '?');
         $_SERVER['QUERY_STRING'] = http_build_query($_GET);
-        $_SERVER['REMOTE_ADDR']  = '127.0.0.1';
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 
         $di['request'] = Stub::construct($di->get('request'), [], ['getRawBody' => $request->getContent()]);
 
         $response = $application->handle();
 
         $headers = $response->getHeaders();
-        $status  = (int)$headers->get('Status');
+        $status = (int)$headers->get('Status');
 
         $headersProperty = new ReflectionProperty($headers, '_headers');
         $headersProperty->setAccessible(true);
@@ -134,7 +133,8 @@ class Phalcon1 extends Client
         return new Response(
             $response->getContent(),
             $status ? $status : 200,
-            $headers);
+            $headers
+        );
     }
 }
 
@@ -178,10 +178,10 @@ class PhalconMemorySession extends SessionAdapter implements SessionInterface
         return $this->isStarted;
     }
 
-    public function destroy($session_id = NULL)
+    public function destroy($session_id = null)
     {
         $this->isStarted = false;
-        $this->data      = [];
+        $this->data      = array();
     }
 
     public function getAll()

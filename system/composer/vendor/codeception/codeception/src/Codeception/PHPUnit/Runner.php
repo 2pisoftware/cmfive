@@ -1,34 +1,28 @@
 <?php
-
 namespace Codeception\PHPUnit;
 
 use Codeception\Configuration;
-use Codeception\PHPUnit\Log\JUnit;
-use Codeception\PHPUnit\ResultPrinter\HTML;
-use Codeception\PHPUnit\ResultPrinter\Report;
+use Codeception\Exception\ConfigurationException;
 
 class Runner extends \PHPUnit_TextUI_TestRunner
 {
-    public static $persistentListeners = array();
+    public static $persistentListeners = [];
 
-    protected $defaultListeners = array(
+    protected $defaultListeners = [
         'xml'  => false,
         'html' => false,
         'tap'  => false,
-        'json' => false
-    );
+        'json' => false,
+        'report' => false
+    ];
 
-    protected $config = array();
+    protected $config = [];
 
     protected $logDir = null;
 
-    protected $defaultArguments = array(
-        'report' => false,
-    );
-
     public function __construct()
     {
-        $this->config  = Configuration::config();
+        $this->config = Configuration::config();
         $this->logDir = Configuration::outputDir(); // prepare log dir
         $this->phpUnitOverriders();
         parent::__construct();
@@ -50,17 +44,12 @@ class Runner extends \PHPUnit_TextUI_TestRunner
     public function doEnhancedRun(
         \PHPUnit_Framework_Test $suite,
         \PHPUnit_Framework_TestResult $result,
-        array $arguments = array()
+        array $arguments = []
     ) {
         unset($GLOBALS['app']); // hook for not to serialize globals
 
-        $arguments = array_merge($this->defaultArguments, $arguments);
         $this->handleConfiguration($arguments);
         $result->convertErrorsToExceptions(false);
-
-        if ($arguments['report']) {
-            $this->printer = new Report();
-        }
 
         if (empty(self::$persistentListeners)) {
             $this->applyReporters($result, $arguments);
@@ -109,38 +98,55 @@ class Runner extends \PHPUnit_TextUI_TestRunner
 
     /**
      * @param \PHPUnit_Framework_TestResult $result
-     * @param array                         $arguments
+     * @param array $arguments
      *
      * @return array
      */
     protected function applyReporters(\PHPUnit_Framework_TestResult $result, array $arguments)
     {
         foreach ($this->defaultListeners as $listener => $value) {
-            if (! isset($arguments[$listener])) {
+            if (!isset($arguments[$listener])) {
                 $arguments[$listener] = $value;
             }
         }
 
-        if ($arguments['html']) {
-            codecept_debug('Printing HTML report into '.$arguments['html']);
-            self::$persistentListeners[] = new HTML($this->absolutePath($arguments['html']));
-        }
-        if ($arguments['xml']) {
-            codecept_debug('Printing JUNIT report into '.$arguments['xml']);
-            self::$persistentListeners[] = new JUnit($this->absolutePath($arguments['xml']), false);
-        }
-        if ($arguments['tap']) {
-            codecept_debug('Printing TAP report into '.$arguments['tap']);
-            self::$persistentListeners[] = new \PHPUnit_Util_Log_TAP($this->absolutePath($arguments['tap']));
-        }
-        if ($arguments['json']) {
-            codecept_debug('Printing JSON report into '.$arguments['json']);
-            self::$persistentListeners[] = new \PHPUnit_Util_Log_JSON($this->absolutePath($arguments['json']));
+        if ($arguments['report']) {
+            self::$persistentListeners[] = $this->instantiateReporter('report');
         }
 
+        if ($arguments['html']) {
+            codecept_debug('Printing HTML report into ' . $arguments['html']);
+            self::$persistentListeners[] = $this->instantiateReporter('html', [$this->absolutePath($arguments['html'])]);
+        }
+        if ($arguments['xml']) {
+            codecept_debug('Printing JUNIT report into ' . $arguments['xml']);
+            self::$persistentListeners[] = $this->instantiateReporter('xml', [$this->absolutePath($arguments['xml']), false]);
+        }
+        if ($arguments['tap']) {
+            codecept_debug('Printing TAP report into ' . $arguments['tap']);
+            self::$persistentListeners[] = $this->instantiateReporter('tap', [$this->absolutePath($arguments['tap'])]);
+        }
+        if ($arguments['json']) {
+            codecept_debug('Printing JSON report into ' . $arguments['json']);
+            self::$persistentListeners[] = $this->instantiateReporter('json', [$this->absolutePath($arguments['json'])]);
+        }
+        
         foreach (self::$persistentListeners as $listener) {
+            if ($listener instanceof ConsolePrinter) {
+                $this->printer = $listener;
+                continue;
+            }
             $result->addListener($listener);
         }
+    }
+
+    protected function instantiateReporter($name, $args = [])
+    {
+        if (!isset($this->config['reporters'][$name])) {
+            throw new ConfigurationException("Reporter $name not defined");
+        }
+        return (new \ReflectionClass($this->config['reporters'][$name]))->newInstanceArgs($args);
+
     }
 
     private function absolutePath($path)
@@ -150,5 +156,4 @@ class Runner extends \PHPUnit_TextUI_TestRunner
         }
         return $this->logDir . $path;
     }
-
 }

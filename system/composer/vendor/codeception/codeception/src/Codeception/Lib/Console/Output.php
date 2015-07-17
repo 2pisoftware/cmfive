@@ -8,11 +8,11 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 
 class Output extends ConsoleOutput
 {
-    protected $config = array(
-        'colors'    => true,
-        'verbosity' => self::VERBOSITY_NORMAL,
+    protected $config = [
+        'colors'      => true,
+        'verbosity'   => self::VERBOSITY_NORMAL,
         'interactive' => true
-    );
+    ];
 
     /**
      * @var \Symfony\Component\Console\Helper\FormatterHelper
@@ -31,12 +31,13 @@ class Output extends ConsoleOutput
         $this->isInteractive = $this->config['interactive'] && isset($_SERVER['TERM']) && php_sapi_name() == 'cli' && $_SERVER['TERM'] != 'linux';
 
         $formatter = new OutputFormatter($this->config['colors']);
-        $formatter->setStyle('bold', new OutputFormatterStyle(null, null, array('bold')));
-        $formatter->setStyle('focus', new OutputFormatterStyle('magenta', null, array('bold')));
+        $formatter->setStyle('bold', new OutputFormatterStyle(null, null, ['bold']));
+        $formatter->setStyle('focus', new OutputFormatterStyle('magenta', null, ['bold']));
         $formatter->setStyle('ok', new OutputFormatterStyle('white', 'magenta'));
         $formatter->setStyle('error', new OutputFormatterStyle('white', 'red'));
         $formatter->setStyle('debug', new OutputFormatterStyle('cyan'));
-        $formatter->setStyle('info', new OutputFormatterStyle('yellow'));
+        $formatter->setStyle('comment', new OutputFormatterStyle('yellow'));
+        $formatter->setStyle('info', new OutputFormatterStyle('green'));
 
         $this->formatHelper = new FormatterHelper();
 
@@ -82,5 +83,10 @@ class Output extends ConsoleOutput
         $this->writeln("(![ $class ]!)");
         $this->writeln($e->getMessage());
         $this->writeln("");
+    }
+
+    public function deprecate($message)
+    {
+        $this->writeln("<comment>DEPRECATION: $message</comment>");
     }
 }

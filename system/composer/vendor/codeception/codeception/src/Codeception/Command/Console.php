@@ -1,13 +1,11 @@
 <?php
-
 namespace Codeception\Command;
 
-use Codeception\Actor;
 use Codeception\Codecept;
-use Codeception\Events;
 use Codeception\Configuration;
 use Codeception\Event\SuiteEvent;
 use Codeception\Event\TestEvent;
+use Codeception\Events;
 use Codeception\Lib\Console\Output;
 use Codeception\Scenario;
 use Codeception\SuiteManager;
@@ -32,16 +30,15 @@ class Console extends Command
     protected $codecept;
     protected $suite;
     protected $output;
+    protected $actions = [];
 
     protected function configure()
     {
-        $this->setDefinition(
-             array(
-                 new InputArgument('suite', InputArgument::REQUIRED, 'suite to be executed'),
-                 new InputOption('config', 'c', InputOption::VALUE_OPTIONAL, 'Use custom path for config'),
-                 new InputOption('colors', '', InputOption::VALUE_NONE, 'Use colors in output'),
-             )
-        );
+        $this->setDefinition([
+            new InputArgument('suite', InputArgument::REQUIRED, 'suite to be executed'),
+            new InputOption('config', 'c', InputOption::VALUE_OPTIONAL, 'Use custom path for config'),
+            new InputOption('colors', '', InputOption::VALUE_NONE, 'Use colors in output'),
+        ]);
 
         parent::configure();
     }
@@ -53,13 +50,13 @@ class Console extends Command
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $suiteName    = $input->getArgument('suite');
+        $suiteName = $input->getArgument('suite');
         $this->output = $output;
 
-        $config   = Configuration::config($input->getOption('config'));
+        $config = Configuration::config($input->getOption('config'));
         $settings = Configuration::suiteSettings($suiteName, $config);
 
-        $options          = $input->getOptions();
+        $options = $input->getOptions();
         $options['debug'] = true;
         $options['silent'] = true;
         $options['interactive'] = false;
@@ -68,22 +65,28 @@ class Console extends Command
         Debug::setOutput(new Output($options));
 
         $this->codecept = new Codecept($options);
-        $dispatcher     = $this->codecept->getDispatcher();
+        $dispatcher = $this->codecept->getDispatcher();
 
-        $this->test     = (new Cept())
+        $suiteManager = new SuiteManager($dispatcher, $suiteName, $settings);
+        $suiteManager->initialize();
+        $this->suite = $suiteManager->getSuite();
+        $moduleContainer = $suiteManager->getModuleContainer();
+
+        $this->actions = array_keys($moduleContainer->getActions());
+
+        $this->test = (new Cept())
             ->configDispatcher($dispatcher)
+            ->configModules($moduleContainer)
             ->configName('')
-            ->config('file','')
+            ->config('file', '')
             ->initConfig();
 
-        $suiteManager   = new SuiteManager($dispatcher, $suiteName, $settings);
-        $suiteManager->initialize();
-        $this->suite    = $suiteManager->getSuite();
-
         $scenario = new Scenario($this->test);
-        if (isset($config["namespace"])) $settings['class_name'] = $config["namespace"] .'\\' . $settings['class_name'];
-        $actor      = $settings['class_name'];
-        $I        = new $actor($scenario);
+        if (isset($config["namespace"])) {
+            $settings['class_name'] = $config["namespace"] .'\\' . $settings['class_name'];
+        }
+        $actor = $settings['class_name'];
+        $I = new $actor($scenario);
 
         $this->listenToSignals();
 
@@ -99,7 +102,7 @@ class Console extends Command
         $dispatcher->dispatch(Events::TEST_BEFORE, new TestEvent($this->test));
 
         $output->writeln("\n\n<comment>\$I</comment> = new {$settings['class_name']}(\$scenario);");
-        $scenario->run();
+        $scenario->stopIfBlocked();
         $this->executeCommands($input, $output, $I, $settings['bootstrap']);
 
         $dispatcher->dispatch(Events::TEST_AFTER, new TestEvent($this->test));
@@ -118,13 +121,13 @@ class Console extends Command
 
         do {
             $question = new Question("<comment>\$I-></comment>");
-            $question->setAutocompleterValues(array_keys(SuiteManager::$actions));
+            $question->setAutocompleterValues($this->actions);
 
             $command = $dialog->ask($input, $output, $question);
             if ($command == 'actions') {
-                $output->writeln("<info>" . implode(' ', array_keys(SuiteManager::$actions)));
+                $output->writeln("<info>" . implode(' ', $this->actions));
                 continue;
-            };
+            }
             if ($command == 'exit') {
                 return;
             }
@@ -133,7 +136,7 @@ class Console extends Command
             }
             try {
                 $value = eval("return \$I->$command;");
-                if ($value and !is_object($value)) {
+                if ($value && !is_object($value)) {
                     codecept_debug($value);
                 }
             } catch (\PHPUnit_Framework_AssertionFailedError $fail) {

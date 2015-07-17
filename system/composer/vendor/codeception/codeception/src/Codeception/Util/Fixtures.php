@@ -1,5 +1,4 @@
 <?php
-
 namespace Codeception\Util;
 
 /**
@@ -16,7 +15,7 @@ namespace Codeception\Util;
  */
 class Fixtures
 {
-    protected static $fixtures = array();
+    protected static $fixtures = [];
 
     public static function add($name, $data)
     {
@@ -34,6 +33,6 @@ class Fixtures
 
     public static function cleanup()
     {
-        self::$fixtures = array();
+        self::$fixtures = [];
     }
 }
