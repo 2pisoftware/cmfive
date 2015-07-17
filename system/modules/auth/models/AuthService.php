@@ -146,7 +146,7 @@ class AuthService extends DbService {
 						return $url ? $url : true;
 					}
 				} else {
-					$this->Log->info($module)
+					$this->Log->info($module.' did not provide passthrough user for:'.$username);
 				}
 			}
 		}
