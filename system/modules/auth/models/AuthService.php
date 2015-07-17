@@ -137,7 +137,7 @@ class AuthService extends DbService {
 			$this->w->Log->debug("Passthrough Username: " . $username);
 			
 			//this hook returns $hook_results[$module][0]=$user or null.
-			$hook_results = $this->w->callHook("auth", "get_authenticated_user", $username);
+			$hook_results = $this->w->callHook("auth", "attendance_auth_get_user_for_passthrough", $username);
 			foreach($hook_results as $module => $user) {
 				if (!empty($user) && $user instanceof User) {
 					$this->forceLogin($user->id);
