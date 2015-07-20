@@ -6,6 +6,7 @@ class AuthService extends DbService {
     public $_roles_loaded = false;
     public $_user = null;
     public $_rest_user = null;
+	private static $_cache = array();
 
     function login($login, $password, $client_timezone, $skip_session = false) {
         // $password = User::encryptPassword($password);
@@ -96,18 +97,23 @@ class AuthService extends DbService {
     }
 
     function allowed($path, $url = null) {
-
+		$key = $path.'::'.$url;
+		if(!empty(self::$_cache[$key])) {
+			return self::$_cache[$key];
+		}
         $parts = $this->w->parseUrl($path);
         if (!in_array($parts['module'], $this->w->modules())) {
             $this->Log->error("Denied access: module '". urlencode($parts['module']). "' doesn't exist");
+			self::$_cache[$key] = false;
             return false;
         }
 
         if ((function_exists("anonymous_allowed") && anonymous_allowed($this->w, $path)) || 
         	($this->user() && $this->user()->allowed($path))) {
-        	return $url ? $url : true;
+			self::$_cache[$key] = $url ? $url : true;
+        	return self::$_cache[$key];
         }
-        
+        self::$_cache[$key] = false;
         return false;
     }
 

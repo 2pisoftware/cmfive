@@ -59,25 +59,27 @@ class Config {
      * @return Mixed the value
      */
     public static function get($key) {
-         if(!empty(self::$_config_cache[$key])) {
-            return self::$_config_cache[$key];
+        if(!empty(self::$_config_cache[$key])) {
+           return self::$_config_cache[$key];
         }
         $exploded_key = explode('.', strtolower($key));
         // Copy the register for processing
         $value = &self::$register;
         if (!empty($exploded_key)) {
+			$i = 0;
             // Loop through each key
-            foreach($exploded_key as $ekey) {
-                if (array_key_exists($ekey, $value)) {
-                    $value = &$value[$ekey];
-                } else {
-                    // Return null when we can't find a key
-                    return NULL;
-                }
-            }
-            self::$_config_cache[$key] = &$value;
-            return $value;
+			while(isset($exploded_key[$i]) && isset($value[$exploded_key[$i]])) {
+				$value = &$value[$exploded_key[$i]];
+				$i++;
+			}
+			if($i !== count($exploded_key)) {
+				self::$_config_cache[$key] = NULL;
+			} else {
+				self::$_config_cache[$key] = &$value;
+			}
+            return self::$_config_cache[$key];
         }
+		self::$_config_cache[$key] = NULL;
         return NULL;
     }
     
