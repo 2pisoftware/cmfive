@@ -17,7 +17,7 @@
         "site5/phantoman": "*",
         "jakoch/phantomjs-installer": "*"
     },
-    "scripts": {
+    "disscripts": {
         "post-install-cmd": [
             "PhantomInstaller\\Installer::installPhantomJS"
         ],
