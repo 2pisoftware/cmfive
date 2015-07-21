@@ -20,6 +20,7 @@ class DbService {
      */
     private static $_cache = array(); // used for single objects
     private static $_cache2 = array();  // used for lists of objects
+	private static $_select_cache = array();
 
     /**
      * This variable keeps track of active transactions
@@ -134,7 +135,8 @@ class DbService {
         if (!empty($order_by)) {
             $this->_db->order_by($order_by);
         }
-
+		
+		$this->buildSelect($o, $table, $class);
 //        $this->w->Log->setLogger("DB_SERVICE")->debug("(getObject) TABLE: " . $table . " WHERE: " . json_encode($idOrWhere));
         //$this->w->Log->setLogger("DB_SERVICE")->debug("SQL: " . $this->_db->getSql());
         $result = $this->_db->fetch_row();
@@ -153,7 +155,32 @@ class DbService {
             return null;
         }
     }
-
+	function buildSelect($object, $table, $class) {
+		$this->_db->clearSelect();
+		if(!isset(self::$_select_cache[$class])) {
+			self::$_select_cache[$class] = array();
+		}
+		if(!empty(self::$_select_cache[$class][$table])) {
+			$this->_db->select(self::$_select_cache[$class][$table]);
+			return NULL;
+		}
+        // Move date conversion to SQL.
+        // Automatically converts keys with different database values
+		$parts = array();
+        foreach ($object->getDbTableColumnNames() as $k) {
+            if(0 === strpos($k, 'dt_') || 0 === strpos($k, 'd_') || 0 === strpos($k, 't_')) {
+                // This is MySQL specific!
+                $parts[] = "UNIX_TIMESTAMP($table.`".$object->getDbColumnName($k)."`) AS `$k`";
+            } else if($k != $object->getDbColumnName($k)) {
+                $parts[] = "`".$object->getDbColumnName($k)."` as `$k`";
+            } else {
+                $parts[] = $k;
+            }
+        }
+		self::$_select_cache[$class][$table] = implode(',', $parts);
+		$this->_db->select(self::$_select_cache[$class][$table]);
+		return NULL;
+	}
     /**
      *
      * @param String $class
@@ -202,20 +229,7 @@ class DbService {
         if (!empty($order_by)) {
             $this->_db->order_by($order_by);
         }
-        // echo $this->_db->getSql();
-        $this->_db->clearSelect();
-        // Move date conversion to SQL.
-        // Automatically converts keys with different database values
-        foreach ($o->getObjectVars() as $k) {
-            if(0 === strpos($k, 'dt_') || 0 === strpos($k, 'd_')) {
-                // This is MySQL specific!
-                $this->_db->select("UNIX_TIMESTAMP($table.`".$o->getDbColumnName($k)."`) AS `$k`");
-            } else if($k != $o->getDbColumnName($k)) {
-                $this->_db->select("`".$o->getDbColumnName($k)."` as `$k`");
-            } else {
-                $this->_db->select($k);
-            }
-        }
+        $this->buildSelect($o, $table, $class);
         $result = $this->_db->fetch_all();
         if ($result) {
             $objects = $this->getObjectsFromRows($class, $result, true);
