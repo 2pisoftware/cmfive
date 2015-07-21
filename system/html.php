@@ -494,7 +494,7 @@ class Html {
         // If form tag is needed print it
         if ($includeFormTag) {
             $class .= " small-12 columns";
-            $form->id($id)->setClass($class)->method($method)->action($action)->target($target);
+            $form->id($id)->name($id)->setClass($class)->method($method)->action($action)->target($target);
                 
             if (in_multiarray("file", $data)) {
                 $form->enctype("multipart/form-data");

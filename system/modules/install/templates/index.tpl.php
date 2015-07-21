@@ -1,69 +1,47 @@
-<div class="row-fluid">
-	<h3>Step <?php echo $step; ?></h3>
-	<?php if( isset($error) ): ?>
-	<div data-alert class="alert-box alert">
-		<?php echo $error; ?>
+<style>
+	button.cancelbutton {
+		display: none;
+	}
+</style>
+
+<div class="row">
+	<div class="small-12 columns">
+		<h3>Installation</h3>
 	</div>
+</div>
+
+<div class="row">
+	<div class="small-12 medium-2 columns">
+		Step <?php echo $step; ?> out of 4
+	</div>
+	<div class="small-12 medium-10 columns">
+		<div class="progress small-12 success radius">
+			<span class="meter" style="width: <?php echo $step * 25; ?>%"></span>
+		</div>
+	</div>
+</div>
+
+<div class="row-fluid">
+	<?php if( isset($error) ): ?>
+		<div data-alert class="alert-box alert">
+			<?php echo $error; ?>
+		</div>
 	<?php endif; ?>
 	<?php if( isset($info) ): ?>
-	<div data-alert class="alert-box success">
-		<?php echo $info; ?>
-	</div>
+		<div data-alert class="alert-box success">
+			<?php echo $info; ?>
+		</div>
 	<?php endif; ?>
-<?php if( $step == 1 ): ?>
-	<form method="post" action="<?php echo $form_action; ?>">
-		<fieldset>
-			<legend>Database connection</legend>
-			<label>Hostname</label>
-			<input type="text" placeholder="Hostname" required="true" value="<?php echo empty($_POST['db_hostname']) ? 'localhost' : $_POST['db_hostname']; ?>" name="db_hostname" />
-			<label>Username</label>
-			<input type="text" placeholder="Username" required="true" value="<?php echo $_POST['db_username']; ?>" name="db_username" />
-			<label>Password</label>
-			<input type="password" placeholder="Password" required="true" value="<?php echo $_POST['db_password']; ?>" name="db_password" />
-			<label>Port</label>
-			<input type="number" placeholder="Port" value="<?php echo $_POST['db_port']; ?>" name="db_port" />
-			<label>Driver</label>
-			<select name="db_driver" required="true">
-				<option>mysql</option>
-			</select>
-			<button class="button" type="submit">Check connection</button>
-		</fieldset>
-	</form>
-<?php elseif( $step == 2 ): ?>
-	<form method="post" action="<?php echo $form_action; ?>">
-		<fieldset>
-			<legend>Select database</legend>
-			<input type="hidden" value="<?php echo $_POST['db_hostname']; ?>" name="db_hostname" />
-			<input type="hidden" value="<?php echo $_POST['db_username']; ?>" name="db_username" />
-			<input type="hidden" value="<?php echo $_POST['db_password']; ?>" name="db_password" />
-			<input type="hidden" value="<?php echo $_POST['db_port']; ?>" name="db_port" />
-			<input type="hidden" value="<?php echo $_POST['db_driver']; ?>" name="db_driver" />
-			<table>
-				<tbody>
-					<?php foreach($databases as $database=>$tables): ?>
-					<tr>
-						<td>
-							<div class="switch tiny round">
-								<input id="database_<?php echo $database; ?>" required="true" type="radio" name="db_database" value="<?php echo $database; ?>" />
-								<label for="database_<?php echo $database; ?>"></label>
-							</div>
-						</td>
-						<td>
-							<label for="database_<?php echo $database; ?>"><?php echo $database; ?>
-							<?php if(!empty($tables)): ?>
-							<span class="label round alert">This database is not empty, existing tables will be removed!</span>
-							<?php else: ?>
-							<span class="label round success">This database is empty</span>
-							<?php endif; ?>
-							</label>
-						</td>
-					<?php endforeach; ?>
-				</tbody>
-			</table>
-			<button class="button" type="submit">Import required tables</button>
-		</fieldset>
-	</form>
-<?php elseif( $step == 3 ): ?>
+</div>
+
+<div class="row">
+	<?php if ($step == 1 || $step == 2) :
+		echo $form_details;
+		if ($step == 2 && !empty($form_database)) :
+			echo $form_database;
+		endif;
+		
+	elseif ( $step == 3 ): ?>
 	<form method="post" action="<?php echo $form_action; ?>">
 		<fieldset>
 			<legend>General configuration</legend>

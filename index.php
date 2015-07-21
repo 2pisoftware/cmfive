@@ -1,8 +1,6 @@
 <?php 
 error_reporting(E_ALL);
 
-
-
 //========= Load System Modules Configuration ===============
 require "system/config.php";
 $web = new Web();
