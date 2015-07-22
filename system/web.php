@@ -548,6 +548,9 @@ class Web {
         
         // if config cache file doesn't exist, then
         // create it new
+		if(!is_dir(ROOT_PATH . '/cache')) {
+			mkdir(ROOT_PATH . '/cache');
+		}
         file_put_contents($cachefile, Config::toJson());
     }
 

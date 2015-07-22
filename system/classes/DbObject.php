@@ -75,6 +75,7 @@ class DbObject extends DbService {
 
     public $id;
     private static $_object_vars = array();
+	private static $_columns = array();
     private $_class;
 
     /**
@@ -308,14 +309,6 @@ class DbObject extends DbService {
             if (!empty($row[$k])) {
                 $this->$k = $row[$k];
             }
-        }
-        // May be modifiable data this will only fire if the keys below
-        // aren't defined in the class
-        if (!empty($row["dt_created"]) && empty($this->dt_created)) {
-            $this->dt_created = $this->dt2Time($row["dt_created"]);
-        }
-        if (!empty($row["dt_modified"]) && empty($this->dt_modified)) {
-            $this->dt_modified = $this->dt2Time($row["dt_modified"]);
         }
         if (!empty($row["creator_id"]) && empty($this->creator_id)) {
             $this->creator_id = $row["creator_id"];
@@ -755,15 +748,18 @@ class DbObject extends DbService {
     }
 
     function getDbTableColumnNames() {
+		if(!empty(self::$_columns[$this->_class])) {
+			return self::$_columns[$this->_class];
+		}
         $rs = $this->_db->_query('SELECT * FROM ' . $this->getDbTableName() . ' LIMIT 0');
         if ($rs !== false) {
-            $columns = array();
             for ($i = 0; $i < $rs->columnCount(); $i++) {
                 $col = $rs->getColumnMeta($i);
-                $columns[] = $col['name'];
+                self::$_columns[$this->_class][] = $col['name'];
             }
-            return $columns; //$this->_db->prepare("DESCRIBE tablename")->execute()->fetchAll(PDO::FETCH_COLUMN);
+            return self::$_columns[$this->_class]; //$this->_db->prepare("DESCRIBE tablename")->execute()->fetchAll(PDO::FETCH_COLUMN);
         }
+		self::$_columns[$this->_class][] = array();
         return array();
     }
 
