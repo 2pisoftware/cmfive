@@ -17,6 +17,12 @@ Config::set('task', array(
     )
 ));
 
+//========= Properties of Task Type Todo ==================
+
+Config::set('task.TaskType_Todo',array(
+	'time-type' => array("Ordinary Hours", "Overtime", "Weekend"),
+));
+
 //========= Properties of Taskgroup Type Todo ============
 
 Config::set('task.TaskGroupType_TaskTodo', array(
@@ -34,6 +40,12 @@ Config::set('task.TaskGroupType_TaskTodo', array(
 	'priorities' => array("Urgent", "Normal", "Nice to have"),
 ));
 
+//========= Properties of Task Type Programming Task =================
+
+Config::set('task.TaskType_ProgrammingTicket',array(
+	'time-type' => array("Ordinary Hours", "Overtime", "Weekend"),
+));
+
 //========= Properties of Taskgroup Type SoftwareDevelopment ==
 
 Config::set('task.TaskGroupType_SoftwareDevelopment', array(
@@ -41,8 +53,7 @@ Config::set('task.TaskGroupType_SoftwareDevelopment', array(
 	'description' => 'Use this for tracking software development tasks.',
 	'can-task-reopen' => true,
 	'tasktypes' => array(
-		"Todo" => "To Do",
-	    "ProgrammingTicket" => "Ticket"),
+	    "ProgrammingTicket" => "Programming Task"),
 	'statuses' => array(
 		array("Idea", false),
 		array("On Hold", false),

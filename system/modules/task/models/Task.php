@@ -355,7 +355,7 @@ class Task extends DbObject {
                 $tg_type->on_before_insert($this);
             }
 
-            // 2. Call on_before_update of the Tasktype
+            // 2. Call on_before_insert of the Tasktype
 
             if ($this->task_type) {
                 $this->getTaskTypeObject()->on_before_insert($this);
@@ -386,7 +386,7 @@ class Task extends DbObject {
                 $this->getTaskTypeObject()->on_after_insert($this);
             }
 
-            // 5. Call on_after_update of the TaskGroupType
+            // 5. Call on_after_insert of the TaskGroupType
 
             if (!empty($tg_type)) {
                 $tg_type->on_after_insert($this);

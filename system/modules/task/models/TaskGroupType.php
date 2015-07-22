@@ -116,39 +116,63 @@ abstract class TaskGroupType {
 	}
 	/**
 	 * Executed before a task is inserted into DB
-	 *
+	 * 
 	 * @param Task $task
 	 */
-	function on_before_insert(Task $task) {}
+	function on_before_insert(Task $task) {
+		if (!empty($task)) {
+			$task->w->callHook("task", get_class($this)."_on_before_insert", $task);
+		}
+	}	
 	/**
 	 * Executed after a task has been inserted into DB
-	 *
+	 * 
 	 * @param Task $task
 	 */
-	function on_after_insert(Task $task) {}
+	function on_after_insert(Task $task) {
+		if (!empty($task)) {
+			$task->w->callHook("task", get_class($this)."_on_after_insert", $task);
+		}
+	}	
 	/**
 	 * Executed before a task is updated in the DB
-	 *
+	 * 
 	 * @param Task $task
 	 */
-	function on_before_update(Task $task) {}
+	function on_before_update(Task $task) {
+		if (!empty($task)) {
+			$task->w->callHook("task", get_class($this)."_on_before_update", $task);
+		}
+	}	
 	/**
 	 * Executed after a task has been updated in the DB
-	 *
+	 * 
 	 * @param Task $task
 	 */
-	function on_after_update(Task $task) {}
+	function on_after_update(Task $task) {
+		if (!empty($task)) {
+			$task->w->callHook("task", get_class($this)."_on_after_update", $task);
+		}
+	}	
 	/**
 	 * Executed before a task is deleted from the DB
-	 *
+	 * 
 	 * @param Task $task
 	 */
-	function on_before_delete(Task $task) {}
+	function on_before_delete(Task $task) {
+		if (!empty($task)) {
+			$task->w->callHook("task", get_class($this)."_on_before_delete", $task);
+		}
+	}	
 	/**
 	 * Executed after a task has been deleted from the DB
-	 *
+	 * 
 	 * @param Task $task
 	 */
-	function on_after_delete(Task $task) {}
-	
+	function on_after_delete(Task $task) {
+		if (!empty($task)) {
+			$task->w->callHook("task", get_class($this)."_on_after_delete", $task);
+		}
+	}
+		
 }
