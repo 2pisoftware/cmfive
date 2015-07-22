@@ -5,24 +5,16 @@
         "bin-dir": "composer/bin"
     },
     "require": {
-        "codeception/codeception": "*",
+        "codeception/codeception": "2.0.14",
         "monolog/monolog": "1.8.*@dev",
+        "site5/phantoman": "*",
+        "jakoch/phantomjs-installer": "*",
         "knplabs/gaufrette": "0.2.*@dev",
         "dropbox-php/dropbox-php": "*",
         "zendframework/zend-mail": "2.2.5",
         "zendframework/zend-serializer": "2.2.5",
         "swiftmailer/swiftmailer": "@stable",
         "twig/twig": "1.*",
-        "nesbot/carbon": "~1.14",
-        "site5/phantoman": "*",
-        "jakoch/phantomjs-installer": "*"
-    },
-    "disscripts": {
-        "post-install-cmd": [
-            "PhantomInstaller\\Installer::installPhantomJS"
-        ],
-        "post-update-cmd": [
-            "PhantomInstaller\\Installer::installPhantomJS"
-        ]
+        "nesbot/carbon": "~1.14"
     }
 }

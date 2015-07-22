@@ -27,7 +27,7 @@ use Composer\Command\UpdateCommand;
 use Symfony\Component\Console\Output\StreamOutput;
 
 function composer_ALL(Web $w) {
-    echo "<pre>".file_get_contents(ROOT_PATH . '/log/composer.log') . "</pre>";
+    echo "<pre>".file_get_contents(STORAGE_PATH . '/log/composer.log') . "</pre>";
     // Collect dependencies
     $dependencies_array = array();
     foreach($w->modules() as $module) {
@@ -52,7 +52,7 @@ function composer_ALL(Web $w) {
 
     //Create the commands
     $input = new ArrayInput(array('command' => 'update', '--prefer-dist' => 'true'));
-    $filestream = new StreamOutput(fopen(ROOT_PATH . '/log/composer.log', 'w'));
+    $filestream = new StreamOutput(fopen(STORAGE_PATH . '/log/composer.log', 'w'));
     
     //Create the application and run it with the commands
     $application = new Application();
