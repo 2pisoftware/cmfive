@@ -82,9 +82,9 @@ class TimelogService extends DbService {
 
         $nav = $nav ? $nav : array();
 
-//        if ($w->Auth->loggedIn()) {
-//            $w->menuLink("timelog/", "Timesheet", $nav);
-//        }
+        if ($w->Auth->loggedIn()) {
+            $w->menuBox("timelog/edit", "Add Timelog", $nav);
+        }
 
         $w->ctx("navigation", $nav);
         return $nav;

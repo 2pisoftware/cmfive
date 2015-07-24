@@ -24,10 +24,25 @@ class Timelog extends DbObject {
     
     // Only return the first comment (comments are 1 - many association but we want to emulate 1 - 1)
     public function getComment() {
-        $comments = $this->w->Comment->getCommentsForTable($this, $this->id);
-        return !empty($comments[0]->id) ? $comments[0] : new Comment($this->w);
+		if ($this->id) {
+			$comments = $this->w->Comment->getCommentsForTable($this, $this->id);
+			return !empty($comments[0]->id) ? $comments[0] : new Comment($this->w);
+		}
+		return null;
     }
 
+	public function setComment($comment) {
+		if ($this->id) {
+			$comment = $this->getComment();
+			if (!empty($comment)) {
+				$comment->comment = $comment;
+				$comment->update();
+			} else {
+				$w->Comment->addComment($this, $comment);
+			}
+		}
+	}
+	
     public function getLinkedObject() {
         if (!empty($this->object_class) && !empty($this->object_id)) {
             if (class_exists($this->object_class)) {
