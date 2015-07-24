@@ -23,15 +23,17 @@ Config::set('email', array(
     "layer"	=> "<?php echo $email_layer; ?>",		// smtp, sendmail
     "host"	=> "<?php echo $email_host; ?>",
     "port"	=> <?php echo intval($email_port); ?>,
-    "auth"	=> <?php echo $email_auth; ?>,
+    "auth"	=> <?php echo $email_auth ? 'true' : 'false'; ?>,
     "username"	=> "<?php echo $email_username; ?>",
     "password"	=> "<?php echo $email_password; ?>"
 ));
 
+Config::set("system.checkCSRF", <?php echo $checkCSRF ? 'true' : 'false'; ?>);
+
 //========= Anonymous Access ================================
 
 // bypass authentication if sent from the following IP addresses
-Config::set("system.allow_from_ip", array());
+Config::set("system.allow_from_ip", <?php var_export($allow_from_ip); ?>);
 
 // or bypass authentication for the following modules
 Config::set("system.allow_module", array(
