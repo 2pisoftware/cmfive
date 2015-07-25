@@ -54,7 +54,7 @@ class DbDiff {
 		}
 		if($repaired) {
 			$this->web->Log->setLogger('DB_REPAIR')->info("Table $table_name successfully repaired.");
-			return $this->dbpdo->get($table_name);
+			return $this->dbpdo->get($table_name, true);
 		} else {
 			$this->web->Log->setLogger('DB_REPAIR')->error("Table $table_name couldn't be repaired.");
 			return NULL;
