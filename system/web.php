@@ -493,7 +493,7 @@ class Web {
      */
     private function initDB() {
     	try {
-        	$this->db = new DbPDO(Config::get("database"));
+        	$this->db = new DbPDO(Config::get("database"), $this);
     	} catch (Exception $ex) {
     		echo "Error: Can't connect to database.";
     		die();
@@ -519,6 +519,14 @@ class Web {
         // Load project module config second
         $baseDir = ROOT_PATH . '/modules';
         $this->scanModuleDirForConfigurationFiles($baseDir);
+        
+        // load the root level config file last because it can override everything
+	    if (!file_exists("config.php")) {
+			return false; //Install script handles this
+			//echo "<b>No config.php found. Please copy config.php.example, change parameters as necessary and rename to config.php<b>";
+			//die();
+		}
+        require ROOT_PATH . "/config.php";
     }
 
     // Helper function for the above, scans a directory for config files in child folders

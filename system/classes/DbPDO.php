@@ -11,6 +11,8 @@ class DbPDO extends PDO {
 
     private $query = null;
     private $fpdo = null;
+    private $dbDiff = null;
+    private $web = null;
     public $sql = null;
     public $total_results = 0;
     
@@ -18,11 +20,27 @@ class DbPDO extends PDO {
     
     private $config;
     
-    public function __construct($config = array()) {
+    public function __construct($config = array(), Web $w) {
+		$this->web = $w;
         // Set up our PDO class
-        $port = isset($config['port']) && !empty($config['port']) ? ";port=".$config['port'] : "";
-        $url = "{$config['driver']}:host={$config['hostname']};dbname={$config['database']}{$port}";
-        parent::__construct($url,$config["username"],$config["password"], null);
+        //GC: sqlsrv requires a different dsn to mysql.
+        switch ($config['driver']) {
+			case 'sqlsrv':
+				$port = isset($config['port']) && !empty($config['port']) ? ",".$config['port'] : "";
+				$url = "{$config['driver']}:Server={$config['hostname']}{$port};Database={$config['database']}";
+				break;
+			//linux apache2 driver
+			case 'dblib':
+				$port = isset($config['port']) && !empty($config['port']) ? ",".$config['port'] : "";
+				$url = "{$config['driver']}:host={$config['hostname']}{$port};dbname={$config['database']}";
+				break;			
+				//mysql
+			default:
+				$port = isset($config['port']) && !empty($config['port']) ? ";port=".$config['port'] : "";
+				$url = "{$config['driver']}:host={$config['hostname']};dbname={$config['database']}{$port}";
+		}
+		$this->dbDiff = new DbDiff($this, $w);
+		parent::__construct($url,$config["username"],$config["password"], null);
         $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
         // Since you cant bind table names, maybe its a good idea to
@@ -40,7 +58,13 @@ class DbPDO extends PDO {
         $this->sql = 'getSql'; //$this->getSql();
         $this->config = $config;
     } 
-
+	
+	public function updateTableList() {
+		DbPDO::$table_names = array();
+		foreach($this->query("show tables")->fetchAll(PDO::FETCH_NUM) as $table)
+			DbPDO::$table_names[] = $table[0];
+	}
+	
     public function getDatabase() {
     	return $this->config['database'];
     }
@@ -64,9 +88,12 @@ class DbPDO extends PDO {
      * @param type $table_name
      * @return \DbPDO|null
      */
-    public function get($table_name){
+    public function get($table_name, $repaired=false){
         if (!in_array($table_name, DbPDO::$table_names)){
-            trigger_error("Table $table_name does not exist in the databse", E_USER_ERROR);
+			if(!$repaired) {
+				return $this->dbDiff->getRepair($table_name);
+			}
+            trigger_error("Table $table_name does not exist in the database", E_USER_ERROR);
             return null;
         }  
         $this->query = $this->fpdo->from($table_name);
