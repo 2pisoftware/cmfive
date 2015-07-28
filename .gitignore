@@ -41,3 +41,4 @@ system/tests/tests/_output/
 /system/modules/*/tests/_support/FunctionalHelper.php
 /system/modules/*/tests/_support/UnitHelper.php
 /system/modules/*/tests/_output/*
+nbproject/
