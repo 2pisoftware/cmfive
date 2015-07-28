@@ -1,10 +1,11 @@
 <?php
+
 function index_ALL(Web $w) {
 	$p = $w->pathMatch("install", "step", "step_number");
 	
 	// Redirect to install of no actions given
 	if(empty($p['install'])) {
-		$w->redirect('install/step/1');
+		$w->redirect('install/index/1');
 	}
 	
 	// Set current step
@@ -12,10 +13,10 @@ function index_ALL(Web $w) {
 	
 	// Redirect to first step if no POST data for step 2/3/4
 	if ($step > 1 && $_SERVER["REQUEST_METHOD"] != "POST") {
-		$w->redirect('install/step/1');
+		$w->redirect('install/index/1');
 	}
 	$w->ctx("step", $step);
-	$w->ctx("form_action", "/install/step/"+($step+1));
+	$w->ctx("form_action", "/install/index/"+($step+1));
 	$drivers = '';
 	foreach(PDO::getAvailableDrivers() as $driver) {
 		$drivers .= "<option>$driver</option>";
@@ -46,7 +47,7 @@ function index_ALL(Web $w) {
 		} catch(PDOException $e) {
 			$w->ctx('error', "Couldn't connect to the database!");
 			$w->ctx('step', 1);
-			$w->ctx("form_action", "/install/step/2");
+			$w->ctx("form_action", "/install/index/2");
 			return;
 		}
 		$w->ctx('info', 'Successfully connected to database');

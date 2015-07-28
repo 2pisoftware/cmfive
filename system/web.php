@@ -199,6 +199,14 @@ class Web {
     }
     
 	function install() {
+		$this->_paths = $this->_getCommandPath();
+		if ($this->_paths[0] !== "install") {
+			$this->redirect("/install");
+		} else {
+			$this->start(false);
+		}
+
+		
 		session_name(SESSION_NAME);
         session_start();
 		$this->_paths = $this->_getCommandPath();
@@ -251,8 +259,10 @@ class Web {
      * 1. look at the request parameter if the action parameter was set
      * 2. if not set, look at the pathinfo and use first
      */
-    function start() {
-        $this->initDB();
+    function start($init_database = true) {
+		if ($init_database) {
+			$this->initDB();
+		}
 
         // start the session
         // $sess = new SessionManager($this);
@@ -468,6 +478,11 @@ class Web {
      * @param unknown $type eg. before / after
      */
     private function _callWebHooks($type) {
+		// If there isn't a database connection, this will crash
+		if (empty($this->db)) {
+			return;
+		}
+		
         $request_method = strtolower($this->_requestMethod);
         
         // call hooks, generic to specific
