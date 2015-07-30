@@ -200,8 +200,8 @@ class Web {
     
 	function install() {
 		$this->_paths = $this->_getCommandPath();
-		if ($this->_paths[0] !== "install") {
-			$this->redirect("/install");
+		if (!in_array($this->_paths[0], ["install", "install-steps"])) {
+			$this->redirect("/install-steps/database");
 		} else {
 			$this->start(false);
 		}

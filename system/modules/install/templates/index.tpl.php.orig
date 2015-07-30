@@ -22,7 +22,6 @@
 </div>
 
 <div class="row-fluid">
-<<<<<<< HEAD
 	<?php if( isset($error) ): ?>
 		<div data-alert class="alert-box alert">
 			<?php echo $error; ?>
