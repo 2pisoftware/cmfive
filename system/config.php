@@ -22,9 +22,6 @@ set_include_path(get_include_path() . PATH_SEPARATOR . SYSTEM_LIBPATH);
 require_once "system/db.php";
 require_once "system/web.php";
 
-//========= Check CSRF Token ================================
-Config::set("system.checkCSRF", true);
-
 //========= Anonymous Access ================================
 
 // bypass authentication if sent from the following IP addresses
@@ -71,4 +68,17 @@ Config::set("system.ldap", array(
      'auth_ou'       => 'OU=Users',
      'auth_search'   => '(cn={$username})', // {username} will be replaced in auth
      'search_filter_attribute' => array(), // Here you can specify only certain attributes to get from ldap such as "ou" or "cn" etc
+));
+
+/**
+ * Syntax for csrf config
+ */
+Config::set('system.csrf', array(
+    'enabled' => true,
+    'protected' => array(
+        'auth' => array(
+            'login',
+            'forgotpassword'
+        )
+    )
 ));
