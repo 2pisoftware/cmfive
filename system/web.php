@@ -198,6 +198,54 @@ class Web {
         return ($aw === $bw ? 0 : ($aw < $bw ? 1 : -1));
     }
     
+	function install() {
+		session_name(SESSION_NAME);
+        session_start();
+		$this->_paths = $this->_getCommandPath();
+		$this->_module = 'install';
+		$this->_action = 'index';
+		$this->_requestMethod = $_SERVER['REQUEST_METHOD'];
+		$actionmethods[] = $this->_action . '_' . $this->_requestMethod;
+		$actionmethods[] = $this->_action . '_ALL';
+
+		$this->ctx('webroot', $this->_webroot);
+		$this->ctx('module', $this->_module);
+		$this->ctx('submodule', $this->_module);
+		$this->ctx('action', $this->_action);
+		$reqpath = $this->getModuleDir($this->_module) . 'actions/' . ($this->_submodule ? $this->_submodule . '/' : '') . $this->_action . '.php';
+		require $reqpath;
+		$action_found = false;
+		foreach ($actionmethods as $action_method) {
+			if (function_exists($action_method)) {
+				$action_found = true;
+				$this->_actionMethod = $action_method;
+				break;
+			}
+		}
+
+		if ($action_found) {
+			$this->ctx("loggedIn", $this->Auth->loggedIn());
+			$this->ctx("error", $this->session('error'));
+			$this->sessionUnset('error');
+			$this->ctx("msg", $this->session('msg'));
+			$this->sessionUnset('msg');
+			try {
+			// Execute the action
+				$method = $this->_actionMethod;
+				$this->_action_executed = true;
+				$method($this);
+			} catch (PermissionDeniedException $ex) {
+				$this->error($ex->getMessage());
+			}
+		}
+		$body = $this->fetchTemplate();
+		$this->ctx($this->_layoutContentMarker, $body);
+		$this->ctx("w", $this);
+		$this->templateOut('install-layout');
+		echo $this->_buffer;
+		exit();
+	}
+	
     /**
      * start processing of request
      * 1. look at the request parameter if the action parameter was set

@@ -78,7 +78,7 @@ function index_ALL(Web $w) {
     }
     
     $w->ctx("taskgroups", $taskgroups);
-    $w->ctx("tasks", $tasks);
+    $w->ctx("tasks", empty($tasks)?array():$tasks );
     $w->ctx("total_tasks", $total_tasks);
     $w->ctx("count_overdue", $count_overdue);
     $w->ctx("count_due_soon", $count_due_soon);
