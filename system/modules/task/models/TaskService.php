@@ -317,53 +317,6 @@ class TaskService extends DbService {
         return $this->getObjects("Task", $where);
     }
     
-    // given a where clause, return all resulting tasks from the database
-//    function getTasks($id = null, $where = null) {
-//        $assign = "";
-//        $grps = "";
-//
-//        // if no user ID given, show all tasks in groups of which logged in user is a member
-//        // get list of groups for inclusion in where clause
-//        $groups = $this->getMemberGroups($_SESSION['user_id']);
-//        if ($groups) {
-//            $grplist = "";
-//            foreach ($groups as $group) {
-//                $grplist .= $group->task_group_id . ",";
-//            }
-//            $grplist = rtrim($grplist, ",");
-//            $grps = "t.task_group_id in (" . $grplist . ") and ";
-//        }
-//
-//        // if where is array, do this
-//        if (is_array($where)) {
-//            if (($id) && ($id = ""))
-//                $where['t.assignee_id'] = $id;
-//            $where['g.is_active'] = 1;
-//            $where['g.is_deleted'] = 0;
-//            $where['t.is_deleted'] = 0;
-//        }
-//        // if where is not blank string, do this
-//        elseif ($where != "") {
-//            if (($id) && ($id != "")) {
-//                $assign = "(t.assignee_id = " . $id . " or t.assignee_id = 0) and ";
-//            }
-//            $where = "where " . $assign . $grps . $where . " and t.is_deleted = 0 and g.is_active = 1 and g.is_deleted = 0";
-//        }
-//        // if where is blank string, do this
-//        elseif ($where == "") {
-//            if (($id) && ($id != "")) {
-//                $assign = "(t.assignee_id = " . $id . " or t.assignee_id = 0) and ";
-//            }
-//            $where = "where " . $assign . $grps . " t.is_closed = 0 and t.is_deleted = 0 and g.is_active = 1 and g.is_deleted = 0";
-//        }
-//
-////		return $this->getObjects("Task",$clause);
-//        // need to check if task group is deleted
-//        $rows = $this->_db->sql("SELECT t.* from " . Task::$_db_table . " as t inner join " . TaskGroup::$_db_table . " as g on t.task_group_id = g.id " . $where . " order by t.task_group_id")->fetch_all();
-//        $rows = $this->fillObjects("Task", $rows);
-//        return $rows;
-//    }
-
     // return a task group from the database given its ID
     function getTasksbyGroupId($id) {
         $where = ($id) ? array("task_group_id" => $id) : null;

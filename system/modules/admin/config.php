@@ -23,7 +23,7 @@ Config::set('admin', array(
     "dependencies" => array(
         "swiftmailer/swiftmailer" => "@stable",
         "twig/twig" => "1.*",
-        "nesbot/carbon" => "~1.14"
+        "nesbot/carbon" => "1.14"
     )
 ));
 

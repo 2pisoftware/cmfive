@@ -49,10 +49,18 @@ function tasklist_ALL(Web $w) {
     }
     // This part is why we want to make our query manually
     if (!empty($dt_from)) {
-        $query_object->where("task.dt_due >= ?", $dt_from);
+        if ($dt_from == "NULL") {
+            $query_object->where("task.dt_due", null);
+        } else {
+            $query_object->where("task.dt_due >= ?", $dt_from);
+        }
     }
     if (!empty($dt_to)) {
-        $query_object->where("task_dt_due <= ?", $dt_to);
+        if ($dt_to == "NULL") {
+            $query_object->where("task.dt_due", null);
+        } else {
+            $query_object->where("task.dt_due <= ?", $dt_to);
+        }
     }
     
     // Standard wheres

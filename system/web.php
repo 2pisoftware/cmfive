@@ -203,20 +203,17 @@ class Web {
         // start the session
         // $sess = new SessionManager($this);
         session_name(SESSION_NAME);
-        
-        // Store the sessions locally to avoid permission errors between OS's
-        // I.e. on Windows by default tries to save to C:\Temp
-        session_save_path(getcwd() . DIRECTORY_SEPARATOR . "storage" . DIRECTORY_SEPARATOR . "session");
-
         session_start();
 
         // Initialise the logger (needs to log "info" to include the request data, see LogService __call function)
         $this->Log->info("info");
         
         // Generate CSRF tokens and store them in the $_SESSION
-        CSRF::getTokenID();
-        CSRF::getTokenValue();
-
+        if (Config::get('system.csrf.enabled') === true) {
+            CSRF::getTokenID();
+            CSRF::getTokenValue();
+        }
+        
         $_SESSION['last_request'] = time();
 
         //$this->debug("Start processing: ".$_SERVER['REQUEST_URI']);        
@@ -296,11 +293,16 @@ class Web {
         $actionmethods[] = $this->_action . '_ALL';
 
         // Check/validate CSRF token 
-        $this->validateCSRF();
-        // Taking out the CSRF regeneration until more testing can be done
-        // if ($this->_requestMethod == 'post') {
-        //     CSRF::regenerate();
-        // }
+        if (Config::get('system.csrf.enabled') === true) {
+            $allowed = Config::get('system.csrf.protected');
+            if (!empty($allowed[$this->_module]) || (!empty($this->_submodule) && !empty($allowed[$this->_module . '-' . $this->_submodule]))) {
+                if (in_array($this->_action, $allowed[$this->_module]) || (!empty($this->_submodule) && in_array($this->_action, $allowed[$this->_module . '-' . $this->_submodule]))) {
+                    // If we get here then we are configured to enforce CSRF checking
+                    $this->Log->debug("Checking CSRF");
+                    $this->validateCSRF();
+                }
+            }
+        }
         
         //
         // if a module file for this url exists, then start processing
@@ -498,7 +500,7 @@ class Web {
 
     private function validateCSRF() {
         // Check for CSRF token and that we have a valid request method
-        if (Config::get("system.checkCSRF") == true && !CSRF::isValid($this->_requestMethod)) {
+        if (Config::get("system.csrf.enabled") == true && !CSRF::isValid($this->_requestMethod)) {
             if (!CSRF::inHistory($this->_requestMethod)) {
                 @$this->service('log')->error("System: CSRF Detected from " . $this->requestIpAddress());
                 header("HTTP/1.0 403 Forbidden");
@@ -1088,7 +1090,7 @@ class Web {
 	
 	            if (function_exists($hook_function_name)) {            
 	                // Call function
-	            	$buffer[$toInvoke] = $hook_function_name($this, $data);	
+	            	$buffer[]= $hook_function_name($this, $data);	
 	            }
             }
         }
