@@ -178,7 +178,7 @@
         <div class="row-fluid body">
             <?php // Body section w/ message and body from template ?>
             <div class="row-fluid <?php // if(!empty($boxes)) echo "medium-10 small-12 "; ?>">
-            	<?php if (!empty($hideTitle) && !empty ($title)):?>
+                <?php if (empty($hideTitle) && !empty ($title)):?>
                 <div class="row-fluid small-12">
                     <h3 class="header"><?php echo $title; ?></h3>
                 </div>
