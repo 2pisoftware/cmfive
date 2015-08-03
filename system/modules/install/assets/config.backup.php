@@ -17,7 +17,7 @@ date_default_timezone_set('{{ timezone }}');
 //========== Database Configuration ==========================
 
 Config::set("database", [
-    "hostname"  => "{{ db_host }}",
+    "hostname"  => "{{ db_hostname }}",
     "username"  => "{{ db_username }}",
     "password"  => "{{ db_password }}",
     "database"  => "{{ db_database }}",
@@ -53,6 +53,7 @@ Config::set('system.allow_action', [
     "auth/login",
     "auth/forgotpassword",
     "auth/resetpassword",
+	"install-steps/finish"
 ]);
 
 //========= REST Configuration ==============================

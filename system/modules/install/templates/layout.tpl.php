@@ -30,8 +30,8 @@
             <h4 class="subheader">Please wait...</h4>
         </div>
 		<div class="row body">
-			<div class="row-fluid">
-				<div class="columns large-12 clearfix">
+			<div class="row-fluid clearfix">
+				<div class="columns large-12">
 					<h3 class="header"><img class="hide-for-small-down" src="/system/templates/img/cmfive-logo.png" alt="Cmfive" /> Installing Cmfive <?php echo CMFIVE_VERSION; ?></h3>
 				</div>
 				<div class="row-fluid">
@@ -47,13 +47,13 @@
 					<?php endif; ?>
 				</div>
 				
-				<div class="row">
-					<div class="small-12 medium-2 columns">
-						Step <?php echo $step; ?> out of 4
+				<div class="row-fluid clearfix">
+					<div class="small-12 medium-4 large-2 columns">
+						Step <?php echo $step; ?> out of 3
 					</div>
-					<div class="small-12 medium-10 columns">
+					<div class="small-12 medium-8 large-10 columns">
 						<div class="progress small-12 success radius">
-							<span class="meter" style="width: <?php echo $step * 25; ?>%"></span>
+							<span class="meter" style="width: <?php echo ceil(100 / ($step == 1 ? 3 : $step == 3 ? 1 : 2)); ?>%"></span>
 						</div>
 					</div>
 				</div>

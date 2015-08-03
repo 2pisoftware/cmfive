@@ -30,6 +30,9 @@ function import_GET(Web $w) {
 		return;
 	}
 	
+	// Write config details to file
+	InstallService::saveConfigData($_GET);
+	
 	// Try and import data
 	foreach($pdo->query("SHOW TABLES;") as $row) {
 		$pdo->exec("DROP TABLE {$row[0]};");
@@ -119,8 +122,10 @@ function import_GET(Web $w) {
 		}
 	}
 
+	// Write the config to the project
+	InstallService::writeConfigToProject();
+	
 	output('Import successful');
-	return;
 }
 
 function output($val) {

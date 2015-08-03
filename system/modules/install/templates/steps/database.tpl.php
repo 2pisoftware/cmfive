@@ -23,6 +23,7 @@
 				return false;
 			}
 			
+			$(".savebutton").remove();
 			toggleModalLoading();
 			jQuery.ajax('/install-steps/import?' + data, {
 				

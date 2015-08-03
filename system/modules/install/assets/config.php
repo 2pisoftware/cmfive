@@ -51,6 +51,7 @@ Config::set('system.allow_action', [
     "auth/login",
     "auth/forgotpassword",
     "auth/resetpassword",
+	"install-steps/finish"
 ]);
 
 //========= REST Configuration ==============================

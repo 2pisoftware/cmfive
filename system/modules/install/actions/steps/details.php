@@ -44,20 +44,6 @@ function details_GET(Web $w) {
 }
 
 function details_POST(Web $w) {
-	
-	$template_path = "system/modules/install/assets/config.php";
-	require_once 'Twig-1.13.2/lib/Twig/Autoloader.php';
-	Twig_Autoloader::register();
-
-	if (file_exists($template_path)) {
-		$dir = dirname($template_path);
-		$loader = new Twig_Loader_Filesystem($dir);
-		$template = str_replace($dir.DIRECTORY_SEPARATOR, "", $template);
-	} else {
-		$loader = new Twig_Loader_String();
-		$template = $template_path;
-	}
-
 	$_POST['email_use_auth'] = (bool) !empty($_POST['email_use_auth']);
 	
 	// Prefil email data
@@ -67,13 +53,10 @@ function details_POST(Web $w) {
 	$_POST["db_driver"] = "{{ db_driver }}";
 	$_POST["db_database"] = "{{ db_database }}";
 	
+	$_POST['email_port'] = !empty($_POST['email_port']) ? $_POST['email_port'] : 0;
+	
 	// Render data in config
-	$twig = new Twig_Environment($loader, array('debug' => true));
-	$twig->addExtension(new Twig_Extension_Debug());
-	
-	$result_config = $twig->render($template, $_POST);
-	
-	$result = file_put_contents($template, $result_config);
+	InstallService::saveConfigData($_POST);
 	
 	$w->msg("Details Saved", "/install-steps/database");
 }

@@ -30,5 +30,4 @@ function database_GET(Web $w) {
 			"db_hostname" => ["required"]
 		])
 	);
-	
 }
