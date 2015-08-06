@@ -75,15 +75,8 @@ class AuthService extends DbService {
 	}
 
 	function getUserForLogin($login) {
-		$user = $this->db->get("user")->where("login", $login)->fetch_row();
+		$user = $this->db->get("user")->where("login COLLATE utf8_bin = ?", $login)->fetch_row();
 		$user_obj = $this->getObjectFromRow("User", $user);
-		// Could someone tell me why getObject instantly returns "admin" and not the user im after?
-
-		// var_dump($user);
-		// echo $login;
-		// $result = $this->getObject("User", array("login", $login));
-		// echo $result->login; die();
-
 		return $user_obj;
 	}
 
@@ -126,10 +119,6 @@ class AuthService extends DbService {
 			return $url ? $url : true;
 		}
 		
-		
-		//$server['AUTH_USER']='2pieUser';
-		
-		//added empty user test to stop infinte loop ie this function called within this condition.
 		if (empty($this->user()) && (Config::get('system.use_passthrough_authentication') === TRUE) && !empty($_SERVER['AUTH_USER'])) {
 			// Get the username
 			$username = explode('\\', $_SERVER["AUTH_USER"]);
