@@ -90,7 +90,7 @@ CREATE TABLE `audit` (
   `message` text COLLATE utf8_unicode_ci,
   `module` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
   `action` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
-  `path` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `path` varchar(1024) COLLATE utf8_unicode_ci NOT NULL,
   `ip` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `db_class` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL,
   `db_action` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL,

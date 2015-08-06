@@ -28,9 +28,9 @@ form {
     flex-flow: row wrap;
 }
 
-.reveal-modal{
+/*.reveal-modal{
     position : fixed;
-}
+}*/
 
 .reveal-modal-bg {
 position: fixed;
