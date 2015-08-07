@@ -75,7 +75,8 @@ class AuthService extends DbService {
 	}
 
 	function getUserForLogin($login) {
-		$user = $this->db->get("user")->where("login COLLATE utf8_bin = ?", $login)->fetch_row();
+		//if case sensitive required use 'login COLLATE utf8_bin = ?' 
+		$user = $this->db->get("user")->where("login", $login)->fetch_row();
 		$user_obj = $this->getObjectFromRow("User", $user);
 		return $user_obj;
 	}
