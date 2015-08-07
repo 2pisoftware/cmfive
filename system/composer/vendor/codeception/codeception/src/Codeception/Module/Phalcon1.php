@@ -1,10 +1,8 @@
 <?php
-
 namespace Codeception\Module;
 
-use Codeception\Exception\Module;
+use Codeception\Exception\ModuleException;
 use PDOException;
-use RuntimeException;
 use Phalcon\Di;
 use Phalcon\DiInterface;
 use Phalcon\Di\Injectable;
@@ -12,14 +10,14 @@ use Phalcon\Mvc\Model as PhalconModel;
 use Codeception\TestCase;
 use Codeception\Configuration;
 use Codeception\Lib\Connector\Phalcon1 as Phalcon1Connector;
-use Codeception\Exception\ModuleConfig;
-use Codeception\Step;
 use Codeception\Lib\Framework;
 use Codeception\Lib\Interfaces\ActiveRecord;
+use Codeception\Lib\Interfaces\PartedModule;
+use Codeception\Exception\ModuleConfigException;
 use Codeception\Lib\Connector\PhalconMemorySession;
 
 /**
- * This module provides integration with [Phalcon framework](http://www.phalconphp.com/) (1.x).
+ * This module provides integration with [Phalcon framework](http://www.phalconphp.com/) (1.x/2.x).
  *
  * ## Demo Project
  *
@@ -50,21 +48,24 @@ use Codeception\Lib\Connector\PhalconMemorySession;
  * <pre>
  * class_name: FunctionalTester
  * modules:
- *     enabled: [FileSystem, TestHelper, Phalcon1]
- *     config:
- *         Phalcon1:
+ *     enabled:
+ *         - Phalcon1:
  *             bootstrap: 'app/config/bootstrap.php'
  *             cleanup: true
  *             savepoints: true
  * </pre>
  *
  *
+ * ## Parts
+ *
+ * * ORM - include only haveRecord/grabRecord/seeRecord/dontSeeRecord actions
+ *
  * ## Status
  *
- * Maintainer: **cujo**
+ * Maintainer: **sergeyklay**
  * Stability: **beta**
  */
-class Phalcon1 extends Framework implements ActiveRecord
+class Phalcon1 extends Framework implements ActiveRecord, PartedModule
 {
     protected $config = [
         'bootstrap'  => 'app/config/bootstrap.php',
@@ -92,21 +93,22 @@ class Phalcon1 extends Framework implements ActiveRecord
     /**
      * HOOK: used after configuration is loaded
      *
-     * @throws ModuleConfig
+     * @throws ModuleConfigException
      */
     public function _initialize()
     {
         if (!file_exists($this->bootstrapFile = Configuration::projectDir() . $this->config['bootstrap'])) {
-            throw new ModuleConfig(__CLASS__,
-                "Bootstrap file does not exist in ".$this->bootstrapFile."\n".
-                "Please create the bootstrap file that returns Application object\n".
-                "And specify path to it with 'bootstrap' config\n\n".
-                "Sample bootstrap: \n\n<?php\n".
-                '$config = include __DIR__ . "/config.php";'."\n".
-                'include __DIR__ . "/loader.php";'."\n".
-                '$di = new \Phalcon\DI\FactoryDefault();'."\n".
-                'include __DIR__ . "/services.php";'."\n".
-                'return new \Phalcon\Mvc\Application($di);'
+            throw new ModuleConfigException(
+                __CLASS__,
+                "Bootstrap file does not exist in " . $this->config['bootstrap'] . "\n"
+                . "Please create the bootstrap file that returns Application object\n"
+                . "And specify path to it with 'bootstrap' config\n\n"
+                . "Sample bootstrap: \n\n<?php\n"
+                . '$config = include __DIR__ . "/config.php";' . "\n"
+                . 'include __DIR__ . "/loader.php";' . "\n"
+                . '$di = new \Phalcon\DI\FactoryDefault();' . "\n"
+                . 'include __DIR__ . "/services.php";' . "\n"
+                . 'return new \Phalcon\Mvc\Application($di);'
             );
         }
 
@@ -117,20 +119,19 @@ class Phalcon1 extends Framework implements ActiveRecord
      * HOOK: before scenario
      *
      * @param TestCase $test
-     * @throws \RuntimeException
-     * @throws Module
+     * @throws ModuleException
      */
     public function _before(TestCase $test)
     {
         $application = require $this->bootstrapFile;
         if (!$application instanceof Injectable) {
-            throw new RuntimeException('Bootstrap must return \Phalcon\Di\Injectable object');
+            throw new ModuleException(__CLASS__, 'Bootstrap must return \Phalcon\Di\Injectable object');
         }
 
         $this->di = $application->getDI();
 
         if (!$this->di instanceof DiInterface) {
-            throw new Module(__CLASS__, 'Dependency injector container must implement DiInterface');
+            throw new ModuleException(__CLASS__, 'Dependency injector container must implement DiInterface');
         }
 
         Di::reset();
@@ -182,7 +183,8 @@ class Phalcon1 extends Framework implements ActiveRecord
                 $level = $this->di['db']->getTransactionLevel();
                 try {
                     $this->di['db']->rollback(true);
-                } catch (PDOException $e) {}
+                } catch (PDOException $e) {
+                }
                 if ($level == $this->di['db']->getTransactionLevel()) {
                     break;
                 }
@@ -192,6 +194,11 @@ class Phalcon1 extends Framework implements ActiveRecord
         Di::reset();
 
         $_SESSION = $_FILES = $_GET = $_POST = $_COOKIE = $_REQUEST = [];
+    }
+
+    public function _parts()
+    {
+        return ['orm'];
     }
 
     /**
@@ -236,16 +243,25 @@ class Phalcon1 extends Framework implements ActiveRecord
      * @param string $model Model name
      * @param array $attributes Model attributes
      * @return mixed
+     * @part orm
      */
     public function haveRecord($model, $attributes = [])
     {
         $record = $this->getModelRecord($model);
         $res = $record->save($attributes);
+        $field = function($field) {
+            if (is_array($field)) {
+                return implode(', ', $field);
+            }
+
+            return $field;
+        };
+
         if (!$res) {
             $messages = $record->getMessages();
             $errors = [];
             foreach ($messages as $message) {
-                $errors[] = sprintf('[%s] %s: %s', $message->getType(), $message->getField(), $message->getMessage());
+                $errors[] = sprintf('[%s] %s: %s', $message->getType(), $field($message->getField()), $message->getMessage());
             }
 
             $this->fail(sprintf("Record %s was not saved. Messages: \n%s", $model, implode(PHP_EOL, $errors)));
@@ -261,6 +277,7 @@ class Phalcon1 extends Framework implements ActiveRecord
      * ``` php
      * <?php
      * $I->seeRecord('Phosphorum\Models\Categories', ['name' => 'Testing']);
+     * ?>
      * ```
      *
      * @param string $model Model name
@@ -270,7 +287,7 @@ class Phalcon1 extends Framework implements ActiveRecord
     {
         $record = $this->findRecord($model, $attributes);
         if (!$record) {
-            $this->fail("Couldn't find $model with ".json_encode($attributes));
+            $this->fail("Couldn't find $model with " . json_encode($attributes));
         }
         $this->debugSection($model, json_encode($record));
     }
@@ -281,6 +298,7 @@ class Phalcon1 extends Framework implements ActiveRecord
      * ``` php
      * <?php
      * $I->dontSeeRecord('Phosphorum\Models\Categories', ['name' => 'Testing']);
+     * ?>
      * ```
      *
      * @param string $model Model name
@@ -291,7 +309,7 @@ class Phalcon1 extends Framework implements ActiveRecord
         $record = $this->findRecord($model, $attributes);
         $this->debugSection($model, json_encode($record));
         if ($record) {
-            $this->fail("Unexpectedly managed to find $model with ".json_encode($attributes));
+            $this->fail("Unexpectedly managed to find $model with " . json_encode($attributes));
         }
     }
 
@@ -301,15 +319,63 @@ class Phalcon1 extends Framework implements ActiveRecord
      * ``` php
      * <?php
      * $category = $I->grabRecord('Phosphorum\Models\Categories', ['name' => 'Testing']);
+     * ?>
      * ```
      *
      * @param string $model Model name
      * @param array $attributes Model attributes
      * @return mixed
+     * @part orm
      */
     public function grabRecord($model, $attributes = [])
     {
         return $this->findRecord($model, $attributes);
+    }
+
+    /**
+     * Resolves the service based on its configuration from Phalcon's DI container
+     * Recommended to use for unit testing.
+     *
+     * @param string $service    Service name
+     * @param array  $parameters Parameters [Optional]
+     *
+     * @return mixed
+     */
+    public function grabServiceFromDi($service, array $parameters = [])
+    {
+        if (!$this->di->has($service)) {
+            $this->fail("Service $service is not available in container");
+        }
+
+        return $this->di->get($service, $parameters);
+    }
+
+    /**
+     * Registers a service in the services container and resolve it. This record will be erased after the test.
+     * Recommended to use for unit testing.
+     *
+     * ``` php
+     * <?php
+     * $filter = $I->haveServiceInDi('filter', ['className' => '\Phalcon\Filter']);
+     * ?>
+     * ```
+     *
+     * @param string $name
+     * @param mixed $definition
+     * @param boolean $shared
+     *
+     * @return mixed|null
+     */
+    public function haveServiceInDi($name, $definition, $shared = false)
+    {
+        try {
+            $service = $this->di->set($name, $definition, $shared);
+            return $service->resolve();
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+
+            return null;
+        }
     }
 
     /**
@@ -327,9 +393,9 @@ class Phalcon1 extends Framework implements ActiveRecord
         foreach ($attributes as $key => $value) {
             $query[] = "$key = '$value'";
         }
-        $query = implode(' AND ', $query);
-        $this->debugSection('Query', $query);
-        return call_user_func_array([$model, 'findFirst'], [$query]);
+        $squery = implode(' AND ', $query);
+        $this->debugSection('Query', $squery);
+        return call_user_func_array([$model, 'findFirst'], [$squery]);
     }
 
     /**
@@ -338,17 +404,19 @@ class Phalcon1 extends Framework implements ActiveRecord
      * @param $model
      *
      * @return \Phalcon\Mvc\Model
-     * @throws \RuntimeException
+     * @throws ModuleException
      */
     protected function getModelRecord($model)
     {
         if (!class_exists($model)) {
-            throw new RuntimeException("Model $model does not exist");
+            throw new ModuleException(__CLASS__, "Model $model does not exist");
         }
+
         $record = new $model;
         if (!$record instanceof PhalconModel) {
-            throw new RuntimeException(sprintf('Model %s is not instance of \Phalcon\Mvc\Model', $model));
+            throw new ModuleException(__CLASS__, "Model $model is not instance of \\Phalcon\\Mvc\\Model");
         }
+
         return $record;
     }
 
@@ -378,6 +446,5 @@ class Phalcon1 extends Framework implements ActiveRecord
             default:
                 return array_intersect_key(get_object_vars($model), array_flip($primaryKeys));
         }
-
     }
 }

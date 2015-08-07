@@ -1,6 +1,4 @@
-# Yii2 Module
 
-**For additional reference, please review the [source](https://github.com/Codeception/Codeception/tree/2.0/src/Codeception/Module/Yii2.php)**
 
 
 This module provides integration with [Yii framework](http://www.yiiframework.com/) (2.0).
@@ -16,17 +14,57 @@ You can use this module by setting params in your functional.suite.yml:
 <pre>
 class_name: TestGuy
 modules:
-    enabled: [Yii2, TestHelper]
-    config:
-        Yii2:
+    enabled:
+        - Yii2:
             configFile: '/path/to/config.php'
 </pre>
+
+## Parts
+
+* ORM - include only haveRecord/grabRecord/seeRecord/dontSeeRecord actions
+
 
 ## Status
 
 Maintainer: **qiangxue**
 Stability: **stable**
 
+
+
+### _findElements
+
+*hidden API method, expected to be used from Helper classes*
+ 
+Locates element using available Codeception locator types:
+
+* XPath
+* CSS
+* Strict Locator
+
+Use it in Helpers or GroupObject or Extension classes:
+
+```php
+$els = $this->getModule('Yii2')->_findElements('.items');
+$els = $this->getModule('Yii2')->_findElements(['name' => 'username']);
+```
+
+WebDriver module returns `Facebook\WebDriver\Remote\RemoteWebElement` instances
+PhpBrowser and Framework modules return `Symfony\Component\DomCrawler\Crawler` instances
+
+ * `param` $locator
+ * `return` array of interactive elements
+
+
+### _savePageSource
+
+*hidden API method, expected to be used from Helper classes*
+ 
+Saves page source of to a file
+
+```php
+$this->getModule('Yii2')->_savePageSource(codecept_output_dir().'page.html');
+```
+ * `param` $filename
 
 
 ### amHttpAuthenticated
@@ -39,11 +77,16 @@ Authenticates user for HTTP_AUTH
 
 ### amOnPage
  
-Converting $page to valid Yii2 url
+Converting $page to valid Yii 2 URL
+
 Allows input like:
+
+```php
 $I->amOnPage(['site/view','page'=>'about']);
 $I->amOnPage('index-test.php?site/index');
 $I->amOnPage('http://localhost/index-test.php?site/index');
+```
+
  * `param` $page string|array parameter for \yii\web\UrlManager::createUrl()
 
 
@@ -321,6 +364,7 @@ $I->dontSeeRecord('app\models\User', array('name' => 'davert'));
 
  * `param` $model
  * `param array` $attributes
+@part orm
 
 
 ### fillField
@@ -382,6 +426,10 @@ $uri = $I->grabFromCurrentUrl();
  * `internal param` $url
 
 
+### grabMultiple
+__not documented__
+
+
 ### grabRecord
  
 Retrieves record from database
@@ -392,6 +440,7 @@ $category = $I->grabRecord('app\models\User', array('name' => 'davert'));
 
  * `param` $model
  * `param array` $attributes
+@part orm
 
 
 ### grabTextFrom
@@ -415,7 +464,7 @@ $value = $I->grabTextFrom('~<input value=(.*?)]~sgi'); // match with a regex
  
  * `param` $field
 
-@return array|mixed|null|string
+ * `return` array|mixed|null|string
 
 
 ### haveRecord
@@ -430,6 +479,7 @@ $user_id = $I->haveRecord('app\models\User', array('name' => 'Davert'));
 
  * `param` $model
  * `param array` $attributes
+@part orm
 
 
 ### resetCookie
@@ -558,7 +608,7 @@ $I->seeInCurrentUrl('/users/');
 
 ### seeInField
  
-Checks that the given input field or textarea contains the given value. 
+Checks that the given input field or textarea contains the given value.
 For fuzzy locators, fields are matched by label text, the "name" attribute, CSS, and XPath.
 
 ``` php
@@ -680,9 +730,9 @@ $I->seeNumberOfElements('tr', [0,10]); //between 0 and 10 elements
 ?>
 ```
  * `param` $selector
- * `param mixed` $expected:
+ * `param mixed` $expected :
 - string: strict number
-- array: range of numbers [0,10]  
+- array: range of numbers [0,10]
 
 
 ### seeOptionIsSelected
@@ -715,6 +765,7 @@ $I->seeRecord('app\models\User', array('name' => 'davert'));
 
  * `param` $model
  * `param array` $attributes
+@part orm
 
 
 ### seeResponseCodeIs
@@ -816,15 +867,13 @@ $I->setCookie('PHPSESSID', 'el4ukv0kqbvoirg7nkp4dncpk3');
  * `param` $name
  * `param` $val
  * `param array` $params
- * `internal param` $cookie
- * `internal param` $value
 
 
 
 ### submitForm
  
-Submits the given form on the page, optionally with the given form values.
-Give the form fields values as an array.
+Submits the given form on the page, optionally with the given form
+values.  Give the form fields values as an array.
 
 Skipped fields will be filled by their values from the page.
 You don't need to click the 'Submit' button afterwards.
@@ -839,9 +888,15 @@ Examples:
 
 ``` php
 <?php
-$I->submitForm('#login', array('login' => 'davert', 'password' => '123456'));
+$I->submitForm('#login', [
+    'login' => 'davert',
+    'password' => '123456'
+]);
 // or
-$I->submitForm('#login', array('login' => 'davert', 'password' => '123456'), 'submitButtonName');
+$I->submitForm('#login', [
+    'login' => 'davert',
+    'password' => '123456'
+], 'submitButtonName');
 
 ```
 
@@ -849,10 +904,17 @@ For example, given this sample "Sign Up" form:
 
 ``` html
 <form action="/sign_up">
-    Login: <input type="text" name="user[login]" /><br/>
-    Password: <input type="password" name="user[password]" /><br/>
-    Do you agree to out terms? <input type="checkbox" name="user[agree]" /><br/>
-    Select pricing plan <select name="plan"><option value="1">Free</option><option value="2" selected="selected">Paid</option></select>
+    Login:
+    <input type="text" name="user[login]" /><br/>
+    Password:
+    <input type="password" name="user[password]" /><br/>
+    Do you agree to our terms?
+    <input type="checkbox" name="user[agree]" /><br/>
+    Select pricing plan:
+    <select name="plan">
+        <option value="1">Free</option>
+        <option value="2" selected="selected">Paid</option>
+    </select>
     <input type="submit" name="submitButton" value="Submit" />
 </form>
 ```
@@ -861,17 +923,36 @@ You could write the following to submit it:
 
 ``` php
 <?php
-$I->submitForm('#userForm', array('user' => array('login' => 'Davert', 'password' => '123456', 'agree' => true)), 'submitButton');
-
+$I->submitForm(
+    '#userForm',
+    [
+        'user' => [
+            'login' => 'Davert',
+            'password' => '123456',
+            'agree' => true
+        ]
+    ],
+    'submitButton'
+);
 ```
-Note that "2" will be the submitted value for the "plan" field, as it is the selected option.
+Note that "2" will be the submitted value for the "plan" field, as it is
+the selected option.
 
-You can also emulate a JavaScript submission by not specifying any buttons in the third parameter to submitForm.
+You can also emulate a JavaScript submission by not specifying any
+buttons in the third parameter to submitForm.
 
 ```php
 <?php
-$I->submitForm('#userForm', array('user' => array('login' => 'Davert', 'password' => '123456', 'agree' => true)));
-
+$I->submitForm(
+    '#userForm',
+    [
+        'user' => [
+            'login' => 'Davert',
+            'password' => '123456',
+            'agree' => true
+        ]
+    ]
+);
 ```
 
 Pair this with seeInFormFields for quick testing magic.
@@ -916,8 +997,31 @@ $I->submitForm('#my-form', [
 ?>
 ```
 
-Mixing string and boolean values for a checkbox's value is not
-supported and may produce unexpected results.
+Mixing string and boolean values for a checkbox's value is not supported
+and may produce unexpected results.
+
+Field names ending in "[]" must be passed without the trailing square 
+bracket characters, and must contain an array for its value.  This allows
+submitting multiple values with the same name, consider:
+
+```php
+$I->submitForm('#my-form', [
+    'field[]' => 'value',
+    'field[]' => 'another value', // 'field[]' is already a defined key
+]);
+```
+
+The solution is to pass an array value:
+
+```php
+// this way both values are submitted
+$I->submitForm('#my-form', [
+    'field' => [
+        'value',
+        'another value',
+    ]
+]);
+```
 
  * `param` $selector
  * `param` $params
@@ -936,4 +1040,4 @@ $I->uncheckOption('#notify');
 
  * `param` $option
 
-<p>&nbsp;</p><div class="alert alert-warning">Module reference is taken from the source code. <a href="https://github.com/Codeception/Codeception/tree/2.0/src/Codeception/Module/Yii2.php">Help us to improve documentation. Edit module reference</a></div>
+<p>&nbsp;</p><div class="alert alert-warning">Module reference is taken from the source code. <a href="https://github.com/Codeception/Codeception/tree/2.1/src/Codeception/Module/Yii2.php">Help us to improve documentation. Edit module reference</a></div>

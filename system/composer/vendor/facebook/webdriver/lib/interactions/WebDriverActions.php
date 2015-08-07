@@ -13,6 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Interactions;
+
+use Facebook\WebDriver\Interactions\Internal\WebDriverClickAndHoldAction;
+use Facebook\WebDriver\Interactions\Internal\WebDriverMoveToOffsetAction;
+use Facebook\WebDriver\Interactions\Internal\WebDriverButtonReleaseAction;
+use Facebook\WebDriver\Interactions\Internal\WebDriverDoubleClickAction;
+use Facebook\WebDriver\Interactions\Internal\WebDriverSendKeysAction;
+use Facebook\WebDriver\Interactions\Internal\WebDriverClickAction;
+use Facebook\WebDriver\Interactions\Internal\WebDriverKeyDownAction;
+use Facebook\WebDriver\Interactions\Internal\WebDriverContextClickAction;
+use Facebook\WebDriver\Interactions\Internal\WebDriverKeyUpAction;
+use Facebook\WebDriver\Interactions\Internal\WebDriverMouseMoveAction;
+use Facebook\WebDriver\WebDriverElement;
+use Facebook\WebDriver\WebDriver;
+
 /**
  * WebDriver action builder. It implements the builder pattern.
  */

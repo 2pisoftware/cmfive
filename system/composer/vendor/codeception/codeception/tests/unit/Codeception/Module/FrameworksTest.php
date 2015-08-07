@@ -12,7 +12,7 @@ class FrameworksTest extends TestsForWeb
     protected $module;
 
     public function setUp() {
-        $this->module = new \Codeception\Module\PhpSiteHelper();
+        $this->module = new \Codeception\Module\UniversalFramework(make_container());
     }
 
     public function testHttpAuth()

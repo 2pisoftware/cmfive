@@ -13,6 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Chrome;
+
+use Facebook\WebDriver\Remote\DesiredCapabilities;
+
 /**
  * The class manages the capabilities in ChromeDriver.
  *

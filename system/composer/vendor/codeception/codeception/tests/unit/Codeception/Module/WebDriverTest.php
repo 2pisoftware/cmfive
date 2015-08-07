@@ -1,6 +1,9 @@
 <?php
 
 use Codeception\Util\Stub;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverKeys;
 
 require_once 'tests/data/app/data.php';
 require_once __DIR__ . '/TestsForBrowsers.php';
@@ -11,7 +14,10 @@ class WebDriverTest extends TestsForBrowsers
      * @var \Codeception\Module\WebDriver
      */
     protected $module;
-    
+
+    /**
+     * @var RemoteWebDriver
+     */
     protected $webDriver;
 
     // this is my local config
@@ -23,12 +29,9 @@ class WebDriverTest extends TestsForBrowsers
     {
         $this->noPhpWebserver();
         $this->noSelenium();
-        $this->module = new \Codeception\Module\WebDriver();
-        $url = '';
-        if (version_compare(PHP_VERSION, '5.4', '>=')) {
-            $url = 'http://localhost:8000';
-        }
-        $this->module->_setConfig(array('url' => $url, 'browser' => 'firefox', 'port' => '4444', 'restart' => true, 'wait' => 0));
+        $this->module = new \Codeception\Module\WebDriver(make_container());
+        $url = 'http://localhost:8000';
+        $this->module->_setConfig(['url' => $url, 'browser' => 'firefox', 'port' => '4444', 'restart' => true, 'wait' => 0]);
         $this->module->_initialize();
         $this->module->_before($this->makeTest());
         $this->webDriver = $this->module->webDriver;
@@ -47,7 +50,7 @@ class WebDriverTest extends TestsForBrowsers
     {
         return Stub::makeEmpty(
             '\Codeception\TestCase\Cept',
-            array('dispatcher' => Stub::makeEmpty('Symfony\Component\EventDispatcher\EventDispatcher'))
+            ['dispatcher' => Stub::makeEmpty('Symfony\Component\EventDispatcher\EventDispatcher')]
         );
     }
 
@@ -131,12 +134,12 @@ class WebDriverTest extends TestsForBrowsers
 
     public function testSubmitForm() {
         $this->module->amOnPage('/form/complex');
-        $this->module->submitForm('form', array(
+        $this->module->submitForm('form', [
                 'name' => 'Davert',
                 'age' => 'child',
                 'terms' => 'agree',
                 'description' => 'My Bio'
-        ));
+        ]);
         $form = data::get('form');
         $this->assertEquals('Davert', $form['name']);
         $this->assertEquals('kill_all', $form['action']);
@@ -146,12 +149,12 @@ class WebDriverTest extends TestsForBrowsers
     }
     public function testSubmitFormWithNumbers() {
         $this->module->amOnPage('/form/complex');
-        $this->module->submitForm('form', array(
+        $this->module->submitForm('form', [
             'name' => 'Davert',
             'age' => 'child',
             'terms' => 'agree',
             'description' => 10
-        ));
+        ]);
         $form = data::get('form');
         $this->assertEquals('Davert', $form['name']);
         $this->assertEquals('kill_all', $form['action']);
@@ -193,7 +196,7 @@ class WebDriverTest extends TestsForBrowsers
     public function testRawSelenium()
     {
         $this->module->amOnPage('/');
-        $this->module->executeInSelenium(function (\Webdriver $webdriver) {
+        $this->module->executeInSelenium(function ($webdriver) {
             $webdriver->findElement(WebDriverBy::id('link'))->click();
         });
         $this->module->seeCurrentUrlEquals('/info');
@@ -202,8 +205,8 @@ class WebDriverTest extends TestsForBrowsers
     public function testKeys()
     {
         $this->module->amOnPage('/form/field');
-        $this->module->pressKey('#name', array('ctrl', 'a'), WebDriverKeys::DELETE);
-        $this->module->pressKey('#name', 'test', array('shift', '111'));
+        $this->module->pressKey('#name', ['ctrl', 'a'], WebDriverKeys::DELETE);
+        $this->module->pressKey('#name', 'test', ['shift', '111']);
         $this->module->pressKey('#name', '1');
         $this->module->seeInField('#name', 'test!!!1');
     }
@@ -231,7 +234,7 @@ class WebDriverTest extends TestsForBrowsers
         $this->module->appendField('form #like', 'code');
         $this->module->click('Submit');
         $form = data::get('form');
-        $this->assertEmpty(array_diff($form['like'], array("eat", "code")));
+        $this->assertEmpty(array_diff($form['like'], ["eat", "code"]));
     }
 
     public function testAppendFieldSelectFails()
@@ -348,9 +351,9 @@ class WebDriverTest extends TestsForBrowsers
     public function testFillPasswordOnFormSubmit()
     {
         $this->module->amOnPage('/form/complex');
-        $this->module->submitForm('form', array(
+        $this->module->submitForm('form', [
            'password' => '123456'
-        ));
+        ]);
         $form = data::get('form');
         $this->assertEquals('123456', $form['password']);
     }
@@ -359,7 +362,7 @@ class WebDriverTest extends TestsForBrowsers
     {
         $this->shouldFail();
         $this->module->amOnPage('/form/complex');
-        $this->module->submitForm('form111', array());
+        $this->module->submitForm('form111', []);
     }
 
     public function testWebDriverByLocators()
@@ -415,7 +418,7 @@ class WebDriverTest extends TestsForBrowsers
 
     public function testCreateCeptScreenshotFail()
     {
-        $fakeWd = Stub::make('\RemoteWebDriver', [
+        $fakeWd = Stub::make('\Facebook\WebDriver\Remote\RemoteWebDriver', [
                 'takeScreenshot' => Stub::once(function() {}),
                 'getPageSource' => Stub::once(function() {})
         ]);
@@ -426,7 +429,7 @@ class WebDriverTest extends TestsForBrowsers
 
     public function testCreateCestScreenshotOnFail()
     {
-        $fakeWd = Stub::make('\RemoteWebDriver', [
+        $fakeWd = Stub::make('\Facebook\WebDriver\Remote\RemoteWebDriver', [
             'takeScreenshot' => Stub::once(function($filename) {
                 PHPUnit_Framework_Assert::assertEquals(codecept_log_dir('stdClass.login.fail.png'), $filename);
             }),
@@ -442,7 +445,7 @@ class WebDriverTest extends TestsForBrowsers
     public function testCreateTestScreenshotOnFail()
     {
         $test = Stub::make('\Codeception\TestCase\Test', ['getName' => 'testLogin']);
-        $fakeWd = Stub::make('\RemoteWebDriver', [
+        $fakeWd = Stub::make('\Facebook\WebDriver\Remote\RemoteWebDriver', [
             'takeScreenshot' => Stub::once(function($filename) use ($test) {
                 PHPUnit_Framework_Assert::assertEquals(codecept_log_dir(get_class($test).'.testLogin.fail.png'), $filename);
             }),
@@ -497,6 +500,13 @@ class WebDriverTest extends TestsForBrowsers
         $this->module->waitForText('12,345', 10, '#field');
     }
 
+    public function testSeeElementMalformedWdLocator()
+    {
+        $this->setExpectedException('Codeception\Exception\MalformedLocatorException');
+        $this->module->amOnPage('/');
+        $this->module->seeElement(WebDriverBy::xpath('H---EY!'));
+    }
+
     public function testBug1637()
     {
         $this->module->amOnPage('/form/bug1637');
@@ -507,6 +517,24 @@ class WebDriverTest extends TestsForBrowsers
         // confirm that it did what we expected and did not do anything else
         $this->module->seeOptionIsSelected('input[name=first_test_radio]', 'Yes');
         $this->module->dontSeeOptionIsSelected('input[name=first_test_radio]', 'No');
+    }
+    
+    public function testBug2046()
+    {
+        $this->module->webDriver = null;
+        $this->module->_saveScreenshot(\Codeception\Configuration::outputDir().'testshot.png');
+    }
+
+    public function testSessionSnapshots()
+    {
+        $this->module->amOnPage('/');
+        $this->module->setCookie('PHPSESSID', '123456', ['path' => '/']);
+        $this->module->saveSessionSnapshot('login');
+        $this->module->seeCookie('PHPSESSID');
+        $this->webDriver->manage()->deleteAllCookies();
+        $this->module->dontSeeCookie('PHPSESSID');
+        $this->module->loadSessionSnapshot('login');
+        $this->module->seeCookie('PHPSESSID');
     }
 
 }

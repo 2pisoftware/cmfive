@@ -1,16 +1,16 @@
 paths:
     tests: tests
-    log: tests/_log
+    log: tests/_output
     data: tests/_data
-    helpers: tests/_helpers
+    helpers: tests/_support
 settings:
     bootstrap: _bootstrap.php
     colors: false
     log: false
 extensions:
     enabled:
-      - Codeception\Platform\SimpleOutput
-      - Codeception\Platform\RunFailed
+      - Codeception\Extension\SimpleOutput
+      - Codeception\Extension\RunFailed
       - VerbosityLevelOutput
 modules:
     config:

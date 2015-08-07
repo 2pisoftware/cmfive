@@ -13,6 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Remote;
+
+use Facebook\WebDriver\Exception\WebDriverException;
+use Facebook\WebDriver\Interactions\Internal\WebDriverCoordinates;
+use Facebook\WebDriver\Internal\WebDriverLocatable;
+use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverDimension;
+use Facebook\WebDriver\WebDriverElement;
+use Facebook\WebDriver\WebDriverKeys;
+use Facebook\WebDriver\WebDriverPoint;
+use ZipArchive;
+
 /**
  * Represents an HTML element.
  */
@@ -405,6 +417,7 @@ class RemoteWebElement implements WebDriverElement, WebDriverLocatable {
    * @return RemoteWebElement
    */
   private function newElement($id) {
-    return new RemoteWebElement($this->executor, $id);
+    $class = get_class($this);
+    return new $class($this->executor, $id);
   }
 }

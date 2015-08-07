@@ -13,6 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Interactions\Internal;
+
+use Closure;
+use Facebook\WebDriver\Exception\UnsupportedOperationException;
+use Facebook\WebDriver\WebDriverPoint;
+
 /**
  * Interface representing basic mouse operations.
  */
@@ -38,6 +44,7 @@ class WebDriverCoordinates {
 
   /**
    * @return WebDriverPoint
+   * @throws UnsupportedOperationException
    */
   public function onScreen() {
     throw new UnsupportedOperationException(

@@ -8,12 +8,11 @@ class Helper
 
     protected $template = <<<EOF
 <?php
-namespace {{namespace}}Codeception\Module;
-
+namespace {{namespace}}Helper;
 // here you can define custom actions
 // all public methods declared in helper class will be available in \$I
 
-class {{name}}Helper extends \\Codeception\\Module
+class {{name}} extends \\Codeception\\Module
 {
 
 }
@@ -25,9 +24,7 @@ EOF;
 
     public function __construct($name, $namespace = '')
     {
-        $this->namespace = $namespace
-            ? $namespace . '\\'
-            : '';
+        $this->namespace = $namespace ? "$namespace\\" : $namespace;
         $this->name = $name;
     }
 
@@ -39,4 +36,8 @@ EOF;
             ->produce();
     }
 
+    public function getHelperName()
+    {
+        return '\\' . $this->namespace . 'Helper\\' . $this->name;
+    }
 }

@@ -22,6 +22,5 @@ return array(
     'PhantomInstaller\\' => array($vendorDir . '/jakoch/phantomjs-installer/src'),
     'Gaufrette' => array($vendorDir . '/knplabs/gaufrette/src'),
     'Dropbox' => array($vendorDir . '/dropbox-php/dropbox-php/src'),
-    'Codeception' => array($vendorDir . '/codeception/codeception/src'),
     'Carbon' => array($vendorDir . '/nesbot/carbon/src'),
 );

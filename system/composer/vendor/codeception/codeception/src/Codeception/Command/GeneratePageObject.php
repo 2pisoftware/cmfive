@@ -2,12 +2,12 @@
 namespace Codeception\Command;
 
 use Codeception\Configuration;
+use Codeception\Lib\Generator\PageObject as PageObjectGenerator;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Codeception\Lib\Generator\PageObject as PageObjectGenerator;
 
 /**
  * Generates PageObject. Can be generated either globally, or just for one suite.
@@ -24,16 +24,16 @@ class GeneratePageObject extends Command
 
     protected function configure()
     {
-        $this->setDefinition(array(
-
+        $this->setDefinition([
             new InputArgument('suite', InputArgument::REQUIRED, 'Either suite name or page object name)'),
             new InputArgument('page', InputArgument::OPTIONAL, 'Page name of pageobject to represent'),
             new InputOption('config', 'c', InputOption::VALUE_OPTIONAL, 'Use custom path for config'),
-        ));
+        ]);
         parent::configure();
     }
 
-    public function getDescription() {
+    public function getDescription()
+    {
         return 'Generates empty PageObject class';
     }
 
@@ -51,13 +51,17 @@ class GeneratePageObject extends Command
             ? $this->getSuiteConfig($suite, $input->getOption('config'))
             : $this->getGlobalConfig($input->getOption('config'));
 
-        $className = $this->getClassName($class);
+        if ($suite) {
+            $suite = DIRECTORY_SEPARATOR . ucfirst($suite);
+        }
 
-        $filename = $suite
-            ? $this->pathToSuitePageObject($conf, $className)
-            : $this->pathToGlobalPageObject($conf, $className);
+        $path = $this->buildPath(Configuration::supportDir() . 'Page' . $suite, $class);
 
-        $gen = new PageObjectGenerator($conf, $class);
+        $filename = $path . $this->getClassName($class) . '.php';
+
+        $output->writeln($filename);
+
+        $gen = new PageObjectGenerator($conf, ucfirst($suite) . '\\' . $class);
         $res = $this->save($filename, $gen->produce());
 
         if (!$res) {
@@ -67,20 +71,7 @@ class GeneratePageObject extends Command
         $output->writeln("<info>PageObject was created in $filename</info>");
     }
 
-    protected function pathToGlobalPageObject($config, $class)
+    protected function pathToPageObject($class, $suite)
     {
-        $path = $this->buildPath(Configuration::projectDir().$config['paths']['tests'].'/_pages/', $class);
-        $filename = $this->completeSuffix($class, 'Page');
-        $this->introduceAutoloader(Configuration::projectDir().$config['paths']['tests'].DIRECTORY_SEPARATOR.$config['settings']['bootstrap'],'Page','_pages');
-        return  $path.$filename;
     }
-
-    protected function pathToSuitePageObject($config, $class)
-    {
-        $path = $this->buildPath($config['path'].'/_pages/', $class);
-        $filename = $this->completeSuffix($class, 'Page');
-        $this->introduceAutoloader($config['path'].DIRECTORY_SEPARATOR.$config['bootstrap'],'Page','_pages');
-        return  $path.$filename;
-    }
-
 }

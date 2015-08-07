@@ -23,17 +23,13 @@ require_once TEST_FILES_PATH . 'BankAccountTest.php';
 /**
  * Tests for the PHP_CodeCoverage class.
  *
- * @category   PHP
- * @package    CodeCoverage
- * @subpackage Tests
- * @author     Sebastian Bergmann <sebastian@phpunit.de>
- * @copyright  Sebastian Bergmann <sebastian@phpunit.de>
- * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
- * @link       http://github.com/sebastianbergmann/php-code-coverage
- * @since      Class available since Release 1.0.0
+ * @since Class available since Release 1.0.0
  */
 class PHP_CodeCoverageTest extends PHP_CodeCoverage_TestCase
 {
+    /**
+     * @var PHP_CodeCoverage
+     */
     private $coverage;
 
     protected function setUp()
@@ -471,5 +467,21 @@ class PHP_CodeCoverageTest extends PHP_CodeCoverage_TestCase
         $getLinesToBeIgnored->setAccessible(true);
 
         return $getLinesToBeIgnored;
+    }
+
+    /**
+     * @covers PHP_CodeCoverage::getLinesToBeIgnored
+     */
+    public function testGetLinesToBeIgnoredWhenIgnoreIsDisabled()
+    {
+        $this->coverage->setDisableIgnoredLines(true);
+
+        $this->assertEquals(
+            array(),
+            $this->getLinesToBeIgnored()->invoke(
+                $this->coverage,
+                TEST_FILES_PATH . 'source_with_ignore.php'
+            )
+        );
     }
 }

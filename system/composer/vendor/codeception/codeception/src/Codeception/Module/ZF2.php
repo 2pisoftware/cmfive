@@ -1,12 +1,16 @@
 <?php
 namespace Codeception\Module;
 
-use Codeception\Codecept;
+use Codeception\Lib\Framework;
+use Codeception\TestCase;
+use Codeception\Configuration;
+use Codeception\Lib\Interfaces\DoctrineProvider;
 use Zend\Console\Console;
 use Zend\EventManager\StaticEventManager;
 use Zend\Mvc\Application;
-use Zend\View\Helper\Placeholder;
 use Zend\Version\Version;
+use Zend\View\Helper\Placeholder\Registry;
+use Codeception\Lib\Connector\ZF2 as ZF2Connector;
 
 /**
  * This module allows you to run tests inside Zend Framework 2.
@@ -31,12 +35,11 @@ use Zend\Version\Version;
  * * client - BrowserKit client
  *
  */
-
-class ZF2 extends \Codeception\Lib\Framework
+class ZF2 extends Framework implements DoctrineProvider
 {
-    protected $config = array(
+    protected $config = [
         'config' => 'tests/application.config.php',
-    );
+    ];
 
     /**
      * @var \Zend\Mvc\ApplicationInterface
@@ -53,22 +56,27 @@ class ZF2 extends \Codeception\Lib\Framework
      */
     public $client;
 
+    protected $applicationConfig;
+
     protected $queries = 0;
     protected $time = 0;
 
-    public function _initialize() {
-        require \Codeception\Configuration::projectDir().'init_autoloader.php';
+    public function _initialize()
+    {
+        require Configuration::projectDir() . 'init_autoloader.php';
 
-        $this->client = new \Codeception\Lib\Connector\ZF2();
-    }
+        $this->client = new ZF2Connector();
 
-    public function _before(\Codeception\TestCase $test) {
-        $applicationConfig = require \Codeception\Configuration::projectDir() . $this->config['config'];
+        $this->applicationConfig = require Configuration::projectDir() . $this->config['config'];
         if (isset($applicationConfig['module_listener_options']['config_cache_enabled'])) {
             $applicationConfig['module_listener_options']['config_cache_enabled'] = false;
         }
         Console::overrideIsConsole(false);
-        $this->application = Application::init($applicationConfig);
+    }
+
+    public function _before(TestCase $test)
+    {
+        $this->application = Application::init($this->applicationConfig);
         $events = $this->application->getEventManager();
         $events->detach($this->application->getServiceManager()->get('SendResponseListener'));
 
@@ -76,18 +84,19 @@ class ZF2 extends \Codeception\Lib\Framework
         $_SERVER['REQUEST_URI'] = '';
     }
 
-    public function _after(\Codeception\TestCase $test) {
-        $_SESSION = array();
-        $_GET     = array();
-        $_POST    = array();
-        $_COOKIE  = array();
+    public function _after(TestCase $test)
+    {
+        $_SESSION = [];
+        $_GET = [];
+        $_POST = [];
+        $_COOKIE = [];
 
         // reset singleton
         StaticEventManager::resetInstance();
-        
+
         // Reset singleton placeholder if version < 2.2.0, no longer required in 2.2.0+
         if (Version::compareVersion('2.2.0') >= 0) {
-            Placeholder\Registry::unsetRegistry();
+            Registry::unsetRegistry();
         }
         //Close the session, if any are open
         if (session_status() == PHP_SESSION_ACTIVE) {
@@ -95,5 +104,11 @@ class ZF2 extends \Codeception\Lib\Framework
         }
         $this->queries = 0;
         $this->time = 0;
+    }
+
+    public function _getEntityManager()
+    {
+        $serviceLocator = Application::init($this->applicationConfig)->getServiceManager();
+        return $serviceLocator->get('Doctrine\ORM\EntityManager');
     }
 }

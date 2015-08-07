@@ -2,12 +2,13 @@
 namespace Codeception\Command;
 
 use Codeception\Lib\Generator\Helper;
-use Symfony\Component\Console\Input\InputOption;
+use Codeception\Util\Template;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Console\Command\Command;
 
 
 /**
@@ -26,13 +27,11 @@ class GenerateSuite extends Command
 
     protected function configure()
     {
-        $this->setDefinition(
-            array(
-                new InputArgument('suite', InputArgument::REQUIRED, 'suite to be generated'),
-                new InputArgument('actor', InputArgument::OPTIONAL, 'name of new actor class'),
-                new InputOption('config', 'c', InputOption::VALUE_OPTIONAL, 'Use custom path for config'),
-            )
-        );
+        $this->setDefinition([
+            new InputArgument('suite', InputArgument::REQUIRED, 'suite to be generated'),
+            new InputArgument('actor', InputArgument::OPTIONAL, 'name of new actor class'),
+            new InputOption('config', 'c', InputOption::VALUE_OPTIONAL, 'Use custom path for config'),
+        ]);
     }
 
     public function getDescription()
@@ -45,7 +44,7 @@ class GenerateSuite extends Command
         $suite = lcfirst($input->getArgument('suite'));
         $actor = $input->getArgument('actor');
 
-        if ($this->containsInvalidCharacters ($suite)) {
+        if ($this->containsInvalidCharacters($suite)) {
             $output->writeln("<error>Suite name '$suite' contains invalid characters. ([A-Za-z0-9_]).</error>");
             return;
         }
@@ -64,33 +63,40 @@ class GenerateSuite extends Command
         $this->buildPath($dir . $suite . DIRECTORY_SEPARATOR, '_bootstrap.php');
 
         // generate bootstrap
-        $this->save($dir . $suite . DIRECTORY_SEPARATOR . '_bootstrap.php',
+        $this->save(
+            $dir . $suite . DIRECTORY_SEPARATOR . '_bootstrap.php',
             "<?php\n// Here you can initialize variables that will be available to your tests\n",
             true
         );
         $actorName = $this->removeSuffix($actor, $config['actor']);
 
+        $file = $this->buildPath(\Codeception\Configuration::supportDir() . "Helper", "$actorName.php") . "$actorName.php";
+
+        $gen = new Helper($actorName, $config['namespace']);
         // generate helper
         $this->save(
-            \Codeception\Configuration::helpersDir() . $actorName . 'Helper.php',
-            (new Helper($actorName, $config['namespace']))->produce()
+            $file,
+            $gen->produce()
         );
 
-        $conf = array(
-            'class_name' => $actorName.$config['actor'],
-            'modules' => array(
-                'enabled' => array($actorName . 'Helper')
-            ),
-        );
+        $conf = <<<EOF
+class_name: {{actor}}
+modules:
+    enabled:
+        - {{helper}}
+EOF;
 
-        $this->save($dir . $suite . '.suite.yml', Yaml::dump($conf, 2));
+        $this->save($dir . $suite . '.suite.yml', (new Template($conf))
+            ->place('actor', $actorName . $config['actor'])
+            ->place('helper', $gen->getHelperName())
+            ->produce()
+        );
 
         $output->writeln("<info>Suite $suite generated</info>");
     }
 
-    private function containsInvalidCharacters ($suite)
+    private function containsInvalidCharacters($suite)
     {
-        return preg_match ('#[^A-Za-z0-9_]#', $suite) ? true : false;
+        return preg_match('#[^A-Za-z0-9_]#', $suite) ? true : false;
     }
-
 }

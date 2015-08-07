@@ -1,5 +1,4 @@
 <?php
-
 namespace Codeception\Lib\Connector\Shared;
 
 /**
@@ -10,8 +9,8 @@ namespace Codeception\Lib\Connector\Shared;
  *
  * @package Codeception\Lib\Connector
  */
-trait PhpSuperGlobalsConverter {
-
+trait PhpSuperGlobalsConverter
+{
     /**
      * Rearrange files array to be compatible with PHP $_FILES superglobal structure
      * @see https://bugs.php.net/bug.php?id=25589
@@ -78,9 +77,11 @@ trait PhpSuperGlobalsConverter {
                      * Convert from ['a' => ['tmp_name' => '/tmp/test.txt'] ]
                      * to ['tmp_name' => ['a' => '/tmp/test.txt'] ]
                      */
-                    $innerInfo = array_map(function($v) use($innerName) {
-                        return [$innerName => $v];
-                    }, $innerInfo);
+                    $innerInfo = array_map(
+                        function ($v) use ($innerName) {
+                            return [$innerName => $v];
+                        }, $innerInfo
+                    );
 
                     if (empty($files[$name])) {
                         $files[$name] = [];
@@ -112,5 +113,4 @@ trait PhpSuperGlobalsConverter {
 
         return $output;
     }
-
 }

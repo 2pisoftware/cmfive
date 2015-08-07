@@ -13,6 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Chrome;
+
+use Facebook\WebDriver\Remote\Service\DriverService;
+
 class ChromeDriverService extends DriverService {
 
   // The environment variable storing the path to the chrome driver executable.

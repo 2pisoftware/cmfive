@@ -15,12 +15,13 @@ class PhpBrowserRestTest extends \PHPUnit_Framework_TestCase
     protected $phpBrowser;
 
     public function setUp() {
-        $this->phpBrowser = new \Codeception\Module\PhpBrowser();
+        $this->phpBrowser = new \Codeception\Module\PhpBrowser(make_container());
         $url = 'http://localhost:8010';
         $this->phpBrowser->_setConfig(array('url' => $url));
         $this->phpBrowser->_initialize();
 
-        $this->module = Stub::make('\Codeception\Module\REST', ['getModules' => [$this->phpBrowser]]);
+        $this->module = Stub::make('\Codeception\Module\REST');
+        $this->module->_inject($this->phpBrowser);
         $this->module->_initialize();
         $this->module->_before(Stub::makeEmpty('\Codeception\TestCase\Cest'));
         $this->phpBrowser->_before(Stub::makeEmpty('\Codeception\TestCase\Cest'));
@@ -36,23 +37,17 @@ class PhpBrowserRestTest extends \PHPUnit_Framework_TestCase
         $this->module->dontSeeResponseCodeIs(404);
     }
 
+    public function testSendAbsoluteUrlGet()
+    {
+        $this->module->sendGET('http://127.0.0.1:8010/rest/user/');
+        $this->module->seeResponseCodeIs(200);
+        $this->assertEquals('http://127.0.0.1:8010/rest/user/', $this->module->client->getHistory()->current()->getUri());
+    }
+
     public function testPost() {
         $this->module->sendPOST('/rest/user/', array('name' => 'john'));
         $this->module->seeResponseContains('john');
         $this->module->seeResponseContainsJson(array('name' => 'john'));
-    }
-
-    public function testGrabDataFromJsonResponse() {
-        $this->module->sendGET('/rest/user/');
-        // simple assoc array
-        $this->assertEquals('davert@mail.ua', $this->module->grabDataFromJsonResponse('email'));
-        // nested assoc array
-        $this->assertEquals('Kyiv', $this->module->grabDataFromJsonResponse('address.city'));
-        // nested index array
-        $this->assertEquals('DavertMik', $this->module->grabDataFromJsonResponse('aliases.0'));
-        // fail if data not found
-        $this->setExpectedException('PHPUnit_Framework_AssertionFailedError', 'Response does not have required data');
-        $this->module->grabDataFromJsonResponse('address.street');
     }
 
     public function testValidJson()
@@ -144,14 +139,6 @@ class PhpBrowserRestTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('john', $request->getParameters());
     }
 
-    public function testUrlIsFull()
-    {
-        $this->module->sendGET('/api/v1/users');
-        /** @var $request \Symfony\Component\BrowserKit\Request  **/
-        $request = $this->module->client->getRequest();
-        $this->assertEquals('http://localhost:8010/api/v1/users',$request->getUri());
-    }
-
     /**
      * @Issue https://github.com/Codeception/Codeception/issues/1650
      */
@@ -165,6 +152,51 @@ class PhpBrowserRestTest extends \PHPUnit_Framework_TestCase
         $this->module->seeResponseContains('host: http://www.example.com');
     }
 
+    /**
+     * @Issue https://github.com/Codeception/Codeception/issues/2075
+     * Client is undefined for the second test
+     */
+    public function testTwoTests() {
+        $cest1 = Stub::makeEmpty('\Codeception\TestCase\Cest');
+        $cest2 = Stub::makeEmpty('\Codeception\TestCase\Cest');
+
+        $this->module->sendGET('/rest/user/');
+        $this->module->seeResponseIsJson();
+        $this->module->seeResponseContains('davert');
+        $this->module->seeResponseContainsJson(array('name' => 'davert'));
+        $this->module->seeResponseCodeIs(200);
+        $this->module->dontSeeResponseCodeIs(404);
+        
+        $this->phpBrowser->_after($cest1);
+        $this->module->_after($cest1);
+        $this->module->_before($cest2);
+        $this->phpBrowser->_before($cest2);
+        
+        $this->module->sendGET('/rest/user/');
+        $this->module->seeResponseIsJson();
+        $this->module->seeResponseContains('davert');
+        $this->module->seeResponseContainsJson(array('name' => 'davert'));
+        $this->module->seeResponseCodeIs(200);
+        $this->module->dontSeeResponseCodeIs(404);
+        
+    }
+    
+    /**
+     * @Issue https://github.com/Codeception/Codeception/issues/2070
+     */
+    public function testArrayOfZeroesInJsonResponse()
+    {
+        $this->module->haveHttpHeader('Content-Type', 'application/json');
+        $this->module->sendGET('/rest/zeroes');
+        $this->module->dontSeeResponseContainsJson([
+            'responseCode' => 0,
+            'data' => [
+                0,
+                0,
+                0,
+            ]
+        ]);
+    }
 
     protected function shouldFail()
     {
