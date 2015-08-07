@@ -1,6 +1,15 @@
 Changelog
 =========
 
+<<<<<<< HEAD
+=======
+5.4.1 (2015-06-06)
+------------------
+
+ * made Swiftmailer exceptions confirm to PHP base exception constructor signature
+ * fixed MAIL FROM & RCPT TO headers to be RFC compliant
+
+>>>>>>> 5e5f4cc3a5bce43172692b87e417588b687bdd40
 5.4.0 (2015-03-14)
 ------------------
 
