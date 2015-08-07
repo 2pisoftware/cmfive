@@ -7,8 +7,5 @@ $baseDir = dirname(dirname($vendorDir));
 
 return array(
     $vendorDir . '/phpunit/php-text-template',
-<<<<<<< HEAD
     $vendorDir . '/phpunit/php-timer',
-=======
->>>>>>> 5e5f4cc3a5bce43172692b87e417588b687bdd40
 );
