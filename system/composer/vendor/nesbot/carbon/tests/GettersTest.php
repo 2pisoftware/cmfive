@@ -24,15 +24,12 @@ class GettersTest extends TestFixture
         $d = Carbon::create(1234, 5, 6, 7, 8, 9);
         $this->assertSame(1234, $d->year);
     }
-<<<<<<< HEAD
-=======
 
     public function testYearIsoGetter()
     {
         $d = Carbon::createFromDate(2012, 12, 31);
         $this->assertSame(2013, $d->yearIso);
     }
->>>>>>> 5e5f4cc3a5bce43172692b87e417588b687bdd40
 
     public function testMonthGetter()
     {

@@ -1,15 +1,9 @@
 <?php
 /*
  * This file is part of the PHPUnit_MockObject package.
-<<<<<<< HEAD
  *
  * (c) Sebastian Bergmann <sebastian@phpunit.de>
  *
-=======
- *
- * (c) Sebastian Bergmann <sebastian@phpunit.de>
- *
->>>>>>> 5e5f4cc3a5bce43172692b87e417588b687bdd40
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -1118,8 +1112,6 @@ class PHPUnit_Framework_MockObject_Generator
     }
 
     /**
-<<<<<<< HEAD
-=======
      * @param  ReflectionParameter $parameter
      * @return boolean
      * @since  Method available since Release 2.3.4
@@ -1130,7 +1122,6 @@ class PHPUnit_Framework_MockObject_Generator
     }
 
     /**
->>>>>>> 5e5f4cc3a5bce43172692b87e417588b687bdd40
      * @param  string $className
      * @return array
      * @since  Method available since Release 2.3.2
