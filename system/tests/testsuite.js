@@ -1,9 +1,9 @@
 
 var testsRunning=false;
 // prevent close window losing test results
-window.onbeforeunload = function() {
-    return 'You will lose your test results!';
-}
+//window.onbeforeunload = function() {
+//    return 'You will lose your test results!';
+//}
 window.onerror = function(message, url, lineNumber) {  
   //save error and send to server for example.
   console.log(message,url,lineNumber);
@@ -12,6 +12,11 @@ window.onerror = function(message, url, lineNumber) {
 
 function initialisePage() {
 	//localStorage.getItem('enableTesting');
+	if ($('.testnamewarning').length>0) {
+		$('#runbutton').remove();
+		$('.accordion').remove();
+	}
+	
 	var activeSuite=localStorage.getItem('activeTestSuite');
 	if (typeof activeSuite=="string" && activeSuite.length>0) {
 		$('.accordion-navigation div.content').removeClass('active');
@@ -86,12 +91,23 @@ function initialisePage() {
 			$(this).parents('li.testsuite').children('.suiteselected')[0].checked=false; //.prop('checked','false');
 		}
 	});
+	
+	$.get('dbmanager.php?checkmysqldiffs=1&mini=1'+getParams(),function(res) {
+			if (res && res.length>0) {
+				$('#showdbtools b').text(res);
+			} else {
+				$('#showdbtools b').text('');
+			}
+			
+	});
+	
 	var xhr ;
 	
 	
 	function startTests(tests) {
 		if ($('#testsenabled:checked').length>0) {
 			UIStartTests();
+			$('.testdetailsreveal').html('');
 			xhr= new XMLHttpRequest();
 			var lastContent='';
 			var currentContent='';
@@ -124,21 +140,90 @@ function initialisePage() {
 			alert('Confirm that you understand before running tests.');
 		}
 	}
-	$('#resetalldatabasesbutton').click(function() {
-		if ($('#testsenabled:checked').length>0) {
-			if (confirm('Are you really sure?')) {
-				var keyid=$('#md5keyid').val();
-				var key=$('#md5key').val();
-				var params='&key='+key+'&keyid='+keyid;
-				$.get('runsuite.php?resetsystemdatabases=1'+params,function(res) {
-					alert('Dropped and created all tables'+"\n"+res);
+	function getParams() {
+		var keyid=$('#md5keyid').val();
+		var key=$('#md5key').val();
+		return '&key='+key+'&keyid='+keyid;
+		
+	}
+	function flashDialog(name,content) {
+		$('#'+name).remove();
+		$('body').append($('<div id="'+name+'" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">'+content+'</div>'));
+		$('#'+name).foundation('reveal','open');
+		setTimeout(function() {
+			$('#'+name).foundation('reveal','close');
+		},2000);	
+	}
+	
+	$('#showdbtools').click(function() {
+		$('#dbtools').html("<div id='mysqldiffs' class='right' ></div><div id='savesnapshot' ><a href='#' class='button tiny' id='savesnapshotbutton' >Save Database Snapshot</a></div><div id='loadsnapshot' ><a href='#' class='button tiny' id='loadsnapshotbutton' >Load Database Snapshot</a></div><div id='resetdatabases' ><a href='#' class='button tiny' id='resetalldatabasesbutton' >Drop and recreate all tables !!</a></div>");
+		$('#mysqldiffs').load('dbmanager.php?checkmysqldiffs=1'+getParams(),function() {
+			$('#listmysqldiffsbutton').click(function() {
+				$('#dbtools').load('dbmanager.php?listmysqldiffs=1'+getParams());
+			});
+			$('#runmysqldiffsbutton').click(function() {
+				if (confirm('Are you really sure that you want to update schema to match source code?')) {
+					$('#mysqldiffs').load('dbmanager.php?runmysqldiffs=1'+getParams());
+				}
+			});
+			$('#resetalldatabasesbutton').click(function() {
+				if ($('#testsenabled:checked').length>0) {
+					if (confirm('Are you really sure that you want to DROP ALL DATABASES and reimport schema?')) {
+						$.get('dbmanager.php?resetsystemdatabases=1'+getParams(),function(res) {
+							//$('#dbtools').foundation('reveal','close');
+							flashDialog('resetallresult',res);
+						});
+					}
+				} else {
+					alert('Confirm that you understand before continuing.');
+				}
+				return false;
+			});
+			$('#savesnapshotbutton').click(function() {
+				var saveAs=prompt('Save As?');
+				if (saveAs.length>0) {
+					$.get('dbmanager.php?savesnapshot='+saveAs+getParams(),function(res) {
+						flashDialog('saved',res);
+					});
+				}
+			});
+			$('#loadsnapshotbutton').click(function() {
+				var button=this;
+				$('#snapshotlist').remove();
+				$.get('dbmanager.php?listsnapshots=1'+getParams(),function(res) {		
+					$('body').append($('<div id="snapshotlist" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">'+res+'</div>'));
+					//<a class="close-reveal-modal" aria-label="Close">&#215;</a>
+					$('#snapshotlist').foundation('reveal','open');
+					$('#snapshotlist .loadsnapshotbutton').click(function() {
+						var saveAs=$(this).parent().data('filename');
+						if (confirm('Really import database snapshot '+saveAs+' and DELETE EXISTING DATA ?')) { 
+							$.get('dbmanager.php?loadsnapshot='+saveAs+getParams(),function(res) {
+								flashDialog('loaded',res);
+							});
+						}
+					});
+					$('#snapshotlist .downloadsnapshotbutton').click(function() {
+						var saveAs=$(this).parent().data('filename');
+						var link=$('<a target="_new" href="'+'dbmanager.php?downloadsnapshot='+saveAs+getParams()+'" >eek</a>')
+						$('body').append(link);
+						link[0].click();
+					});
+					$('#snapshotlist .deletesnapshotbutton').click(function() {
+						var saveAs=$(this).parent().data('filename');
+						if (confirm('Really delete database snapshot '+saveAs +' ?')) { 
+							var button=this;
+							
+							$.get('dbmanager.php?deletesnapshot='+saveAs+getParams(),function(res) {
+								$(button).parent().remove();
+							});
+						}
+					});
 				});
-			}
-		} else {
-			alert('Confirm that you understand before continuing.');
-		}
-		return false;
+			});
+		});	
 	});
+	
+	
 	$('.accordion-navigation').click(function() {
 		if ($(this).hasClass('active')) {
 		} else {
@@ -151,10 +236,7 @@ function initialisePage() {
 		e.stopImmediatePropagation();
 		if (testsRunning==false)  {
 			if (e.ctrlKey==true)  {
-				var keyid=$('#md5keyid').val();
-				var key=$('#md5key').val();
-				var params='&key='+key+'&keyid='+keyid+'&v=1';
-				window.open($(this).attr('href')+params);
+				window.open($(this).attr('href')+getParams()+'&v=1');
 			} else {
 				startTests($(this).attr('href')); //$(this).parent().attr('id'));
 			}
@@ -166,10 +248,7 @@ function initialisePage() {
 		e.stopImmediatePropagation();
 		if (testsRunning==false)  {
 			if (e.ctrlKey==true)  {
-				var keyid=$('#md5keyid').val();
-				var key=$('#md5key').val();
-				var params='&key='+key+'&keyid='+keyid+'&v=1';
-				window.open($(this).attr('href')+params);
+				window.open($(this).attr('href')+getParams()+'&v=1');
 			} else {
 				startTests($(this).attr('href')); //$(this).parents('li').first().data('suite'));
 			}
@@ -181,12 +260,9 @@ function initialisePage() {
 		e.stopImmediatePropagation();
 		if (testsRunning==false)  {
 			if (e.ctrlKey==true)  {
-				var keyid=$('#md5keyid').val();
-				var key=$('#md5key').val();
-				var params='&key='+key+'&keyid='+keyid+'&v=1';
-				window.open('runsuite.php?tests='+getSelectedTests()+params);
+				window.open('dbmanager.php?tests='+getSelectedTests()+getParams()+'&v=1');
 			} else {
-				startTests('runsuite.php?tests='+getSelectedTests());
+				startTests('dbmanager.php?tests='+getSelectedTests());
 			}
 		}
 		return false;
@@ -202,12 +278,13 @@ function UIStartTests() {
 	testsRunning=true;
 	$('#runbutton').hide();
 	$('#stopbutton').show();
+	$('body').addClass('disabled');
 }
 function UIStopTests() {
 	testsRunning=false;
 	$('#runbutton').show();
 	$('#stopbutton').hide();
-	
+	$('body').removeClass('disabled');
 }
 
 
@@ -273,9 +350,11 @@ function updatePage(latestContent) {
 					
 		if ($(newContent).hasClass('testresult')) {
 			var listedTest=$('#'+$(newContent).data('title')+'___'+$(newContent).data('suite')+'___'+$(newContent).data('test')+'___'+$(newContent).data('function'));
-			//console.log('testres');
+			console.log('testres');
 			//console.log($(newContent));
+			console.log($(listedTest));
 			if ($(newContent).hasClass('testresult-passed')) {
+				console.log('passed');
 				listedTest.removeClass('testresult-failed');
 				listedTest.removeClass('testresult-pending');
 				listedTest.addClass('testresult-passed');
@@ -284,6 +363,7 @@ function updatePage(latestContent) {
 				$('#logfile-'+listedTest.attr('id')).remove();
 				updateSuiteStatus(listedTest);
 			} else {
+				console.log('failed');
 				listedTest.removeClass('testresult-passed');
 				listedTest.removeClass('testresult-pending');
 				listedTest.addClass('testresult-failed');
@@ -291,7 +371,7 @@ function updatePage(latestContent) {
 			}
 			//$(newContent).appendTo($('#testsuite-'+$(newContent).data('title')));
 		} else if ($(newContent).hasClass('testdetails')) {
-			//console.log('import test details',$(newContent));
+			console.log('import test details',$(newContent));
 			var test=$('#'+$(newContent).data('testid'));
 			//console.log($(newContent).data('testid'));
 			if ($('.reveal-modal',test).length>0)  {
@@ -306,7 +386,7 @@ function updatePage(latestContent) {
 					showButton='<a href="#" class="showerrorbutton button tiny" data-reveal-id="logfile-'+$(newContent).data('testid')+'">Show</a> ';
 				}
 				
-				test.append($('<span>&nbsp;</span><a href="#" class="detailsbutton tiny" data-reveal-id="testdetails-'+$(newContent).data('testid')+'">Details</a>'+showButton+' <div id="testdetails-'+$(newContent).data('testid')+'" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">'+newContent.html()+'<a class="close-reveal-modal" aria-label="Close">&#215;</a></div>'));
+				test.append($('<span>&nbsp;</span><a href="#" class="detailsbutton button tiny" data-reveal-id="testdetails-'+$(newContent).data('testid')+'">Details</a>&nbsp;&nbsp;&nbsp;'+showButton+' <div id="testdetails-'+$(newContent).data('testid')+'" class="testdetailsreveal reveal-modal" data-reveal aria-hidden="true" role="dialog">'+newContent.html()+'<a class="close-reveal-modal" aria-label="Close">&#215;</a></div>'));
 			}
 			$(document).foundation(); // {'reveal': {'close_on_background_click': true,'close_on_esc': true}});
 		} else if ($(newContent).hasClass('phperror')) {

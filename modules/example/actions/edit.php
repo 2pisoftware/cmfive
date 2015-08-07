@@ -25,6 +25,7 @@ function edit_GET(Web $w) {
 			array("Edit Example Data","section"),
 			array("Title","text","title", $data->title),
 			array("Data","text","data",$data->data),
+			array("Check","checkbox","data",'1'),
 	),$w->localUrl("/example/edit/".$p['id']),"POST"," Save ");
 	
 	// circumvent the template and print straight into the layout
