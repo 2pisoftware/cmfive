@@ -308,11 +308,11 @@ class Configuration
     public static function createModule($class, $config, $namespace = '')
     {
         $hasNamespace = (mb_strpos($class, '\\') !== false);
-
-        if ($hasNamespace) {
-            return new $class($config);
-        }
-
+		try {
+			if ($hasNamespace) {
+				return new $class($config);
+			}
+		} catch (Exception $e) {}
         // try find module under users suite namespace setting
         $className = $namespace.'\\Codeception\\Module\\' . $class;
 
