@@ -1,8 +1,10 @@
 <?php
+
 namespace Codeception\Module;
 
 // here you can define custom actions
 // all public methods declared in helper class will be available in $I
+define('DS', DIRECTORY_SEPARATOR); 
 
 class AcceptanceHelper extends \Codeception\Module
 {
@@ -23,33 +25,34 @@ class AcceptanceHelper extends \Codeception\Module
 					 $env=trim($GLOBALS['argv'][$i+1]);
 				 }
 			 }
-			 /**
-             * We need the Db module to run the queries
-             */
-            $dbh = $this->getModule('Db');
-            
-            /**
-             * The Db driver load function requires an array
-             */
-            $queries = array();
-
-            /**
-             * Get all the queries in the directory
-             */
-            foreach(glob($basePath.'tests'.DS.'_data'.DS. $dir.DS.'*.sql') as $sqlFile){
-              
-                //echo "\n".'Import SQL from test :'.$sqlFile."\n";
-                $query = file_get_contents($sqlFile);
-                //echo $query;
-                array_push($queries, $query);
-            }
-            
-            /**
-             * If there are queries load them
-             */
-            if(count($queries) > 0){
-                $dbh->driver->load($queries);
-            }
+			 
+			//include_once($basePath.'tests'.DS.'Spyc.php');
+			$codeceptionConfig = \Spyc::YAMLLoad($basePath.'/codeception.yml');
+			
+			$dbUser='';
+			$dbPass='';
+			$dbName='';
+			if (strlen($env)>0) {
+				$dbUser=$codeceptionConfig['env'][$env]['modules']['config']['Db']['user'];
+				$dbPass=$codeceptionConfig['env'][$env]['modules']['config']['Db']['password'];
+				$dbName=explode("dbname=",$codeceptionConfig['env'][$env]['modules']['config']['Db']['dsn'])[1];
+			} else {
+				$dbUser=$codeceptionConfig['modules']['config']['Db']['user'];
+				$dbPass=$codeceptionConfig['modules']['config']['Db']['password'];
+				$dbName=explode("dbname=",$codeceptionConfig['modules']['config']['Db']['dsn'])[1];
+			}
+			$sql='';
+			$mysqli = new \mysqli("localhost", $dbUser, $dbPass, $dbName);
+			foreach (glob($basePath.'tests'.DS.'_data'.DS. $dir.DS.'*.sql') as $path) {
+				if (file_exists($path)) {
+					$output=array();
+					$sql=file_get_contents($path);
+					echo "load sql ".$path;
+					$result = mysqli_multi_query($mysqli,$sql); //implode('\n',$sql));
+					// flush multi_queries
+					while ($mysqli->more_results() && $ir=$mysqli->next_result()) {if (!$ir) echo $mysqli->error;} 
+				}
+			}			 
             
 			ob_flush();
             
