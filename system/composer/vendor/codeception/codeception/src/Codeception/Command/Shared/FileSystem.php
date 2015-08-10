@@ -1,11 +1,10 @@
 <?php
 namespace Codeception\Command\Shared;
-use Codeception\Util\Shared\Namespaces;
+use Codeception\Util\Shared\Namespaces as Namespaces;
 
 trait FileSystem
 {
-    use Namespaces;
-
+   
     protected function buildPath($basePath, $testName)
     {
         $basePath = rtrim($basePath, DIRECTORY_SEPARATOR);

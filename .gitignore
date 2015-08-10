@@ -2,7 +2,6 @@
 /uploads/*
 .project
 /config.php
-/system/composer/*
 /tests/dumps
 codeception.yml
 codeception.master.yml
