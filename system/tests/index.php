@@ -7,6 +7,11 @@ if (DS=='/') {
 	$folder=str_replace('/','\\',dirname($_SERVER['SCRIPT_FILENAME']));
 } 
 include(dirname(dirname($folder)).DS.'tests'.DS.'suites.php');
+// read cm5 config and check testing is enabled
+include(dirname(dirname($folder)).DS.'system'.DS.'classes'.DS.'Config.php');
+include(dirname(dirname($folder)).DS.'config.php');
+if (!config::get('system.enabletesting')) die('Testing is disabled');
+
 // output control
 header('Content-Encoding: none;');
 set_time_limit(0);
