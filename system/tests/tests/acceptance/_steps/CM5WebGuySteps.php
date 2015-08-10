@@ -25,7 +25,7 @@ class CM5WebGuySteps extends \AcceptanceTester
 		$I->fillField('password',$password);
 		$I->click('Login');
 		$redirect=$I->grabFromDatabase('user','redirect_url',array('login'=>$username));
-		$I->canSeeInCurrentUrl($redirect);
+		if (strlen(trim($redirect)>0)) $I->canSeeInCurrentUrl($redirect);
 	}
 	
 	/**
