@@ -40,6 +40,7 @@ class InstallService extends DbService {
 	 */
 	public static function writeConfigToProject() {
 		copy("system/modules/install/assets/config.php", "config.php");
+		file_put_contents("config.php", "<?php\n\n" . file_get_contents("config.php"));
 	}
 	
 	public static function resetConfigFile() {

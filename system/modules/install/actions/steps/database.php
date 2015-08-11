@@ -5,6 +5,17 @@ function database_GET(Web $w) {
 
 	// Database form
 	$form_details = [
+		"Admin User Account" => [
+			[
+				["First name", "text", "admin_firstname", $w->request("admin_firstname")],
+				["Last name", "text", "admin_lastname", $w->request("admin_lastname")],
+				["Email", "text", "admin_email", $w->request("admin_email")]
+			],
+			[
+				["Username", "text", "admin_username", $w->request("admin_username")],
+				["Password", "password", "admin_password"]
+			]
+		],
 		"Database Connection" => [
 			[["Driver", "select", "db_driver", $w->request("db_driver", "mysql"), PDO::getAvailableDrivers()]],
 			[
@@ -27,7 +38,12 @@ function database_GET(Web $w) {
 			"db_username" => ["required"], 
 			"db_password" => ["required"], 
 			"db_port" => ["required"], 
-			"db_hostname" => ["required"]
+			"db_hostname" => ["required"],
+			"admin_username" => ["required"],
+			"admin_password" => ["required"],
+			"admin_first_name" => ["required"],
+			"admin_last_name" => ["required"],
+			"admin_email" => ["required"]
 		])
 	);
 }

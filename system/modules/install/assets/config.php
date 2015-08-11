@@ -1,37 +1,37 @@
 //======= Override Main Module Company Parameters ============
 
-Config::set('main.application_name', '{{ application_name }}');
-Config::set('main.company_name', '{{ company_name }}');
-Config::set('main.company_url', '{{ company_url }}');
+Config::set('main.application_name', '2pi CRM');
+Config::set('main.company_name', '2pi Software');
+Config::set('main.company_url', 'http://2pisoftware.com');
 
 // enter a valid email address
 
-Config::set('main.company_support_email','{{ company_support_email }}');
+Config::set('main.company_support_email','adam@2pisoftware.com');
 
 //=============== Timezone ===================================
 
-date_default_timezone_set('{{ timezone }}');
+date_default_timezone_set('Australia/Sydney');
 
 //========== Database Configuration ==========================
 
 Config::set('database', array(
-    "hostname"  => "{{ db_host }}",
-    "username"  => "{{ db_username }}",
-    "password"  => "{{ db_password }}",
-    "database"  => "{{ db_database }}",
-    "driver"    => "{{ db_driver }}"
+    "hostname"  => "",
+    "username"  => "crm2pi",
+    "password"  => "crm2pi",
+    "database"  => "crm2pi",
+    "driver"    => "mysql"
 ));
 
 //=========== Email Layer Configuration =====================
 
 Config::set('email', [
-    "layer"	=> "{{ email_layer }}",		// smtp or sendmail
-    "command" => "{{ sendmail_command }}",		// used for sendmail layer only
-    "host"	=> "{{ email_host }}",
-	"port"	=> {{ email_port }},
-	"auth"	=> {{ email_use_auth }},
-    "username"	=> '{{ email_username }}',
-    "password"	=> '{{ email_password }}',
+    "layer"	=> "STMP",		// smtp or sendmail
+    "command" => "",		// used for sendmail layer only
+    "host"	=> "smtp.mandrillapp.com",
+	"port"	=> 465,
+	"auth"	=> 1,
+    "username"	=> 'adam@2pisoftware.com',
+    "password"	=> 'wzTN9gU-NKrpBiuI0ALU0A',
 ]);
 
 //========= Anonymous Access ================================
@@ -61,7 +61,7 @@ Config::set('system.allow_action', [
 
 // use the API_KEY to authenticate with username and password
 
-Config::set('system.rest_api_key', "{{ rest_api_key }}");
+Config::set('system.rest_api_key', "");
 
 // include class of objects that you want available via REST
 // be aware that only the listed objects will be available via

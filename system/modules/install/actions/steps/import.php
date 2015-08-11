@@ -101,7 +101,7 @@ function import_GET(Web $w) {
 				$pdo->exec(file_get_contents($directory . "/install/db.sql"));
 			} catch (Exception $e) {
 				output("Error from module install:");
-				output($e->getMessage() . '<br/>in ' . $direcotory);
+				output($e->getMessage() . '<br/>in ' . $directory);
 			}
 		} else {
 			continue;
@@ -124,6 +124,29 @@ function import_GET(Web $w) {
 
 	// Write the config to the project
 	InstallService::writeConfigToProject();
+
+	// Create admin user
+	
+	// Generate encrypted password
+	$statement = $pdo->prepare("INSERT INTO contact (`id`, `firstname`, `lastname`, `othername`, `title`, `homephone`, `workphone`, `mobile`, `priv_mobile`, `fax`, `email`, `notes`, `dt_created`, `dt_modified`, `is_deleted`, `private_to_user_id`, `creator_id`) VALUES (NULL, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ?, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '0', NULL, NULL);");
+	$statement->bindParam(1, $_GET['admin_firstname']);
+	$statement->bindParam(2, $_GET['admin_lastname']);
+	$statement->bindParam(3, $_GET['admin_email']);
+	$result = $statement->execute();
+	
+	$contact_id = $pdo->lastInsertId();
+	
+	$user_statement = $pdo->prepare("INSERT INTO user (`id`, `login`, `password`, `password_salt`, `contact_id`, `password_reset_token`, `dt_password_reset_at`, `redirect_url`, `is_admin`, `is_active`, `is_deleted`, `is_group`, `dt_created`, `dt_lastlogin`) VALUES (NULL, ?, ?, ?, ?, NULL, NULL, 'main/index', '0', '1', '0', '0', CURRENT_TIMESTAMP, NULL);");
+	$user_statement->bindParam(1, $_GET['admin_username']);
+	
+	$salt = User::generateSalt();
+	$password = sha1($salt . trim($_GET['admin_password']));
+	$user_statement->bindParam(2, $password);
+	$user_statement->bindParam(3, $salt);
+	$user_statement->bindParam(4, $contact_id);
+	$result = $user_statement->execute();
+	
+	output("Admin user created");
 	
 	output('Import successful');
 }

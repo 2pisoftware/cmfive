@@ -53,7 +53,7 @@
 					</div>
 					<div class="small-12 medium-8 large-10 columns">
 						<div class="progress small-12 success radius">
-							<span class="meter" style="width: <?php echo ceil(100 / ($step == 1 ? 3 : $step == 3 ? 1 : 2)); ?>%"></span>
+							<span class="meter" style="width: <?php echo $step == 1 ? 33 : ($step == 3 ? 100 : 64); ?>%"></span>
 						</div>
 					</div>
 				</div>
