@@ -297,9 +297,8 @@ function getTimeSelect($start = 8, $end = 19) {
 }
 
 function formatDate($date, $format = "d/m/Y", $usetimezone = true) {
-    if (!$date)
-        return null;
-    if (!is_long($date)) {
+    if (!$date) return NULL;
+    if (!is_long($date) && !is_numeric($date)) {
         $date = strtotime(str_replace("/", "-", $date));
     }
     /*

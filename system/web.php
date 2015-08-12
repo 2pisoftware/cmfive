@@ -1,15 +1,36 @@
 <?php
+// ========= Session ========================
+ini_set('session.gc_maxlifetime', 60 * 60 * 6);
+
+//========== Constants =====================================
+define("CMFIVE_VERSION", "0.8.0");
+
+define("ROOT_PATH", str_replace("\\", "/", getcwd()));
+define("SYSTEM_PATH", str_replace("\\", "/", getcwd() . '/system'));
+
+define("LIBPATH", str_replace("\\", "/", getcwd() . '/lib'));
+define("SYSTEM_LIBPATH", str_replace("\\", "/", getcwd() . '/system/lib'));
+define("FILE_ROOT", str_replace("\\", "/", getcwd() . "/uploads/")); // dirname(__FILE__)
+define("MEDIA_ROOT", str_replace("\\", "/", dirname(__FILE__) . "/../media/"));
+define("ROOT", str_replace("\\", "/", dirname(__FILE__)));
+define("SESSION_NAME", "CM5_SID");
+
+set_include_path(get_include_path() . PATH_SEPARATOR . LIBPATH);
+set_include_path(get_include_path() . PATH_SEPARATOR . SYSTEM_LIBPATH);
+
+require_once __DIR__ ."/db.php";
+require_once __DIR__ ."/html.php";
+require_once __DIR__ ."/functions.php";
+require_once __DIR__ ."/classes/CSRF.php";
+require_once __DIR__ ."/classes/Config.php";
+require_once __DIR__ ."/classes/History.php";
 
 // Load system Composer autoloader
 if (file_exists(__DIR__ . "/composer/vendor/autoload.php")) {
     require "composer/vendor/autoload.php";
 }
 
-require_once "html.php";
-require_once "functions.php";
-require_once "classes/CSRF.php";
-require_once "classes/Config.php";
-require_once "classes/History.php";
+
 
 class PermissionDeniedException extends Exception {
     
@@ -51,6 +72,8 @@ class Web {
     public $_partialsdir = "partials";
     public $db;
     public $_isFrontend = false;
+    
+    private $_classdirectory; // used by the class auto loader
 
     public $_scripts = array();
     public $_styles = array();
@@ -83,31 +106,55 @@ class Web {
         $this->_actionMethod = null;
         
         $this->loadConfigurationFiles();
+        
         spl_autoload_register(array($this, 'modelLoader'));
         
         define("WEBROOT", $this->_webroot);
     }
 
     private function modelLoader($className) {
+    	// 1. check if class directory has to be loaded from cache
+    	$classdirectory_cache_file = ROOT_PATH."/cache/classdirectory.cache";
+    	
+    	if (empty($this->_classdirectory) && file_exists($classdirectory_cache_file)) {
+    		require_once $classdirectory_cache_file;
+    	}
+    	// 2. if filename is stored in $this->_classdirectory
+    	if (!empty($this->_classdirectory[$className])) {
+    		if (file_exists($this->_classdirectory[$className])) {
+    			require_once $this->_classdirectory[$className];
+    			return true;
+    		}
+    	}
+    	// 3. class has to be found the hard way
         $modules = $this->modules();
+        
+        // create the class cache file
+        if (!file_exists($classdirectory_cache_file)) {
+        	file_put_contents($classdirectory_cache_file,"<?php\n");
+        }
         foreach ($modules as $model) {
             // Check if the hosting module is active before we autoload it
             if (Config::get("{$model}.active") === true) {
                 $file = $this->getModuleDir($model) . 'models/' . ucfirst($className) . ".php";
                 if (file_exists($file)) {
-                    include $file;
+                    require_once $file;
+                    // add this class file to the cache file
+                    file_put_contents($classdirectory_cache_file,'$this->_classdirectory["'.$className.'"]="'.$file.'";'."\n", FILE_APPEND);
                     return true;
                 } else {
                     // Try a lower case version
                     $file = $this->getModuleDir($model) . 'models/' . $className . ".php";
                     if (file_exists($file)) {
-                        include $file;
+                        require_once $file;
+                        // add this class file to the cache file
+                    	file_put_contents($classdirectory_cache_file,'$this->_classdirectory["'.$className.'"]="'.$file.'";'."\n", FILE_APPEND);
                         return true;
                     }
                 }
             }
         }
-        $this->service('log')->debug("Class " . $file . " not found.");
+        $this->Log->debug("Class " . $file . " not found.");
         return false;
     }
 
@@ -487,6 +534,19 @@ class Web {
     }
 
     private function loadConfigurationFiles() {
+    	$cachefile = ROOT_PATH . "/cache/config.cache";
+    	
+    	// check for config cache file. If exists, then load the config
+    	// from this file!
+    	if (file_exists($cachefile)) {
+    		// load the cache file
+    		Config::fromJson(file_get_contents($cachefile));
+    		return;
+    	}
+    	
+    	// first load the system config file
+    	require SYSTEM_PATH . "/config.php";
+    	
         // Load System config first
         $baseDir = SYSTEM_PATH . '/modules';
         $this->scanModuleDirForConfigurationFiles($baseDir);
@@ -494,6 +554,20 @@ class Web {
         // Load project module config second
         $baseDir = ROOT_PATH . '/modules';
         $this->scanModuleDirForConfigurationFiles($baseDir);
+        
+        // load the root level config file last because it can override everything
+	    if (!file_exists("config.php")) {
+			echo "<b>No config.php found. Please copy config.php.example, change parameters as necessary and rename to config.php<b>";
+			die();
+		}
+        require ROOT_PATH . "/config.php";
+        
+        // if config cache file doesn't exist, then
+        // create it new
+		if(!is_dir(ROOT_PATH . '/cache')) {
+			mkdir(ROOT_PATH . '/cache');
+		}
+        file_put_contents($cachefile, Config::toJson());
     }
 
     // Helper function for the above, scans a directory for config files in child folders
