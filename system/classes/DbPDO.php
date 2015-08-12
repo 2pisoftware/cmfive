@@ -67,8 +67,10 @@ class DbPDO extends PDO {
      */
     public function get($table_name){
         if (!in_array($table_name, DbPDO::$table_names)){
-            trigger_error("Table $table_name does not exist in the databse", E_USER_ERROR);
-            return null;
+			if (!$this->install($table_name)) {
+				trigger_error("Table $table_name does not exist in the databse", E_USER_ERROR);
+				return null;
+			}
         }  
         $this->query = $this->fpdo->from($table_name);
         return $this;
@@ -380,4 +382,37 @@ class DbPDO extends PDO {
 		return self::$trx_token > 0;
 	} 
     
+	/**
+	 * A self healing function when a table doesn't exist
+	 * This class will check the Config definition for a module and try and load
+	 * it's install SQL file
+	 */
+	public function install($table) {
+		if (!class_exists("Config")) {
+			return false;
+		}
+		
+		// Check if $table happens to be an entry in Config, i.e. a module
+		$config = Config::get($table);
+		if (empty($config)) {
+			return false;
+		}
+		
+		// Get install path
+		$sql_folder_path = ROOT_PATH . '/' . $config['path'] . '/' . $table . '/install';
+		if (!is_dir($sql_folder_path) || !file_exists($sql_folder_path . '/db.sql')) {
+			return false;
+		}
+		
+		try {
+			$statement = $this->prepare(file_get_contents($sql_folder_path . '/db.sql'));
+			$statement->execute();
+		} catch (Exception $e) {
+			echo $e->getMessage();
+			return false;
+		}
+		
+		
+		return true;
+	}
 }

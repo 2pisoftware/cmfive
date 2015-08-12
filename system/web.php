@@ -133,7 +133,12 @@ class Web {
         if (!file_exists($classdirectory_cache_file)) {
         	file_put_contents($classdirectory_cache_file,"<?php\n");
         }
+		
+		// Regenerate configuration cache
+		$this->regenerateConfigCache();
+		
         foreach ($modules as $model) {
+			
             // Check if the hosting module is active before we autoload it
             if (Config::get("{$model}.active") === true) {
                 $file = $this->getModuleDir($model) . 'models/' . ucfirst($className) . ".php";
@@ -154,6 +159,8 @@ class Web {
                 }
             }
         }
+		
+		
         $this->Log->debug("Class " . $file . " not found.");
         return false;
     }
@@ -569,6 +576,16 @@ class Web {
         file_put_contents($cachefile, Config::toJson());
     }
 
+	private function regenerateConfigCache() {
+		// Check to see if a config entry for $modulename exists, if not, regenerate cache and try again
+		$cachePath = ROOT_PATH . "/cache/config.cache";
+		if (file_exists($cachePath)) {
+			unlink($cachePath);
+		}
+
+		$this->loadConfigurationFiles();
+	}
+	
     // Helper function for the above, scans a directory for config files in child folders
     private function scanModuleDirForConfigurationFiles($dir = "") {
         // Check that dir is dir
@@ -1043,7 +1060,7 @@ class Web {
         if (class_exists($classname)) {
             $modulename = $this->getModuleNameForModel($classname);
             if ($modulename === null || Config::get("$modulename.active") === false) {
-                return false;
+				return false;
             }   
             return true;
         }
