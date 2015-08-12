@@ -36,7 +36,11 @@ Config::set('system.allow_action', array(
     "auth/login",
     "auth/forgotpassword",
     "auth/resetpassword",
-    "admin/datamigration"
+    "admin/datamigration",
+	"install-steps/details",
+	"install-steps/database",
+	"install-steps/import",
+	"install-steps/finish",
 ));
 
 Config::set('system.password_salt', 'override this in your project config');

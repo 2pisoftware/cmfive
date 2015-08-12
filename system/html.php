@@ -536,7 +536,7 @@ class Html {
         // If form tag is needed print it
         if ($includeFormTag) {
             $class .= " small-12 columns";
-            $form->id($id)->setClass($class)->method($method)->action($action)->target($target);
+            $form->id($id)->name($id)->setClass($class)->method($method)->action($action)->target($target);
                 
             if (in_multiarray("file", $data)) {
                 $form->enctype("multipart/form-data");
@@ -596,6 +596,7 @@ class Html {
                     switch($type) {
                         case "text":
                         case "password":
+						case "email":
                             $size = !empty($field[4]) ? $field[4] : null;
                             $buffer .= '<input' . $readonly . ' style="width:100%;" type="' . $type . '" name="' . $name . '" value="' . htmlspecialchars($value) . '" size="' . $size . '" id="' . $name . '" ' . $required . " />";
                         break;

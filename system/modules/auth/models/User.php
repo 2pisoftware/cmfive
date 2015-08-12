@@ -306,4 +306,8 @@ class User extends DbObject {
         $this->password = $this->encryptPassword($password);
     }
 
+	public static function generateSalt() {
+		return md5(uniqid(rand(), TRUE));
+	}
+	
 }
