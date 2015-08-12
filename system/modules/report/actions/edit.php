@@ -24,9 +24,19 @@ function edit_GET(Web &$w) {
         array("Title", "text", "title", $report->title),
         array("Module", "select", "module", $report->module, $w->Report->getModules()),
         array("Description", "textarea", "description", $report->description, "110", "2"),
-        array("Code", "textarea", "report_code", $report->report_code, "110", "22", "codemirror"),
+        //array("Code", "textarea", "report_code", $report->report_code, "110", "22", "codemirror"),
         array("Connection", "select", "report_connection_id", $report->report_connection_id, $w->Report->getConnections())
     );
+    
+    if (!empty($report)) {
+	    $sqlform = array(
+	    		array("", "hidden", "title", $report->title),
+	    		array("", "hidden", "module", $report->module),
+	    		array("", "hidden", "description", $report->description),
+	    		array("Code", "textarea", "report_code", $report->report_code, "110", "82", "codemirror"),
+	    		array("", "hidden", "report_connection_id", $report->report_connection_id, $w->Report->getConnections())
+	    );
+    }
 
     // DB view table
     $db_table = Html::form(array(
@@ -44,7 +54,9 @@ function edit_GET(Web &$w) {
     if (!empty($report->id)) {
     	$btnrun = Html::b("/report/runreport/" . $report->id, "Execute Report");
     	$w->ctx("btnrun", $btnrun);
-    }    
+    } else {
+    	$w->ctx("btnrun", "");
+    }
     
     // Check access rights
     // If user is editing, we need to check multiple things, detailed in the helper function
@@ -69,7 +81,8 @@ function edit_GET(Web &$w) {
     }
     
     $w->ctx("report_form", Html::form($form, $w->localUrl("/report/edit/{$report->id}"), "POST", "Save Report"));
-       
+    $w->ctx("sql_form", !empty($sqlform) ? Html::form($sqlform, $w->localUrl("/report/edit/{$report->id}"), "POST", "Save Report") : "");
+    
     if (!empty($report->id)) {
     	
     	// ============= Members tab ===================

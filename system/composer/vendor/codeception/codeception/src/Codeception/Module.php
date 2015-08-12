@@ -1,13 +1,17 @@
 <?php
-
 namespace Codeception;
 
-use Codeception\Util\Debug;
+use Codeception\Lib\ModuleContainer;
 use Codeception\Util\Shared\Asserts;
 
 abstract class Module
 {
     use Asserts;
+    
+    /**
+     * @var ModuleContainer
+     */
+    protected $moduleContainer;
 
     /**
      * By setting it to false module wan't inherit methods of parent class.
@@ -21,32 +25,34 @@ abstract class Module
      *
      * @var array
      */
-    public static $onlyActions = array();
+    public static $onlyActions = [];
 
     /**
      * Allows to explicitly exclude actions from module.
      *
      * @var array
      */
-    public static $excludeActions = array();
+    public static $excludeActions = [];
 
     /**
      * Allows to rename actions
      *
      * @var array
      */
-    public static $aliases = array();
+    public static $aliases = [];
 
-    protected $storage = array();
+    protected $storage = [];
 
-    protected $config = array();
+    protected $config = [];
 
-    protected $backupConfig = array();
+    protected $backupConfig = [];
 
-    protected $requiredFields = array();
+    protected $requiredFields = [];
 
-    public function __construct($config = null)
+    public function __construct(ModuleContainer $moduleContainer, $config = null)
     {
+        $this->moduleContainer = $moduleContainer;
+
         $this->backupConfig = $this->config;
         if (is_array($config)) {
             $this->_setConfig($config);
@@ -61,7 +67,7 @@ abstract class Module
 
     public function _reconfigure($config)
     {
-        $this->config =  array_merge($this->backupConfig, $config);
+        $this->config = array_merge($this->backupConfig, $config);
         $this->onReconfigure();
         $this->validateConfig();
     }
@@ -80,21 +86,23 @@ abstract class Module
     {
         $fields = array_keys($this->config);
         if (array_intersect($this->requiredFields, $fields) != $this->requiredFields) {
-            throw new Exception\ModuleConfig(
+            throw new Exception\ModuleConfigException(
                 get_class($this),
-                "\nOptions: " . implode(', ', $this->requiredFields) . " are required\n
-                Please, update the configuration and set all the required fields\n\n"
+                "\nOptions: " . implode(', ', $this->requiredFields) . " are required\n" .
+                "Please, update the configuration and set all the required fields\n\n"
             );
         }
     }
 
     public function _getName()
     {
-        $module = get_class($this);
-         if (preg_match('@\\\\([\w]+)$@', $module, $matches)) {
-             $module = $matches[1];
-         }
-         return $module;
+        $moduleName = '\\'.get_class($this);
+
+        if (strpos($moduleName, ModuleContainer::MODULE_NAMESPACE) === 0) {
+            return substr($moduleName, strlen(ModuleContainer::MODULE_NAMESPACE));
+        }
+
+        return $moduleName;
     }
 
     public function _hasRequiredFields()
@@ -113,7 +121,7 @@ abstract class Module
     }
 
     // HOOK: before each suite
-    public function _beforeSuite($settings = array())
+    public function _beforeSuite($settings = [])
     {
     }
 
@@ -149,7 +157,7 @@ abstract class Module
 
     protected function debug($message)
     {
-        Debug::debug($message);
+        codecept_debug($message);
     }
 
     protected function debugSection($title, $message)
@@ -162,21 +170,31 @@ abstract class Module
 
     protected function hasModule($name)
     {
-        return SuiteManager::hasModule($name);
+        return $this->moduleContainer->hasModule($name);
     }
 
     protected function getModules()
     {
-        return SuiteManager::$modules;
+        return $this->moduleContainer->all();
     }
 
     protected function getModule($name)
     {
         if (!$this->hasModule($name)) {
-            throw new Exception\Module(__CLASS__, "Module $name couldn't be connected");
+            throw new Exception\ModuleException(__CLASS__, "Module $name couldn't be connected");
         }
+        return $this->moduleContainer->getModule($name);
+    }
 
-        return SuiteManager::$modules[$name];
+    public function _getConfig($key = null)
+    {
+        if (!$key) {
+            return $this->config;
+        }
+        if (isset($this->config[$key])) {
+            return $this->config[$key];
+        }
+        return null;
     }
 
     protected function scalarizeArray($array)

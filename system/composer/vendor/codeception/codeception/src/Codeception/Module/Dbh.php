@@ -1,6 +1,11 @@
 <?php
 namespace Codeception\Module;
 
+use Codeception\Module as CodeceptionModule;
+use Codeception\Lib\Interfaces\Db as DbInterface;
+use Codeception\Exception\ModuleConfigException;
+use Codeception\TestCase;
+
 /**
  * This module replaces Db module for functional and unit testing, and requires PDO instance to be set.
  * By default it will cover all database queries into transaction and rollback it afterwards.
@@ -37,50 +42,59 @@ namespace Codeception\Module;
  *
  * ### Example
  *
- *     modules: 
+ *     modules:
  *        enabled: [Dbh]
  *        config:
  *           Dbh:
  *              cleanup: false
  *
  */
-
-class Dbh extends \Codeception\Module implements \Codeception\Lib\Interfaces\Db
+class Dbh extends CodeceptionModule implements DbInterface
 {
     public static $dbh;
 
-    public function _before(\Codeception\TestCase $test) {
+    public function _before(TestCase $test)
+    {
 
-        if (!self::$dbh) throw new \Codeception\Exception\ModuleConfig(__CLASS__,
-            "Transaction module requires PDO instance explicitly set.\n" .
-            "You can use your bootstrap file to assign the dbh:\n\n" .
-            '\Codeception\Module\Dbh::$dbh = $dbh');
+        if (!self::$dbh) {
+            throw new ModuleConfigException(
+                __CLASS__,
+                "Transaction module requires PDO instance explicitly set.\n"
+                . "You can use your bootstrap file to assign the dbh:\n\n"
+                . '\Codeception\Module\Dbh::$dbh = $dbh'
+            );
+        }
 
-        if(!self::$dbh->inTransaction()) {
+        if (!self::$dbh->inTransaction()) {
             self::$dbh->beginTransaction();
         }
     }
 
-    public function _after(\Codeception\TestCase $test) {
+    public function _after(TestCase $test)
+    {
 
-        if (!self::$dbh) throw new \Codeception\Exception\ModuleConfig(__CLASS__,
-            "Transaction module requires PDO instance explicitly set.\n" .
-            "You can use your bootstrap file to assign the dbh:\n\n" .
-            '\Codeception\Module\Dbh::$dbh = $dbh');
+        if (!self::$dbh) {
+            throw new ModuleConfigException(
+                __CLASS__,
+                "Transaction module requires PDO instance explicitly set.\n"
+                . "You can use your bootstrap file to assign the dbh:\n\n"
+                . '\Codeception\Module\Dbh::$dbh = $dbh'
+            );
+        }
 
-        if(self::$dbh->inTransaction()) {
-          self::$dbh->rollback();
+        if (self::$dbh->inTransaction()) {
+            self::$dbh->rollback();
         }
     }
 
-    public function seeInDatabase($table, $criteria = array())
+    public function seeInDatabase($table, $criteria = [])
     {
         $res = $this->proceedSeeInDatabase($table, "count(*)", $criteria);
         \PHPUnit_Framework_Assert::assertGreaterThan(0, $res);
     }
 
 
-    public function dontSeeInDatabase($table, $criteria = array())
+    public function dontSeeInDatabase($table, $criteria = [])
     {
         $res = $this->proceedSeeInDatabase($table, "count(*)", $criteria);
         \PHPUnit_Framework_Assert::assertLessThan(1, $res);
@@ -88,24 +102,23 @@ class Dbh extends \Codeception\Module implements \Codeception\Lib\Interfaces\Db
 
     protected function proceedSeeInDatabase($table, $column, $criteria)
     {
-        $query = "select %s from %s where %s";
-
-        $params = array();
+        $params = [];
         foreach ($criteria as $k => $v) {
             $params[] = "$k = ?";
         }
-        $params = implode('AND ',$params);
+        $sparams = implode('AND ', $params);
 
-        $query = sprintf($query, $column, $table, $params);
+        $query = sprintf('select %s from %s where %s', $column, $table, $sparams);
 
-        $this->debugSection('Query',$query, $params);
+        $this->debugSection('Query', $query, $sparams);
 
         $sth = self::$dbh->prepare($query);
         $sth->execute(array_values($criteria));
         return $sth->fetchColumn();
     }
 
-    public function grabFromDatabase($table, $column, $criteria = array()) {
+    public function grabFromDatabase($table, $column, $criteria = [])
+    {
         return $this->proceedSeeInDatabase($table, $column, $criteria);
     }
 }

@@ -13,6 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Remote;
+
+use Exception;
+use Facebook\WebDriver\Chrome\ChromeOptions;
+use Facebook\WebDriver\Firefox\FirefoxDriver;
+use Facebook\WebDriver\Firefox\FirefoxProfile;
+use Facebook\WebDriver\WebDriverCapabilities;
+use Facebook\WebDriver\WebDriverPlatform;
+
 class DesiredCapabilities implements WebDriverCapabilities {
 
   private $capabilities;

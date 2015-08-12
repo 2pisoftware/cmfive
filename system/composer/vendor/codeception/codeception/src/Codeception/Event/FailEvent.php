@@ -1,5 +1,4 @@
 <?php
-
 namespace Codeception\Event;
 
 class FailEvent extends TestEvent
@@ -16,8 +15,8 @@ class FailEvent extends TestEvent
 
     public function __construct(\PHPUnit_Framework_Test $test, \Exception $e, $count = 0)
     {
-        $this->test  = $test;
-        $this->fail  = $e;
+        $this->test = $test;
+        $this->fail = $e;
         $this->count = $count;
     }
 

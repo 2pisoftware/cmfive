@@ -7,43 +7,20 @@
 // Set titles, descriptions and additional form fields for each task type
 // Set flag to allow/disallow closed task to be reopened for each Task Group Type
 // This allows <module>.tasks.php file to be created under each module,
-// integrating Tasks with Flow modules and leveraging the existing functionality of modules
-// Such files are loaded by task.model.php-TaskService->_loadTaskFiles()
+// integrating Tasks with Cmfive modules and leveraging the existing functionality of modules
+// Such files are loaded by TaskService->_loadTaskFiles()
 ////////////////////////////////////////////////////
 ////		TaskGroupType						////
 ////////////////////////////////////////////////////
 
+/**
+ * A Todo task group.
+ * all properties are defined in the config.php
+ * 
+ * @author careck
+ *
+ */
 class TaskGroupType_TaskTodo extends TaskGroupType {
-
-    function getTaskGroupTypeDescription() {
-        return "This is a TODO list. Use this for assigning any work.";
-    }
-
-    function getTaskGroupTypeTitle() {
-        return "To Do";
-    }
-
-    function getTaskTypeArray() {
-        return array("Todo" => "To Do");
-    }
-
-    function getStatusArray() {
-        return array(array("New", false),
-            array("Assigned", false),
-            array("Wip", false),
-            array("Pending", false),
-            array("Done", true),
-            array("Rejected", true));
-    }
-
-    function getTaskPriorityArray() {
-        return array("Urgent", "Normal", "Nice to have");
-    }
-
-    function getCanTaskGroupReopen() {
-        return true;
-    }
-
 }
 
 ////////////////////////////////////////////////
@@ -62,44 +39,14 @@ class TaskType_Todo extends TaskType {
 
 }
 
+/**
+ * A Software Development task group.
+ * all properties are defined in the config.php
+ *
+ * @author careck
+ *
+ */
 class TaskGroupType_SoftwareDevelopment extends TaskGroupType {
-
-    function getTaskGroupTypeDescription() {
-        return "Use this for tracking software development tasks.";
-    }
-
-    function getTaskGroupTypeTitle() {
-        return "Software Development";
-    }
-
-    function getTaskTypeArray() {
-        return array(
-            "Todo" => "To Do",
-            "ProgrammingTicket" => "Ticket");
-    }
-
-    function getStatusArray() {
-        return array(array("Idea", false),
-            array("On Hold", false),
-            array("Backlog", false),
-            array("Todo", false),
-            array("WIP", false),
-            array("Testing", false),
-            array("Review", false),
-            array("Deploy", false),
-            array("Live", true),
-            array("Rejected", true),
-        );
-    }
-
-    function getTaskPriorityArray() {
-        return array("Critical", "Urgent", "Normal", "Low");
-    }
-
-    function getCanTaskGroupReopen() {
-        return true;
-    }
-
 }
 
 /**
@@ -161,13 +108,5 @@ class TaskType_ProgrammingTicket extends TaskType {
         }
     }
 
-    /**
-     * set the task title according to the module selected
-     * 
-     * @see TaskType::on_after_insert()
-     */
-    function on_after_insert(Task $task) {
-        
-    }
 
 }

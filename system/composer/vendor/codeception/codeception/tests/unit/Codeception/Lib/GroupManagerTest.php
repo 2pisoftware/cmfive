@@ -79,6 +79,9 @@ class GroupManagerTest extends \Codeception\TestCase\Test
 
 class DescriptiveTestCase extends \Codeception\TestCase implements Reported
 {
+    public function getEnvironment() {}
     public function getScenario() {}
     public function getReportFields() {}
+    public function _startTest() {}
+    public function _finishTest() {}
 }

@@ -1,11 +1,10 @@
 <?php
 namespace Codeception\Subscriber\Shared;
 
-trait StaticEvents {
-
+trait StaticEvents
+{
     static function getSubscribedEvents()
     {
         return static::$events;
     }
-
 }

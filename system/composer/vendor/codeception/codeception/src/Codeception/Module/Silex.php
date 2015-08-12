@@ -2,9 +2,10 @@
 namespace Codeception\Module;
 
 use Codeception\Configuration;
-use Codeception\Exception\ModuleConfig;
+use Codeception\Exception\ModuleConfigException;
+use Codeception\Lib\Framework;
 use Codeception\TestCase;
-use Codeception\Lib\InnerBrowser;
+use Symfony\Component\HttpKernel\Client;
 
 /**
  * Module for testing Silex applications like you would regularly do with Silex\WebTestCase.
@@ -39,15 +40,14 @@ use Codeception\Lib\InnerBrowser;
  * ### Example (`functional.suite.yml`)
  *
  *     modules:
- *        enabled: [Silex]
- *        config:
- *           Silex:
+ *        enabled:
+ *           - Silex:
  *              app: 'app/bootstrap.php'
  *
  * Class Silex
  * @package Codeception\Module
  */
-class Silex extends InnerBrowser
+class Silex extends Framework
 {
 
     protected $app;
@@ -55,14 +55,14 @@ class Silex extends InnerBrowser
 
     public function _initialize()
     {
-        if (!file_exists(Configuration::projectDir().$this->config['app'])) {
-            throw new ModuleConfig(__CLASS__, "Bootstrap file {$this->config['app']} not found");
+        if (!file_exists(Configuration::projectDir() . $this->config['app'])) {
+            throw new ModuleConfigException(__CLASS__, "Bootstrap file {$this->config['app']} not found");
         }
     }
 
     public function _before(TestCase $test)
     {
-        $this->app = require Configuration::projectDir().$this->config['app'];
+        $this->app = require Configuration::projectDir() . $this->config['app'];
 
         // if $app is not returned but exists
         if (isset($app)) {
@@ -70,13 +70,13 @@ class Silex extends InnerBrowser
         }
 
         if (!isset($this->app)) {
-            throw new ModuleConfig(__CLASS__, "\$app instance was not received from bootstrap file");
+            throw new ModuleConfigException(__CLASS__, "\$app instance was not received from bootstrap file");
         }
         // some silex apps (like bolt) may rely on global $app variable
         $GLOBALS['app'] = $this->app;
 
 
-        $this->client = new \Symfony\Component\HttpKernel\Client($this->app);
+        $this->client = new Client($this->app);
     }
 
     /**
@@ -96,5 +96,4 @@ class Silex extends InnerBrowser
     {
         return $this->app[$service];
     }
-
-} 
+}

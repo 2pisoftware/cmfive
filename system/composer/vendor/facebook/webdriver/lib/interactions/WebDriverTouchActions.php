@@ -13,6 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Interactions;
+
+use Facebook\WebDriver\Interactions\Touch\WebDriverTouchScreen;
+use Facebook\WebDriver\Interactions\Touch\WebDriverDoubleTapAction;
+use Facebook\WebDriver\Interactions\Touch\WebDriverFlickAction;
+use Facebook\WebDriver\Interactions\Touch\WebDriverFlickFromElementAction;
+use Facebook\WebDriver\Interactions\Touch\WebDriverLongPressAction;
+use Facebook\WebDriver\Interactions\Touch\WebDriverTapAction;
+use Facebook\WebDriver\Interactions\Touch\WebDriverScrollFromElementAction;
+use Facebook\WebDriver\Interactions\Touch\WebDriverDownAction;
+use Facebook\WebDriver\Interactions\Touch\WebDriverMoveAction;
+use Facebook\WebDriver\Interactions\Touch\WebDriverScrollAction;
+use Facebook\WebDriver\WebDriverUpAction;
+use Facebook\WebDriver\WebDriverElement;
+use Facebook\WebDriver\WebDriver;
+
 /**
  * WebDriver action builder for touch events
  */

@@ -1,6 +1,8 @@
 <?php
 namespace Codeception\Module;
 
+use Codeception\Module as CodeceptionModule;
+
 /**
  * Wrapper for basic shell commands and shell output
  *
@@ -11,7 +13,7 @@ namespace Codeception\Module;
  *
  * *Please review the code of non-stable modules and provide patches if you have issues.*
  */
-class Cli extends \Codeception\Module
+class Cli extends CodeceptionModule
 {
     public $output = '';
 
@@ -35,15 +37,18 @@ class Cli extends \Codeception\Module
      * @param $command
      * @param bool $failNonZero
      */
-    public function runShellCommand($command, $failNonZero = true) {
-        $data = array();
+    public function runShellCommand($command, $failNonZero = true)
+    {
+        $data = [];
         exec("$command", $data, $resultCode);
         $this->output = implode("\n", $data);
-        if ($this->output === null) \PHPUnit_Framework_Assert::fail("$command can't be executed");
-        if ($resultCode !== 0 && $failNonZero) {
-            \PHPUnit_Framework_Assert::fail("Result code was $resultCode.\n\n".$this->output);
+        if ($this->output === null) {
+            \PHPUnit_Framework_Assert::fail("$command can't be executed");
         }
-        $this->debug(preg_replace('~s/\e\[\d+(?>(;\d+)*)m//g~', '',$this->output));
+        if ($resultCode !== 0 && $failNonZero) {
+            \PHPUnit_Framework_Assert::fail("Result code was $resultCode.\n\n" . $this->output);
+        }
+        $this->debug(preg_replace('~s/\e\[\d+(?>(;\d+)*)m//g~', '', $this->output));
     }
 
     /**
@@ -51,7 +56,8 @@ class Cli extends \Codeception\Module
      *
      * @param $text
      */
-    public function seeInShellOutput($text) {
+    public function seeInShellOutput($text)
+    {
 
         \PHPUnit_Framework_Assert::assertContains($text, $this->output);
     }
@@ -62,7 +68,8 @@ class Cli extends \Codeception\Module
      * @param $text
      *
      */
-    public function dontSeeInShellOutput($text) {
+    public function dontSeeInShellOutput($text)
+    {
         $this->debug($this->output);
         \PHPUnit_Framework_Assert::assertNotContains($text, $this->output);
     }
@@ -71,5 +78,4 @@ class Cli extends \Codeception\Module
     {
         \PHPUnit_Framework_Assert::assertRegExp($regex, $this->output);
     }
-
 }

@@ -13,6 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Support\Events;
+
+use Facebook\WebDriver\Exception\WebDriverException;
+use Facebook\WebDriver\WebDriverDispatcher;
+use Facebook\WebDriver\WebDriverNavigation;
+
 class EventFiringWebDriverNavigation {
 
   /**

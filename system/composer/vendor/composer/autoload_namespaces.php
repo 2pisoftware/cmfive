@@ -19,9 +19,8 @@ return array(
     'Twig_' => array($vendorDir . '/twig/twig/lib'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log'),
     'Prophecy\\' => array($vendorDir . '/phpspec/prophecy/src'),
+    'PhantomInstaller\\' => array($vendorDir . '/jakoch/phantomjs-installer/src'),
     'Gaufrette' => array($vendorDir . '/knplabs/gaufrette/src'),
     'Dropbox' => array($vendorDir . '/dropbox-php/dropbox-php/src'),
-    'Doctrine\\Instantiator\\' => array($vendorDir . '/doctrine/instantiator/src'),
-    'Codeception' => array($vendorDir . '/codeception/codeception/src'),
     'Carbon' => array($vendorDir . '/nesbot/carbon/src'),
 );

@@ -3,7 +3,6 @@ namespace Codeception\Lib\Driver;
 
 class Db
 {
-
     /**
      * @var \PDO
      */
@@ -80,8 +79,8 @@ class Db
         $this->dbh = new \PDO($dsn, $user, $password);
         $this->dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
-        $this->dsn      = $dsn;
-        $this->user     = $user;
+        $this->dsn = $dsn;
+        $this->user = $user;
         $this->password = $password;
     }
 
@@ -107,13 +106,13 @@ class Db
 
     public function load($sql)
     {
-        $query           = '';
-        $delimiter       = ';';
+        $query = '';
+        $delimiter = ';';
         $delimiterLength = 1;
 
         foreach ($sql as $sqlLine) {
             if (preg_match('/DELIMITER ([\;\$\|\\\\]+)/i', $sqlLine, $match)) {
-                $delimiter       = $match[1];
+                $delimiter = $match[1];
                 $delimiterLength = strlen($delimiter);
                 continue;
             }
@@ -136,15 +135,15 @@ class Db
     public function insert($tableName, array &$data)
     {
         $columns = array_map(
-          [$this, 'getQuotedName'],
-          array_keys($data)
+            [$this, 'getQuotedName'],
+            array_keys($data)
         );
 
         return sprintf(
-          "INSERT INTO %s (%s) VALUES (%s)",
-          $this->getQuotedName($tableName),
-          implode(', ', $columns),
-          implode(', ', array_fill(0, count($data), '?'))
+            "INSERT INTO %s (%s) VALUES (%s)",
+            $this->getQuotedName($tableName),
+            implode(', ', $columns),
+            implode(', ', array_fill(0, count($data), '?'))
         );
     }
 
@@ -161,9 +160,9 @@ class Db
                 $params[] = "$k = ?";
             }
         }
-        $params = implode(' AND ', $params);
+        $sparams = implode(' AND ', $params);
 
-        return sprintf($query, $column, $table, $params);
+        return sprintf($query, $column, $table, $sparams);
     }
 
     public function deleteQuery($table, $id, $primaryKey = 'id')
@@ -184,17 +183,12 @@ class Db
 
     protected function sqlLine($sql)
     {
-        if (trim($sql) == "") {
-            return true;
-        }
-        if (trim($sql) == ";") {
-            return true;
-        }
-        if (preg_match('~^((--.*?)|(#))~s', $sql)) {
-            return true;
-        }
-
-        return false;
+        $sql = trim($sql);
+        return (
+            $sql === ''
+            || $sql === ';'
+            || preg_match('~^((--.*?)|(#))~s', $sql)
+        );
     }
 
     protected function sqlQuery($query)

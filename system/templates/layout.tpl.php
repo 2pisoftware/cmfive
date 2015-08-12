@@ -188,9 +188,11 @@
         <div class="row-fluid body">
             <?php // Body section w/ message and body from template ?>
             <div class="row-fluid <?php // if(!empty($boxes)) echo "medium-10 small-12 "; ?>">
+                <?php if (empty($hideTitle) && !empty ($title)):?>
                 <div class="row-fluid small-12">
-                    <h3 class="header"><?php echo !empty($title) ? $title : ucfirst($w->currentModule()); ?></h3>
+                    <h3 class="header"><?php echo $title; ?></h3>
                 </div>
+                <?php endif;?>
                 <?php if (!empty($error) || !empty($msg)) : ?>
                     <?php $type = !empty($error) ? array("name" => "error", "class" => "warning") : array("name" => "msg", "class" => "info"); ?>
                     <div data-alert class="alert-box <?php echo $type["class"]; ?>">
@@ -211,7 +213,7 @@
             </div>
         </div>
 
-        <div id="cmfive-modal" class="reveal-modal xlarge" data-reveal style="top: 30px !important;"></div>
+        <div id="cmfive-modal" class="reveal-modal xlarge" data-reveal></div>
         
         <script type="text/javascript" src="/system/templates/js/foundation-5.5.0/js/foundation.min.js"></script>
         <script type="text/javascript" src="/system/templates/js/foundation-5.5.0/js/foundation/foundation.clearing.js"></script>

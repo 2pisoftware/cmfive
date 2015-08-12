@@ -13,12 +13,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Interactions\Internal;
+
+use Facebook\WebDriver\WebDriverMouse;
+use Facebook\WebDriver\Internal\WebDriverLocatable;
+
 /**
  * Base class for all mouse-related actions.
  */
 class WebDriverMouseAction {
 
+  /**
+   * @var WebDriverMouse
+   */
   protected $mouse;
+
+  /**
+   * @var WebDriverLocatable
+   */
   protected $locationProvider;
 
   public function __construct(
@@ -34,9 +46,9 @@ class WebDriverMouseAction {
   protected function getActionLocation() {
     if ($this->locationProvider !== null) {
       return $this->locationProvider->getCoordinates();
-    } else {
-      return null;
     }
+
+    return null;
   }
 
   /**

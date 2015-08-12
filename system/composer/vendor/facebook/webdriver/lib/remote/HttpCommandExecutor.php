@@ -13,6 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Remote;
+
+use Facebook\WebDriver\Exception\WebDriverException;
+use Facebook\WebDriver\WebDriverCommandExecutor;
+use InvalidArgumentException;
+use BadMethodCallException;
+
 /**
  * Command executor talking to the standalone server via HTTP.
  */
@@ -110,10 +117,19 @@ class HttpCommandExecutor implements WebDriverCommandExecutor {
 
   /**
    * @param string $url
+   * @param string|null $http_proxy
+   * @param int|null $http_proxy_port
    */
-  public function __construct($url) {
+  public function __construct($url, $http_proxy = null, $http_proxy_port = null) {
     $this->url = $url;
     $this->curl = curl_init();
+
+    if (!empty($http_proxy)) {
+      curl_setopt($this->curl, CURLOPT_PROXY, $http_proxy);
+      if (!empty($http_proxy_port)) {
+        curl_setopt($this->curl, CURLOPT_PROXYPORT, $http_proxy_port);
+      }
+    }
 
     // Get credentials from $url (if any)
     $matches = null;
@@ -173,7 +189,10 @@ class HttpCommandExecutor implements WebDriverCommandExecutor {
 
   /**
    * @param WebDriverCommand $command
+   *
    * @return mixed
+   *
+   * @throws WebDriverException
    */
   public function execute(WebDriverCommand $command) {
     if (!isset(self::$commands[$command->getName()])) {
@@ -208,18 +227,18 @@ class HttpCommandExecutor implements WebDriverCommandExecutor {
     curl_setopt($this->curl, CURLOPT_URL, $this->url . $url);
 
     // https://github.com/facebook/php-webdriver/issues/173
-    switch ($command->getName()) {
-      case DriverCommand::NEW_SESSION:
-        curl_setopt($this->curl, CURLOPT_POST, 1);
-        break;
-      default:
-        curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $http_method);
+    if ($command->getName() === DriverCommand::NEW_SESSION) {
+      curl_setopt($this->curl, CURLOPT_POST, 1);
+    } else {
+      curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $http_method);
     }
 
     $encoded_params = null;
+
     if ($http_method === 'POST' && $params && is_array($params)) {
       $encoded_params = json_encode($params);
     }
+
     curl_setopt($this->curl, CURLOPT_POSTFIELDS, $encoded_params);
 
     $raw_results = trim(curl_exec($this->curl));

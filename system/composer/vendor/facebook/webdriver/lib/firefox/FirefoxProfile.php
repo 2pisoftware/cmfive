@@ -13,6 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Firefox;
+
+use Facebook\WebDriver\Exception\WebDriverException;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use ZipArchive;
+
 class FirefoxProfile {
 
   /**
@@ -120,7 +127,9 @@ class FirefoxProfile {
 
   /**
    * @param string $prefix Prefix of the temp directory.
+   *
    * @return string The path to the temp directory created.
+   * @throws WebDriverException
    */
   private function createTempDirectory($prefix = '') {
     $temp_dir = tempnam('', $prefix);
@@ -135,9 +144,11 @@ class FirefoxProfile {
   }
 
   /**
-   * @param string $xpi The path to the .xpi extension.
+   * @param string $xpi        The path to the .xpi extension.
    * @param string $target_dir The path to the unzip directory.
+   *
    * @return FirefoxProfile
+   * @throws \Exception
    */
   private function extractTo($xpi, $target_dir) {
     $zip = new ZipArchive();
@@ -145,7 +156,7 @@ class FirefoxProfile {
       $zip->extractTo($target_dir);
       $zip->close();
     } else {
-      throw new Exception("Failed to open the firefox extension. '$xpi'");
+      throw new \Exception("Failed to open the firefox extension. '$xpi'");
     }
     return $this;
   }

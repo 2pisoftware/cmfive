@@ -1,13 +1,14 @@
 <?php
-
 namespace Codeception\Module;
 
-use Codeception\Exception\Module as ModuleException;
+use Codeception\Module as CodeceptionModule;
+use Codeception\Exception\ModuleException as ModuleException;
+use Codeception\TestCase;
 use Exception;
-use PhpAmqpLib\Message\AMQPMessage;
-use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Channel\AMQPChannel;
-use PhpAmqpLib\Exception\AMQPChannelException;
+use PhpAmqpLib\Connection\AMQPConnection;
+use PhpAmqpLib\Message\AMQPMessage;
+use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 
 /**
  * This module interacts with message broker software that implements
@@ -38,9 +39,8 @@ use PhpAmqpLib\Exception\AMQPChannelException;
  * ### Example
  *
  *     modules:
- *         enabled: [AMQP]
- *         config:
- *             AMQP:
+ *         enabled:
+ *             - AMQP:
  *                 host: 'localhost'
  *                 port: '5672'
  *                 username: 'guest'
@@ -56,16 +56,16 @@ use PhpAmqpLib\Exception\AMQPChannelException;
  * @author tiger.seo@gmail.com
  * @author davert
  */
-class AMQP extends \Codeception\Module
+class AMQP extends CodeceptionModule
 {
-    protected $config = array(
-        'host' => 'locahost',
+    protected $config = [
+        'host'     => 'locahost',
         'username' => 'guest',
         'password' => 'guest',
-        'port' => '5672',
-        'vhost' => '/',
-        'cleanup' => true,
-    );
+        'port'     => '5672',
+        'vhost'    => '/',
+        'cleanup'  => true,
+    ];
 
     /**
      * @var AMQPConnection
@@ -77,7 +77,7 @@ class AMQP extends \Codeception\Module
      */
     protected $channel;
 
-    protected $requiredFields = array('host', 'username', 'password', 'vhost');
+    protected $requiredFields = ['host', 'username', 'password', 'vhost'];
 
     public function _initialize()
     {
@@ -89,12 +89,12 @@ class AMQP extends \Codeception\Module
 
         try {
             $this->connection = new AMQPConnection($host, $port, $username, $password, $vhost);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ModuleException(__CLASS__, $e->getMessage() . ' while establishing connection to MQ server');
         }
     }
 
-    public function _before(\Codeception\TestCase $test)
+    public function _before(TestCase $test)
     {
         if ($this->config['cleanup']) {
             $this->cleanup();
@@ -145,7 +145,7 @@ class AMQP extends \Codeception\Module
             : new AMQPMessage($message);
 
         $this->connection->channel()->queue_declare($queue);
-        $this->connection->channel()->basic_publish($message, '',$queue);
+        $this->connection->channel()->basic_publish($message, '', $queue);
     }
 
     /**
@@ -167,9 +167,13 @@ class AMQP extends \Codeception\Module
     public function seeMessageInQueueContainsText($queue, $text)
     {
         $msg = $this->connection->channel()->basic_get($queue);
-        if (!$msg) $this->fail("Message was not received");
-        if (!$msg instanceof AMQPMessage) $this->fail("Received message is not format of AMQPMessage");
-        $this->debugSection("Message",$msg->body);
+        if (!$msg) {
+            $this->fail("Message was not received");
+        }
+        if (!$msg instanceof AMQPMessage) {
+            $this->fail("Received message is not format of AMQPMessage");
+        }
+        $this->debugSection("Message", $msg->body);
         $this->assertContains($text, $msg->body);
     }
 
@@ -189,15 +193,17 @@ class AMQP extends \Codeception\Module
 
     protected function cleanup()
     {
-        if (! isset($this->config['queues'])) {
+        if (!isset($this->config['queues'])) {
             throw new ModuleException(__CLASS__, "please set queues for cleanup");
         }
-        if (!$this->connection) return;
+        if (!$this->connection) {
+            return;
+        }
         foreach ($this->config['queues'] as $queue) {
             try {
                 $this->connection->channel()->queue_purge($queue);
-            } catch (\PhpAmqpLib\Exception\AMQPProtocolChannelException $e) {
-                # ignore if exchange/queue doesn't exist and rethrow exception if it's something else
+            } catch (AMQPProtocolChannelException $e) {
+                // ignore if exchange/queue doesn't exist and rethrow exception if it's something else
                 if ($e->getCode() !== 404) {
                     throw $e;
                 }

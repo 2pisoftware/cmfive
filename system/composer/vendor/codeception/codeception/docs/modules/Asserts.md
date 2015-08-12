@@ -1,6 +1,4 @@
-# Asserts Module
 
-**For additional reference, please review the [source](https://github.com/Codeception/Codeception/tree/2.0/src/Codeception/Module/Asserts.php)**
 
 
 Special module for using asserts in your tests.
@@ -42,9 +40,25 @@ Checks that condition is negative.
  * `param string` $message
 
 
+### assertFileExists
+ 
+Checks if file exists
+ 
+ * `param string` $filename
+ * `param string` $message
+
+
+### assertFileNotExists
+ 
+Checks if file doesn't exists
+ 
+ * `param string` $filename
+ * `param string` $message
+
+
 ### assertGreaterThan
  
-Checks that expected is greater than actual
+Checks that actual is greater than expected
 
  * `param`        $expected
  * `param`        $actual
@@ -53,7 +67,7 @@ Checks that expected is greater than actual
 
 ### assertGreaterThanOrEqual
  
-Checks that expected is greater or equal than actual
+Checks that actual is greater or equal than expected
 
  * `param`        $expected
  * `param`        $actual
@@ -72,7 +86,7 @@ Checks that expected is greater or equal than actual
 
 ### assertLessThan
  
-Checks that expected is less than actual
+Checks that actual is less than expected
 
  * `param`        $expected
  * `param`        $actual
@@ -81,7 +95,7 @@ Checks that expected is less than actual
 
 ### assertLessThanOrEqual
  
-Checks that expected is less or equal than actual
+Checks that actual is less or equal than expected
 
  * `param`        $expected
  * `param`        $actual
@@ -122,6 +136,15 @@ Checks that variable is not NULL
  * `param string` $message
 
 
+### assertNotRegExp
+ 
+Checks that string not match with pattern
+
+ * `param string` $pattern
+ * `param string` $string
+ * `param string` $message
+
+
 ### assertNotSame
  
 Checks that two variables are not same
@@ -136,6 +159,15 @@ Checks that two variables are not same
 Checks that variable is NULL
 
  * `param`        $actual
+ * `param string` $message
+
+
+### assertRegExp
+ 
+Checks that string match with pattern
+
+ * `param string` $pattern
+ * `param string` $string
  * `param string` $message
 
 
@@ -163,4 +195,4 @@ Fails the test with message.
 
  * `param` $message
 
-<p>&nbsp;</p><div class="alert alert-warning">Module reference is taken from the source code. <a href="https://github.com/Codeception/Codeception/tree/2.0/src/Codeception/Module/Asserts.php">Help us to improve documentation. Edit module reference</a></div>
+<p>&nbsp;</p><div class="alert alert-warning">Module reference is taken from the source code. <a href="https://github.com/Codeception/Codeception/tree/2.1/src/Codeception/Module/Asserts.php">Help us to improve documentation. Edit module reference</a></div>

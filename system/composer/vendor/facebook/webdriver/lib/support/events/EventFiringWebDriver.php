@@ -13,6 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Support\Events;
+
+use Facebook\WebDriver\Exception\UnsupportedOperationException;
+use Facebook\WebDriver\Exception\WebDriverException;
+use Facebook\WebDriver\Interactions\Touch\WebDriverTouchScreen;
+use Facebook\WebDriver\JavaScriptExecutor;
+use Facebook\WebDriver\WebDriver;
+use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverDispatcher;
+use Facebook\WebDriver\WebDriverElement;
+use Facebook\WebDriver\WebDriverOptions;
+use Facebook\WebDriver\WebDriverTargetLocator;
+use Facebook\WebDriver\WebDriverWait;
+
 class EventFiringWebDriver implements WebDriver, JavaScriptExecutor {
 
   /**

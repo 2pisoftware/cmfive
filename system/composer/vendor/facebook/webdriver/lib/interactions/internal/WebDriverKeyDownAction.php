@@ -13,6 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Interactions\Internal;
+
+use Facebook\WebDriver\WebDriverAction;
+
 class WebDriverKeyDownAction
     extends WebDriverSingleKeyAction
     implements WebDriverAction {

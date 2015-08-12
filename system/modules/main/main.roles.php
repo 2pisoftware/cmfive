@@ -13,6 +13,3 @@ function role_user_allowed(Web $w,$path) {
     $allowed = in_array($module,$include);
     return $allowed;
 }
-
-
-?>

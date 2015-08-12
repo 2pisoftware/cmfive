@@ -356,7 +356,7 @@ class Task extends DbObject {
                 $tg_type->on_before_insert($this);
             }
 
-            // 2. Call on_before_update of the Tasktype
+            // 2. Call on_before_insert of the Tasktype
 
             if ($this->task_type) {
                 $this->getTaskTypeObject()->on_before_insert($this);
@@ -387,7 +387,7 @@ class Task extends DbObject {
                 $this->getTaskTypeObject()->on_after_insert($this);
             }
 
-            // 5. Call on_after_update of the TaskGroupType
+            // 5. Call on_after_insert of the TaskGroupType
 
             if (!empty($tg_type)) {
                 $tg_type->on_after_insert($this);
@@ -406,6 +406,12 @@ class Task extends DbObject {
      */
     function update($force = false, $force_validation = false) {
 
+    	// 0. set the is_closed flag to make sure the task can be queried easily
+    	
+    	if ($this->isStatusClosed()) {
+    		$this->is_closed = 1;
+    	}
+    	
         try {
             $this->startTransaction();
 
@@ -500,4 +506,31 @@ class Task extends DbObject {
         return $this->Task->getTaskGroup($this->task_group_id);
     }
 
+    function getIcal() {
+        if (empty($this->id) || empty($this->dt_due)) {
+            return null;
+        }
+        
+        $date = date("Ymd", strtotime(str_replace('/', '-', $this->dt_due)));
+
+        // Borrowed from here http://stackoverflow.com/questions/1463480/how-can-i-use-php-to-dynamically-publish-an-ical-file-to-be-read-by-google-calen
+        $ical = "BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//hacksw/handcal//NONSGML v1.0//EN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:" . md5(uniqid(mt_rand(), true)) . "@2pisoftware.com
+DTSTAMP:" . gmdate('Ymd').'T'. gmdate('His') . "Z
+DTSTART;VALUE=DATE:" . $date . "
+DTEND;VALUE=DATE:" . $date . "
+SUMMARY:" . $this->title . "
+DESCRIPTION:" . htmlentities($this->description) . "
+SEQUENCE:0
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR";
+        
+        return $ical;
+    }
+    
 }

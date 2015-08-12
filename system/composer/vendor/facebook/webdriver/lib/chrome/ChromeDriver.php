@@ -13,6 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Chrome;
+
+use Facebook\WebDriver\Remote\DesiredCapabilities;
+use Facebook\WebDriver\Remote\DriverCommand;
+use Facebook\WebDriver\Remote\Service\DriverCommandExecutor;
+use Facebook\WebDriver\Exception\WebDriverException;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\Remote\WebDriverCommand;
+
 class ChromeDriver extends RemoteWebDriver {
 
   public static function start(
@@ -45,10 +54,14 @@ class ChromeDriver extends RemoteWebDriver {
   }
 
   /**
-   * @param string $url The url of the remote server
+   * Always throws an exception. Use ChromeDriver::start() instead.
+   *
+   * @param string              $url                  The url of the remote server
    * @param DesiredCapabilities $desired_capabilities The desired capabilities
-   * @param int|null $connection_timeout_in_ms
-   * @param int|null $request_timeout_in_ms
+   * @param int|null            $timeout_in_ms
+   * @param int|null            $request_timeout_in_ms
+   *
+   * @throws WebDriverException
    */
   public static function create(
     $url = 'http://localhost:4444/wd/hub',
@@ -59,6 +72,14 @@ class ChromeDriver extends RemoteWebDriver {
     throw new WebDriverException('Please use ChromeDriver::start() instead.');
   }
 
+  /**
+   * Always throws an exception. Use ChromeDriver::start() instead.
+   *
+   * @param string $session_id The existing session id
+   * @param string $url        The url of the remote server
+   *
+   * @throws WebDriverException
+   */
   public static function createBySessionID(
     $session_id,
     $url = 'http://localhost:4444/wd/hub'

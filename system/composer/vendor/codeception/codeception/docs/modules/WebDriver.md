@@ -1,6 +1,4 @@
-# WebDriver Module
 
-**For additional reference, please review the [source](https://github.com/Codeception/Codeception/tree/2.0/src/Codeception/Module/WebDriver.php)**
 
 
 New generation Selenium WebDriver module.
@@ -39,22 +37,21 @@ It allows you to run Selenium tests on a server without a GUI installed.
 * clear_cookies - Set to false to keep cookies, or set to true (default) to delete all cookies between tests.
 * wait - Implicit wait (default 0 seconds).
 * capabilities - Sets Selenium2 [desired capabilities](http://code.google.com/p/selenium/wiki/DesiredCapabilities). Should be a key-value array.
+* connection_timeout - timeout for opening a connection to remote selenium server (30 seconds by default).
+* request_timeout - timeout for a request to return something from remote selenium server (30 seconds by default).
 
 ### Example (`acceptance.suite.yml`)
 
     modules:
-       enabled: [WebDriver]
-       config:
-          WebDriver:
+       enabled:
+          - WebDriver:
              url: 'http://localhost/'
              browser: firefox
              window_size: 1024x768
              wait: 10
              capabilities:
                  unexpectedAlertBehaviour: 'accept'
-                 firefox_profile: '/Users/paul/Library/Application Support/Firefox/Profiles/codeception-profile.zip.b64' 
-
-
+                 firefox_profile: '/Users/paul/Library/Application Support/Firefox/Profiles/codeception-profile.zip.b64'
 ## Locating Elements
 
 Most methods in this module that operate on a DOM element (e.g. `click`) accept a locator as the first argument, which can be either a string or an array.
@@ -79,12 +76,77 @@ If you prefer, you may also pass a string for the locator. This is called a "fuz
 
 Be warned that fuzzy locators can be significantly slower than strict locators. If speed is a concern, it's recommended you stick with explicitly specifying the locator type via the array syntax.
 
-## Migration Guide (Selenium2 -> WebDriver)
+## Public Properties
 
-* `wait` method accepts seconds instead of milliseconds. All waits use second as parameter.
+* `webDriver` - instance of `\Facebook\WebDriver\Remote\RemoteWebDriver`. Can be accessed from Helper classes for complex WebDriver interactions.
+
+```php
+// inside Helper class
+$this->getModule('WebDriver')->webDriver->getKeyboard()->sendKeys('hello, webdriver');
+```
+
+## Methods
 
 
-# Methods
+### _findElements
+
+*hidden API method, expected to be used from Helper classes*
+ 
+Locates element using available Codeception locator types:
+
+* XPath
+* CSS
+* Strict Locator
+
+Use it in Helpers or GroupObject or Extension classes:
+
+```php
+$els = $this->getModule('WebDriver')->_findElements('.items');
+$els = $this->getModule('WebDriver')->_findElements(['name' => 'username']);
+```
+
+WebDriver module returns `Facebook\WebDriver\Remote\RemoteWebElement` instances
+PhpBrowser and Framework modules return `Symfony\Component\DomCrawler\Crawler` instances
+
+ * `param` $locator
+ * `return` array of interactive elements
+
+
+### _getCurrentUri
+
+*hidden API method, expected to be used from Helper classes*
+ 
+Uri of currently opened page.
+@return string
+
+
+
+### _getUrl
+
+*hidden API method, expected to be used from Helper classes*
+ 
+Returns URL of a host.
+
+
+
+### _savePageSource
+
+*hidden API method, expected to be used from Helper classes*
+ 
+Saves HTML source of a page to a file
+ * `param` $filename
+
+
+### _saveScreenshot
+
+*hidden API method, expected to be used from Helper classes*
+ 
+Saves screenshot of current page to a file
+
+```php
+$this->getModule('WebDriver')->_saveScreenshot(codecept_output_dir().'screenshot_1.png');
+```
+ * `param` $filename
 
 
 ### acceptPopup
@@ -156,7 +218,7 @@ $I->appendField('#myTextField', 'appended');
 
  * `param string` $field
  * `param string` $value
- \Codeception\Exception\ElementNotFound
+
 
 
 ### attachFile
@@ -230,7 +292,7 @@ $I->click(['link' => 'Login']);
 Performs contextual click with the right mouse button on an element.
 
  * `param` $cssOrXPath
- \Codeception\Exception\ElementNotFound
+
 
 
 ### dontSee
@@ -455,7 +517,7 @@ $I->dontSeeOptionIsSelected('#form input[name=payment]', 'Visa');
 Performs a double-click on an element matched by CSS or XPath.
 
  * `param` $cssOrXPath
- \Codeception\Exception\ElementNotFound
+
 
 
 ### dragAndDrop
@@ -478,7 +540,7 @@ Low-level API method.
 If Codeception commands are not enough, this allows you to use Selenium WebDriver methods directly:
 
 ``` php
-$I->executeInSelenium(function(\WebDriver $webdriver) {
+$I->executeInSelenium(function(\Facebook\WebDriver\RemoteWebDriver $webdriver) {
   $webdriver->get('http://google.com');
 });
 ```
@@ -524,7 +586,7 @@ $I->fillField(['name' => 'email'], 'jon@mail.com');
  
 Grabs all visible text from the current page.
 
-@return string
+ * `return` string
 
 
 ### grabAttributeFrom
@@ -571,6 +633,10 @@ $uri = $I->grabFromCurrentUrl();
  * `internal param` $url
 
 
+### grabMultiple
+__not documented__
+
+
 ### grabTextFrom
  
 Finds and returns the text contents of the given element.
@@ -604,6 +670,14 @@ $name = $I->grabValueFrom(['name' => 'username']);
 
  * `param` $field
 
+
+
+### loadSessionSnapshot
+ 
+Loads cookies from saved snapshot.
+
+ * `param` $name
+@see saveSessionSnapshot
 
 
 ### makeScreenshot
@@ -652,7 +726,7 @@ $I->moveMouseOver(['css' => '.checkout'], 20, 50);
  * `param int` $offsetX
  * `param int` $offsetY
 
- \Codeception\Exception\ElementNotFound
+
 
 
 ### pauseExecution
@@ -665,10 +739,10 @@ This method is useful while writing tests, since it allows you to inspect the cu
 
 ### pressKey
  
-Presses the given key on the given element. 
-To specify a character and modifier (e.g. ctrl, alt, shift, meta), pass an array for $char with 
+Presses the given key on the given element.
+To specify a character and modifier (e.g. ctrl, alt, shift, meta), pass an array for $char with
 the modifier as the first element and the character as the second.
-For special keys use key constants from \WebDriverKeys class.
+For special keys use key constants from WebDriverKeys class.
 
 ``` php
 <?php
@@ -677,13 +751,13 @@ $I->pressKey('#page','a'); // => olda
 $I->pressKey('#page',array('ctrl','a'),'new'); //=> new
 $I->pressKey('#page',array('shift','111'),'1','x'); //=> old!!!1x
 $I->pressKey('descendant-or-self::*[@id='page']','u'); //=> oldu
-$I->pressKey('#name', array('ctrl', 'a'), WebDriverKeys::DELETE); //=>''
+$I->pressKey('#name', array('ctrl', 'a'), \Facebook\WebDriver\WebDriverKeys::DELETE); //=>''
 ?>
 ```
 
  * `param` $element
  * `param` $char Can be char or array with modifier. You can provide several chars.
- \Codeception\Exception\ElementNotFound
+
 
 
 ### reloadPage
@@ -713,6 +787,37 @@ $I->resizeWindow(800, 600);
 
  * `param int` $width
  * `param int` $height
+
+
+### saveSessionSnapshot
+ 
+Saves current cookies into named snapshot in order to restore them in other tests
+This is useful to save session state between tests.
+For example, if user needs log in to site for each test this scenario can be executed once
+while other tests can just restore saved cookies.
+
+``` php
+<?php
+// inside AcceptanceTester class:
+
+public function login()
+{
+     // if snapshot exists - skipping login
+     if ($I->loadSessionSnapshot('login')) return;
+
+     // logging in
+     $I->amOnPage('/login');
+     $I->fillField('name', 'jon');
+     $I->fillField('password', '123345');
+     $I->click('Login');
+
+     // saving snapshot
+     $I->saveSessionSnapshot('login');
+}
+?>
+```
+
+ * `param` $name
 
 
 ### see
@@ -844,7 +949,7 @@ $I->seeInCurrentUrl('/users/');
 
 ### seeInField
  
-Checks that the given input field or textarea contains the given value. 
+Checks that the given input field or textarea contains the given value.
 For fuzzy locators, fields are matched by label text, the "name" attribute, CSS, and XPath.
 
 ``` php
@@ -985,9 +1090,9 @@ $I->seeNumberOfElements('tr', [0,10]); //between 0 and 10 elements
 ?>
 ```
  * `param` $selector
- * `param mixed` $expected:
+ * `param mixed` $expected :
 - string: strict number
-- array: range of numbers [0,10]  
+- array: range of numbers [0,10]
 
 
 ### seeOptionIsSelected
@@ -1043,15 +1148,14 @@ $I->setCookie('PHPSESSID', 'el4ukv0kqbvoirg7nkp4dncpk3');
  * `param` $name
  * `param` $val
  * `param array` $params
- * `internal param` $cookie
- * `internal param` $value
 
 
 
 ### submitForm
  
-Submits the given form on the page, optionally with the given form values.
-Give the form fields values as an array. Note that hidden fields can't be accessed.
+Submits the given form on the page, optionally with the given form
+values.  Give the form fields values as an array. Note that hidden fields
+can't be accessed.
 
 Skipped fields will be filled by their values from the page.
 You don't need to click the 'Submit' button afterwards.
@@ -1066,9 +1170,15 @@ Examples:
 
 ``` php
 <?php
-$I->submitForm('#login', array('login' => 'davert', 'password' => '123456'));
+$I->submitForm('#login', [
+    'login' => 'davert',
+    'password' => '123456'
+]);
 // or
-$I->submitForm('#login', array('login' => 'davert', 'password' => '123456'), 'submitButtonName');
+$I->submitForm('#login', [
+    'login' => 'davert',
+    'password' => '123456'
+], 'submitButtonName');
 
 ```
 
@@ -1076,10 +1186,17 @@ For example, given this sample "Sign Up" form:
 
 ``` html
 <form action="/sign_up">
-    Login: <input type="text" name="user[login]" /><br/>
-    Password: <input type="password" name="user[password]" /><br/>
-    Do you agree to out terms? <input type="checkbox" name="user[agree]" /><br/>
-    Select pricing plan <select name="plan"><option value="1">Free</option><option value="2" selected="selected">Paid</option></select>
+    Login:
+    <input type="text" name="user[login]" /><br/>
+    Password:
+    <input type="password" name="user[password]" /><br/>
+    Do you agree to our terms?
+    <input type="checkbox" name="user[agree]" /><br/>
+    Select pricing plan:
+    <select name="plan">
+        <option value="1">Free</option>
+        <option value="2" selected="selected">Paid</option>
+    </select>
     <input type="submit" name="submitButton" value="Submit" />
 </form>
 ```
@@ -1088,19 +1205,90 @@ You could write the following to submit it:
 
 ``` php
 <?php
-$I->submitForm('#userForm', array('user' => array('login' => 'Davert', 'password' => '123456', 'agree' => true)), 'submitButton');
-
+$I->submitForm(
+    '#userForm',
+    [
+        'user[login]' => 'Davert',
+        'user[password]' => '123456',
+        'user[agree]' => true
+    ],
+    'submitButton'
+);
 ```
-Note that "2" will be the submitted value for the "plan" field, as it is the selected option.
+Note that "2" will be the submitted value for the "plan" field, as it is
+the selected option.
 
-You can also emulate a JavaScript submission by not specifying any buttons in the third parameter to submitForm.
+Also note that this differs from PhpBrowser, in that
+```'user' => [ 'login' => 'Davert' ]``` is not supported at the moment.
+Named array keys *must* be included in the name as above.
+
+Pair this with seeInFormFields for quick testing magic.
+
+``` php
+<?php
+$form = [
+     'field1' => 'value',
+     'field2' => 'another value',
+     'checkbox1' => true,
+     // ...
+];
+$I->submitForm('//form[@id=my-form]', $form, 'submitButton');
+// $I->amOnPage('/path/to/form-page') may be needed
+$I->seeInFormFields('//form[@id=my-form]', $form);
+?>
+```
+
+Parameter values must be set to arrays for multiple input fields
+of the same name, or multi-select combo boxes.  For checkboxes,
+either the string value can be used, or boolean values which will
+be replaced by the checkbox's value in the DOM.
+
+``` php
+<?php
+$I->submitForm('#my-form', [
+     'field1' => 'value',
+     'checkbox' => [
+         'value of first checkbox',
+         'value of second checkbox,
+     ],
+     'otherCheckboxes' => [
+         true,
+         false,
+         false
+     ],
+     'multiselect' => [
+         'first option value',
+         'second option value'
+     ]
+]);
+?>
+```
+
+Mixing string and boolean values for a checkbox's value is not supported
+and may produce unexpected results.
+
+Field names ending in "[]" must be passed without the trailing square 
+bracket characters, and must contain an array for its value.  This allows
+submitting multiple values with the same name, consider:
 
 ```php
-<?php
-$I->submitForm('#userForm', array('user' => array('login' => 'Davert', 'password' => '123456', 'agree' => true)));
-
+$I->submitForm('#my-form', [
+    'field[]' => 'value',
+    'field[]' => 'another value', // 'field[]' is already a defined key
+]);
 ```
 
+The solution is to pass an array value:
+
+```php
+// this way both values are submitted
+$I->submitForm('#my-form', [
+    'field' => [
+        'value',
+        'another value',
+    ]
+]);
+```
  * `param` $selector
  * `param` $params
  * `param` $button
@@ -1153,7 +1341,7 @@ If the window has no name, the only way to access it is via the `executeInSeleni
 
 ``` php
 <?php
-$I->executeInSelenium(function (\Webdriver $webdriver) {
+$I->executeInSelenium(function (\Facebook\WebDriver\RemoteWebDriver $webdriver) {
      $handles=$webdriver->getWindowHandles();
      $last_window = end($handles);
      $webdriver->switchTo()->window($last_window);
@@ -1193,7 +1381,7 @@ __not documented__
 Wait for $timeout seconds.
 
  * `param int` $timeout secs
- \Codeception\Exception\TestRuntime
+
 
 
 ### waitForElement
@@ -1210,7 +1398,7 @@ $I->click('#agree_button');
 
  * `param` $element
  * `param int` $timeout seconds
- \Exception
+
 
 
 ### waitForElementChange
@@ -1220,7 +1408,8 @@ Element "change" is determined by a callback function which is called repeatedly
 
 ``` php
 <?php
-$I->waitForElementChange('#menu', function(\WebDriverElement $el) {
+use \Facebook\WebDriver\WebDriverElement
+$I->waitForElementChange('#menu', function(WebDriverElement $el) {
     return $el->isDisplayed();
 }, 100);
 ?>
@@ -1229,7 +1418,7 @@ $I->waitForElementChange('#menu', function(\WebDriverElement $el) {
  * `param` $element
  * `param \Closure` $callback
  * `param int` $timeout seconds
- \Codeception\Exception\ElementNotFound
+
 
 
 ### waitForElementNotVisible
@@ -1245,7 +1434,7 @@ $I->waitForElementNotVisible('#agree_button', 30); // secs
 
  * `param` $element
  * `param int` $timeout seconds
- \Exception
+
 
 
 ### waitForElementVisible
@@ -1262,7 +1451,7 @@ $I->click('#agree_button');
 
  * `param` $element
  * `param int` $timeout seconds
- \Exception
+
 
 
 ### waitForJS
@@ -1297,6 +1486,6 @@ $I->waitForText('foo', 30, '.title'); // secs
  * `param string` $text
  * `param int` $timeout seconds
  * `param null` $selector
- \Exception
 
-<p>&nbsp;</p><div class="alert alert-warning">Module reference is taken from the source code. <a href="https://github.com/Codeception/Codeception/tree/2.0/src/Codeception/Module/WebDriver.php">Help us to improve documentation. Edit module reference</a></div>
+
+<p>&nbsp;</p><div class="alert alert-warning">Module reference is taken from the source code. <a href="https://github.com/Codeception/Codeception/tree/2.1/src/Codeception/Module/WebDriver.php">Help us to improve documentation. Edit module reference</a></div>

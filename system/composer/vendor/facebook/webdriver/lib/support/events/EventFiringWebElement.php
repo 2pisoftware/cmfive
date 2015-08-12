@@ -13,6 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Support\Events;
+
+use Facebook\WebDriver\Exception\WebDriverException;
+use Facebook\WebDriver\Interactions\Internal\WebDriverCoordinates;
+use Facebook\WebDriver\Internal\WebDriverLocatable;
+use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverDimension;
+use Facebook\WebDriver\WebDriverDispatcher;
+use Facebook\WebDriver\WebDriverElement;
+use Facebook\WebDriver\WebDriverPoint;
+
 class EventFiringWebElement implements WebDriverElement, WebDriverLocatable {
 
   /**

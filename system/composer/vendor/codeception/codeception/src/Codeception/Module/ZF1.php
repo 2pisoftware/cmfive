@@ -1,13 +1,19 @@
 <?php
 namespace Codeception\Module;
 
+use Codeception\Configuration;
+use Codeception\Lib\Framework;
+use Codeception\TestCase;
+use Codeception\Exception\ModuleException;
+use Codeception\Lib\Connector\ZF1 as ZF1Connector;
+
 /**
  * This module allows you to run tests inside Zend Framework.
  * It acts just like ControllerTestCase, but with usage of Codeception syntax.
  *
  * It assumes, you have standard structure with __APPLICATION_PATH__ set to './application'
  * and LIBRARY_PATH set to './library'. If it's not then set the appropriate path in the Config.
- * 
+ *
  * [Tutorial](http://codeception.com/01-27-2012/bdd-with-zend-framework.html)
  *
  * ## Status
@@ -57,12 +63,14 @@ namespace Codeception\Module;
  * This will make your functional tests run super-fast.
  *
  */
-use Codeception\Configuration as Configuration;
-
-class ZF1 extends \Codeception\Lib\Framework
+class ZF1 extends Framework
 {
-    protected $config = array('env' => 'testing', 'config' => 'application/configs/application.ini',
-        'app_path' => 'application', 'lib_path' => 'library');
+    protected $config = [
+        'env' => 'testing',
+        'config' => 'application/configs/application.ini',
+        'app_path' => 'application',
+        'lib_path' => 'library'
+    ];
 
     /**
      * @var \Zend_Application
@@ -82,28 +90,34 @@ class ZF1 extends \Codeception\Lib\Framework
     protected $queries = 0;
     protected $time = 0;
 
-    public function _initialize() {
+    public function _initialize()
+    {
         defined('APPLICATION_ENV') || define('APPLICATION_ENV', $this->config['env']);
         defined('APPLICATION_PATH') || define('APPLICATION_PATH', Configuration::projectDir() . $this->config['app_path']);
         defined('LIBRARY_PATH') || define('LIBRARY_PATH', Configuration::projectDir() . $this->config['lib_path']);
 
         // Ensure library/ is on include_path
-        set_include_path(implode(PATH_SEPARATOR, array(
-            LIBRARY_PATH,
-            get_include_path(),
-        )));
+        set_include_path(
+            implode(
+                PATH_SEPARATOR, [
+                    LIBRARY_PATH,
+                    get_include_path(),
+                ]
+            )
+        );
 
         require_once 'Zend/Loader/Autoloader.php';
         \Zend_Loader_Autoloader::getInstance();
-        $this->client = new \Codeception\Lib\Connector\ZF1();
+        $this->client = new ZF1Connector();
     }
 
-    public function _before(\Codeception\TestCase $test) {
+    public function _before(TestCase $test)
+    {
         \Zend_Session::$_unitTestEnabled = true;
         try {
             $this->bootstrap = new \Zend_Application($this->config['env'], Configuration::projectDir() . $this->config['config']);
         } catch (\Exception $e) {
-            throw new \Codeception\Exception\Module(__CLASS__, $e->getMessage());
+            throw new ModuleException(__CLASS__, $e->getMessage());
         }
         $this->bootstrap->bootstrap();
         $this->client->setBootstrap($this->bootstrap);
@@ -116,11 +130,12 @@ class ZF1 extends \Codeception\Lib\Framework
         }
     }
 
-    public function _after(\Codeception\TestCase $test) {
-        $_SESSION = array();
-        $_GET     = array();
-        $_POST    = array();
-        $_COOKIE  = array();
+    public function _after(TestCase $test)
+    {
+        $_SESSION = [];
+        $_GET = [];
+        $_POST = [];
+        $_COOKIE = [];
         if ($this->bootstrap) {
             $fc = $this->bootstrap->getBootstrap()->getResource('frontcontroller');
             if ($fc) {
@@ -141,16 +156,15 @@ class ZF1 extends \Codeception\Lib\Framework
 //            $this->client->getzendrequest()->getcontrollername(),
 //            $this->client->getzendrequest()->getactionname()
 //        ));
-        $this->debugSection('Session',json_encode($_COOKIE));
+        $this->debugSection('Session', json_encode($_COOKIE));
         if ($this->db) {
             $profiler = $this->db->getProfiler();
             $queries = $profiler->getTotalNumQueries() - $this->queries;
             $time = $profiler->getTotalElapsedSecs() - $this->time;
-            $this->debugSection('Db',$queries.' queries');
-            $this->debugSection('Time',round($time,2).' secs taken');
+            $this->debugSection('Db', $queries . ' queries');
+            $this->debugSection('Time', round($time, 2) . ' secs taken');
             $this->time = $profiler->getTotalElapsedSecs();
             $this->queries = $profiler->getTotalNumQueries();
         }
     }
-
 }

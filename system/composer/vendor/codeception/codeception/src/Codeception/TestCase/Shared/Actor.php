@@ -2,15 +2,17 @@
 namespace Codeception\TestCase\Shared;
 
 use Codeception\Event\StepEvent;
+use Codeception\Event\TestEvent;
 use Codeception\Events;
 use Codeception\Exception\ConditionalAssertionFailed;
-use Codeception\Step;
-use Codeception\Scenario;
+use Codeception\Exception\ConfigurationException;
+use Codeception\Lib\Di;
+use Codeception\Lib\ModuleContainer;
 use Codeception\Lib\Parser;
-use Codeception\Exception\Configuration as ConfigurationException;
+use Codeception\Scenario;
+use Codeception\Step;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-
 
 trait Actor
 {
@@ -18,6 +20,17 @@ trait Actor
      * @var EventDispatcher
      */
     protected $dispatcher;
+
+    /**
+     * @var ModuleContainer
+     */
+    protected $moduleContainer;
+
+    /**
+     * @var Di
+     */
+    protected $di;
+
     protected $actor;
     protected $testName;
     protected $testFile;
@@ -33,11 +46,22 @@ trait Actor
      */
     protected $parser;
 
+    /**
+     * @var \PHPUnit_Framework_TestResult
+     */
+    protected $testResult;
+
 
     public function initConfig()
     {
-        $this->scenario  = new Scenario($this);
-        $this->parser    = new Parser($this->scenario);
+        $this->scenario = new Scenario(
+            $this, [
+            'env'     => $this->env,
+            'modules' => $this->moduleContainer->all(),
+            'name'    => $this->testName
+        ]
+        );
+        $this->parser = new Parser($this->scenario);
         return $this;
     }
 
@@ -57,17 +81,24 @@ trait Actor
         return $this->scenario;
     }
 
-    protected $trace = [];
+    /**
+     * @return \PHPUnit_Framework_TestResult
+     */
+    abstract public function getTestResultObject();
+
+    public function prepareActorForTest()
+    {
+        $this->testResult = $this->getTestResultObject();
+    }
 
     public function runStep(Step $step)
     {
-        $this->trace[] = $step;
+        $result = null;
         $this->fire(Events::STEP_BEFORE, new StepEvent($this, $step));
         try {
-            $result = $step->run();
+            $result = $step->run($this->moduleContainer);
         } catch (ConditionalAssertionFailed $f) {
-            $result = $this->getTestResultObject();
-            $result->addFailure(clone($this), $f, $result->time());
+            $this->testResult->addFailure(clone($this), $f, $this->testResult->time());
         } catch (\Exception $e) {
             $this->fire(Events::STEP_AFTER, new StepEvent($this, $step));
             throw $e;
@@ -79,11 +110,6 @@ trait Actor
     public function getFeature()
     {
         return $this->scenario->getFeature();
-    }
-
-    public function getTrace()
-    {
-        return $this->trace;
     }
 
     public function configActor($actor)
@@ -117,6 +143,18 @@ trait Actor
     public function configEnv($env)
     {
         $this->env = $env;
+        return $this;
+    }
+
+    public function configModules(ModuleContainer $moduleContainer)
+    {
+        $this->moduleContainer = $moduleContainer;
+        return $this;
+    }
+
+    public function configDi(Di $di)
+    {
+        $this->di = clone($di);
         return $this;
     }
 

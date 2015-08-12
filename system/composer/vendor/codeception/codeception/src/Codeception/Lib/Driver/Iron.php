@@ -5,7 +5,6 @@ use Codeception\Lib\Interfaces\Queue;
 
 class Iron implements Queue
 {
-
     /**
      * @var \IronMQ
      */
@@ -18,12 +17,14 @@ class Iron implements Queue
      */
     public function openConnection($config)
     {
-        $this->queue = new \IronMQ(array(
-            "token" => $config['token'],
+        $this->queue = new \IronMQ([
+            "token"      => $config['token'],
             "project_id" => $config['project'],
-            "host" => $config['host']
-        )) OR \PHPUnit_Framework_Assert::fail('connection failed or timed-out.');
-
+            "host"       => $config['host']
+        ]);
+        if (!$this->queue) {
+            \PHPUnit_Framework_Assert::fail('connection failed or timed-out.');
+        }
     }
 
     /**
@@ -45,8 +46,8 @@ class Iron implements Queue
     public function getQueues()
     {
         // Format the output to suit
-        $queues = array();
-        foreach($this->queue->getQueues() as $queue) {
+        $queues = [];
+        foreach ($this->queue->getQueues() as $queue) {
             $queues[] = $queue->name;
         }
         return $queues;
@@ -95,7 +96,7 @@ class Iron implements Queue
 
     public function getRequiredConfig()
     {
-        return array('host', 'token', 'project');
+        return ['host', 'token', 'project'];
     }
 
     public function getDefaultConfig()

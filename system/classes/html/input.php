@@ -50,7 +50,7 @@ class input {
         if (!in_array(strtolower($this->type), $this->typeList)) return;
         
         // Open tag and data
-        $buffer = "<input type='{$this->typeList[$this->type]}' name='{$this-name}' ";
+        $buffer = "<input type='{$this->typeList[$this->type]}' name='{$this->name}' ";
         if (!empty($this->id)) {
             $buffer .= "id='{$this->id}' ";
         }

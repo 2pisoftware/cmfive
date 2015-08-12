@@ -74,6 +74,9 @@
 class DbObject extends DbService {
 
     public $id;
+    private static $_object_vars = array();
+	private static $_columns = array();
+    private $_class;
 
     /**
      * Constructor
@@ -93,6 +96,7 @@ class DbObject extends DbService {
         if (property_exists($this, "_searchable") && !property_exists($this, "_remove_searchable")) {
             $this->_searchable = new AspectSearchable($this);
         }
+        $this->_class = get_class($this);
     }
 
     // public function __clone(){
@@ -278,7 +282,22 @@ class DbObject extends DbService {
         }
         return $v;
     }
-
+    
+    function getObjectVars() {
+        if(!empty(self::$_object_vars[$this->_class])) {
+            return self::$_object_vars[$this->_class];
+        }
+        // build cache of filtered object vars
+        self::$_object_vars[$this->_class] = array();
+        foreach(get_object_vars($this) as $k=>$v) {
+            // ignore volatile vars and web
+            if('_' !== $k{0} && 'w' !== $k) {
+                self::$_object_vars[$this->_class][] = $k;
+            }
+        }
+        return self::$_object_vars[$this->_class];
+    }
+    
     /**
      * fill this object from an array where the keys correspond to the
      * variable of this object.
@@ -286,26 +305,10 @@ class DbObject extends DbService {
      * @param array $row
      */
     function fill($row, $from_db = false) {
-        foreach (get_object_vars($this) as $k => $v) {
-            if ($k{0} != "_") { // ignore volatile vars
-                $dbk = $k;
-                if ($from_db) {
-                    $dbk = $this->getDbColumnName($k);
-                }
-
-                if (array_key_exists($dbk, $row)) {
-                    $v = $row[$dbk];
-                    $this->$k = $from_db ? $this->readConvert($k, $v) : $v;
-                }
+        foreach ($this->getObjectVars() as $k) {
+            if (!empty($row[$k])) {
+                $this->$k = $row[$k];
             }
-        }
-        // May be modifiable data this will only fire if the keys below
-        // aren't defined in the class
-        if (!empty($row["dt_created"]) && empty($this->dt_created)) {
-            $this->dt_created = $this->dt2Time($row["dt_created"]);
-        }
-        if (!empty($row["dt_modified"]) && empty($this->dt_modified)) {
-            $this->dt_modified = $this->dt2Time($row["dt_modified"]);
         }
         if (!empty($row["creator_id"]) && empty($this->creator_id)) {
             $this->creator_id = $row["creator_id"];
@@ -351,10 +354,8 @@ class DbObject extends DbService {
      */
     function toArray() {
         $arr = array();
-        foreach (get_object_vars($this) as $k => $v) {
-            if ($k{0} != "_" && $k != "w") { // ignore volatile vars
-                $arr[$k] = $v;
-            }
+        foreach ($this->getObjectVars() as $k) {
+            $arr[$k] = $this->$k;
         }
         return $arr;
     }
@@ -747,15 +748,18 @@ class DbObject extends DbService {
     }
 
     function getDbTableColumnNames() {
+		if(!empty(self::$_columns[$this->_class])) {
+			return self::$_columns[$this->_class];
+		}
         $rs = $this->_db->_query('SELECT * FROM ' . $this->getDbTableName() . ' LIMIT 0');
         if ($rs !== false) {
-            $columns = array();
             for ($i = 0; $i < $rs->columnCount(); $i++) {
                 $col = $rs->getColumnMeta($i);
-                $columns[] = $col['name'];
+                self::$_columns[$this->_class][] = $col['name'];
             }
-            return $columns; //$this->_db->prepare("DESCRIBE tablename")->execute()->fetchAll(PDO::FETCH_COLUMN);
+            return self::$_columns[$this->_class]; //$this->_db->prepare("DESCRIBE tablename")->execute()->fetchAll(PDO::FETCH_COLUMN);
         }
+		self::$_columns[$this->_class][] = array();
         return array();
     }
 

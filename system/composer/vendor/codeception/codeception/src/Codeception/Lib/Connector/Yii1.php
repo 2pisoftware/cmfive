@@ -1,6 +1,6 @@
 <?php
-
 namespace Codeception\Lib\Connector;
+
 use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\BrowserKit\Response;
 use Yii;
@@ -47,15 +47,15 @@ class Yii1 extends Client
         $_REQUEST       = $this->remapRequestParameters($request->getParameters());
         $_POST          = $_GET = array();
 
-        if (strtoupper($request->getMethod()) == 'GET')
+        if (strtoupper($request->getMethod()) == 'GET') {
             $_GET = $_REQUEST;
-        else {
+        } else {
             $_POST = $_REQUEST;
         }
 
         // Parse url parts
-        $uriPath    = trim(parse_url($request->getUri(), PHP_URL_PATH), '/');
-        $uriQuery   = ltrim(parse_url($request->getUri(), PHP_URL_QUERY), '?');
+        $uriPath = trim(parse_url($request->getUri(), PHP_URL_PATH), '/');
+        $uriQuery = ltrim(parse_url($request->getUri(), PHP_URL_QUERY), '?');
         $scriptName = trim(parse_url($this->url, PHP_URL_PATH), '/');
         if (!empty($uriQuery)) {
 
@@ -78,12 +78,12 @@ class Yii1 extends Client
         }
 
         $_SERVER['REQUEST_METHOD'] = strtoupper($request->getMethod());
-        $_SERVER['REQUEST_URI']    = $uriPath;
+        $_SERVER['REQUEST_URI'] = $uriPath;
 
         /**
          * Hack to be sure that CHttpRequest will resolve route correctly
          */
-        $_SERVER['SCRIPT_NAME']     = "/{$scriptName}";
+        $_SERVER['SCRIPT_NAME'] = "/{$scriptName}";
         $_SERVER['SCRIPT_FILENAME'] = $this->appPath;
 
         ob_start();
@@ -96,12 +96,12 @@ class Yii1 extends Client
                 $route->enabled = false;
             }
         }
-        Yii::app()->onEndRequest->add(array($this, 'setHeaders'));
+        Yii::app()->onEndRequest->add([$this, 'setHeaders']);
         Yii::app()->run();
 
         $content = ob_get_clean();
 
-        $headers    = $this->getHeaders();
+        $headers = $this->getHeaders();
         $statusCode = 200;
         foreach ($headers as $header => $val) {
             if ($header == 'Location') {

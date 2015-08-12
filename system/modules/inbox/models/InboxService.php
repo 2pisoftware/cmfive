@@ -108,11 +108,14 @@ class InboxService extends DbService {
             } elseif ($bcc) {
                 $mail->AddBCC($bcc);
             }
-
-            if (!$mail->Send()) {
-                $this->w->error("Mailer Error: " . $mail->ErrorInfo, "/main/index");
-                return false;
-            }
+			try {
+				if (!$mail->Send()) {
+					$this->w->error("Mailer Error: " . $mail->ErrorInfo, "/main/index");
+					return false;
+				}
+			} catch (Exception $e) {
+				$this->w->error("Mailer Error: " . $e, "/main/index");
+			}
             return true;
         }
     }

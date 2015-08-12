@@ -106,7 +106,7 @@ class CSRF {
      * @param integer $len
      * @return string
      */
-    private static function random($len) {
+    public static function random($len) {
         $cstrong = false;
         $bytes = openssl_random_pseudo_bytes($len, $cstrong);
         while ($cstrong == false) {

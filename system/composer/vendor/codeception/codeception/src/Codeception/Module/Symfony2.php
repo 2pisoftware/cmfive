@@ -1,12 +1,13 @@
 <?php
 namespace Codeception\Module;
 
-use Codeception\Exception\ModuleRequire;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpKernel\Exception\FlattenException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpFoundation\Response;
+use Codeception\Configuration;
+use Codeception\TestCase;
+use Codeception\Lib\Framework;
+use Codeception\Exception\ModuleRequireException;
 use Codeception\Lib\Connector\Symfony2 as Symfony2Connector;
+use Codeception\Lib\Interfaces\DoctrineProvider;
+use Symfony\Component\Finder\Finder;
 
 /**
  * This module uses Symfony2 Crawler and HttpKernel to emulate requests and test response.
@@ -28,11 +29,11 @@ use Codeception\Lib\Connector\Symfony2 as Symfony2Connector;
  * * app_path: 'app' - specify custom path to your app dir, where bootstrap cache and kernel interface is located.
  * * environment: 'local' - environment used for load kernel
  * * debug: true - turn on/off debug mode
- * 
- *
+ * * em_service: 'doctrine.orm.entity_manager' - use the stated EntityManager to pair with Doctrine Module.
+ * *
  * ### Example (`functional.suite.yml`) - Symfony 2.x Directory Structure
  *
- *     modules: 
+ *     modules:
  *        enabled: [Symfony2]
  *        config:
  *           Symfony2:
@@ -44,17 +45,17 @@ use Codeception\Lib\Connector\Symfony2 as Symfony2Connector;
  * * app_path: 'app' - specify custom path to your app dir, where the kernel interface is located.
  * * var_path: 'var' - specify custom path to your var dir, where bootstrap cache is located.
  * * environment: 'local' - environment used for load kernel
+ * * em_service: 'doctrine.orm.entity_manager' - use the stated EntityManager to pair with Doctrine Module.
  * * debug: true - turn on/off debug mode
  *
  * ### Example (`functional.suite.yml`) - Symfony 3 Directory Structure
  *
  *     modules:
- *        enabled: [Symfony2]
- *        config:
- *           Symfony2:
- *              app_path: 'app/front'
- *              var_path: 'var'
- *              environment: 'local_test'
+ *        enabled:
+ *           - Symfony2:
+ *               app_path: 'app/front'
+ *               var_path: 'var'
+ *               environment: 'local_test'
  *
  *
  * ## Public Properties
@@ -64,8 +65,7 @@ use Codeception\Lib\Connector\Symfony2 as Symfony2Connector;
  * * container - dependency injection container instance
  *
  */
-
-class Symfony2 extends \Codeception\Lib\Framework
+class Symfony2 extends Framework implements DoctrineProvider
 {
     /**
      * @var \Symfony\Component\HttpKernel\Kernel
@@ -77,8 +77,14 @@ class Symfony2 extends \Codeception\Lib\Framework
      */
     public $container;
 
-    public $config = array('app_path' => 'app', 'var_path' => 'app', 'environment' => 'test', 'debug' => true);
-    
+    public $config = [
+        'app_path' => 'app',
+        'var_path' => 'app',
+        'environment' => 'test',
+        'debug' => true,
+        'em_service' => 'doctrine.orm.entity_manager'
+    ];
+
     /**
      * @var
      */
@@ -86,23 +92,40 @@ class Symfony2 extends \Codeception\Lib\Framework
 
     public $permanentServices = [];
 
-
-    public function _initialize() {
-        $cache = \Codeception\Configuration::projectDir() . $this->config['var_path'] . DIRECTORY_SEPARATOR . 'bootstrap.php.cache';
+    public function _initialize()
+    {
+        $cache = Configuration::projectDir() . $this->config['var_path'] . DIRECTORY_SEPARATOR . 'bootstrap.php.cache';
         if (!file_exists($cache)) {
-            throw new ModuleRequire(__CLASS__, 'Symfony2 bootstrap file not found in '.$cache);
+            throw new ModuleRequireException(__CLASS__, 'Symfony2 bootstrap file not found in ' . $cache);
         }
         require_once $cache;
         $this->kernelClass = $this->getKernelClass();
-        $this->kernel = new $this->kernelClass($this->config['environment'], $this->config['debug']);
         ini_set('xdebug.max_nesting_level', 200); // Symfony may have very long nesting level
     }
 
-    public function _before(\Codeception\TestCase $test) {
-        $this->kernel->boot();
+    public function _before(\Codeception\TestCase $test) 
+    {
+        $this->bootKernel();
         $this->container = $this->kernel->getContainer();
         $this->client = new Symfony2Connector($this->kernel);
         $this->client->followRedirects(true);
+    }
+
+    public function _getEntityManager()
+    {
+        $this->bootKernel();
+        if (!$this->kernel->getContainer()->has($this->config['em_service'])) {
+            return null;
+        }
+        $this->client->persistentServices[] = $this->config['em_service'];
+        $this->client->persistentServices[] = 'doctrine.orm.default_entity_manager';
+        return $this->kernel->getContainer()->get($this->config['em_service']);
+    }
+
+    protected function bootKernel()
+    {
+        $this->kernel = new $this->kernelClass($this->config['environment'], $this->config['debug']);
+        $this->kernel->boot();
     }
 
     /**
@@ -118,7 +141,7 @@ class Symfony2 extends \Codeception\Lib\Framework
         $finder->name('*Kernel.php')->depth('0')->in(\Codeception\Configuration::projectDir() . $this->config['app_path']);
         $results = iterator_to_array($finder);
         if (!count($results)) {
-            throw new ModuleRequire(__CLASS__, 'AppKernel was not found. Specify directory where Kernel class for your application is located in "app_path" parameter.');
+            throw new ModuleRequireException(__CLASS__, 'AppKernel was not found. Specify directory where Kernel class for your application is located in "app_path" parameter.');
         }
 
         $file = current($results);
@@ -134,12 +157,17 @@ class Symfony2 extends \Codeception\Lib\Framework
      *
      * @throws \LogicException
      */
-    public function seeEmailIsSent() {
+    public function seeEmailIsSent()
+    {
         $profile = $this->getProfiler();
-        if (!$profile) \PHPUnit_Framework_Assert::fail('Emails can\'t be tested without Profiler');
-        if (!$profile->hasCollector('swiftmailer')) \PHPUnit_Framework_Assert::fail('Emails can\'t be tested without SwiftMailer connector');
+        if (!$profile) {
+            $this->fail('Emails can\'t be tested without Profiler');
+        }
+        if (!$profile->hasCollector('swiftmailer')) {
+            $this->fail('Emails can\'t be tested without SwiftMailer connector');
+        }
 
-        \PHPUnit_Framework_Assert::assertGreaterThan(0, $profile->getCollector('swiftmailer')->getMessageCount());
+        $this->assertGreaterThan(0, $profile->getCollector('swiftmailer')->getMessageCount());
     }
 
     /**
@@ -155,8 +183,11 @@ class Symfony2 extends \Codeception\Lib\Framework
      * @param $service
      * @return mixed
      */
-    public function grabServiceFromContainer($service) {
-        if (!$this->kernel->getContainer()->has($service)) $this->fail("Service $service is not available in container");
+    public function grabServiceFromContainer($service)
+    {
+        if (!$this->kernel->getContainer()->has($service)) {
+            $this->fail("Service $service is not available in container");
+        }
         return $this->kernel->getContainer()->get($service);
     }
 
@@ -165,7 +196,9 @@ class Symfony2 extends \Codeception\Lib\Framework
      */
     protected function getProfiler()
     {
-        if (!$this->kernel->getContainer()->has('profiler')) return null;
+        if (!$this->kernel->getContainer()->has('profiler')) {
+            return null;
+        }
         $profiler = $this->kernel->getContainer()->get('profiler');
         return $profiler->loadProfileFromResponse($this->client->getResponse());
     }
@@ -183,9 +216,13 @@ class Symfony2 extends \Codeception\Lib\Framework
             }
             if ($profile->hasCollector('swiftmailer')) {
                 $messages = $profile->getCollector('swiftmailer')->getMessageCount();
-                if ($messages) $this->debugSection('Emails', $messages . ' sent');
+                if ($messages) {
+                    $this->debugSection('Emails', $messages . ' sent');
+                }
             }
-            if ($profile->hasCollector('timer'))    $this->debugSection('Time', $profile->getCollector('timer')->getTime());
+            if ($profile->hasCollector('timer')) {
+                $this->debugSection('Time', $profile->getCollector('timer')->getTime());
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * deduplicates arrays of arrays, something that array_unique can't do.
  * 
@@ -7,11 +8,10 @@
  * @param unknown $input
  * @return multitype:
  */
-function array_unique_multidimensional($input)
-{
-	$serialized = array_map('serialize', $input);
-	$unique = array_unique($serialized);
-	return array_intersect_key($input, $unique);
+function array_unique_multidimensional($input) {
+    $serialized = array_map('serialize', $input);
+    $unique = array_unique($serialized);
+    return array_intersect_key($input, $unique);
 }
 
 function humanReadableBytes($input, $rounding = 2, $bytesValue = true) {
@@ -233,7 +233,7 @@ function startsWith($haystack, $needle) {
     if (empty($haystack) || empty($needle)) {
         return false;
     }
-    
+
     if (is_scalar($needle)) {
         return strpos($haystack, $needle) === 0;
     } else if (is_array($needle) && sizeof($needle) > 0) {
@@ -298,9 +298,8 @@ function getTimeSelect($start = 8, $end = 19) {
 }
 
 function formatDate($date, $format = "d/m/Y", $usetimezone = true) {
-    if (!$date)
-        return null;
-    if (!is_long($date)) {
+    if (!$date) return NULL;
+    if (!is_long($date) && !is_numeric($date)) {
         $date = strtotime(str_replace("/", "-", $date));
     }
     /*
@@ -341,7 +340,7 @@ function formatMoney($format, $number) {
     if (empty($locale['mon_thousands_sep'])) {
         $locale['mon_thousands_sep'] = ",";
     }
-    
+
     preg_match_all($regex, $format, $matches, PREG_SET_ORDER);
 
     foreach ($matches as $fmatch) {
@@ -428,7 +427,7 @@ function recursiveArraySearch($haystack, $needle, $index = null) {
     $it = new RecursiveIteratorIterator($aIt);
 
     while ($it->valid()) {
-        if (((isset($index) && ( $it->key() == $index)) || ( !isset($index))) && ( $it->current() == $needle)) {
+        if (((isset($index) && ( $it->key() == $index)) || (!isset($index))) && ( $it->current() == $needle)) {
             return $aIt->key();
         }
 
@@ -554,9 +553,9 @@ function AESdecrypt($text, $password) {
  * @param String $end
  * @return string
  */
-function getBetween($content, $start, $end){
+function getBetween($content, $start, $end) {
     $r = explode($start, $content);
-    if (isset($r[1])){
+    if (isset($r[1])) {
         $r = explode($end, $r[1]);
         return $r[0];
     }
@@ -581,4 +580,47 @@ function is_associative_array($array) {
  */
 function is_complete_associative_array($array) {
     return (bool) (count(array_filter(array_keys($array), 'is_string')) == count($array));
+}
+
+/**
+ * Returns whether or not a given number ($subject) is within the bounds
+ * $min and $max. $include is for whether or not to include $min and $max 
+ * in boundary.
+ * 
+ * I.e. If $min = 1, $max = 10 and $subject is 10:
+ *      $include == true will return true (1 <= 10 <= 10 is true)
+ *      $include == false will return false (1 < 10 < 10 is false)
+ * 
+ * @param <float> $subject
+ * @param <float> $min
+ * @param <float> $max
+ * @param <boolean> $include
+ * @return <boolean>
+ */
+function in_numeric_range($subject, $min, $max, $include = true) {
+    // Sanity checks
+    if (!is_numeric($subject) || !is_numeric($min) || !is_numeric($max)) {
+        return false;
+    }
+
+    // Check if bounds given in wrong order
+    // Has effect of checking outside the boundary
+    if ($max < $min) {
+        if (true === $include) {
+            return ($subject <= $min || $subject >= $max);
+        } else {
+            return ($subject < $min || $subject > $max);
+        }
+    }
+    // For cases where for some reason all given vars are the same
+    if ($min === $max && $min === $subject) {
+        return $include;
+    }
+
+    // Check
+    if (true === $include) {
+        return ($subject >= $min && $subject <= $max);
+    } else {
+        return $subject > $min && $subject < $max;
+    }
 }

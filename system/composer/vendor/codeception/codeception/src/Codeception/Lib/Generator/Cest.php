@@ -28,6 +28,7 @@ class {{name}}Cest
     {
     }
 }
+
 EOF;
 
     protected $settings;
@@ -42,8 +43,9 @@ EOF;
     public function produce()
     {
         $actor = $this->settings['class_name'];
-        $ns = $this->getNamespaceString($this->settings['namespace'] . '\\' . $this->name);
-        $ns .= "use " . $this->settings['namespace'] . '\\' . $actor . ";";
+        $namespace = rtrim( $this->settings['namespace'], '\\' );
+        $ns = $this->getNamespaceHeader($namespace.'\\'.$this->name);
+        $ns .= "use ".$this->settings['namespace'].'\\'.$actor.";";
 
         return (new Template($this->template))
             ->place('name', $this->getShortClassName($this->name))
@@ -51,5 +53,4 @@ EOF;
             ->place('actor', $actor)
             ->produce();
     }
-
 }

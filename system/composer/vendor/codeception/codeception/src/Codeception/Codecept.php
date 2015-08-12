@@ -1,13 +1,13 @@
 <?php
 namespace Codeception;
 
+use Codeception\Exception\ConfigurationException;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use \Symfony\Component\EventDispatcher\EventDispatcher;
-use Codeception\Exception\Configuration as ConfigurationException;
 
 class Codecept
 {
-    const VERSION = "2.0.14";
+    const VERSION = "2.1.1";
 
     /**
      * @var \Codeception\PHPUnit\Runner
@@ -19,6 +19,11 @@ class Codecept
     protected $result;
 
     /**
+     * @var \Codeception\CodeCoverage
+     */
+    protected $coverage;
+
+    /**
      * @var \Symfony\Component\EventDispatcher\EventDispatcher
      */
     protected $dispatcher;
@@ -26,38 +31,39 @@ class Codecept
     /**
      * @var array
      */
-    protected $options = array(
-        'silent' => false,
-        'debug' => false,
-        'steps' => false,
-        'html' => false,
-        'xml' => false,
-        'json' => false,
-        'tap' => false,
-        'report' => false,
-        'colors' => false,
-        'coverage' => false,
-        'coverage-xml' => false,
+    protected $options = [
+        'silent'        => false,
+        'debug'         => false,
+        'steps'         => false,
+        'html'          => false,
+        'xml'           => false,
+        'json'          => false,
+        'tap'           => false,
+        'report'        => false,
+        'colors'        => false,
+        'coverage'      => false,
+        'coverage-xml'  => false,
         'coverage-html' => false,
         'coverage-text' => false,
-        'groups' => null,
+        'groups'        => null,
         'excludeGroups' => null,
-        'filter' => null,
-        'env' => null,
-        'fail-fast' => false,
-        'verbosity' => 1,
-        'interactive' => true,
-        'no-rebuild' => false
-    );
+        'filter'        => null,
+        'env'           => null,
+        'fail-fast'     => false,
+        'verbosity'     => 1,
+        'interactive'   => true,
+        'no-rebuild'    => false
+    ];
 
     protected $config = [];
 
     /**
      * @var array
      */
-    protected $extensions = array();
+    protected $extensions = [];
 
-    public function __construct($options = array()) {
+    public function __construct($options = [])
+    {
         $this->result = new \PHPUnit_Framework_TestResult;
         $this->dispatcher = new EventDispatcher();
 
@@ -96,27 +102,35 @@ class Codecept
         $config = Configuration::config();
         foreach ($config['extensions']['enabled'] as $extensionClass) {
             if (!class_exists($extensionClass)) {
-                throw new ConfigurationException("Class `$extensionClass` is not defined. Autoload it or include into '_bootstrap.php' file of 'tests' directory");
+                throw new ConfigurationException(
+                    "Class `$extensionClass` is not defined. Autoload it or include into "
+                    . "'_bootstrap.php' file of 'tests' directory"
+                );
             }
-            $extensionConfig =  isset($config['extensions']['config'][$extensionClass])
+            $extensionConfig = isset($config['extensions']['config'][$extensionClass])
                 ? $config['extensions']['config'][$extensionClass]
                 : [];
 
             $extension = new $extensionClass($extensionConfig, $options);
             if (!$extension instanceof EventSubscriberInterface) {
-                throw new ConfigurationException("Class $extensionClass is not an EventListener. Please create it as Extension or Group class.");
+                throw new ConfigurationException(
+                    "Class $extensionClass is not an EventListener. Please create it as Extension or Group class."
+                );
             }
             $this->extensions[] = $extension;
         }
     }
 
-    protected function registerPHPUnitListeners() {
+    protected function registerPHPUnitListeners()
+    {
         $listener = new PHPUnit\Listener($this->dispatcher);
         $this->result->addListener($listener);
     }
 
-    public function registerSubscribers() {
+    public function registerSubscribers()
+    {
         // required
+        $this->dispatcher->addSubscriber(new Subscriber\GracefulTermination());
         $this->dispatcher->addSubscriber(new Subscriber\ErrorHandler());
         $this->dispatcher->addSubscriber(new Subscriber\Bootstrap());
         $this->dispatcher->addSubscriber(new Subscriber\Module());
@@ -159,16 +173,27 @@ class Codecept
             return;
         }
 
-        foreach ($environments as $env => $config) {
-            if (!in_array($env, $selectedEnvironments)) {
+        foreach (array_unique($selectedEnvironments) as $envList) {
+            $envArray = explode(',', $envList);
+            $config = [];
+            foreach ($envArray as $env) {
+                if (isset($environments[$env])) {
+                    $currentEnvironment = isset($config['current_environment']) ? [$config['current_environment']] : [];
+                    $config = Configuration::mergeConfigs($config, $environments[$env]);
+                    $currentEnvironment[] = $config['current_environment'];
+                    $config['current_environment'] = implode(',', $currentEnvironment);
+                }
+            }
+            if (empty($config)) {
                 continue;
             }
-            $suiteToRun = is_int($env) ? $suite : "{$suite}-{$env}";
+            $suiteToRun = "{$suite}-{$envList}";
             $this->runSuite($config, $suiteToRun, $test);
         }
     }
 
-    public function runSuite($settings, $suite, $test = null) {
+    public function runSuite($settings, $suite, $test = null)
+    {
         $suiteManager = new SuiteManager($this->dispatcher, $suite, $settings);
         $suiteManager->initialize();
         $suiteManager->loadTests($test);
@@ -177,11 +202,13 @@ class Codecept
         return $this->result;
     }
 
-    public static function versionString() {
-        return 'Codeception PHP Testing Framework v'.self::VERSION;
+    public static function versionString()
+    {
+        return 'Codeception PHP Testing Framework v' . self::VERSION;
     }
 
-    public function printResult() {
+    public function printResult()
+    {
         $result = $this->getResult();
         $result->flushListeners();
 
@@ -194,11 +221,13 @@ class Codecept
     /**
      * @return \PHPUnit_Framework_TestResult
      */
-    public function getResult() {
+    public function getResult()
+    {
         return $this->result;
     }
 
-    public function getOptions() {
+    public function getOptions()
+    {
         return $this->options;
     }
 

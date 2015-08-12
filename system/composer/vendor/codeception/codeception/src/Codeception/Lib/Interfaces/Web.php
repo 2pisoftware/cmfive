@@ -1,5 +1,4 @@
 <?php
-
 namespace Codeception\Lib\Interfaces;
 
 interface Web
@@ -55,8 +54,8 @@ interface Web
     public function dontSee($text, $selector = null);
 
     /**
-     * Submits the given form on the page, optionally with the given form values.
-     * Give the form fields values as an array.
+     * Submits the given form on the page, optionally with the given form
+     * values.  Give the form fields values as an array.
      *
      * Skipped fields will be filled by their values from the page.
      * You don't need to click the 'Submit' button afterwards.
@@ -66,14 +65,20 @@ interface Web
      * in the request with the last parameter as an alternative to
      * explicitly setting its value in the second parameter, as
      * button values are not otherwise included in the request.
-     * 
+     *
      * Examples:
      *
      * ``` php
      * <?php
-     * $I->submitForm('#login', array('login' => 'davert', 'password' => '123456'));
+     * $I->submitForm('#login', [
+     *     'login' => 'davert',
+     *     'password' => '123456'
+     * ]);
      * // or
-     * $I->submitForm('#login', array('login' => 'davert', 'password' => '123456'), 'submitButtonName');
+     * $I->submitForm('#login', [
+     *     'login' => 'davert',
+     *     'password' => '123456'
+     * ], 'submitButtonName');
      *
      * ```
      *
@@ -81,10 +86,17 @@ interface Web
      *
      * ``` html
      * <form action="/sign_up">
-     *     Login: <input type="text" name="user[login]" /><br/>
-     *     Password: <input type="password" name="user[password]" /><br/>
-     *     Do you agree to out terms? <input type="checkbox" name="user[agree]" /><br/>
-     *     Select pricing plan <select name="plan"><option value="1">Free</option><option value="2" selected="selected">Paid</option></select>
+     *     Login:
+     *     <input type="text" name="user[login]" /><br/>
+     *     Password:
+     *     <input type="password" name="user[password]" /><br/>
+     *     Do you agree to our terms?
+     *     <input type="checkbox" name="user[agree]" /><br/>
+     *     Select pricing plan:
+     *     <select name="plan">
+     *         <option value="1">Free</option>
+     *         <option value="2" selected="selected">Paid</option>
+     *     </select>
      *     <input type="submit" name="submitButton" value="Submit" />
      * </form>
      * ```
@@ -93,17 +105,36 @@ interface Web
      *
      * ``` php
      * <?php
-     * $I->submitForm('#userForm', array('user' => array('login' => 'Davert', 'password' => '123456', 'agree' => true)), 'submitButton');
-     *
+     * $I->submitForm(
+     *     '#userForm',
+     *     [
+     *         'user' => [
+     *             'login' => 'Davert',
+     *             'password' => '123456',
+     *             'agree' => true
+     *         ]
+     *     ],
+     *     'submitButton'
+     * );
      * ```
-     * Note that "2" will be the submitted value for the "plan" field, as it is the selected option.
+     * Note that "2" will be the submitted value for the "plan" field, as it is
+     * the selected option.
      * 
-     * You can also emulate a JavaScript submission by not specifying any buttons in the third parameter to submitForm.
+     * You can also emulate a JavaScript submission by not specifying any
+     * buttons in the third parameter to submitForm.
      * 
      * ```php
      * <?php
-     * $I->submitForm('#userForm', array('user' => array('login' => 'Davert', 'password' => '123456', 'agree' => true)));
-     * 
+     * $I->submitForm(
+     *     '#userForm',
+     *     [
+     *         'user' => [
+     *             'login' => 'Davert',
+     *             'password' => '123456',
+     *             'agree' => true
+     *         ]
+     *     ]
+     * );
      * ```
      * 
      * Pair this with seeInFormFields for quick testing magic.
@@ -148,8 +179,31 @@ interface Web
      * ?>
      * ```
      *
-     * Mixing string and boolean values for a checkbox's value is not
-     * supported and may produce unexpected results.
+     * Mixing string and boolean values for a checkbox's value is not supported
+     * and may produce unexpected results.
+     * 
+     * Field names ending in "[]" must be passed without the trailing square 
+     * bracket characters, and must contain an array for its value.  This allows
+     * submitting multiple values with the same name, consider:
+     * 
+     * ```php
+     * $I->submitForm('#my-form', [
+     *     'field[]' => 'value',
+     *     'field[]' => 'another value', // 'field[]' is already a defined key
+     * ]);
+     * ```
+     * 
+     * The solution is to pass an array value:
+     * 
+     * ```php
+     * // this way both values are submitted
+     * $I->submitForm('#my-form', [
+     *     'field' => [
+     *         'value',
+     *         'another value',
+     *     ]
+     * ]);
+     * ```
      * 
      * @param $selector
      * @param $params
@@ -357,7 +411,7 @@ interface Web
     public function dontSeeCheckboxIsChecked($checkbox);
 
     /**
-     * Checks that the given input field or textarea contains the given value. 
+     * Checks that the given input field or textarea contains the given value.
      * For fuzzy locators, fields are matched by label text, the "name" attribute, CSS, and XPath.
      *
      * ``` php
@@ -658,7 +712,7 @@ interface Web
      * @param array $attributes
      * @return
      */
-    public function seeElement($selector, $attributes = array());
+    public function seeElement($selector, $attributes = []);
 
     /**
      * Checks that the given element is invisible or not present on the page.
@@ -676,11 +730,11 @@ interface Web
      * @param $selector
      * @param array $attributes
      */
-    public function dontSeeElement($selector, $attributes = array());
+    public function dontSeeElement($selector, $attributes = []);
 
-   /**
+    /**
      * Checks that there are a certain number of elements matched by the given locator on the page.
-     * 
+     *
      * ``` php
      * <?php
      * $I->seeNumberOfElements('tr', 10);
@@ -688,12 +742,12 @@ interface Web
      * ?>
      * ```
      * @param $selector
-     * @param mixed $expected:
+     * @param mixed $expected :
      * - string: strict number
-     * - array: range of numbers [0,10]  
+     * - array: range of numbers [0,10]
      */
-    public function seeNumberOfElements($selector, $expected);    
-    
+    public function seeNumberOfElements($selector, $expected);
+
     /**
      * Checks that the given option is selected.
      *
@@ -790,8 +844,6 @@ interface Web
      * @param $name
      * @param $val
      * @param array $params
-     * @internal param $cookie
-     * @internal param $value
      *
      * @return mixed
      */

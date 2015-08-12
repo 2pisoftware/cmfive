@@ -3,11 +3,19 @@ namespace Codeception\Module;
 
 use Codeception\Exception\ModuleConfig;
 use Codeception\Lib\Connector\Laravel4 as LaravelConnector;
-use Codeception\Lib\Connector\LaravelMemorySessionHandler;
 use Codeception\Lib\Framework;
 use Codeception\Lib\Interfaces\ActiveRecord;
+use Codeception\Lib\Interfaces\PartedModule;
+use Codeception\Lib\ModuleContainer;
+use Codeception\Configuration;
+use Codeception\TestCase;
+use Codeception\Step;
 use Codeception\Subscriber\ErrorHandler;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\ClassLoader;
+use Illuminate\Workbench\Starter;
+use Illuminate\Foundation\Application;
+use Illuminate\Auth\UserInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 /**
@@ -19,6 +27,12 @@ use Symfony\Component\Console\Output\BufferedOutput;
  * ## Demo Project
  *
  * <https://github.com/Codeception/sample-l4-app>
+ *
+ * ## Example
+ *
+ *     modules:
+ *         enabled:
+ *             - Laravel4
  *
  * ## Status
  *
@@ -40,8 +54,12 @@ use Symfony\Component\Console\Output\BufferedOutput;
  * * app - `Illuminate\Foundation\Application` instance
  * * client - `BrowserKit` client
  *
+ * ## Parts
+ *
+ * * ORM - include only haveRecord/grabRecord/seeRecord/dontSeeRecord actions
+ *
  */
-class Laravel4 extends Framework implements ActiveRecord
+class Laravel4 extends Framework implements ActiveRecord, PartedModule
 {
 
     /**
@@ -54,32 +72,27 @@ class Laravel4 extends Framework implements ActiveRecord
      */
     public $config = [];
 
-    /**
-     * Constructor.
-     *
-     * @param array $config
-     */
-    public function __construct($config = null)
+    public function __construct(ModuleContainer $container, $config = null)
     {
         $this->config = array_merge(
-            array(
-                'cleanup' => true,
-                'unit' => true,
+            [
+                'cleanup'     => true,
+                'unit'        => true,
                 'environment' => 'testing',
                 'start' => 'bootstrap' . DIRECTORY_SEPARATOR . 'start.php',
                 'root' => '',
                 'filters' => false,
-            ),
+            ],
             (array) $config
         );
 
-        $projectDir = explode('workbench', \Codeception\Configuration::projectDir())[0];
+        $projectDir = explode('workbench', Configuration::projectDir())[0];
         $projectDir .= $this->config['root'];
 
         $this->config['project_dir'] = $projectDir;
         $this->config['start_file'] = $projectDir . $this->config['start'];
 
-        parent::__construct();
+        parent::__construct($container, null);
     }
 
     /**
@@ -93,13 +106,24 @@ class Laravel4 extends Framework implements ActiveRecord
         $this->client = new LaravelConnector($this);
     }
 
+    public function _parts()
+    {
+        return ['framework', 'orm'];
+    }
+
+    protected function revertErrorHandler()
+    {
+        $handler = new ErrorHandler();
+        set_error_handler([$handler, 'errorHandler']);
+    }
+
     /**
      * Before hook.
      *
      * @param \Codeception\TestCase $test
      * @throws ModuleConfig
      */
-    public function _before(\Codeception\TestCase $test)
+    public function _before(TestCase $test)
     {
         if ($this->config['filters']) {
             $this->haveEnabledFilters();
@@ -115,7 +139,7 @@ class Laravel4 extends Framework implements ActiveRecord
      *
      * @param \Codeception\TestCase $test
      */
-    public function _after(\Codeception\TestCase $test)
+    public function _after(TestCase $test)
     {
         if ($this->app['db'] && $this->cleanupDatabase()) {
             $this->app['db']->rollback();
@@ -127,7 +151,7 @@ class Laravel4 extends Framework implements ActiveRecord
      *
      * @param \Codeception\Step $step
      */
-    public function _beforeStep(\Codeception\Step $step)
+    public function _beforeStep(Step $step)
     {
         parent::_beforeStep($step);
 
@@ -142,7 +166,7 @@ class Laravel4 extends Framework implements ActiveRecord
      *
      * @param \Codeception\Step $step
      */
-    public function _afterStep(\Codeception\Step $step)
+    public function _afterStep(Step $step)
     {
         parent::_beforeStep($step);
 
@@ -161,7 +185,9 @@ class Laravel4 extends Framework implements ActiveRecord
 
         if (! file_exists($startFile)) {
             throw new ModuleConfig(
-                $this, "Laravel bootstrap start.php file not found in $startFile.\nPlease provide a valid path to it using 'start' config param. "
+                $this,
+                "Laravel bootstrap start.php file not found in $startFile.\n"
+                . "Please provide a valid path to it using 'start' config param. "
             );
         }
     }
@@ -173,21 +199,11 @@ class Laravel4 extends Framework implements ActiveRecord
     {
         require $this->config['project_dir'] . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
-        \Illuminate\Support\ClassLoader::register();
+        ClassLoader::register();
 
         if (is_dir($workbench = $this->config['project_dir'] . 'workbench')) {
-            \Illuminate\Workbench\Starter::start($workbench);
+            Starter::start($workbench);
         }
-    }
-
-    /**
-     * Revert back to the Codeception error handler,
-     * because Laravel registers it's own error handler.
-     */
-    protected function revertErrorHandler()
-    {
-        $handler = new ErrorHandler();
-        set_error_handler(array($handler, 'errorHandler'));
     }
 
     /**
@@ -211,7 +227,7 @@ class Laravel4 extends Framework implements ActiveRecord
      */
     protected function databaseTransactionsSupported()
     {
-        return version_compare(\Illuminate\Foundation\Application::VERSION, '4.0.6', '>=');
+        return version_compare(Application::VERSION, '4.0.6', '>=');
     }
 
     /**
@@ -301,7 +317,7 @@ class Laravel4 extends Framework implements ActiveRecord
      * @param $route
      * @param array $params
      */
-    public function seeCurrentRouteIs($route, $params = array())
+    public function seeCurrentRouteIs($route, $params = [])
     {
         $this->seeCurrentUrlEquals($this->app['url']->route($route, $params, false));
     }
@@ -318,7 +334,7 @@ class Laravel4 extends Framework implements ActiveRecord
      * @param $action
      * @param array $params
      */
-    public function seeCurrentActionIs($action, $params = array())
+    public function seeCurrentActionIs($action, $params = [])
     {
         $this->seeCurrentUrlEquals($this->app['url']->action($action, $params, false));
     }
@@ -487,10 +503,11 @@ class Laravel4 extends Framework implements ActiveRecord
      * @param  \Illuminate\Auth\UserInterface|array $user
      * @param  string $driver
      * @return void
+     * @part framework
      */
     public function amLoggedAs($user, $driver = null)
     {
-        if ($user instanceof \Illuminate\Auth\UserInterface) {
+        if ($user instanceof UserInterface) {
             $this->app['auth']->driver($driver)->login($user);
         } else {
             $this->app['auth']->driver($driver)->attempt($user);
@@ -499,6 +516,7 @@ class Laravel4 extends Framework implements ActiveRecord
 
     /**
      * Logs user out
+     * @part framework
      */
     public function logout()
     {
@@ -507,6 +525,7 @@ class Laravel4 extends Framework implements ActiveRecord
 
     /**
      * Checks that user is authenticated
+     * @part framework
      */
     public function seeAuthentication()
     {
@@ -543,6 +562,7 @@ class Laravel4 extends Framework implements ActiveRecord
      *
      * @param  string $class
      * @return mixed
+     * @part framework
      */
     public function grabService($class)
     {
@@ -561,6 +581,8 @@ class Laravel4 extends Framework implements ActiveRecord
      * @param $tableName
      * @param array $attributes
      * @return mixed
+     * @part orm
+     * @part framework
      */
     public function haveRecord($tableName, $attributes = array())
     {
@@ -582,6 +604,8 @@ class Laravel4 extends Framework implements ActiveRecord
      *
      * @param $tableName
      * @param array $attributes
+     * @part orm
+     * @part framework
      */
     public function seeRecord($tableName, $attributes = array())
     {
@@ -603,6 +627,8 @@ class Laravel4 extends Framework implements ActiveRecord
      *
      * @param $tableName
      * @param array $attributes
+     * @part orm
+     * @part framework
      */
     public function dontSeeRecord($tableName, $attributes = array())
     {
@@ -625,6 +651,8 @@ class Laravel4 extends Framework implements ActiveRecord
      * @param $tableName
      * @param array $attributes
      * @return mixed
+     * @part ORM
+     * @part framework
      */
     public function grabRecord($tableName, $attributes = array())
     {
@@ -663,5 +691,4 @@ class Laravel4 extends Framework implements ActiveRecord
 
         return $output->fetch();
     }
-
 }

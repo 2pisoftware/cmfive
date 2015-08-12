@@ -339,8 +339,13 @@ button.button {
 }
 
 /* Task group styling */
-table.taskgroup_summary {
+table.taskgroup_summary thead {
     margin-bottom: 0px !important;
+    background: white;
+    
+}
+table.taskgroup_summary {
+	border: 0px;
 }
 
 /* Should be supported in IE7+ */
@@ -513,6 +518,10 @@ a > div#active_log_time {
     min-width: 80px;
 }
 
+
+.reveal-modal-bg {
+    position: fixed;
+}
 
 @-moz-keyframes spinPulse {
     0% {

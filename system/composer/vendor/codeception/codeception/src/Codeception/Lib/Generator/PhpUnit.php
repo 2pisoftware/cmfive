@@ -26,8 +26,8 @@ class {{name}}Test extends \PHPUnit_Framework_TestCase
     public function testMe()
     {
     }
-
 }
+
 EOF;
 
     protected $settings;
@@ -41,12 +41,11 @@ EOF;
 
     public function produce()
     {
-        $ns = $this->getNamespaceString($this->settings['namespace'] . '\\' . $this->name);
+        $ns = $this->getNamespaceHeader($this->settings['namespace'] . '\\' . $this->name);
 
         return (new Template($this->template))
             ->place('namespace', $ns)
             ->place('name', $this->getShortClassName($this->name))
             ->produce();
     }
-
 }

@@ -1,9 +1,8 @@
 <?php
-
 namespace Codeception\Coverage;
 
-use \Symfony\Component\Finder\Finder;
-use \Codeception\Configuration;
+use Codeception\Configuration;
+use Symfony\Component\Finder\Finder;
 
 class Filter
 {
@@ -56,18 +55,24 @@ class Filter
     public function whiteList($config)
     {
         $filter = $this->filter;
-        if (!isset($config['coverage'])) return $this;
+        if (!isset($config['coverage'])) {
+            return $this;
+        }
         $coverage = $config['coverage'];
         if (!isset($coverage['whitelist'])) {
-            $coverage['whitelist'] = array();
-            if (isset($coverage['include'])) $coverage['whitelist']['include'] = $coverage['include'];
-            if (isset($coverage['exclude'])) $coverage['whitelist']['exclude'] = $coverage['exclude'];
+            $coverage['whitelist'] = [];
+            if (isset($coverage['include'])) {
+                $coverage['whitelist']['include'] = $coverage['include'];
+            }
+            if (isset($coverage['exclude'])) {
+                $coverage['whitelist']['exclude'] = $coverage['exclude'];
+            }
         }
 
         if (isset($coverage['whitelist']['include'])) {
             foreach ($coverage['whitelist']['include'] as $fileOrDir) {
                 $finder = strpos($fileOrDir, '*') === false
-                    ? array($fileOrDir)
+                    ? [$fileOrDir]
                     : $this->matchWildcardPattern($fileOrDir);
 
                 foreach ($finder as $file) {
@@ -79,7 +84,7 @@ class Filter
         if (isset($coverage['whitelist']['exclude'])) {
             foreach ($coverage['whitelist']['exclude'] as $fileOrDir) {
                 $finder = strpos($fileOrDir, '*') === false
-                    ? array($fileOrDir)
+                    ? [$fileOrDir]
                     : $this->matchWildcardPattern($fileOrDir);
 
                 foreach ($finder as $file) {
@@ -97,13 +102,15 @@ class Filter
     public function blackList($config)
     {
         $filter = $this->filter;
-        if (!isset($config['coverage'])) return $this;
+        if (!isset($config['coverage'])) {
+            return $this;
+        }
         $coverage = $config['coverage'];
         if (isset($coverage['blacklist'])) {
             if (isset($coverage['blacklist']['include'])) {
                 foreach ($coverage['blacklist']['include'] as $fileOrDir) {
                     $finder = strpos($fileOrDir, '*') === false
-                        ? array($fileOrDir)
+                        ? [$fileOrDir]
                         : $this->matchWildcardPattern($fileOrDir);
 
                     foreach ($finder as $file) {
@@ -114,7 +121,7 @@ class Filter
             if (isset($coverage['blacklist']['exclude'])) {
                 foreach ($coverage['blacklist']['exclude'] as $fileOrDir) {
                     $finder = strpos($fileOrDir, '*') === false
-                        ? array($fileOrDir)
+                        ? [$fileOrDir]
                         : $this->matchWildcardPattern($fileOrDir);
 
                     foreach ($finder as $file) {
@@ -152,5 +159,4 @@ class Filter
     {
         return $this->filter;
     }
-
 }
