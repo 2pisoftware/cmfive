@@ -1,6 +1,7 @@
 /log/*.log
 /uploads/*
 .project
+/nbproject
 /config.php
 /system/composer/*
 codeception.yml
