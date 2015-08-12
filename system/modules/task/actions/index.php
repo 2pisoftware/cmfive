@@ -63,8 +63,7 @@ function index_ALL(Web $w) {
     $time_total_overall = 0;
     if (!empty($time_entries)) {
         foreach($time_entries as $time_entry) {
-            
-            $entry_date = date('d/m', $time_entry->dt_start);
+            $entry_date = date('d/m', strtotime($time_entry->dt_start));
             if (empty($time_entry_objects[$entry_date])) {
                 $time_entry_objects[$entry_date] = array('entries' => array(), "total" => 0);
             }

@@ -31,8 +31,9 @@ class DbPDO extends PDO {
         // Setting this to static however should make this array share the memory
         // heap for this var across all instances
         if (empty(DbPDO::$table_names)){
-            foreach($this->query("show tables")->fetchAll(PDO::FETCH_NUM) as $table)
+            foreach($this->query("show tables")->fetchAll(PDO::FETCH_NUM) as $table) {
                 DbPDO::$table_names[] = $table[0];
+			}
         }
         // Instantiate a FluentPDO class and init vars
         $this->fpdo = new FluentPDO($this);
@@ -276,7 +277,7 @@ class DbPDO extends PDO {
     
     // Returns the SQL query string
     public function getSql(){
-        if (!empty($this->query) and in_array(get_class($this->query), DbPDO::$_QUERY_CLASSNAME)) {
+        if (!empty($this->query) && in_array(get_class($this->query), DbPDO::$_QUERY_CLASSNAME)) {
             return $this->query->getQuery();
         }
         return null;
@@ -292,7 +293,7 @@ class DbPDO extends PDO {
     
     // Completely clears the select statement (removes table.*)
     public function clearSelect() {
-        if (!empty($this->query) and is_a($this->query, "SelectQuery")) {
+        if (!empty($this->query) && is_a($this->query, "SelectQuery")) {
             $this->query = $this->query->select(null);
         }
         return $this;
@@ -300,7 +301,7 @@ class DbPDO extends PDO {
     
     public function clear_sql(){
         // Clear everything
-        if (!empty($this->query) and is_a($this->query, "PDOStatement")) {
+        if (!empty($this->query) && is_a($this->query, "PDOStatement")) {
             $this->query = $this->query->where(null);
             $this->query = $this->query->orderBy(null);
             $this->query = $this->query->limit(null);
