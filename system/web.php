@@ -3,7 +3,7 @@
 ini_set('session.gc_maxlifetime', 60 * 60 * 6);
 
 //========== Constants =====================================
-define("CMFIVE_VERSION", "0.8.0");
+define("CMFIVE_VERSION", "0.8.3");
 
 define("ROOT_PATH", str_replace("\\", "/", getcwd()));
 define("SYSTEM_PATH", str_replace("\\", "/", getcwd() . '/system'));
@@ -104,7 +104,7 @@ class Web {
         	$this->_webroot = "https://" . $_SERVER['HTTP_HOST'];
         }
         $this->_actionMethod = null;
-        
+
         $this->loadConfigurationFiles();
         
         spl_autoload_register(array($this, 'modelLoader'));
@@ -557,8 +557,7 @@ class Web {
         
         // load the root level config file last because it can override everything
 	    if (!file_exists("config.php")) {
-			echo "<b>No config.php found. Please copy config.php.example, change parameters as necessary and rename to config.php<b>";
-			die();
+			$this->install();
 		}
         require ROOT_PATH . "/config.php";
         
