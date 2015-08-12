@@ -27,13 +27,16 @@
 			toggleModalLoading();
 			jQuery.ajax('/install-steps/import?' + data, {
 				
-			}).done(function(response) {
+			}).always(function(response) {
 				jQuery("#output").append(response).show();
 				toggleModalLoading();
-				jQuery("#output").append("<a id='finish_button' class='button success' href='/install-steps/finish'>Finish</a>");
 				jQuery('html,body').animate({
 					scrollTop: $("#finish_button").offset().top
 				}, 2000);
+			}).done(function(response) {
+				jQuery("#output").append("<a id='finish_button' class='button success' href='/install-steps/finish'>Finish</a>");
+			}).fail(function(response) {
+				
 			});
 
 			return false;
