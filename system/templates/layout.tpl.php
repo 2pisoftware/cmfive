@@ -210,7 +210,8 @@
             $(document).foundation({
                 reveal : {
                     animation_speed: 150,
-                    animation: 'fade'
+                    animation: 'fade',
+					root_element: window
                 }
             });
             
