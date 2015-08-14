@@ -47,7 +47,7 @@ class Attendance extends \Codeception\Module  {
 		//$I->login($I,self::$users[$user]['username'],self::$users[$user]['password']);
 		$I->amOnPage('/attendance');
 		$I->selectOption('select.fortnightending',$date);
-		$I->wait(3);
+		$I->wait(5);
 		if ($capture) $I->makeScreenshot('Created a timesheet for '.$user.' in fortnight ending' .$date);
 		//$id=$I->executeJS("return $('.timesheet_list).attr('data-id');");
 		$id=$I->grabAttributeFrom('.timesheet_list','data-id');
@@ -60,12 +60,12 @@ class Attendance extends \Codeception\Module  {
 		//$I->login($I,self::$users[$user]['username'],self::$users[$user]['password']);
 		$I->amOnPage('/attendance');
 		$I->selectOption('select.fortnightending',$date);
-		$I->wait(3);
+		$I->wait(5);
 		if ($capture) $I->makeScreenshot('Login as '.$user.', Select a pay period and click Submit to send timesheet for approval');
 		
 		$I->click('Submit');
 		// bypass vha banking
-		$I->wait(3);
+		$I->wait(5);
 		if ($capture) $I->makeScreenshot('Choose to bank time if available');
 		$I->click('#cmfive-modal input[name=submit]');
 	}
@@ -76,7 +76,7 @@ class Attendance extends \Codeception\Module  {
 		//$I->login($I,self::$users[$user]['username'],self::$users[$user]['password']);
 		$I->amOnPage('/attendance');
 		$I->selectOption('select.fortnightending',$date);
-		$I->wait(3);
+		$I->wait(5);
 		if ($capture) $I->makeScreenshot('Click reset to remove all modifications to timesheet');
 		$I->click('Reset');
 		//$I->acceptPopup();
@@ -91,7 +91,7 @@ class Attendance extends \Codeception\Module  {
 		$I->click('My Employees');
 		if ($capture) $I->makeScreenshot('Login as a supervisor and navigate to My Employees page and choose a pay period');
 		$I->selectOption('select.fortnightending',$date);
-		$I->wait(3);
+		$I->wait(5);
 		// choose the user
 		if (self::$users[$approveUser]['employee_number']>0) {
 			$I->click('.tablesorter tbody tr[data-id="'.self::$users[$approveUser]['employee_number'].'"] a');
@@ -112,7 +112,7 @@ class Attendance extends \Codeception\Module  {
 		//$I->amOnPage('/attendance-employee/descendants');
 		$I->click('My Employees');
 		$I->selectOption('select.fortnightending',$date);
-		$I->wait(3);
+		$I->wait(5);
 		if ($capture) $I->makeScreenshot('Login as a supervisor, navigate to My Employees then choose a pay period');
 		// choose the user
 		if (self::$users[$approveUser]['employee_number']>0) {
@@ -138,7 +138,7 @@ class Attendance extends \Codeception\Module  {
 		if (self::$users[$approveUser]['employee_number']>0) {
 			$I->click('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$approveUser]['employee_number'].'"] a.timesheetlink');
 			$I->selectOption('select.fortnightending',$date);
-			$I->wait(3);
+			$I->wait(5);
 			if ($capture) $I->makeScreenshot('Click Rollback to revert the timesheet');
 			$I->click('Rollback');
 			//$I->acceptPopup();
@@ -156,7 +156,7 @@ class Attendance extends \Codeception\Module  {
 		if (self::$users[$approveUser]['employee_number']>0) {
 			$I->click('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$approveUser]['employee_number'].'"] a.timesheetlink');
 			$I->selectOption('select.fortnightending',$date);
-			$I->wait(3);
+			$I->wait(5);
 			if ($capture) $I->makeScreenshot('Click Delete to remove the timesheet and allow the user to start fresh');
 		
 			$I->click('Delete');
@@ -175,7 +175,7 @@ class Attendance extends \Codeception\Module  {
 		if (self::$users[$checkUser]['employee_number']>0) {
 			$I->click('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"] a.timesheetlink');
 			$I->selectOption('select.fortnightending',$date);
-			$I->wait(3);
+			$I->wait(5);
 			if ($capture) $I->makeScreenshot('Check timesheet status matches '.$status);
 			$I->see('Timesheet '.$status);
 		}
@@ -205,7 +205,7 @@ class Attendance extends \Codeception\Module  {
 			// set employee type to Variable
 			$I->selectOption('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  select[data-field="type"]','Variable');
 			// set rdo type to Monthly
-			$I->selectOption('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  select[data-field="rdo_type"]','Monthly');
+			$I->selectOption('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  select[data-field="rdo_type"]','Monthly RDO');
 			// set start time to 9am
 			$I->selectOption('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  select[data-field="default_start_time"]','9:00AM');
 			// set lunch to 45 minutes
@@ -239,12 +239,12 @@ class Attendance extends \Codeception\Module  {
 				$('#cmfive-modal .savebutton').click();
 			 ");
 						
-			$I->wait(3);
+			$I->wait(5);
 			// reload page and check that values persisted
 			$I->amOnPage('/attendance-employee/list');
 			if ($capture) $I->makeScreenshot('Reload page and check values saved to database');
 			$I->assertEquals('Variable',$I->grabValueFrom('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  select[data-field="type"]'));
-			$I->assertEquals('Monthly',$I->grabValueFrom('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  select[data-field="rdo_type"]'));
+			$I->assertEquals('Monthly RDO',$I->grabValueFrom('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  select[data-field="rdo_type"]'));
 			$I->assertEquals('9:00AM',$I->grabValueFrom('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  select[data-field="default_start_time"]'));
 			$I->assertEquals('45',$I->grabValueFrom('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  select[data-field="lunch_length"]'));
 			$I->assertEquals('on',$I->grabValueFrom('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  input[data-field="vwh_allowed"]'));
@@ -271,20 +271,20 @@ class Attendance extends \Codeception\Module  {
 			// set employee type to Variable
 			$I->selectOption('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  select[data-field="type"]','Fixed');
 			// set rdo type to Monthly
-			$I->selectOption('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  select[data-field="rdo_type"]','');
+			$I->selectOption('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  select[data-field="rdo_type"]','Casual/Part time');
 			// set start time to 9am
 			$I->selectOption('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  select[data-field="default_start_time"]','5:00AM');
 			// set lunch to 45 minutes
 			$I->selectOption('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  select[data-field="lunch_length"]','15');
 			// enable variable hours
 			$I->uncheckOption('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  input[data-field="vwh_allowed"]');
-			$I->wait(3);
+			$I->wait(5);
 			
 			// reload page and check that values persisted
 			$I->amOnPage('/attendance-employee/list');
 			if ($capture) $I->makeScreenshot('Reload page and check values saved to database');
 			$I->assertEquals('Fixed',$I->grabValueFrom('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  select[data-field="type"]'));
-			$I->assertEquals('',$I->grabValueFrom('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  select[data-field="rdo_type"]'));
+			$I->assertEquals('Casual/Part time',$I->grabValueFrom('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  select[data-field="rdo_type"]'));
 			$I->assertEquals('5:00AM',$I->grabValueFrom('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  select[data-field="default_start_time"]'));
 			$I->assertEquals('15',$I->grabValueFrom('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  select[data-field="lunch_length"]'));
 			//$I->assertEquals('off',$I->grabValueFrom('#employeeList tr.editablelistrow[data-employeenumber="'.self::$users[$checkUser]['employee_number'].'"]  input[data-field="vwh_allowed"]'));
@@ -335,7 +335,7 @@ class Attendance extends \Codeception\Module  {
 		
 		// check default lunch length, start end times
 		$lunch=$I->grabValueFrom('.lunchlength');
-		echo $lunch;
+		//echo $lunch;
 		$timesheetId=$I->executeJS("return $('#timesheet_list').data('id');");
 		
 		// set lunch

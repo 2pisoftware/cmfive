@@ -138,9 +138,9 @@ function renderSuitesBlock($suites,$key,$keyid) {
 									}
 									$functionLabel=ucfirst($functionNameParts[0].' '.implode(' ',array_slice($functionNameParts,1)));
 									if ($testLabel!==$lastTestLabel) {
-										$suiteTests.='<div class="testseperator" >&nbsp;<hr/></div>';
+										$suiteTests.='<hr/><div class="testseperator" ><i>'.ucfirst($testLabel).'</i></div>';
 									} 
-									$suiteTests.='<div class="test testresult-'.$status.'" id="'.$suiteName.'___'.$testType.'___'.$testName.'___'.$functionName.'" >'.'<input class="testselected" type="checkbox" checked="checked" />'." <a class='runtestbutton testrunner button tiny' href='dbmanager.php?tests=".$suiteName.'___'.$testType.'___'.$testName.'___'.$functionName."' target='_new' >Run Test</a> <i>".ucfirst($testLabel).'</i> - '.ucfirst($functionLabel).'</div>';
+									$suiteTests.='<div class="test testresult-'.$status.'" id="'.$suiteName.'___'.$testType.'___'.$testName.'___'.$functionName.'" >'.'<input class="testselected" type="checkbox" checked="checked" />'." <a class='runtestbutton testrunner button tiny' href='dbmanager.php?tests=".$suiteName.'___'.$testType.'___'.$testName.'___'.$functionName."' target='_new' >Run Test</a> ".ucfirst($functionLabel).'</div>';
 									$lastTestLabel=$testLabel;
 									$count++;
 								}

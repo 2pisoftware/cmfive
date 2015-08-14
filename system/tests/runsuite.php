@@ -148,7 +148,9 @@ function runTests($suites,$requestUrl) {
 				foreach ($suite['paths'] as $suiteTitle=>$path) {
 					$cmds=array();
 					if ($runAllTests==true) {
-						$cmds=array('cd '.$path.' && php '.$suite['codeception'].' run  '.$verbosity.'--no-colors --config="'.$path.'"'.$env);
+						$cmds=[];
+						//array_push($cmds,'cd '.$path.' && php '.$suite['codeception'].' clean &&');
+						array_push($cmds,'cd '.$path.' && php '.$suite['codeception'].' run  '.$verbosity.'--no-colors --config="'.$path.'"'.$env);
 					} else {
 						if (array_key_exists($suiteTitle,$requestedTests)) {
 							foreach($requestedTests[$suiteTitle] as $rtk => $rtv) {
