@@ -91,7 +91,7 @@ function initialisePage() {
 			$(this).parents('li.testsuite').children('.suiteselected')[0].checked=false; //.prop('checked','false');
 		}
 	});
-	
+	/*
 	$.get('dbmanager.php?checkmysqldiffs=1&mini=1'+getParams(),function(res) {
 			if (res && res.length>0) {
 				$('#showdbtools b').text(res);
@@ -100,10 +100,9 @@ function initialisePage() {
 			}
 			
 	});
+	*/
 	
 	var xhr ;
-	
-	
 	function startTests(tests) {
 		if ($('#testsenabled:checked').length>0) {
 			UIStartTests();

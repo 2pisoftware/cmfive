@@ -128,7 +128,15 @@ function renderSuitesBlock($suites,$key,$keyid) {
 									
 									$testName=substr(basename($spv),0,strlen(basename($spv))-4);
 									$status='pending';
-									$suiteTests.='<div class="test testresult-'.$status.'" id="'.$suiteName.'___'.$testType.'___'.$testName.'___'.$functionName.'" >'.'<input class="testselected" type="checkbox" checked="checked" />'." <a class='runtestbutton testrunner button tiny' href='dbmanager.php?tests=".$suiteName.'___'.$testType.'___'.$testName.'___'.$functionName."' target='_new' >Run Test</a> ".$testName.' '.$functionName.'</div>';
+									$testNameParts= preg_split('/(?=[A-Z])/',lcfirst($testName));
+									$functionNameParts= preg_split('/(?=[A-Z])/',lcfirst($functionName)); 
+									if ($testNameParts[count($testNameParts)-1]=="Cest") array_pop($testNameParts);
+									$testLabel=implode(' ',$testNameParts);
+									function mylcfirst($array,$key) {
+										$array[$key]=lcfirst($array[$key]);
+									}
+									$functionLabel=ucfirst($functionNameParts[0]).implode(' ',array_walk(array_slice($functionNameParts,1),'mylcfirst'));
+									$suiteTests.='<div class="test testresult-'.$status.'" id="'.$suiteName.'___'.$testType.'___'.$testName.'___'.$functionName.'" >'.'<input class="testselected" type="checkbox" checked="checked" />'." <a class='runtestbutton testrunner button tiny' href='dbmanager.php?tests=".$suiteName.'___'.$testType.'___'.$testName.'___'.$functionName."' target='_new' >Run Test</a> <i>".ucfirst($testLabel).'</i> - '.ucfirst($functionLabel).'</div>';
 									$count++;
 								}
 								
@@ -179,10 +187,10 @@ function renderSuitesBlock($suites,$key,$keyid) {
 						<div id='phperrors' style='display: none;' ></div>
 						<input type='hidden' id='md5keyid' value='<?php echo $keyid; ?>'>
 						<input type='hidden' id='md5key' value='<?php echo $key; ?>'>
-						<a href="#" id='showdbtools' class='button right' data-reveal-id="dbtools">DB Tools<b>...</b></a>
+						<!--a href="#" id='showdbtools' class='button right' data-reveal-id="dbtools">DB Tools<b>...</b></a>
 
 						<div id="dbtools" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-						</div>
+						</div-->
 						
 						
 						<div style='display: none' id='warning' >Running tests will modify database structure and data.<br/>
