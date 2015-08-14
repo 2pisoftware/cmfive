@@ -11,9 +11,9 @@
 
 namespace Codeception\Extension;
 
-use Codeception\Exception\Extension as ExtensionException;
+use Codeception\Exception\ExtensionException as ExtensionException;
 
-class Phantoman extends \Codeception\Platform\Extension
+class Phantoman extends \Codeception\Extension
 {
 
     // list events to listen to
@@ -24,14 +24,19 @@ class Phantoman extends \Codeception\Platform\Extension
     private $resource;
 
     private $pipes;
-
+    
+    protected $config = [
+        'path'     => 'vendor/bin/phantomjs',
+        'port'     => 4444,
+    ];
+    
 	public static $includeInheritedActions = false;
 
- // include only "see" and "click" actions
-public static $onlyActions = array();
+	 // include only "see" and "click" actions
+	public static $onlyActions = array();
 
-// exclude "seeElement" action
-public static $excludeActions = array();
+	// exclude "seeElement" action
+	public static $excludeActions = array();
 
 public function _beforeSuite($settings = array()) {
 }
@@ -71,7 +76,7 @@ public function _failed(\Codeception\TestCase $test, $fail) {
 
     public function __construct($config, $options=array('silent'=>false))
     {
-        parent::__construct($config, $options);
+	    parent::__construct( $options,array());
 
         // Set default path for PhantomJS to "vendor/bin/phantomjs" for if it was installed via composer
         if (!isset($this->config['path'])) {
@@ -153,7 +158,7 @@ public function _failed(\Codeception\TestCase $test, $fail) {
 
         if (!is_resource($this->resource) || !proc_get_status($this->resource)['running']) {
             proc_close($this->resource);
-            throw new ExtensionException($this, 'Failed to start PhantomJS server.');
+            throw new Exception($this, 'Failed to start PhantomJS server.');
         }
 
         // Wait till the server is reachable before continuing
@@ -163,7 +168,7 @@ public function _failed(\Codeception\TestCase $test, $fail) {
         $this->write("Waiting for the PhantomJS server to be reachable");
         while (true) {
             if ($checks >= $max_checks) {
-                throw new ExtensionException($this, 'PhantomJS server never became reachable');
+                throw new Exception($this, 'PhantomJS server never became reachable');
                 break;
             }
 
