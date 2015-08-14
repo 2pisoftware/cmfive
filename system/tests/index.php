@@ -103,6 +103,7 @@ function renderSuitesBlock($suites,$key,$keyid) {
 				//file_put_contents($folder.DS.'tests'.DS.'_bootstrap.php',$bs);
 				foreach (array('acceptance','unit','functional') as $ttk => $testType) {
 					$count=0;
+					$lastTestLabel='';
 					foreach (glob($suitePath.DS."tests".DS.$testType.DS."*Cest.php") as $spv) {
 						// foreach public test function inside
 						$file = file_get_contents ($spv);
@@ -132,11 +133,15 @@ function renderSuitesBlock($suites,$key,$keyid) {
 									$functionNameParts= preg_split('/(?=[A-Z])/',lcfirst($functionName)); 
 									if ($testNameParts[count($testNameParts)-1]=="Cest") array_pop($testNameParts);
 									$testLabel=implode(' ',$testNameParts);
-									function mylcfirst($array,$key) {
-										$array[$key]=lcfirst($array[$key]);
+									foreach ($functionNameParts as $k=>$v) {
+										$functionNameParts[$k]=lcfirst($v);
 									}
-									$functionLabel=ucfirst($functionNameParts[0]).implode(' ',array_walk(array_slice($functionNameParts,1),'mylcfirst'));
+									$functionLabel=ucfirst($functionNameParts[0].' '.implode(' ',array_slice($functionNameParts,1)));
+									if ($testLabel!==$lastTestLabel) {
+										$suiteTests.='<div class="testseperator" >&nbsp;<hr/></div>';
+									} 
 									$suiteTests.='<div class="test testresult-'.$status.'" id="'.$suiteName.'___'.$testType.'___'.$testName.'___'.$functionName.'" >'.'<input class="testselected" type="checkbox" checked="checked" />'." <a class='runtestbutton testrunner button tiny' href='dbmanager.php?tests=".$suiteName.'___'.$testType.'___'.$testName.'___'.$functionName."' target='_new' >Run Test</a> <i>".ucfirst($testLabel).'</i> - '.ucfirst($functionLabel).'</div>';
+									$lastTestLabel=$testLabel;
 									$count++;
 								}
 								
