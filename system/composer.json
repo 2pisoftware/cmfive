@@ -5,10 +5,7 @@
         "bin-dir": "composer/bin"
     },
     "require": {
-        "codeception/codeception": "2.0.14",
         "monolog/monolog": "1.8.*@dev",
-        "site5/phantoman": "*",
-        "jakoch/phantomjs-installer": "*",
         "knplabs/gaufrette": "0.2.*@dev",
         "dropbox-php/dropbox-php": "*",
         "zendframework/zend-mail": "2.2.5",
