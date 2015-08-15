@@ -302,73 +302,18 @@ class Attendance extends \Codeception\Module  {
 	
 	public function setEntryStartEndTimes($I,$entryPos,$startHour,$startMinute,$startAmPm,$endHour,$endMinute,$endAmPm) {
 		// start
-		$I->click('.timesheet_list_item::nth-child('.$entryPos.') .active_time_entry .starttime');
+		$I->click('.timesheet_list_item:nth-child('.$entryPos.') .active_time_entry .starttime');
 		$I->selectOption('#timepicker_modal_hours',$startHour);
 		$I->selectOption('#timepicker_modal_minutes',$startMinute);
 		$I->checkOption('#timepicker_modal_'.$startAmPm);
 		$I->click('Save');
+		$I->wait(1);
 		// end
-		$I->click('.timesheet_list_item::nth-child('.$entryPos.') .active_time_entry .endtime');
+		$I->click('.timesheet_list_item:nth-child('.$entryPos.') .active_time_entry .endtime');
 		$I->selectOption('#timepicker_modal_hours',$endHour);
 		$I->selectOption('#timepicker_modal_minutes',$endMinute);
 		$I->checkOption('#timepicker_modal_'.$endAmPm);
 		$I->click('Save');
 	}
 	
-	/************************
-	 * Submit a timesheet 
-	 ************************/
-	public function updateTimeSheet($I,$capture=true) {
-		$I->dontSee('Access Denied');
-		$I->see('2piUser - Timesheet');
-		// fortnight selector
-		$I->selectOption('select.fortnightending','14-08-2015');		
-		// see authority leave in list and day view
-		
-		$I->click('.timesheet_list_item::nth-child(1)');
-		$I->see('Saturday 1st of August');
-		// next previous buttons
-		$I->click('.tomorrowbutton');
-		$I->see('Sunday 2nd of August');
-		$I->click('.yesterdaybutton');
-		$I->see('Saturday 1st of August');
-		
-		// check default lunch length, start end times
-		$lunch=$I->grabValueFrom('.lunchlength');
-		//echo $lunch;
-		$timesheetId=$I->executeJS("return $('#timesheet_list').data('id');");
-		
-		// set lunch
-		
-		// set rdo
-		
-		// set vha
-		
-		// set start end times
-		
-		
-		// back button
-		
-		// marked day approved
-		
-		// check stats against preconfigured data in sql dump
-		
-		// check time banks increment after submitting and approving a timesheet
-		
-		// reset
-		
-		// add rows
-		
-		// delete rows
-		
-		// change leave type (and see textarea for comment)
-		
-		// submit with comment
-		
-		
-		// disabled for editing ?
-		
-	}
-	
- 
 }

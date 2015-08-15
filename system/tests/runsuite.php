@@ -147,7 +147,7 @@ function runTests($suites,$requestUrl) {
 				} 
 				foreach ($suite['paths'] as $suiteTitle=>$path) {
 					$cmds=array();
-					if ($runAllTests==true) {
+					if ($runAllTests==true && false) {
 						$cmds=[];
 						//array_push($cmds,'cd '.$path.' && php '.$suite['codeception'].' clean &&');
 						array_push($cmds,'cd '.$path.' && php '.$suite['codeception'].' run  '.$verbosity.'--no-colors --config="'.$path.'"'.$env);

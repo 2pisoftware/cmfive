@@ -192,10 +192,10 @@ function renderSuitesBlock($suites,$key,$keyid) {
 						<div id='phperrors' style='display: none;' ></div>
 						<input type='hidden' id='md5keyid' value='<?php echo $keyid; ?>'>
 						<input type='hidden' id='md5key' value='<?php echo $key; ?>'>
-						<!--a href="#" id='showdbtools' class='button right' data-reveal-id="dbtools">DB Tools<b>...</b></a>
+						<a href="#" id='showdbtools' class='button right' data-reveal-id="dbtools">DB Tools<b>...</b></a>
 
 						<div id="dbtools" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-						</div-->
+						</div>
 						
 						
 						<div style='display: none' id='warning' >Running tests will modify database structure and data.<br/>
