@@ -1128,7 +1128,7 @@ class Web {
      * @param String module
      * @param String $function
      * @param Mixed $data
-     * @return anything that the hook function wants to return
+     * @return an array of return values from all functions that answer to this hool
      */
     public function callHook($module, $function, $data = null) {
         if (empty($module) or empty($function)) {
