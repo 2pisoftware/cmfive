@@ -869,10 +869,14 @@ class DbObject extends DbService {
             }
         }
 
-        // add custom content to the index
+        // add custom content from the object to the index
         $str .= $this->addToIndex();
 
-        $str .= implode(" ",$this->w->callHook("core_dbobject", "add_to_index", $this));
+        // add content from hooks anywhere in the system
+        $additional = $this->w->callHook("core_dbobject", "add_to_index", $this);
+        if (!empty($additional)) {
+        	$str .= implode(" ",$additional); 
+        }
 
         // ------------ sanitise string ----------------------------------
         // Remove all xml/html tags
