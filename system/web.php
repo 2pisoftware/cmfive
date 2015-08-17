@@ -154,7 +154,7 @@ class Web {
                 }
             }
         }
-        $this->Log->debug("Class " . $file . " not found.");
+        // $this->Log->debug("Class " . $file . " not found.");
         return false;
     }
 
