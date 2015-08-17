@@ -1,0 +1,13 @@
+<?php
+/**
+ * config settings for tags
+ *
+ * @author Robert Lockerbie, robert@lockerbie.id.au, 2015
+ **/
+
+Config::set('tag', array(
+    'active' => true,
+    'path' => 'system/modules',
+    'topmenu' => false,
+    //'widgets' => array('favorites_widget'),
+));
