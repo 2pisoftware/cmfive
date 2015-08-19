@@ -14,6 +14,13 @@ class Tag extends DbObject {
 
 	public static $_db_table = "tag";
 	
+	function getSelectOptionTitle() {
+		return $this->tag;
+	}
+	function getSelectOptionValue() {
+		return $this->tag;
+	}
+	
 	public function insert($force_validation = true) {
 		parent::insert($force_validation);
 		// Call Hook

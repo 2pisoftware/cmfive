@@ -21,11 +21,17 @@ class TagService extends DbService {
 			}
 		}
 	}
-	public function getAllTags() {
+	public function getAllTags($returnObjects=false) {
 		//@TODO: Is there a way to do this without raw SQL?
 		//Loads a list of all tags that were ever created
 		//How to really delete a tag...?
 		$tags = $this->_db->sql('SELECT id,tag,tag_color FROM tag WHERE 1 GROUP BY tag ORDER BY tag')->fetch_all();
+		if($returnObjects) {
+			if(!empty($tags)) {
+				$objects = $this->getObjectsFromRows('Tag', $tags, true);
+				return $objects;
+			}
+		}
 		$tagList = array();
 		foreach($tags as $tag) {
 			$tagList[$tag['id']] = $tag;
@@ -53,7 +59,7 @@ class TagService extends DbService {
 			$user = $this->w->Auth->user();
 			$tag->user_id = $user->id;
 			$tag->tag_color = $color;
-			$tag->tag = strip_tags($tagText);
+			$tag->tag = trim(strip_tags($tagText));
 			$tag->insert();
 		}
 	}
