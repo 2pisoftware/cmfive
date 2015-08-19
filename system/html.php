@@ -156,6 +156,48 @@ class Html {
         $button->href($href)->text($title)->confirm($confirm)->id($id)->setClass($class)->newtab($newtab)->type($type);
         return $button->__toString();
     }
+    /**
+     * Create an a link styled as a button
+     * */
+    public static function ab($href, $title, $class = null, $id = null,$confirm = null) {
+		$classParam=' button tiny ';
+		if (strlen($class)>0) {
+			$classParam.=$class;
+		} 
+		$classParam=" class='".$classParam."' ";
+		$idParam='';
+		if (strlen($id)>0)  {
+			$idParam=" id='".$id."' ";
+		}
+		$confirmParam='';
+		if (strlen($confirm)>0)  {
+			$confirmParam=" onclick=\"return confirm('".$confirm."')\" ";
+		}
+		
+        return '<a href="'.$href.'" '.$classParam.' '.$idParam.' '.$confirmParam.'>'.$title.'</a>';
+    }
+    
+    /**
+     * Create an a link styled as a button that pops up a reveal dialog
+     * */
+    public static function abox($href, $title, $class = null, $id = null,$confirm = null) {	
+		$classParam=' button tiny ';
+		if (strlen($class)>0) {
+			$classParam.=$class;
+		} 
+		$classParam=" class='".$classParam."' ";
+		$idParam='';
+		if (strlen($id)>0)  {
+			$idParam=" id='".$id."' ";
+		}
+		$confirmParam='';
+		if (strlen($confirm)>0)  {
+			$confirmParam=" onclick='return(\"".$confirm."\");' ";
+		}
+		
+        return '<a href="'.$href.'" data-reveal-id="cmfive-modal" data-reveal-ajax="true" '.$classParam.' '.$idParam.' '.$confirmParam.'>'.$title.'</a>';
+    }
+    
 
     /**
      * Creates a link (or button) which will pop up a colorbox
@@ -424,7 +466,7 @@ class Html {
         $buffer .= "<div class='row-fluid small-12 multicolform'>";
         $buffer .= "<div class='row-fluid'>";// "<ul class='small-block-grid-1 medium-block-grid-2 large-block-grid-3 section-body'>";
         foreach ($data as $section => $rows) {
-            $buffer .= "<div class='item'><div class='panel'><h4>{$section}</h4><table>";
+            $buffer .= "<div class='item ".toSlug($section)."'><div class='panel'><h4>{$section}</h4><table>";
             foreach($rows as $row) {
                 
                 foreach($row as $field) {
@@ -449,12 +491,12 @@ class Html {
     //                $buffer .= "<li class='display-row'>";
 
                     // Add title field
-                    $buffer .= "<tr>";
+                    $buffer .= "<tr class='".toSlug($title)."' >";
                     if (!empty($title)) {
                         $buffer .= "<td class='small-6 large-4'><b>{$title}</b></td>";
                     }
 
-                    $buffer .= "<td class='small-6 large-8'>{$value}</td></tr>";
+                    $buffer .= "<td class='small-6 large-8 type_".toSlug($type)."'>{$value}</td></tr>";
                 }
             }
             $buffer .= "</table></div></div>";
@@ -494,7 +536,7 @@ class Html {
         // If form tag is needed print it
         if ($includeFormTag) {
             $class .= " small-12 columns";
-            $form->id($id)->setClass($class)->method($method)->action($action)->target($target);
+            $form->id($id)->name($id)->setClass($class)->method($method)->action($action)->target($target);
                 
             if (in_multiarray("file", $data)) {
                 $form->enctype("multipart/form-data");
@@ -554,6 +596,7 @@ class Html {
                     switch($type) {
                         case "text":
                         case "password":
+						case "email":
                             $size = !empty($field[4]) ? $field[4] : null;
                             $buffer .= '<input' . $readonly . ' style="width:100%;" type="' . $type . '" name="' . $name . '" value="' . htmlspecialchars($value) . '" size="' . $size . '" id="' . $name . '" ' . $required . " />";
                         break;

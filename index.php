@@ -1,18 +1,13 @@
 <?php 
+
 error_reporting(E_ALL);
 
-
-
-//========= Load System Modules Configuration ===============
-require "system/config.php";
+require_once 'system/web.php';
 $web = new Web();
 
-//========= Load Application Modules Configuration ==========
-if (!file_exists("config.php")) {
-	$web->install();
-} else {
-	require "config.php";
-	
+//if (!file_exists("config.php")) {
+//	$web->install();
+//} else {
 	//============== start application =============
 	$web->start();
-}
+//}
