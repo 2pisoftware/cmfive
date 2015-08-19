@@ -77,7 +77,13 @@
                         breadcrumbs.css('height', (breadcrumbs.height() + 20) + "px");
                     }
                 }
-                
+
+				// Admin clear cache button function
+				$('#admin_clear_cache').bind('click', function(e) {
+					$.get($(this).attr('href'));
+					e.preventDefault();
+					return false;
+				});
                 // Search function shortcut listener
                 $(document).on('keydown', function ( e ) {
                     if ((e.ctrlKey || e.metaKey) && e.which === 70) {
@@ -120,8 +126,12 @@
                         <!-- Search bar -->
                         <li><?php echo Html::box("/search", "<span class='fi-magnifying-glass'></span>", false, false, null, null, null, "cmfive_search_button"); ?></li>
                         
-                        <!-- User Profile drop down -->
                         <?php if ($w->Auth->user()): ?>
+						<!-- Clear cache button -->
+							<?php if ($w->Auth->user()->is_admin): ?>
+							<li><a id="admin_clear_cache" href="/admin/ajaxClearCache" onclick="return false;" title="Clear configuration cache"><span class="fi-refresh"></span></a></li>
+							<?php endif; ?>
+                        <!-- User Profile drop down -->
                             <li class="has-dropdown">
                                 <a href="#"><span  class="fi-torso"></span></a>
                                 <?php
