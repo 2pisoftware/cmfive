@@ -7,8 +7,12 @@ function results_GET(Web $w) {
 	$p = $w->request('p'); // page
 	$ps = $w->request('ps'); // pageSize	
 	$tr = $w->request('tr'); // total results
+	$tags = $w->request('tags'); // Tags
 	
-	if ($q && strlen($q) >= 3) {
+	if ( ($q && strlen($q) >= 3) || (!empty($tags)) ) {
+			if(!empty($tags)) {
+				$q.= ' unitag'.strtolower($tags);
+			}
             $results = $w->Search->getResults($q, $idx,$p,$ps);
 
             if (empty($p) && empty($ps) && empty($tr)) {
