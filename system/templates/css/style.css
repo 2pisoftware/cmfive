@@ -35,7 +35,10 @@ form {
 ul.accordion {
     margin-left: 0px;
 }
-
+.CodeMirror {
+	height:auto!important;
+	margin-bottom:10px;
+}
 .accordion .accordion-navigation > .content {
     padding: 0px;
 }

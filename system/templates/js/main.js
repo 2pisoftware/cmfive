@@ -54,7 +54,9 @@ function bindCodeMirror() {
                     mode: 'text/html',
                     matchBrackets: true,
                     autoCloseTags: true,
-                    wordWrap: true
+                    wordWrap: true,
+					viewportMargin: Infinity,
+					
                 });
                 if (codeInstanceCount < (maxCodeInstances - 1)) {
                     codeInstanceCount++;
