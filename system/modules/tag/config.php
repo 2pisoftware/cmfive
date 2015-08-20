@@ -8,7 +8,7 @@
 Config::set('tag', array(
     'active' => true,
     'path' => 'system/modules',
-    'topmenu' => false,
+    'topmenu' => true,
     'hooks' => array(
 		'core_dbobject',
 	),

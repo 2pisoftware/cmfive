@@ -93,7 +93,7 @@ class SearchService extends DbService {
 		$index_all_limit = 10;
 		
 		$select = "SELECT class_name, object_id ";
-        $from = " FROM object_index WHERE object_id != 0 AND MATCH (content) AGAINST ('$str' IN $index_mode) ";
+        $from = " FROM object_index WHERE object_id != 0 AND MATCH (content) AGAINST (".$this->_db->quote($str)." IN $index_mode) ";
         $select .= $from;
         
 		$select_count = "select count(*) as MAX_RESULT ".$from;

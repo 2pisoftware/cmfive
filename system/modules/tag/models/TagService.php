@@ -18,13 +18,15 @@ class TagService extends DbService {
 			$tag = $this->getObject("Tag", array("obj_class" => $obj_class, "obj_id" => $object_id, 'tag' => $tagText));
 			if(!empty($tag)) {
 				$tag->delete();
+				//Update objects index and anything else...
+				$obj = $this->getObject($obj_class, $object_id);
+				$obj->update();
 			}
 		}
 	}
 	public function getAllTags($returnObjects=false) {
 		//@TODO: Is there a way to do this without raw SQL?
 		//Loads a list of all tags that were ever created
-		//How to really delete a tag...?
 		$tags = $this->_db->sql('SELECT id,tag,tag_color FROM tag WHERE 1 GROUP BY tag ORDER BY tag')->fetch_all();
 		if($returnObjects) {
 			if(!empty($tags)) {
@@ -52,6 +54,9 @@ class TagService extends DbService {
 		if(!empty($tagLookup)) {
 			$tagLookup->is_deleted = 0;
 			$tagLookup->update();
+			//Update objects index and anything else...
+			$obj = $this->getObject($obj_class, $object_id);
+			$obj->update();
 		} else {
 			$tag = new Tag($this->w);
 			$tag->obj_class = $obj_class;
@@ -61,6 +66,42 @@ class TagService extends DbService {
 			$tag->tag_color = $color;
 			$tag->tag = trim(strip_tags($tagText));
 			$tag->insert();
+			//Update objects index and anything else...
+			$obj = $this->getObject($obj_class, $object_id);
+			$obj->update();
+		}
+	}
+	
+	public function deleteTag($tag) {
+		$tags = $this->getObjects("Tag", array('tag' => $tag));
+		if(!empty($tags)) {
+			foreach($tags as $tag) {
+				$tag->delete(true);
+				if(!$tag->is_deleted) {
+					//Update objects index and anything else...
+					$obj = $this->getObject($tag->obj_class, $tag->obj_id);
+					$obj->update();
+				}
+			}
+		}
+	}
+	public function renameTag($tag, $tagText) {
+		//Check if tagText already exists...
+		$tags = $this->getObjects("Tag", array('tag' => trim(strip_tags($tagText))));
+		if(!empty($tags)) {
+			return -1;
+		}
+		$tags = $this->getObjects("Tag", array('tag' => $tag));
+		if(!empty($tags)) {
+			foreach($tags as $tag) {
+				$tag->tag = trim(strip_tags($tagText));
+				$tag->update();
+				if(!$tag->is_deleted) {
+					//Update objects index and anything else...
+					$obj = $this->getObject($tag->obj_class, $tag->obj_id);
+					$obj->update();
+				}
+			}
 		}
 	}
 	
@@ -106,4 +147,17 @@ class TagService extends DbService {
 		}
 		return $buf;
 	}
+	public function navigation(Web $w, $title = null, $nav = null) {
+        if ($title) {
+            $w->ctx("title", $title);
+        }
+
+        $nav = $nav ? $nav : array();
+
+        if ($w->Auth->loggedIn() && $this->w->Auth->user()->hasRole('tag_admin')) {
+            $w->menuLink("tag/index", "Tag Admin", $nav);
+        }
+        $w->ctx("navigation", $nav);
+        return $nav;
+    }
 }

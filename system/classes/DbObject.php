@@ -875,9 +875,7 @@ class DbObject extends DbService {
         // add content from hooks anywhere in the system
         $additional = $this->w->callHook("core_dbobject", "add_to_index", $this);
         if (!empty($additional)) {
-			foreach($additional as $addition) {
-				$str .= ' '.implode(" ",$addition); 
-			}
+			$str .= ' '.implode(" ",$additional); 
         }
 
         // ------------ sanitise string ----------------------------------

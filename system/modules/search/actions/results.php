@@ -11,7 +11,13 @@ function results_GET(Web $w) {
 	
 	if ( ($q && strlen($q) >= 3) || (!empty($tags)) ) {
 			if(!empty($tags)) {
-				$q.= ' unitag'.strtolower($tags);
+				if(is_array($tags)) {
+					foreach($tags as $tag) {
+						$q.= ' unitag'.strtolower(preg_replace('%[^a-z]%i', '', $tag));
+					}
+				} else {
+					$q.= ' unitag'.strtolower(preg_replace('%[^a-z]%i', '', $tags));
+				}
 			}
             $results = $w->Search->getResults($q, $idx,$p,$ps);
 
