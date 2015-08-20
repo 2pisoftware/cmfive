@@ -585,7 +585,10 @@ right:-1px;
 }
 .tag_list_header {
 background-color:#ccc;
-padding:3px;
+padding:5px;
+}
+.tag_list_header > div {
+margin-top:2px;
 }
 .tag_list_body {
 margin:3px 0 5px;
@@ -594,8 +597,26 @@ margin:3px 0 5px;
 .available_tags_list  .custom_tag  {
 padding:4px 5px 4px 15px;
 }
+.tag_selection,
+.hide_tag_list {
+cursor:pointer;
+}
+.available_tags_list  .tag .label,
+.available_tags_list  .custom_tag .label  {
+transition:box-shadow 0.5s;
+cursor:pointer;
+}
+.available_tags_list  .tag .label:hover,
+.available_tags_list  .custom_tag .label:hover  {
+box-shadow:0 0 0.5em #008CBA;
+}
 .hide_tag_list {
 float:right;
+padding:0 5px;
+transition:color 0.5s;
+}
+.hide_tag_list:hover {
+color:#CD0000;
 }
 .tag_list_dialog .tag_list_modal {
 font-size:12pt;

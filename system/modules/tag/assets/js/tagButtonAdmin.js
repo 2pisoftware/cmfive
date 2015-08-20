@@ -85,20 +85,27 @@ var uniTag = {
 		if(term.length == 0) {
 			$('.available_tags_list .custom_tag').remove();
 		} else {
-			if($('.available_tags_list .tag:visible').length == 0) {
+			var showNewTag = true;
+			// Show new tag option unless there is an exact match for an existing tag
+			$('.available_tags_list .tag:visible').each(function() {
+				if( $(this).data('tag') == term.trim() ) {
+					showNewTag = false;
+				}
+			});
+			if(showNewTag) {
 				if($('.available_tags_list .custom_tag').length == 0) {
-					$('.available_tags_list').prepend('<div class="custom_tag"><div class="label radius success"><span class="fi-price-tag">'+term+'</span></div></div>');
+					$('.available_tags_list').prepend('<div class="custom_tag"><div class="label radius success"><span class="fi-price-tag" data-tag="'+term+'">Create tag "'+term+'"</span></div></div>');
 				} else {
 					if($('.available_tags_list .custom_tag .label').hasClass('secondary')) {
 						$('.available_tags_list .custom_tag .label').removeClass('secondary').addClass('success');
 					}
-					$('.available_tags_list .custom_tag .fi-price-tag').text(term);
+					$('.available_tags_list .custom_tag .fi-price-tag').text('Create tag "'+term+'"').data('tag', term);
 				}
 				$('.available_tags_list .custom_tag').unbind('click');
 				$('.available_tags_list .custom_tag').bind('click', function() {
 					//Add new tag to this object
 					var url = $('.tag_list').data('url');
-					var tagText = $(this).find('.fi-price-tag').text();
+					var tagText = $(this).find('.fi-price-tag').data('tag');
 					$.get(url+'&cmd=addTag&tag='+encodeURIComponent(tagText), function(result) {
 						if(result == 'Invalid request') {
 							alert('Placeholder error');
@@ -110,6 +117,8 @@ var uniTag = {
 					});
 					$(this).remove();
 				});
+			} else {
+				$('.available_tags_list .custom_tag').remove();
 			}
 		}
 	},

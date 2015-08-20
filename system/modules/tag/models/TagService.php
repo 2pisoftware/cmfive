@@ -92,15 +92,17 @@ class TagService extends DbService {
 					$buf .= '<span data-tag="'.$tag->tag.'" class="label radius secondary tag_selection"><span '.(!empty($tag->tag_color) ? 'style="color:'.$tag->tag_color.'"' : '').' class="fi-price-tag">'.$tag->tag.'</span></span> ';
 				}
 			}
-			//Build tag dialog popup
-			//This is empty on load and is dynamically filled
-			$tagDialogId = 'tag_list_'.$class.$id;
-			$buf .= '<div class="tag_list_dialog" id="'.$tagDialogId.'">
-				<div class="tag_list_modal">
-					<div class="tag_list_header">Available tags <span class="fi-x hide_tag_list"></span><div><input type="text" placeholder="Filter tags" class="search_tags" /></div></div>
-					<div class="tag_list_body"></div>
-				</div>
-			</div></span>';
+			if( !empty($user) ) {
+				//Build tag dialog popup
+				//This is empty on load and is dynamically filled
+				$tagDialogId = 'tag_list_'.$class.$id;
+				$buf .= '<div class="tag_list_dialog" id="'.$tagDialogId.'">
+					<div class="tag_list_modal">
+						<div class="tag_list_header">Available tags <span class="fi-x hide_tag_list"></span><div><input type="text" placeholder="'.($user->hasRole("tag_admin") ? 'Add / ': '').'Filter tags" class="search_tags" /></div></div>
+						<div class="tag_list_body"></div>
+					</div>
+				</div></span>';
+			}
 		}
 		return $buf;
 	}
