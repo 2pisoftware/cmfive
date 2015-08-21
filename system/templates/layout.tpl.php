@@ -49,7 +49,6 @@
         ?>
         <script type="text/javascript">
             var $ = jQuery;
-
             $(document).ready(function() {
                 $("table.tablesorter").tablesorter({dateFormat: "uk", widthFixed: true, widgets: ['zebra']});
                 $(".tab-head").children("a").each(function() {
@@ -77,7 +76,23 @@
                         breadcrumbs.css('height', (breadcrumbs.height() + 20) + "px");
                     }
                 }
-                
+
+				// Admin clear cache button function
+				$('#admin_clear_cache').bind('click', function(e) {
+					$('#admin_clear_cache').css('color', '#CD0000');
+					$.get($(this).attr('href'), function() {
+						setTimeout(function() {
+							$('#admin_clear_cache').css('color', '#4B6995');
+							$('#admin_clear_cache .clear_cache_icon').removeClass('fi-refresh').addClass('fi-check');
+							setTimeout(function() {
+								$('#admin_clear_cache').css('color', '#FFF');
+								$('#admin_clear_cache .clear_cache_icon').removeClass('fi-check').addClass('fi-refresh');
+							}, 500);
+						}, 500);
+					});
+					e.preventDefault();
+					return false;
+				});
                 // Search function shortcut listener
                 $(document).on('keydown', function ( e ) {
                     if ((e.ctrlKey || e.metaKey) && e.which === 70) {
@@ -120,8 +135,12 @@
                         <!-- Search bar -->
                         <li><?php echo Html::box("/search", "<span class='fi-magnifying-glass'></span>", false, false, null, null, null, "cmfive_search_button"); ?></li>
                         
-                        <!-- User Profile drop down -->
                         <?php if ($w->Auth->user()): ?>
+						<!-- Clear cache button -->
+							<?php if ($w->Auth->user()->is_admin): ?>
+							<li><a id="admin_clear_cache" href="/admin/ajaxClearCache" onclick="return false;" title="Clear configuration cache"><span class="clear_cache_icon fi-refresh"></span></a></li>
+							<?php endif; ?>
+                        <!-- User Profile drop down -->
                             <li class="has-dropdown">
                                 <a href="#"><span  class="fi-torso"></span></a>
                                 <?php
