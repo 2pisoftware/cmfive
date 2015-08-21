@@ -17,15 +17,17 @@ function ajaxTag_ALL(Web $w) {
 		if( 'get' == $cmd ) {
 			$tags = $w->Tag->getTagsByObject($id, $class);
 			$tagArray = array();
-			foreach($tags as $tagO) {
-				$tag = array(
-					'id' => $tagO->id,
-					'value' => $tagO->id,
-					'tag' => $tagO->tag,
-					'label' => $tagO->tag,
-					'tag_color' => $tagO->tag_color,
-				);
-				$tagArray[$tagO->id] = $tag;
+			if (!empty($tags)) {
+				foreach($tags as $tagO) {
+					$tag = array(
+						'id' => $tagO->id,
+						'value' => $tagO->id,
+						'tag' => $tagO->tag,
+						'label' => $tagO->tag,
+						'tag_color' => $tagO->tag_color,
+					);
+					$tagArray[$tagO->id] = $tag;
+				}
 			}
 			header('Content-type: application/json;');
 			echo json_encode($tagArray);
@@ -33,15 +35,17 @@ function ajaxTag_ALL(Web $w) {
 			//Build list of all available tags
 			$tags = $w->Tag->getAllTags();
 			$tagArray = array();
-			foreach($tags as $tagA) {
-				$tag = array(
-					'id' => $tagA['id'],
-					'value' => $tagA['id'],
-					'tag' => $tagA['tag'],
-					'label' => $tagA['tag'],
-					'tag_color' => $tagA['tag_color'],
-				);
-				$tagArray[] = $tag;
+			if (!empty($tags)) {
+				foreach($tags as $tagA) {
+					$tag = array(
+						'id' => $tagA['id'],
+						'value' => $tagA['id'],
+						'tag' => $tagA['tag'],
+						'label' => $tagA['tag'],
+						'tag_color' => $tagA['tag_color'],
+					);
+					$tagArray[] = $tag;
+				}
 			}
 			header('Content-type: application/json;');
 			echo json_encode($tagArray);
