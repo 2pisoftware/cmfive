@@ -26,6 +26,7 @@ abstract class TaskType {
 	 * 
 	 */
 	function getFieldFormArray(TaskGroup $taskgroup, Task $task = null) {}
+	
 	/**
 	 * Executed before a task is inserted into DB
 	 * 
@@ -111,8 +112,7 @@ abstract class TaskType {
 	 * @return array
 	 */
 	function getTimeTypes() {
-		$value = Config::get("task.".get_class($this).".time-types");
-		return !empty($value) ? $value : false;
+		return array();
 	} 
 	
 }

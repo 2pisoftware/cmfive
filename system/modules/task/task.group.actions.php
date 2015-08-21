@@ -223,24 +223,18 @@ function updategroupmember_POST(Web &$w) {
 function addgroupmembers_GET(Web &$w) {
 	$p = $w->pathMatch("task_group_id");
 
-	// get all users
+	// get all users (getUsers strips out users that are groups)
 	$users = $w->Auth->getUsers();
-	
-	// not interested in users who are really groups
-	foreach ($users as $user) {
-		if ($user->is_group == "0")
-			$usr[] = $user;
-	}
 	
 	// build 'add members' form given task group ID, the list of group roles and the list of users.
 	// if current members are added as if new, their membership will be updated, not recreated, with the selected role
 	$addUserForm['Add Group Members'] = array(
-	array(array("","hidden", "task_group_id",$p['task_group_id'])),
-	array(array("As Role","select","role","",$w->Task->getTaskGroupPermissions())),
-	array(array("Add Group Members","select","member",null,$usr)));
+		array(array("","hidden", "task_group_id", $p['task_group_id'])),
+		array(array("As Role", "select", "role", null, $w->Task->getTaskGroupPermissions())),
+		array(array("Add Group Members", "select", "member", null, $users))
+	);
 
-//	$w->setLayout(null);
-	$w->out(Html::multiColForm($addUserForm,$w->localUrl("/task-group/updategroupmembers/"),"POST"," Submit "));
+	$w->out(Html::multiColForm($addUserForm,$w->localUrl("/task-group/updategroupmembers/"),"POST","Submit"));
 }
 
 function updategroupmembers_POST(Web &$w) {

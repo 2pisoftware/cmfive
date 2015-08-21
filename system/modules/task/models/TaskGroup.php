@@ -118,8 +118,10 @@ class TaskGroup extends DbObject {
         return $assign ? $assign->getFullName() : "";
     }
 
-    function getTasks() {
-        return $this->getObjects("Task", array("task_group_id" => $this->id, "is_deleted" => 0));
+    function getTasks($where = array()) {
+		$where["task_group_id"] = $this->id;
+		$where["is_deleted"] = 0;
+        return $this->getObjects("Task", $where);
     }
 
     public function getSelectOptionTitle() {
