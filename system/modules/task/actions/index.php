@@ -6,15 +6,15 @@
 
 function index_ALL(Web $w) {
     $w->Task->navigation($w, "Task Dashboard");
-        
+	
     // I want to see:
     //   Number of open tasks assigned to me (out of total open tasks) \/
     //   My Tasks that are overdue (with tasks with no due date)
     //   My tasks with urgent status
     //   Taskgroups that I'm a member of and the amount of tasks in it
     
-    $total_tasks = $w->db->get("task")->where("is_deleted", 0)->count();
-    $tasks = $w->Task->getTasks(array("assignee_id" => $w->Auth->user()->id));
+    $total_tasks = $w->db->get("task")->where("is_deleted", 0)->where("is_closed", 0)->count();
+    $tasks = $w->Task->getTasks(array("assignee_id" => $w->Auth->user()->id, "is_closed" => 0));
     $taskgroups = $w->Task->getTaskGroupsForMember($w->Auth->user()->id);
     
     $count_overdue = 0;
@@ -26,7 +26,7 @@ function index_ALL(Web $w) {
     // Task group task count
     if (!empty($taskgroups)) {
         foreach($taskgroups as $taskgroup) {
-            $count_taskgroup_tasks += count($taskgroup->getTasks());
+            $count_taskgroup_tasks += count($taskgroup->getTasks(array("is_closed" => 0)));
         }
     }
     

@@ -33,9 +33,9 @@ function edit_GET($w) {
 
     // Create form
     $form = array(
-        (!empty($p["id"]) ? "Edit task" : "Create a new task") => array(
+        (!empty($p["id"]) ? 'Edit task [' . $task->id . ']' : "Create a new task") => array(
             array(
-                !empty($p["id"]) ?
+				!empty($p["id"]) ?
                         array("Task Group", "text", "-task_group_id_text", $taskgroup->title) :
                         array("Task Group", "autocomplete", "task_group_id", !empty($task->task_group_id) ? $task->task_group_id : $taskgroup_id, $taskgroups),
                 !empty($p["id"]) ?
@@ -56,6 +56,10 @@ function edit_GET($w) {
             array(array("Description", "textarea", "description", $task->description)),
         )
     );
+	
+	if (!empty($p['id'])) {
+		$form['Edit task [' . $task->id . ']'][5][] = array("Task Group ID", "hidden", "task_group_id", $task->task_group_id);
+	}
 
     if (empty($p['id'])) {
         History::add("New Task");
