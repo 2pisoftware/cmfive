@@ -10,6 +10,10 @@ class MailService extends DbService {
 		$this->initTransport();
 	}
 	
+	public function getTransport() {
+		return $this->transport;
+	}
+	
     /**
      * Sends an email using config array from /config.php and the swiftmailer lib
      * for transport. 
