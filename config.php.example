@@ -4,6 +4,7 @@
 
 Config::set('main.application_name', 'Cmfive');
 Config::set('main.company_name', '2pi Software');
+Config::set('main.application_logo', '/system/templates/img/cmfive-logo.png');
 Config::set('main.company_url', 'http://2pisoftware.com');
 
 // enter a valid email address
