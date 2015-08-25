@@ -33,12 +33,13 @@ class Timelog extends DbObject {
 
 	public function setComment($comment) {
 		if ($this->id) {
-			$comment = $this->getComment();
-			if (!empty($comment)) {
-				$comment->comment = $comment;
-				$comment->update();
+			$comment_object = $this->getComment();
+		
+			if (!empty($comment_object->id)) {
+				$comment_object->comment = $comment;
+				$comment_object->update();
 			} else {
-				$w->Comment->addComment($this, $comment);
+				$this->w->Comment->addComment($this, $comment);
 			}
 		}
 	}

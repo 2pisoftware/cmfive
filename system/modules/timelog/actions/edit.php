@@ -16,8 +16,8 @@ function edit_GET(Web $w) {
 
 	$form = [
 		'Timelog' => [
-			[["Module", "select", "module", null, $select_indexes]],
-            [["Search", "text", "-search"]],
+			[["Module", "select", "object_class", $timelog->object_class, $select_indexes]],
+            [["Search", "autocomplete", "search", $timelog->object_id, $w->Task->getTasks()]],
             [["object id", 'hidden', "object_id", $timelog->object_id]],
 			[["From", "datetime", "dt_start", $timelog->dt_start ? $w->Timelog->time2Dt($timelog->dt_start) : ""]],
 			[["To", "datetime", "dt_end", $timelog->dt_end ? $w->Timelog->time2Dt($timelog->dt_end) : ""]],
@@ -29,7 +29,6 @@ function edit_GET(Web $w) {
 }
 
 function edit_POST(Web $w) {
-	
 	$p = $w->pathMatch("id");
 	
 	$timelog = !empty($p['id']) ? $w->Timelog->getTimelog($p['id']) : new Timelog($w);
@@ -40,7 +39,7 @@ function edit_POST(Web $w) {
 	$timelog->insertOrUpdate();
 	
 	$timelog->setComment($_POST['description']);
-	
+
 	$w->msg("Timelog saved", "/timelog");
 	
 }

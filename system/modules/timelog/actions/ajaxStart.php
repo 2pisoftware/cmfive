@@ -1,30 +1,36 @@
 <?php
 
-function ajaxStart_GET(Web $w) {
+function ajaxStart_POST(Web $w) {
     if ($w->Timelog->hasActiveLog()) {
-        $this->w->Log->debug("active log exists");
-        return;
+        $w->Log->debug("active log exists");
+		
+        return "0";
     }
     
     $p = $w->pathMatch("class", "id");
     
     if (!class_exists($p['class'])) {
-        $this->w->Log->debug("class " . $p['class'] . " doesnt exist");
-        return;
+        $w->Log->debug("class " . $p['class'] . " doesnt exist");
+        return "0";
     }
     
     $object = $w->Timelog->getObject($p['class'], $p['id']);
-    
+
     if (!empty($object->id)) {
         $timelog = new Timelog($w);
         $timelog->start($object);
-    
+		
+		if (!empty($_POST['description'])) {
+			$timelog->setComment($_POST['description']);
+		}
+		
         echo json_encode([
             'object'    => $p['class'],
             'title'     => $object->getSelectOptionTitle()
         ]);
 //        $w->Comment->addComment($timelog, $w->request('description'));
     } else {
-        $this->w->Log->debug("object not found");
+        $w->Log->debug("object not found");
+		return "0";
     }
 }

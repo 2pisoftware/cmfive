@@ -12,7 +12,8 @@
                             <td><?php echo ($time_entry->getLinkedObject() ? get_class($time_entry->getLinkedObject()) . ": " . $time_entry->getLinkedObject()->toLink() : ''); ?></td>
                             <td><?php echo $time_entry->getComment()->comment; ?></td>
                             <td>
-                                <?php echo Html::a('/task/edit/' . $time_entry->task_id . "#timelog", "View Time Log"); ?>
+                                <?php echo $time_entry->object_class == "Task" ? Html::a('/task/edit/' . $time_entry->object_id . "#timelog", "View Time Log") : ""; ?>
+								<?php echo Html::box('/timelog/edit/' . $time_entry->id, 'Edit'); ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
