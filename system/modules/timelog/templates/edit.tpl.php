@@ -5,14 +5,13 @@
     $(document).ready(function() {
         var searchBaseUrl = '/timelog/ajaxSearch';
         var searchUrl = searchBaseUrl;
-        $("#module").change(function() {
+        $("#object_class").change(function() {
             if ($(this).val() !== "") {
                 $("#search").removeAttr("readonly");
                 searchUrl = searchBaseUrl + "?index=" + $(this).val();
-//                alert(searchUrl);
             } else {
                 $("#search").attr("readonly", "true");
-                searchUrl = searchBaseUrl
+                searchUrl = searchBaseUrl;
             }
         });
         
@@ -27,6 +26,11 @@
             },
             select: function(event, ui) {
                 $("#object_id").val(ui.item.value);
+				$.get('/timelog/ajaxGetExtraDetails/<?php echo !empty($timelog_id) ? $timelog_id : ""; ?>', {
+					success: function(response) {
+						alert(response);
+					}
+				});
             },
             minLength: 3
         });
@@ -36,7 +40,7 @@
                 url: '/timelog/ajaxStart',
                 method: 'POST',
                 data: {
-                    'object': $("#module").val(),
+                    'object': $("#object_class").val(),
                     'object_id': $("#object_id").val(),
                     'description': $("#description").val()
                 },

@@ -19,7 +19,7 @@ function edit_GET(Web $w) {
 	$form = [
 		'Timelog' => [
 			[["Module", "select", "object_class", $timelog->object_class, $select_indexes]],
-            [["Search", "autocomplete", "search", $timelog->object_id, $w->Task->getTasks()]],
+            [["Search", empty($timelog->object_id) ? "text" : "autocomplete", (empty($timelog->object_id) ? '-' : '') . "search", $timelog->object_id]],
             [["object id", 'hidden', "object_id", $timelog->object_id]],
 			[["From", "datetime", "dt_start", $timelog->dt_start ? $w->Timelog->time2Dt($timelog->dt_start) : ""]],
 			[["To", "datetime", "dt_end", $timelog->dt_end ? $w->Timelog->time2Dt($timelog->dt_end) : ""]],
@@ -28,14 +28,14 @@ function edit_GET(Web $w) {
 	];
 	
 	$additional_form_fields = $w->callHook("timelog", "extra_form_fields", $timelog);
-	if (!empty($additional_form_fields)) {
+	if (!empty($additional_form_fields[0])) {
 		$form['Additional Fields'] = array();
 		foreach($additional_form_fields as $form_fields) {
 			$form['Additional Fields'][] = $form_fields;
 		}
 	}
-	
-	$w->ctx("form", Html::multiColForm($form, "/timelog/edit/" . $timelog->id));
+
+	$w->ctx("form", Html::multiColForm($form, "/timelog/edit/" . $timelog->id, "POST", "Save", "timelog_edit_form"));
 }
 
 function edit_POST(Web $w) {
