@@ -111,8 +111,7 @@ abstract class TaskType {
 	 * @return array
 	 */
 	function getTimeTypes() {
-		$value = Config::get("task.".get_class($this).".time-types");
-		return !empty($value) ? $value : false;
+		return Config::get("task.".get_class($this).".time-types");
 	} 
 	
 }

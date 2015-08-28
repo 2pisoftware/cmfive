@@ -8,6 +8,23 @@ define('TASK_NOTIFICATION_TIME_LOG', 'time_log');
 define('TASK_NOTIFICATION_TASK_DOCUMENTS', 'task_documents');
 
 /**
+ * Add custom time type object to timelogs
+ * 
+ * @param Web $w
+ * @param Task $object
+ */
+function task_timelog_extra_form_fields(Web $w, $object) {
+	$timelog_linked_object = $object->getLinkedObject();
+	if (!empty($timelog_linked_object) && strtolower(get_class($timelog_linked_object)) == "task") {
+		$task_type = $w->Task->getTaskTypeObject($timelog_linked_object->task_type);
+		$time_types = $task_type->getTimeTypes();
+		if (!empty($time_types)) {
+			return [["Task time", "select", "time_type", $object->time_type, $time_types]];
+		}
+	}
+}
+
+/**
  * Hook to notify relevant people when a task has been created
  * 
  * @param Web $w

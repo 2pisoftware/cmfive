@@ -10,7 +10,8 @@ Config::set('task', array(
         'core_web',
         'core_dbobject',
         'comment',
-        'attachment'
+        'attachment',
+		'timelog'
     ),
     'ical' => array(
         'send' => false

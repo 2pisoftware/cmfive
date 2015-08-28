@@ -13,6 +13,8 @@ function edit_GET(Web $w) {
             $select_indexes[] = array($friendly_name, $search_name);
         }
     }
+	
+	$comment = $timelog->getComment();
 
 	$form = [
 		'Timelog' => [
@@ -21,9 +23,17 @@ function edit_GET(Web $w) {
             [["object id", 'hidden', "object_id", $timelog->object_id]],
 			[["From", "datetime", "dt_start", $timelog->dt_start ? $w->Timelog->time2Dt($timelog->dt_start) : ""]],
 			[["To", "datetime", "dt_end", $timelog->dt_end ? $w->Timelog->time2Dt($timelog->dt_end) : ""]],
-			[["Description", "text", "description", $timelog->getComment()]]
+			[["Description", "text", "description", !empty($comment) ? $comment->comment : null]]
 		]
 	];
+	
+	$additional_form_fields = $w->callHook("timelog", "extra_form_fields", $timelog);
+	if (!empty($additional_form_fields)) {
+		$form['Additional Fields'] = array();
+		foreach($additional_form_fields as $form_fields) {
+			$form['Additional Fields'][] = $form_fields;
+		}
+	}
 	
 	$w->ctx("form", Html::multiColForm($form, "/timelog/edit/" . $timelog->id));
 }
@@ -31,15 +41,21 @@ function edit_GET(Web $w) {
 function edit_POST(Web $w) {
 	$p = $w->pathMatch("id");
 	
+	// Get and save timelog
 	$timelog = !empty($p['id']) ? $w->Timelog->getTimelog($p['id']) : new Timelog($w);
 	$timelog->object_class = $_POST['object_class'];
 	$timelog->object_id = $_POST['object_id'];
+	$timelog->time_type = !empty($_POST['time_type']) ? $_POST['time_type'] : null;
 	$timelog->dt_start = $w->Timelog->dt2Time($_POST['dt_start']);
 	$timelog->dt_end = $w->Timelog->dt2Time($_POST['dt_end']);
 	$timelog->insertOrUpdate();
 	
+	// Save comment
 	$timelog->setComment($_POST['description']);
 
+	// Hook to save any additional form fields
+	$w->callHook("timelog", "save_extra_form_fields", $_POST);
+	
 	$w->msg("Timelog saved", "/timelog");
 	
 }
