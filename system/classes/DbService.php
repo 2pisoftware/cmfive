@@ -189,7 +189,7 @@ class DbService {
      * 
      * @return <type>
      */
-    function getObjects($class, $where = null, $cache_list = false, $use_cache = true, $order_by = null) {
+    function getObjects($class, $where = null, $cache_list = false, $use_cache = true, $order_by = null, $offset = null, $limit = null) {
         if (!$class)
             return null;
 
@@ -226,9 +226,22 @@ class DbService {
         } else if ($where && is_scalar($where)) {
             $this->_db->where($where, false);
         }
+		
+		// Ordering
         if (!empty($order_by)) {
             $this->_db->order_by($order_by);
         }
+		
+		// Offset
+		if (!empty($offset)) {
+			$this->_db->offset($offset);
+		}
+		
+		// Limit
+		if (!empty($limit)) {
+			$this->_db->limit($limit);
+		}
+
         $this->buildSelect($o, $table, $class);
         $result = $this->_db->fetch_all();
         if ($result) {

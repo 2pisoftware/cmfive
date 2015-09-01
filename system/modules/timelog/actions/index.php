@@ -1,22 +1,22 @@
 <?php
 
 define('DEFAULT_PAGE', 1);
-define('DEFAULT_PAGE_SIZE', 30);
+define('DEFAULT_PAGE_SIZE', 10);
 
 function index_GET(Web $w) {
-    $p = $w->pathMatch('page', 'pagesize');
-    $page = (!empty($p['page']) ? $p['page'] : DEFAULT_PAGE);
-    $pagesize = (!empty($p['pagesize']) ? $p['pagesize'] : DEFAULT_PAGE_SIZE);
+    $page = $w->request("p", DEFAULT_PAGE);
+    $pagesize = $w->request("ps", DEFAULT_PAGE_SIZE);
     
-    $timelog = $w->Timelog->getTimelogsForUser(); // $w->Task->getTaskTimes();
-    $totalresults = count($timelog);
+	// Get paged timelogs
+    $timelog = $w->Timelog->getTimelogsForUser($w->Auth->user(), false, $page, $pagesize);
+    $totalresults = $w->Timelog->countTotalTimelogsForUser($w->Auth->user(), false);
 
-    $w->ctx('pagination', Html::pagination($page, (ceil($totalresults / $pagesize)), $pagesize, $totalresults, '/task-time'));
+    $w->ctx('pagination', Html::pagination($page, (ceil($totalresults / $pagesize)), $pagesize, $totalresults, '/timelog'));
     
     $time_entry_objects = array();
-    $paged_timelogs = array_slice($timelog, (($page - 1) * $pagesize), $pagesize);
-    if (!empty($paged_timelogs)) {
-        foreach($paged_timelogs as $time_entry) {
+	
+    if (!empty($timelog)) {
+        foreach($timelog as $time_entry) {
             
             $entry_date = date('d/m', $time_entry->dt_start);
             if (empty($time_entry_objects[$entry_date])) {
@@ -28,8 +28,4 @@ function index_GET(Web $w) {
         }
     }
     $w->ctx('time_entries', $time_entry_objects);
-}
-
-function index_POST(Web $w) {
-    
 }

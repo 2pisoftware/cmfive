@@ -14,7 +14,7 @@
                 searchUrl = searchBaseUrl;
             }
         });
-        
+
         $("#search").autocomplete({
             source: function(request, response) {
                 $.ajax({
@@ -25,12 +25,13 @@
                 });
             },
             select: function(event, ui) {
-                $("#object_id").val(ui.item.value);
-				$.get('/timelog/ajaxGetExtraDetails/<?php echo !empty($timelog_id) ? $timelog_id : ""; ?>', {
-					success: function(response) {
-						alert(response);
-					}
-				});
+                $("#object_id").val(ui.item.id);
+				$.get('/timelog/ajaxGetExtraData/' + $("#object_class").val() + '/' + $("#object_id").val())
+					.done(function(response) {
+						var append_panel = "<div class='panel'><div class='row-fluid section-header'><h4>Additional Fields</h4></div><ul class='small-block-grid-1 medium-block-grid-1 section-body'><li>" + response + "</li></ul></div>";
+						$("#timelog_edit_form .panel").after(append_panel);
+					});
+				
             },
             minLength: 3
         });

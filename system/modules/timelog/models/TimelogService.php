@@ -15,7 +15,7 @@ class TimelogService extends DbService {
 	 * @param boolean $includeDeleted
 	 * @return Timelog
 	 */
-    public function getTimelogsForUser(User $user = null, $includeDeleted = false) {
+    public function getTimelogsForUser(User $user = null, $includeDeleted = false, $page = 1, $page_size = 20) {
         if ($user === null) {
             $user = $this->w->Auth->user();
         }
@@ -25,9 +25,22 @@ class TimelogService extends DbService {
             $where['is_deleted'] = 0;
         }
         
-        return $this->getObjects("Timelog", $where);
+        return $this->getObjects("Timelog", $where, false, true, "dt_created DESC", ($page - 1) * $page_size, $page_size);
     }
-    
+	
+	public function countTotalTimelogsForUser(User $user = null, $includeDeleted = false) {
+        if ($user === null) {
+            $user = $this->w->Auth->user();
+        }
+        
+        $where = ['user_id' => $user->id];
+        if (!$includeDeleted) {
+            $where['is_deleted'] = 0;
+        }
+        
+        return $this->db->get("timelog")->where($where)->count();
+    }
+	
 	/**
 	 * Returns all non deleted timelogs
 	 * 
@@ -61,6 +74,12 @@ class TimelogService extends DbService {
         return $this->_trackObject;
     }
     
+	public function getTrackingObjectClass() {
+		if ($this->hasTrackingObject()) {
+			return get_class($this->_trackObject);
+		}
+	}
+	
     public function getJSTrackingObject() {
         if ($this->hasTrackingObject()) {
             $class = new stdClass();
@@ -80,10 +99,12 @@ class TimelogService extends DbService {
             $w->ctx("title", $title);
         }
 
-        $nav = $nav ? $nav : array();
+        $nav = $nav ? : array();
 
+		$trackingObject = $w->Timelog->getTrackingObject();
+		
         if ($w->Auth->loggedIn()) {
-            $w->menuBox("timelog/edit", "Add Timelog", $nav);
+            $w->menuBox("timelog/edit" . (!empty($trackingObject) && !empty($trackingObject->id) ? "?class=" . get_class($trackingObject) . "&id=" . $trackingObject->id : ''), "Add Timelog", $nav);
         }
 
         $w->ctx("navigation", $nav);

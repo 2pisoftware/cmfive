@@ -929,16 +929,17 @@ class Html {
 
                 // Build pagination links
                 for ($page = 1; $page <= $numpages; $page++) {
-                    $buf .= "<li>";
-
                     // Check if the current page
                     if ($currentpage == $page) {
-                        $buf .= "<a href='#' class='active'>$page</a>";
+                        $buf .= "<li class='current'>";
                     } else {
-                        $buf .= "<a href='{$baseurl}";
-                        $buf .= (strpos($baseurl, "?") == 0 ? "?" : "&");
-                        $buf .= "{$pageparam}={$page}&{$pagesizeparam}={$pagesize}&{$totalresultsparam}={$totalresults}'>" . $page . "</a>";
-                    }
+						$buf .= "<li>";
+					}
+					
+					$buf .= "<a href='{$baseurl}";
+					$buf .= (strpos($baseurl, "?") == 0 ? "?" : "&");
+					$buf .= "{$pageparam}={$page}&{$pagesizeparam}={$pagesize}&{$totalresultsparam}={$totalresults}'>" . $page . "</a>";
+
                     $buf .= "</li>";
                 }
             }

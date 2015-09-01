@@ -14,6 +14,7 @@
                             <td>
                                 <?php echo $time_entry->object_class == "Task" ? Html::b('/task/edit/' . $time_entry->object_id . "#timelog", "View Time Log") : ""; ?>
 								<?php echo Html::box('/timelog/edit/' . $time_entry->id, 'Edit', true); ?>
+								<?php echo Html::b('/timelog/delete/' . $time_entry->id, 'Delete', 'Are you sure you want to delete this timelog?'); ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -24,4 +25,9 @@
         <h4>No time logs found</h4>
     <?php endif; ?>
 </div>
-<?php echo !empty($pagination) ? $pagination : ''; ?>
+
+<?php if (!empty($pagination)) : ?>
+	<div class="pagination-centered">
+		<?php echo $pagination; ?>
+	</div>
+<?php endif;

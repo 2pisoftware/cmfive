@@ -136,10 +136,7 @@ class DbPDO extends PDO {
     }
     
     public function order_by($orderby){
-        if ($this->query !== null && !empty($orderby)){
-            $this->query = $this->query->orderBy($orderby);
-        }
-        return $this;
+        return $this->orderBy($orderby);
     }
     
     public function limit($limit){
@@ -148,6 +145,13 @@ class DbPDO extends PDO {
         }
         return $this;
     }
+	
+	public function offset($offset) {
+		if ($this->query !== null and !is_null($offset)){
+            $this->query = $this->query->offset($offset);
+        }
+        return $this;
+	}
     
     public function groupBy($grouping) {
         if ($this->query !== null and !is_null($grouping)){

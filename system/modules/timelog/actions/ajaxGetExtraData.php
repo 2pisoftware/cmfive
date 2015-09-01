@@ -1,20 +1,23 @@
 <?php
 
 function ajaxGetExtraData_GET(Web $w) {
-	$p = $w->pathMatch("id");
+	$p = $w->pathMatch("class", "id");
 	
-	if (empty($p['id'])) {
+	if (empty($p['class']) || empty($p['id'])) {
 		return;
 	}
 	
-	$timelog = $w->Timelog->getTimelog($p['id']);
-	if (empty($timelog)) {
+	$object = $w->Timelog->getObject($p['class'], $p['id']);
+	
+	if (empty($object->id)) {
 		return;
 	}
 	
-	$form_data = $w->callHook("timelog", "extra_form_fields", $timelog);
-	if (!empty($form_data[0])) {
-		$w->out(Html::multiColForm($form_data));
+	$form_data = $w->callHook("timelog", "type_options_for_" . $p['class'], $object);
+	
+	if (!empty($form_data[0][0][4])) {
+		// We dont want the structure for multiColForm, we want it for a select
+		echo Html::select($form_data[0][0][2], $form_data[0][0][4]);
 	}
 	return;
 	
