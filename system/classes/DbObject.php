@@ -553,9 +553,12 @@ class DbObject extends DbService {
                 $this->_versionable->insert();
             }
             if (property_exists($this, "_searchable") && (null !== $this->_searchable)) {
-                $this->_searchable->insert();
+                $this->_searchable->insert(false);
             }
 
+            // give related objects the chance to update their index
+            $this->w->callHook("core_dbobject", "indexChange_".get_class($this), $this);
+            
             // store this id in the context for hooks etc.
             $inserts = $this->w->ctx('db_inserts');
             if (!$inserts) {
@@ -649,9 +652,12 @@ class DbObject extends DbService {
                 $this->_versionable->update();
             }
             if (property_exists($this, "_searchable") && (null !== $this->_searchable)) {
-                $this->_searchable->update();
+                $this->_searchable->update(false);
             }
-
+            
+            // give related objects the chance to update their index
+			$this->w->callHook("core_dbobject", "indexChange_".get_class($this), $this);
+			
             // store this id in the context for hooks
             $updates = $this->w->ctx('db_updates');
             if (!$updates) {
@@ -699,6 +705,9 @@ class DbObject extends DbService {
             // calling hooks AFTER deleting the object
             $this->_callHooks("after", "delete");
 
+            // give related objects the chance to update their index
+            $this->w->callHook("core_dbobject", "indexChange_".get_class($this), $this);
+            
             // store this id in the context for listeners
             $deletes = $this->w->ctx('db_deletes');
             if (!$deletes) {
@@ -854,7 +863,7 @@ class DbObject extends DbService {
      * 
      * @return string
      */
-    function getIndexContent() {
+    function getIndexContent($ignoreAdditional = true) {
 
         // -------------- concatenate all object fields ---------------------		
         $str = "";
@@ -873,7 +882,10 @@ class DbObject extends DbService {
         $str .= $this->addToIndex();
 
         // add content from hooks anywhere in the system
-        $additional = $this->w->callHook("core_dbobject", "add_to_index", $this);
+        if (!$ignoreAdditional) {
+	        $additional = $this->w->callHook("core_dbobject", "add_to_index", $this);
+        }
+        
         if (!empty($additional)) {
 			$str .= ' '.implode(" ",$additional); 
         }

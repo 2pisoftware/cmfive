@@ -49,7 +49,7 @@ class AspectSearchable {
 	/**
 	 * Create index entry for new objects
 	 */
-	function insert() {
+	function insert($ignoreAdditional = true) {
 		if (!$this->getIndex()) {
 			$io = new ObjectIndex($this->object->w);
 			$io->class_name = get_class($this->object);
@@ -57,7 +57,7 @@ class AspectSearchable {
 			$io->dt_created = time();
 			$io->creator_id = ($io->Auth->loggedIn() ? $io->Auth->user()->id : 0);
 			
-			$io->content = $this->object->getIndexContent();
+			$io->content = $this->object->getIndexContent($ignoreAdditional);
 			
 			$io->insert();
 		}
@@ -66,12 +66,12 @@ class AspectSearchable {
 	/**
 	 * Update index for updated object
 	 */
-	function update() {
+	function update($ignoreAdditional = true) {
 		if ($this->getIndex()) {
 			$this->_index->dt_modified = time();
 			$this->_index->modifier_id = ($this->_index->w->Auth->loggedIn() ? $this->_index->w->Auth->user()->id : 0);
 			
-			$this->_index->content = $this->object->getIndexContent();
+			$this->_index->content = $this->object->getIndexContent($ignoreAdditional);
 					
 			$this->_index->update();
 		} else {
