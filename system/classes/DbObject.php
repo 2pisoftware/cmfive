@@ -868,6 +868,7 @@ class DbObject extends DbService {
                 $str .= $v . " ";
             }
         }
+        
 
         // add custom content from the object to the index
         $str .= $this->addToIndex();
@@ -875,7 +876,10 @@ class DbObject extends DbService {
         // add content from hooks anywhere in the system
         $additional = $this->w->callHook("core_dbobject", "add_to_index", $this);
         if (!empty($additional)) {
-			$str .= ' '.implode(" ",$additional); 
+            $additional = implode(" ",$additional);
+            if(!empty($additional)) {
+                $str .= ' '.$additional; 
+            }
         }
 
         // ------------ sanitise string ----------------------------------

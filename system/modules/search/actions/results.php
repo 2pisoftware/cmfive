@@ -44,7 +44,13 @@ function results_GET(Web $w) {
                                 if ($object->canList($w->Auth->user())) {
                                     $buffer .= '<div class="panel search-result">';
                                     if ($object->canView($w->Auth->user())) {
-                                        $buffer .= "<a class=\"row search-title\" href=\"".$w->localUrl($object->printSearchUrl())."\">{$object->printSearchTitle()}</a>"
+                                        //load tags
+                                        $tags = $w->Tag->getTagsByObject($object->id, get_class($object));
+                                        $tagList = '';
+                                        foreach($tags as $tag) {
+                                            $tagList .= '<span class="label radius">'.$tag->tag.'</span> ';
+                                        }
+                                        $buffer .= "<a class=\"row search-title\" href=\"".$w->localUrl($object->printSearchUrl())."\">{$object->printSearchTitle()} $tagList</a>"
                                         . "<div class=\"row search-listing\">{$object->printSearchListing()}</div>";
                                     } else {
                                         $buffer .= "<div class=\"small-12 columns search-title\">{$object->printSearchTitle()}</div><div class=\"row search-listing\">(restricted)</div>";
