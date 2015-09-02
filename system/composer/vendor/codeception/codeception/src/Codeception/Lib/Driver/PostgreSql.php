@@ -28,8 +28,11 @@ class PostgreSql extends Db
                 continue;
             }
 
-            if (strpos(trim($sqlLine), '$$') === 0) {
-                $dollarsOpen = !$dollarsOpen;
+            if (!preg_match('/\'.*\$\$.*\'/', $sqlLine)) { // Ignore $$ inside SQL standard string syntax such as in INSERT statements.
+                $pos = strpos($sqlLine, '$$');
+                if (($pos !== false) && ($pos >= 0)) {
+                    $dollarsOpen = !$dollarsOpen;
+                }
             }
 
             $query .= "\n" . rtrim($sqlLine);
@@ -101,24 +104,6 @@ class PostgreSql extends Db
         }
     }
 
-    public function select($column, $table, array &$criteria)
-    {
-        $where = $criteria ? "where %s" : '';
-        $query = 'select %s from "%s" ' . $where;
-        $params = [];
-        foreach ($criteria as $k => $v) {
-            if ($v === null) {
-                $params[] = "$k IS NULL ";
-                unset($criteria[$k]);
-            } else {
-                $params[] = "$k = ? ";
-            }
-        }
-        $sparams = implode('AND ', $params);
-
-        return sprintf($query, $column, $table, $sparams);
-    }
-
     public function lastInsertId($table)
     {
         /*We make an assumption that the sequence name for this table is based on how postgres names sequences for SERIAL columns */
@@ -137,7 +122,7 @@ class PostgreSql extends Db
         );
         return implode('.', $name);
     }
-    
+
     /**
      * @param string $tableName
      *
