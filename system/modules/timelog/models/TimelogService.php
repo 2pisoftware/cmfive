@@ -59,11 +59,12 @@ class TimelogService extends DbService {
     }
     
     public function hasActiveLog() {
-        return !empty($this->getActiveTimeLogForUser());
+		$timelog = $this->getActiveTimeLogForUser();
+        return !empty($timelog);
     }
     
     public function hasTrackingObject() {
-        return !empty($this->getTrackingObject());
+        return !empty($this->_trackObject);
     }
     
     public function registerTrackingObject($object) {
