@@ -335,7 +335,10 @@ class Task extends DbObject {
             $this->startTransaction();
 
             // 1. Call on_before_insert of the TaskGroupType
-
+			if ($this->isStatusClosed()) {
+				$this->is_closed = 1;
+			}
+			
             $tg = $this->getTaskGroup();
             if (!empty($tg)) {
 
