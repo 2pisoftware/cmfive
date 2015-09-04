@@ -8,10 +8,13 @@
             <div class="small-12 medium-6 columns">
                 <input class="input-large" type="text" name="q" id="q" autofocus/>
             </div>
-            <div class="small-12 medium-3 columns">
+			<div class="small-12 medium-2 columns">
                 <?php echo Html::select("idx", $indexes); ?>
             </div>
-            <div class="small-12 medium-3 columns">
+            <div class="small-12 medium-2 columns">
+                <?php echo Html::select("tags", $tags); ?>
+            </div>
+            <div class="small-12 medium-2 columns">
                 <button class="button tiny small-12" type="submit">Go</button>
             </div>
         </div>

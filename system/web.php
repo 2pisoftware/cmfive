@@ -133,12 +133,7 @@ class Web {
         if (!file_exists($classdirectory_cache_file)) {
         	file_put_contents($classdirectory_cache_file,"<?php\n");
         }
-		
-		// Regenerate configuration cache
-		$this->regenerateConfigCache();
-		
         foreach ($modules as $model) {
-			
             // Check if the hosting module is active before we autoload it
             if (Config::get("{$model}.active") === true) {
                 $file = $this->getModuleDir($model) . 'models/' . ucfirst($className) . ".php";
@@ -159,9 +154,7 @@ class Web {
                 }
             }
         }
-		
-		
-        $this->Log->debug("Class " . $file . " not found.");
+        // $this->Log->debug("Class " . $file . " not found.");
         return false;
     }
 
@@ -576,16 +569,6 @@ class Web {
         file_put_contents($cachefile, Config::toJson());
     }
 
-	private function regenerateConfigCache() {
-		// Check to see if a config entry for $modulename exists, if not, regenerate cache and try again
-		$cachePath = ROOT_PATH . "/cache/config.cache";
-		if (file_exists($cachePath)) {
-			unlink($cachePath);
-		}
-
-		$this->loadConfigurationFiles();
-	}
-	
     // Helper function for the above, scans a directory for config files in child folders
     private function scanModuleDirForConfigurationFiles($dir = "") {
         // Check that dir is dir
@@ -1060,7 +1043,7 @@ class Web {
         if (class_exists($classname)) {
             $modulename = $this->getModuleNameForModel($classname);
             if ($modulename === null || Config::get("$modulename.active") === false) {
-				return false;
+                return false;
             }   
             return true;
         }
@@ -1072,7 +1055,7 @@ class Web {
      * 
      * This works like an action/template except that it can't be called directly from a url.
      * 
-     * Partials don't have access to the global context and do not store anything in the global context
+     * Partials don't have access to the global context and do not store anything in the global context!
      * 
      * @param string $name
      * @param array $params
@@ -1145,7 +1128,7 @@ class Web {
      * @param String module
      * @param String $function
      * @param Mixed $data
-     * @return anything that the hook function wants to return
+     * @return an array of return values from all functions that answer to this hool
      */
     public function callHook($module, $function, $data = null) {
         if (empty($module) or empty($function)) {
@@ -1157,16 +1140,16 @@ class Web {
             foreach ($this->modules() as $modulename) {
             	// only include active modules!
             	if (Config::get("$modulename.active") !== false) {
-                    $hooks = Config::get("{$modulename}.hooks");
-                    if (!empty($hooks)) {
-                        foreach ($hooks as $hook) {
-                            $this->_hooks[$hook][] = $modulename;
-                        }
-                    }
+	                $hooks = Config::get("{$modulename}.hooks");
+	                if (!empty($hooks)) {
+	                    foreach ($hooks as $hook) {
+	                        $this->_hooks[$hook][] = $modulename;
+	                    }
+	                }
             	}
             }
         }
-
+        
         // Check that the module calling has subscribed to hooks
         if (!array_key_exists($module, $this->_hooks)) {
             return null;

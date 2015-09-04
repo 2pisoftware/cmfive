@@ -10,8 +10,13 @@ abstract class TaskType {
 	function __construct(Web $w) {
 		$this->w = $w;
 	}
-	function getTaskTypeTitle(){}
-	function getTaskTypeDescription() {}
+	function getTaskTypeTitle(){
+		return Config::get("task.".get_class($this).".title");
+	}
+	
+	function getTaskTypeDescription() {
+		return Config::get("task.".get_class($this).".description");
+	}
 	
 	/**
 	 * return a value that should be added to the search index for this task
@@ -26,6 +31,7 @@ abstract class TaskType {
 	 * 
 	 */
 	function getFieldFormArray(TaskGroup $taskgroup, Task $task = null) {}
+	
 	/**
 	 * Executed before a task is inserted into DB
 	 * 
@@ -113,5 +119,5 @@ abstract class TaskType {
 	function getTimeTypes() {
 		return Config::get("task.".get_class($this).".time-types");
 	} 
-	
+
 }
