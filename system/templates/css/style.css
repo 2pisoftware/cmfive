@@ -507,6 +507,18 @@ ul.cmfive_breadcrumbs > li {
     margin-bottom: 0px;
 }
 
+/* Pickadate override */
+.picker .picker__select--year, .picker .picker__select--month {
+	height: 3em !important;
+}
+.picker__footer button {
+	font-size: 1rem !important;
+	color: black;
+}
+.picker__table th, .picker__table td {
+	text-align: center;
+}
+
 @-moz-keyframes spinPulse {
     0% {
         -webkit-transform: rotate(360deg);

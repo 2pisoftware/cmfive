@@ -40,6 +40,18 @@ function toggleModalLoading() {
     }
 }
 
+function hideModalLoading() {
+	if ($(".loading_overlay").is(":visible")) {
+		$(".loading_overlay").fadeOut();
+	}
+}
+
+function showModalLoading() {
+	if (!$(".loading_overlay").is(":visible")) {
+		$(".loading_overlay").fadeIn();
+	}
+}
+
 function bindCodeMirror() {
     var _codeMirror = [];
     //setup code-mirror
