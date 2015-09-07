@@ -1,11 +1,11 @@
 <?php
 
-define('DEFAULT_PAGE', 1);
-define('DEFAULT_PAGE_SIZE', 10);
+define('TIMELOG_DEFAULT_PAGE', 1);
+define('TIMELOG_DEFAULT_PAGE_SIZE', 20);
 
 function index_GET(Web $w) {
-    $page = $w->request("p", DEFAULT_PAGE);
-    $pagesize = $w->request("ps", DEFAULT_PAGE_SIZE);
+    $page = $w->request("p", TIMELOG_DEFAULT_PAGE);
+    $pagesize = $w->request("ps", TIMELOG_DEFAULT_PAGE_SIZE);
     
 	// Get paged timelogs
     $timelog = $w->Timelog->getTimelogsForUser($w->Auth->user(), false, $page, $pagesize);
