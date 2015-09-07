@@ -39,7 +39,11 @@ position: fixed;
 ul.accordion {
     margin-left: 0px;
 }
-
+.CodeMirror {
+	height:auto!important;
+	margin-bottom:10px;
+	font-size: 12pt;
+}
 .accordion .accordion-navigation > .content {
     padding: 0px;
 }

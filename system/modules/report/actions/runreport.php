@@ -24,13 +24,7 @@ function runreport_ALL(Web &$w) {
 			else {
 				// display form
 				$w->Report->navigation($w, $rep->title);
-				
-				if ((!empty($member->role) && $member->role == "EDITOR") || ($w->Auth->hasRole("report_admin"))) {
-					$btnedit = Html::b("/report/viewreport/".$rep->id," Edit Report ");
-				}
-				else {
-					$btnedit = "";
-				}
+				History::add("Report: ".$rep->title);
 
 				// get the form array
 				$form = $rep->getReportCriteria();
@@ -38,13 +32,12 @@ function runreport_ALL(Web &$w) {
 				// if there is a form display it, otherwise say as much
 				if ($form) {
 					$theform = Html::form($form,$w->localUrl("/report/exereport/".$rep->id),"POST"," Display Report ");
-				}
-				else {
-					$theform = "No search criteria?";
+				} else {
+					$w->redirect($w->localUrl("/report/exereport/".$rep->id));
 				}
 
 				// display
-				$w->ctx("btnedit",$btnedit);
+				$w->ctx("rep",$rep);
 				$w->ctx("report",$theform);
 			}
 		}
