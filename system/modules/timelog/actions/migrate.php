@@ -27,6 +27,10 @@ function migrate_GET(Web $w) {
 				$timelog->is_suspect = $tasktime->is_suspect;
 				$timelog->insert();
 				
+				// Need to preserve created timestamp for ordering
+				$timelog->dt_created = $tasktime->dt_created;
+				$timelog->update();
+				
 				if (!empty($comment->comment)) {
 					$timelog->setComment($comment->comment);
 				}
