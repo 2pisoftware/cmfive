@@ -1,9 +1,10 @@
 <?php
+
 /**
  * widget for displaying favoritres 
  *
- * @author Steve Ryan, steve@2pisystems.com, 2015
- **/
+ * @author Steve Ryan, steve@2pisoftware.com, 2015
+ */
 
 class favorites_widget extends ModuleWidget {
 
@@ -14,6 +15,6 @@ class favorites_widget extends ModuleWidget {
     }
 
     public function display() {
-		echo $this->w->partial("listfavorite",array('classname'=>'Favorite'), "favorites");
+		echo $this->w->partial("listfavorite", array('classname' => 'Favorite'), "favorites");
 	}
 }

@@ -2,7 +2,7 @@
 /**
  *  Favorite class for flagging records
  * 
- * @author Steve Ryan, steve@2pisystems.com, 2015
+ * @author Steve Ryan, steve@2pisoftware.com, 2015
  */
 class Favorite extends DbObject {
 	
@@ -21,6 +21,9 @@ class Favorite extends DbObject {
 	public $modifier_id; // <-- foreign key to user table
 	public $creator_id; // <-- foreign key to user table
 	
+	function getLinkedObject() {
+		return $this->getObject($this->object_class, $this->object_id);
+	}
 	
 	// functions for implementing access restrictions, these are optional
 

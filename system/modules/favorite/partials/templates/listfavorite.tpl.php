@@ -1,7 +1,7 @@
 <?php
 /**
  * template for favorites partial
- * @author Steve Ryan, steve@2pisystems.com, 2015
+ * @author Steve Ryan, steve@2pisoftware.com, 2015
  **/
 $tabHead=array();
 $buffer='';	

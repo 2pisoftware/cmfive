@@ -1147,4 +1147,8 @@ class DbObject extends DbService {
         return $v;
     }
 
+	public function __toString() {
+		return $this->printSearchTitle();
+	}
+	
 }
