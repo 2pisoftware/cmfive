@@ -25,7 +25,7 @@ class TimelogService extends DbService {
             $where['is_deleted'] = 0;
         }
         
-        return $this->getObjects("Timelog", $where, false, true, "dt_created DESC", ($page - 1) * $page_size, $page_size);
+        return $this->getObjects("Timelog", $where, false, true, "dt_start DESC", ($page - 1) * $page_size, $page_size);
     }
 	
 	public function countTotalTimelogsForUser(User $user = null, $includeDeleted = false) {
