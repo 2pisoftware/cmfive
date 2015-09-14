@@ -48,7 +48,7 @@ Config::set('system.csrf', array(
     )
 ));
 
-Config::append('email.transports', array(
+Config::set('email.transports', array(
 	'smtp' => 'SwiftMailerTransport',
 	'swiftmailer' => 'SwiftMailerTransport',
 	'sendmail' => 'SwiftMailerTransport'
