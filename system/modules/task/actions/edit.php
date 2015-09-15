@@ -229,7 +229,12 @@ function edit_POST($w) {
         $user = $w->Auth->getUser($task->assignee_id);
         $contact = $user->getContact();
 
-		$w->Mail->sendMail($contact->email, $contact->email, "Invite to " . $task->title, 'Your iCal is attached<br/>View Task at: ' . $task->toLink(null, null, $user), null, null, [$ical]);
+		$attachments = [
+			'type' => 'attachment/calendar',
+			'name'	=> 'invite.ics',
+			'content' => $ical
+		];
+		$w->Mail->sendMail($contact->email, $contact->email, "Invite to " . $task->title, 'Your iCal is attached<br/>View Task at: ' . $task->toLink(null, null, $user), null, null, $attachments);
 	}
 
 }
