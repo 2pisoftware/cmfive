@@ -84,6 +84,9 @@ class MandrillTransport implements GenericTransport {
 						$message['from_name'] = $replyto_name;
 						break;
 					}
+				} else {
+					$message['from_email'] = $replyto;
+					$message['from_name'] = $replyto;
 				}
 				
 				// Set cc and bcc
