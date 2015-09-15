@@ -225,18 +225,31 @@ function edit_POST($w) {
     
 	
 	if (empty($p['id']) && Config::get('task.ical.send') == true) {
-		$data = $task->getIcal();
+        $data = $task->getIcal();
         $user = $w->Auth->getUser($task->assignee_id);
         $contact = $user->getContact();
 
-		$attachments = [
-			[
-				'type' => 'attachment/calendar',
-				'name'	=> 'invite.ics',
-				'content' => $ical
-			]
-		];
-		$w->Mail->sendMail($contact->email, $contact->email, "Invite to " . $task->title, 'Your iCal is attached<br/>View Task at: ' . $task->toLink(null, null, $user), null, null, $attachments);
-	}
+        $messageObject = Swift_Message::newInstance();
+        $messageObject->addPart("Your iCal is attached<br/>View Task at: " . $task->toLink(null, null, $user), "text/html");
 
+        $messageObject->setSubject("Invite to: " . $task->title)
+                ->setFrom($w->Auth->user()->getContact()->email);
+
+        $messageObject->setTo(array($contact->email));
+        $ics_content = $data;
+        $ics_attachment = Swift_Attachment::newInstance()
+                ->setBody(trim($ics_content))
+                ->setEncoder(Swift_Encoding::get7BitEncoding());
+        $headers = $ics_attachment->getHeaders();
+        $content_type_header = $headers->get("Content-Type");
+        $content_type_header->setValue("text/calendar");
+        $content_type_header->setParameters(array(
+            'charset' => 'UTF-8',
+            'method' => 'REQUEST'
+        ));
+        $messageObject->attach($ics_attachment);
+
+        $mailObject = Swift_Mailer::newInstance($w->Mail->getTransport());
+        $mailObject->send($messageObject);
+    }
 }
