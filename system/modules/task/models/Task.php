@@ -516,16 +516,23 @@ class Task extends DbObject {
         
         $date = date("Ymd", strtotime(str_replace('/', '-', $this->dt_due)));
 
+		$task_creator = $this->getCreator();
+		$task_assignee = $this->getAssignee();
+		
         // Borrowed from here http://stackoverflow.com/questions/1463480/how-can-i-use-php-to-dynamically-publish-an-ical-file-to-be-read-by-google-calen
         $ical = "BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//hacksw/handcal//NONSGML v1.0//EN
-METHOD:PUBLISH
+CALSCALE:GREGORIAN
+METHOD:REQUEST
 BEGIN:VEVENT
-UID:" . md5(uniqid(mt_rand(), true)) . "@2pisoftware.com
-DTSTAMP:" . gmdate('Ymd').'T'. gmdate('His') . "Z
 DTSTART;VALUE=DATE:" . $date . "
 DTEND;VALUE=DATE:" . $date . "
+DTSTAMP:" . gmdate('Ymd').'T'. gmdate('His') . "Z
+ORGANIZER;CN=" . $task_creator->getFullName() . ":mailto:" . $task_creator->getContact()->email . "
+UID:" . md5(uniqid(mt_rand(), true)) . "@2pisoftware.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+  TRUE;CN=" . $task_assignee->getFullName() . ";X-NUM-GUESTS=0:mailto:" . $task_assignee->getContact()->email . "
 SUMMARY:" . $this->title . "
 DESCRIPTION:" . htmlentities($this->description) . "
 SEQUENCE:0

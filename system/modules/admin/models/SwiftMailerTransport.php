@@ -10,6 +10,10 @@ class SwiftMailerTransport implements GenericTransport {
 	}
 	
 	public function getTransport($layer) {
+		if (!empty($this->transport)) {
+			return $this->transport;
+		}
+		
 		switch(strtolower($layer)) {
 			case "smtp":
 			case "swiftmailer":

@@ -224,32 +224,43 @@ function edit_POST($w) {
     }
     
 	
-	if (empty($p['id']) && Config::get('task.ical.send') == true) {
+	if (empty($p['id']) && Config::get('task.ical.send') == true) {		
         $data = $task->getIcal();
         $user = $w->Auth->getUser($task->assignee_id);
         $contact = $user->getContact();
 
         $messageObject = Swift_Message::newInstance();
-        $messageObject->addPart("Your iCal is attached<br/>View Task at: " . $task->toLink(null, null, $user), "text/html");
-
+		$messageObject->setTo(array($contact->email));
         $messageObject->setSubject("Invite to: " . $task->title)
-                ->setFrom($w->Auth->user()->getContact()->email);
+            ->setFrom($w->Auth->user()->getContact()->email);
 
-        $messageObject->setTo(array($contact->email));
+        $messageObject->addPart("Your iCal is attached<br/>View Task at: " . $task->toLink(null, null, $user), "text/html");
         $ics_content = $data;
+		$messageObject->addPart($ics_content, "text/calendar");
+		
+		file_put_contents(FILE_ROOT . "invite.ics", $data);
+		
         $ics_attachment = Swift_Attachment::newInstance()
-                ->setBody(trim($ics_content))
+                ->setBody(trim($ics_content), "application/ics; name=\"invite.ics\"")
                 ->setEncoder(Swift_Encoding::get7BitEncoding());
         $headers = $ics_attachment->getHeaders();
         $content_type_header = $headers->get("Content-Type");
-        $content_type_header->setValue("text/calendar");
+        $content_type_header->setValue("application/ics; name=\"invite.ics\"");
         $content_type_header->setParameters(array(
             'charset' => 'UTF-8',
             'method' => 'REQUEST'
         ));
-        $messageObject->attach($ics_attachment);
+		
+		$content_disposition_header = $headers->get("Content-Disposition");
+		$content_disposition_header->setValue("attachment; filename=\"invite.ics\"");
+		
+		$messageObject->attach($ics_attachment);
 
-        $mailObject = Swift_Mailer::newInstance($w->Mail->getTransport());
+		$email_layer = Config::get('email.layer');
+		$swiftmailer_transport = new SwiftMailerTransport($w, $email_layer);
+        $mailObject = Swift_Mailer::newInstance($swiftmailer_transport->getTransport($email_layer));
         $mailObject->send($messageObject);
+
+		unlink(FILE_ROOT . "invite.ics");
     }
 }
