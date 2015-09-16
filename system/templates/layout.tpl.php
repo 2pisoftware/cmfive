@@ -143,16 +143,24 @@
                         ?>
                         
                         <!-- Search bar -->
-                        <li><?php echo Html::box("/search", "<span class='fi-magnifying-glass'></span>", false, false, null, null, null, "cmfive_search_button"); ?></li>
+                        <li><?php echo Html::box("/search", "<span class='fi-magnifying-glass show-for-medium-up'></span><span class='show-for-small'>Search</span>", false, false, null, null, null, "cmfive_search_button"); ?></li>
                         
                         <?php if ($w->Auth->user()): ?>
 						<!-- Clear cache button -->
 							<?php if ($w->Auth->user()->is_admin): ?>
-							<li><a id="admin_clear_cache" href="/admin/ajaxClearCache" onclick="return false;" title="Clear configuration cache"><span class="clear_cache_icon fi-refresh"></span></a></li>
+							<li>
+								<a id="admin_clear_cache" href="/admin/ajaxClearCache" onclick="return false;" title="Clear configuration cache">
+									<span class="clear_cache_icon fi-refresh show-for-medium-up"></span>
+									<span class="show-for-small">Clear cache</span>
+								</a>
+							</li>
 							<?php endif; ?>
                         <!-- User Profile drop down -->
                             <li class="has-dropdown">
-                                <a href="#"><span  class="fi-torso"></span></a>
+                                <a href="#">
+									<span class="fi-torso show-for-medium-up"></span>
+									<span class="show-for-small">Account</span>
+								</a>
                                 <?php
                                 echo Html::ul(
                                     array(
@@ -167,7 +175,7 @@
                     <!-- Left Nav Section -->
                     <ul class="left">
                         <?php if ($w->Auth->loggedIn()) : ?>
-                            <li><?php echo $w->menuLink($w->Main->getUserRedirectURL(), "<span class='fi-home'></span>"); ?></li>
+                            <li><?php echo $w->menuLink($w->Main->getUserRedirectURL(), "<span class='fi-home show-for-medium-up'></span><span class='show-for-small'>Home</span>"); ?></li>
                             <li class="divider"></li>
                             <?php foreach ($w->modules() as $module) {
                                 // Check if config is set to display on topmenu
@@ -191,7 +199,7 @@
                             }
                         
                             if ($w->Auth->allowed('help/view')) : ?>
-                                <li><?php echo Html::box(WEBROOT . "/help/view/" . $w->_module . ($w->_submodule ? "-" . $w->_submodule : "") . "/" . $w->_action, "<span class='fi-q'>?</span>", false, true, 750, 500); ?> </li>
+                                <li><?php echo Html::box(WEBROOT . "/help/view/" . $w->_module . ($w->_submodule ? "-" . $w->_submodule : "") . "/" . $w->_action, "<span class='fi-q show-for-medium-up'>?</span><span class='show-for-small'>Help</span>", false, true, 750, 500); ?> </li>
                             <?php endif;
                         endif; ?>
                     </ul> <!-- End left nav section -->
