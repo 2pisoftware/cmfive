@@ -6,6 +6,7 @@
  */
 function delete_GET(Web $w) {
 	$p = $w->pathMatch("id");
+	$redirect = $w->request("redirect", '');
 	
 	// Check for parameter
 	if (empty($p['id'])) {
@@ -24,5 +25,5 @@ function delete_GET(Web $w) {
 	}
 	
 	$timelog->delete();
-	$w->msg("Timelog deleted", "/timelog");
+	$w->msg("Timelog deleted", !empty($redirect) ? $redirect : "/timelog");
 }

@@ -6,7 +6,8 @@
         <ul class="clearing-thumbs small-block-grid-2 medium-block-grid-6 large-block-grid-9" data-clearing>
         <?php foreach ($attachments as $att) : ?>
             <?php if ($att->isImage()) : ?>
-                <li><a class="th" href="/uploads/<?php echo $att->fullpath; ?>"><img data-caption="<?php echo $att->title; ?>" src="<?php echo $att->getThumbnailUrl(); ?>"></a></li>
+                <!--<li><a class="th" href="/uploads/<?php echo $att->fullpath; ?>"><img data-caption="<?php echo $att->title; ?>" src="<?php echo $att->getThumbnailUrl(); ?>"></a></li>-->
+				<li><a class="th" href="/file/atfile/<?php echo $att->id; ?>"><img data-caption="<?php echo $att->title; ?>" src="<?php echo $att->getThumbnailUrl(); ?>"></a></li>
             <?php else :
                 $notImages[] = $att;
             endif;
