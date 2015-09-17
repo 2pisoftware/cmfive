@@ -258,7 +258,7 @@
             // Automatically append the close 'x' to reveal modals
             $(document).on('opened', '[data-reveal]', function () {
                 $("#cmfive-modal").append("<a class=\"close-reveal-modal\">&#215;</a>");
-                modal_history.push()
+                modal_history.push();
                 bindModalLinks();
             });
             
@@ -268,16 +268,19 @@
                     if ($(this).hasClass("close-reveal-modal")) {
                         $("#cmfive-modal").foundation("reveal", "close");
                     } else {
-                        if ($(this).attr('href')[0] === "#") {
-                            return true;
-                        } else {
-                            // Add href to history if the href wasnt the last item in the stack and that we arent the back link
-                            if (modal_history.indexOf($(this).attr('href')) !== modal_history.length) {
-                                modal_history.push($(this).attr('href'));
-                                modal_history_pop = true;
-                            }
-                            changeModalWindow($(this).attr('href'));
-                        }
+						// No one is using the help system at the moment
+						// Therefore no real need for a dynamic modal history
+						return true;
+//                        if ($(this).attr('href')[0] === "#") {
+//                            return true;
+//                        } else {
+//                            // Add href to history if the href wasnt the last item in the stack and that we arent the back link
+//                            if (modal_history.indexOf($(this).attr('href')) !== modal_history.length) {
+//                                modal_history.push($(this).attr('href'));
+//                                modal_history_pop = true;
+//                            }
+//                            changeModalWindow($(this).attr('href'));
+//                        }
                     }
                     return false;
                 });
