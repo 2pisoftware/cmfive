@@ -89,6 +89,17 @@ class FileService extends DbService {
 		return WEBROOT."/file/path/".$path;
 	}
 
+	function getAttachmentsFileList($objectOrTable, $id=null) {
+		$attachments = $this->getAttachments($objectOrTable, $id);
+		if (!empty($attachments)) {
+			$pluck = array();
+			array_reduce($attachments, function(&$pluck, $attachment) {
+				$pluck[] = $attachment->fullpath;
+			});
+			return $pluck;
+		}
+		return array();
+	}
 
 	function getAttachments($objectOrTable,$id=null) {
 		if (is_scalar($objectOrTable)) {

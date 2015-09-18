@@ -39,17 +39,33 @@ function task_core_dbobject_after_insert_Task(Web $w, $object) {
         $event_title = $object->getHumanReadableAttributeName(TASK_NOTIFICATION_TASK_CREATION);
         
         // send it to the inbox of the user's on our send list
+		// prepare our message, add heading, add URL to task, add notification advice in messgae footer 
+		$subject = $event_title . "[" . $object->id . "]: " . $object->title;
+        $logged_in_user = $w->Auth->user();
+		
         foreach ($users_to_notify as $user) {
-            // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
-            $subject = "Task - " . $object->title . ": " . $event_title;
-            $message = "<b>" . $event_title . "</b><br/>\n";
+            $message = "<b>" . $event_title . " [" . $object->id . "]</b><br/>\n";
             $message .= "<p>A new task has been created</p>";
             
+			$message .= "<p><b>Subject:</b> " . $object->title . "</p>";
+			$message .= "<p><b>Body:</b>" . $object->description . "</p>";
+			
             $user_object = $w->Auth->getUser($user);
-            $message .= $object->toLink(null, null, $user_object);
+            $message .= "<br/><p>Access the task here: " . $object->toLink(null, null, $user_object) . "</p>";
             $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
 
-            $w->Inbox->addMessage($subject, $message, $user);
+			$attachments = $w->File->getAttachmentsFileList($object);
+			
+			if (!$logged_in_user || $logged_in_user->id !== $user_object->id) {
+				$w->Mail->sendMail(
+					$user_object->getContact()->email, 
+					!empty($logged_in_user->id) ? $logged_in_user->getContact()->email : Config::get('main.company_support_email'),
+					$subject, $message, null, null, $attachments
+				);
+			}
+			
+			// Add message to inbox (needed?) but dont send an email
+            $w->Inbox->addMessage($subject, $message, $user, null, null, false);
         }
     }
 }

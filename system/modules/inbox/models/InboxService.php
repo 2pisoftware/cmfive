@@ -39,7 +39,7 @@ class InboxService extends DbService {
 			if (!empty($rContact) && !empty($lSender)) {
 				$lContact=$lSender->getContact();
 				if (!empty($lContact) && $send_email === true && $msg->user_id !== $msg->sender_id) {
-					$this->w->Mail->sendMail($rContact->email, $logged_in ? $lContact->email : "system@crm.2pisoftware.com", $msg->subject, $mso->message);
+					$this->w->Mail->sendMail($rContact->email, $logged_in ? $lContact->email : Config::get('main.company_support_email'), $msg->subject, $mso->message);
 				}
 			}
 		}
