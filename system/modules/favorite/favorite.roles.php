@@ -6,5 +6,5 @@
  **/
 
 function role_favorites_user_allowed($w, $path) {
-	return startsWith($path, "favorites");
+	return startsWith($path, "favorite");
 }
