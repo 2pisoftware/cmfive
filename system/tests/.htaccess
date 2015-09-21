@@ -1,10 +1,1 @@
-RewriteEngine Off
-<Files ~ "\.php$">
-    Order allow,deny
-    Allow from all
-</Files>
-
-AuthUserFile .htpasswd
-AuthName "Please Enter Password"
-AuthType Basic
-#Require valid-user
+Deny from all

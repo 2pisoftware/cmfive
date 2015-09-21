@@ -17,16 +17,17 @@ define("SESSION_NAME", "CM5_SID");
 
 set_include_path(get_include_path() . PATH_SEPARATOR . LIBPATH);
 set_include_path(get_include_path() . PATH_SEPARATOR . SYSTEM_LIBPATH);
+set_include_path(get_include_path() . PATH_SEPARATOR . $_SERVER['DOCUMENT_ROOT']);
 
-require_once __DIR__ ."/db.php";
-require_once __DIR__ ."/html.php";
-require_once __DIR__ ."/functions.php";
-require_once __DIR__ ."/classes/CSRF.php";
-require_once __DIR__ ."/classes/Config.php";
-require_once __DIR__ ."/classes/History.php";
+require_once "db.php";
+require_once "html.php";
+require_once "functions.php";
+require_once "classes/CSRF.php";
+require_once "classes/Config.php";
+require_once "classes/History.php";
 
 // Load system Composer autoloader
-if (file_exists(__DIR__ . "/composer/vendor/autoload.php")) {
+if (file_exists("composer/vendor/autoload.php")) {
     require "composer/vendor/autoload.php";
 }
 
