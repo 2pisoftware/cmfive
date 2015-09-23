@@ -6,7 +6,7 @@ ini_set('session.gc_maxlifetime', 60 * 60 * 6);
 define("CMFIVE_VERSION", "0.8.3");
 
 define("ROOT_PATH", str_replace("\\", "/", getcwd()));
-define("SYSTEM_PATH", str_replace("\\", "/", getcwd() . '/system'));
+define("SYSTEM_PATH", str_replace("\\", "/", $_SERVER['DOCUMENT_ROOT'] . '/system'));
 
 define("LIBPATH", str_replace("\\", "/", getcwd() . '/lib'));
 define("SYSTEM_LIBPATH", str_replace("\\", "/", getcwd() . '/system/lib'));
@@ -19,16 +19,16 @@ set_include_path(get_include_path() . PATH_SEPARATOR . LIBPATH);
 set_include_path(get_include_path() . PATH_SEPARATOR . SYSTEM_LIBPATH);
 set_include_path(get_include_path() . PATH_SEPARATOR . $_SERVER['DOCUMENT_ROOT']);
 
-require_once "db.php";
-require_once "html.php";
-require_once "functions.php";
-require_once "classes/CSRF.php";
-require_once "classes/Config.php";
-require_once "classes/History.php";
+require_once SYSTEM_PATH . "/db.php";
+require_once SYSTEM_PATH . "/html.php";
+require_once SYSTEM_PATH . "/functions.php";
+require_once SYSTEM_PATH . "/classes/CSRF.php";
+require_once SYSTEM_PATH . "/classes/Config.php";
+require_once SYSTEM_PATH . "/classes/History.php";
 
 // Load system Composer autoloader
-if (file_exists("composer/vendor/autoload.php")) {
-    require "composer/vendor/autoload.php";
+if (file_exists(SYSTEM_PATH . "/composer/vendor/autoload.php")) {
+    require SYSTEM_PATH . "/composer/vendor/autoload.php";
 }
 
 
@@ -546,7 +546,7 @@ class Web {
     	}
     	
     	// first load the system config file
-    	require SYSTEM_PATH . "/config.php";
+    	require "config.php";
     	
         // Load System config first
         $baseDir = SYSTEM_PATH . '/modules';
@@ -560,7 +560,7 @@ class Web {
 	    if (!file_exists("config.php")) {
 			$this->install();
 		}
-        require ROOT_PATH . "/config.php";
+        require "../config.php";
         
         // if config cache file doesn't exist, then
         // create it new

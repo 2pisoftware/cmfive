@@ -3,7 +3,7 @@
 // Need to fake server vars
 $_SERVER['HTTPS'] = '';
 $_SERVER['HTTP_HOST'] = 'localhost';
-$_SERVER['DOCUMENT_ROOT'] = realpath(__DIR__ . '/../../');
+$_SERVER['DOCUMENT_ROOT'] = realpath(__DIR__ . '/../../../');
 require "../web.php";
 
 class WebTest extends PHPUnit_Framework_TestCase {

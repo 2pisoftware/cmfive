@@ -1,5 +1,0 @@
-<phpunit colors="true">
-	<testsuite name="Application Test Suite">
-		
-	</testsuite>
-</phpunit>
