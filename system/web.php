@@ -546,7 +546,7 @@ class Web {
     	}
     	
     	// first load the system config file
-    	require "config.php";
+    	require SYSTEM_PATH . "/config.php";
     	
         // Load System config first
         $baseDir = SYSTEM_PATH . '/modules';
@@ -560,7 +560,7 @@ class Web {
 	    if (!file_exists("config.php")) {
 			$this->install();
 		}
-        require "../config.php";
+        require "config.php";
         
         // if config cache file doesn't exist, then
         // create it new
