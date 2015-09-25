@@ -8,13 +8,13 @@
 	</div>
 	<div class="tab-body">
 		<div id="fields">
-			<?php echo Html::box("/form-field/edit/", "Add a field"); ?>
+			<?php echo Html::box("/form-field/edit/?form_id=" . $form->id, "Add a field", true); ?>
 			
 			<?php if (!empty($fields)) : ?>
 				<table class="table small-12">
 					<thead>
 						<tr>
-							<th>Name</th><th>Type</th><th>Mask</th><th>Actions</th>
+							<th>Name</th><th>Type</th><th>Additional Details</th><th>Actions</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -22,9 +22,10 @@
 							<tr>
 								<td><?php echo $field->name; ?></td>
 								<td><?php echo $field->type; ?></td>
-								<td></td>
+								<td><?php echo $field->mask; ?></td>
 								<td>
-									
+									<?php echo Html::box("/form-fields/edit/" . $field->id, "Edit", true) ?>
+									<?php echo Html::b("/form-fields/delete/" . $field->id, "Delete", "Are you sure you want to delete this form field? (WARNING: there may be existing data saved to this form field!)", null, false, "alert"); ?>
 								</td>
 							</tr>
 						<?php endforeach; ?>
