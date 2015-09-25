@@ -5,6 +5,10 @@ class Form extends DbObject {
 	public $title;
 	public $description;
 	
+	public function getFields() {
+		return $this->getObjects("FormField", ["form_id" => $this->id, "is_deleted" => 0]);
+	}
+	
 	public function getSelectOptionTitle() {
 		return $this->title;
 	}
@@ -18,6 +22,7 @@ class Form extends DbObject {
 	}
 	
 	public function printSearchUrl() {
-		return "/form/edit/" . $this->id;
+		return "/form/show/" . $this->id;
 	}
+
 }
