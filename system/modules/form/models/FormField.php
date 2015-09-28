@@ -9,46 +9,42 @@ class FormField extends DbObject {
 	
 	public static function getFieldTypes() {
 		return [
-			"number" => "Whole Number",
-			"decimal" => "Decimal",
-			"date" => "Date",
-			"datetime" => "DateTime",
-			"money" => "Money",
-			"text" => "Text",
+			["Whole Number", "number"],
+			["Decimal", "decimal"],
+			["Date", "date"],
+			["DateTime", "datetime"],
+			["Money", "money"],
+			["Text", "text"],
 		];
 	}
 	
-	public function getMasksForFieldType() {
+	public function getFormReferenceName() {
+		return str_replace(" ", "_", $this->name);
+	}
+	
+	public function getFormRow() {
 		if (empty($this->type)) {
 			return null;
 		}
 		
-		switch($this->type) {
-			case "number": {
-				return;
-			}
-			case "decimal": {
-				return [
-					"Decimal Places", "text", "decimal_places", $this->getMaskValue("decimal_places")
-				];
-			}
-			case "date": {
-				
+		$field_type = null;
+		switch(strtolower($this->type)) {
+			case "date": 
+				$field_type = "date"; 
 				break;
-			}
-			case "datetime": {
-				
+			case "datetime":
+				$field_type = "datetime";
 				break;
-			}
-			case "money": {
-				
+			case "number": 
+			case "decimal":
+			case "money": 
+			case "text":
+			default:
+				$field_type = "text";
 				break;
-			}
-			case "text": {
-				
-				break;
-			}
 		}
+		return [
+			$this->name, $field_type, $this->getFormReferenceName()
+		];
 	}
-	
 }

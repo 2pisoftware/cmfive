@@ -7,5 +7,35 @@ class FormValue extends DbObject {
 	public $value;
 	public $type;
 	public $mask;
+
+	public function getFormField() {
+		return $this->getObject("FormField", $this->form_field_id);
+	}
 	
+	public function getFormRow() {
+		$field = $this->getFormField();
+		return array_push($field->getFormRow(), $this->getMaskedValue());
+	}
+	
+	public function getMaskedValue() {
+		if (empty($this->type)) {
+			return null;
+		}
+		
+		switch($this->type) {
+			case "date": 
+				return formatDate($this->value);
+			case "datetime":
+				return formatDateTime($this->value);
+			case "number": 
+				return intval($this->value);
+			case "decimal":
+				return round($this->value, 2);
+			case "money":
+				return formatMoney("%.2n", $this->value);
+			case "text":
+			default:
+				return $this->value;
+		}
+	}
 }

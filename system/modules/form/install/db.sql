@@ -38,7 +38,7 @@ CREATE TABLE `form_value` (
 	`dt_creator` DATETIME NOT NULL,
 	`dt_modified` DATETIME NOT NULL,
 	PRIMARY KEY (`id`) 
-) ENGINE = InnoDB CHARACTER SET utf16 COLLATE utf8_general_ci;
+) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 CREATE TABLE `form_field_metadata` (
 	`id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -57,6 +57,18 @@ CREATE TABLE `form_instance` (
 	`id` BIGINT NOT NULL AUTO_INCREMENT,
 	`form_id` BIGINT NOT NULL,
 	`is_deleted` TINYINT(1) NOT NULL DEFAULT '0',
+	`creator_id` BIGINT NOT NULL,
+	`modifier_id` BIGINT NOT NULL,
+	`dt_created` DATETIME NOT NULL,
+	`dt_modified` DATETIME NOT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+CREATE TABLE `form_mapping` ( 
+	`id` BIGINT NOT NULL AUTO_INCREMENT,
+	`form_id` BIGINT NOT NULL,
+	`object` VARCHAR(256) NOT NULL,
+	`is_deleted` TINYINT NOT NULL DEFAULT '0',
 	`creator_id` BIGINT NOT NULL,
 	`modifier_id` BIGINT NOT NULL,
 	`dt_created` DATETIME NOT NULL,
