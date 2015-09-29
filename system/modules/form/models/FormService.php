@@ -14,6 +14,10 @@ class FormService extends DbService {
 		return $this->getObject("FormField", $id);
 	}
 	
+	public function getFormInstance($id) {
+		return $this->getObject("FormInstance", $id);
+	}
+	
 	public function buildForm(FormInstance $form_instance, Form $form) {
 		$form_structure = $form_instance->getEditForm($form);
 		return $form_structure;

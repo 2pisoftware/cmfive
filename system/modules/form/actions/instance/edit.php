@@ -88,5 +88,5 @@ function edit_POST(Web $w) {
 		}
 	}
 	
-	$w->msg($form->title . (!empty($p['id']) ? "updated" : "created"), $redirect_url);
+	$w->msg($form->title . (!empty($p['id']) ? "updated" : "created"), $redirect_url . "#form");
 }
