@@ -9,6 +9,23 @@ class Form extends DbObject {
 		return $this->getObjects("FormField", ["form_id" => $this->id, "is_deleted" => 0]);
 	}
 	
+	public function getTableHeaders() {
+		$fields = $this->getFields();
+		
+		$header_string = '';
+		if (!empty($fields)) {
+			foreach($fields as $field) {
+				$header_string .= '<th>' . $field->name . '</th>';
+			}
+		}
+		
+		return $header_string;
+	}
+	
+	public function getFormInstances() {
+		return $this->getObjects("FormInstance", ["form_id" => $this->id, "is_deleted" => 0]);
+	}
+	
 	public function getSelectOptionTitle() {
 		return $this->title;
 	}

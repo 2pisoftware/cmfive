@@ -17,7 +17,13 @@ class FormInstance extends DbObject {
 	public function getTableRow() {
 		$form_values = $this->getSavedValues();
 		
-		
+		$table_row = '';
+		if (!empty($form_values)) {
+			foreach($form_values as $form_value) {
+				$table_row .= "<td>" . $form_value->getMaskedValue() . "</td>";
+			}
+		}
+		return $table_row;
 	}
 	
 	public function getEditForm($form) {

@@ -23,5 +23,25 @@ class FormService extends DbService {
 		$mapping = $this->getObject("FormMapping", ["form_id" => $form->id, "object" => $object, "is_deleted" => 0]);
 		return !empty($mapping->id);
 	}
+
+	public function areFormsMappedToObject($object) {
+		$mapping = $this->getObjects("FormMapping", ["object" => get_class($object), "is_deleted" => 0]);
+		return count($mapping) > 0;
+	}
 	
+	public function getFormsMappedToObject($object) {
+		$mapping = $this->getObjects("FormMapping", ["object" => get_class($object), "is_deleted" => 0]);
+		$forms = [];
+		if (!empty($mapping)) {
+			foreach($mapping as $map) {
+				$forms[] = $map->getForm();
+			}
+		}
+		
+		return $forms;
+	}
+	
+	public function getFormFieldByFormIdAndTitle($form_id, $name) {
+		return $this->getObject("FormField", ["form_id" => $form_id, "technical_name" => $name, "is_deleted" => 0]);
+	}
 }

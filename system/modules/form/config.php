@@ -3,5 +3,8 @@
 Config::set('form', [
 	'active' => true,
 	'topmenu' => true,
-	'path' => 'system/modules'
+	'path' => 'system/modules',
+	'hooks' => [
+		'core_template'
+	]
 ]);

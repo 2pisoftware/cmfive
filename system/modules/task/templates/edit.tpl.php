@@ -6,6 +6,12 @@
             <a href="#comments">Comments</a>
             <a href="#attachments">Attachments</a>
             <?php if ($task->getCanINotify()):?><a href="#notification">Notifications</a><?php endif;?>
+			<?php 
+				$tab_headers = $w->callHook('core_template', 'tab_headers', $task); 
+				if (!empty($tab_headers)) {
+					echo implode('', $tab_headers);
+				}
+			?>
         <?php endif; ?>
     </div>
     <div class="tab-body">
@@ -51,6 +57,12 @@
                 <?php echo $tasknotify;?>
             </div>
             <?php endif;?>
+			<?php
+				$tab_content = $w->callHook('core_template', 'tab_content', ['object' => $task, 'redirect_url' => '/task/edit/' . $task->id]); 
+				if (!empty($tab_content)) {
+					echo implode('', $tab_content);
+				}
+			?>
         <?php endif; ?>
     </div>
 </div>

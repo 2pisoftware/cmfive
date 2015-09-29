@@ -4,9 +4,20 @@ class FormField extends DbObject {
 	
 	public $form_id;
 	public $name;
+	public $technical_name;
 	public $type;
 	public $mask;
 	
+	public function insert($force_validation = true) {
+		$this->technical_name = strtolower(str_replace(" ", "_", $this->name));
+		parent::insert($force_validation);
+	}
+	
+	public function update($force_null_values = false, $force_validation = true) {
+		$this->technical_name = strtolower(str_replace(" ", "_", $this->name));
+		parent::update($force_null_values, $force_validation);
+	}
+
 	public static function getFieldTypes() {
 		return [
 			["Whole Number", "number"],
@@ -44,7 +55,7 @@ class FormField extends DbObject {
 				break;
 		}
 		return [
-			$this->name, $field_type, $this->getFormReferenceName()
+			$this->name, $field_type, $this->technical_name
 		];
 	}
 }

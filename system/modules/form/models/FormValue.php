@@ -8,6 +8,11 @@ class FormValue extends DbObject {
 	public $type;
 	public $mask;
 
+	public function getFieldName() {
+		$field = $this->getFormField();
+		return $field->name;
+	}
+	
 	public function getFormField() {
 		return $this->getObject("FormField", $this->form_field_id);
 	}

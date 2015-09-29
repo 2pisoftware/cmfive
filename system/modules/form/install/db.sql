@@ -15,6 +15,7 @@ CREATE TABLE `form_field` (
 	`id` BIGINT NOT NULL AUTO_INCREMENT,
 	`form_id` BIGINT NOT NULL,
 	`name` VARCHAR(256) NOT NULL,
+	`technical_name` VARCHAR(256) NOT NULL,
 	`type` VARCHAR(256) NOT NULL,
 	`mask` VARCHAR(1024) NULL,
 	`is_deleted` TINYINT(1) NOT NULL DEFAULT '0',
@@ -56,6 +57,8 @@ CREATE TABLE `form_field_metadata` (
 CREATE TABLE `form_instance` (
 	`id` BIGINT NOT NULL AUTO_INCREMENT,
 	`form_id` BIGINT NOT NULL,
+	`object_class` VARCHAR(256) NOT NULL,
+	`object_id` BIGINT NOT NULL,
 	`is_deleted` TINYINT(1) NOT NULL DEFAULT '0',
 	`creator_id` BIGINT NOT NULL,
 	`modifier_id` BIGINT NOT NULL,
