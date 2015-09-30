@@ -15,7 +15,7 @@ function edit_GET(Web $w) {
 	$instance = null;
 	$form = null;
 	if (!empty($p['id'])) {
-		$instance = $w->Form->getInstance($p['id']);
+		$instance = $w->Form->getFormInstance($p['id']);
 		$form = $instance->getForm();
 	} else {
 		$form = $w->Form->getForm($form_id);
@@ -42,7 +42,7 @@ function edit_POST(Web $w) {
 	$instance = null;
 	$form = null;
 	if (!empty($p['id'])) {
-		$instance = $w->Form->getInstance($p['id']);
+		$instance = $w->Form->getFormInstance($p['id']);
 		$form = $instance->getForm();
 	} else {
 		$form = $w->Form->getForm($form_id);

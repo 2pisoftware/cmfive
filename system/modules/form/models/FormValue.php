@@ -19,7 +19,11 @@ class FormValue extends DbObject {
 	
 	public function getFormRow() {
 		$field = $this->getFormField();
-		return array_push($field->getFormRow(), $this->getMaskedValue());
+		$row = $field->getFormRow();
+		$value = $this->getMaskedValue();
+		
+		array_push($row, $value);
+		return $row;
 	}
 	
 	public function getMaskedValue() {

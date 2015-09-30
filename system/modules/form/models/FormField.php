@@ -58,4 +58,8 @@ class FormField extends DbObject {
 			$this->name, $field_type, $this->technical_name
 		];
 	}
+	
+	public function getMetaDataForm() {
+		
+	}
 }
