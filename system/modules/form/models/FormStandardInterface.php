@@ -27,6 +27,19 @@ class FormStandardInterface extends FormFieldInterface {
 		return null;
 	}
 	
+	public static function metadataForm($type) {
+		if (!static::doesRespondTo($type)) {
+			return null;
+		}
+		
+		switch(strtolower($type)) {
+			case "decimal":
+				return [["Decimal Places", "text", "decimal_places"]];
+			default:
+				return null;
+		}
+	}
+	
 	public static function modifyForDisplay($type, $value) {
 		if (!static::doesRespondTo($type)) {
 			return $value;

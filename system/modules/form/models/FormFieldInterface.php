@@ -54,6 +54,15 @@ abstract class FormFieldInterface {
 		return null;
 	}
 	
+	/**
+	 * Returns a form for adding metadata to a field
+	 * 
+	 * @param String $type
+	 * @return null|Array
+	 */
+	public static function metadataForm($type) {
+		return null;
+	}
 	
 	/**
 	 * This is where the 'magic' happens. Based on the given type, the class

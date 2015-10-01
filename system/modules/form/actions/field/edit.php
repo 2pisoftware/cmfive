@@ -18,7 +18,8 @@ function edit_GET(Web $w) {
 		]
 	];
 	
-	$w->out(Html::multiColForm($form, '/form-field/edit/' . $_form_field_object->id . '?form_id=' . $form_id));
+	$w->ctx("field", $_form_field_object);
+	$w->ctx("form", Html::multiColForm($form, '/form-field/edit/' . $_form_field_object->id . '?form_id=' . $form_id));
 }
 
 function edit_POST(Web $w) {

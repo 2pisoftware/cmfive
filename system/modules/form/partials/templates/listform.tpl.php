@@ -1,4 +1,5 @@
 <div class='row-fluid'>
+	<h4><?php echo $form->title; ?></h4>
 	<?php echo Html::box("/form-instance/edit?form_id=" . $form->id . "&redirect_url=" . $redirect_url . "&object_class=" . get_class($object) . "&object_id=" . $object->id, "Add new " . $form->title, true); ?>
 	<?php if (!empty($instances)) : ?>
 		<table class='small-12'>
