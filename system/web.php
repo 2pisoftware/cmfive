@@ -3,21 +3,22 @@
 ini_set('session.gc_maxlifetime', 60 * 60 * 6);
 
 //========== Constants =====================================
+define("DS", DIRECTORY_SEPARATOR);
 define("CMFIVE_VERSION", "0.8.3");
 
-define("ROOT_PATH", str_replace("\\", "/", getcwd()));
-define("SYSTEM_PATH", str_replace("\\", "/", $_SERVER['DOCUMENT_ROOT'] . '/system'));
+define("ROOT_PATH", str_replace("\\", "/",  $_SERVER['DOCUMENT_ROOT']));
+define("SYSTEM_PATH", str_replace("\\", "/", ROOT_PATH . '/system'));
 
-define("LIBPATH", str_replace("\\", "/", getcwd() . '/lib'));
-define("SYSTEM_LIBPATH", str_replace("\\", "/", getcwd() . '/system/lib'));
-define("FILE_ROOT", str_replace("\\", "/", getcwd() . "/uploads/")); // dirname(__FILE__)
+define("LIBPATH", str_replace("\\", "/", ROOT_PATH . '/lib'));
+define("SYSTEM_LIBPATH", str_replace("\\", "/", ROOT_PATH . '/system/lib'));
+define("FILE_ROOT", str_replace("\\", "/", ROOT_PATH . "/uploads/")); // dirname(__FILE__)
 define("MEDIA_ROOT", str_replace("\\", "/", dirname(__FILE__) . "/../media/"));
 define("ROOT", str_replace("\\", "/", dirname(__FILE__)));
 define("SESSION_NAME", "CM5_SID");
 
 set_include_path(get_include_path() . PATH_SEPARATOR . LIBPATH);
 set_include_path(get_include_path() . PATH_SEPARATOR . SYSTEM_LIBPATH);
-set_include_path(get_include_path() . PATH_SEPARATOR . $_SERVER['DOCUMENT_ROOT']);
+set_include_path(get_include_path() . PATH_SEPARATOR . ROOT_PATH);
 
 require_once SYSTEM_PATH . "/db.php";
 require_once SYSTEM_PATH . "/html.php";
@@ -30,8 +31,6 @@ require_once SYSTEM_PATH . "/classes/History.php";
 if (file_exists(SYSTEM_PATH . "/composer/vendor/autoload.php")) {
     require SYSTEM_PATH . "/composer/vendor/autoload.php";
 }
-
-
 
 class PermissionDeniedException extends Exception {
     

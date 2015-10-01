@@ -6,5 +6,8 @@ Config::set('form', [
 	'path' => 'system/modules',
 	'hooks' => [
 		'core_template'
+	],
+	'interfaces' => [
+		'FormStandardInterface'
 	]
 ]);

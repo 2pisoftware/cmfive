@@ -5,9 +5,27 @@ class FormValue extends DbObject {
 	public $form_instance_id;
 	public $form_field_id;
 	public $value;
-	public $type;
+	public $field_type;
 	public $mask;
 
+	public function insert($force_validation = true) {
+		$field = $this->getFormField();
+		
+		$interface = $field->interface_class;
+		$this->value = $interface::modifyForPersistance($field->type, $this->value);
+		
+		parent::insert($force_validation);
+	}
+	
+	public function update($force_null_values = false, $force_validation = true) {
+		$field = $this->getFormField();
+		
+		$interface = $field->interface_class;
+		$this->value = $interface::modifyForPersistance($field->type, $this->value);
+		
+		parent::update($force_validation);
+	}
+	
 	public function getFieldName() {
 		$field = $this->getFormField();
 		return $field->name;
@@ -27,24 +45,29 @@ class FormValue extends DbObject {
 	}
 	
 	public function getMaskedValue() {
-		if (empty($this->type)) {
+		if (empty($this->field_type)) {
 			return null;
 		}
 		
-		switch($this->type) {
-			case "date": 
-				return formatDate($this->value);
-			case "datetime":
-				return formatDateTime($this->value);
-			case "number": 
-				return intval($this->value);
-			case "decimal":
-				return round($this->value, 2);
-			case "money":
-				return formatMoney("%.2n", $this->value);
-			case "text":
-			default:
-				return $this->value;
-		}
+		$field = $this->getFormField();
+		$interface = $field->interface_class;
+		
+		return $interface::modifyForDisplay($this->field_type, $this->value);
+//		
+//		switch($this->type) {
+//			case "date": 
+//				return formatDate($this->value);
+//			case "datetime":
+//				return formatDateTime($this->value);
+//			case "number": 
+//				return intval($this->value);
+//			case "decimal":
+//				return round($this->value, 2);
+//			case "money":
+//				return formatMoney("%.2n", $this->value);
+//			case "text":
+//			default:
+//				return $this->value;
+//		}
 	}
 }

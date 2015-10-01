@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This abstract class is for defining a standard way that field types
+ * This abstract (static) class is for defining a standard way that field types
  * can be created. The system can them look at all instances that implement
  * this interface and present them to the user. The advantage to this is that
  * modules can define their own form fields as long as it implements this
@@ -14,7 +14,7 @@ abstract class FormFieldInterface {
 	// The definition of what form types this class can manipulate
 	// Format should be ["<NAME>" => "<DB VALUE>"] (note the types
 	// defined here are persisted against the form object)
-	protected $_respondsTo = [
+	protected static $_respondsTo = [
 		// "Money" => "money"
 	];
 	
@@ -25,8 +25,8 @@ abstract class FormFieldInterface {
 	 * 
 	 * @return Array
 	 */
-	public function respondsTo() {
-		return $this->_respondsTo;
+	public static function respondsTo() {
+		return static::$_respondsTo;
 	}
 	
 	/**
@@ -35,9 +35,25 @@ abstract class FormFieldInterface {
 	 * @param String $type
 	 * @return boolean
 	 */
-	public function doesRespondTo($type) {
-		return in_array($type, $this->respondsTo());
+	public static function doesRespondTo($type) {
+		foreach(static::$_respondsTo as $respondsTo) {
+			if (in_array($type, $respondsTo)) {
+				return true;
+			}
+		}
+		return false;
 	}
+	
+	/**
+	 * Returns the form element 
+	 * 
+	 * @param String $type
+	 * @return boolean
+	 */
+	public static function formType($type) {
+		return null;
+	}
+	
 	
 	/**
 	 * This is where the 'magic' happens. Based on the given type, the class
@@ -51,10 +67,12 @@ abstract class FormFieldInterface {
 	 * @param Mixed $value
 	 * @return Mixed
 	 */
-	abstract function modifyForDisplay($type, $value);
+	public static function modifyForDisplay($type, $value) {
+		return $value;
+	}
 	
 	//	E.g. for error handling
-	//	public function modifyForDisplay($type, $value) {
+	//	public static function modifyForDisplay($type, $value) {
 	//		if (!$this->doesRespondTo($type)) {
 	//			return $value;
 	//		}
@@ -79,6 +97,8 @@ abstract class FormFieldInterface {
 	 * @param Mixed $value
 	 * @return Mixed
 	 */
-	abstract function modifyForPersistance($type, $value); 
+	public static function modifyForPersistance($type, $value) {
+		return $value;
+	}
 	
 }

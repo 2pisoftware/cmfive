@@ -8,14 +8,15 @@ CREATE TABLE IF NOT EXISTS `form` (
   `dt_created` datetime NOT NULL,
   `dt_modified` datetime NOT NULL,
   `is_deleted` tinyint(4) NOT NULL DEFAULT '0',
-   PRIMARY KEY('id')
-) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci;
+   PRIMARY KEY(`id`)
+) ENGINE=InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 CREATE TABLE `form_field` (
 	`id` BIGINT NOT NULL AUTO_INCREMENT,
 	`form_id` BIGINT NOT NULL,
 	`name` VARCHAR(256) NOT NULL,
 	`technical_name` VARCHAR(256) NOT NULL,
+	`interface_class` VARCHAR(256) NULL,
 	`type` VARCHAR(256) NOT NULL,
 	`mask` VARCHAR(1024) NULL,
 	`is_deleted` TINYINT(1) NOT NULL DEFAULT '0',
@@ -36,7 +37,7 @@ CREATE TABLE `form_value` (
 	`is_deleted` TINYINT(1) NOT NULL DEFAULT '0',
 	`creator_id` BIGINT NOT NULL,
 	`modifier_id` BIGINT NOT NULL,
-	`dt_creator` DATETIME NOT NULL,
+	`dt_created` DATETIME NOT NULL,
 	`dt_modified` DATETIME NOT NULL,
 	PRIMARY KEY (`id`) 
 ) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci;
