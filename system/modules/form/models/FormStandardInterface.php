@@ -40,7 +40,7 @@ class FormStandardInterface extends FormFieldInterface {
 		}
 	}
 	
-	public static function modifyForDisplay($type, $value) {
+	public static function modifyForDisplay($type, $value, $metadata = null) {
 		if (!static::doesRespondTo($type)) {
 			return $value;
 		}
@@ -48,7 +48,12 @@ class FormStandardInterface extends FormFieldInterface {
 		// Alter value based on type
 		switch (strtolower($type)) {
 			case "decimal":
-				return $value * 1.0;
+				$decimal_places = self::getMetadataForKey($metadata, "decimal_places");
+				if (!empty($decimal_places->id)) {
+					return round($value, $decimal_places->meta_value);
+				} else {
+					return $value * 1.0;
+				}
 			case "date":
 				return date("d/m/Y", $value);
 			case "datetime":

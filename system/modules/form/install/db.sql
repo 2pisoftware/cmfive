@@ -50,8 +50,8 @@ CREATE TABLE `form_field_metadata` (
 	`is_deleted` TINYINT(1) NOT NULL DEFAULT '0',
 	`creator_id` BIGINT NOT NULL,
 	`modifier_id` BIGINT NOT NULL,
-	`dt_creator` DATETIME NOT NULL,
-	`dt_modifier` DATETIME NOT NULL,
+	`dt_created` DATETIME NOT NULL,
+	`dt_modified` DATETIME NOT NULL,
 	PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci;
 

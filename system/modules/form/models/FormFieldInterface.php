@@ -110,4 +110,15 @@ abstract class FormFieldInterface {
 		return $value;
 	}
 	
+	public static function getMetadataForKey($metadata, $key) {
+		if (!empty($metadata)) {
+			foreach($metadata as $_meta) {
+				if ($_meta->meta_key == $key) {
+					return $_meta;
+				}
+			}
+		}
+		return null;
+	}
+	
 }

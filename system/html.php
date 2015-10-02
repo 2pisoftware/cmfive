@@ -546,14 +546,14 @@ class Html {
         }
         
         // Set up shell layout
-        $buffer .= "<div class='row-fluid small-12 multicolform'>";
+        $buffer .= "<div class='row-fluid clearfix small-12 multicolform'>";
         
         // Print internals
         foreach ($data as $section => $rows) {
             
             // Print section header
             $buffer .= "<div class='panel'>";
-            $buffer .= "<div class='row-fluid section-header'><h4>{$section}</h4></div>";
+            $buffer .= "<div class='row-fluid clearfix section-header'><h4>{$section}</h4></div>";
             
             // Loop through each row
             foreach ($rows as $row) {

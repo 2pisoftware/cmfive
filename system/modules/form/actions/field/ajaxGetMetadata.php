@@ -18,9 +18,9 @@ function ajaxGetMetadata_GET(Web $w) {
 			return;
 		}
 	
-		$instance = $field->instance_class;
-		if ($instance::respondsTo($type)) {
-			echo Html::form($instance::metadataForm($type));
+		$metadata_form = $field->getMetadataForm();
+		if (!empty($metadata_form)) {
+			echo Html::form($metadata_form);
 		}
 	} else {
 		if(empty($type)) {
@@ -28,11 +28,11 @@ function ajaxGetMetadata_GET(Web $w) {
 			return;
 		}
 		
-		$instances = Config::get('form.instances');
-		if (!empty($instances)) {
-			foreach($instances as $instance) {
-				if ($instance::respondsTo($type)) {
-					echo Html::form($instance::metadataForm($type));
+		$interfaces = Config::get('form.interface');
+		if (!empty($interfaces)) {
+			foreach($interfaces as $interface) {
+				if ($interface::respondsTo($type)) {
+					echo Html::form($interface::metadataForm($type));
 				}
 			}
 		}

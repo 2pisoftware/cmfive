@@ -24,7 +24,7 @@
 							<tr>
 								<td><?php echo $field->name; ?></td>
 								<td><?php echo $field->type; ?></td>
-								<td><?php echo $field->mask; ?></td>
+								<td><?php echo $field->getAdditionalDetails(); ?></td>
 								<td>
 									<?php echo Html::box("/form-field/edit/" . $field->id . "?form_id=" . $form->id, "Edit", true) ?>
 									<?php echo Html::b("/form-field/delete/" . $field->id, "Delete", "Are you sure you want to delete this form field? (WARNING: there may be existing data saved to this form field!)", null, false, "alert"); ?>
