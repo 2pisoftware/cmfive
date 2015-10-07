@@ -43,14 +43,24 @@
 		<div id="mapping">
 			<div class="row-fluid clearfix">
 				<form action="/form-mapping/edit/?form_id=<?php echo $form->id; ?>" method="POST">
-					<?php foreach($w->modules() as $module) : ?>
-						<div class="small-12 medium-2 columns">
-							<label><?php echo ucfirst($module); ?></label>
-							<?php echo Html::checkbox($module, $w->Form->isFormMappedToObject($form, $module)); ?>
+					<div class="row-fluid clearfix">
+						<div class="small-12 columns">
+						<?php 
+							$mappings = Config::get('form.mapping');
+							if (!empty($mappings)) {
+								foreach($mappings as $mapping) {
+									echo Html::checkbox($mapping, $w->Form->isFormMappedToObject($form, $mapping));
+									echo "<label>$mapping</label>";
+								}
+							}
+						?>
 						</div>
-					<?php endforeach; ?>
-					
-					<button class="button">Save</button>
+					</div>
+					<div class="row-fluid clearfix">
+						<div class="small-12 columns">
+							<button class="button">Save</button>
+						</div>
+					</div>
 				</form>
 			</div>
 		</div>

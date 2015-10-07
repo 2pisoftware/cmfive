@@ -45,6 +45,10 @@ class FormService extends DbService {
 		return $forms;
 	}
 	
+	public function getFormInstancesForFormAndObject($form, $object) {
+		return $this->getObjects("FormInstance", ["form_id" => $form->id, "object_class" => get_class($object), "object_id" => $object->id, "is_deleted" => 0]);
+	}
+	
 	public function getFormFieldByFormIdAndTitle($form_id, $name) {
 		return $this->getObject("FormField", ["form_id" => $form_id, "technical_name" => $name, "is_deleted" => 0]);
 	}

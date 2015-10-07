@@ -9,5 +9,6 @@ Config::set('form', [
 	],
 	'interfaces' => [
 		'FormStandardInterface'
-	]
+	],
+	'mapping' => []
 ]);

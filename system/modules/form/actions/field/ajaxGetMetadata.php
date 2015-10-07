@@ -11,24 +11,8 @@ function ajaxGetMetadata_GET(Web $w) {
 	}
 	
 	$field = null;
-	if (!empty($p['id'])) {
-		$field = $w->Form->getFormField($p['id']);
-		if(empty($field->id)) {
-			header("HTTP/1.1 404 Not Found");
-			return;
-		}
-	
-		$metadata_form = $field->getMetadataForm();
-		if (!empty($metadata_form)) {
-			echo Html::form($metadata_form);
-		}
-	} else {
-		if(empty($type)) {
-			header("HTTP/1.1 404 Not Found");
-			return;
-		}
-		
-		$interfaces = Config::get('form.interface');
+	if(!empty($type)) {
+		$interfaces = Config::get('form.interfaces');
 		if (!empty($interfaces)) {
 			foreach($interfaces as $interface) {
 				if ($interface::respondsTo($type)) {
@@ -36,6 +20,21 @@ function ajaxGetMetadata_GET(Web $w) {
 				}
 			}
 		}
+	} else {
+		if (!empty($p['id'])) {
+			$field = $w->Form->getFormField($p['id']);
+			if(empty($field->id)) {
+				header("HTTP/1.1 404 Not Found");
+				return;
+			}
+
+			$metadata_form = $field->getMetadataForm();
+			if (!empty($metadata_form)) {
+				echo Html::form($metadata_form);
+			}
+		} else {
+			header("HTTP/1.1 404 Not Found");
+			return;
+		}
 	}
-	
 }

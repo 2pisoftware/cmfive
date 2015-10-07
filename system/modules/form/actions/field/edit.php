@@ -11,11 +11,12 @@ function edit_GET(Web $w) {
 	
 	$_form_field_object = $p['id'] ? $w->Form->getFormField($p['id']) : new FormField($w);
 	
-	$form = [
-		["Name", "text", "name", $_form_field_object->name],
-		["Type", "select", "type", $_form_field_object->type, FormField::getFieldTypes()],
-	];
+//	$form = [
+//		["Name", "text", "name", $_form_field_object->name],
+//		["Type", "select", "type", $_form_field_object->type, FormField::getFieldTypes()],
+//	];
 	
+	$metadata_form = [];
 	if (!empty($_form_field_object->id)) {
 		$metadata_form = $_form_field_object->getMetadataForm();
 		
@@ -31,13 +32,14 @@ function edit_GET(Web $w) {
 			}
 		}
 		
-		if (!empty($metadata_form)) {
-			$form = array_merge($form, $metadata_form);
-		}
+//		if (!empty($metadata_form)) {
+//			$form = array_merge($form, $metadata_form);
+//		}
 	}
 	
+	$w->ctx("form_id", $form_id ? : $_form_field_object->form_id);
 	$w->ctx("field", $_form_field_object);
-	$w->ctx("form", Html::form($form, '/form-field/edit/' . $_form_field_object->id . '?form_id=' . $form_id));
+	$w->ctx("metadata_form", $metadata_form);
 }
 
 function edit_POST(Web $w) {

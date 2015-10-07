@@ -12,7 +12,7 @@ function edit_POST(Web $w) {
 		foreach($current_mappings as $mapping) {
 			if(!array_key_exists($mapping->object, $_POST)) {
 				// Hard delete because we dont really need to track soft deleted
-				// But option is there in we ever want to
+				// But option is there in case we ever want to
 				$mapping->delete(true);
 			} else {
 				// Insert
