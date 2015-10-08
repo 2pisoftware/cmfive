@@ -304,10 +304,10 @@ class DbObject extends DbService {
      *
      * @param array $row
      */
-    function fill($row, $from_db = false) {
+    function fill($row, $convert = false) {
         foreach ($this->getObjectVars() as $k) {
             if (!empty($row[$k])) {
-                $this->$k = $row[$k];
+                $this->$k = ($convert ? $this->readConvert($k, $row[$k]) : $row[$k]);
             }
         }
         if (!empty($row["creator_id"]) && empty($this->creator_id)) {

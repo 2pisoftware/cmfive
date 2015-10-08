@@ -162,6 +162,7 @@ function import_GET(Web $w) {
 	}
 	
 	output('Import successful');
+	output('<a href="/install-steps/finish" class="button">Continue</a>');
 }
 
 function output($val) {

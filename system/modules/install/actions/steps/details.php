@@ -20,7 +20,7 @@ function details_GET(Web $w) {
 				["Company Name", "text", "company_name", $w->request("company_name")],
 				["Company URL", "text", "company_url", $w->request("company_url", "http://cmfive.com")]
 			],
-			[["Compant Support Email", "email", "company_support_email", $w->request("company_support_email")]],
+			[["Company Support Email", "email", "company_support_email", $w->request("company_support_email")]],
 			[["Timezone", "select", "timezone", $w->request("timezone", date_default_timezone_get()), $timezones]]
 		],
 		"Email Server Details" => [

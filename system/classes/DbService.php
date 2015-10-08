@@ -143,7 +143,7 @@ class DbService {
 //        $this->w->Log->setLogger("DB_SERVICE")->debug("RESULT: " . json_encode($result));
 
         if ($result) {
-            $obj = $this->getObjectFromRow($class, $result, true);
+            $obj = $this->getObjectFromRow($class, $result);
             if ($usecache) {
                 self::$_cache[$class][$key] = $obj;
                 if ($obj->id != $key && !empty(self::$_cache[$class][$obj->id])) {
@@ -245,7 +245,7 @@ class DbService {
         $this->buildSelect($o, $table, $class);
         $result = $this->_db->fetch_all();
         if ($result) {
-            $objects = $this->getObjectsFromRows($class, $result, true);
+            $objects = $this->getObjectsFromRows($class, $result);
             if ($objects) {
 
                 // store the complete list
