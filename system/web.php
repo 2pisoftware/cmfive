@@ -105,11 +105,10 @@ class Web {
         }
         $this->_actionMethod = null;
 
+		// The order of the following three lines are important
+		spl_autoload_register(array($this, 'modelLoader'));
+		define("WEBROOT", $this->_webroot);
         $this->loadConfigurationFiles();
-        
-        spl_autoload_register(array($this, 'modelLoader'));
-        
-        define("WEBROOT", $this->_webroot);
     }
 
     private function modelLoader($className) {
@@ -991,7 +990,6 @@ class Web {
         // This function will need to reject service calls when the active flag is false
         // To do this we need to check the config for the module housing the service call
         // As the service may not be the module, see Log in Main
-         
         $name = ucfirst($name);
         if (!key_exists($name, $this->_services)) {
             $cname = $name . "Service";
@@ -1009,6 +1007,7 @@ class Web {
 //                throw new Exception("Class $name not found!");
             }
         }
+		
         return $this->_services[$name];
     }
 

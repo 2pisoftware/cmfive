@@ -30,7 +30,7 @@ class TagService extends DbService {
 		$tags = $this->_db->sql('SELECT id,tag,tag_color FROM tag WHERE 1 GROUP BY tag ORDER BY tag')->fetch_all();
 		if($returnObjects) {
 			if(!empty($tags)) {
-				$objects = $this->getObjectsFromRows('Tag', $tags, true);
+				$objects = $this->getObjectsFromRows('Tag', $tags);
 				return $objects;
 			}
 		}
