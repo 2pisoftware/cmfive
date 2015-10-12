@@ -238,7 +238,7 @@ function task_core_dbobject_after_insert_TaskTime(Web $w, $object) {
             // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
             $subject = "Task - " . $task->title . ": " . $event_title;
             $message = "<b>" . $event_title . "</b><br/>\n";
-            $message .= "<p>" . $task->title . " as had a new time log entry</p>";
+            $message .= "<p>" . $task->title . " has had a new time log entry</p>";
             
             $user_object = $w->Auth->getUser($user);
             $message .= $task->toLink(null, null, $user_object);
@@ -269,7 +269,7 @@ function task_attachment_attachment_added_task(Web $w, $object) {
             // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
             $subject = "Task - " . $task->title . ": " . $event_title;
             $message = "<b>" . $event_title . "</b><br/>\n";
-            $message .= "<p>" . $task->title . " as got a new attachment</p>";
+            $message .= "<p>" . $task->title . " has got a new attachment</p>";
             
             $user_object = $w->Auth->getUser($user);
             $message .= $task->toLink(null, null, $user_object);
