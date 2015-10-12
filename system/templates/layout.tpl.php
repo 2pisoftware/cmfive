@@ -120,7 +120,18 @@
             <div class="circle_center"></div>
             <h4 class="subheader">Please wait...</h4>
         </div>
-        <div class="row-fluid">
+		
+		<?php if (Config::get('system.test_mode') === true) : ?>
+			<div class="row-fluid">
+				<div class="small-12">
+					<div data-alert class="alert-box warning" style="margin-bottom: 0px; padding: 5px 0px;">
+						<h4 style="font-weight: lighter; text-align: center; color: white; padding: 5px 0px 0px 0px;">You are using a test system</h4>
+					</div>
+				</div>
+			</div>
+		<?php endif; ?>
+        
+		<div class="row-fluid">
             <nav class="top-bar" data-topbar><!-- To make it that you need to click to activate dropdown use  data-options="is_hover: false" -->
                 <ul class="title-area">
                     <li class="name">
