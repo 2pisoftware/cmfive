@@ -8,6 +8,7 @@
   tt.object_id = t.id and
   tt.is_deleted = 0 and
   tt.user_id = '{{current_user_id}}'
+  order by title
 ]]
 
 [[dt_from||date||From Date (opt)]]
