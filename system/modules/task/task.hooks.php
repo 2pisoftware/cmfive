@@ -206,7 +206,7 @@ function task_comment_comment_added_comment(Web $w, $object) {
             
             $user_object = $w->Auth->getUser($user);
             if ($task->canView($user_object)) {
-                $message .= "<a href='/task/edit/" . $task->id . "?scroll_comment_id=" . $object->id . "#comments'><p>Click here to view the comment</p></a>";            
+                $message .= "<a href='" .  $w->localUrl("/task/edit/" . $task->id . "?scroll_comment_id=" . $object->id . "#comments") . "'><p>Click here to view the comment</p></a>";            
             } else {
                 $message .= "<p><b>You are unable to view this task</b></p>";
             }
