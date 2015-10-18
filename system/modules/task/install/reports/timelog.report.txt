@@ -1,10 +1,11 @@
 [[group||select||Task Group (opt)||
   select 
   distinct tg.title as title, tg.id as value 
-  from task_group tg, task_time tt, task t, task_group_member tm
+  from task_group tg, timelog tt, task t, task_group_member tm
   where 
   tg.id = t.task_group_id and 
-  tt.task_id = t.id and
+  tt.object_id = t.id and
+  tt.object_class = 'Task' and
   tt.is_deleted = 0 and
   tm.task_group_id = tg.id and
 
@@ -16,10 +17,15 @@
         (tg.can_view = 'MEMBER' and tm.role in ('OWNER','MEMBER')) or
         (tg.can_view = 'GUEST' and tm.role in ('OWNER','MEMBER','GUEST')) or
         (t.assignee_id = '{{current_user_id}}'))))
-
+ 
+ order by title
 ]]
 
-[[user||select||User (opt)||select u.id as value, concat(c.firstname,' ',c.lastname) as title from user u, contact c where u.contact_id = c.id and u.id in (select distinct user_id from task_time) order by title]]
+[[user||select||User (opt)||
+  select u.id as value, concat(c.firstname,' ',c.lastname) as title from user u, contact c 
+  where u.contact_id = c.id and u.id in (select distinct user_id from task_time) 
+  order by title
+]]
 
 [[dt_from||date||From Date (opt)]]
 [[dt_to||date||To Date (opt)]]
@@ -30,13 +36,14 @@ select
 concat(c.firstname,' ',c.lastname) as User,
 sec_to_time(sum(unix_timestamp(dt_end) - unix_timestamp(dt_start))) 'Hours'
 
-from task_time tt
+from timelog tt
 join user u on u.id = tt.user_id
 join contact c on u.contact_id = c.id
-join task t on tt.task_id = t.id
+join task t on tt.object_id = t.id and tt.object_class = 'Task'
 join task_group tg on t.task_group_id = tg.id
 
 where 
+('{{group}}' = '' OR tg.id = '{{group}}') and
 ('{{user}}' = '' OR tt.user_id = '{{user}}') and
 ('{{dt_from}}' = '' OR tt.dt_start >= '{{dt_from}} 00:00:00') and
 ('{{dt_to}}' = '' OR tt.dt_end <= '{{dt_to}} 23:59:59') and
@@ -65,13 +72,14 @@ select
 tg.title as 'Task Group',
 sec_to_time(sum(unix_timestamp(dt_end) - unix_timestamp(dt_start))) 'Hours'
 
-from task_time tt
+from timelog tt
 join user u on u.id = tt.user_id
 join contact c on u.contact_id = c.id
-join task t on tt.task_id = t.id
+join task t on tt.object_id = t.id and tt.object_class = 'Task'
 join task_group tg on t.task_group_id = tg.id
 
 where 
+('{{group}}' = '' OR tg.id = '{{group}}') and
 ('{{user}}' = '' OR tt.user_id = '{{user}}') and
 ('{{dt_from}}' = '' OR tt.dt_start >= '{{dt_from}} 00:00:00') and
 ('{{dt_to}}' = '' OR tt.dt_end <= '{{dt_to}} 23:59:59') and
@@ -100,13 +108,14 @@ t.title as Task,
 concat('{{webroot}}task/edit/',t.id) as Task_link,
 sec_to_time(sum(unix_timestamp(dt_end) - unix_timestamp(dt_start))) 'Hours'
 
-from task_time tt
+from timelog tt
 join user u on u.id = tt.user_id
 join contact c on u.contact_id = c.id
-join task t on tt.task_id = t.id
+join task t on tt.object_id = t.id and tt.object_class = 'Task'
 join task_group tg on t.task_group_id = tg.id
 
 where 
+('{{group}}' = '' OR tg.id = '{{group}}') and
 ('{{user}}' = '' OR tt.user_id = '{{user}}') and
 ('{{dt_from}}' = '' OR tt.dt_start >= '{{dt_from}} 00:00:00') and
 ('{{dt_to}}' = '' OR tt.dt_end <= '{{dt_to}} 23:59:59') and
@@ -125,28 +134,30 @@ tt.is_deleted = 0 and
 
 
 
-group by tt.task_id
+group by tt.object_id
 order by tg.title, t.title
 @@
 
 @@Detailed Time Log||
 
 select 
-concat(c.firstname,' ',c.lastname) as User,
-tg.title as 'Group',
+concat(c.firstname,' ',c.lastname) as User,                      
+dt_start as 'Start Time',
+sec_to_time(unix_timestamp(dt_end) - unix_timestamp(dt_start)) as 'Hours',                                  
 t.title as Task,
 concat('{{webroot}}task/edit/',t.id) as Task_link,
-dt_start as 'Start Time',
-dt_end as 'End Time',
-sec_to_time(unix_timestamp(dt_end) - unix_timestamp(dt_start)) as 'Hours'
+tg.title as 'Group',
+substring(co.comment,1,50) as 'Comment'                                  
 
-from task_time tt
+from timelog tt
 join user u on u.id = tt.user_id
 join contact c on u.contact_id = c.id
-join task t on tt.task_id = t.id
+join task t on tt.object_id = t.id and tt.object_class = 'Task'
 join task_group tg on t.task_group_id = tg.id
+join comment co on co.obj_id = tt.id and co.obj_table = 'timelog'
 
 where 
+('{{group}}' = '' OR tg.id = '{{group}}') and
 ('{{user}}' = '' OR tt.user_id = '{{user}}') and
 ('{{dt_from}}' = '' OR tt.dt_start >= '{{dt_from}} 00:00:00') and
 ('{{dt_to}}' = '' OR tt.dt_end <= '{{dt_to}} 23:59:59') and
