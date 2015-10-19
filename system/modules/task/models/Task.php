@@ -9,6 +9,7 @@ class Task extends DbObject {
     public $task_group_id;  // can be null!
     public $status;   // text
     public $priority;   // text
+	public $effort;		// float (null)
     public $task_type;   // text
     public $assignee_id;  // who is currently assigned
     public $dt_assigned;  // date & time of current (last) assignment
@@ -377,6 +378,7 @@ class Task extends DbObject {
             $comm = new TaskComment($this->w);
             $comm->obj_table = $this->getDbTableName();
             $comm->obj_id = $this->id;
+			$comm->is_system = 1;
             $comm->comment = "Task Created";
             $comm->insert();
 

@@ -15,6 +15,20 @@ class Timelog extends DbObject {
     public $dt_modified;
     public $is_deleted;
 
+	public function getUser() {
+		return $this->getObject("User", $this->user_id);
+	}
+	
+	public function getFullName() {
+		$user = $this->getUser();
+		if (!empty($user->id)) {
+			$contact = $user->getContact();
+			if (!empty($contact->id)) {
+				return $contact->getFullName();
+			}
+		}
+		return '';
+	}
 
     public function getDuration() {
         if (!empty($this->dt_start) and !empty($this->dt_end)) {

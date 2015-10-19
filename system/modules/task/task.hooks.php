@@ -82,6 +82,12 @@ function task_core_dbobject_after_update_Task(Web $w, $object) {
     $users_to_notify = $w->Task->getNotifyUsersForTask($object, TASK_NOTIFICATION_TASK_DETAILS);
     $w->Log->setLogger("TASK")->info("Notifying " . count($users_to_notify) . " users");
     
+	// Only send emails where the status has changed
+	$w->Log->setLogger("TASK")->debug($object->status . " <= " . $object->__old['status']);
+	if ($object->status == $object->__old['status']) {
+		return;
+	}
+	
     if (!empty($users_to_notify)) {
         $event_title = $object->getHumanReadableAttributeName(TASK_NOTIFICATION_TASK_DETAILS);
         
@@ -112,7 +118,7 @@ function task_comment_comment_added_task(Web $w, $object) {
     
     $task = $w->Task->getTask($object->obj_id);
     
-    if (empty($task->id)) {
+    if (empty($task->id) || (!empty($object->is_system) && $object->is_system == 1)) {
         return;
     }
     

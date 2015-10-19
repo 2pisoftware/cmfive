@@ -32,7 +32,7 @@ class InboxService extends DbService {
         $receiver = $this->Auth->getUser($user_id);
         
         // Notify users via email if specified and the user isn't sending a message to themselves
-        $this->w->Log->debug("IDs: " . var_export($msg->user_id, true) . " - " . var_export($msg->sender_id, true));
+        // $this->w->Log->debug("IDs: " . var_export($msg->user_id, true) . " - " . var_export($msg->sender_id, true));
         if (!empty($mso) && !empty($msg) && !empty($receiver)) {
 			$rContact=$receiver->getContact();
 			$lSender=$this->w->Auth->getUser($msg->sender_id);

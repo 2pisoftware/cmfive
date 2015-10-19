@@ -5,12 +5,13 @@
 
 <?php if (!empty($timelogs)) : ?>
 	<table class='small-12'>
-		<thead><tr><th width="10%">From</th><th width="10%">To</th><th width="60%">Description</th><th width="20%">Actions</th></tr></thead>
+		<thead><tr><th width="10%">Name</th><th width="15%">From</th><th width="15%">To</th><th width="40%">Description</th><th width="20%">Actions</th></tr></thead>
 		<tbody>
 			<?php foreach($timelogs as $timelog) : ?>
 				<tr>
-					<td><?php echo formatDate($timelog->dt_start, "H:i:s"); ?></td>
-					<td><?php echo formatDate($timelog->dt_end, "H:i:s"); ?></td>
+					<td><?php echo $timelog->getFullName(); ?></td>
+					<td><?php echo formatDate($timelog->dt_start, "d-m-Y H:i:s"); ?></td>
+					<td><?php echo formatDate($timelog->dt_end, "d-m-Y H:i:s"); ?></td>
 					<td><?php echo $timelog->getComment()->comment; ?></td>
 					<td>
 						<?php echo Html::box('/timelog/edit/' . $timelog->id . (!empty($redirect) ? "?redirect=$redirect" : ''), 'Edit', true); ?>

@@ -56,6 +56,10 @@ function edit_GET($w) {
                 	array("Assigned To", "select", "assignee_id", $task->assignee_id, $members) :
                 	array("Assigned To", "select", "-assignee_id", $task->assignee_id, $members)
             ),
+			array(
+				array("Estimated hours", "text", "estimate_hours", $task->estimate_hours),
+				array("Effort", "text", "effort", $task->effort)
+			),
             array(array("Description", "textarea", "description", $task->description)),
         		        	
         )
