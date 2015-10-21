@@ -670,17 +670,3 @@ a > div#active_log_time {
 .tag_list_item:last-child {
 	border:0;
 }
-
-.taskgroup_tasklist .row-fluid {
-	border: 1px solid white;
-}
-
-.taskgroup_tasklist .row-fluid .label {
-	margin-top: 3px;
-	line-height: 12px;
-}
-
-.taskgroup_tasklist .row-fluid:hover {
-	border: 1px solid #cacaca;
-	background-color: #efefef;
-}
