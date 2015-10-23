@@ -5,7 +5,6 @@
         "bin-dir": "composer/bin"
     },
     "require": {
-        "codeception/codeception": "*",
         "monolog/monolog": "1.8.*@dev",
         "knplabs/gaufrette": "0.2.*@dev",
         "dropbox-php/dropbox-php": "*",
