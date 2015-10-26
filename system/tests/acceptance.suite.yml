@@ -9,3 +9,7 @@ modules:
         capabilities:
           unexpectedAlertBehaviour: accept
     - \Helper\Acceptance
+    - \Helper\CmFiveTestHelper
+extensions:
+    enabled:
+        - Codeception\Extension\Recorder
