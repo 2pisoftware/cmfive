@@ -23,12 +23,19 @@ function anonymous_allowed(Web $w,$path) {
                     return true;
             }
         }
+	$in_path=false;
+	if (is_array(Config::get('system.allow_action'))) {
+		$in_path = in_array($path,Config::get('system.allow_action'));
+	}
 
-	$in_path = in_array($path,Config::get('system.allow_action'));
-
-	$path_explode = explode("/", $path);
-	$module = $path_explode[0];
-	// $action = $path_explode[1];
-	$allowed = in_array($module,Config::get('system.allow_module'));
+	$allowed=false;
+	if (is_array($path)) {
+		$path_explode = explode("/", $path);
+		$module = $path_explode[0];
+		// $action = $path_explode[1];
+		if (is_array(Config::get('system.allow_module'))) {
+			$allowed = in_array($module,Config::get('system.allow_module'));
+		}
+	}
 	return $allowed || $in_path;
 }
