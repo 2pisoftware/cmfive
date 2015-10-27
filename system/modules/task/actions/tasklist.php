@@ -42,11 +42,11 @@ function tasklist_ALL(Web $w) {
     if (!empty($task_status)) {
         $query_object->where("task.status", $task_status);
     }
-    if (!empty($is_closed)) {
-        $query_object->where("task.is_closed", ((is_null($is_closed) || $is_closed == 0) ? 0 : 1));
-    } else {
-        $query_object->where("task.is_closed", 0);
-    }
+//    if (!empty($is_closed)) {
+//        $query_object->where("task.is_closed", ((is_null($is_closed) || $is_closed == 0) ? 0 : 1));
+//    } else {
+//        $query_object->where("task.is_closed", 0);
+//    }
     // This part is why we want to make our query manually
     if (!empty($dt_from)) {
         if ($dt_from == "NULL") {
@@ -70,6 +70,13 @@ function tasklist_ALL(Web $w) {
     $tasks_result_set = $query_object->fetch_all();
     $task_objects = $w->Task->getObjectsFromRows("Task", $tasks_result_set);
     
+	// Filter in or out closed tasks based on given is_closed filter parameter
+	if (!empty($task_objects)) {
+		$task_objects = array_filter($task_objects, function($task) use ($is_closed) {
+			return (is_null($is_closed) || $is_closed == 0) ? !$task->getisTaskClosed() : $task->getisTaskClosed();
+		});
+	}
+	
     $w->ctx("tasks", $task_objects);
     
     // Build the filter and its data
