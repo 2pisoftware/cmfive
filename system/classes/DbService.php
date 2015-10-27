@@ -143,7 +143,7 @@ class DbService {
 //        $this->w->Log->setLogger("DB_SERVICE")->debug("RESULT: " . json_encode($result));
 
         if ($result) {
-            $obj = $this->getObjectFromRow($class, $result);
+            $obj = $this->getObjectFromRow($class, $result, true);
             if ($usecache) {
                 self::$_cache[$class][$key] = $obj;
                 if ($obj->id != $key && !empty(self::$_cache[$class][$obj->id])) {
@@ -245,7 +245,7 @@ class DbService {
         $this->buildSelect($o, $table, $class);
         $result = $this->_db->fetch_all();
         if ($result) {
-            $objects = $this->getObjectsFromRows($class, $result);
+            $objects = $this->getObjectsFromRows($class, $result, true);
             if ($objects) {
 
                 // store the complete list
@@ -278,7 +278,12 @@ class DbService {
         if (!$row || !$class)
             return null;
         $o = new $class($this->w);
-        $o->fill($row, $from_db);
+		
+		// The second parameter below is the prompt to convert mysql timestamps into unix timestamps
+		// We make this convert in the db query now but there are times when using getObjectFromRow
+		// where you may have made the query yourself (and therefore no UNIX() cast in mysql)
+		// It also happens that the $from_db flag is inversely related to the convert parameter below
+        $o->fill($row, !$from_db);
 		 
         // test implementation for preserving original database values
         if ($from_db == true) {

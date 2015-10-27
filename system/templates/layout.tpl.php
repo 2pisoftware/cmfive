@@ -260,8 +260,11 @@
                 reveal : {
                     animation_speed: 150,
                     animation: 'fade'
-                }
-            });
+                },
+				accordion: {
+					multi_expand: true,
+				}
+			});
             
             var modal_history = [];
             var modal_history_pop = false;
