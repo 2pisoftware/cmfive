@@ -234,6 +234,10 @@ class Task extends DbObject {
     // get status types for a task group given a task group ID
     // given a status, return true| false ... $c[<status>] = true|false
     function getisTaskClosed() {
+		if ($this->is_closed !== NULL) {
+			return $this->is_closed;
+		}
+		
         if (!empty($this->_taskgroup->id)) {
             $statlist = $this->_taskgroup->getStatus(); //Task->getTaskStatus($this->w->Task->getTaskGroupTypeById($this->task_group_id));
             if ($statlist) {
@@ -272,13 +276,14 @@ class Task extends DbObject {
 
     // return due date in bold red for display, if it is on or past the due date
     function isTaskLate() {
-        if (($this->dt_due == "0000-00-00 00:00:00") || ($this->dt_due == ""))
+        if (($this->dt_due == "0000-00-00 00:00:00") || ($this->dt_due == "")) {
             return "Not given";
-
-        if ((!$this->getisTaskClosed()) && (date("U") > $this->dt_due)) {
-            return "<font color=red><b>" . formatDateTime($this->dt_due) . "</b></font>";
+		}
+		
+        if ((!$this->getisTaskClosed()) && (time() > $this->dt_due)) {
+            return "<font color=red><b>" . formatDate($this->dt_due) . "</b></font>";
         } else {
-            return formatDateTime($this->dt_due);
+            return formatDate($this->dt_due);
         }
     }
 

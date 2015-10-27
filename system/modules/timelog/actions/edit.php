@@ -23,11 +23,15 @@ function edit_GET(Web $w) {
 	
 	$form = [
 		'Timelog' => [
-			[["Module", "select", "object_class", $timelog->object_class ? : $tracking_class, $select_indexes]],
-            [["Search", empty($timelog->object_id) && empty($tracking_id) ? "text" : "autocomplete", (empty($timelog->object_id) && empty($tracking_id) ? '-' : '') . "search", !empty($timelog->object_id) ? $timelog->object_id : $tracking_id, (!empty($timelog->object_class) || !empty($tracking_class) ? $w->Timelog->getObjects($timelog->object_class ? : $tracking_class) : '')]],
+			[
+				["Module", "select", "object_class", $timelog->object_class ? : $tracking_class, $select_indexes],
+				["Search", empty($timelog->object_id) && empty($tracking_id) ? "text" : "autocomplete", (empty($timelog->object_id) && empty($tracking_id) ? '-' : '') . "search", !empty($timelog->object_id) ? $timelog->object_id : $tracking_id, (!empty($timelog->object_class) || !empty($tracking_class) ? $w->Timelog->getObjects($timelog->object_class ? : $tracking_class) : '')]
+			],
             [["object id", 'hidden', "object_id", $timelog->object_id ? : $tracking_id]],
-			[["From", "datetime", "dt_start", formatDateTime($timelog->dt_start)]],
-			[["To", "datetime", "dt_end", formatDateTime($timelog->dt_end)]],
+			[
+				["From", "datetime", "dt_start", formatDateTime($timelog->dt_start)],
+				["To", "datetime", "dt_end", formatDateTime($timelog->dt_end)]
+			],
 			[["Description", "text", "description", !empty($comment) ? $comment->comment : null]]
 		]
 	];
@@ -58,7 +62,7 @@ function edit_POST(Web $w) {
 	$redirect = $w->request("redirect", '');
 	
 	// Get and save timelog
-	if (empty($_POST['object_class']) || empty($_POST['object_id']) || empty($_POST['dt_start']) || empty($_POST['dt_end'])) {
+	if (empty($_POST['object_class']) || empty($_POST['object_id']) || empty($_POST['dt_start'])) {
 		$w->error('Missing data', '/timelog');
 	}
 	
