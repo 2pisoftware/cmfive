@@ -322,8 +322,6 @@ class Task extends DbObject {
     }
 
 	function toLink($class = null, $target = null, $user = null) {
-		echo "<br/>" . $this->id . "<br/>";
-		var_dump($this->title);
         if (empty($user)) {
             $user = $this->w->Auth->user();
         }
