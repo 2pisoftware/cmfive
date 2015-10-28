@@ -14,6 +14,9 @@ class MigrationService extends DbService {
 			$system_module_path = 'system' . DS . 'modules' . DS . $module . DS . 'install' . DS . 'migrations';
 			
 			$migration_paths = [$module_path, $system_module_path];
+			if (empty($availableMigrations[$module])) {
+				$availableMigrations[$module] = [];
+			}
 			
 			foreach($migration_paths as $migration_path) {
 				if (is_dir(ROOT_PATH . DS . $migration_path)) {
@@ -21,7 +24,7 @@ class MigrationService extends DbService {
 						if (!is_dir($file)) {
 							$classname = explode('.', str_replace('-', '.', $file));
 							if (!empty($classname[1])) {
-								$availableMigrations[$migration_path . DS . $file] = $classname[1];
+								$availableMigrations[$module][$migration_path . DS . $file] = $classname[1];
 							} else {
 								$this->w->Log->error("Migration '" . $file . "' does not conform to naming convention");
 							}
