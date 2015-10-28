@@ -234,6 +234,10 @@ class Task extends DbObject {
     // get status types for a task group given a task group ID
     // given a status, return true| false ... $c[<status>] = true|false
     function getisTaskClosed() {
+		if ($this->is_closed !== NULL) {
+			return $this->is_closed;
+		}
+		
         if (!empty($this->_taskgroup->id)) {
             $statlist = $this->_taskgroup->getStatus(); //Task->getTaskStatus($this->w->Task->getTaskGroupTypeById($this->task_group_id));
             if ($statlist) {
@@ -272,13 +276,14 @@ class Task extends DbObject {
 
     // return due date in bold red for display, if it is on or past the due date
     function isTaskLate() {
-        if (($this->dt_due == "0000-00-00 00:00:00") || ($this->dt_due == ""))
+        if (($this->dt_due == "0000-00-00 00:00:00") || ($this->dt_due == "")) {
             return "Not given";
-
-        if ((!$this->getisTaskClosed()) && (date("U") > $this->dt_due)) {
-            return "<font color=red><b>" . formatDateTime($this->dt_due) . "</b></font>";
+		}
+		
+        if ((!$this->getisTaskClosed()) && (time() > $this->dt_due)) {
+            return "<font color=red><b>" . formatDate($this->dt_due) . "</b></font>";
         } else {
-            return formatDateTime($this->dt_due);
+            return formatDate($this->dt_due);
         }
     }
 
@@ -290,7 +295,7 @@ class Task extends DbObject {
     }
 
     function printSearchTitle() {
-        $buf = $this->title . ', ' . strtoupper($this->status);
+        $buf = (!empty($this->title) ? $this->title : 'Task [' . $this->id . ']') . ', ' . strtoupper($this->status);
         return $buf;
     }
 
@@ -316,6 +321,16 @@ class Task extends DbObject {
         return "task/edit/" . $this->id;
     }
 
+	function toLink($class = null, $target = null, $user = null) {
+        if (empty($user)) {
+            $user = $this->w->Auth->user();
+        }
+        if ($this->canView($user)) {
+            return Html::a($this->w->localUrl($this->printSearchUrl()), (!empty($this->title) ? htmlentities($this->title) : 'Task [' . $this->id . ']'), null, $class, null, $target);
+        }
+        return (!empty($this->title) ? htmlentities($this->title) : 'Task [' . $this->id . ']');
+    }
+	
     function getAssignee() {
         if ($this->assignee_id) {
             return $this->getObject("User", $this->assignee_id);
@@ -373,6 +388,10 @@ class Task extends DbObject {
                 $this->w->errorMessage($this, "Task", $validation_response, false, "/tasks/edit");
             }
 
+			if (empty($this->title)) {
+				$this->update();
+			}
+			
             // run any post-insert routines
             // add a comment upon task creation
             $comm = new TaskComment($this->w);
@@ -435,7 +454,10 @@ class Task extends DbObject {
             }
 
             // 3. update the task
-
+			if (empty($this->title)) {
+				$this->title = 'Task [' . $this->id . ']';
+			}
+			
             $validation_response = parent::update($force, $force_validation);
             if ($validation_response !== true) {
                 $this->rollbackTransaction();

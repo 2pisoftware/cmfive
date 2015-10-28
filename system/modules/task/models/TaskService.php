@@ -822,6 +822,21 @@ class TaskService extends DbService {
         return $notifyUsers;
     }
     
+	public function getNotificationAdditionalDetails(Task $task) {
+		$additional_details = $this->w->callHook("task", "notification_additional_details", $task);
+		$message = '';
+		
+		if (!empty($additional_details)) {
+//			$message .= "<br/><p>Additional details:</p>";
+			foreach($additional_details as $additional_detail) {
+				if (!empty($additional_detail)) {
+					$message .= "<p>" . $additional_detail . "</p>";
+				}
+			}
+		}
+		
+		return !empty($message) ? "<br/><p>Additional details:</p>" . $message : '';
+	}
     
     public function navigation(Web $w, $title = null, $nav = null) {
         if ($title) {
