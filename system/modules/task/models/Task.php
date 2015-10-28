@@ -295,7 +295,7 @@ class Task extends DbObject {
     }
 
     function printSearchTitle() {
-        $buf = $this->title . ', ' . strtoupper($this->status);
+        $buf = (!empty($this->title) ? $this->title : 'Task [' . $this->id . ']') . ', ' . strtoupper($this->status);
         return $buf;
     }
 
@@ -321,6 +321,18 @@ class Task extends DbObject {
         return "task/edit/" . $this->id;
     }
 
+	function toLink($class = null, $target = null, $user = null) {
+		echo "<br/>" . $this->id . "<br/>";
+		var_dump($this->title);
+        if (empty($user)) {
+            $user = $this->w->Auth->user();
+        }
+        if ($this->canView($user)) {
+            return Html::a($this->w->localUrl($this->printSearchUrl()), (!empty($this->title) ? htmlentities($this->title) : 'Task [' . $this->id . ']'), null, $class, null, $target);
+        }
+        return (!empty($this->title) ? htmlentities($this->title) : 'Task [' . $this->id . ']');
+    }
+	
     function getAssignee() {
         if ($this->assignee_id) {
             return $this->getObject("User", $this->assignee_id);
@@ -378,6 +390,10 @@ class Task extends DbObject {
                 $this->w->errorMessage($this, "Task", $validation_response, false, "/tasks/edit");
             }
 
+			if (empty($this->title)) {
+				$this->update();
+			}
+			
             // run any post-insert routines
             // add a comment upon task creation
             $comm = new TaskComment($this->w);
@@ -440,7 +456,10 @@ class Task extends DbObject {
             }
 
             // 3. update the task
-
+			if (empty($this->title)) {
+				$this->title = 'Task [' . $this->id . ']';
+			}
+			
             $validation_response = parent::update($force, $force_validation);
             if ($validation_response !== true) {
                 $this->rollbackTransaction();
