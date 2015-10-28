@@ -50,6 +50,9 @@ function task_core_dbobject_after_insert_Task(Web $w, $object) {
 			$message .= "<p><b>Subject:</b> " . $object->title . "</p>";
 			$message .= "<p><b>Body:</b>" . $object->description . "</p>";
 			
+			// Get additional details
+			$message .= $w->Task->getNotificationAdditionalDetails($object);
+			
             $user_object = $w->Auth->getUser($user);
             $message .= "<br/><p>Access the task here: " . $object->toLink(null, null, $user_object) . "</p>";
             $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
@@ -98,6 +101,9 @@ function task_core_dbobject_after_update_Task(Web $w, $object) {
             $message = "<b>" . $event_title . "</b><br/>\n";
             $message .= "<p>" . $object->title . " details has been updated</p>";
             
+			// Get additional details
+			$message .= $w->Task->getNotificationAdditionalDetails($object);
+			
             $user_object = $w->Auth->getUser($user);
             $message .= $object->toLink(null, null, $user_object);
             $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
@@ -137,7 +143,10 @@ function task_comment_comment_added_task(Web $w, $object) {
             $user_object = $w->Auth->getUser($user);
             $message = $task->toLink(null, null, $user_object);
             $message .= $w->partial("displaycomment", array("object" => $object, "displayOnly" => true, 'redirect' => '/inbox'), "admin");
-            
+
+			// Get additional details
+			$message .= $w->Task->getNotificationAdditionalDetails($task);
+			
             $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
 
             $w->Inbox->addMessage($subject, $message, $user, null, null, true);
@@ -216,6 +225,9 @@ function task_comment_comment_added_comment(Web $w, $object) {
             } else {
                 $message .= "<p><b>You are unable to view this task</b></p>";
             }
+			
+			// Get additional details
+			$message .= $w->Task->getNotificationAdditionalDetails($task);
             
             $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
 
@@ -246,6 +258,9 @@ function task_core_dbobject_after_insert_TaskTime(Web $w, $object) {
             $message = "<b>" . $event_title . "</b><br/>\n";
             $message .= "<p>" . $task->title . " has had a new time log entry</p>";
             
+			// Get additional details
+			$message .= $w->Task->getNotificationAdditionalDetails($task);
+			
             $user_object = $w->Auth->getUser($user);
             $message .= $task->toLink(null, null, $user_object);
             $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
@@ -277,6 +292,9 @@ function task_attachment_attachment_added_task(Web $w, $object) {
             $message = "<b>" . $event_title . "</b><br/>\n";
             $message .= "<p>" . $task->title . " has got a new attachment</p>";
             
+			// Get additional details
+			$message .= $w->Task->getNotificationAdditionalDetails($task);
+			
             $user_object = $w->Auth->getUser($user);
             $message .= $task->toLink(null, null, $user_object);
             $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
