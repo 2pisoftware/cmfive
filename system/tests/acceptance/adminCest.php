@@ -21,5 +21,16 @@ class adminCest
 		$I->updateUser($I,'testuser',array('firstname'=>'Fred' ,'lastname'=>'Flintstone','check:is_admin'=>true));
 		$I->deleteUser($I,'testuser');
 	}
+	
+	public function testGroupAdmin($I) {
+		$I->login($I,$this->username,$this->password);
+		$I->createUserGroup($I,'testgroup');
+		$I->seeLink('testgroup');
+		$I->updateUserGroup($I,'testgroup','new test group');
+		$I->seeLink('new test group');
+		$I->deleteUserGroup($I,'new test group');
+	}
+	
+	
 
 }
