@@ -15,10 +15,6 @@ function index_GET(Web $w) {
 			return strcmp($a, $b);
 		}
 	});
-	
-//	var_dump($available);
-//	var_dump($installed);
-	
 	$w->ctx('installed', $installed);
 	$w->ctx('available', $available);
 	

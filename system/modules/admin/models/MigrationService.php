@@ -3,7 +3,7 @@
 defined('DS') || define('DS', DIRECTORY_SEPARATOR);
 defined('MIGRATION_DIRECTORY') || define('MIGRATION_DIRECTORY', 'install' . DS . 'migrations');
 defined('PROJECT_MODULE_DIRECTORY') || define('PROJECT_MODULE_DIRECTORY', 'modules');
-defined('SYSTEM_MODULE_DIRECTORY') || define('SYSTEM_MODULE_DIRECTORY', 'sysmte' . DS . 'modules');
+defined('SYSTEM_MODULE_DIRECTORY') || define('SYSTEM_MODULE_DIRECTORY', 'system' . DS . 'modules');
 
 class MigrationService extends DbService {
 	
@@ -81,6 +81,7 @@ class MigrationService extends DbService {
 			return 'Missing module or it doesn\'t exist';
 		}
 		
+		$module = strtolower($module);
 		if (empty($name)) {
 			$name = "Migration";
 		}
