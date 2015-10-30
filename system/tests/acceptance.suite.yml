@@ -5,11 +5,9 @@ modules:
         url: 
         browser: firefox
         window_size: 1024x768
-        wait: 10
+        wait: 1
         capabilities:
-          unexpectedAlertBehaviour: accept
+            unexpectedAlertBehaviour: 'accept'
     - \Helper\Acceptance
     - \Helper\CmFiveTestHelper
-extensions:
-    enabled:
-        - Codeception\Extension\Recorder
+    - Asserts

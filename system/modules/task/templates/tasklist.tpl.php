@@ -18,7 +18,7 @@
                     if ($task->getCanIView()) {
                         $table_line = array();
 						$table_line[] = $task->id;
-                        $table_line[] = Html::a("/task/edit/" . $task->id, $task->title);
+                        $table_line[] = $task->toLink(); // Html::a("/task/edit/" . $task->id, $task->title);
 
                         
                         // Append the rest of the data
