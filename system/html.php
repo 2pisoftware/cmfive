@@ -45,8 +45,10 @@ class Html {
             }
             
             $buffer .= "<tbody>";
-            foreach($data as $row) {
-                $buffer .= "<tr>";
+            foreach($data as $key => $row) {
+				// add a data-id attribute to each table row
+				$rowId=' data-id="'.$key.'" ';
+				$buffer .= "<tr ".$rowId.">";
                 foreach($row as $column) {
                     if (!is_array($column)) {
                         $buffer .= "<td>{$column}</td>";
