@@ -58,7 +58,7 @@ function createtaskgroup_POST(Web &$w) {
     );
 
     // return
-    $w->msg("Task Group ".$taskgroup->title." added", "/task/tasklist/?taskgroups=".$taskgroup->id);
+    $w->msg("<div id='saved_record_id' data-id='".$taskgroup->id."' >Task Group ".$taskgroup->title." added</div>", "/task/tasklist/?taskgroups=".$taskgroup->id);
 }
 
 function updatetaskgroup_POST(Web &$w) {

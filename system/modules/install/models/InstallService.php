@@ -68,9 +68,20 @@ class InstallService extends DbService {
 	 * Get a PDO connection
 	 ********************************************************/	
 	 public static function getConnection($port,$driver,$hostname,$username,$password,$database) {
-		$pdo;
 		// Try and connect
+		$pdo;
 		try {
+			// CREATE DATABASE IF NOT EXISTS 
+			// TODO this requires admin db username/pass which is a security challenge
+			// perhaps dual configurable passwords or just use this feature for dev 
+			// and in production, precreate database and users with appropriate perms some other way
+			$pdo = new PDO("mysql:host=localhost", $username, $password);
+			$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+			$dbname = "`".str_replace("`","``",$database)."`";
+			$pdo->query("CREATE DATABASE IF NOT EXISTS $dbname");
+			$pdo->query("use $dbname");
+			// NOW CONNECT TO DATABASE
 			$pdo = new DbPDO([
 				'port' => $port, 
 				'driver' => $driver, 
@@ -81,6 +92,7 @@ class InstallService extends DbService {
 		} catch (Exception $ex) {
 			// Return error
 			echo ucfirst($driver) . ' returned an error: ' . $ex->getMessage();
+			
 			return;
 		}
 		return $pdo;
