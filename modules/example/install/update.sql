@@ -1,1 +1,1 @@
-UPDATE TABLE `example_data`
+--UPDATE TABLE `example_data`

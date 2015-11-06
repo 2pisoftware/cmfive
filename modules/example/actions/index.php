@@ -8,7 +8,7 @@ function index_ALL(Web $w) {
 	$w->ctx("message","Example Data List");
 	// get the list of data objects
 	$listdata = $w->Example->getAllData();
-	echo 'hello world'; die;
+	
 	
 	// prepare table data
 	$t[]=array("Title", "Data", "Checkbox", "Actions"); // table header
@@ -17,7 +17,7 @@ function index_ALL(Web $w) {
 			$row = array();
 			$row[] = $d->title;
 			$row[] = $d->data;
-			//$row[] = $d->check;
+			$row[] = $d->example_checkbox ? "Yes" : "No";
 			
 			// prepare action buttons for each row
 			$actions = array();
