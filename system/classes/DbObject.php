@@ -306,7 +306,7 @@ class DbObject extends DbService {
      */
     function fill($row, $convert = false) {
         foreach ($this->getObjectVars() as $k) {
-            if (!empty($row[$k])) {
+            if (array_key_exists($k, $row)) {
                 $this->$k = ($convert ? $this->readConvert($k, $row[$k]) : $row[$k]);
             }
         }
