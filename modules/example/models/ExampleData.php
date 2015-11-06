@@ -11,6 +11,7 @@ class ExampleData extends DbObject {
 	// public $id; <-- this is defined in the parent class
 	public $title;
 	public $data;
+	//public $check;
 	
 	// standard system properties
 	
