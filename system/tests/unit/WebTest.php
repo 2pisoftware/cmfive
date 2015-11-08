@@ -89,17 +89,64 @@ class WebTest extends  \Codeception\TestCase\Test {
 	}
 	
 	
-	function test_loadConfigurationFiles() {}
+	function test_modelLoader() {
+		// THIS TEST IS USELESS, IT PASSES BUT WTF. TRICKY TO GET AT PRIVATE 
+		// FUNCTION MODEL LOADER EXCEPT THROUGH AUTOLOAD MECHANISM
+		//codecept_debug('ML');
+		// modelLoader is called by autoloader
+		// in tasks module
+		//$t=new Task(self::$web);
+		//$t=new User(self::$web);
+		$t=new ExampleData(self::$web);
+		//$this->assertTrue(class_exists('Task',true));
+		// is in cache?
+		//codecept_debug('ML CACHE');
+		//codecept_debug(self::$web->_classdirectory);  // empty ????
+		// non existant class
+		$this->assertFalse(class_exists('ExampleDataISNotReallyATypeOfObject',true));
+	}
+
+	function test_getSubmodules() {
+		//codecept_debug(self::$web->getSubmodules('report'));
+		//codecept_debug(self::$web->getSubmodules('task'));
+		$this->assertTrue(self::$web->getSubmodules('report')==['connections','templates']);
+	}
+	
+	function test_checkUrl() {
+		$this->assertTrue(self::$web->checkUrl('tasks-groups/delete/5','tasks','groups','delete'));
+		$this->assertTrue(self::$web->checkUrl('tasks-groups/delete/5','*','groups','delete'));
+		$this->assertTrue(self::$web->checkUrl('tasks-groups/delete/5','tasks','*','delete'));
+		$this->assertTrue(self::$web->checkUrl('tasks-groups/delete/5','tasks','groups','*'));
+		$this->assertFalse(self::$web->checkUrl('tasks-groups/delete/5','tasks','groups','add'));
+		$this->assertFalse(self::$web->checkUrl('tasks-groups/delete/5','tasks','friends','delete'));
+		$this->assertFalse(self::$web->checkUrl('tasks-groups/delete/5','users','groups','add'));
+	}
+	
+ //function ctx($key, $value = null, $append = false) {
+   
+	function test_ctx() {
+		// as setter
+		self::$web->ctx('name','joe');
+		// append
+		self::$web->ctx('name',' janes',true);
+		// as getter
+		$this->assertTrue(self::$web->ctx('name')==="joe janes");
+	}
 	
 	
 
 
 
 /*
+ * 
+ * 
+
+function test_cmp_weights($a, $b) {}
+		
+
+	function test_loadConfigurationFiles() {}
+	
 	function test___construct() {}
-	function test_modelLoader($className) {}
-	function test__getCommandPath($url = null) {    	}
-	function test_cmp_weights($a, $b) {}
 	function test_install() {}
 	function test_start($init_database = true) {}
 	function test__callWebHooks($type) {}
@@ -108,7 +155,7 @@ class WebTest extends  \Codeception\TestCase\Test {
 	function test_moduleConf($module, $key) {}
 	function test_scanModuleDirForConfigurationFiles($dir = "") {}
 	function test_validateCSRF() {}
-	function test_getSubmodules($module) {}
+	
 	function test_isAjax() {}
 	function test_checkAccess($msg = "Access Restricted") {}
 	function test_getMimetype($filename) {}
