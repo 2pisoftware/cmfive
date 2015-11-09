@@ -1,4 +1,4 @@
-<div class="tag_list" data-url="/tag/ajaxTag/<?php echo ($object_class ? "?class='" . $object_class : '') . ($object_id ? '&id=' . $object_id : ''); ?>">
+<div class="tag_list" data-url="/tag/ajaxTag/<?php echo ($object_class ? "?class=" . $object_class : '') . ($object_id ? '&id=' . $object_id : ''); ?>">
 	<?php if (!empty($tags)) : ?>
 		<?php foreach($tags as $tag) : ?>
 			<span data-tag="<?php echo $tag->tag; ?>" class="label radius secondary tag_selection">

@@ -55,12 +55,16 @@ class InstallService extends DbService {
 	 * Write config.php from a template and variables
 	 ********************************************************/
 	public static function writeConfig($config) {
-		$template_path = "system/modules/install/templates/config.install.tpl.php";
+		// keep a copy of the original config file before generating
+		copy('config.old.php','config.old.'.time().'.php');
+		copy('config.php','config.old.php');
+		$template_path = "system".DIRECTORY_SEPARATOR."modules".DIRECTORY_SEPARATOR."install".DIRECTORY_SEPARATOR."templates".DIRECTORY_SEPARATOR."config.install.tpl.php";
 		ob_start();
 		require($template_path);
 		$result_config=ob_get_contents();
 		ob_end_clean();
-		@unlink('cache\config.cache');
+		// clear the config cache
+		unlink('cache'.DIRECTORY_SEPARATOR.'config.cache');
 		return file_put_contents("config.php", "<?php\n\n" .$result_config);
 	}
 	
@@ -98,13 +102,94 @@ class InstallService extends DbService {
 		return $pdo;
 	}
 	
+	
+	
+	public static function getInstallSql($pdo) {
+		$output=[];
+		
+		$output[]="\n\n# Clearing main database";
+		
+		// Try and import data
+		foreach($pdo->query("SHOW TABLES;") as $row) {
+			$output[]="DROP TABLE IF EXISTS {$row[0]};";
+		}
+		
+		$output[]="\n\n# Installing main database SQL";
+		
+		// Run install SQL
+		$output[]=file_get_contents('system/install/db.sql');
+		
+		$output[]="\n\n#Installing updates";
+		
+		// Run updates
+		foreach(glob('system/install/updates/*.sql') as $file) {
+			//$output[]=file_get_contents($file);
+		}
+		$output[]="\n\n#Installing seed data";
+		$output[]=file_get_contents('system/install/dbseed.sql');
+		
+		$output[]="\n\n#Installing system modules";
+		// Install system modules
+		foreach(glob('system/modules/*', GLOB_ONLYDIR) as $directory) {
+			$output[]="\n\n#Installing " . $directory . " module";
+			
+			// Install system module SQL
+			if (file_exists($directory . "/install/db.sql")) {
+				$output[]=file_get_contents($directory . "/install/db.sql");
+			}
+			
+			if (is_dir($directory . "/install/updates")) {
+				$output[]="\n\n#Installing " . $directory . " module updates";
+		
+				// Install system module updates
+				foreach(glob($directory . "/install/updates/*.sql") as $module_file) {
+				//	$output[]=file_get_contents($module_file);
+				}
+			}
+		}
+		
+		// Install individual modules
+		foreach(glob('modules/*', GLOB_ONLYDIR) as $directory) {
+			$output[]="\n\n#Installing " . $directory . " module";
+			
+			// Run project modules install SQL
+			if (file_exists($directory . "/install/db.sql")) {
+				$output[]=file_get_contents($directory . "/install/db.sql");
+			}
+		
+			// Install project module updates
+			if (is_dir($directory . "/install/updates")) {
+				$output[]="\n\n#Installing " . $directory . " module updates";
+				
+				foreach(glob($directory . "/install/updates/*.sql") as $module_file) {
+					//$output[]=file_get_contents($module_file);
+				}
+			}
+		}
+		// admin user
+		$output[]="INSERT INTO `contact` (`id`, `firstname`, `lastname`, `othername`, `title`, `homephone`, `workphone`, `mobile`, `priv_mobile`, `fax`, `email`, `notes`, `dt_created`, `dt_modified`, `is_deleted`, `private_to_user_id`, `creator_id`) VALUES
+(1, 'Administrator', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'admin@tripleacs.com', NULL, '2012-04-27 06:31:52', '0000-00-00 00:00:00', 0, NULL, NULL);";
+		$output[]="INSERT INTO `user` (`id`, `login`, `password`, `password_salt`, `contact_id`, `is_admin`, `is_active`, `is_deleted`, `is_group`, `dt_created`, `dt_lastlogin`) VALUES
+(1, 'admin', 'ca1e51f19afbe6e0fb51dde5bcf01ab73e52c7cd', '9b618fbc7f9509fc28ebea98becfdd58', 1, 1, 1, 0, 0, '2012-04-27 06:31:07', '2012-04-27 17:23:54');";
+		$output[]="INSERT INTO user_role (`id`, `user_id`, `role`) VALUES (NULL, 1, 'user');";
+		return implode("\n",$output);
+	}
+	
 	/*********************************************************
 	 * Execute sql install files scattered through cmFive
 	 ********************************************************/
-	public static function runInstallSql($pdo) {
+	public static function runSql($pdo,$sql) {
 		$errors=[];
-		$output=[];
-		
+		$output=['Install SQL for cmfive and all modules'];
+		try {
+			$pdo->exec($sql);
+		} catch (Exception $e) {
+			$errors[]="Error from SQL install: " . $e->getMessage();
+		}
+		return array('errors'=>$errors,'output'=>$output);
+	
+	
+	/*	
 		$output[]="Clearing main database<br/><hr/>";
 		
 		// Try and import data
@@ -192,11 +277,13 @@ class InstallService extends DbService {
 			}
 		}
 		return array('errors'=>$errors,'output'=>$output);
+		*/
 	}
 
 	/*********************************************************
 	 * Create an admin user
 	 ********************************************************/
+	 /*
 	public static function createAdminUser($pdo,$adminUsername,$adminPassword,$adminFirstName,$adminLastName,$adminEmail) {
 		$errors=[];
 		$output=[];
@@ -235,6 +322,6 @@ class InstallService extends DbService {
 			$errors[]="Failed to create user: " . $e->getMessage();
 		}
 		return array('errors'=>$errors,'output'=>$output);
-	}
+	}*/
 	
 }

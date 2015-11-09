@@ -26,6 +26,7 @@ function humanReadableBytes($input, $rounding = 2, $bytesValue = true) {
         $input /= $barrier;
         array_shift($ext);
         if ($ext[0] === end($ext)) {
+			$input = round($input, $rounding);
             return "$input $ext[0]";
         }
     }
