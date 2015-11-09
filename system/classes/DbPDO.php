@@ -6,7 +6,7 @@
  * @author Adam Buckley for TripleACS
  */
 class DbPDO extends PDO {
-    private static $table_names = array();
+    private $table_names = array();
     private static $_QUERY_CLASSNAME = array("InsertQuery", "SelectQuery", "UpdateQuery"); //"PDOStatement", 
 
     private $query = null;
@@ -45,10 +45,17 @@ class DbPDO extends PDO {
         // unecessary to do on every call so maybe move it to get()
         // Setting this to static however should make this array share the memory
         // heap for this var across all instances
-        if (empty(DbPDO::$table_names)){
-            foreach($this->query("show tables")->fetchAll(PDO::FETCH_NUM) as $table)
-                DbPDO::$table_names[] = $table[0];
+        if (empty($this->table_names)){
+			$query = 'show tables';
+			if ($config['driver'] == 'sqlsrv') {
+				$query = 'select TABLE_NAME from INFORMATION_SCHEMA.TABLES';
+			}
+			
+            foreach($this->query($query)->fetchAll(PDO::FETCH_NUM) as $table) {
+                $this->table_names[] = $table[0];
+			}
         }
+		
         // Instantiate a FluentPDO class and init vars
         $this->fpdo = new FluentPDO($this);
         
@@ -80,7 +87,7 @@ class DbPDO extends PDO {
      * @return \DbPDO|null
      */
     public function get($table_name){
-        if (!in_array($table_name, DbPDO::$table_names)){
+        if (!in_array($table_name, $this->table_names)){
             trigger_error("Table $table_name does not exist in the database", E_USER_ERROR);
             return null;
         }  
