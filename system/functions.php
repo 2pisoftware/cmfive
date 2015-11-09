@@ -482,24 +482,35 @@ function returncorrectdates(Web &$w, $dm_var, $from_date, $to_date) {
     }
 }
 
-// find a value in a multidimension array
+/**
+ * Find a value in a multidimension array
+ * NOTE: This function uses strict type comparison, with one exception where
+ * a string $value will match it's integer equivalent (i.e. '1' == 1, but '1s' != 1)
+ * 
+ * Setting the value to an integer will match against non-associative array keys of
+ * the same value
+ * 
+ * @param <Mixed> $value
+ * @param <Mixed> $array
+ * @return <boolean> $in_multiarray
+ */
 function in_multiarray($value, $array) {
     if (is_array($array)) {
-        if (in_array($value, $array)) {
+        if (in_array($value, $array, true) || array_key_exists($value, $array)) {
             return true;
         } else {
             foreach ($array as $key => $arr_value) {
-                if (in_multiarray($value, $key)) {
-                    return true;
-                } else {
-                    if (in_multiarray($value, $arr_value)) {
+//                if (in_multiarray($value, $key)) {
+//                    return true;
+//                } else {
+                    if (is_array($arr_value) && in_multiarray($value, $arr_value)) {
                         return true;
                     }
-                }
+//                }
             }
         }
     } else {
-        if ($value == $array) {
+        if ($value === $array) {
             return true;
         }
     }
@@ -514,18 +525,22 @@ function in_modified_multiarray($value, $array, $levels = 3) {
         if (in_array($value, $array)) {
             return true;
         } else {
-            --$levels;
-            if ($levels <= 0)
+			if (--$levels < 0) {
                 return false;
-
+			}
+			
             foreach ($array as $key => $arr_value) {
-                if (in_multiarray($value, $key, $levels)) {
+				if ($value === $key) {
+					return true;
+				}
+				
+                if (is_array($arr_value) && in_modified_multiarray($value, $arr_value, $levels)) {
                     return true;
                 }
             }
         }
     } else {
-        if ($value == $array) {
+        if ($value === $array) {
             return true;
         }
     }
