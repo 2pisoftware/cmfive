@@ -21,7 +21,7 @@ class FunctionsTest extends  \Codeception\TestCase\Test {
 
 /*
 
-function in_multiarray($value, $array) {
+
 function in_modified_multiarray($value, $array, $levels = 3) {
 function getBetween($content, $start, $end) {
 function is_associative_array($array) {
@@ -36,6 +36,20 @@ function array_unique_multidimensional($input) {
 function recursiveArraySearch($haystack, $needle, $index = null) {
 
 */
+        
+function test_in_multiarray() {
+        $test_string = "find_me";
+        $test_array1 = array('',array('','',array('',''),''));
+        $this->assertEquals(in_multiarray($test_string, $test_array1),false);
+        
+        $test_array2 = array('',array('','',array('','find_me'),''));
+        $this->assertEquals(in_multiarray($test_string, $test_array2),true);
+        
+        $test_value = array('test','testttt');
+        $test_array3 = array('',array('','',$test_string => $test_value,''));
+        $this->assertEquals(in_multiarray($test_value, $test_array3),true);
+        $this->assertEquals(in_multiarray($test_string, $test_array3),true);
+}
 
 function test_humanReadableBytes() {
 	codecept_debug(humanReadableBytes(null));
