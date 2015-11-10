@@ -39,6 +39,8 @@ class WebTest extends  \Codeception\TestCase\Test {
 	 * Testing Web->enqueueScript($script)
 	 */
 	public function testEnqueueAndOutputScript() {
+		codecept_debug(self::$web);
+	
 		self::$web->enqueueScript(array("name" => "modernizr.js", "uri" => "/system/templates/js/modernizr.js", "weight" => 10));
 		
 		// Test one script
