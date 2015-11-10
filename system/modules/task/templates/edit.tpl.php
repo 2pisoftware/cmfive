@@ -14,12 +14,13 @@
                 <div class="row-fluid columns">
                     <?php 
                     	echo $w->Favorite->getFavoriteButton($task);
-                    	echo $w->Tag->getTagButton($task->id,"Task")."&nbsp;";
                         // Note the extra buttons only show when the task_type object
                         $tasktypeobject = $task->getTaskTypeObject();
                         echo !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null; 
-                    ?>
-                    <?php echo (!empty($task->id) && $task->canDelete($w->Auth->user())) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), "Delete", "Are you sure you want to delete this task?" ) : ''; ?>
+                    	//echo $w->Tag->getTagButton($task->id,"Task")."&nbsp;";
+                        echo (!empty($task->id) && $task->canDelete($w->Auth->user())) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), "Delete", "Are you sure you want to delete this task?" ) : ''; 
+                        echo $w->partial('listTags',['object' => $task], 'tag');
+                        ?>
                 </div>
                 <div class="row-fluid clearfix">
                     <div class="small-12 large-9">
