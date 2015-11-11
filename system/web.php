@@ -1373,7 +1373,7 @@ class Web {
     function request($key, $default = null) {
         if (array_key_exists($key, $_REQUEST) && is_array($_REQUEST[$key])) {
             foreach ($_REQUEST[$key] as &$k) {
-                urldecode($k);
+                $k=urldecode($k);
             }
             return $_REQUEST[$key];
         }
