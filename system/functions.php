@@ -2,6 +2,8 @@
 
 /**
  * deduplicates arrays of arrays, something that array_unique can't do.
+ * Given an array of arrays, this function will return an array containing only 
+ * unique arrays having removed any duplicate arrays.
  * 
  * Thanks to http://stackoverflow.com/a/308955/1082633
  * 
