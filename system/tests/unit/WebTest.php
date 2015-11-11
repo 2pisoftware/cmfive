@@ -115,6 +115,8 @@ class WebTest extends  \Codeception\TestCase\Test {
 	}
 	
 	function test_checkUrl() {
+		//function test_parseUrl($url) {}
+	
 		$this->assertTrue(self::$web->checkUrl('tasks-groups/delete/5','tasks','groups','delete'));
 		$this->assertTrue(self::$web->checkUrl('tasks-groups/delete/5','*','groups','delete'));
 		$this->assertTrue(self::$web->checkUrl('tasks-groups/delete/5','tasks','*','delete'));
@@ -124,7 +126,6 @@ class WebTest extends  \Codeception\TestCase\Test {
 		$this->assertFalse(self::$web->checkUrl('tasks-groups/delete/5','users','groups','add'));
 	}
 	
- //function ctx($key, $value = null, $append = false) {
    
 	function test_ctx() {
 		// as setter
@@ -135,13 +136,68 @@ class WebTest extends  \Codeception\TestCase\Test {
 		$this->assertTrue(self::$web->ctx('name')==="joe janes");
 	}
 	
+	function test_validate() {
+		$_REQUEST['myparam']='this is not a phone';
+		$this->assertEquals(self::$web->validate([['myparam','phone:','not a phone']]),['not a phone']);
+		$_REQUEST['myparam']='phone:876876876767';
+		$this->assertEquals(self::$web->validate([['myparam','phone:','not a phone']]),[]);
+		$this->assertNull(self::$web->validate(false));
+	}
 	
-
+	function test_request() {
+		// normal case
+		$_REQUEST['myparam']='%21%7E%23%24+%26%2A%28';
+		$_REQUEST['mynullparam']=null;
+		$this->assertEquals(self::$web->request('myparam'),'!~#$ &*(');
+		// non existent case
+		$this->assertNull(self::$web->request('mynonexistingparam'));
+		// empty value
+		$this->assertEquals(self::$web->request('mynullparam'),'');
+		// array
+		$_REQUEST['arrayparam']=['data'=>'%21%7E%23%24+%26%2A%28'];
+		codecept_debug('RAW');
+		codecept_debug($_REQUEST['arrayparam']);
+		codecept_debug('request');
+		codecept_debug(self::$web->request('arrayparam'));
+		$this->assertEquals(self::$web->request('arrayparam'),['data'=>'!~#$ &*(']);
+	}
+	
 
 
 /*
  * 
  * 
+NOT TESTED - TRIVAL
+	function test_moduleConf($module, $key) {}
+	function test_isAjax() {}
+	function test_dump() {}
+	function test_setTitle($title) {}
+	function test_currentRequestMethod() {}
+	function test_getPath() {}
+	function test_requestIpAddress() {}
+	function test_currentModule() {}
+	function test_currentSubModule() {}
+	function test_currentAction() {}
+	
+	
+
+
+NOT TESTED - HARD
+	// no access to header in CLI PHP
+	function test_redirect($url) {}
+	function test_sendHeader($key, $value) {}
+	// no access to session in CLI PHP
+	function test_session($key, $value = null) {}
+	function test_sessionUnset($key) {}
+	function test_sessionDestroy() {}
+	// stubs ??
+	function test_callHook($module, $function, $data = null) {}
+	function test__callPreListeners() {}
+	function test__callPostListeners() {}
+	
+
+
+
 
 function test_cmp_weights($a, $b) {}
 		
@@ -154,11 +210,10 @@ function test_cmp_weights($a, $b) {}
 	function test__callWebHooks($type) {}
 	function test___get($name) {}
 	function test_initDB() {}
-	function test_moduleConf($module, $key) {}
 	function test_scanModuleDirForConfigurationFiles($dir = "") {}
 	function test_validateCSRF() {}
 	
-	function test_isAjax() {}
+
 	function test_checkAccess($msg = "Access Restricted") {}
 	function test_getMimetype($filename) {}
 	function test_sendFile($filename) {}
@@ -178,7 +233,6 @@ function test_cmp_weights($a, $b) {}
 	function test_getModuleNameForModel($classname) {}
 	function test_isClassActive($classname) {}
 	function test_partial($name, $params = null, $module = null, $method = "ALL") {}
-	function test_callHook($module, $function, $data = null) {}
 	function test_setLayout($l) {}
 	function test_getLayout($l) {}
 	function test_setTemplate($t) {}
@@ -193,30 +247,12 @@ function test_cmp_weights($a, $b) {}
 	function test_out($txt) {}
 	function test_webroot() {}
 	function test_pathMatch() {}
-	function test_request($key, $default = null) {}
-	function test_requestIpAddress() {}
-	function test_currentModule() {}
-	function test_currentSubModule() {}
-	function test_currentAction() {}
-	function test__callPreListeners() {}
-	function test__callPostListeners() {}
-	function test_validate($valarray) {}
-	function test_currentRequestMethod() {}
-	function test_getPath() {}
-	function test_ctx($key, $value = null, $append = false) {}
-	function test_session($key, $value = null) {}
-	function test_sessionUnset($key) {}
-	function test_sessionDestroy() {}
-	function test_redirect($url) {}
-	function test_sendHeader($key, $value) {}
-	function test_dump() {}
-	function test_setTitle($title) {}
-	function test_parseUrl($url) {}
-	function test_checkUrl($url,$module,$submodule,$action) {}
+	
 	function test_WebTemplate() {}
 	function test_set($name, $value) {}
 	function test_set_vars($vars, $clear = false) {}
 	function test_fetch($file) {}
+
 	function test_CachedTemplate($path, $cache_id = null, $expire = 900) {}
 	function test_is_cached() {}
 	function test_fetch_cache($file) {}
