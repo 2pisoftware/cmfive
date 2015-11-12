@@ -149,7 +149,6 @@ var uniTag = {
 		var tagId = $(obj).data('id');
 		var tag = $(obj).data('tag');
 		if(label.hasClass('primary')) {
-                    console.log("Removing tag:"+$('#'+parent_id+' .tag_selection:visible').length+";")
 			$('#'+parent_id+' .tag_selection[data-tag="'+tag+'"]').hide();
                         // If there are no more tags then show no tag
 			if($('#'+parent_id+' .tag_selection:visible').length == 0) {

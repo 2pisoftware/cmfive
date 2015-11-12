@@ -18,8 +18,8 @@ function listTags_ALL(Web $w, $params) {
 	
 	if (!empty($params['object'])) {
 		$object_class = get_class($params['object']);
-		$object_id = $params['object']->id;
-		
+		$object_id = ($params['object']->id === null) ? 0 : $params['object']->id; 
+                
 		$w->ctx("object_class", $object_class);
 		$w->ctx("object_id", $object_id);
 		

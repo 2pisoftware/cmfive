@@ -9,7 +9,6 @@
 var uniTag = {
 	buf:'',
 	ready: function(reload) {
-            console.log("here")
                 // There can be multiple tag lists on the page, so bind tags for
                 // each individually
                 $('.tag_list').each(function (index) {
