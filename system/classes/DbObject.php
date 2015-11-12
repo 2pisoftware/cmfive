@@ -77,7 +77,8 @@ class DbObject extends DbService {
     private static $_object_vars = array();
 	private static $_columns = array();
     private $_class;
-
+	public $__use_auditing = true;
+	
     /**
      * Constructor
      *
