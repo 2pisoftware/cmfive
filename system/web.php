@@ -158,10 +158,13 @@ class Web {
     }
 
     /**
+     * This function returns an array of the $_SERVER['REQUEST_URI'] parts split by /
+     * Where the $_SERVER['SCRIPT_NAME'] split by / has parts in common at the beginning, these are removed
+     * eg /site/users/do/2 + site/index.php  => [users,do,2]
      * Thanks to:
      * http://www.phpaddiction.com/tags/axial/url-routing-with-php-part-one/
      */
-    private function _getCommandPath($url = null) {    	
+    public function _getCommandPath($url = null) {    	
         $uri = explode('?', empty($url) ? $_SERVER['REQUEST_URI'] : $url); // get rid of parameters
         $uri = $uri[0];
         // get rid of trailing slashes
@@ -170,6 +173,7 @@ class Web {
         }
         $requestURI = explode('/', $uri);
         $scriptName = explode('/', $_SERVER['SCRIPT_NAME']);
+        
         for ($i = 0; $i < sizeof($scriptName); $i++) {
             // Checking is these vars are set makes the logout function not work
             // So we can just supress the warnings
@@ -532,7 +536,7 @@ class Web {
         return Config::get("{$module}.{$key}");
     }
 
-    private function loadConfigurationFiles() {
+    public function loadConfigurationFiles() {
     	$cachefile = ROOT_PATH . "/cache/config.cache";
     	
     	// check for config cache file. If exists, then load the config
@@ -633,8 +637,11 @@ class Web {
     }
 
     /**
-     * Check if the currently logged in user
-     * has access to this path
+     * Check if the currently logged in user has access to this path
+     * Return true if access is allowed
+     * Redirect back a page or logout and show an error if access is denied
+     * 
+     * Save LAST_ALLOWED_URI to session
      *
      * @param <type> $msg
      * @return <type>
@@ -1373,7 +1380,7 @@ class Web {
     function request($key, $default = null) {
         if (array_key_exists($key, $_REQUEST) && is_array($_REQUEST[$key])) {
             foreach ($_REQUEST[$key] as &$k) {
-                urldecode($k);
+                $k=urldecode($k);
             }
             return $_REQUEST[$key];
         }

@@ -88,6 +88,10 @@ class AuthService extends DbService {
         return $this->user() ? $this->user()->hasRole($role) : false;
     }
 
+	/**
+     * 
+     * Check if the current user can access the specified path
+     */
     function allowed($path, $url = null) {
 		$key = $path.'::'.$url;
 		if(!empty(self::$_cache[$key])) {
