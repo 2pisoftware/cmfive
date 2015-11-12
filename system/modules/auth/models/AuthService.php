@@ -57,15 +57,7 @@ class AuthService extends DbService {
 
     function getUserForLogin($login) {
         $user = $this->db->get("user")->where("login", $login)->fetch_row();
-        $user_obj = $this->getObjectFromRow("User", $user);
-        // Could someone tell me why getObject instantly returns "admin" and not the user im after?
-
-        // var_dump($user);
-        // echo $login;
-        // $result = $this->getObject("User", array("login", $login));
-        // echo $result->login; die();
-
-        return $user_obj;
+		return $this->getObjectFromRow("User", $user);
     }
 
     function getUserForToken($token) {
@@ -96,6 +88,10 @@ class AuthService extends DbService {
         return $this->user() ? $this->user()->hasRole($role) : false;
     }
 
+	/**
+     * 
+     * Check if the current user can access the specified path
+     */
     function allowed($path, $url = null) {
 		$key = $path.'::'.$url;
 		if(!empty(self::$_cache[$key])) {
