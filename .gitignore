@@ -5,3 +5,6 @@
 /config.php
 /system/composer/*
 storage/
+config.old.php
+config.old.*.php
+cache/
