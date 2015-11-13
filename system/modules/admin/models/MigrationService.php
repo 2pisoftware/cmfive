@@ -7,6 +7,8 @@ defined('SYSTEM_MODULE_DIRECTORY') || define('SYSTEM_MODULE_DIRECTORY', 'system'
 
 class MigrationService extends DbService {
 	
+	public static $_installed = []; 
+	
 	public function getAvailableMigrations($module_name) {
 		$availableMigrations = [];
 		
@@ -56,7 +58,10 @@ class MigrationService extends DbService {
 	}
 	
 	public function isInstalled($classname) {
-		return $this->w->db->get('migration')->where('classname', $classname)->count() == 1;
+		if (empty(self::$_installed[$classname])) {
+			self::$_installed[$classname] = $this->w->db->get('migration')->where('classname', $classname)->count() == 1;
+		}
+		return self::$_installed[$classname];
 	}
 	
 	public function getInstalledMigrations($module) {
@@ -64,7 +69,7 @@ class MigrationService extends DbService {
 		if (!empty($module) && $module !== "all") {
 			$migrations_query->where('module', strtolower($module));
 		}
-		$migrations = $migrations_query->fetch_all();
+		$migrations = $migrations_query->orderBy('dt_created ASC')->fetch_all();
 		$migrationsInstalled = [];
 		
 		if (!empty($migrations)) {
@@ -128,14 +133,18 @@ MIGRATION;
 		return "Migration created";
 	}
 	
-	public function runMigrations($module, $timestamp) {
+	public function runMigrations($module, $filename) {
 		$alreadyRunMigrations = $this->getInstalledMigrations($module);
 		$availableMigrations = $this->getAvailableMigrations($module);
 		
 		// Sort available into ascending order
-		uksort($availableMigrations, function($a, $b) use ($availableMigrations) {
-			return strcmp(substr($availableMigrations[$a], strrpos($availableMigrations[$a], '/') + 1), substr($availableMigrations[$b], strrpos($availableMigrations[$b], '/') + 1));
-		});
+		if (!empty($availableMigrations)) {
+			foreach($availableMigrations as $alreadyRunMigration) {
+				uksort($availableMigration, function($a, $b) use ($availableMigration) {
+					return strcmp(substr($availableMigration[$a], strrpos($availableMigration[$a], '/') + 1), substr($availableMigration[$b], strrpos($availableMigration[$b], '/') + 1));
+				});
+			}
+		}
 		
 		// Return if there are no migrations to run
 		if (empty($availableMigrations)) {
@@ -155,6 +164,20 @@ MIGRATION;
 			}
 		}
 		
+		// If filename is specified then strip out migrations that shouldnt be run
+		if (strtolower($module) !== "all" && !empty($filename)) {
+			$offset_index = 1;
+
+			foreach($availableMigrations[$module] as $availableMigrationsPath => $availableMigrationsClass) {
+				if (strpos($availableMigrationsPath, $filename) !== FALSE) {
+					break;
+				}
+				$offset_index++;
+			}
+			
+			$availableMigrations[$module] = array_slice($availableMigrations[$module], 0, $offset_index);
+		}
+		
 		// Install migrations
 		if (!empty($availableMigrations)) {
 			$this->w->db->startTransaction();
@@ -166,6 +189,7 @@ MIGRATION;
 					'name' => Config::get('database.database')
 				]);
 				
+				$runMigrations = 0;
 				foreach($availableMigrations as $module => $migrations) {
 					if (empty($migrations)) {
 						continue;
@@ -190,7 +214,8 @@ MIGRATION;
 								$migration_object->classname = $migration;
 								$migration_object->module = strtolower($module);
 								$migration_object->insert();
-
+								
+								$runMigrations++;
 								$this->w->Log->setLogger("MIGRATION")->info("Migration has run");
 							}
 						}
@@ -199,7 +224,7 @@ MIGRATION;
 
 				// Finalise transaction
 				$this->w->db->commitTransaction();
-				return count($availableMigrations) . ' migration' . (count($availableMigrations) == 1 ? ' has' : 's have') . ' run'; 
+				return count($runMigrations) . ' migration' . (count($runMigrations) == 1 ? ' has' : 's have') . ' run'; 
 			} catch (Exception $e) {
 				$this->w->out("Error with a migration: " . $e->getMessage());
 				$this->w->Log->setLogger("MIGRATION")->error("Error with a migration: " . $e->getMessage());
@@ -207,6 +232,85 @@ MIGRATION;
 			}
 		} else {
 			return "No migrations to run!";
+		}
+	}
+	
+	/**
+	 * Will rollback migrations for a given module up to (and including) the
+	 * given filename, if no filename is given this function will not run.
+	 * 
+	 * The file name should be the migration filename minus the .php extension
+	 * to minimise the chance that an actual PHP file is served by the web server
+	 * 
+	 * @param <string> $module
+	 * @param <string> $filename
+	 * @return <string> $response
+	 */
+	public function rollback($module, $filename) {
+		if (empty($module) || empty($filename)) {
+			return "Missing parameters required for a rollback";
+		}
+		
+		if (!in_array($module, $this->w->modules())) {
+			return "Module doesn't exist";
+		}
+		
+		$installed_migrations = $this->getInstalledMigrations($module);
+		if (empty($installed_migrations[$module])) {
+			return "There are no installed migrations to rollback";
+		}
+		
+		$offset_index = 0;
+		foreach($installed_migrations[$module] as $installed_module_migration) {
+			if (strpos($installed_module_migration['path'], $filename) !== FALSE) {
+				break;
+			}
+			$offset_index++;
+		}
+		
+		$migrations_to_rollback = array_slice($installed_migrations[$module], $offset_index);
+		
+		// Attempt to rollback all migrations
+		if (!empty($migrations_to_rollback)) {
+			$this->w->db->startTransaction();
+
+			try {
+				// Use MySQL for now
+				$mysql_adapter = new \Phinx\Db\Adapter\MysqlAdapter([
+					'connection' => $this->w->db,
+					'name' => Config::get('database.database')
+				]);
+				
+				foreach($migrations_to_rollback as $migration) {
+					if (file_exists(ROOT_PATH . '/' . $migration['path'])) {
+						include_once ROOT_PATH . '/' . $migration['path'];
+
+						// Class name must match filename after timestamp and hyphen 
+						if (class_exists($migration['classname'])) {
+							$this->w->Log->setLogger("MIGRATION")->info("Rolling back migration: " . $migration['id']);
+
+							// Run migration UP
+							$migration_class = new $migration['classname'](1);
+							$migration_class->setAdapter($mysql_adapter);
+							$migration_class->down();
+
+							// Delete migration record from DB
+							$migration_object = $this->getObjectFromRow("Migration", $migration);
+							$migration_object->delete();
+
+							$this->w->Log->setLogger("MIGRATION")->info("Migration has rolled back");
+						}
+					}
+				}
+
+				// Finalise transaction
+				$this->w->db->commitTransaction();
+				return count($migrations_to_rollback) . ' migration' . (count($migrations_to_rollback) == 1 ? ' has' : 's have') . ' rolled back'; 
+			} catch (Exception $e) {
+				$this->w->out("Error with a migration: " . $e->getMessage());
+				$this->w->Log->setLogger("MIGRATION")->error("Error with a migration: " . $e->getMessage());
+				$this->w->db->rollbackTransaction();
+			}
 		}
 	}
 	

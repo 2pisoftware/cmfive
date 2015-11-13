@@ -12,8 +12,9 @@
 					<?php echo ucfirst($module); ?>
 					<div class="right">
 						<?php
-							echo (count($available_in_module) - count(@$installed[$module]) > 0 ? '<span class="label round warning">' . (count($available_in_module) - count(@$installed[$module])) . '/' : '<span class="label round">');
-							echo count($available_in_module) . '</span>';
+							echo count(@$installed[$module]) > 0 ? "<span class='label round success' style='font-size: 14pt;'>" . count($installed[$module]) . "</span>" : "";
+						
+							echo (count($available_in_module) - count(@$installed[$module]) > 0 ? '<span class="label round warning" style="font-size: 14pt;">' . (count($available_in_module) - count(@$installed[$module])) . '</span>' : '');
 						?>
 					</div>
 				</a>
@@ -32,7 +33,7 @@
 						</thead>
 						<tbody>
 							<?php foreach($available_in_module as $a_migration_path => $a_migration_class): ?>
-							<tr style='background-color: <?php echo ($w->Migration->isInstalled($a_migration_class)) ? '#43CD80' : '#FA8072'; ?>;'>
+							<tr <?php echo ($w->Migration->isInstalled($a_migration_class)) ? 'style="background-color: #43CD80;"' : ''; ?>>
 								<td><?php echo $a_migration_class; ?></td>
 								<td><?php echo $a_migration_path; ?></td>
 								<td>
@@ -44,7 +45,14 @@
 									<?php endif; ?> 
 								</td>
 								<td>
-									
+								<?php
+									$filename = basename($a_migration_path, ".php");
+									if ($w->Migration->isInstalled($a_migration_class)) {
+										echo Html::b('/admin-migration/rollback/' . $module . '/' . $filename, "Rollback to here", "Are you 110% sure you want to rollback a migration? DATA COULD BE LOST PERMANENTLY!", null, false, "warning expand");
+									} else {
+										echo Html::b('/admin-migration/run/' . $module . '/' . $filename, "Migrate to here", "Are you sure you want to run a migration?", null, false, "info expand");
+									}
+								?>
 								</td>
 							</tr>
 							<?php endforeach; ?>
@@ -56,11 +64,27 @@
 	</div>
 	<script>
 		$(document).ready(function() {
-			var tab_item = $("ul#migrations_list li:visible").first(); //.addClass("active");
-			tab_item.addClass("active");
+			$("ul#migrations_list li:visible").click(function() {
+				window.location.hash = $('a', $(this)).attr('href');
+			});
 			
-			var element_href = tab_item.find('a').attr('href');
-			$(".tabs-content #" + element_href.substring(1, element_href.length).toLowerCase()).addClass("active");
+			var tab_item;
+			if (window.location.hash) {
+				$("ul#migrations_list li:visible").each(function(index, element) {
+					if ($('a', element).attr('href') == window.location.hash) {
+						$(element).addClass('active');
+						tab_item = $(element);
+					}
+				});
+			} else {
+				tab_item = $("ul#migrations_list li:visible").first(); //.addClass("active");
+				tab_item.addClass("active");
+			}
+			
+			if (tab_item) {
+				var element_href = tab_item.find('a').attr('href');
+				$(".tabs-content #" + element_href.substring(1, element_href.length).toLowerCase()).addClass("active");
+			}
 		});
 	</script>
 <?php else: ?>
