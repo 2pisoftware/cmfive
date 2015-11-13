@@ -138,13 +138,15 @@ MIGRATION;
 		$availableMigrations = $this->getAvailableMigrations($module);
 		
 		// Sort available into ascending order
-		if (!empty($availableMigrations)) {
-			foreach($availableMigrations as $alreadyRunMigration) {
-				uksort($availableMigration, function($a, $b) use ($availableMigration) {
-					return strcmp(substr($availableMigration[$a], strrpos($availableMigration[$a], '/') + 1), substr($availableMigration[$b], strrpos($availableMigration[$b], '/') + 1));
-				});
-			}
-		}
+//		if (!empty($availableMigrations)) {
+//			foreach($availableMigrations as $module => $alreadyRunMigration) {
+//				if (!empty($alreadyRunMigration)) {
+//					uksort($alreadyRunMigration, function($a, $b) {
+//						return strcmp(basename($a), basename($b));
+//					});
+//				}
+//			}
+//		}
 		
 		// Return if there are no migrations to run
 		if (empty($availableMigrations)) {
