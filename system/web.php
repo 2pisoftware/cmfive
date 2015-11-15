@@ -516,7 +516,7 @@ class Web {
     /**
      * Connect to the database
      */
-    private function initDB() {
+    public function initDB() {
     	try {
         	$this->db = new DbPDO(Config::get("database"));
     	} catch (Exception $ex) {
@@ -596,14 +596,15 @@ class Web {
         }
     }
 
-    private function validateCSRF() {
+    public function validateCSRF() {
         // Check for CSRF token and that we have a valid request method
         if (Config::get("system.csrf.enabled") == true && !CSRF::isValid($this->_requestMethod)) {
-            if (!CSRF::inHistory($this->_requestMethod)) {
+            if (!CSRF::inHistory()) {
                 @$this->service('log')->error("System: CSRF Detected from " . $this->requestIpAddress());
-                header("HTTP/1.0 403 Forbidden");
-                echo "Cross site request forgery detected. Your IP has been logged";
-                die();
+                throw new CSRFException("Cross site request forgery detected. Your IP has been logged");
+                //header("HTTP/1.0 403 Forbidden");
+                //echo "Cross site request forgery detected. Your IP has been logged";
+                //die();
             } else {
                 $this->msg("Duplicate form submission detected, make sure you only click buttons once");
             }
@@ -777,10 +778,11 @@ class Web {
      */
     function sendFile($filename) {
         if (file_exists($filename)) {
-            $filesystem = $this->File->getFilesystem(dirname($filename));
-            $file = $this->File->getFileObject($filesystem, $filename);
+            //$filesystem = $this->File->getFilesystem(dirname($filename));
+            //$file = $this->File->getFileObject($filesystem, $filename);
             header("Content-Type: " . $this->getMimetype($filename));
-            echo $file->getContent();
+            //echo $file->getContent();
+            readfile($filename);
         } else {
             header("HTTP/1.1 404 Not Found");
         }
@@ -1204,6 +1206,7 @@ class Web {
         $this->_layout = $l;
     }
 
+	/** TODO - Fix this to GET value **/
     function getLayout($l) {
         $this->_layout = $l;
     }
@@ -1232,13 +1235,12 @@ class Web {
      */
     function templateExists($name) {
         if ($this->_submodule) {
-            $paths[] = implode("/", array($this->getModuleDir($this->_module), $this->_templatePath, $this->_submodule));
+            $paths[] = implode("/", array(rtrim($this->getModuleDir($this->_module),'/'), $this->_templatePath, $this->_submodule));
         }
-        $paths[] = implode("/", array($this->getModuleDir($this->_module), $this->_templatePath));
-        $paths[] = implode("/", array($this->getModuleDir($this->_module)));
+        $paths[] = implode("/", array(rtrim($this->getModuleDir($this->_module),'/'), $this->_templatePath));
+        $paths[] = implode("/", array(rtrim($this->getModuleDir($this->_module),'/')));
         $paths[] = implode("/", array($this->_templatePath, $this->_module));
         $paths[] = $this->_templatePath;
-        
         // Add system fallback
         $paths[] = SYSTEM_PATH . "/" . $this->_templatePath;
 

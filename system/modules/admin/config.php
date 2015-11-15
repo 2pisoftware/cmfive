@@ -27,4 +27,4 @@ Config::set('admin', array(
 		"mandrill/mandrill" => "1.0.*"
     )
 ));
-Config:set('testing.systemmodule','fred');
+Config::set('testing.systemmodule','fred');

@@ -5,48 +5,17 @@
 TODO
 	* 
 	
-	function test_validateCSRF() {}
 	
-	function test_WebTemplate() {}
-	function test_set($name, $value) {}
-	function test_set_vars($vars, $clear = false) {}
-	function test_fetch($file) {}
+NOT TESTED
+    function test_dump() {}  - low priority function, hard to generate oracle case for output of $this
+	
+NOT TESTED - DEPRECATED
+ 
+	function test__callPreListeners() {}
+	function test__callPostListeners() {}
 
-	function test_CachedTemplate($path, $cache_id = null, $expire = 900) {}
-	function test_is_cached() {}
-	function test_fetch_cache($file) {}
-
-NOT TESTED - TRIVAL
-
-	function test_sendHeader($key, $value) {}
-	function test_cmp_weights($a, $b) {}
-	function test_install() {}
-			
-	function test_moduleConf($module, $key) {}
-	function test_isAjax() {}
-	function test_dump() {}
-	function test_setTitle($title) {}
-	function test_currentRequestMethod() {}
-	function test_getPath() {}
-	function test_requestIpAddress() {}
-	function test_currentModule() {}
-	function test_currentSubModule() {}
-	function test_currentAction() {}
 	
-	function test_putTemplate($key, $template) {}
-	function test_templateOut($template) {}
-	function test_out($txt) {}
-	function test_webroot() {}
-	
-	function test_setLayout($l) {}
-	function test_getLayout($l) {}
-	function test_setTemplate($t) {}
-	function test_getTemplate() {}
-	function test_setTemplatePath($path) {}
-	function test_setTemplateExtension($ext) {}
-	function test_modules() {}
-	
-STUBBED
+NOT TESTED - STUBBED
 	// these methods are stubbed so cannot be tested INSIDE THIS TEST CLASS
 	// TODO need to test these functions in  another test class where they are not stubbed in the Web instance
 	function test_checkAccess($msg = "Access Restricted") {}
@@ -61,35 +30,7 @@ STUBBED
 	function test_sessionUnset($key) {}
 	function test_sessionDestroy() {}
 
-NOT TESTED YET - HARD	 
 
-	function test_start($init_database = true) {}
-	
-	// stubs ?? WITH STUB::once,exactly
-	function test_callHook($module, $function, $data = null) {}
-	function test__callPreListeners() {}
-	function test__callPostListeners() {}
-	
-	// file download ??  handle on direct output??
-	function test_sendFile($filename) {}
-	
-	
-	function test_modelLoader() {
-		// THIS TEST IS USELESS, IT PASSES BUT WTF. TRICKY TO GET AT PRIVATE 
-		// FUNCTION MODEL LOADER EXCEPT THROUGH AUTOLOAD MECHANISM
-		//codecept_debug('ML');
-		// modelLoader is called by autoloader
-		// in tasks module
-		//$t=new Task(self::$web);
-		//$t=new User(self::$web);
-		$t=new ExampleData(self::$web);
-		//$this->assertTrue(class_exists('Task',true));
-		// is in cache?
-		//codecept_debug('ML CACHE');
-		//codecept_debug(self::$web->_classdirectory);  // empty ????
-		// non existant class
-		$this->assertFalse(class_exists('ExampleDataISNotReallyATypeOfObject',true));
-	}
 
 
 */
@@ -184,6 +125,74 @@ class WebTest extends  \Codeception\TestCase\Test {
 	 * TESTS 
 	 *****************************************/
 	
+	// accessors
+	function test_webroot() {
+		$this->assertEquals(self::$web->webroot(),self::$web->_webroot);
+	}
+	function test_sendHeader() {
+		self::$web->sendHeader('mykey', 'myvalue');
+		$this->assertEquals(self::$web->_headers['mykey'],'myvalue');
+	}
+			
+	function test_moduleConf() {
+		\Config::set('testmodule.mykey','myvalue');
+		$this->assertEquals(self::$web->moduleConf('testmodule', 'mykey'),\Config::get('testmodule.mykey'));
+	}
+	
+	function test_isAjax() {
+		unset($_SERVER['HTTP_X_REQUESTED_WITH']);
+		$this->assertFalse(self::$web->isAjax());
+		$_SERVER['HTTP_X_REQUESTED_WITH']=true;
+		$this->assertTrue(self::$web->isAjax());
+	}
+	function test_setTitle() {
+		self::$web->setTitle('thetitle');
+		$this->assertEquals(self::$web->ctx('title'),'thetitle');
+	}
+	function test_currentRequestMethod() {
+		$this->assertEquals(self::$web->currentRequestMethod(),self::$web->_requestMethod);
+	}
+	function test_getPath() {
+		self::$web->_paths=['a','b','c'];
+		$this->assertEquals(self::$web->getPath,implode("/", self::$web->_paths));
+	}
+	function test_requestIpAddress() {
+		$_SERVER['REMOTE_ADDR']='111.111.111.111';
+		$this->assertEquals(self::$web->requestIpAddress(),'111.111.111.111');
+	}
+	function test_currentModule() {
+		$this->assertEquals(self::$web->currentModule(),self::$web->_module);
+	}
+	function test_currentSubModule() {
+		$this->assertEquals(self::$web->currentSubModule(),self::$web->_submodule);
+	}
+	function test_currentAction() {
+		$this->assertEquals(self::$web->currentAction(),self::$web->_action);
+	}
+	function test_modules() {
+		$this->assertEquals(self::$web->modules(),\Config::keys());
+	}
+	
+	
+	
+	
+	function test_modelLoader() {
+		// modelLoader is called by autoloader
+		try {
+			if (! 
+				class_exists('Task',true)
+				&& class_exists('User',true)
+				&& class_exists('ExampleData',true)
+			) {
+				$this->fail('Failed to load models');
+			}
+			if (class_exists('ExampleDataISNotReallyATypeOfObject',true)) {
+				$this->fail('Failed to throw exception on load of invalid object type');
+			}
+		} catch (Exception $e) {
+			
+		}
+	}
 	/**
 	 * Testing Web->enqueueScript($script)
 	 */
@@ -448,8 +457,8 @@ class WebTest extends  \Codeception\TestCase\Test {
 		// clear existing configuration
 		$cachefile = ROOT_PATH . "/cache/config.cache";
 		unlink($cachefile);
-		foreach (Config::keys(true) as $key) {
-			Config::set($key,NULL);
+		foreach (\Config::keys(true) as $key) {
+			\Config::set($key,NULL);
 		}
 		// now reload
 		self::$web->loadConfigurationFiles();
@@ -458,25 +467,406 @@ class WebTest extends  \Codeception\TestCase\Test {
 			$this->fail('Cache file was not written');
 		}
 		// system config setting
-		$this->assertEqual(Config::get('testing.system'),'fred');
+		$this->assertEqual(\Config::get('testing.system'),'fred');
 		// system module config setting
-		$this->assertEqual(Config::get('testing.systemmodule'),'fred');
+		$this->assertEqual(\Config::get('testing.systemmodule'),'fred');
 		// module config setting
-		$this->assertEqual(Config::get('testing.system'),'fred');
+		$this->assertEqual(\Config::get('testing.system'),'fred');
 		// site config setting
 		$dbUser=Config::get('database.username');
-		$this->assertTrue(strlen(Config::get('database.username'))>0);
+		$this->assertTrue(strlen(\Config::get('database.username'))>0);
 		// check cache loading
 		// change value then reload and check value reverted
-		Config::set('database.username','fred');
+		\Config::set('database.username','fred');
 		self::$web->loadConfigurationFiles();
-		$this->assertEquals(Config::get('database.username'),$dbUser);
+		$this->assertEquals(\Config::get('database.username'),$dbUser);
+	}
+
+	function test_validateCSRF() {
+		// disabled
+		global $_SESSION;
+		global $_POST;
+		\Config::set('system.csrf.enabled',false);
+		$output=$this->captureOutput(self::$web,'validateCSRF');
+		$this->assertEquals($output,'');
+		// csrf is valid
+		\Config::set('system.csrf.enabled',true);
+		self::$web->_requestMethod='get';
+		$output=$this->captureOutput(self::$web,'validateCSRF');
+		$this->assertEquals($output,'');
+		self::$web->_requestMethod='notget';
+		// csrf is invalid
+		// not in history
+		//$_SESSION[\CSRF::getTokenHistoryName()]=['a'=>'b'];
+		//$_POST['a']='e';
+		try {
+			unset($_SESSION[\CSRF::getTokenHistoryName()]);
+			self::$web->validateCSRF();
+			$this->fail('Failed to throw exception for invalid csrf with no history available');
+		} catch (\CSRFException $e) {
+			// all good
+		}
+		// in history
+		$_SESSION[\CSRF::getTokenHistoryName()]=['a'=>'b'];
+		$_POST['a']='b';
+		$output=$this->captureOutput(self::$web,'validateCSRF');
+		//codecept_debug($output);
+		$this->assertEquals($output,'::MESSAGE::Duplicate form submission detected, make sure you only click buttons once::');
+		
 	}
 	
+	function test_getTemplateRealFilename() {
+		$ext=self::$web->_templateExtension;
+		$this->assertEquals(self::$web->getTemplateRealFilename('fred'),'fred'.$ext);
+	}
+	
+	function test_setLayout() {
+		$l='fred';
+		self::$web->setLayout($l);
+		$this->assertEquals(self::$web->getLayout(),$l);
+	}
+	function test_setTemplate() {
+		$l='fred';
+		//self::$web->setTemplate($l);
+		//$this->assertEquals(self::$web->getTemplate(),$l);
+	}
+	function test_setTemplatePath() {
+		$l='fred';
+		self::$web->setTemplatePath($l);
+		$this->assertEquals(self::$web->_templatePath,$l);
+	}
+	function test_setTemplateExtension() {
+		$l='fred';
+		self::$web->setTemplateExtension($l);
+		$this->assertEquals(self::$web->_templateExtension,$l);
+	}
+	
+	/*****************************************
+	 * Return a list of files that cover all the permutations for templateExists
+	 ****************************************/	
+	function getTestTemplateFiles() {
+		$paths=[
+			
+			'modules/testmodule/templates/submodule/testtemplate',
+			'modules/testmodule/templates/submodule/get',
+			'modules/testmodule/templates/submodule/edit',
+			'modules/testmodule/templates/submodule/submodule',
+			'modules/testmodule/templates/submodule/testmodule',
+			
+			'modules/testmodule/templates/testtemplate',
+			'modules/testmodule/templates/get',
+			'modules/testmodule/templates/edit',
+			'modules/testmodule/templates/submodule',
+			'modules/testmodule/templates/testmodule',
+			
+			'modules/testmodule/testtemplate',
+			'modules/testmodule/get',
+			'modules/testmodule/edit',
+			'modules/testmodule/submodule',
+			'modules/testmodule/testmodule',
+
+			'system/modules/systestmodule/templates/submodule/testtemplate',
+			'system/modules/systestmodule/templates/submodule/get',
+			'system/modules/systestmodule/templates/submodule/edit',
+			'system/modules/systestmodule/templates/submodule/submodule',
+			'system/modules/systestmodule/templates/submodule/testmodule',
+			
+			'system/modules/systestmodule/templates/testtemplate',
+			'system/modules/systestmodule/templates/get',
+			'system/modules/systestmodule/templates/edit',
+			'system/modules/systestmodule/templates/submodule',
+			'system/modules/systestmodule/templates/testmodule',
+			
+			'system/modules/systestmodule/testtemplate',
+			'system/modules/systestmodule/get',
+			'system/modules/systestmodule/edit',
+			'system/modules/systestmodule/submodule',
+			'system/modules/systestmodule/testmodule',
+
+			'templates/testmodule/testtemplate',
+			'templates/testmodule/get',
+			'templates/testmodule/edit',
+			'templates/testmodule/submodule',
+			'templates/testmodule/testmodule',
+
+			'templates/testtemplate',
+			'templates/get',
+			'templates/edit',
+			'templates/submodule',
+			'templates/testmodule',
+
+			'system/templates/testtemplate',
+			'system/templates/get',
+			'system/templates/edit',
+			'system/templates/submodule',
+			'system/templates/testmodule'
+		];
+		return $paths;
+	}	
+	
+	function createTestTemplateFiles() {
+		$paths=$this->getTestTemplateFiles();
+		foreach ($paths as $path) {
+			$file=ROOT_PATH."/".self::$web->getTemplateRealFilename($path);
+			if (!is_dir(dirname($file))) {
+				mkdir(dirname($file),0777,true);
+			}
+			
+			file_put_contents($file,':::TEMPLATE:::'.$file."::");
+		}
+		file_put_contents(ROOT_PATH."/system/modules/testmodule/config.php",'<'.'?php Config::set("testmodule",["path"=>"system/modules"]);');
+		file_put_contents(ROOT_PATH."/modules/testmodule/config.php",'<'.'?php Config::set("testmodule",["path"=>"modules"]);');
+		self::$web->loadConfigurationFiles();
+		
+	}
+
+	function removeTestTemplateFiles() {
+		$paths=$this->getTestTemplateFiles();
+		foreach ($paths as $path) {
+			$file=ROOT_PATH."/".self::$web->getTemplateRealFilename($path);
+			unlink($file);
+		}
+	}
+
+		
+	function test_templateExists() {
+		$this->createTestTemplateFiles();
+		self::$web->_module='testmodule';
+		self::$web->_submodule='';
+		self::$web->_action='';
+		self::$web->_actionMethod='';
+		
+		$this->assertNull(self::$web->templateExists('thisIsATemplateNameThatWillNeverExist'));
+		
+		// tests based on explicit template parameter to templateExists
+		// remove found templates and search again to test priority
+		$findPath='modules/testmodule/templates/testtemplate';
+		$this->assertEquals(self::$web->templateExists('testtemplate'),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		
+		$findPath='modules/testmodule/testtemplate';
+		$this->assertEquals(self::$web->templateExists('testtemplate'),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		
+		$findPath='templates/testmodule/testtemplate';
+		$this->assertEquals(self::$web->templateExists('testtemplate'),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		
+		$findPath='templates/testtemplate';
+		$this->assertEquals(self::$web->templateExists('testtemplate'),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		
+		$findPath=ROOT_PATH."/".'system/templates/testtemplate';
+		$this->assertEquals(self::$web->templateExists('testtemplate'),$findPath);
+		unlink(self::$web->getTemplateRealFilename($findPath));
+		// NO MORE MATCHING TEMPLATES LEFT
+		$this->assertNull(self::$web->templateExists('testtemplate'));
+		
+		// tests based on internal values for self::$web->_submodule, self::$web->_action, self::$web->_actionMethod
+		self::$web->_submodule='submodule';
+		self::$web->_action='edit';
+		self::$web->_actionMethod='get';
+		
+		// first thing found is actionMethod
+		// modules/testmodule/templates
+		$findPath='modules/testmodule/templates/submodule/get';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		
+		$findPath='modules/testmodule/templates/submodule/edit';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		
+		$findPath='modules/testmodule/templates/submodule/submodule';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		
+		$findPath='modules/testmodule/templates/get';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		
+		$findPath='modules/testmodule/templates/edit';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		
+		$findPath='modules/testmodule/templates/submodule';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		
+		self::$web->_submodule='';
+		$findPath='modules/testmodule/templates/testmodule';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		self::$web->_submodule='submodule';
+		
+		
+		// modules/testmodule
+		$findPath='modules/testmodule/get';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		
+		$findPath='modules/testmodule/edit';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		
+		$findPath='modules/testmodule/submodule';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		
+		self::$web->_submodule='';
+		$findPath='modules/testmodule/testmodule';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		self::$web->_submodule='submodule';
+
+		// templates/testmodule
+		$findPath='templates/testmodule/get';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		
+		$findPath='templates/testmodule/edit';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		
+		$findPath='templates/testmodule/submodule';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		
+		self::$web->_submodule='';
+		$findPath='templates/testmodule/testmodule';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		self::$web->_submodule='submodule';
+
+		// templates/
+		$findPath='templates/get';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		
+		$findPath='templates/edit';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		
+		$findPath='templates/submodule';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		
+		self::$web->_submodule='';
+		$findPath='templates/testmodule';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename(ROOT_PATH."/".$findPath));
+		self::$web->_submodule='submodule';
+
+		// system/templates
+		$findPath=ROOT_PATH."/".'system/templates/get';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename($findPath));
+		
+		$findPath=ROOT_PATH."/".'system/templates/edit';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename($findPath));
+		
+		$findPath=ROOT_PATH."/".'system/templates/submodule';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename($findPath));
+		
+		self::$web->_submodule='';
+		$findPath=ROOT_PATH."/".'system/templates/testmodule';
+		$this->assertEquals(self::$web->templateExists(''),$findPath);
+		unlink(self::$web->getTemplateRealFilename($findPath));
+		self::$web->_submodule='submodule';
+
+		
+		// no matches left
+		$this->assertNull(self::$web->templateExists(''));
+		
+		
+		$this->removeTestTemplateFiles();
+	}
+
+	
+	function test_fetchTemplate() {
+		//function test_putTemplate($key, $template) {}
+		//function test_templateOut() {}
+		self::$web->_module='testmodule';
+		self::$web->ctx('a','avalue');
+		@mkdir(ROOT_PATH."/modules/testmodule/",0777,true);
+		// write config file with path set for module to enable module recognition
+		file_put_contents(ROOT_PATH."/modules/testmodule/config.php",'<'.'?php Config::set("testmodule",["path"=>"system/modules"]);');
+		// write template
+		file_put_contents(ROOT_PATH."/modules/testmodule/edit.tpl.php",':::TEMPLATE:::<'.'?php echo $a; ?'.'>:::');
+		// fetchTemplate
+		$this->assertEquals(self::$web->fetchTemplate('edit'),':::TEMPLATE:::avalue:::');
+		// putTemplate
+		self::$web->putTemplate('editkey','edit');
+		$this->assertEquals(self::$web->ctx('editkey'),':::TEMPLATE:::avalue:::');
+		// templateOut
+		$output=captureOutput(self::$web,'putTemplate',['editkey','edit']);
+		$this->assertEquals($output,':::TEMPLATE:::avalue:::');
+		
+		unlink(ROOT_PATH."/modules/testmodule/config.php");
+		unlink(ROOT_PATH."/modules/testmodule/edit.tpl.php");
+	}
+	
+	
+	function test_out() {
+		$buffer=self::$web->_buffer;
+		self::$web->out('testoutput');
+		$this->assertEquals(self::$web->_buffer,$buffer.'testoutput');
+	}
+		
+	// file download ??  handle on direct output??
+	function test_sendFile() {
+		@mkdir(ROOT_PATH."/modules/testmodule/",0777,true);
+		file_put_contents(ROOT_PATH."/modules/testmodule/blah.txt",'BLAH');
+		// todo sendFile calls exit which stops further tests 
+		$output='BB';
+		// $this->captureOutput(self::$web,'sendFile',[ROOT_PATH."/modules/testmodule/blah.txt"]);
+		$this->assertEquals($output,'BLAH');
+		unlink(ROOT_PATH."/modules/testmodule/blah.txt");
+	}
+	
+	function test_WebTemplate() {
+		@mkdir(ROOT_PATH."/modules/testmodule/",0777,true);
+		// write config file with path set for module to enable module recognition
+		// write template
+		file_put_contents(ROOT_PATH."/modules/testmodule/edit.tpl.php",':::TEMPLATE:::<'.'?php echo $a.":::".(!empty($b) ? $b : "nob").":::".$c.":::"; ?'.'>');
+		$t=new \WebTemplate();
+		$t->set('a','aval');
+		$t->set_vars(['a'=>'avalue','b'=>'bvalue','c'=>'cvalue']);
+		$this->assertEquals($t->fetch(ROOT_PATH."/modules/testmodule/edit.tpl.php"),":::TEMPLATE:::avalue:::bvalue:::cvalue:::");
+		$t->set_vars(['a'=>'avalue','c'=>'cvalue'],true);
+		$this->assertEquals($t->fetch(ROOT_PATH."/modules/testmodule/edit.tpl.php"),":::TEMPLATE:::avalue:::nob:::cvalue:::");
+	}
+	
+	
+	function test_CachedTemplate() {
+		//function test_is_cached() {}
+		//function test_fetch_cache() {}
+		// TODO
+		return;
+		@mkdir(ROOT_PATH."/modules/testmodule/",0777,true);
+		// write config file with path set for module to enable module recognition
+		// write template
+		file_put_contents(ROOT_PATH."/modules/testmodule/edit.tpl.php",':::TEMPLATE:::<'.'?php echo $a.":::".(!empty($b) ? $b : "nob").":::".$c.":::"; ?'.'>');
+		$t=new \CachedTemplate();
+		$t->set('a','aval');
+		$t->set_vars(['a'=>'avalue','b'=>'bvalue','c'=>'cvalue']);
+		$this->assertEquals($t->fetch(ROOT_PATH."/modules/testmodule/edit.tpl.php"),":::TEMPLATE:::avalue:::bvalue:::cvalue:::");
+		
+	}
+	
+
+	// stubs ?? WITH STUB::once,exactly
+	function test_callHook() {}
+    //private function _callWebHooks() {
+	
+	function test_cmp_weights() {}
+	function test_install() {}
+	
 	function test_partial() {} //$name, $params = null, $module = null, $method = "ALL"
-	function test_templateExists() {}  //$name
-	function test_getTemplateRealFilename() {}  //$tmpl
-	function test_fetchTemplate() {}  //$name = null
+	
+	function test_start() {}
 
 		
 }  // class
