@@ -599,7 +599,7 @@ a > div#active_log_time {
 	z-index:10;
 	position:absolute;
 	top:25px;
-	left:auto;
+	left:10px;
 	display:none;
 	right:-1px;
 }

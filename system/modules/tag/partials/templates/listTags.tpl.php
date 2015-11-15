@@ -1,5 +1,7 @@
-<div class="tag_list" data-url="/tag/ajaxTag/<?php echo ($object_class ? "?class=" . $object_class : '') . ($object_id ? '&id=' . $object_id : ''); ?>">
+<div class="tag_list" id="tag_list_<?php echo ($object_class ? $object_class : '') . ($object_id ? $object_id : ''); ?>"
+     data-url="/tag/ajaxTag/<?php echo ($object_class ? "?class=" . $object_class : '') . ($object_id ? '&id=' . $object_id : ''); ?>">
 	<?php if (!empty($tags)) : ?>
+		<span class="label radius secondary no_tags tag_selection" style="display:none"><span class="fi-price-tag">No tag</span></span>
 		<?php foreach($tags as $tag) : ?>
 			<span data-tag="<?php echo $tag->tag; ?>" class="label radius secondary tag_selection">
 				<span <?php echo (!empty($tag->tag_color) ? 'style="color: '.$tag->tag_color.'"' : '') ?> class="fi-price-tag"><?php echo $tag->tag; ?></span>
