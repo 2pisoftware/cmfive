@@ -21,7 +21,8 @@ class FunctionsTest extends  \Codeception\TestCase\Test {
 
 /*
 
-
+ * These functions have not been tested due to their not being used in both cmfive 
+ * and crm
 
 function getBetween($content, $start, $end) {  //This function is not used in cm5 or crm
 function is_associative_array($array) {  //This function is not used
