@@ -107,7 +107,11 @@ class Web {
 
 		// The order of the following three lines are important
 		spl_autoload_register(array($this, 'modelLoader'));
-		define("WEBROOT", $this->_webroot);
+		try {
+			$wr=WEBROOT;
+		} catch (Exception $e) {
+			define("WEBROOT", $this->_webroot);
+		}
         $this->loadConfigurationFiles();
     }
 
@@ -480,7 +484,7 @@ class Web {
      * 
      * @param unknown $type eg. before / after
      */
-    private function _callWebHooks($type) {
+    public function _callWebHooks($type) {
 		// If there isn't a database connection, this will crash
 		if (empty($this->db)) {
 			return;
@@ -574,7 +578,7 @@ class Web {
 
     // Helper function for the above, scans a directory for config files in child folders
     private function scanModuleDirForConfigurationFiles($dir = "") {
-        // Check that dir is dir
+		// Check that dir is dir
         if (is_dir($dir)) {
 
             // Scan directory
@@ -778,11 +782,11 @@ class Web {
      */
     function sendFile($filename) {
         if (file_exists($filename)) {
-            //$filesystem = $this->File->getFilesystem(dirname($filename));
-            //$file = $this->File->getFileObject($filesystem, $filename);
+            $filesystem = $this->File->getFilesystem(dirname($filename));
+            $file = $this->File->getFileObject($filesystem, $filename);
             header("Content-Type: " . $this->getMimetype($filename));
-            //echo $file->getContent();
-            readfile($filename);
+            echo $file->getContent();
+            //readfile($filename);
         } else {
             header("HTTP/1.1 404 Not Found");
         }
@@ -1139,16 +1143,17 @@ class Web {
      * @return an array of return values from all functions that answer to this hool
      */
     public function callHook($module, $function, $data = null) {
-        if (empty($module) or empty($function)) {
+        if (empty($module) || empty($function)) {
             return null;
         }
 
         // Build _hook registry if empty
         if (empty($this->_hooks)) {
-            foreach ($this->modules() as $modulename) {
+           foreach ($this->modules() as $modulename) {
             	// only include active modules!
             	if (Config::get("$modulename.active") !== false) {
 	                $hooks = Config::get("{$modulename}.hooks");
+	               
 	                if (!empty($hooks)) {
 	                    foreach ($hooks as $hook) {
 	                        $this->_hooks[$hook][] = $modulename;
@@ -1157,7 +1162,6 @@ class Web {
             	}
             }
         }
-        
         // Check that the module calling has subscribed to hooks
         if (!array_key_exists($module, $this->_hooks)) {
             return null;
@@ -1167,7 +1171,6 @@ class Web {
         if (Config::get("$module.active") === false) {
             return null;
         }
-        
         // Loop through each registered module to try and invoke the function
         $buffer = array();
         foreach ($this->_hooks[$module] as $toInvoke) {
@@ -1256,7 +1259,7 @@ class Web {
                 $names[] = $this->_module;
             }
         }
-
+        
         // we need to find a template from a combination of paths and names
         // in the above arrays from the most specific to the most broad
         $template = null;
