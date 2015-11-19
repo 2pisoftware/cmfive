@@ -930,10 +930,6 @@
 			$output.=$this->captureOutput(self::$web,'_callWebHooks',['testhooks']);
 			$this->assertEquals($output,':::HOOK:::testmodule_core_web_testhooks::::::HOOK:::testmodule_core_web_testhooks_ping::::::HOOK:::testmodule_core_web_testhooks_ping_testmodule::::::HOOK:::testmodule_core_web_testhooks_ping_testmodule_submodule::::::HOOK:::testmodule_core_web_testhooks_ping_testmodule_submodule_sleep::::::HOOK:::testmodule_core_web_testhooks::::::HOOK:::testmodule_core_web_testhooks_ping::::::HOOK:::testmodule_core_web_testhooks_ping_testmodule::::::HOOK:::testmodule_core_web_testhooks_ping_testmodule_sleep:::');
 		}
-		  
-		
-		function test_cmp_weights() {}
-		function test_install() {}
 		
 		function test_partial() {
 			self::$web->_partialsdir='mypartials';
@@ -944,6 +940,9 @@
 			$this->assertEquals($ctx,self::$web->_context);
 			$this->assertEquals($buffer,self::$web->_buffer);
 		}
+
+		function test_cmp_weights() {}
+		function test_install() {}
 		
 		function test_start() {}
 
