@@ -107,12 +107,8 @@ class Web {
 
 		// The order of the following three lines are important
 		spl_autoload_register(array($this, 'modelLoader'));
-		try {
-			$wr=WEBROOT;
-		} catch (Exception $e) {
-			define("WEBROOT", $this->_webroot);
-		}
-        $this->loadConfigurationFiles();
+		defined("WEBROOT") ||  define("WEBROOT", $this->_webroot);
+		$this->loadConfigurationFiles();
     }
 
     private function modelLoader($className) {
@@ -665,8 +661,9 @@ class Web {
             if (!$this->Auth->allowed($path)) {
                 $this->Log->info("System: Access Denied to " . $path . $usrmsg . " from " . $this->requestIpAddress());
                 // redirect to the last allowed page 
-                if ($this->Auth->allowed($_SESSION['LAST_ALLOWED_URI'])) {
-                    $this->error($msg, $_SESSION['LAST_ALLOWED_URI']);
+                $lastAllowed=(is_array($_SESSION) && array_key_exists('LAST_ALLOWED_URI',$_SESSION)) ? $_SESSION['LAST_ALLOWED_URI'] : '';
+                if ($this->Auth->allowed($lastAllowed)) {
+                    $this->error($msg, $lastAllowed);
                 } else {
                     // Logout user
                     $this->sessionDestroy();
