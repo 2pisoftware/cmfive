@@ -95,8 +95,8 @@ class DbPDO extends PDO {
         return $this;
     }
     
-    public function select($select){
-        if ($this->query !== NULL && !empty($select)){
+    public function select($select = null){
+        if ($this->query !== NULL){
             $this->query = $this->query->select($select);
         }
         return $this;

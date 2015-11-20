@@ -74,7 +74,8 @@
 class DbObject extends DbService {
 
     public $id;
-
+	public $__use_auditing = true;
+	
     /**
      * Constructor
      *
