@@ -576,6 +576,7 @@ class Html {
                     if (!empty($validation[$name])) {
                         if (in_array("required", $validation[$name])) {
                             $required = "required";
+                            $title .= '*';
                         }
                     }
 
@@ -726,8 +727,8 @@ class Html {
      * @param <type> $value
      * @param <type> $class
      */
-    public static function select($name, $items, $value = null, $class = null, $style = null, $allmsg = "-- Select --", $required = null) {
-        $buf = '<select id="' . $name . '"  name="' . $name . '" class="' . $class . '" style="' . $style . '" ' . $required . '>';
+    public static function select($name, $items, $value = null, $class = null, $style = null, $allmsg = "-- Select --", $readonly = null, $required = null) {
+        $buf = '<select id="' . $name . '"  name="' . $name . '" class="' . $class . '" style="' . $style . '" ' . $readonly . ' ' . $required . '>';
         $buf.= $allmsg ? "<option value=''>" . $allmsg . "</option>" : '';
         if (!empty($items) && is_array($items)) {
             foreach ($items as $item) {

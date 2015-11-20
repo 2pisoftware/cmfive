@@ -26,7 +26,7 @@ class Task extends DbObject {
     public $is_deleted;  // is_deleted flag
     public $_modifiable;  // Modifiable Aspect
     public $_searchable;
-    public $_validation = array(
+    public static $_validation = array(
         "title" => array('required'),
         "task_group_id" => array('required'),
         "status" => array('required'),

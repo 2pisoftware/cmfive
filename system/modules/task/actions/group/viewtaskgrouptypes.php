@@ -51,6 +51,8 @@ function viewtaskgrouptypes_ALL(Web $w) {
 			array("Active","select","is_active",null,$is_active),
 			array("","hidden","is_deleted","0"),
 			array("Description","textarea","description",null,"26","6"),
+			array("Default Task Type","select","default_task_type",null,null),
+			array("Default Priority","select","default_priority",null,null),
 			array("Default Assignee","select","default_assignee_id",null,$w->Auth->getUsers()),
 	),$w->localUrl("/task-group/createtaskgroup"),"POST","Save");
 

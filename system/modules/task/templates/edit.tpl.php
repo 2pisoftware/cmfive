@@ -88,7 +88,7 @@
                     $('#assignee_id').parent().html(result[2]);
                     $('#status').html(result[4])
                 }
-                initialChange = true;
+                initialChange = false;
                 $('#tasktext').html(result[3]);
                 $("#tasktext").fadeIn();
 
