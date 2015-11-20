@@ -107,7 +107,11 @@ class Web {
 
 		// The order of the following three lines are important
 		spl_autoload_register(array($this, 'modelLoader'));
-		define("WEBROOT", $this->_webroot);
+		try {
+			$wr=WEBROOT;
+		} catch (Exception $e) {
+			define("WEBROOT", $this->_webroot);
+		}
         $this->loadConfigurationFiles();
     }
 
@@ -480,7 +484,7 @@ class Web {
      * 
      * @param unknown $type eg. before / after
      */
-    private function _callWebHooks($type) {
+    public function _callWebHooks($type) {
 		// If there isn't a database connection, this will crash
 		if (empty($this->db)) {
 			return;
@@ -516,7 +520,7 @@ class Web {
     /**
      * Connect to the database
      */
-    private function initDB() {
+    public function initDB() {
     	try {
         	$this->db = new DbPDO(Config::get("database"));
     	} catch (Exception $ex) {
@@ -574,7 +578,7 @@ class Web {
 
     // Helper function for the above, scans a directory for config files in child folders
     private function scanModuleDirForConfigurationFiles($dir = "") {
-        // Check that dir is dir
+		// Check that dir is dir
         if (is_dir($dir)) {
 
             // Scan directory
@@ -596,14 +600,15 @@ class Web {
         }
     }
 
-    private function validateCSRF() {
+    public function validateCSRF() {
         // Check for CSRF token and that we have a valid request method
         if (Config::get("system.csrf.enabled") == true && !CSRF::isValid($this->_requestMethod)) {
-            if (!CSRF::inHistory($this->_requestMethod)) {
+            if (!CSRF::inHistory()) {
                 @$this->service('log')->error("System: CSRF Detected from " . $this->requestIpAddress());
-                header("HTTP/1.0 403 Forbidden");
-                echo "Cross site request forgery detected. Your IP has been logged";
-                die();
+                throw new CSRFException("Cross site request forgery detected. Your IP has been logged");
+                //header("HTTP/1.0 403 Forbidden");
+                //echo "Cross site request forgery detected. Your IP has been logged";
+                //die();
             } else {
                 $this->msg("Duplicate form submission detected, make sure you only click buttons once");
             }
@@ -781,6 +786,7 @@ class Web {
             $file = $this->File->getFileObject($filesystem, $filename);
             header("Content-Type: " . $this->getMimetype($filename));
             echo $file->getContent();
+            //readfile($filename);
         } else {
             header("HTTP/1.1 404 Not Found");
         }
@@ -1137,16 +1143,17 @@ class Web {
      * @return an array of return values from all functions that answer to this hool
      */
     public function callHook($module, $function, $data = null) {
-        if (empty($module) or empty($function)) {
+        if (empty($module) || empty($function)) {
             return null;
         }
 
         // Build _hook registry if empty
         if (empty($this->_hooks)) {
-            foreach ($this->modules() as $modulename) {
+           foreach ($this->modules() as $modulename) {
             	// only include active modules!
             	if (Config::get("$modulename.active") !== false) {
 	                $hooks = Config::get("{$modulename}.hooks");
+	               
 	                if (!empty($hooks)) {
 	                    foreach ($hooks as $hook) {
 	                        $this->_hooks[$hook][] = $modulename;
@@ -1155,7 +1162,6 @@ class Web {
             	}
             }
         }
-        
         // Check that the module calling has subscribed to hooks
         if (!array_key_exists($module, $this->_hooks)) {
             return null;
@@ -1165,7 +1171,6 @@ class Web {
         if (Config::get("$module.active") === false) {
             return null;
         }
-        
         // Loop through each registered module to try and invoke the function
         $buffer = array();
         foreach ($this->_hooks[$module] as $toInvoke) {
@@ -1204,6 +1209,7 @@ class Web {
         $this->_layout = $l;
     }
 
+	/** TODO - Fix this to GET value **/
     function getLayout($l) {
         $this->_layout = $l;
     }
@@ -1232,13 +1238,12 @@ class Web {
      */
     function templateExists($name) {
         if ($this->_submodule) {
-            $paths[] = implode("/", array($this->getModuleDir($this->_module), $this->_templatePath, $this->_submodule));
+            $paths[] = implode("/", array(rtrim($this->getModuleDir($this->_module),'/'), $this->_templatePath, $this->_submodule));
         }
-        $paths[] = implode("/", array($this->getModuleDir($this->_module), $this->_templatePath));
-        $paths[] = implode("/", array($this->getModuleDir($this->_module)));
+        $paths[] = implode("/", array(rtrim($this->getModuleDir($this->_module),'/'), $this->_templatePath));
+        $paths[] = implode("/", array(rtrim($this->getModuleDir($this->_module),'/')));
         $paths[] = implode("/", array($this->_templatePath, $this->_module));
         $paths[] = $this->_templatePath;
-        
         // Add system fallback
         $paths[] = SYSTEM_PATH . "/" . $this->_templatePath;
 
@@ -1254,7 +1259,7 @@ class Web {
                 $names[] = $this->_module;
             }
         }
-
+        
         // we need to find a template from a combination of paths and names
         // in the above arrays from the most specific to the most broad
         $template = null;
