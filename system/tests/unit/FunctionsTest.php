@@ -213,6 +213,26 @@ function test_formatDateTime() {
     
 }
 
+
+function test_defaultVal() {
+    //$val, $default = null, $forceNull = false
+    $test_val = null;
+    $this->assertEquals(null, defaultVal($test_val));
+    
+    $test_val2 = 'val';
+    $this->assertEquals('val', defaultVal($test_val2));
+    
+    $test_default = 'default';
+    $this->assertEquals('default', defaultVal($test_val,$test_default));
+    $this->assertEquals('val', defaultVal($test_val2,$test_default));
+    
+}
+
+
+/*******************************************
+ * FAILED TESTS NEEDING BUG FIX
+ *******************************************/
+
 function test_isNumber() {
     //$var
     $test_var = 0;
@@ -241,19 +261,6 @@ function test_isNumber() {
     $this->assertEquals(false, isNumber($test_var12));
 }
 
-function test_defaultVal() {
-    //$val, $default = null, $forceNull = false
-    $test_val = null;
-    $this->assertEquals(null, defaultVal($test_val));
-    
-    $test_val2 = 'val';
-    $this->assertEquals('val', defaultVal($test_val2));
-    
-    $test_default = 'default';
-    $this->assertEquals('default', defaultVal($test_val,$test_default));
-    $this->assertEquals('val', defaultVal($test_val2,$test_default));
-    
-}
 
 function test_formatMoney() {
     //$format, $number
