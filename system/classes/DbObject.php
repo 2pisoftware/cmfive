@@ -591,7 +591,6 @@ class DbObject extends DbService {
      */
     function update($force_null_values = false, $force_validation = true) {
         try {
-            $this->w->Log->Info("DbObject.update START-----------------------".$this->_class);
             $this->startTransaction();
 
             if ($force_validation && property_exists($this, "_validation")) {
@@ -668,7 +667,6 @@ class DbObject extends DbService {
             $updates [get_class($this)] [] = $this->id;
             $this->w->ctx('db_updates', $updates);
             $this->commitTransaction();
-            $this->w->Log->Info("DbObject.update END-----------------------");
         } catch (Exception $e) {
             // echo $e->getMessage();
             $this->w->Log->error("SQL ERROR: " . $e->getMessage());
