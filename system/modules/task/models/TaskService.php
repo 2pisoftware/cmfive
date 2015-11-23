@@ -654,7 +654,7 @@ class TaskService extends DbService {
      *  
      * @return TaskGroup
      */
-    function createTaskGroup($type, $title, $description, $default_assignee_id, $can_assign = "OWNER", $can_view = "OWNER", $can_create = "OWNER", $is_active = 1, $is_deleted = 0, $default_task_type, $default_priority) {
+    function createTaskGroup($type, $title, $description, $default_assignee_id, $can_assign = "OWNER", $can_view = "OWNER", $can_create = "OWNER", $is_active = 1, $is_deleted = 0, $default_task_type = null, $default_priority = null) {
         // title should be unique!
         $taskgroup = $this->getTaskGroupByUniqueTitle($title);
         if (null != $taskgroup) {
