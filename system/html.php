@@ -576,8 +576,8 @@ class Html {
                     if (!empty($validation[$name])) {
                         if (in_array("required", $validation[$name])) {
                             $required = "required";
-                            $title .= '*';
-                        }
+                            $title .= ' <small>Required</small>';
+                        } 
                     }
 
                     $readonly = "";
