@@ -48,6 +48,8 @@ function import_GET(Web $w) {
 	// Run updates
 	foreach(glob('system/install/updates/*.sql') as $file) {
 		try {
+			// TODO - this is not sufficient as multi statement update files will not throw an exception unless
+			// there is a problem on the FIRST statement. See InstallService for alternative solution.
 			$pdo->exec(file_get_contents($file));
 		} catch (Exception $e) {
 			output("Error from system update:");

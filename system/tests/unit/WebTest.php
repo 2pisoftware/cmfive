@@ -45,7 +45,10 @@
 		echo("::HEADER::".$a);
 	}
 			
-		
+	/**************
+	 * Global to simplify registering as die function
+	 * **********************************/
+	
 	class WebTest extends  \Codeception\TestCase\Test {
 		
 		
@@ -119,32 +122,19 @@
 		}
 
 		public function _after() {
-			$this->removeTestTemplateFiles();
+			$this->helper_removeTestTemplateFiles();
 		}
 		
 		private function captureOutput($class,$functionToRun,$arguments=[]) {
-			ob_start();
+			$t = ob_get_clean(); // get current output buffer and stopping output buffering
+			ob_start(); // start output buffering
 			call_user_func_array(array($class,$functionToRun),$arguments);
 			$generated=ob_get_contents();
 			ob_end_clean();
+			ob_start(); // start output buffering
+			echo($t); // restore output bufferob_start();
+			echo($generated);
 			return $generated;
-		}
-		
-		/*****************************
-		 * Recursively delete a folder
-		 *****************************/
-		function rmdirRecursive($dir) { 
-			if (is_dir($dir)) { 
-				$files = array_diff(scandir($dir), array('.','..')); 
-				foreach ($files as $file) { 
-					if (is_dir($dir.DIRECTORY_SEPARATOR.basename($file))) {
-						$this->rmdirRecursive($dir.DIRECTORY_SEPARATOR.basename($file)) ;
-					} else { 
-						unlink($dir.DIRECTORY_SEPARATOR.basename($file)); 
-					}
-				} 
-				return rmdir($dir); 
-			}
 		}
 		
 		/*****************************************
@@ -152,7 +142,6 @@
 		 ****************************************/	
 		function getTestTemplateFiles() {
 			$paths=[
-				
 				'modules/testmodule/templates/submodule/testtemplate',
 				'modules/testmodule/templates/submodule/get',
 				'modules/testmodule/templates/submodule/edit',
@@ -211,6 +200,11 @@
 		}	
 		
 		function createTestTemplateFiles() {
+			register_shutdown_function(
+				function($webTest) {
+					$webTest->helper_removeTestTemplateFiles();
+				}
+			,$this);
 			$paths=$this->getTestTemplateFiles();
 			foreach ($paths as $path) {
 				$file=ROOT_PATH."/".$path.".tpl.php";
@@ -219,8 +213,22 @@
 				}
 				file_put_contents($file,':::TEMPLATE:::'.$file."::");
 			}
+			// write module basics
 			file_put_contents(ROOT_PATH."/system/modules/systestmodule/config.php",'<'.'?php Config::set("systestmodule",["active"=>true,"topmenu"=>false,"path"=>"system/modules","hooks"=>["systestmodule","core_web"]]);');
 			file_put_contents(ROOT_PATH."/modules/testmodule/config.php",'<'.'?php Config::set("testmodule",["active"=>true,"topmenu"=>false,"path"=>"modules","hooks"=>["systestmodule","core_web"]]);');
+			// hooks file
+			$content='<'.'?php';
+			foreach ([
+			'testmodule_core_web_testhooks',
+			'testmodule_core_web_testhooks_ping',
+			'testmodule_core_web_testhooks_ping_testmodule',
+			'testmodule_core_web_testhooks_ping_testmodule_submodule',
+			'testmodule_core_web_testhooks_ping_testmodule_submodule_sleep',
+			'testmodule_core_web_testhooks_ping_testmodule_sleep',
+			] as $hookFunction) {
+				$content.=' function '.$hookFunction.'($w,$a) { throw Exception("dd"); echo ":::HOOK:::'.$hookFunction.':::"; }'."\n";
+			}
+			file_put_contents(ROOT_PATH."/system/modules/systestmodule/systestmodule.hooks.php",$content);
 			// partial in testmodule
 			@mkdir(ROOT_PATH."/modules/testmodule/mypartials");
 			@mkdir(ROOT_PATH."/modules/testmodule/mypartials/actions");
@@ -231,11 +239,37 @@
 			file_put_contents(ROOT_PATH."/modules/testmodule/mypartials/templates/testpartial.tpl.php",'<'.'?php '. 
 			'echo "testpartial:::".$partialvalue.":::";'
 			);
+			@mkdir(ROOT_PATH."/modules/testmodule/actions");
+			@mkdir(ROOT_PATH."/modules/testmodule/templates");
+			file_put_contents(ROOT_PATH."/modules/testmodule/actions/testaction.php",'<'.'?php '. 
+			'function testaction_ALL(Web $w) { $w->ctx("testactionvalue","thevalue");} ;'
+			);
+			file_put_contents(ROOT_PATH."/modules/testmodule/templates/testaction.tpl.php",'<'.'?php '. 
+			'echo "testaction:::".$testactionvalue.":::";'
+			);
 		}
-
-		function removeTestTemplateFiles() {
-			$this->rmdirRecursive(ROOT_PATH."/system/modules/systestmodule");
-			$this->rmdirRecursive(ROOT_PATH."/modules/testmodule");
+		/*****************************
+		 * Recursively delete a folder
+		 *****************************/
+		function helper_rmdirRecursive($dir) { 
+			if (is_dir($dir)) { 
+				$files = array_diff(scandir($dir), array('.','..')); 
+				foreach ($files as $file) { 
+					if (is_dir($dir.DIRECTORY_SEPARATOR.basename($file))) {
+						$this->helper_rmdirRecursive($dir.DIRECTORY_SEPARATOR.basename($file)) ;
+					} else { 
+						unlink($dir.DIRECTORY_SEPARATOR.basename($file)); 
+					}
+				} 
+				return rmdir($dir); 
+			}
+		}
+		/*****************************
+		 * Delete template files
+		 *****************************/
+		function helper_removeTestTemplateFiles() {
+			$this->helper_rmdirRecursive(ROOT_PATH."/system/modules/systestmodule");
+			$this->helper_rmdirRecursive(ROOT_PATH."/modules/testmodule");
 			foreach ([
 				'templates/testmodule/testtemplate',
 				'templates/testmodule/get',
@@ -259,7 +293,9 @@
 					}
 				}
 
-		}	
+		}		
+			
+
 		/*****************************************
 		 * TESTS 
 		 *****************************************/
@@ -594,14 +630,19 @@
 
 		// WORKING 	
 		function test_loadConfigurationFiles() {
-			$dbUser=Config::get('database.username');
+			$dbUser=\Config::get('database.username');
 			//function test_scanModuleDirForConfigurationFiles($dir = "") {}
 			// clear existing configuration
 			$cachefile = ROOT_PATH . "/cache/config.cache";
 			unlink($cachefile);
+			file_put_contents(ROOT_PATH .'/config.php',"\nConfig::set('testing.base','fred');\n",FILE_APPEND);
 			foreach (\Config::keys(true) as $key) {
 				\Config::set($key,NULL);
 			}
+			// write sample module outlines
+			file_put_contents(ROOT_PATH."/system/modules/systestmodule/config.php",'<'.'?php Config::set("systestmodule",["testing"=>"fred","active"=>true,"topmenu"=>false,"path"=>"system/modules","hooks"=>["systestmodule","core_web"]]);');
+			file_put_contents(ROOT_PATH."/modules/testmodule/config.php",'<'.'?php Config::set("testmodule",["testing"=>"fred","active"=>true,"topmenu"=>false,"path"=>"modules","hooks"=>["systestmodule","core_web"]]);');
+			
 			// now reload
 			self::$web->loadConfigurationFiles();
 			// and check
@@ -625,7 +666,6 @@
 		}
 
 		function test_validateCSRF() {
-			// disabled
 			global $_SESSION;
 			global $_POST;
 			\Config::set('system.csrf.enabled',false);
@@ -849,7 +889,6 @@
 			$this->assertNull(self::$web->templateExists(''));
 			
 			
-			$this->removeTestTemplateFiles();
 		}
 
 		
@@ -913,18 +952,7 @@
 			self::$web->_action='sleep';
 			self::$web->_requestMethod='ping';
 			self::$web->initDB();
-			$content='<'.'?php';
-			foreach ([
-			'testmodule_core_web_testhooks',
-			'testmodule_core_web_testhooks_ping',
-			'testmodule_core_web_testhooks_ping_testmodule',
-			'testmodule_core_web_testhooks_ping_testmodule_submodule',
-			'testmodule_core_web_testhooks_ping_testmodule_submodule_sleep',
-			'testmodule_core_web_testhooks_ping_testmodule_sleep',
-			] as $hookFunction) {
-				$content.=' function '.$hookFunction.'($w,$a) {echo ":::HOOK:::'.$hookFunction.':::"; }'."\n";
-			}
-			file_put_contents(ROOT_PATH."/system/modules/systestmodule/systestmodule.hooks.php",$content);
+			
 			$output=$this->captureOutput(self::$web,'_callWebHooks',['testhooks']);
 			self::$web->_submodule='';
 			$output.=$this->captureOutput(self::$web,'_callWebHooks',['testhooks']);
@@ -944,8 +972,31 @@
 		function test_cmp_weights() {}
 		function test_install() {}
 		
-		function test_start() {}
-
+		function test_start() {
+	//		return;
+			global $_SESSION;
+			$_SERVER['REQUEST_URI']='testmodule/testaction/3';
+			$_SERVER['REQUEST_METHOD']='SET';
+			$_SERVER['REMOTE_ADDR']='999.999.999.999';
+			$_SESSION['LAST_ALLOWED_URI']='HERE.COM';
+			$output=$this->captureOutput(self::$web,'start',[]);
+			codecept_debug($output);
+			//$this->assertEquals($output,'testaction:::thevalue:::');
+			$this->assertTrue(!empty(self::$web->_db));
+			$this->assertEquals(self::$web->_paths,['testmodule','testaction','3']);
+			$this->assertEquals(self::$web->_module,'testmodule');
+			$this->assertEquals(self::$web->_action,'testaction');
+			$this->assertEquals(self::$web->_submodule,'');
+			$this->assertEquals(self::$web->_requestMethod,'SET');
+			
+		}
+/*file_put_contents(ROOT_PATH."/modules/testmodule/actions/testaction.php",'<'.'?php '. 
+			'function testaction_ALL(Web $w,$params) { $w->ctx("testactionvalue","thevalue".$params["paramsvalue"]);} ;'
+			);
+			file_put_contents(ROOT_PATH."/modules/testmodule/templates/testaction.tpl.php",'<'.'?php '. 
+			'echo "testaction:::".$testactionvalue.":::";'
+			);
+*/
 			
 	}  // class
 }  // namespace

@@ -18,7 +18,9 @@ class TaskGroup extends DbObject {
     public $is_active;  // 0 / 1
     public $is_deleted;  // 0 / 1
     public $description;
-    public $default_assignee_id; // can be null
+    public $default_assignee_id; // can not be null
+    public $default_task_type;   // can be null
+    public $default_priority;    // can be null
     public $task_group_type; // php class name of concrete TaskGroupType implementation
     public $_modifiable;
     

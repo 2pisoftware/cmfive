@@ -26,7 +26,7 @@ class Task extends DbObject {
     public $is_deleted;  // is_deleted flag
     public $_modifiable;  // Modifiable Aspect
     public $_searchable;
-    public $_validation = array(
+    public static $_validation = array(
         "title" => array('required'),
         "task_group_id" => array('required'),
         "status" => array('required'),
@@ -351,12 +351,13 @@ class Task extends DbObject {
             $this->startTransaction();
 
             // 1. Call on_before_insert of the TaskGroupType
-			if ($this->isStatusClosed()) {
-				$this->is_closed = 1;
-			}
 			
             $tg = $this->getTaskGroup();
             if (!empty($tg)) {
+
+                if ($this->isStatusClosed()) {
+                        $this->is_closed = 1;
+                }
 
                 // if no assignee selected for newly created task, use task group default assignee
                 if (empty($this->assignee_id)) {
