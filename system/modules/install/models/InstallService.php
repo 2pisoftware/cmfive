@@ -56,7 +56,7 @@ class InstallService extends DbService {
 	 ********************************************************/
 	public static function writeConfig($config) {
 		// keep a copy of the original config file before generating
-//		copy('config.old.php','config.old.'.time().'.php');
+		copy('config.old.php','config.old.'.time().'.php');
 		copy('config.php','config.old.php');
 		$template_path = "system".DIRECTORY_SEPARATOR."modules".DIRECTORY_SEPARATOR."install".DIRECTORY_SEPARATOR."templates".DIRECTORY_SEPARATOR."config.install.tpl.php";
 		ob_start();
