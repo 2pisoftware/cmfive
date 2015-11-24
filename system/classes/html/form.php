@@ -46,7 +46,7 @@ class form {
         return $this;
     }
     
-    public function novalidate($novalivate) {
+    public function novalidate($novalidate) {
         if (!empty($novalidate)) {
             $this->novalidate = "novalidate";
         }

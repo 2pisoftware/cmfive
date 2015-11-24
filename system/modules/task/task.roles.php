@@ -9,6 +9,7 @@ function role_task_user_allowed(Web $w,$path) {
         $w->checkUrl($path, "task", null, "index") || 
         $w->checkUrl($path, "task", null, "tasklist") ||
         $w->checkUrl($path, "task", null, "edit") ||
+        $w->checkUrl($path, "task", null, "duplicatetask") ||
         $w->checkUrl($path, "task", null, "ajaxGetExtraDetails") ||
         $w->checkUrl($path, "task", null, "ajaxGetFieldForm") || 
         $w->checkUrl($path, "task", null, "addtime") || 

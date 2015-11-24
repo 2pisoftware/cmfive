@@ -75,8 +75,8 @@ function edit_GET($w) {
     	History::add("Task: {$task->title}");
     }
     $w->ctx("task", $task);
-    $w->ctx("form", Html::multiColForm($form, $w->localUrl("/task/edit/{$task->id}"), "POST", "Save", "edit_form"));
-    
+    $w->ctx("form", Html::multiColForm($form, $w->localUrl("/task/edit/{$task->id}"), "POST", "Save", "edit_form", null, null, "_self", true, Task::$_validation));
+   
     //////////////////////////
     // Build time log table //
     //////////////////////////

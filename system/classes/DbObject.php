@@ -1142,7 +1142,7 @@ class DbObject extends DbService {
                 return null;
         } else if (strpos($k, "s_") === 0) {
             if (!empty($v)) {
-                return AESencrypt($v, $this->__password);
+                return AESencrypt($v, Config::get('system.password_salt'));
             }
         }
         return $v;

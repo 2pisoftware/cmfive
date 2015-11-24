@@ -56,7 +56,7 @@ class InstallService extends DbService {
 	 ********************************************************/
 	public static function writeConfig($config) {
 		// keep a copy of the original config file before generating
-		copy('config.old.php','config.old.'.time().'.php');
+//		copy('config.old.php','config.old.'.time().'.php');
 		copy('config.php','config.old.php');
 		$template_path = "system".DIRECTORY_SEPARATOR."modules".DIRECTORY_SEPARATOR."install".DIRECTORY_SEPARATOR."templates".DIRECTORY_SEPARATOR."config.install.tpl.php";
 		ob_start();
@@ -71,7 +71,7 @@ class InstallService extends DbService {
 	/*********************************************************
 	 * Get a PDO connection
 	 ********************************************************/	
-	 public static function getConnection($port,$driver,$hostname,$username,$password,$database) {
+	 public static function getConnection($port = 3306,$driver = 'mysql',$hostname = 'localhost',$username,$password,$database) {
 		// Try and connect
 		$pdo;
 		try {
@@ -79,7 +79,7 @@ class InstallService extends DbService {
 			// TODO this requires admin db username/pass which is a security challenge
 			// perhaps dual configurable passwords or just use this feature for dev 
 			// and in production, precreate database and users with appropriate perms some other way
-			$pdo = new PDO("mysql:host=localhost", $username, $password);
+			$pdo = new PDO("$driver:host=$hostname", $username, $password);
 			$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 			$dbname = "`".str_replace("`","``",$database)."`";
