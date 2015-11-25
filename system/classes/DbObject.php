@@ -1067,7 +1067,7 @@ class DbObject extends DbService {
                         // Case insensitive field check against an array of predefined values
                         if (is_array($rule_array)) {
                             $this->$vr_key = filter_var($this->$vr_key, FILTER_SANITIZE_STRING);
-                            if (!in_array(ucfirst(strtolower($this->$vr_key)), $rule_array)) {
+                            if (!in_array($this->$vr_key, $rule_array)) {
                                 $response["invalid"]["$vr_key"][] = "Invalid value, allowed are " . implode(", ", $rule_array);
                             } else {
                                 $response["valid"][] = $vr_key;
