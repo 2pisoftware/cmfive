@@ -14,22 +14,34 @@ class FunctionsTest extends  \Codeception\TestCase\Test {
 	}
 	
 	
-	/*****************************************
-	 * TESTS
-	 *****************************************/
-	
 
 /*
+ *      /*****************************************
+	 * NOT TESTED
+	 *****************************************
 
-
+ * These functions have not been tested due to their not being used in both cmfive 
+ * and crm
 
 function getBetween($content, $start, $end) {  //This function is not used in cm5 or crm
 function is_associative_array($array) {  //This function is not used
 function paginate($array, $pageSize) { // not used
 function columnize($array, $noOfColumns) {   // not used
 function recursiveArraySearch($haystack, $needle, $index = null) { // not used
+function rotateImage($img, $rotation) {
+ * function getTimeSelect($start = 8, $end = 19) {
+ * function returncorrectdates(Web &$w, $dm_var, $from_date, $to_date) {
+ * function str_whitelist($dirty_data, $limit = 0) {
+ * function phone_whitelist($dirty_data) {
+ * function int_whitelist($dirty_data, $limit) {
 
 */
+        
+	/*****************************************
+	 * TESTS
+	 *****************************************/
+	
+
         
 function test_in_multiarray() {
         $test_string = "find_me";
@@ -145,9 +157,6 @@ function test_array_unique_multidimensional() {
 }
 
 function test_humanReadableBytes() {
-	codecept_debug(humanReadableBytes(null));
-	codecept_debug(humanReadableBytes(-5000));
-	codecept_debug(humanReadableBytes(5000,4));
 	// bytes value 1000
 	codecept_debug(humanReadableBytes(5000,4,false));
 	$this->assertEquals(humanReadableBytes(5000000000000000),'4547.47 TB');
@@ -201,6 +210,26 @@ function test_formatDateTime() {
     
 }
 
+
+function test_defaultVal() {
+    //$val, $default = null, $forceNull = false
+    $test_val = null;
+    $this->assertEquals(null, defaultVal($test_val));
+    
+    $test_val2 = 'val';
+    $this->assertEquals('val', defaultVal($test_val2));
+    
+    $test_default = 'default';
+    $this->assertEquals('default', defaultVal($test_val,$test_default));
+    $this->assertEquals('val', defaultVal($test_val2,$test_default));
+    
+}
+
+
+/*******************************************
+ * FAILED TESTS NEEDING BUG FIX
+ *******************************************/
+
 function test_isNumber() {
     //$var
     $test_var = 0;
@@ -229,43 +258,47 @@ function test_isNumber() {
     $this->assertEquals(false, isNumber($test_var12));
 }
 
-function test_defaultVal() {
-    //$val, $default = null, $forceNull = false
-    $test_val = null;
-    $this->assertEquals(null, defaultVal($test_val));
+
+function test_formatMoney() {
+    //$format, $number
+    $test_format = "%.2n";
+    $test_number = 0;
+    $this->assertEquals('$0.00', formatMoney($test_format, $test_number));
+    $test_number2 = '0';
+    $this->assertEquals('$0.00', formatMoney($test_format, $test_number2));
+    $test_number3 = 1;
+    $this->assertEquals('$1.00', formatMoney($test_format, $test_number3));
+    $test_number4 = 1111.11111;
+    $this->assertEquals('$1,111.11', formatMoney($test_format, $test_number4));
+    $test_number5 = -11.11;
+    $this->assertEquals('-$11.11', formatMoney($test_format, $test_number5));
+    $test_number6 = 'string';
+    $this->assertEquals('$0.00', formatMoney($test_format, $test_number6));
+    $test_number7 = '5555.5555';
+    $this->assertEquals('$5,555.56', formatMoney($test_format, $test_number7));
+    $test_format2 = "%!.2n";
+    $this->assertEquals('5,555.56', formatMoney($test_format2, $test_number7));
+    $test_format3 = "%n";
+    $this->assertEquals('$5,555.56',formatMoney($test_format3, $test_number7));
     
-    $test_val2 = 'val';
-    $this->assertEquals('val', defaultVal($test_val2));
-    
-    $test_default = 'default';
-    $this->assertEquals('default', defaultVal($test_val,$test_default));
-    $this->assertEquals('val', defaultVal($test_val2,$test_default));
     
 }
 
+function lookupForSelect() {
+    //&$w, $type
+    
+}
 
-/*******************************************
- * NOT TESTED
- *******************************************/
-/*
-
-
-function formatMoney($format, $number) {
-
-
-
-
-function rotateImage($img, $rotation) {
-
-function lookupForSelect(&$w, $type) {
-function getStateSelectArray() {
-function getTimeSelect($start = 8, $end = 19) {
-function returncorrectdates(Web &$w, $dm_var, $from_date, $to_date) {
-
-function str_whitelist($dirty_data, $limit = 0) {
-function phone_whitelist($dirty_data) {
-function int_whitelist($dirty_data, $limit) {
-*/
-
-
+function test_getStateSelectArray() {
+    $test_return = array(
+        array("ACT", "ACT"),
+        array("NSW", "NSW"),
+        array("NT", "NT"),
+        array("QLD", "QLD"),
+        array("SA", "SA"),
+        array("TAS", "TAS"),
+        array("VIC", "VIC"),
+        array("WA", "WA"));
+    $this->assertEquals($test_return, getStateSelectArray());
+}
 }

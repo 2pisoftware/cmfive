@@ -576,7 +576,8 @@ class Html {
                     if (!empty($validation[$name])) {
                         if (in_array("required", $validation[$name])) {
                             $required = "required";
-                        }
+                            $title .= ' <small>Required</small>';
+                        } 
                     }
 
                     $readonly = "";
@@ -927,7 +928,7 @@ class Html {
         $buf = "<ul class='pagination'>";
         if (isNumber($currentpage) && isNumber($numpages) && isNumber($pagesize) && isNumber($totalresults)) {
             // Check that we're within range
-            if ($currentpage > 0 and $currentpage <= $numpages and $numpages > 1) {
+            if ($currentpage > 0 && $currentpage <= $numpages && $numpages > 1) {
 
                 // Build pagination links
                 for ($page = 1; $page <= $numpages; $page++) {

@@ -12,8 +12,11 @@ function groupmember_GET(Web $w)
 
 	$select = [0 => [], 1 => []];
 	foreach ($users as $user) {
+            // We do not list ourselves as an option 
+            if ($user->id != $option["group_id"]) {
 		$name = $user->is_group == 1 ? strtoupper($user->login) : $user->getContact()->getFullName();
 		$select[!empty($user->is_group)][$name] = array($name, $user->id);
+            }
 	}
 	
 	ksort($select[0]);

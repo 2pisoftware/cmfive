@@ -58,6 +58,8 @@ CREATE TABLE IF NOT EXISTS `task_group` (
   `description` text COLLATE utf8_unicode_ci NOT NULL,
   `task_group_type` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `default_assignee_id` bigint(20) NOT NULL,
+  `default_task_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `default_priority` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
 

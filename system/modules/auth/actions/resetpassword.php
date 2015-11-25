@@ -49,8 +49,8 @@ function resetpassword_POST(Web $w) {
     $validData = false;
     if (!empty($user->id)) {
         // Check that the password reset hasn't expired
-        if (time() - strtotime($user->dt_password_reset_at) < 0) {
-            $w->msg("Your token has expired (max 24 hours), please submit for a new one", "/admin/forgotpassword");
+        if ((time() - $user->dt_password_reset_at) > 86400) {
+            $w->msg("Your token has expired (max 24 hours), please submit for a new one", "/auth/forgotpassword");
             return;
         }
 

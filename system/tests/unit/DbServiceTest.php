@@ -13,7 +13,7 @@ class DbServiceTest extends  \Codeception\TestCase\Test {
 	public function _before() {
 	}
 	
-	
+}	
 	/*****************************************
 	 * TESTS
 	 *****************************************/
@@ -41,4 +41,3 @@ class DbServiceTest extends  \Codeception\TestCase\Test {
     public function isActiveTransaction() {
     function lookupArray($type) {
 */
-}

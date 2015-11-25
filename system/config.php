@@ -54,4 +54,4 @@ Config::set('email.transports', array(
 	'sendmail' => 'SwiftMailerTransport'
 ));
 // for testing
-Config:set('testing.system','fred');
+Config::set('testing.system','fred');

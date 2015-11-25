@@ -25,6 +25,10 @@ function viewtaskgroup_GET(Web &$w) {
 	$arrassign = $w->Task->getTaskGroupPermissions();
 	// unset 'ALL' given all can never assign a task
 	unset($arrassign[0]);
+
+        // Get list of possible task types and priorities
+        $tasktypes = $w->Task->getTaskTypes($group_details->task_group_type);
+        $priorities = $w->Task->getTaskPriority($group_details->task_group_type);
 	
 	// build form displaying current attributes from database
 	$f = Html::form(array(
@@ -36,6 +40,8 @@ function viewtaskgroup_GET(Web &$w) {
 	array("Who Can Create","select","can_create",$group_details->can_create,$w->Task->getTaskGroupPermissions()),
 	array("Is Active","select", "is_active", $group_details->is_active,$is_active),
 	array("Description","textarea", "description",$group_details->description,"26","6"),
+        array("Default Task Type","select","default_task_type",$group_details->default_task_type,$tasktypes),
+        array("Default Priority","select","default_priority",$group_details->default_priority,$priorities),
 	array("Default Assignee","select", "default_assignee_id",$group_details->default_assignee_id,$w->Task->getMembersInGroup($p['id'])),
 	),$w->localUrl("/task-group/updatetaskgroup/".$group_details->id),"POST"," Update ");
 
@@ -54,7 +60,9 @@ function createtaskgroup_POST(Web &$w) {
         $w->request('can_view'),
         $w->request('can_create'),
         $w->request('is_active'),
-        $w->request('is_deleted')
+        $w->request('is_deleted'),
+        $w->request('default_task_type'),
+        $w->request('default_priority')
     );
 
     // return
@@ -69,7 +77,12 @@ function updatetaskgroup_POST(Web &$w) {
 	// if group exists, update the details
 	if ($group_details) {
 		$group_details->fill($_REQUEST);
-		$group_details->update();
+		$response = $group_details->update();
+
+                // Check the validation
+                if ($response !== true) {
+                    $w->errorMessage($group_details, "Taskgroup", $response, true, "/task-group/viewmembergroup/".$p['id']."#members");
+                }                
 
 		// if a default assignee is set, return their membership object for this group
 		if ($_REQUEST['default_assignee_id'] != "") {
@@ -315,5 +328,3 @@ function deletegroupmember_POST(Web &$w) {
 		$w->msg("Task Group Members no longer exists?","/task-group/viewmembergroup/".$tgid);
 	}
 }
-
-?>
