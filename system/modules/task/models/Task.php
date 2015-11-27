@@ -437,6 +437,8 @@ class Task extends DbObject {
     	
     	if ($this->isStatusClosed()) {
     		$this->is_closed = 1;
+    	} else {
+    		$this->is_closed = 0;
     	}
     	
         try {
