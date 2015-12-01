@@ -356,7 +356,9 @@ class Task extends DbObject {
             if (!empty($tg)) {
 
                 if ($this->isStatusClosed()) {
-                        $this->is_closed = 1;
+                    $this->is_closed = 1;
+                } else {
+                	$this->is_closed = 0;
                 }
 
                 // if no assignee selected for newly created task, use task group default assignee
@@ -435,6 +437,8 @@ class Task extends DbObject {
     	
     	if ($this->isStatusClosed()) {
     		$this->is_closed = 1;
+    	} else {
+    		$this->is_closed = 0;
     	}
     	
         try {

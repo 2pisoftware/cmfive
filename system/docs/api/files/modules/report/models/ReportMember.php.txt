@@ -8,7 +8,7 @@ class ReportMember extends DbObject {
 
 	public static $_db_table = "report_member";
 	// actual table name
-	public function getDbTableName() {
+	public function getDbTableName() {
 		return "report_member";
 	}
 }
