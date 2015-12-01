@@ -19,19 +19,35 @@ class DbService {
      * @var <type>
      */
     private static $_cache = array(); // used for single objects
-    private static $_cache2 = array();  // used for lists of objects
-	private static $_select_cache = array();
+    public static $_cache2 = array();  // used for lists of objects
+	public static $_select_cache = array();
 
     /**
      * This variable keeps track of active transactions
      *
      * @var boolean
      */
-    private static $_active_trx = false;
+    public static $_active_trx = false;
 
     public function __get($name) {
         return $this->w->$name;
     }
+    
+    public static function getCache() {
+		return self::$_cache;
+	}
+    public static function getCacheValue($class,$id) {
+		if (array_key_exists($class,self::$_cache) && array_key_exists($id,self::$_cache[$class]))  {
+			return self::$_cache[$class][$id];
+		}
+		return null;
+	}
+    public static function getCacheListValue($class,$key) {
+		if (array_key_exists($class,self::$_cache2) && array_key_exists($key,self::$_cache2[$class]))  {
+			return self::$_cache2[$class][$key];
+		}
+		return null;
+	}
 
     function __construct(Web $w) {
         $this->_db = $w->db;

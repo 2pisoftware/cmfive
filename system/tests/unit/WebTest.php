@@ -1,5 +1,6 @@
 <?php
 	namespace WebTest {
+	use AspectMock\Test as test;
 	use \Codeception\Util\Stub;
 	use \Config as Config;
 	/*
@@ -13,6 +14,8 @@
 		function test_dump() {}  - low priority function, hard to generate oracle case for output of $this
 		function test_sendFile() {} - cannot capture output from CLI
 		function test_CachedTemplate() {} - Unused
+		function test_install() {}  - 
+		
 		
 	NOT TESTED - DEPRECATED
 	 
@@ -41,9 +44,10 @@
 	*/
 
 	// disable header function
-	function header($a) {
-		echo("::HEADER::".$a);
-	}
+	//function header($a,$b) {
+	//	echo("::HEADER::".$a."::".$b);
+	//}
+
 			
 	/**************
 	 * Global to simplify registering as die function
@@ -62,7 +66,7 @@
 		protected static $web;
 
 		
-		private static function _stubWeb() {
+		public static function helper_stubWeb() {
 				//self::$web = new Web(); //Stub::construct('Web');;
 				$overrideFunctions=[];
 				$overrideFunctions['dump']='::DUMP::';
@@ -91,6 +95,9 @@
 				$overrideFunctions['sessionDestroy']=function() {
 					//codecept_debug('::SESSIONDESTROY::');
 				};
+				$overrideFunctions['reallySendHeader']=function($a) {
+					echo ('::HEADER::'.$a.':::');
+				};
 				$blankFunctions=[];
 				foreach ($blankFunctions as $functionName) {
 					$overrideFunctions[$functionName]='';
@@ -101,199 +108,48 @@
 				$web->_services['Auth']=Stub::make("AuthService",[
 					'login'=>'',
 					'allowed'=>function($path,$url) {
-						if (strpos($path,'admin')===0) {
+						if (strpos($path,'systestmodule/fail')===0) {
 							return false;
 						} else { 
-							return $url;
+							return $url ? $url : true;
 						}
 					},
 					'loggedIn'=>true,
 					'user'=>function() {
-						return Stub::make('User',[]);
+						$user=Stub::make('User',[]);
+						$user->id=1;
+						$user->is_admin=1;
+						return $user;
 					}
 				]);
 				return $web;
 		}
 		
 		public function _before() {
-			// before is called per test so check existence before creating
-			$this->createTestTemplateFiles();
-			self::$web=self::_stubWeb();
+			// renew sample modules for each test
+			require_once(getenv('thisTestRun_testRunnerPath').'/src/CmFiveTestModuleGenerator.php');
+			$gen=new \CmFiveTestModuleGenerator(getenv('thisTestRun_testIncludePath'));
+			$gen->createTestTemplateFiles();
+		
+			self::$web=self::helper_stubWeb();
 		}
 
 		public function _after() {
-			$this->helper_removeTestTemplateFiles();
 		}
 		
-		private function captureOutput($class,$functionToRun,$arguments=[]) {
+		function captureOutput($class,$functionToRun,$arguments=[]) {
 			$t = ob_get_clean(); // get current output buffer and stopping output buffering
 			ob_start(); // start output buffering
 			call_user_func_array(array($class,$functionToRun),$arguments);
+			//$class->$functionToRun($arguments);
 			$generated=ob_get_contents();
 			ob_end_clean();
 			ob_start(); // start output buffering
 			echo($t); // restore output bufferob_start();
-			echo($generated);
+			//echo($generated);
 			return $generated;
 		}
-		
-		/*****************************************
-		 * Return a list of files that cover all the permutations for templateExists
-		 ****************************************/	
-		function getTestTemplateFiles() {
-			$paths=[
-				'modules/testmodule/templates/submodule/testtemplate',
-				'modules/testmodule/templates/submodule/get',
-				'modules/testmodule/templates/submodule/edit',
-				'modules/testmodule/templates/submodule/submodule',
-				'modules/testmodule/templates/submodule/testmodule',
-				
-				'modules/testmodule/templates/testtemplate',
-				'modules/testmodule/templates/get',
-				'modules/testmodule/templates/edit',
-				'modules/testmodule/templates/submodule',
-				'modules/testmodule/templates/testmodule',
-				
-				'modules/testmodule/testtemplate',
-				'modules/testmodule/get',
-				'modules/testmodule/edit',
-				'modules/testmodule/submodule',
-				'modules/testmodule/testmodule',
-
-				'system/modules/systestmodule/templates/submodule/testtemplate',
-				'system/modules/systestmodule/templates/submodule/get',
-				'system/modules/systestmodule/templates/submodule/edit',
-				'system/modules/systestmodule/templates/submodule/submodule',
-				'system/modules/systestmodule/templates/submodule/testmodule',
-				
-				'system/modules/systestmodule/templates/testtemplate',
-				'system/modules/systestmodule/templates/get',
-				'system/modules/systestmodule/templates/edit',
-				'system/modules/systestmodule/templates/submodule',
-				'system/modules/systestmodule/templates/testmodule',
-				
-				'system/modules/systestmodule/testtemplate',
-				'system/modules/systestmodule/get',
-				'system/modules/systestmodule/edit',
-				'system/modules/systestmodule/submodule',
-				'system/modules/systestmodule/testmodule',
-
-				'templates/testmodule/testtemplate',
-				'templates/testmodule/get',
-				'templates/testmodule/edit',
-				'templates/testmodule/submodule',
-				'templates/testmodule/testmodule',
-
-				'templates/testtemplate',
-				'templates/get',
-				'templates/edit',
-				'templates/submodule',
-				'templates/testmodule',
-
-				'system/templates/testtemplate',
-				'system/templates/get',
-				'system/templates/edit',
-				'system/templates/submodule',
-				'system/templates/testmodule'
-			];
-			return $paths;
-		}	
-		
-		function createTestTemplateFiles() {
-			register_shutdown_function(
-				function($webTest) {
-					$webTest->helper_removeTestTemplateFiles();
-				}
-			,$this);
-			$paths=$this->getTestTemplateFiles();
-			foreach ($paths as $path) {
-				$file=ROOT_PATH."/".$path.".tpl.php";
-				if (!is_dir(dirname($file))) {
-					mkdir(dirname($file),0777,true);
-				}
-				file_put_contents($file,':::TEMPLATE:::'.$file."::");
-			}
-			// write module basics
-			file_put_contents(ROOT_PATH."/system/modules/systestmodule/config.php",'<'.'?php Config::set("systestmodule",["active"=>true,"topmenu"=>false,"path"=>"system/modules","hooks"=>["systestmodule","core_web"]]);');
-			file_put_contents(ROOT_PATH."/modules/testmodule/config.php",'<'.'?php Config::set("testmodule",["active"=>true,"topmenu"=>false,"path"=>"modules","hooks"=>["systestmodule","core_web"]]);');
-			// hooks file
-			$content='<'.'?php';
-			foreach ([
-			'testmodule_core_web_testhooks',
-			'testmodule_core_web_testhooks_ping',
-			'testmodule_core_web_testhooks_ping_testmodule',
-			'testmodule_core_web_testhooks_ping_testmodule_submodule',
-			'testmodule_core_web_testhooks_ping_testmodule_submodule_sleep',
-			'testmodule_core_web_testhooks_ping_testmodule_sleep',
-			] as $hookFunction) {
-				$content.=' function '.$hookFunction.'($w,$a) { throw Exception("dd"); echo ":::HOOK:::'.$hookFunction.':::"; }'."\n";
-			}
-			file_put_contents(ROOT_PATH."/system/modules/systestmodule/systestmodule.hooks.php",$content);
-			// partial in testmodule
-			@mkdir(ROOT_PATH."/modules/testmodule/mypartials");
-			@mkdir(ROOT_PATH."/modules/testmodule/mypartials/actions");
-			@mkdir(ROOT_PATH."/modules/testmodule/mypartials/templates");
-			file_put_contents(ROOT_PATH."/modules/testmodule/mypartials/actions/testpartial.php",'<'.'?php '. 
-			'function testpartial_ALL(Web $w,$params) { $w->ctx("partialvalue","thepartialvalue".$params["paramsvalue"]);} ;'
-			);
-			file_put_contents(ROOT_PATH."/modules/testmodule/mypartials/templates/testpartial.tpl.php",'<'.'?php '. 
-			'echo "testpartial:::".$partialvalue.":::";'
-			);
-			@mkdir(ROOT_PATH."/modules/testmodule/actions");
-			@mkdir(ROOT_PATH."/modules/testmodule/templates");
-			file_put_contents(ROOT_PATH."/modules/testmodule/actions/testaction.php",'<'.'?php '. 
-			'function testaction_ALL(Web $w) { $w->ctx("testactionvalue","thevalue");} ;'
-			);
-			file_put_contents(ROOT_PATH."/modules/testmodule/templates/testaction.tpl.php",'<'.'?php '. 
-			'echo "testaction:::".$testactionvalue.":::";'
-			);
-		}
-		/*****************************
-		 * Recursively delete a folder
-		 *****************************/
-		function helper_rmdirRecursive($dir) { 
-			if (is_dir($dir)) { 
-				$files = array_diff(scandir($dir), array('.','..')); 
-				foreach ($files as $file) { 
-					if (is_dir($dir.DIRECTORY_SEPARATOR.basename($file))) {
-						$this->helper_rmdirRecursive($dir.DIRECTORY_SEPARATOR.basename($file)) ;
-					} else { 
-						unlink($dir.DIRECTORY_SEPARATOR.basename($file)); 
-					}
-				} 
-				return rmdir($dir); 
-			}
-		}
-		/*****************************
-		 * Delete template files
-		 *****************************/
-		function helper_removeTestTemplateFiles() {
-			$this->helper_rmdirRecursive(ROOT_PATH."/system/modules/systestmodule");
-			$this->helper_rmdirRecursive(ROOT_PATH."/modules/testmodule");
-			foreach ([
-				'templates/testmodule/testtemplate',
-				'templates/testmodule/get',
-				'templates/testmodule/edit',
-				'templates/testmodule/submodule',
-				'templates/testmodule/testmodule',
-
-				'templates/testtemplate',
-				'templates/get',
-				'templates/edit',
-				'templates/submodule',
-				'templates/testmodule',
-
-				'system/templates/testtemplate',
-				'system/templates/get',
-				'system/templates/edit',
-				'system/templates/submodule',
-				'system/templates/testmodule'] as $toRemove) {
-					if (file_exists(ROOT_PATH.DIRECTORY_SEPARATOR.$toRemove.'.tpl.php')) {
-						unlink(ROOT_PATH.DIRECTORY_SEPARATOR.$toRemove.'.tpl.php');
-					}
-				}
-
-		}		
+	
 			
 
 		/*****************************************
@@ -371,7 +227,7 @@
 		/**
 		 * Testing Web->enqueueScript($script)
 		 */
-		public function testEnqueueAndOutputScript() {
+		function testEnqueueAndOutputScript() {
 		
 			self::$web->enqueueScript(array("name" => "modernizr.js", "uri" => "/system/templates/js/modernizr.js", "weight" => 10));
 			
@@ -399,7 +255,7 @@
 		/**
 		 * Testing Web->enqueueStyle($style)
 		 */
-		public function testEnqueueAndOutputStyle() {
+		private  function testEnqueueAndOutputStyle() {
 			self::$web->enqueueStyle(array("name" => "style.css", "uri" => "/system/style.css", "weight" => 10));
 			
 			// Test one script
@@ -496,9 +352,9 @@
 		
 		function test_getModuleDir() {
 			// system
-			$this->assertEquals(self::$web->getModuleDir('task'),'system/modules/task/');
+			$this->assertEquals(self::$web->getModuleDir('systestmodule'),'system/modules/systestmodule/');
 			// non system
-			$this->assertEquals(self::$web->getModuleDir('example'),'modules/example/');
+			$this->assertEquals(self::$web->getModuleDir('testmodule'),'modules/testmodule/');
 		}
 		
 		
@@ -516,8 +372,8 @@
 		}
 		
 		function test_moduleUrl() {
-			$this->assertEquals($this->stripDomainFromUrl(self::$web->moduleUrl('task')),'system/modules/task/');
-			$this->assertEquals($this->stripDomainFromUrl(self::$web->moduleUrl('example')),'modules/example/');
+			$this->assertEquals($this->stripDomainFromUrl(self::$web->moduleUrl('systestmodule')),'system/modules/systestmodule/');
+			$this->assertEquals($this->stripDomainFromUrl(self::$web->moduleUrl('testmodule')),'modules/testmodule/');
 			
 		}
 		
@@ -585,24 +441,23 @@
 		function test_localUrl() {
 			$webRoot=self::$web->webroot();
 			// with and without leading slash
-			$this->assertEquals(self::$web->localUrl('tasks/edit/1'),$webRoot.'/tasks/edit/1');
-			$this->assertEquals(self::$web->localUrl('/tasks/edit/1'),$webRoot.'/tasks/edit/1');
+			$this->assertEquals(self::$web->localUrl('testmodule/testaction/1'),$webRoot.'/testmodule/testaction/1');
+			$this->assertEquals(self::$web->localUrl('/testmodule/testaction/1'),$webRoot.'/testmodule/testaction/1');
 		}   
 		
 		function test_internalLink() {
 			// generate link
-			$this->assertEquals(self::$web->internalLink('Title','task','delete'),"<a href='http://localhost/task/delete'>Title</a>");
-			// no access
-			$this->assertNull(self::$web->internalLink('Title','admin','edit'));
+			$this->assertEquals(self::$web->internalLink('Title','testmodule','testaction'),"<a href='http://localhost/testmodule/testaction'>Title</a>");
 		}
 		
 		
 		function test_menuLink() {
 			$links=[];
 			// not allowed empty
-			$this->assertFalse(self::$web->menuLink('admin/users/2','Admin User 2',$links));
-			$expect="<a href='http://localhost/task/edit/2' >Edit Task 2</a>";
-			$this->assertEquals(self::$web->menuLink('task/edit/2','Edit Task 2',$links),$expect);
+			$this->assertFalse(self::$web->menuLink('systestmodule/fail/2','Admin User 2',$links));
+			$expect="<a href='http://localhost/testmodule/testaction/2' >Test action 2</a>";
+			$this->assertEquals(self::$web->menuLink('testmodule/testaction/2','Test action 2',$links),$expect);
+			
 			// check links array
 			$this->assertEquals($links,[0=>'',1=>$expect]);
 		}
@@ -610,10 +465,9 @@
 		function test_menuButton() {
 			$links=[];
 			// not allowed empty
-			$this->assertFalse(self::$web->menuButton('admin/users/2','Admin User 2',$links));
-			$expect="<button class=\"button tiny \" onclick=\"parent.location='http://localhost/task/edit/2'; return false;\" >Edit Task 2</button>";
-			//codecept_debug(self::$web->menuButton('task/edit/2','Edit Task 2'));
-			$this->assertEquals(self::$web->menuButton('task/edit/2','Edit Task 2',$links),$expect);
+			$this->assertFalse(self::$web->menuButton('systestmodule/fail/2','Admin User 2',$links));
+			$expect="<button class=\"button tiny \" onclick=\"parent.location='http://localhost/testmodule/testaction/2'; return false;\" >Edit Task 2</button>";
+			$this->assertEquals(self::$web->menuButton('testmodule/testaction/2','Edit Task 2',$links),$expect);
 			// check links array
 			$this->assertEquals($links,[0=>'',1=>$expect]);
 		} 
@@ -621,9 +475,9 @@
 		function test_menuBox() {
 			$links=[];
 			// not allowed empty
-			$this->assertFalse(self::$web->menuBox('admin/users/2','Admin User 2',$links));
-			$expect="<a onclick=\"modal_history.push(&quot;http://localhost/task/edit/2?isbox=1&quot;); $(&quot;#cmfive-modal&quot;).foundation(&quot;reveal&quot;, &quot;open&quot;, &quot;http://localhost/task/edit/2?isbox=1&quot;);return false;\">Edit Task 2</a>";
-			$this->assertEquals(self::$web->menuBox('task/edit/2','Edit Task 2',$links),$expect);
+			$this->assertFalse(self::$web->menuBox('systestmodule/fail/2','Admin User 2',$links));
+			$expect="<a onclick=\"modal_history.push(&quot;http://localhost/testmodule/testaction/2?isbox=1&quot;); $(&quot;#cmfive-modal&quot;).foundation(&quot;reveal&quot;, &quot;open&quot;, &quot;http://localhost/testmodule/testaction/2?isbox=1&quot;);return false;\">Test action 2</a>";
+			$this->assertEquals(self::$web->menuBox('testmodule/testaction/2','Test action 2',$links),$expect);
 			// check links array
 			$this->assertEquals($links,[0=>'',1=>$expect]);
 		} 
@@ -640,8 +494,8 @@
 				\Config::set($key,NULL);
 			}
 			// write sample module outlines
-			file_put_contents(ROOT_PATH."/system/modules/systestmodule/config.php",'<'.'?php Config::set("systestmodule",["testing"=>"fred","active"=>true,"topmenu"=>false,"path"=>"system/modules","hooks"=>["systestmodule","core_web"]]);');
-			file_put_contents(ROOT_PATH."/modules/testmodule/config.php",'<'.'?php Config::set("testmodule",["testing"=>"fred","active"=>true,"topmenu"=>false,"path"=>"modules","hooks"=>["systestmodule","core_web"]]);');
+			//file_put_contents(ROOT_PATH."/system/modules/systestmodule/config.php",'<'.'?php Config::set("systestmodule",["testing"=>"fred","active"=>true,"topmenu"=>false,"path"=>"system/modules","hooks"=>["systestmodule","core_web"]]);');
+			//file_put_contents(ROOT_PATH."/modules/testmodule/config.php",'<'.'?php Config::set("testmodule",["testing"=>"fred","active"=>true,"topmenu"=>false,"path"=>"modules","hooks"=>["systestmodule","core_web"]]);');
 			
 			// now reload
 			self::$web->loadConfigurationFiles();
@@ -733,7 +587,7 @@
 
 			
 		function test_templateExists() {
-			$this->createTestTemplateFiles();
+			//unitHelper_createTestTemplateFiles();
 			self::$web->_module='testmodule';
 			self::$web->_submodule='';
 			self::$web->_action='';
@@ -933,9 +787,6 @@
 
 		// stubs ?? WITH STUB::once,exactly
 		function test_callHook() {
-			// write hooks file
-			file_put_contents(ROOT_PATH."/system/modules/systestmodule/systestmodule.hooks.php",'<'.'?php function systestmodule_systestmodule_dostuff($w,$a) {echo ":::".$w->_module.":::".$a.":::stuff done";}');
-			
 			ob_start();
 			// check that self::$web is available inside hook function
 			self::$web->_module='notamodule';
@@ -946,6 +797,7 @@
 			$this->assertEquals($content,":::notamodule:::fred:::stuff done");
 			
 		}
+
 		function test_callWebHooks() {
 			self::$web->_module='testmodule';
 			self::$web->_submodule='submodule';
@@ -969,34 +821,101 @@
 			$this->assertEquals($buffer,self::$web->_buffer);
 		}
 
-		function test_cmp_weights() {}
-		function test_install() {}
+		function test_cmp_weights() {
+			$this->assertEquals(self::$web->cmp_weights(['weight'=>5],['weight'=>5]),0);
+			$this->assertEquals(self::$web->cmp_weights(['weight'=>4],['weight'=>5]),1);
+			$this->assertEquals(self::$web->cmp_weights(['weight'=>4],['weight'=>3]),-1);
+		}
+		
+		function test_install() {
+			global $_SERVER;
+			$_SERVER['REQUEST_URI']='notinstall/me';
+			$output=$this->captureOutput(self::$web,'install',[]);
+			//codecept_debug($output);
+			$this->assertEquals($output,'::REDIRECT::/install-steps/details');
+		}
+		
 		
 		function test_start() {
-	//		return;
+			//$function=test::func('WebTest','header',function($a) {
+			//	echo "SHOWHEADER:::".$a;
+			//});
+			global $_SERVER;
 			global $_SESSION;
+			
+			// setup
 			$_SERVER['REQUEST_URI']='testmodule/testaction/3';
 			$_SERVER['REQUEST_METHOD']='SET';
 			$_SERVER['REMOTE_ADDR']='999.999.999.999';
 			$_SESSION['LAST_ALLOWED_URI']='HERE.COM';
+			unset($_SERVER['HTTP_X_REQUESTED_WITH']);
+			self::$web=$this->helper_stubWeb();
+			self::$web->_layout='minilayout';
+			self::$web->_headers['myheader']='myheadervalue';
+			
+			// inactive module
+			//Config::set('testmodule.active',false);
+			//$_SERVER['REQUEST_URI']='testmodule/testaction/3';
+			//$output=$this->captureOutput(self::$web,'start',[]);
+			//$this->assertTrue(strpos($output,'::ERROR::The testmodule module is not active')===0);
+			
+			//// now activate
+			//Config::set('testmodule.active',true);
+			//// test module with full action and rendering traversal
+			//$_SERVER['REQUEST_URI']='testmodule/testaction/3';
+			//$_SERVER['REQUEST_URI']='testmodule/testaction/3';
+			//self::$web=$this->helper_stubWeb();
+			//self::$web->_layout='minilayout';
+			//self::$web->_headers['myheader']='myheadervalue';
 			$output=$this->captureOutput(self::$web,'start',[]);
-			codecept_debug($output);
-			//$this->assertEquals($output,'testaction:::thevalue:::');
-			$this->assertTrue(!empty(self::$web->_db));
-			$this->assertEquals(self::$web->_paths,['testmodule','testaction','3']);
+			//codecept_debug($output);
+			$this->assertEquals($output,'::HEADER::myheader: myheadervalue:::MINILAYOUT||testaction:::thevalue:::||');
+			//$this->assertTrue(!empty(self::$web->_db));
+			//$this->assertEquals(self::$web->_paths,['testmodule','testaction','3']);
 			$this->assertEquals(self::$web->_module,'testmodule');
 			$this->assertEquals(self::$web->_action,'testaction');
 			$this->assertEquals(self::$web->_submodule,'');
 			$this->assertEquals(self::$web->_requestMethod,'SET');
 			
+			$_SERVER['REQUEST_METHOD']='GET';
+			// no access case
+			$_SERVER['REQUEST_URI']='systestmodule/fail/3';
+			self::$web=$this->helper_stubWeb();
+			self::$web->_layout='minilayout';
+			self::$web->_headers['myheader']='myheadervalue';
+			$output=$this->captureOutput(self::$web,'start',[]);
+			$this->assertEquals(self::$web->_module,'systestmodule');
+			$this->assertEquals(self::$web->_action,'fail');
+			$this->assertEquals(self::$web->_submodule,'');
+			$this->assertEquals(self::$web->_requestMethod,'GET');
+			$this->assertTrue(strpos($output,'::ERROR::Access Restricted::')===0) ; // at the start of the output
+			
+			// no action file
+			$_SERVER['REQUEST_URI']='testmodule/missinglookup/3';
+			self::$web=$this->helper_stubWeb();
+			self::$web->_layout='minilayout';
+			self::$web->_headers['myheader']='myheadervalue';
+			$output=$this->captureOutput(self::$web,'start',[]);
+			$this->assertEquals($output,'::NOTFOUNDPAGE::::NOTFOUNDPAGE::'); // not found is called twice because not found stub doesn't die()
+			
+			// default handler and action
+			$_SERVER['REQUEST_URI']='/';
+			self::$web=$this->helper_stubWeb();
+			self::$web->_defaultHandler='testmodule';
+			self::$web->_defaultAction='testaction';
+			$output=$this->captureOutput(self::$web,'start',[]);
+			$this->assertEquals(self::$web->_module,'testmodule');
+			$this->assertEquals(self::$web->_action,'testaction');
+			
+			
+			// csrf
+			//Config::set('system.csrf.enabled',true);
+			//Config::set('system.csrf.protected.testmodule',true);
+			
+			
+			
+			
 		}
-/*file_put_contents(ROOT_PATH."/modules/testmodule/actions/testaction.php",'<'.'?php '. 
-			'function testaction_ALL(Web $w,$params) { $w->ctx("testactionvalue","thevalue".$params["paramsvalue"]);} ;'
-			);
-			file_put_contents(ROOT_PATH."/modules/testmodule/templates/testaction.tpl.php",'<'.'?php '. 
-			'echo "testaction:::".$testactionvalue.":::";'
-			);
-*/
 			
 	}  // class
 }  // namespace

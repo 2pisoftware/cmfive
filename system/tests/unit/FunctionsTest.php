@@ -158,7 +158,6 @@ function test_array_unique_multidimensional() {
 
 function test_humanReadableBytes() {
 	// bytes value 1000
-	codecept_debug(humanReadableBytes(5000,4,false));
 	$this->assertEquals(humanReadableBytes(5000000000000000),'4547.47 TB');
 	$this->assertEquals(humanReadableBytes(5000000000000),'4.55 TB');
 	$this->assertEquals(humanReadableBytes(5000000000),'4.66 GB');
