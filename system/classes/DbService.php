@@ -114,6 +114,8 @@ class DbService {
         if (!$idOrWhere || !$class)
             return null;
 
+		if ($order_by !== null) $use_cache=false;
+
         $key = $idOrWhere;
         if (is_array($idOrWhere)) {
             $key = "";
@@ -208,6 +210,11 @@ class DbService {
     function getObjects($class, $where = null, $cache_list = false, $use_cache = true, $order_by = null, $offset = null, $limit = null) {
         if (!$class)
             return null;
+		
+		if ($order_by !== null || $offset !== null || $limit !== null ) {
+			$use_cache=false;
+			$cache_list=false;
+		}
 
         // if using the list cache
         if ($cache_list) {
