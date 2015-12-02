@@ -256,7 +256,7 @@ class DbService {
         }
 		
 		// Offset
-		if (!empty($offset)) {
+		if (!empty($offset) && !empty($limit)) {
 			$this->_db->offset($offset);
 		}
 		
