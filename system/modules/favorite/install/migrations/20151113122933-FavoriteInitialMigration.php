@@ -8,19 +8,21 @@ class FavoriteInitialMigration extends CmfiveMigration {
                ->setType('biginteger')
                ->setIdentity(true);
 
-		$this->table('favourite', [
-            'id'          => false,
-            'primary_key' => 'id'
-		])->addColumn($column)
-			->addColumn('object_class', 'string', ['limit' => 255])
-			->addColumn('object_id', 'biginteger')
-			->addColumn('user_id', 'biginteger')
-			->addCmfiveParameters()
-			->create();
+		if (!$this->hasTable('favourite')) {
+			$this->table('favourite', [
+				'id'          => false,
+				'primary_key' => 'id'
+			])->addColumn($column)
+				->addColumn('object_class', 'string', ['limit' => 255])
+				->addColumn('object_id', 'biginteger')
+				->addColumn('user_id', 'biginteger')
+				->addCmfiveParameters()
+				->create();
+		}
 	}
 
 	public function down() {
-		$this->dropTable('favourite');
+		$this->hasTable('favourite') ? $this->dropTable('favourite') : null;
 	}
 
 }

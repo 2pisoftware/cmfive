@@ -10,6 +10,24 @@ class MigrationService extends DbService {
 	public static $_installed = []; 
 	
 	public function getAvailableMigrations($module_name) {
+		$_this = $this;
+		set_error_handler(function($errno, $errstr) use ($_this) {
+			if (!(error_reporting() & $errno)) {
+				return;
+			}
+			
+			if ($errno === E_USER_ERROR) {
+				// Check if error contains a db error message
+				if (strpos($errstr, "does not exist in the database") !== FALSE) {
+					// Run the admin migrations to install the migration table (the normal cause of this error)
+					$_this->installInitialMigration();
+					
+					// Reload the page
+					$_this->w->redirect($_SERVER["REQUEST_URI"]);
+				}
+			}
+		});
+		
 		$availableMigrations = [];
 		
 		// Read all modules directories for any migrations that need to run
@@ -20,6 +38,8 @@ class MigrationService extends DbService {
 		} else {
 			$availableMigrations = $this->getMigrationsForModule($module_name);
 		}
+		
+		// restore_error_handler();
 		
 		return $availableMigrations;
 	}
@@ -133,7 +153,7 @@ MIGRATION;
 		return "Migration created";
 	}
 	
-	public function runMigrations($module, $filename) {
+	public function runMigrations($module, $filename = null) {
 		$alreadyRunMigrations = $this->getInstalledMigrations($module);
 		$availableMigrations = $this->getAvailableMigrations($module);
 		
@@ -314,6 +334,44 @@ MIGRATION;
 				$this->w->db->rollbackTransaction();
 			}
 		}
+	}
+	
+	private function installInitialMigration() {
+		$migration = "AdminInitialMigration";
+		$filename = "20151030134124-AdminInitialMigration.php";
+		$directory = SYSTEM_MODULE_DIRECTORY . DS . "admin" . DS . MIGRATION_DIRECTORY;
+		
+		$mysql_adapter = new \Phinx\Db\Adapter\MysqlAdapter([
+			'connection' => $this->w->db,
+			'name' => Config::get('database.database')
+		]);
+
+		if (file_exists(ROOT_PATH . DS . $directory . DS . $filename)) {
+			include_once ROOT_PATH . DS . $directory . DS . $filename;
+
+			// Class name must match filename after timestamp and hyphen 
+			if (class_exists($migration)) {
+				$this->w->Log->setLogger("MIGRATION")->info("Running migration: " . $migration);
+
+				// Run migration UP
+				$migration_class = new $migration(1);
+				$migration_class->setAdapter($mysql_adapter);
+				$migration_class->up();
+
+				// Insert migration record into DB
+				$migration_object = new Migration($this->w);
+				$migration_object->path = $directory . DS . $filename;
+				$migration_object->classname = $migration;
+				$migration_object->module = "admin";
+				$migration_object->insert();
+
+				$this->w->Log->setLogger("MIGRATION")->info("Initial migration has run");
+				
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 }
