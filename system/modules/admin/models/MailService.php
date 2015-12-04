@@ -3,6 +3,7 @@
 class MailService extends DbService {
 	
 	private $transport;
+	private $mailer;
 	private static $logger = 'MAIL';
         
 	public function __construct(Web $w) {
@@ -31,8 +32,10 @@ class MailService extends DbService {
 					return;
 				}
 
-				$mailer = Swift_Mailer::newInstance($this->transport);
-
+				if (empty($this->mailer)) {
+					$this->mailer = Swift_Mailer::newInstance($this->transport);
+				}
+				
 				// To, cc, bcc need to be given as arrays when sending to more than one person
 				// Ie you separate them by a comma, this will split them into arrays as expected by Swift
 				if (strpos($to, ",") !== FALSE) {
@@ -71,11 +74,13 @@ class MailService extends DbService {
 					}
 				}
 
-				$this->w->Log->setLogger(MailService::$logger)->info("Sending email to {$to} from {$replyto} with {$subject} (" . count($attachments) . " attachments");
-				$mailer_status = $mailer->send($message, $failures);
+				$this->w->Log->setLogger(MailService::$logger)->info("Sending email to {$to} from {$replyto} with {$subject} (" . count($attachments) . " attachments)");
+				$mailer_status = $this->mailer->send($message, $failures);
 				if (!empty($failures)) {
 					$this->w->Log->setLogger(MailService::$logger)->error("Failed to send email: " . serialize($failures));
+					return 1;
 				}
+				return 0;
 			} catch (Exception $e) {
 				$this->w->Log->setLogger(MailService::$logger)->error("Failed to send email: " . $e);
 			}
