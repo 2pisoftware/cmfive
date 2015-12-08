@@ -803,7 +803,7 @@ class DbObject extends DbService {
     }
 
     function _tn() {
-        return $this->getTableName();
+        return $this->getDbTableName();
     }
 
     function _cn($attr) {

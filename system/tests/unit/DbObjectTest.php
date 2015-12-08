@@ -18,6 +18,21 @@ class DbObjectTest extends  \Codeception\TestCase\Test {
 		self::$dbService = new DbService(self::$web);
 	}
 	
+	function captureOutput($class,$functionToRun,$arguments=[]) {
+		$t = ob_get_clean(); // get current output buffer and stopping output buffering
+		ob_start(); // start output buffering
+		call_user_func_array(array($class,$functionToRun),$arguments);
+		//$class->$functionToRun($arguments);
+		$generated=ob_get_contents();
+		ob_end_clean();
+		ob_start(); // start output buffering
+		echo($t); // restore output bufferob_start();
+		//echo($generated);
+		return $generated;
+	}
+
+	
+	
 	/*****************************************
 	 * TESTS
 	 *****************************************/
@@ -167,11 +182,83 @@ class DbObjectTest extends  \Codeception\TestCase\Test {
 		$data->id='99';
 		$data->title='thetitle';
 		$data->data='thedata';
-		codecept_debug($data->getIndexContent());
+		//codecept_debug($data->getIndexContent());
 		$this->assertEquals($data->getIndexContent(),'thetitle thedata interestingly thern testmoduledata::99');
 		// TODO IMPLEMENT HOOKS AND TRY THE $ignoreAdditional parameter
 	} //$ignoreAdditional = true) {
     
+	function test_validate() {
+		TestmoduleData::$_validation = [
+			"title" => array('required'),
+			"data" => array('required','number'),
+			"notafield" => array('required'),
+		];
+		$data= new TestmoduleData(self::$web);
+		$data->title='thetitle';
+		$data->data='99';
+		$validationResult=$data->validate();
+		$this->assertEquals($validationResult['success'],true);
+		$this->assertEquals($validationResult['valid'],['title','data','data']);
+		$this->assertEquals($validationResult['invalid'],[]);
+		//codecept_debug();
+		$data->data='the stuff';
+		$validationResult=$data->validate();
+		$this->assertEquals($validationResult['success'],false);
+		$this->assertEquals($validationResult['valid'],['title','data']);
+		$this->assertEquals($validationResult['invalid'],['data'=>['Invalid Number']]);
+		//codecept_debug($data->validate());
+		$data->data='99';
+		$data->title='';
+		$validationResult=$data->validate();
+		$this->assertEquals($validationResult['success'],false);
+		$this->assertEquals($validationResult['valid'],['data','data']);
+		$this->assertEquals($validationResult['invalid'],['title'=>['Required Field']]);
+		//codecept_debug($data->validate());
+	}
+	
+	function test_getSelectOptions() {
+		$data= new TestmoduleData(self::$web);
+		// no options
+		$this->assertEquals($data->getSelectOptions('title'),[]);
+		// array of strings
+		TestmoduleData::$_title_ui_select_strings = array("option1","option2");
+		$this->assertEquals($data->getSelectOptions('title'),['option1','option2']);
+		
+		// lookup db table
+		$data= new TestmoduleFoodHasName(self::$web);
+		//codecept_debug('C:'.count($data->getSelectOptions('title')));
+		$this->guy->haveInDatabase('lookup',['id'=>'1001','type'=>'testtype','code'=>'WHATMYNAME','title'=>'what is my name']);
+		$this->guy->haveInDatabase('lookup',['id'=>'1002','type'=>'testtype','code'=>'WHEREMYNAME','title'=>'where is my name']);
+		$this->guy->haveInDatabase('lookup',['id'=>'1003','type'=>'nottesttype','code'=>'WHEREELSEMYNAME','title'=>'where else is my name']);		
+		TestmoduleFoodHasName::$_title_ui_select_lookup_code = "testtype"; 
+		$options=$data->getSelectOptions('title');
+		$this->assertEquals(count($options),2);
+		$this->assertEquals($options[0]->code,'WHATMYNAME');
+		$this->assertEquals($options[1]->code,'WHEREMYNAME');
+		
+		// objects lookup
+		$data= new TestmoduleFoodHasTitle(self::$web);
+		//codecept_debug('C:'.count($data->getSelectOptions('title')));
+		$this->guy->haveInDatabase('testmodule_data',['id'=>'1001','data'=>'testtype','title'=>'what is my name']);
+		$this->guy->haveInDatabase('testmodule_data',['id'=>'1002','data'=>'testtype','title'=>'where is my name']);
+		$this->guy->haveInDatabase('testmodule_data',['id'=>'1003','data'=>'nottesttype','title'=>'where else is my name']);		
+		TestmoduleFoodHasTitle::$_title_ui_select_objects_class = "TestmoduleData"; //"Contact";
+		TestmoduleFoodHasTitle::$_title_ui_select_objects_filter = ['data'=>'testtype']; //array("is_deleted"=>0);
+	
+		$options=$data->getSelectOptions('title');
+		$this->assertEquals(count($options),2);
+		$this->assertEquals($options[0]->title,'what is my name');
+		$this->assertEquals($options[1]->title,'where is my name');
+		
+		
+		
+		//codecept_debug($data->getSelectOptions('title'));
+		//TestmoduleData::$_title_ui_select_objects_class = ""; //"Contact";
+		//TestmoduleData::$_title_ui_select_objects_filter = []; //array("is_deleted"=>0);
+	
+	} //$field) {
+
+
     
 	function test_dateTimeConversions() {
 		//function getDate($var, $format = 'd/m/Y') {
@@ -180,26 +267,139 @@ class DbObjectTest extends  \Codeception\TestCase\Test {
 		//function setTime($var, $date) {
 		//function setDate($var, $date) {
 		//function setDateTime($var, $date) {
-	}
-   
-	
-	function test_validate() {
+		
+		$data= new TestmoduleData(self::$web);
+		$data->d_last_known=99999999;
+		// get
+		$this->assertEquals($data->getDate('d_last_known'),$data->time2D(99999999,'d/m/Y'));
+		$this->assertEquals($data->getDateTime('d_last_known'),$data->time2Dt(99999999,'d/m/Y H:i'));
+		$this->assertEquals($data->getTime('d_last_known'),$data->time2T(99999999,null));
+		// set
+		$data->setTime('d_last_known',99999999);
+		$this->assertEquals($data->d_last_known,$data->t2Time(99999999));
+		$data->setDate('d_last_known','12/02/2013');
+		$this->assertEquals($data->d_last_known,$data->d2Time('12/02/2013'));
+		$data->setDateTime('d_last_known','12/02/2013 12:00pm');
+		$this->assertEquals($data->d_last_known,$data->dt2Time('12/02/2013 12:00pm'));
 		
 	}
+   
+	function test_insertOrUpdate() {
+		$object=Stub::construct('TestmoduleData',['web'=>&self::$web],['update'=>function($a,$b) {echo "::UPDATE::".$a.'::'.$b.'::'; },'insert'=>function($a) {echo "::INSERT::".$a.'::'; }]);
+		$out=$this->captureOutput($object,'insertOrUpdate',[]);
+		$this->assertEquals($out,'::INSERT::1::');
+		$out=$this->captureOutput($object,'insertOrUpdate',["1","0"]);
+		$this->assertEquals($out,'::INSERT::0::');
+		$object->id=5;
+		$out=$this->captureOutput($object,'insertOrUpdate',[]);
+		$this->assertEquals($out,'::UPDATE::::1::');
+		$out=$this->captureOutput($object,'insertOrUpdate',["1","0"]);
+		$this->assertEquals($out,'::UPDATE::1::0::');
+	} //$force_null_values = false, $force_validation = true) {
+
+    function test_insertUpdateDelete() {
+		//function insert()
+		//function update($force_null_values = false, $force_validation = true) {
+		//function delete($force = false) {
+		self::$web->_module='testmodule';
+			
+		// override Auth service with stub
+		self::$web->_services['Auth']=Stub::make("AuthService",[
+			'login'=>'',
+			'loggedIn'=>true,
+			'user'=>function() {
+				$user=Stub::make('User',[]);
+				$user->id=1;
+				return $user;
+			}
+		]);
+		$object=new TestmoduleData(self::$web);
+		$object->setPassword('fredfredfredfred');
+		
+		// check INSERT
+		$object->fill(['title'=>'thetitle','data'=>'thedata','d_last_known'=>'17/03/2009','t_killed'=>'999999999','dt_born'=>'21/03/2009 7:00pm','s_data'=>'thesecret']);
+		$output=$this->captureOutput($object,'insert',[]);
+		//codecept_debug("::OUT::".$output."::");
+		$this->assertEquals($output,':::DBHOOK:::testmodule_core_dbobject_before_insert::::::DBHOOK:::testmodule_core_dbobject_before_insert_TestmoduleData::::::DBHOOK:::testmodule_core_dbobject_before_insert::::::DBHOOK:::testmodule_core_dbobject_after_insert::::::DBHOOK:::testmodule_core_dbobject_after_insert::::::DBHOOK:::testmodule_core_dbobject_after_insert_TestmoduleData::::::DBHOOK:::testmodule_core_dbobject_indexChange_TestmoduleData:::');
+		  
+		
+		
+		// check defaults
+		$this->assertNotNull($object->dt_created);
+		//codecept_debug([$object->dt_modified, $object->dt_created,$object->dt_modified - $object->dt_created]);
+		// 2 second window between setting modified and created
+		$this->assertTrue($object->dt_modified - $object->dt_created <2 && $object->dt_modified - $object->dt_created>=0);
+		$this->assertEquals($object->creator_id,'1');
+		$this->assertEquals($object->modifier_id,'1');
+		// check db 
+		$this->assertTrue($object->id > 0);
+		$record=[];
+		$record['title']=$this->guy->grabFromDatabase('testmodule_data','title',['id'=>$object->id]);
+		$record['data']=$this->guy->grabFromDatabase('testmodule_data','data',['id'=>$object->id]);
+		$record['d_last_known']=$this->guy->grabFromDatabase('testmodule_data','d_last_known',['id'=>$object->id]);
+		$record['t_killed']=$this->guy->grabFromDatabase('testmodule_data','t_killed',['id'=>$object->id]);
+		$record['dt_born']=$this->guy->grabFromDatabase('testmodule_data','dt_born',['id'=>$object->id]);
+		$record['s_data']=$this->guy->grabFromDatabase('testmodule_data','s_data',['id'=>$object->id]);
+		$this->assertEquals($record,['title'=>'thetitle','data'=>'thedata','d_last_known'=>'2009-03-17','t_killed'=>'11:46:39','dt_born'=>'2009-03-21 19:00:00','s_data'=>'AneEIUoDSs8kgH/Kms7dfw==']);
+		// check inserts into context
+		$inserts=self::$web->ctx('db_inserts');
+		$this->assertTrue(array_key_exists('TestmoduleData',$inserts) && $inserts['TestmoduleData']===[$object->id]);
+		// ensure modified date differs on update
+		sleep(1);
+		//  now check UPDATE
+		$object->fill(['title'=>'newtitle','data'=>'newdata','d_last_known'=>'17/03/2015','t_killed'=>'99999944','dt_born'=>'21/03/2015 7:00pm','s_data'=>'AneEIUoDSs8kgH/Kms7dfw==']);
+		$output=$this->captureOutput($object,'update',[]);
+	//	codecept_debug("::OUT::".$output."::");
+		$this->assertEquals($output,
+		':::DBHOOK:::testmodule_core_dbobject_before_update::::::DBHOOK:::testmodule_core_dbobject_before_insert::::::DBHOOK:::testmodule_core_dbobject_after_insert::::::DBHOOK:::testmodule_core_dbobject_after_update::::::DBHOOK:::testmodule_core_dbobject_after_update_TestmoduleData::::::DBHOOK:::testmodule_core_dbobject_indexChange_TestmoduleData:::');
 	
-	function test_getSelectOptions() {
-		$data= new TestmoduleData(self::$web);
-		codecept_debug($data->getSelectOptions());
-	} //$field) {
+		// check defaults
+		$this->assertNotNull($object->dt_created);
+		$this->assertNotEquals($object->dt_created,$object->dt_modified);
+		$this->assertTrue($object->id > 0);
+		$record=[];
+		$record['title']=$this->guy->grabFromDatabase('testmodule_data','title',['id'=>$object->id]);
+		$record['data']=$this->guy->grabFromDatabase('testmodule_data','data',['id'=>$object->id]);
+		$record['d_last_known']=$this->guy->grabFromDatabase('testmodule_data','d_last_known',['id'=>$object->id]);
+		$record['t_killed']=$this->guy->grabFromDatabase('testmodule_data','t_killed',['id'=>$object->id]);
+		$record['dt_born']=$this->guy->grabFromDatabase('testmodule_data','dt_born',['id'=>$object->id]);
+		$record['s_data']=$this->guy->grabFromDatabase('testmodule_data','s_data',['id'=>$object->id]);
+	//	codecept_debug($record);
+		$this->assertEquals($record,['title'=>'newtitle','data'=>'newdata','d_last_known'=>'2015-03-17','t_killed'=>'20:45:44','dt_born'=>'2015-03-21 19:00:00','s_data'=>'D+p4Y9iRvvQM+HC20OiT/vD0rLRVY2MRoqp5UYjerfs=']);
+		// check inserts into context
+		$updates=self::$web->ctx('db_updates');
+		$this->assertTrue(array_key_exists('TestmoduleData',$updates) && $updates['TestmoduleData']===[$object->id]);
+		
+		// now check DELETE
+		$this->assertTrue($object->id > 0);
+		$this->assertNotEquals($this->guy->grabFromDatabase('testmodule_data','is_deleted',['id'=>$object->id]),'1');
+		
+		$output=$this->captureOutput($object,'delete',[]);
+		//codecept_debug("::OUT::".$output."::");
+		// note that delete calls both delete and update hooks when is_deleted flag is used
+		$this->assertEquals($output,
+	':::DBHOOK:::testmodule_core_dbobject_before_delete::::::DBHOOK:::testmodule_core_dbobject_before_delete_TestmoduleData::::::DBHOOK:::testmodule_core_dbobject_before_update::::::DBHOOK:::testmodule_core_dbobject_before_insert::::::DBHOOK:::testmodule_core_dbobject_after_insert::::::DBHOOK:::testmodule_core_dbobject_after_update::::::DBHOOK:::testmodule_core_dbobject_after_update_TestmoduleData::::::DBHOOK:::testmodule_core_dbobject_indexChange_TestmoduleData::::::DBHOOK:::testmodule_core_dbobject_before_insert::::::DBHOOK:::testmodule_core_dbobject_after_insert::::::DBHOOK:::testmodule_core_dbobject_after_delete::::::DBHOOK:::testmodule_core_dbobject_after_delete_TestmoduleData::::::DBHOOK:::testmodule_core_dbobject_indexChange_TestmoduleData:::'); 
+		$this->assertEquals($this->guy->grabFromDatabase('testmodule_data','is_deleted',['id'=>$object->id]),'1');
+		// check inserts into context
+		$updates=self::$web->ctx('db_deletes');
+		$this->assertTrue(array_key_exists('TestmoduleData',$updates) && $updates['TestmoduleData']===[$object->id]);
+		// really delete using force
+		$object->delete(true);
+		$this->guy->dontSeeInDatabase('testmodule_data',['id'=>$object->id]);
+		
+		// check delete where no is_deleted field
+		$object=new TestmoduleFoodHasName(self::$web);
+		$object->fill(['name'=>'fred']);
+		$object->insert();
+		$this->guy->seeInDatabase('patch_testmodule_food_has_name',['id'=>$object->id]);
+		$object->delete();
+		$this->guy->dontSeeInDatabase('patch_testmodule_food_has_name',['id'=>$object->id]);
+		
+	} 
+
 
 /*
-    function insertOrUpdate($force_null_values = false, $force_validation = true) {
-    function insert($force_validation = true) {
-    function update($force_null_values = false, $force_validation = true) {
-    function delete($force = false) {
-    // tested by calls to insert,update,delete
-    function test_callHooks($type, $action) {}
-	
+    
     
     // stubbing
     function getCreator() {
@@ -212,17 +412,15 @@ class DbObjectTest extends  \Codeception\TestCase\Test {
      
      
     
-	
-	* 
-	* 
+	// NOT TESTED
 	// intended to be overridden
 	function canList(User $user) {
     function canView(User $user) {
     function canEdit(User $user) {
     function canDelete(User $user) {
-    function addToIndex() {
-    
-    
+    // tested by calls to insert,update,delete
+    function test_callHooks($type, $action) {}
+	
 */
 
 }
