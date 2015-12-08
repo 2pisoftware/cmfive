@@ -64,7 +64,7 @@ class InstallService extends DbService {
 		$result_config=ob_get_contents();
 		ob_end_clean();
 		// clear the config cache
-		unlink('cache'.DIRECTORY_SEPARATOR.'config.cache');
+		if (file_exists('cache'.DIRECTORY_SEPARATOR.'config.cache')) unlink('cache'.DIRECTORY_SEPARATOR.'config.cache');
 		return file_put_contents("config.php", "<?php\n\n" .$result_config);
 	}
 	
@@ -145,7 +145,7 @@ class InstallService extends DbService {
 		}
 		$output[]="\n\n#Installing seed data";
 		$seed=file_get_contents('system/install/dbseed.sql');
-		self::runSql($pdo,implode("\n",$seed));
+		self::runSql($pdo,$seed);
 		$output[]=$seed;
 		$output[]="\n\n#Installing system modules";
 		// Install system modules
