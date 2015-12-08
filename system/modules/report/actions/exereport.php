@@ -107,7 +107,7 @@ function exereport_ALL(Web &$w) {
 	                                // keys points to fields so need to maintain array and create all URLS
 	                                // before we start dumping fields and splicing links
 	                                foreach ($fkey as $n => $u) {
-	                                    $a[$n] = "<a href=\"" . $v[$n] . "\">" . $v[$u] . "</a>";
+	                                    $a[$n] = "<a target='_blank' href=\"" . $v[$n] . "\">" . $v[$u] . "</a>";
 	                                    $dump[] = $n;
 	                                    $dump[] = $u;
 	                                }

@@ -156,7 +156,7 @@ class ReportService extends DbService {
         
         $rows = $this->_db->sql("SELECT distinct r.* from " . ReportMember::$_db_table . " as m inner join " . 
                 Report::$_db_table . " as r on m.report_id = r.id where m.user_id in (" . $theid . ") " . $where . 
-                " order by r.is_approved desc,r.title")->fetch_all();
+                " and r.is_deleted = 0 order by r.is_approved desc,r.title")->fetch_all();
         return $this->fillObjects("Report", $rows);
     }
 
