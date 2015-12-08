@@ -35,9 +35,9 @@ class DbServiceTest extends  \Codeception\TestCase\Test {
 		$class='TestmoduleData';
 		$dbService=self::$dbService;
 		$dbService->buildSelect($object, $table, $class);
-	//	codecept_debug($dbService::$_select_cache[$class][$table]);
+		//codecept_debug($dbService::$_select_cache[$class][$table]);
 		// check that correct select fields held in cache
-		$this->assertEquals($dbService::$_select_cache[$class][$table],"id,title,data,UNIX_TIMESTAMP(testmodule_data.`d_last_known`) AS `d_last_known`,is_deleted,UNIX_TIMESTAMP(testmodule_data.`dt_created`) AS `dt_created`,creator_id,UNIX_TIMESTAMP(testmodule_data.`dt_modified`) AS `dt_modified`,modifier_id");
+		$this->assertEquals($dbService::$_select_cache[$class][$table],'id,title,data,UNIX_TIMESTAMP(testmodule_data.`d_last_known`) AS `d_last_known`,UNIX_TIMESTAMP(testmodule_data.`t_killed`) AS `t_killed`,UNIX_TIMESTAMP(testmodule_data.`dt_born`) AS `dt_born`,is_deleted,UNIX_TIMESTAMP(testmodule_data.`dt_created`) AS `dt_created`,creator_id,UNIX_TIMESTAMP(testmodule_data.`dt_modified`) AS `dt_modified`,modifier_id');
 		
 	} //() {
     
@@ -85,7 +85,7 @@ class DbServiceTest extends  \Codeception\TestCase\Test {
 		$dbService=self::$dbService;
 		$dbService->clearCache(); 
 		// get all
-		$objects=$dbService->getObjects('TestmoduleData',['data'=>'what is my age'],true,true,'id');
+		$objects=$dbService->getObjects('TestmoduleData',['data'=>'what is my age'],true,true);
 		$this->assertEquals($objects[0]->title,'fred');
 		$this->assertEquals($objects[1]->title,'afreddo');
 		// check cache
@@ -97,7 +97,7 @@ class DbServiceTest extends  \Codeception\TestCase\Test {
 		$this->assertEquals(count($objects),2);
 		$this->assertEquals($objects[0]->title,'fred');
 		$this->assertEquals($objects[1]->title,'afreddo');
-		$dbService->clearCache(); 
+		//$dbService->clearCache(); 
 		
 		// ordering
 		$objects=$dbService->getObjects('TestmoduleData',['data'=>'what is my age'],false,true,'title');
