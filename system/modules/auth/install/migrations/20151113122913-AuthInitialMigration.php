@@ -79,7 +79,7 @@ class AuthInitialMigration extends CmfiveMigration {
 					->addColumn('priv_mobile', 'string', ['limit' => 64, 'null' => true])
 					->addColumn('fax', 'string', ['limit' => 64, 'null' => true])
 					->addColumn('email', 'string', ['limit' => 255, 'null' => true])
-					->addColumn('notes', 'text')
+					->addColumn('notes', 'text', ['null' => true])
 					->addColumn('private_to_user_id', 'biginteger', ['null' => true])
 					->addCmfiveParameters([	'modifier_id'])
 					->create();

@@ -1,5 +1,10 @@
 <?php
 
+// Load system Composer autoloader
+if (file_exists(SYSTEM_PATH . "/composer/vendor/autoload.php")) {
+    require SYSTEM_PATH . "/composer/vendor/autoload.php";
+}
+
 function import_GET(Web $w) {
 	$w->setLayout(null);
    
@@ -33,10 +38,16 @@ function import_GET(Web $w) {
 	// Write config details to file
 	InstallService::saveConfigData($_GET);
 	
+	// Load the config into the Config class
+	$config_exec = file_get_contents("system/modules/install/assets/config.php");
+	if (!empty($config_exec)) {
+		eval($config_exec);
+	}
+	
 	// Try and import data
-//	foreach($pdo->query("SHOW TABLES;") as $row) {
-//		$pdo->exec("DROP TABLE {$row[0]};");
-//	}
+	foreach($pdo->query("SHOW TABLES;") as $row) {
+		$pdo->exec("DROP TABLE {$row[0]};");
+	}
 //	
 //	output("Installing main database SQL<br/><hr/>");
 //	
@@ -125,6 +136,7 @@ function import_GET(Web $w) {
 	$w->db = $pdo;
 	
 	// Run migrations
+	$w->Migration->installInitialMigration();
 	$w->Migration->runMigrations("all");
 	
 	// Create admin user

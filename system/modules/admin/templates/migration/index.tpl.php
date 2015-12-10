@@ -40,7 +40,7 @@
 									<?php if ($w->Migration->isInstalled($a_migration_class)) :
 										$installedMigration = $w->Migration->getMigrationByClassname($a_migration_class); ?>
 										<span data-tooltip aria-haspopup="true" title="<?php echo @formatDate($installedMigration->dt_created, "d-M-Y \a\\t H:i"); ?>">
-											Run <?php echo Carbon::createFromTimeStamp($installedMigration->dt_created)->diffForHumans(); ?> by <?php echo  $w->Auth->getUser($installedMigration->creator_id)->getContact()->getFullName(); ?>
+											Run <?php echo Carbon::createFromTimeStamp($installedMigration->dt_created)->diffForHumans(); ?> by <?php echo !empty($installedMigration->creator_id) ? $w->Auth->getUser($installedMigration->creator_id)->getContact()->getFullName() : "System"; ?>
 										</span>
 									<?php endif; ?> 
 								</td>

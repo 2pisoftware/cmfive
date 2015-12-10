@@ -139,6 +139,10 @@ class {$classname} extends CmfiveMigration {
 
 	public function up() {
 		// UP
+		\$column = parent::Column();
+		\$column->setName('id')
+				->setType('biginteger')
+				->setIdentity(true);
 	}
 
 	public function down() {
@@ -248,7 +252,7 @@ MIGRATION;
 				$this->w->db->commitTransaction();
 				return count($runMigrations) . ' migration' . (count($runMigrations) == 1 ? ' has' : 's have') . ' run'; 
 			} catch (Exception $e) {
-				$this->w->out("Error with a migration: " . $e->getMessage());
+				$this->w->out("Error with a migration: " . $e->getMessage() . "<br/>More info: " . var_export($e));
 				$this->w->Log->setLogger("MIGRATION")->error("Error with a migration: " . $e->getMessage());
 				$this->w->db->rollbackTransaction();
 			}
@@ -336,7 +340,7 @@ MIGRATION;
 		}
 	}
 	
-	private function installInitialMigration() {
+	public function installInitialMigration() {
 		$migration = "AdminInitialMigration";
 		$filename = "20151030134124-AdminInitialMigration.php";
 		$directory = SYSTEM_MODULE_DIRECTORY . DS . "admin" . DS . MIGRATION_DIRECTORY;

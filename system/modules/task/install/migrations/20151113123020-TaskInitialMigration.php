@@ -109,7 +109,7 @@ class TaskInitialMigration extends CmfiveMigration {
 				->addColumn('task_id', 'biginteger')
 				->addColumn('key', 'string', ['limit' => 255])
 				->addColumn('table_name', 'string', ['limit' => 255])
-				->addColumn('object_id', 'bigintger')
+				->addColumn('object_id', 'biginteger')
 				->create();
 
 		$this->table('task_time', [

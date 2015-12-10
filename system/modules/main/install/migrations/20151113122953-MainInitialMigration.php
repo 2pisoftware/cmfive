@@ -75,7 +75,7 @@ class MainInitialMigration extends CmfiveMigration {
 					])->addColumn($column)
 					->addColumn('history_id', 'biginteger')
 					->addColumn('attr_name', 'string', ['limit' => 255, 'null' => true])
-					->addColumn('attr_value', 'text', ['limit' => \Phinx\Db\Adapter\MysqlAdapter::LONG_TEXT])
+					->addColumn('attr_value', 'text', ['limit' => \Phinx\Db\Adapter\MysqlAdapter::TEXT_LONG])
 					->create();
 		}
 		

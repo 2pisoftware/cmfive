@@ -1,5 +1,7 @@
 <?php
 
+use \Phinx\Db\Adapter\MysqlAdapter;
+
 class AdminInitialMigration extends CmfiveMigration {
 
 	public function up() {
@@ -104,7 +106,7 @@ class AdminInitialMigration extends CmfiveMigration {
 					->addColumn('category', 'string', ['limit' => 255, 'null' => true])
 					->addColumn('module', 'string', ['limit' => 255, 'null' => true])
 					->addColumn('template_title', 'text')
-					->addColumn('template_body', 'text', ['limit' => \Phinx\Db\Adapter\MysqlAdapter::LONG_TEXT])
+					->addColumn('template_body', 'text', ['limit' => \Phinx\Db\Adapter\MysqlAdapter::TEXT_LONG])
 					->addColumn('test_title_json', 'text')
 					->addColumn('test_body_json', 'text')
 					->addColumn('is_active', 'boolean', ['default' => 1])

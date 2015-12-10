@@ -448,7 +448,7 @@ class Html {
 
     public static function timePicker($name, $value = null, $size = null, $required = null) {
         $buf = '<input class="date_picker" type="text" name="' . $name . '" value="' . $value . '" size="' . $size . '" id="' . $name . '" ' . $required . ' />';
-        $buf.= "<script>$('#$name').timepicker({ampm: true, dateFormat: 'dd/mm/yy'});$('#$name').keyup( function(event) { $(this).val('');}); </script>";
+        $buf.= "<script>$('#$name').timepicker({ampm: true, timeFormat: 'hh:mm tt'});$('#$name').keyup( function(event) { $(this).val('');}); </script>";
         return $buf;
     }
 
