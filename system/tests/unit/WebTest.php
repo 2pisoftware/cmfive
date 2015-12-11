@@ -838,7 +838,7 @@
 		
 		function test_start() {
 			// TODO fix this test - allow for extra db hooks 
-			// hmm
+			// hmm ff
 			return;
 			//$function=test::func('WebTest','header',function($a) {
 			//	echo "SHOWHEADER:::".$a;
