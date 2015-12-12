@@ -65,7 +65,6 @@
             <?php echo !empty($filter_data) ? Html::filter("Search Tasks", $filter_data, "/task/tasklist") : ""; ?>
             <form id="updatestatus" action="<?php echo $webroot . "/task/updatestatus"; ?>" method="POST">
                 <input type="hidden" name="<?php echo CSRF::getTokenID(); ?>" value="<?php echo CSRF::getTokenValue(); ?>" />
-                <?php echo $mytasks; ?>
             </form>
         </div>
         <div id="notifications" class="clearfix">
