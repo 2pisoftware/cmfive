@@ -12,6 +12,20 @@ class ExampleData extends DbObject {
 	public $title;
 	public $data;
 	public $example_checkbox;
+	public $select_field;
+	public $autocomplete_field;
+	public $multiselect_field;
+	public $radio_field;
+	public $password_field;
+	public $email_field;
+	public $hidden_field;
+	public $d_date_field;
+	public $dt_datetime_field;
+	public $t_time_field;
+	//public $rte_field; 
+	//public $file_field;
+	//public $multifile_field;
+	
 	
 	// standard system properties
 	
