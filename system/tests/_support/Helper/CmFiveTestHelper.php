@@ -43,23 +43,18 @@ class CmFiveTestHelper extends \Codeception\Module
 					} else {
 						$I->uncheckOption('#'.$fieldNameParts[1]);
 					}
-				} else if ($fieldNameParts[0]=='select' && count($fieldNameParts)>1) {
+				} else if (($fieldNameParts[0]=='select' || $fieldNameParts[0]=='radio') && count($fieldNameParts)>1) {
 					$I->selectOption('#'.$fieldNameParts[1] ,$fieldValue);
 				} else if ($fieldNameParts[0]=='date' && count($fieldNameParts)>1) {
-					//$I->selectOption('#'.$fieldNameParts[1] ,$fieldValue);
+					$I->fillDatePicker($I,$fieldNameParts[1],$fieldValue);
+				} else if ($fieldNameParts[0]=='datetime' && count($fieldNameParts)>1) {
+					$I->fillDateTimePicker($I,$fieldNameParts[1],$fieldValue);
+				} else if ($fieldNameParts[0]=='time' && count($fieldNameParts)>1) {
+					$I->fillTimePicker($I,$fieldNameParts[1],$fieldValue);
 				} else if ($fieldNameParts[0]=='rte' && count($fieldNameParts)>1) {
-					//$I->switchToIFrame('.cke_wysiwyg_frame');
-					//$I->executeJS('
-					//document.getElementsByClassName("cke_editable").foreach (function(key,value) {
-				//		value.innerHTML = "<p>'.$fieldValue.'</p>";
-				//	})
-					//');
-					//$I->switchToIFrame(); // back to parent
-					//$I->executeJS('$("#'.$fieldNameParts[1].'").val("'.$fieldValue.'")');
-					//$I->selectOption('#'.$fieldNameParts[1] ,$fieldValue);
+					$I->fillCkEditorById($I,$fieldNameParts[1],$fieldValue);
 				} else if ($fieldNameParts[0]=='autocomplete' && count($fieldNameParts)>1) {
-					$I->fillField("#".$fieldNameParts[1],$fieldValue);
-					$I->click($fieldValue,'.ui-autocomplete');
+					$I->fillAutocomplete($I,$fieldNameParts[1],$fieldValue);
 				} else {
 					$I->fillField('#'.$fieldName ,$fieldValue);
 				}
@@ -111,13 +106,14 @@ class CmFiveTestHelper extends \Codeception\Module
 	public function createUser($I,$username,$password,$firstName,$lastName,$email) {
 		$I->click('List Users');
 		$I->click('Add New User');
-		$I->fillField('#login',$username);
-		$I->fillField('#password',$password);
-		$I->fillField('#password2',$password);
-		$I->checkOption('#is_active');
-		$I->fillField('#firstname',$firstName);
-		$I->fillField('#lastname',$lastName);
-		$I->fillField('#email',$email);
+		$I->fillForm($I,[
+		'login'=>$username,
+		'password'=>$password,
+		'password2'=>$password,
+		'check:is_active'=>true,
+		'firstname'=>$firstName,
+		'lastname'=>$lastName,
+		'email'=>$email]);
 		$I->click('Save');
 		$I->see('User '.$username.' added');
 	}
@@ -483,7 +479,7 @@ class CmFiveTestHelper extends \Codeception\Module
 			'title'=>$task,
 			'select:status'=>!empty($data['status']) ? $data['status'] : '',
 			'select:priority'=>!empty($data['priority']) ? $data['priority'] : '',
-			//'date:dt_due'=>$data['dt_due'],
+			'date:dt_due'=>$data['dt_due'],
 			'select:assignee_id'=>!empty($data['assignee_id']) ? $data['assignee_id'] : '',
 			'estimate_hours'=>!empty($data['estimate_hours']) ?  $data['estimate_hours'] : '',
 			'effort'=>!empty($data['effort']) ? $data['effort'] : '',
@@ -492,6 +488,113 @@ class CmFiveTestHelper extends \Codeception\Module
 		$I->click('Save');
 	}
 	
+
+
+/*******************************************************
+ * LIB 
+ *******************************************************/
+ 
+public function fillDatePicker($I,$field,$date) {
+	$day=date('j',$date);
+	$month=date('M',$date);
+	$year=date('Y',$date);
+	$hour=date('H',$date);
+	$dateFormatted=date('d/m/Y H:i',$date);
+	$finalDateFormatted=date('d/m/Y',$date);
+	$I->executeJS('return $("#'.$field.'").datepicker("setDate","'.$dateFormatted.'");');
+	$I->seeInField('#'.$field,$finalDateFormatted);
+} 
+
+public function fillDateTimePicker($I,$field,$date) {
+	$day=date('j',$date);
+	$month=date('M',$date);
+	$year=date('Y',$date);
+	$hour=date('H',$date);
+	$dateFormatted=date('d/m/Y H:i',$date);
+	$finalDateTimeFormatted=date('d/m/Y h:i a',$date);
+	$I->executeJS('return $("#'.$field.'").datepicker("setDate","'.$dateFormatted.'");');
+	$I->seeInField('#'.$field,$finalDateTimeFormatted);
+} 
+
+public function fillTimePicker($I,$field,$date) {
+	$day=date('j',$date);
+	$month=date('M',$date);
+	$year=date('Y',$date);
+	$hour=date('H',$date);
+	$dateFormatted=date('d/m/Y H:i',$date);
+	$finalTimeFormatted=date('h:i a',$date);
+	$I->executeJS('return $("#'.$field.'").datepicker("setDate","'.$dateFormatted.'");');
+	$I->seeInField('#'.$field,$finalTimeFormatted);
+} 
+
+public function fillAutocomplete($I,$field,$value) {
+	$I->fillField("#".$field,$value);
+	$I->waitForElement(".ui-autocomplete a",5);
+	// down
+	$I->pressKey("#acp_".$field,"\xEE\x80\x95");
+	// select
+	$I->executeJS('$(".ui-autocomplete a").show(); $(".ui-autocomplete a").get(0).click();');
+}
+ 
+ 
+/*******************************************************
+ * http://stackoverflow.com/questions/29168107/how-to-fill-a-rich-text-editor-field-for-a-codeception-acceptance-test
+ *******************************************************/
+ public function fillCkEditorById($I,$element_id, $content) {
+        $I->fillRteEditor($I,
+            \Facebook\WebDriver\WebDriverBy::cssSelector(
+                '#cke_' . $element_id . ' .cke_wysiwyg_frame'
+            ),
+            $content
+        );
+    }
+
+    public function fillCkEditorByName($I,$element_name, $content) {
+        $I->fillRteEditor($I,
+            \Facebook\WebDriver\WebDriverBy::cssSelector(
+                'textarea[name="' . $element_name . '"] + .cke .cke_wysiwyg_frame'
+            ),
+            $content
+        );
+    }
+    public  function fillRteEditor($I,$selector, $content) {
+        $I->executeInSelenium(
+            function (\Facebook\WebDriver\Remote\RemoteWebDriver $webDriver)
+            use ($selector, $content) {
+                $webDriver->switchTo()->frame(
+                    $webDriver->findElement($selector)
+                );
+
+                $webDriver->executeScript(
+                    'arguments[0].innerHTML = "' . addslashes($content) . '"',
+                    [$webDriver->findElement(\Facebook\WebDriver\WebDriverBy::tagName('body'))]
+                );
+
+                $webDriver->switchTo()->defaultContent();
+            });
+    }
+
+
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
