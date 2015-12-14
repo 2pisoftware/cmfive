@@ -175,7 +175,7 @@ class CmFiveTestHelper extends \Codeception\Module
 	}
 	
 	/**
-	 * Create a user then login as them
+	 * Create a user then login as them aa
 	 */
 	public function createAndLoginUser($I,$user) {
 		$admin=['username'=>'admin','password'=>'admin'];
