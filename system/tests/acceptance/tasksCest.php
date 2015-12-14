@@ -13,8 +13,10 @@ class tasksCest
     // auth details
 	var $username='admin';
 	var $password='admin';
-		
-	public function testTasks($I) {
+	
+	// DISABLEDXY
+	
+	private function testTasks($I) {
 		$I->login($I,$this->username,$this->password);
 		$I->createUser($I,'testuser','password','testy','tererer','testy@tererer.com');
 		$I->createTaskGroup($I,'testgroup',[
