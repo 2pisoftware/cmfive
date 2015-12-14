@@ -25,5 +25,12 @@ Config::set('admin', array(
         "twig/twig" => "1.*",
         "nesbot/carbon" => "1.14",
 		"mandrill/mandrill" => "1.0.*"
-    )
+    ),
+	'email' => array(
+		'api' => array(
+			'credentials' => array(
+				'key' => ''
+			)
+		)
+	)
 ));
