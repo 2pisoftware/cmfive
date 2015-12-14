@@ -11,3 +11,4 @@ modules:
     - \Helper\Acceptance
     - \Helper\CmFiveTestHelper
     - Asserts
+    - Db
