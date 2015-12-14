@@ -314,7 +314,7 @@ class Web {
                 array_unshift($this->_paths, $domainmodule);
             }
         }
-        
+
         // continue as usual
         
         // first find the module file
@@ -621,6 +621,10 @@ class Web {
      */
     function getSubmodules($module) {
     	$dir = $this->getModuleDir($module)."actions";
+		if (!is_dir($dir)) {
+			return null;
+		}
+		
  		$listing = scandir($dir);
  		if (empty($listing)) {
  			return null;
