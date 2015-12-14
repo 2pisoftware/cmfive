@@ -23,13 +23,14 @@
 
 <?php if (!empty($messages)) : ?>
 	<table class="small-12 columns">
-		<thead><tr><th>Time</th><th>Status</th><th>Email</th><th>Opens</th></tr></thead>
+		<thead><tr><th>Time</th><th>Status</th><th>Email</th><th>Subject</th><th>Opens</th></tr></thead>
 		<tbody>
 			<?php foreach($messages as $message) : ?>
 				<tr>
 					<td><?php echo date('H:i d-m-Y', $message['ts']); ?></td>
 					<td><?php echo $message['state']; ?></td>
 					<td><?php echo $message['email']; ?></td>
+					<td><?php echo $message['subject']; ?></td>
 					<td><?php echo $message['opens']; ?></td>
 				</tr>
 			<?php endforeach; ?>
