@@ -47,7 +47,7 @@ class exampleGenericCRUDCest
 			'time:t_time_field'=>strtotime('11-05-2014 14:55')];
 		//$I->createNewRecord($I,$this); // not flexible enough
 		$I->doCreateNewRecord($I,$this->navSelector,'New Data','Save',$this->recordLabel.' updated',$this->databaseTable, $this->validRecord);
-		// update
+		// update stuff
 		// $I->editRecord($I,$this);//// not flexible enough
 		$I->doEditRecord($I,$this->navSelector,$this->moduleUrl.'edit/','Save',$this->recordLabel.' updated',$this->databaseTable, $this->validDBRecord,$this->updateData);
 		// delete
