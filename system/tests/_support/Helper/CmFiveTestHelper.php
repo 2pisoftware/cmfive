@@ -7,7 +7,7 @@ namespace Helper;
  ******************************************/
 class CmFiveTestHelper extends \Codeception\Module
 {
-	
+
 	/****************************
 	 * MISC FUNCTIONS
 	 ****************************/
@@ -173,6 +173,20 @@ class CmFiveTestHelper extends \Codeception\Module
 		}
 		$I->assertTrue($actionCompleted);
 	}
+	
+	/**
+	 * Create a user then login as them aa
+	 */
+	public function createAndLoginUser($I,$user) {
+		$admin=['username'=>'admin','password'=>'admin'];
+		$I->login($I,$admin['username'],$admin['password']);
+		$I->createUser($I,$user['username'],$user['password'],$user['first_name'],$user['last_name'],$user['email']);
+		if (array_key_exists('roles',$user)) {
+			$I->setUserPermissions($I,$user['username'],$user['roles']);
+		}
+		$I->logout($I);
+		$I->login($I,$user['username'],$user['password']);
+	}
 	 
 	/**
 	 * Update a user matching $username
@@ -198,6 +212,14 @@ class CmFiveTestHelper extends \Codeception\Module
 		$I->assertTrue($actionCompleted);
 	} 
 		
+	/****************************
+	 * Create an employee record associated with the provided user (containing array data)
+	 ****************************/
+	public function createEmployee($I,$user,$employee=[]) {
+		$employee['autocomplete:user_id']=$user['first_name'].' '.$user['last_name'];
+		$I->doCreateNewRecord($I,'Staff','New Employee','Save','Employee created','staff_employee', $employee);
+		
+	}	
 	/****************************
 	 * USERGROUPS
 	 ****************************/
@@ -533,7 +555,7 @@ public function fillAutocomplete($I,$field,$value) {
 	// down
 	$I->pressKey("#acp_".$field,"\xEE\x80\x95");
 	// select
-	$I->executeJS('$(".ui-autocomplete a").show(); $(".ui-autocomplete a").get(0).click();');
+	$I->executeJS('$(".ui-autocomplete a").show(); $(".ui-autocomplete a").click();');
 }
  
  
@@ -575,6 +597,165 @@ public function fillAutocomplete($I,$field,$value) {
     }
 
 
+
+
+
+
+
+
+
+/*******************************************************
+ * generic crud routines based on meta data from test class
+ * these generic routines will work in some BUT NOT ALL cases
+ *******************************************************/
+
+	/**
+	 * Create a new record with default parameters from test object
+	 */
+	public function createNewRecord($I,$test) {
+		$this->doCreateNewRecord($I,$test->navSelector,'.addbutton','Save',$test->recordLabel.' created',$test->databaseTable, $test->validRecord);
+		// TODO return id of new record
+	}
+	
+	/**
+	 * Create a new record
+	 */
+	public function doCreateNewRecord($I,$navSelector,$createButtonSelector,$saveButtonSelector,$saveText,$databaseTable,$record) {
+		$I->wantTo('Create a new record');
+		// twice to for flyout menus
+		$I->click($navSelector);
+		$I->click($navSelector);
+		
+		$I->click($createButtonSelector);
+		$I->fillForm($I,$record);
+		
+/*		$r=array();
+		if (array_key_exists('input',$record)) {
+			foreach($record['input'] as $field=>$value) {
+				$I->fillField($field,$value);
+				$r[$field]=$value;
+			}
+		}
+		if (array_key_exists('select',$record)) {
+			foreach($record['select'] as $field=>$value) {
+				$I->selectOption($field,$value);
+				$r[$field]=$value;
+			}
+		}
+		if (array_key_exists('checkbox',$record)) {
+			foreach($record['checkbox'] as $field=>$value) {
+				if ($value=='1') {
+					$I->checkOption($field);
+				} else {
+					$I->uncheckOption($field);
+				}
+				$r[$field]=$value;
+			}
+		}
+*/		
+		$I->click($saveButtonSelector);
+		$I->see($saveText);
+		//$I->seeInDatabase($databaseTable,$r);
+	}
+	
+	/**
+	 * Edit a record with default parameters from test object
+	 */
+	public function editRecord($I,$test) {
+		$this->doEditRecord($I,$test->navSelector,$test->moduleUrl.'edit/','Update',$test->recordLabel.' updated',$test->databaseTable, $test->validDBRecord,$test->updateData);
+	}
+	
+	/**
+	 * Edit a record
+	 */
+	public function doEditRecord($I,$navSelector,$editButtonUrl,$saveButtonSelector,$saveText,$databaseTable,$record,$updateData) {
+		$I->wantTo('Edit and save a record');
+		
+		$I->click($navSelector);
+		$I->click($navSelector);
+		//$record['is_deleted']='0';
+		//$id=1; 
+		$id=$I->grabFromDatabase($databaseTable,'id',$record);
+		//codecept_debug(["A",$ad,"B"]);
+		//$id=$dbRec['id'];
+		
+		$I->click('.editbutton[href^="'.$editButtonUrl.$id.'"]');
+		$I->fillForm($I,$updateData);
+		
+		$I->click($saveButtonSelector);
+		$I->see($saveText);
+		//$I->seeInDatabase($databaseTable, $r); 
+	}
+	
+	/**
+	 * Delete a record with default parameters from test
+	 */
+	public function deleteRecord($I,$test) {
+		$this->doDeleteRecord($I,
+			$test->navSelector, // nav to page
+			$test->moduleUrl.'delete/',  // delete link base
+			$test->recordLabel.' deleted',  // success message
+			$test->databaseTable,  // table 
+			$test->validDBRecord);  // dummy record
+	}  
+	
+	/**
+	 * Delete a record
+	 */
+	public function doDeleteRecord($I,$navSelector,$deleteButtonUrl,$deletedText,$databaseTable,$record) {
+		//$id=$I->haveInDatabase($databaseTable, $record);
+		$id=1;
+		$I->wantTo('Delete a record');
+		$I->click($navSelector);
+		$I->click($navSelector);
+		// disable confirm
+		$I->executeJS('window.confirm = function(){return true;}');
+		$I->click('.deletebutton[href^="'.$deleteButtonUrl.$id.'"]');
+		$I->see($deletedText);
+		//$I->seeInDatabase($databaseTable, array('id' => $id,'is_deleted'=>'1'));
+		return $id;
+	}  
+	
+	/**
+	 * Run search tests
+	 */ 
+/*	public function searchRecords($I,$test) {
+		$this->doSearchRecords($I,$test->navSelector,$test->searches);
+	}
+	public function doSearchRecords($I,$navSelector,$searches) {
+		$I->wantTo('Search '.$navSelector);
+		$I->click($navSelector);
+		$I->click($navSelector);
+		$I->runSearches($I,$searches);
+	}
+	*//**
+	 * Run a search with criteria and check number of results for each element of searches array 
+	 */ 
+/*	public function runSearches($I,$searches) {
+		foreach ($searches as $k=> $searchCriteria) {
+			if (array_key_exists('input',$searchCriteria)) {
+				foreach ($searchCriteria['input'] as $field => $value) {
+					$I->fillField("#".$field,$value);
+				}
+			}
+			if (array_key_exists('select',$searchCriteria)) {
+				foreach ($searchCriteria['select'] as $field => $value) {
+					$I->selectOption("#".$field,$value);
+				}
+			}
+			if (array_key_exists('checkbox',$searchCriteria)) {
+				foreach ($searchCriteria['checkbox'] as $field => $value) {
+					if ($value=='1') {
+						$I->checkOption($field);
+					} else {
+						$I->uncheckOption($field);
+					}
+				}
+			}
+			$I->click('Filter');
+			$I->seeNumberOfElements('table.tablesorter tbody tr',$searchCriteria['result']);
+		}
+	}*/
 	
 }
 
