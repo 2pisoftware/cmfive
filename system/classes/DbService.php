@@ -186,7 +186,7 @@ class DbService {
         // Automatically converts keys with different database values
 		$parts = array();
         foreach ($object->getDbTableColumnNames() as $k) {
-            if(0 === strpos($k, 'dt_') || 0 === strpos($k, 'd_') || 0 === strpos($k, 't_')) {
+            if(0 === strpos($k, 'dt_') || 0 === strpos($k, 'd_')) { //  || 0 === strpos($k, 't_')
                 // This is MySQL specific!
                 $parts[] = "UNIX_TIMESTAMP($table.`".$object->getDbColumnName($k)."`) AS `$k`";
             } else if($k != $object->getDbColumnName($k)) {

@@ -113,7 +113,7 @@ class DbPDO extends PDO {
      * @return \DbPDO|null
      */
     public function where($column, $equals = null){
-        if ($this->query !== null){
+        if ($this->query !== null && is_object($this->query)){
             if (empty($column)){
                 // Resets the where part of the statement
                 $this->query = $this->query->where(null);
@@ -129,7 +129,7 @@ class DbPDO extends PDO {
     }
     
     public function orderBy($orderby){
-        if ($this->query !== null && !empty($orderby)){
+        if ($this->query !== null && !empty($orderby) && is_object($this->query)){
             $this->query = $this->query->orderBy($orderby);
         }
         return $this;
