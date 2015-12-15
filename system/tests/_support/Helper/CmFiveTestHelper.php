@@ -555,7 +555,7 @@ public function fillAutocomplete($I,$field,$value) {
 	// down
 	$I->pressKey("#acp_".$field,"\xEE\x80\x95");
 	// select
-	$I->executeJS('$(".ui-autocomplete a").show(); $(".ui-autocomplete a").get(0).click();');
+	$I->executeJS('$(".ui-autocomplete a").show(); $(".ui-autocomplete a").click();');
 }
  
  

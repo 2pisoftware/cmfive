@@ -14,9 +14,7 @@ class tasksCest
 	var $username='admin';
 	var $password='admin';
 	
-	// DISABLEDXY
-	
-	private function testTasks($I) {
+	public function testTasks($I) {
 		$I->login($I,$this->username,$this->password);
 		$I->createUser($I,'testuser','password','testy','tererer','testy@tererer.com');
 		$I->createTaskGroup($I,'testgroup',[
