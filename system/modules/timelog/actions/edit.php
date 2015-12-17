@@ -21,12 +21,21 @@ function edit_GET(Web $w) {
 	$tracking_class = $w->request("class");
 	$tracking_id = $w->request("id");
 	
-	$form = [
+        // If timelog.object_id is required then we must require the search field
+        $validation = Timelog::$_validation;
+        if (!empty($validation["object_id"])) {
+            if (in_array("required", $validation["object_id"])) {
+                $validation["search"] = array('required');
+            } 
+        }
+        $form = [
 		'Timelog' => [
 			[
 				["Module", "select", "object_class", $timelog->object_class ? : $tracking_class, $select_indexes],
-				["Search", empty($timelog->object_id) && empty($tracking_id) ? "text" : "autocomplete", (empty($timelog->object_id) && empty($tracking_id) ? '-' : '') . "search", !empty($timelog->object_id) ? $timelog->object_id : $tracking_id, (!empty($timelog->object_class) || !empty($tracking_class) ? $w->Timelog->getObjects($timelog->object_class ? : $tracking_class) : '')]
+				["Search", "autocomplete", "search", !empty($timelog->object_id) ? $timelog->object_id : $tracking_id, (!empty($timelog->object_class) || !empty($tracking_class) ? $w->Timelog->getObjects($timelog->object_class ? : $tracking_class) : '')]
 			],
+//				["Search", empty($timelog->object_id) && empty($tracking_id) ? "text" : "autocomplete", (empty($timelog->object_id) && empty($tracking_id) ? '-' : '') . "search", !empty($timelog->object_id) ? $timelog->object_id : $tracking_id, (!empty($timelog->object_class) || !empty($tracking_class) ? $w->Timelog->getObjects($timelog->object_class ? : $tracking_class) : '')]
+//			],
             [["object id", 'hidden', "object_id", $timelog->object_id ? : $tracking_id]],
 			[
 				["From", "datetime", "dt_start", formatDateTime($timelog->dt_start)],
@@ -53,7 +62,7 @@ function edit_GET(Web $w) {
 		}
 	}
 	
-	$w->ctx("form", Html::multiColForm($form, "/timelog/edit/" . $timelog->id . (!empty($redirect) ? "?redirect=$redirect" : ''), "POST", "Save", "timelog_edit_form"));
+	$w->ctx("form", Html::multiColForm($form, "/timelog/edit/" . $timelog->id . (!empty($redirect) ? "?redirect=$redirect" : ''), "POST", "Save", "timelog_edit_form", null, null, "_self", true, $validation));
 }
 
 function edit_POST(Web $w) {

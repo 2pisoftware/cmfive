@@ -14,6 +14,14 @@ class Timelog extends DbObject {
     public $dt_created;
     public $dt_modified;
     public $is_deleted;
+    
+    public static $_validation = array(
+        "object_class" => array('required'),
+        "object_id" => array('required'),
+        "dt_start" => array('required'),
+        "dt_end" => array('required'),
+        // "time_type" => array('required') Only required in some cases??!!
+    );    
 
 	public function getUser() {
 		return $this->getObject("User", $this->user_id);
