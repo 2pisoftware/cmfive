@@ -30,7 +30,7 @@ class AuditService extends DbService {
 		$log->module = $this->w->currentModule();
 		$log->submodule = $this->w->currentSubModule();		
 		$log->action = $this->w->currentAction();
-		$log->path = $_SERVER['REQUEST_URI'];
+		$log->path = array_key_exists('REQUEST_URI',$_SERVER) ? $_SERVER['REQUEST_URI'] : '';
 		$log->ip = $this->w->requestIpAddress();
 		$log->insert();
 	}
@@ -41,7 +41,7 @@ class AuditService extends DbService {
 			$log->module = $this->w->currentModule();
 			$log->submodule = $this->w->currentSubModule();
 			$log->action = $this->w->currentAction();
-			$log->path = $_SERVER['REQUEST_URI'];
+			$log->path = array_key_exists('REQUEST_URI',$_SERVER) ? $_SERVER['REQUEST_URI'] : '';
 			$log->ip = $this->w->requestIpAddress();
 			$log->db_action = $action;
 			$log->db_class = $class;

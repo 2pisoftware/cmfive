@@ -7,7 +7,7 @@ namespace Helper;
  ******************************************/
 class CmFiveTestHelper extends \Codeception\Module
 {
-	
+
 	/****************************
 	 * MISC FUNCTIONS
 	 ****************************/
@@ -43,23 +43,18 @@ class CmFiveTestHelper extends \Codeception\Module
 					} else {
 						$I->uncheckOption('#'.$fieldNameParts[1]);
 					}
-				} else if ($fieldNameParts[0]=='select' && count($fieldNameParts)>1) {
+				} else if (($fieldNameParts[0]=='select' || $fieldNameParts[0]=='radio') && count($fieldNameParts)>1) {
 					$I->selectOption('#'.$fieldNameParts[1] ,$fieldValue);
 				} else if ($fieldNameParts[0]=='date' && count($fieldNameParts)>1) {
-					//$I->selectOption('#'.$fieldNameParts[1] ,$fieldValue);
+					$I->fillDatePicker($I,$fieldNameParts[1],$fieldValue);
+				} else if ($fieldNameParts[0]=='datetime' && count($fieldNameParts)>1) {
+					$I->fillDateTimePicker($I,$fieldNameParts[1],$fieldValue);
+				} else if ($fieldNameParts[0]=='time' && count($fieldNameParts)>1) {
+					$I->fillTimePicker($I,$fieldNameParts[1],$fieldValue);
 				} else if ($fieldNameParts[0]=='rte' && count($fieldNameParts)>1) {
-					//$I->switchToIFrame('.cke_wysiwyg_frame');
-					//$I->executeJS('
-					//document.getElementsByClassName("cke_editable").foreach (function(key,value) {
-				//		value.innerHTML = "<p>'.$fieldValue.'</p>";
-				//	})
-					//');
-					//$I->switchToIFrame(); // back to parent
-					//$I->executeJS('$("#'.$fieldNameParts[1].'").val("'.$fieldValue.'")');
-					//$I->selectOption('#'.$fieldNameParts[1] ,$fieldValue);
+					$I->fillCkEditorById($I,$fieldNameParts[1],$fieldValue);
 				} else if ($fieldNameParts[0]=='autocomplete' && count($fieldNameParts)>1) {
-					$I->fillField("#".$fieldNameParts[1],$fieldValue);
-					$I->click($fieldValue,'.ui-autocomplete');
+					$I->fillAutocomplete($I,$fieldNameParts[1],$fieldValue);
 				} else {
 					$I->fillField('#'.$fieldName ,$fieldValue);
 				}
@@ -111,13 +106,14 @@ class CmFiveTestHelper extends \Codeception\Module
 	public function createUser($I,$username,$password,$firstName,$lastName,$email) {
 		$I->click('List Users');
 		$I->click('Add New User');
-		$I->fillField('#login',$username);
-		$I->fillField('#password',$password);
-		$I->fillField('#password2',$password);
-		$I->checkOption('#is_active');
-		$I->fillField('#firstname',$firstName);
-		$I->fillField('#lastname',$lastName);
-		$I->fillField('#email',$email);
+		$I->fillForm($I,[
+		'login'=>$username,
+		'password'=>$password,
+		'password2'=>$password,
+		'check:is_active'=>true,
+		'firstname'=>$firstName,
+		'lastname'=>$lastName,
+		'email'=>$email]);
 		$I->click('Save');
 		$I->see('User '.$username.' added');
 	}
@@ -177,6 +173,20 @@ class CmFiveTestHelper extends \Codeception\Module
 		}
 		$I->assertTrue($actionCompleted);
 	}
+	
+	/**
+	 * Create a user then login as them aa
+	 */
+	public function createAndLoginUser($I,$user) {
+		$admin=['username'=>'admin','password'=>'admin'];
+		$I->login($I,$admin['username'],$admin['password']);
+		$I->createUser($I,$user['username'],$user['password'],$user['first_name'],$user['last_name'],$user['email']);
+		if (array_key_exists('roles',$user)) {
+			$I->setUserPermissions($I,$user['username'],$user['roles']);
+		}
+		$I->logout($I);
+		$I->login($I,$user['username'],$user['password']);
+	}
 	 
 	/**
 	 * Update a user matching $username
@@ -202,6 +212,14 @@ class CmFiveTestHelper extends \Codeception\Module
 		$I->assertTrue($actionCompleted);
 	} 
 		
+	/****************************
+	 * Create an employee record associated with the provided user (containing array data)
+	 ****************************/
+	public function createEmployee($I,$user,$employee=[]) {
+		$employee['autocomplete:user_id']=$user['first_name'].' '.$user['last_name'];
+		$I->doCreateNewRecord($I,'Staff','New Employee','Save','Employee created','staff_employee', $employee);
+		
+	}	
 	/****************************
 	 * USERGROUPS
 	 ****************************/
@@ -483,7 +501,7 @@ class CmFiveTestHelper extends \Codeception\Module
 			'title'=>$task,
 			'select:status'=>!empty($data['status']) ? $data['status'] : '',
 			'select:priority'=>!empty($data['priority']) ? $data['priority'] : '',
-			//'date:dt_due'=>$data['dt_due'],
+			'date:dt_due'=>$data['dt_due'],
 			'select:assignee_id'=>!empty($data['assignee_id']) ? $data['assignee_id'] : '',
 			'estimate_hours'=>!empty($data['estimate_hours']) ?  $data['estimate_hours'] : '',
 			'effort'=>!empty($data['effort']) ? $data['effort'] : '',
@@ -492,6 +510,272 @@ class CmFiveTestHelper extends \Codeception\Module
 		$I->click('Save');
 	}
 	
+
+
+/*******************************************************
+ * LIB 
+ *******************************************************/
+ 
+public function fillDatePicker($I,$field,$date) {
+	$day=date('j',$date);
+	$month=date('M',$date);
+	$year=date('Y',$date);
+	$hour=date('H',$date);
+	$dateFormatted=date('d/m/Y H:i',$date);
+	$finalDateFormatted=date('d/m/Y',$date);
+	$I->executeJS('return $("#'.$field.'").datepicker("setDate","'.$dateFormatted.'");');
+	$I->seeInField('#'.$field,$finalDateFormatted);
+} 
+
+public function fillDateTimePicker($I,$field,$date) {
+	$day=date('j',$date);
+	$month=date('M',$date);
+	$year=date('Y',$date);
+	$hour=date('H',$date);
+	$dateFormatted=date('d/m/Y H:i',$date);
+	$finalDateTimeFormatted=date('d/m/Y h:i a',$date);
+	$I->executeJS('return $("#'.$field.'").datepicker("setDate","'.$dateFormatted.'");');
+	$I->seeInField('#'.$field,$finalDateTimeFormatted);
+} 
+
+public function fillTimePicker($I,$field,$date) {
+	$day=date('j',$date);
+	$month=date('M',$date);
+	$year=date('Y',$date);
+	$hour=date('H',$date);
+	$dateFormatted=date('d/m/Y H:i',$date);
+	$finalTimeFormatted=date('h:i a',$date);
+	$I->executeJS('return $("#'.$field.'").datepicker("setDate","'.$dateFormatted.'");');
+	$I->seeInField('#'.$field,$finalTimeFormatted);
+} 
+
+public function fillAutocomplete($I,$field,$value) {
+	$I->fillField("#".$field,$value);
+	$I->waitForElement(".ui-autocomplete a",5);
+	// down
+	$I->pressKey("#acp_".$field,"\xEE\x80\x95");
+	// select
+	$I->executeJS('$(".ui-autocomplete a").show(); $(".ui-autocomplete a").click();');
+}
+ 
+ 
+/*******************************************************
+ * http://stackoverflow.com/questions/29168107/how-to-fill-a-rich-text-editor-field-for-a-codeception-acceptance-test
+ *******************************************************/
+ public function fillCkEditorById($I,$element_id, $content) {
+        $I->fillRteEditor($I,
+            \Facebook\WebDriver\WebDriverBy::cssSelector(
+                '#cke_' . $element_id . ' .cke_wysiwyg_frame'
+            ),
+            $content
+        );
+    }
+
+    public function fillCkEditorByName($I,$element_name, $content) {
+        $I->fillRteEditor($I,
+            \Facebook\WebDriver\WebDriverBy::cssSelector(
+                'textarea[name="' . $element_name . '"] + .cke .cke_wysiwyg_frame'
+            ),
+            $content
+        );
+    }
+    public  function fillRteEditor($I,$selector, $content) {
+        $I->executeInSelenium(
+            function (\Facebook\WebDriver\Remote\RemoteWebDriver $webDriver)
+            use ($selector, $content) {
+                $webDriver->switchTo()->frame(
+                    $webDriver->findElement($selector)
+                );
+
+                $webDriver->executeScript(
+                    'arguments[0].innerHTML = "' . addslashes($content) . '"',
+                    [$webDriver->findElement(\Facebook\WebDriver\WebDriverBy::tagName('body'))]
+                );
+
+                $webDriver->switchTo()->defaultContent();
+            });
+    }
+
+
+
+
+
+
+
+
+
+/*******************************************************
+ * generic crud routines based on meta data from test class
+ * these generic routines will work in some BUT NOT ALL cases
+ *******************************************************/
+
+	/**
+	 * Create a new record with default parameters from test object
+	 */
+	public function createNewRecord($I,$test) {
+		$this->doCreateNewRecord($I,$test->navSelector,'.addbutton','Save',$test->recordLabel.' created',$test->databaseTable, $test->validRecord);
+		// TODO return id of new record
+	}
+	
+	/**
+	 * Create a new record
+	 */
+	public function doCreateNewRecord($I,$navSelector,$createButtonSelector,$saveButtonSelector,$saveText,$databaseTable,$record) {
+		$I->wantTo('Create a new record');
+		// twice to for flyout menus
+		$I->click($navSelector);
+		$I->click($navSelector);
+		
+		$I->click($createButtonSelector);
+		$I->fillForm($I,$record);
+		
+/*		$r=array();
+		if (array_key_exists('input',$record)) {
+			foreach($record['input'] as $field=>$value) {
+				$I->fillField($field,$value);
+				$r[$field]=$value;
+			}
+		}
+		if (array_key_exists('select',$record)) {
+			foreach($record['select'] as $field=>$value) {
+				$I->selectOption($field,$value);
+				$r[$field]=$value;
+			}
+		}
+		if (array_key_exists('checkbox',$record)) {
+			foreach($record['checkbox'] as $field=>$value) {
+				if ($value=='1') {
+					$I->checkOption($field);
+				} else {
+					$I->uncheckOption($field);
+				}
+				$r[$field]=$value;
+			}
+		}
+*/		
+		$I->click($saveButtonSelector);
+		$I->see($saveText);
+		//$I->seeInDatabase($databaseTable,$r);
+	}
+	
+	/**
+	 * Edit a record with default parameters from test object
+	 */
+	public function editRecord($I,$test) {
+		$this->doEditRecord($I,$test->navSelector,$test->moduleUrl.'edit/','Update',$test->recordLabel.' updated',$test->databaseTable, $test->validDBRecord,$test->updateData);
+	}
+	
+	/**
+	 * Edit a record
+	 */
+	public function doEditRecord($I,$navSelector,$editButtonUrl,$saveButtonSelector,$saveText,$databaseTable,$record,$updateData) {
+		$I->wantTo('Edit and save a record');
+		
+		$I->click($navSelector);
+		$I->click($navSelector);
+		//$record['is_deleted']='0';
+		//$id=1; 
+		$id=$I->grabFromDatabase($databaseTable,'id',$record);
+		//codecept_debug(["A",$ad,"B"]);
+		//$id=$dbRec['id'];
+		
+		$I->click('.editbutton[href^="'.$editButtonUrl.$id.'"]');
+		$I->fillForm($I,$updateData);
+		
+		$I->click($saveButtonSelector);
+		$I->see($saveText);
+		//$I->seeInDatabase($databaseTable, $r); 
+	}
+	
+	/**
+	 * Delete a record with default parameters from test
+	 */
+	public function deleteRecord($I,$test) {
+		$this->doDeleteRecord($I,
+			$test->navSelector, // nav to page
+			$test->moduleUrl.'delete/',  // delete link base
+			$test->recordLabel.' deleted',  // success message
+			$test->databaseTable,  // table 
+			$test->validDBRecord);  // dummy record
+	}  
+	
+	/**
+	 * Delete a record
+	 */
+	public function doDeleteRecord($I,$navSelector,$deleteButtonUrl,$deletedText,$databaseTable,$record) {
+		//$id=$I->haveInDatabase($databaseTable, $record);
+		$id=1;
+		$I->wantTo('Delete a record');
+		$I->click($navSelector);
+		$I->click($navSelector);
+		// disable confirm
+		$I->executeJS('window.confirm = function(){return true;}');
+		$I->click('.deletebutton[href^="'.$deleteButtonUrl.$id.'"]');
+		$I->see($deletedText);
+		//$I->seeInDatabase($databaseTable, array('id' => $id,'is_deleted'=>'1'));
+		return $id;
+	}  
+	
+	/**
+	 * Run search tests
+	 */ 
+/*	public function searchRecords($I,$test) {
+		$this->doSearchRecords($I,$test->navSelector,$test->searches);
+	}
+	public function doSearchRecords($I,$navSelector,$searches) {
+		$I->wantTo('Search '.$navSelector);
+		$I->click($navSelector);
+		$I->click($navSelector);
+		$I->runSearches($I,$searches);
+	}
+	*//**
+	 * Run a search with criteria and check number of results for each element of searches array 
+	 */ 
+/*	public function runSearches($I,$searches) {
+		foreach ($searches as $k=> $searchCriteria) {
+			if (array_key_exists('input',$searchCriteria)) {
+				foreach ($searchCriteria['input'] as $field => $value) {
+					$I->fillField("#".$field,$value);
+				}
+			}
+			if (array_key_exists('select',$searchCriteria)) {
+				foreach ($searchCriteria['select'] as $field => $value) {
+					$I->selectOption("#".$field,$value);
+				}
+			}
+			if (array_key_exists('checkbox',$searchCriteria)) {
+				foreach ($searchCriteria['checkbox'] as $field => $value) {
+					if ($value=='1') {
+						$I->checkOption($field);
+					} else {
+						$I->uncheckOption($field);
+					}
+				}
+			}
+			$I->click('Filter');
+			$I->seeNumberOfElements('table.tablesorter tbody tr',$searchCriteria['result']);
+		}
+	}*/
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

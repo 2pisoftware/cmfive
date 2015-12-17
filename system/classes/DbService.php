@@ -19,19 +19,35 @@ class DbService {
      * @var <type>
      */
     private static $_cache = array(); // used for single objects
-    private static $_cache2 = array();  // used for lists of objects
-	private static $_select_cache = array();
+    public static $_cache2 = array();  // used for lists of objects
+	public static $_select_cache = array();
 
     /**
      * This variable keeps track of active transactions
      *
      * @var boolean
      */
-    private static $_active_trx = false;
+    public static $_active_trx = false;
 
     public function __get($name) {
         return $this->w->$name;
     }
+    
+    public static function getCache() {
+		return self::$_cache;
+	}
+    public static function getCacheValue($class,$id) {
+		if (array_key_exists($class,self::$_cache) && array_key_exists($id,self::$_cache[$class]))  {
+			return self::$_cache[$class][$id];
+		}
+		return null;
+	}
+    public static function getCacheListValue($class,$key) {
+		if (array_key_exists($class,self::$_cache2) && array_key_exists($key,self::$_cache2[$class]))  {
+			return self::$_cache2[$class][$key];
+		}
+		return null;
+	}
 
     function __construct(Web $w) {
         $this->_db = $w->db;
@@ -97,6 +113,8 @@ class DbService {
     function getObject($class, $idOrWhere, $use_cache = true, $order_by = null) {
         if (!$idOrWhere || !$class)
             return null;
+
+		if ($order_by !== null) $use_cache=false;
 
         $key = $idOrWhere;
         if (is_array($idOrWhere)) {
@@ -168,7 +186,7 @@ class DbService {
         // Automatically converts keys with different database values
 		$parts = array();
         foreach ($object->getDbTableColumnNames() as $k) {
-            if(0 === strpos($k, 'dt_') || 0 === strpos($k, 'd_') || 0 === strpos($k, 't_')) {
+            if(0 === strpos($k, 'dt_') || 0 === strpos($k, 'd_')) { //  || 0 === strpos($k, 't_')
                 // This is MySQL specific!
                 $parts[] = "UNIX_TIMESTAMP($table.`".$object->getDbColumnName($k)."`) AS `$k`";
             } else if($k != $object->getDbColumnName($k)) {
@@ -192,6 +210,11 @@ class DbService {
     function getObjects($class, $where = null, $cache_list = false, $use_cache = true, $order_by = null, $offset = null, $limit = null) {
         if (!$class)
             return null;
+		
+		if ($order_by !== null || $offset !== null || $limit !== null ) {
+			$use_cache=false;
+			$cache_list=false;
+		}
 
         // if using the list cache
         if ($cache_list) {
@@ -233,7 +256,7 @@ class DbService {
         }
 		
 		// Offset
-		if (!empty($offset)) {
+		if (!empty($offset) && !empty($limit)) {
 			$this->_db->offset($offset);
 		}
 		

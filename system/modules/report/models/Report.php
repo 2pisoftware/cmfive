@@ -134,7 +134,7 @@ class Report extends DbObject {
         // merge arrays to give all parameter form requirements
         if (!empty($template_values)) {
         	$arr[] = array("Select an Optional Template", "section");
-        	$arr[] =array("Format", "select", "format", null, $template_values);
+        	$arr[] =array("Format", "select", "template", null, $template_values);
         }
         // return form
         return !empty($arr) ? $arr : null;
@@ -278,7 +278,7 @@ class Report extends DbObject {
             $connection = $this->getDb();
             $return = $connection->query($sql)->fetchAll();
         } else {
-            $return = $this->_db->sql($sql)->fetch_all();
+            $return = $this->_db->sql($sql)->fetch_all(PDO::FETCH_BOTH);
         }
         
         if (!empty($return)) {

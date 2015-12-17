@@ -328,5 +328,3 @@ function deletegroupmember_POST(Web &$w) {
 		$w->msg("Task Group Members no longer exists?","/task-group/viewmembergroup/".$tgid);
 	}
 }
-
-?>

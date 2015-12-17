@@ -5,9 +5,10 @@ modules:
         url: 
         browser: firefox
         window_size: 1024x768
-        wait: 1
+        wait: 0.1
         capabilities:
             unexpectedAlertBehaviour: 'accept'
     - \Helper\Acceptance
     - \Helper\CmFiveTestHelper
     - Asserts
+    - Db

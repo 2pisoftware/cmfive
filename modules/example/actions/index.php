@@ -22,10 +22,10 @@ function index_ALL(Web $w) {
 			// prepare action buttons for each row
 			$actions = array();
 			if ($d->canEdit($w->Auth->user())) {
-				$actions[] = Html::box("/example/edit/".$d->id, "Edit", true);
+				$actions[] = Html::abox("/example/edit/".$d->id, "Edit",'editbutton');
 			}
 			if ($d->canDelete($w->Auth->user())) {
-				$actions[] = Html::b("/example/delete/".$d->id, "Delete", "Really delete?");
+				$actions[] = Html::ab("/example/delete/".$d->id, "Delete",'deletebutton', "Really delete?");
 			}
 			
 			// allow any other module to add actions here

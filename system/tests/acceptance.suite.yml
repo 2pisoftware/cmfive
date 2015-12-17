@@ -5,7 +5,7 @@ modules:
         url: 
         browser: firefox
         window_size: 1024x768
-        wait: 1
+        wait: 2
         capabilities:
             unexpectedAlertBehaviour: 'accept'
     - \Helper\Acceptance

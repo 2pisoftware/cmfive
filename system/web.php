@@ -269,9 +269,12 @@ class Web {
 
         // start the session
         // $sess = new SessionManager($this);
-        session_name(SESSION_NAME);
-        session_start();
-
+        try {
+			session_name(SESSION_NAME);
+			session_start();
+		} catch (Exception  $e) {
+			$this->Log->info("Error starting session ".$e->getMessage());
+		}
         // Initialise the logger (needs to log "info" to include the request data, see LogService __call function)
         $this->Log->info("info");
         
@@ -424,7 +427,7 @@ class Web {
             // send headers first
             if ($this->_headers) {
                 foreach ($this->_headers as $key => $val) {
-                    header($key . ': ' . $val);
+                    $this->reallySendHeader($key . ': ' . $val);
                 }
             }
             $body = null;
@@ -448,8 +451,6 @@ class Web {
         } else {
             $this->notFoundPage();
         }
-        
-        exit();
     }
 
     /**
@@ -602,9 +603,6 @@ class Web {
             if (!CSRF::inHistory()) {
                 @$this->service('log')->error("System: CSRF Detected from " . $this->requestIpAddress());
                 throw new CSRFException("Cross site request forgery detected. Your IP has been logged");
-                //header("HTTP/1.0 403 Forbidden");
-                //echo "Cross site request forgery detected. Your IP has been logged";
-                //die();
             } else {
                 $this->msg("Duplicate form submission detected, make sure you only click buttons once");
             }
@@ -781,11 +779,11 @@ class Web {
         if (file_exists($filename)) {
             $filesystem = $this->File->getFilesystem(dirname($filename));
             $file = $this->File->getFileObject($filesystem, $filename);
-            header("Content-Type: " . $this->getMimetype($filename));
+            $this->reallySendHeader("Content-Type: " . $this->getMimetype($filename));
             echo $file->getContent();
             //readfile($filename);
         } else {
-            header("HTTP/1.1 404 Not Found");
+            $this->reallySendHeader("HTTP/1.1 404 Not Found");
         }
         exit;
     }
@@ -937,10 +935,10 @@ class Web {
             echo "The page requested could not be found.";
         } else {
             if ($this->templateExists($this->_notFoundTemplate)) {
-                header("HTTP/1.0 404 Not Found");
+                $this->reallySendHeader("HTTP/1.0 404 Not Found");
                 echo $this->fetchTemplate($this->_notFoundTemplate);
             } else {
-                header("HTTP/1.0 404 Not Found");
+                $this->reallySendHeader("HTTP/1.0 404 Not Found");
                 echo '<p align="center">Sorry, page not found.</p>';
             }
         }
@@ -1390,7 +1388,7 @@ class Web {
     }
 
     function requestIpAddress() {
-        return $_SERVER['REMOTE_ADDR'];
+        return array_key_exists('REMOTE_ADDR',$_SERVER) ? $_SERVER['REMOTE_ADDR'] : '';
     }
 
     /**
@@ -1564,7 +1562,7 @@ class Web {
             $this->_callPostListeners();
         }
 
-        header("Location: " . trim($url));
+        $this->reallySendHeader("Location: " . trim($url));
         exit();
     }
 
@@ -1574,6 +1572,13 @@ class Web {
     function sendHeader($key, $value) {
         $this->_headers[$key] = $value;
     }
+    
+    /**
+     *  Allow stubbing of global header function for unit tets
+     */
+    function reallySendHeader($string) {
+		header($string);
+	}
 
     /**
      * returns a string representation of everything

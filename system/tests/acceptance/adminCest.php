@@ -14,6 +14,10 @@ class adminCest
 	var $username='admin';
 	var $password='admin';
 	
+	public function testMini($I) {
+		$I->login($I,$this->username,$this->password);
+	}
+	
 	public function testUserAdmin($I) {
 		$I->login($I,$this->username,$this->password);
 		$I->createUser($I,'testuser','password','testy','tererer','testy@tererer.com');

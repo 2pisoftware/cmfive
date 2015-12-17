@@ -727,8 +727,8 @@ class Html {
      * @param <type> $value
      * @param <type> $class
      */
-    public static function select($name, $items, $value = null, $class = null, $style = null, $allmsg = "-- Select --", $readonly = null, $required = null) {
-        $buf = '<select id="' . $name . '"  name="' . $name . '" class="' . $class . '" style="' . $style . '" ' . $readonly . ' ' . $required . '>';
+    public static function select($name, $items, $value = null, $class = null, $style = null, $allmsg = "-- Select --", $required = null) {
+        $buf = '<select id="' . $name . '"  name="' . $name . '" class="' . $class . '" style="' . $style . '" ' . $required . '>';
         $buf.= $allmsg ? "<option value=''>" . $allmsg . "</option>" : '';
         if (!empty($items) && is_array($items)) {
             foreach ($items as $item) {
