@@ -2,8 +2,11 @@
 
 function listchannels_GET(Web $w) {
 	$w->Channels->navigation($w, "Channels List");
-	// Get all email, FTP, local channels
+	
+        // Get known channel types: email and web
 	$email_channels = $w->Channel->getEmailChannels();
+	$web_channels = $w->Channel->getWebChannels();
 
-	$w->ctx("channels", $email_channels);
+	$w->ctx("channels", array_merge((isset($email_channels)) ? $email_channels : array(),
+                                        (isset($web_channels)) ? $web_channels : array()));
 }
