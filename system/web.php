@@ -1376,6 +1376,7 @@ class Web {
             }
             $this->ctx($key, $val);
             $match[$key] = $val;
+			$match[$i] = $val;		// Use associative listing as well (so list() can work)
         }
         return $match;
     }

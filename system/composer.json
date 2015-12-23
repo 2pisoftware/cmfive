@@ -5,7 +5,9 @@
         "bin-dir": "composer/bin"
     },
     "require": {
+        "codeception/codeception": "*",
         "monolog/monolog": "1.8.*@dev",
+        "robmorgan/phinx": "^0.4.6",
         "knplabs/gaufrette": "0.2.*@dev",
         "dropbox-php/dropbox-php": "*",
         "zendframework/zend-mail": "2.2.5",
@@ -13,7 +15,6 @@
         "swiftmailer/swiftmailer": "@stable",
         "twig/twig": "1.*",
         "nesbot/carbon": "1.14",
-        "mandrill/mandrill": "1.0.*",
-        "robmorgan/phinx": "^0.4.6"
+        "mandrill/mandrill": "1.0.*"
     }
 }

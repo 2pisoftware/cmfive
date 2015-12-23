@@ -239,6 +239,7 @@ MIGRATION;
 								$migration_object->path = $migration_path;
 								$migration_object->classname = $migration;
 								$migration_object->module = strtolower($module);
+								$migration_object->batch = Migration::getNextBatchNumber();
 								$migration_object->insert();
 								
 								$runMigrations++;
@@ -338,6 +339,23 @@ MIGRATION;
 				$this->w->db->rollbackTransaction();
 			}
 		}
+	}
+	
+	public function batchRollback() {
+		
+		// Get latest batch
+		$batch_no = (new Migration($this->w))->getNextBatchNumber() - 1;
+		
+		$migrations = $this->getObjects("Migration", ["batch" => $batch_no]);
+		$migrations_rolled_back = 0;
+		if (!empty($migrations)) {
+			foreach($migrations as $migration) {
+				$migrations_rolled_back++;
+				$this->rollback($migration->module, $migration->path);
+			}
+		}
+		
+		return $migrations_rolled_back . " migration" . ($migrations_rolled_back == 1 ? '' : 's') . " rolled back";
 	}
 	
 	public function installInitialMigration() {

@@ -9,7 +9,8 @@ class ReportInitialMigration extends CmfiveMigration {
 				->setIdentity(true);
 
 		// Create report table
-		$this->table('report', [
+		if (!$this->hasTable("report")) {
+			$this->table('report', [
 					'id' => false,
 					'primary_key' => 'id'
 				])->addColumn($column)
@@ -23,9 +24,11 @@ class ReportInitialMigration extends CmfiveMigration {
 				->addColumn('sqltype', 'string', ['limit' => 255, 'null' => true])
 				->addCmfiveParameters(['dt_created', 'dt_modified', 'creator_id', 'modifier_id'])
 				->create();
-
+		}
+		
 		// Create report connection table
-		$this->table('report_connection', [
+		if (!$this->hasTable("report_connection")) {
+			$this->table('report_connection', [
 					'id' => false,
 					'primary_key' => 'id'
 				])->addColumn($column)
@@ -38,9 +41,11 @@ class ReportInitialMigration extends CmfiveMigration {
 				->addColumn('s_db_password', 'string', ['limit' => 1024, 'null' => true])
 				->addCmfiveParameters()
 				->create();
+		}
 		
 		// Create report feed table
-		$this->table('report_feed', [
+		if (!$this->hasTable("report_feed")) {
+			$this->table('report_feed', [
 					'id' => false,
 					'primary_key' => 'id'
 				])->addColumn($column)
@@ -51,9 +56,11 @@ class ReportInitialMigration extends CmfiveMigration {
 				->addColumn('url', 'string', ['limit' => 1024])
 				->addCmfiveParameters(['dt_modified', 'creator_id', 'modifier_id'])
 				->create();
+		}
 		
 		// Create report feed table
-		$this->table('report_member', [
+		if (!$this->hasTable("report_member")) {
+			$this->table('report_member', [
 					'id' => false,
 					'primary_key' => 'id'
 				])->addColumn($column)
@@ -62,9 +69,11 @@ class ReportInitialMigration extends CmfiveMigration {
 				->addColumn('role', 'string', ['limit' => 255, 'null' => true])
 				->addCmfiveParameters(['dt_created', 'dt_modified', 'creator_id', 'modifier_id'])
 				->create();
+		}
 		
 		// Create report feed table
-		$this->table('report_template', [
+		if (!$this->hasTable("report_template")) {
+			$this->table('report_template', [
 					'id' => false,
 					'primary_key' => 'id'
 				])->addColumn($column)
@@ -73,14 +82,15 @@ class ReportInitialMigration extends CmfiveMigration {
 				->addColumn('type', 'string', ['limit' => 255, 'null' => true])
 				->addCmfiveParameters()
 				->create();
+		}
 	}
 
 	public function down() {
-		$this->dropTable('report');
-		$this->dropTable('report_connection');
-		$this->dropTable('report_feed');
-		$this->dropTable('report_member');
-		$this->dropTable('report_template');
+		$this->hasTable("report") ? $this->dropTable('report') : null;
+		$this->hasTable("report_connection") ? $this->dropTable('report_connection') : null;
+		$this->hasTable("report_feed") ? $this->dropTable('report_feed') : null;
+		$this->hasTable("report_member") ? $this->dropTable('report_member') : null;
+		$this->hasTable("report_template") ? $this->dropTable('report_template') : null;
 	}
 
 }

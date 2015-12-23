@@ -10,6 +10,6 @@ function run_GET(Web $w) {
 	
 	$response = $w->Migration->runMigrations($p['module'], $p['file']);
 	
-	$w->msg($response, "/admin-migration#" . $p['module']);
+	$w->msg($response, "/admin-migration");
 	
 }

@@ -9,7 +9,8 @@ class TaskInitialMigration extends CmfiveMigration {
 				->setIdentity(true);
 
 		// Create task table
-		$this->table('task', [
+		if (!$this->hasTable("task")) {
+			$this->table('task', [
 					'id' => false,
 					'primary_key' => 'id'
 				])->addColumn($column)
@@ -33,9 +34,11 @@ class TaskInitialMigration extends CmfiveMigration {
 				->addColumn('longitude', 'string', ['limit' => 20, 'null' => true])
 				->addCmfiveParameters(['dt_created', 'dt_modified', 'creator_id', 'modifier_id'])
 				->create();
-
+		}
+		
 		// Create task data table
-		$this->table('task_data', [
+		if(!$this->hasTable("task_data")) {
+			$this->table('task_data', [
 					'id' => false,
 					'primary_key' => 'id'
 				])->addColumn($column)
@@ -43,9 +46,11 @@ class TaskInitialMigration extends CmfiveMigration {
 				->addColumn('data_key', 'string', ['limit' => 100])
 				->addColumn('value', 'string', ['limit' => 255])
 				->create();
+		}
 
 		// Create taskgroup table
-		$this->table('task_group', [
+		if (!$this->hasTable("task_group")) {
+			$this->table('task_group', [
 					'id' => false,
 					'primary_key' => 'id'
 				])->addColumn($column)
@@ -59,9 +64,11 @@ class TaskInitialMigration extends CmfiveMigration {
 				->addColumn('default_assignee_id', 'biginteger')
 				->addCmfiveParameters(['dt_created', 'dt_modified', 'creator_id', 'modifier_id'])
 				->create();
-
+		}
+		
 		// Create taskgroup member table
-		$this->table('task_group_member', [
+		if (!$this->hasTable("task_group_member")) {
+			$this->table('task_group_member', [
 					'id' => false,
 					'primary_key' => 'id'
 				])->addColumn($column)
@@ -71,9 +78,11 @@ class TaskInitialMigration extends CmfiveMigration {
 				->addColumn('priority', 'integer')
 				->addColumn('is_active', 'boolean')
 				->create();
-
+		}
+		
 		// Create taskgroup notify table
-		$this->table('task_group_notify', [
+		if (!$this->hasTable("task_group_notify")) {
+			$this->table('task_group_notify', [
 					'id' => false,
 					'primary_key' => 'id'
 				])->addColumn($column)
@@ -82,9 +91,11 @@ class TaskInitialMigration extends CmfiveMigration {
 				->addColumn('type', 'string', ['limit' => 255, 'null' => true])
 				->addColumn('value', 'boolean', ['default' => 0])
 				->create();
-
+		}
+		
 		// Create taskgroup user notify table
-		$this->table('task_group_user_notify', [
+		if (!$this->hasTable("task_group_user_notify")) {
+			$this->table('task_group_user_notify', [
 					'id' => false,
 					'primary_key' => 'id'
 				])->addColumn($column)
@@ -100,9 +111,11 @@ class TaskInitialMigration extends CmfiveMigration {
 				->addColumn('task_documents', 'boolean', ['default' => 0])
 				->addColumn('task_pages', 'boolean', ['default' => 0])
 				->create();
-
+		}
+		
 		// Create taskgroup notify table
-		$this->table('task_object', [
+		if (!$this->hasTable("task_object")) {
+			$this->table('task_object', [
 					'id' => false,
 					'primary_key' => 'id'
 				])->addColumn($column)
@@ -111,8 +124,10 @@ class TaskInitialMigration extends CmfiveMigration {
 				->addColumn('table_name', 'string', ['limit' => 255])
 				->addColumn('object_id', 'biginteger')
 				->create();
-
-		$this->table('task_time', [
+		}
+		
+		if (!$this->hasTable("task_time")) {
+			$this->table('task_time', [
 					'id' => false,
 					'primary_key' => 'id'
 				])->addColumn($column)
@@ -125,9 +140,11 @@ class TaskInitialMigration extends CmfiveMigration {
 				->addColumn('is_suspect', 'boolean', ['default' => 0])
 				->addCmfiveParameters(['dt_modified', 'modifier_id'])
 				->create();
-
+		}
+		
 		// Create taskgroup user notify table
-		$this->table('task_user_notify', [
+		if (!$this->hasTable("task_user_notify")) {
+			$this->table('task_user_notify', [
 					'id' => false,
 					'primary_key' => 'id'
 				])->addColumn($column)
@@ -140,18 +157,19 @@ class TaskInitialMigration extends CmfiveMigration {
 				->addColumn('task_documents', 'boolean', ['default' => 0])
 				->addColumn('task_pages', 'boolean', ['default' => 0])
 				->create();
+		}
 	}
 
 	public function down() {
-		$this->dropTable("task");
-		$this->dropTable("task_data");
-		$this->dropTable("task_group");
-		$this->dropTable("task_group_member");
-		$this->dropTable("task_group_notify");
-		$this->dropTable("task_group_user_notify");
-		$this->dropTable("task_object");
-		$this->dropTable("task_time");
-		$this->dropTable("task_user_notify");
+		$this->hasTable("task") ? $this->dropTable("task") : null;
+		$this->hasTable("task_data") ? $this->dropTable("task_data") : null;
+		$this->hasTable("task_group") ? $this->dropTable("task_group") : null;
+		$this->hasTable("task_group_member") ? $this->dropTable("task_group_member") : null;
+		$this->hasTable("task_group_notify") ? $this->dropTable("task_group_notify") : null;
+		$this->hasTable("task_group_user_notify") ? $this->dropTable("task_group_user_notify") : null;
+		$this->hasTable("task_object") ? $this->dropTable("task_object") : null;
+		$this->hasTable("task_time") ? $this->dropTable("task_time") : null;
+		$this->hasTable("task_user_notify") ? $this->dropTable("task_user_notify") : null;
 	}
 
 }
