@@ -95,7 +95,7 @@
 				$overrideFunctions['sessionDestroy']=function() {
 					//codecept_debug('::SESSIONDESTROY::');
 				};
-				$overrideFunctions['reallySendHeader']=function($a) {
+				$overrideFunctions['header']=function($a) {
 					echo ('::HEADER::'.$a.':::');
 				};
 				$blankFunctions=[];

@@ -1,15 +1,96 @@
+<style>
+	
+	div.image-container {
+		width: auto;
+		height: 220px;
+		position: relative;
+		margin-left: auto;
+		margin-right: auto;
+		overflow: hidden;
+		padding: 10px;
+		border: 1px solid #444;
+		margin: 5px;
+		background-color: #efefef;
+	}
+
+	div.image-container-overlay {
+		background-color: rgba(0, 0, 0, 0.7);
+		position: absolute;
+		margin: auto;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 100;
+		display: none;
+		padding: 10px;
+	}
+	
+	div.image-container-overlay > .row-fluid {
+		height: 75px;
+	}
+ 	
+	div.image-container-overlay:hover {
+		display: block;
+	} 
+	 
+	img.image-cropped {
+		position: absolute;
+		margin: auto;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+	}
+	
+</style>
+	
 <?php
-    echo Html::box(WEBROOT."/file/attach/".get_class($object)."/{$object->id}/".(str_replace("/", "+", $redirect)), "Attach a File", true);
+//    echo Html::box(WEBROOT."/file/attach/".get_class($object)."/{$object->id}/".(str_replace("/", "+", $redirect)), "Attach a File", true);
+	echo Html::box("/file/new/" . get_class($object) . "/{$object->id}?redirect_url=" . urlencode($redirect), "Attach a File", true);
+	
     $notImages = array();
     if (!empty($attachments)) : ?>
         <br/><br/>
-        <ul class="clearing-thumbs small-block-grid-2 medium-block-grid-6 large-block-grid-9" data-clearing>
-        <?php foreach ($attachments as $att) : ?>
-            <?php if ($att->isImage()) : ?>
-                <!--<li><a class="th" href="/uploads/<?php echo $att->fullpath; ?>"><img data-caption="<?php echo $att->title; ?>" src="<?php echo $att->getThumbnailUrl(); ?>"></a></li>-->
-				<li><a class="th" href="/file/atfile/<?php echo $att->id; ?>"><img data-caption="<?php echo $att->title; ?>" src="<?php echo $att->getThumbnailUrl(); ?>"></a></li>
+        <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+        <?php foreach ($attachments as $attachment) : ?>
+            <?php if ($attachment->isImage()) : ?>
+				<li>
+					<div class="image-container">
+						<div class="image-container-overlay">
+							<div class="row-fluid">
+								<a href="#" data-reveal-id="attachment_modal_<?php echo $attachment->id; ?>" class="button expand">View</a>
+							</div>
+							<div class="row-fluid">
+								<?php echo Html::box("/file/edit/" . $attachment->id . "?redirect_url=" . urlencode($redirect), "Edit", true, null, null, null, null, null, "button expand secondary"); ?>
+							</div>
+							<div class="row-fluid">
+								<?php echo Html::b("/file/delete/" . $attachment->id . "?redirect_url=" . urlencode($redirect), "Delete", "Are you sure you want to delete this attachment?", null, false, "expand alert ");?>
+							</div>
+						</div>
+						<img class="image-cropped" data-caption="<?php echo $attachment->title; ?>" src="<?php echo $attachment->getThumbnailUrl(); ?>">
+					</div>
+					
+					<a href="#" data-reveal-id="attachment_modal_<?php echo $attachment->id; ?>">
+						<div class="row-fluid clearfix text-center">
+							<b><?php echo $attachment->title; ?></b>
+						</div>
+						<div class="row-fluid clearfix text-center">
+							<?php echo strip_tags($attachment->description); ?>
+						</div>
+					</a>
+					<div id="attachment_modal_<?php echo $attachment->id; ?>" class="reveal-modal" data-reveal role="dialog">
+						<h2 id="firstModalTitle"><?php echo $attachment->title; ?></h2>
+						<a href="/file/atfile/<?php echo $attachment->id; ?>" target="_blank" class="button right" onclick="$('#attachment_modal_<?php echo $attachment->id; ?>').foundation('reveal', 'close');">Open in new tab/window</a>
+						<p><?php echo $attachment->description; ?></p>
+						<div class="row-fluid panel" style="text-align: center;">
+							<img src="/file/atfile/<?php echo $attachment->id; ?>" alt="<?php echo $attachment->title; ?>" />
+						</div>
+						<a class="close-reveal-modal" aria-label="Close">&#215;</a>
+					</div>
+				</li>
             <?php else :
-                $notImages[] = $att;
+                $notImages[] = $attachment;
             endif;
         endforeach; ?>
         </ul>
@@ -39,3 +120,16 @@
             </tbody>
         </table>
     <?php endif; ?>
+
+	<script>
+		
+		$(document).ready(function() {
+			$(".image-container-overlay button").removeClass("tiny");
+			$(".image-container").hover(function() {
+				$(".image-container-overlay", this).stop().fadeIn("fast");
+			}, function() {
+				$(".image-container-overlay", this).stop().fadeOut("fast");
+			});
+		});
+
+	</script>

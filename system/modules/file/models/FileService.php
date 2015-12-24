@@ -4,81 +4,109 @@ use Gaufrette\Filesystem;
 use Gaufrette\File as File;
 use Gaufrette\Adapter\Local as LocalAdapter;
 use Gaufrette\Adapter\InMemory as InMemoryAdapter;
+use Gaufrette\Adapter\AwsS3 as AwsS3;
+use Aws\S3\S3Client as S3Client;
 
 class FileService extends DbService {
-    
-    public static $_thumb_height = 200;
-    public static $_thumb_width = 200;
-    public static $_stream_name = "attachment";
 
-    // This will need a rethink (storing full path in Attachment but also setting the full path here) etc
-    function getFilePath($path) {
-    	if (strpos($path, FILE_ROOT . "attachments/") !== FALSE){
-            return $path;
-    	}
-        if (strpos($path, "attachments/") !== FALSE) {
-            return FILE_ROOT . $path;
-        }
-    
-    	return FILE_ROOT . "attachments/" . $path;
-    }
+	public static $_thumb_height = 200;
+	public static $_thumb_width = 200;
+	public static $_stream_name = "attachment";
 
-    function getFileObject($filesystem, $filename) {
-    	$file = new File(basename($filename), $filesystem);
-    	return $file;
-    }
+	// This will need a rethink (storing full path in Attachment but also setting the full path here) etc
+	function getFilePath($path) {
+		if (strpos($path, FILE_ROOT . "attachments/") !== FALSE) {
+			return $path;
+		}
+		if (strpos($path, "attachments/") !== FALSE) {
+			return FILE_ROOT . $path;
+		}
 
-    function getFilesystem($path = null, $adapter = "local", $content = null) {
-    	$adapter_obj = null;
-    	switch ($adapter){
-    		case "local":
-    			$adapter_obj = new LocalAdapter($this->getFilePath($path), true);
-    			break;
-    		case "memory":
-    			$adapter_obj = new InMemoryAdapter(array(basename($path) => $content));
-    			break;
-    	}
-    		
-    	if ($adapter_obj !== null){
-    		return new Filesystem($adapter_obj);
-    	}
-    	return null;
-    }
+		return FILE_ROOT . "attachments/" . $path;
+	}
 
-    function registerStreamWrapper($filesystem = null) {
-    	if (!empty($filesystem)){
-    		$map = \Gaufrette\StreamWrapper::getFilesystemMap();
-    		$map->set(self::$_stream_name, $filesystem);
+	function getFileObject($filesystem, $filename) {
+		$file = new File(basename($filename), $filesystem);
+		return $file;
+	}
 
-    		\Gaufrette\ StreamWrapper::register();
-    	}
-    }
+	function getActiveAdapter() {
+		$adapters = Config::get('file.adapters');
+		if (!empty($adapters)) {
+
+			// Omit local because we always default to it
+			foreach ($adapters as $adapter => $settings) {
+				if ($settings['active'] == true && $adapter !== "local") {
+					return $adapter;
+				}
+			}
+		}
+
+		// Always default to local
+		return "local";
+	}
+
+	function getFilesystem($path = null, $content = null) {
+		$adapter_obj = null;
+
+		$adapter = $this->getActiveAdapter();
+		switch ($adapter) {
+			case "local":
+				$adapter_obj = new LocalAdapter($this->getFilePath($path), true);
+				break;
+			case "memory":
+				$adapter_obj = new InMemoryAdapter(array(basename($path) => $content));
+				break;
+			case "s3":
+				$client = S3Client::factory(["key" => Config::get('file.adapters.s3.key'), "secret" => Config::get('file.adapters.s3.key')]);
+				$adapter_obj = new AwsS3($client, Config::get('file.adapters.s3.bucket'));
+				break;
+		}
+
+		if ($adapter_obj !== null) {
+			return new Filesystem($adapter_obj);
+		}
+		return null;
+	}
+
+	function registerStreamWrapper($filesystem = null) {
+		if (!empty($filesystem)) {
+			$map = \Gaufrette\StreamWrapper::getFilesystemMap();
+			$map->set(self::$_stream_name, $filesystem);
+
+			\Gaufrette\StreamWrapper::register();
+		}
+	}
 
 	function getImg($path) {
-		$file = FILE_ROOT.$path;
+		$file = FILE_ROOT . $path;
 		if (!file_exists($file))
-		return null;
+			return null;
 
 		list($width, $height, $type, $attr) = getimagesize($file);
 
-		$tag = "<img src='".WEBROOT."/file/path/".$path."' border='0' ".$attr." />";
+		$tag = "<img src='" . WEBROOT . "/file/path/" . $path . "' border='0' " . $attr . " />";
 		return $tag;
 	}
 
 	function getThumbImg($path) {
-		$file = FILE_ROOT.$path;
+		$file = FILE_ROOT . $path;
 		if (!file_exists($file))
-		return $path." does not exist.";
+			return $path . " does not exist.";
 
 		list($width, $height, $type, $attr) = getimagesize($file);
-                
-		$tag = "<img src='".WEBROOT."/file/thumb/".$path."' height='".self::$_thumb_height."' width='".self::$_thumb_width."' />";
+
+		$tag = "<img src='" . WEBROOT . "/file/thumb/" . $path . "' height='" . self::$_thumb_height . "' width='" . self::$_thumb_width . "' />";
 		return $tag;
 	}
 
 	function isImage($path) {
-        if (file_exists(str_replace("'","\\'",FILE_ROOT."/".$path))) {
-			list($width, $height, $type, $attr) = getimagesize(str_replace("'","\\'",FILE_ROOT."/".$path));
+		if (file_exists(str_replace("'", "\\'", FILE_ROOT . "/" . $path))) {
+			$path = str_replace("'", "\\'", FILE_ROOT . "/" . $path);
+			$attr = null;
+			if (is_file($path)) {
+				list($width, $height, $type, $attr) = getimagesize($path);
+			}
 			return $attr !== null;
 		} else {
 			return false;
@@ -86,10 +114,10 @@ class FileService extends DbService {
 	}
 
 	function getDownloadUrl($path) {
-		return WEBROOT."/file/path/".$path;
+		return WEBROOT . "/file/path/" . $path;
 	}
 
-	function getAttachmentsFileList($objectOrTable, $id=null) {
+	function getAttachmentsFileList($objectOrTable, $id = null) {
 		$attachments = $this->getAttachments($objectOrTable, $id);
 		if (!empty($attachments)) {
 			$pluck = array();
@@ -101,7 +129,7 @@ class FileService extends DbService {
 		return array();
 	}
 
-	function getAttachments($objectOrTable,$id=null) {
+	function getAttachments($objectOrTable, $id = null) {
 		if (is_scalar($objectOrTable)) {
 			$table = $objectOrTable;
 		} elseif (is_a($objectOrTable, "DbObject")) {
@@ -109,7 +137,7 @@ class FileService extends DbService {
 			$id = $objectOrTable->id;
 		}
 		if ($table && $id) {
-			$rows = $this->_db->get("attachment")->where("parent_table",$table)->and("parent_id",$id)->and("is_deleted",0)->fetch_all();
+			$rows = $this->_db->get("attachment")->where("parent_table", $table)->and("parent_id", $id)->and("is_deleted", 0)->fetch_all();
 			return $this->fillObjects("Attachment", $rows);
 		}
 		return null;
@@ -132,89 +160,87 @@ class FileService extends DbService {
 	 * @param <type> $description
 	 * @return the id of the attachment object or null
 	 */
-	function uploadAttachment($requestkey,$parentObject,$title=null,$description=null,$type_code=null) {
+	function uploadAttachment($requestkey, $parentObject, $title = null, $description = null, $type_code = null) {
 		if (!is_a($parentObject, "DbObject")) {
 			$this->w->error("Parent not found.");
 		}
 
-		$rpl_nil = array("..","'",'"',",","\\","/");
-		$rpl_ws = array(" ","&","+","$","?","|","%","@","#","(",")","{","}","[","]",",",";",":");
-                
-                $rpl_nil = array("..","'",'"',",","\\","/");
-		$rpl_ws = array(" ","&","+","$","?","|","%","@","#","(",")","{","}","[","]",",",";",":");
-		$filename = str_replace($rpl_ws, "_", str_replace($rpl_nil, "", basename($_FILES[$requestkey]['name'])));
+		$replace_empty = array("..", "'", '"', ",", "\\", "/");
+		$replace_underscore = array(" ", "&", "+", "$", "?", "|", "%", "@", "#", "(", ")", "{", "}", "[", "]", ",", ";", ":");
 
-                $att = new Attachment($this->w);
-                $att->filename = $filename;
-                $att->fullpath = null;
-                $att->parent_table = $parentObject->getDbTableName();
-                $att->parent_id = $parentObject->id;
-                $att->title = $title;
-                $att->description = $description;
-                $att->type_code = $type_code;
-                $att->insert();
+		$filename = str_replace($replace_underscore, "_", str_replace($replace_empty, "", basename($_FILES[$requestkey]['name'])));
 
-                $filesystemPath = FILE_ROOT . "attachments/" . $parentObject->getDbTableName().'/'.date('Y/m/d').'/'.$att->id . '/';
-                $filesystem = $this->getFilesystem($filesystemPath);
-                $file = new File($filename, $filesystem);
-                $file->setContent(file_get_contents($_FILES[$requestkey]['tmp_name']));
+		$att = new Attachment($this->w);
+		$att->filename = $filename;
+		$att->fullpath = null;
+		$att->parent_table = $parentObject->getDbTableName();
+		$att->parent_id = $parentObject->id;
+		$att->title = $title;
+		$att->description = $description;
+		$att->type_code = $type_code;
+		$att->insert();
 
-                $att->fullpath = str_replace(FILE_ROOT, "", $filesystemPath . $filename);
-                $att->update();
+		$filesystemPath = FILE_ROOT . "attachments/" . $parentObject->getDbTableName() . '/' . date('Y/m/d') . '/' . $att->id . '/';
+		$filesystem = $this->getFilesystem($filesystemPath);
+		$file = new File($filename, $filesystem);
+		$file->setContent(file_get_contents($_FILES[$requestkey]['tmp_name']));
+
+		$att->fullpath = str_replace(FILE_ROOT, "", $filesystemPath . $filename);
+		$att->update();
 		return $att->id;
 	}
-        
-        /**
+
+	/**
 	 * Uploads multiple attachments at once (Using the Html::multiFileUpload function
 	 *
 	 *  Stores in /uploads/attachments/<ObjectTableName>/<year>/<month>/<day>/<attachId>/<filename>
 	 *
-         * @param <string> $requestKey
-         * @param <DbObject> $parentObject
+	 * @param <string> $requestKey
+	 * @param <DbObject> $parentObject
 	 * @param <Array> $titles
 	 * @param <Array> $descriptions
-         * @param <Array> $type_codes
+	 * @param <Array> $type_codes
 	 * @return <bool> if upload was successful
 	 */
 	function uploadMultiAttachment($requestkey, $parentObject, $titles = null, $descriptions = null, $type_codes = null) {
 		if (!is_a($parentObject, "DbObject")) {
-                    $this->w->error("Parent object not found.");
-                    return false;
+			$this->w->error("Parent object not found.");
+			return false;
 		}
-		
-                $rpl_nil = array("..","'",'"',",","\\","/");
-		$rpl_ws = array(" ","&","+","$","?","|","%","@","#","(",")","{","}","[","]",",",";",":");
-                
-                if (!empty($_FILES[$requestkey]['name']) && is_array($_FILES[$requestkey]['name'])) {
-                    $file_index = 0;
-                    foreach ($_FILES[$requestkey]['name'] as $FILE_filename) {
-                        // Files can be empty
-                        if (!empty($FILE_filename['file'])) {
-                            $filename = str_replace($rpl_ws, "_", str_replace($rpl_nil, "", basename($FILE_filename['file'])));
 
-                            $att = new Attachment($this->w);
-                            $att->filename = $filename;
-                            $att->fullpath = null;
-                            $att->parent_table = $parentObject->getDbTableName();
-                            $att->parent_id = $parentObject->id;
-                            $att->title = (!empty($titles[$file_index]) ? $titles[$file_index] : '');
-                            $att->description = (!empty($descriptions[$file_index]) ? $descriptions[$file_index] : '');
-                            $att->type_code = (!empty($type_codes) ? $type_codes[$file_index] : '');
-                            $att->insert();
-                            
-                            $filesystemPath = FILE_ROOT . "attachments/" . $parentObject->getDbTableName().'/'.date('Y/m/d').'/'.$att->id . '/';
-                            $filesystem = $this->getFilesystem($filesystemPath);
-                            $file = new File($filename, $filesystem);
-                            $file->setContent(file_get_contents($_FILES[$requestkey]['tmp_name'][$file_index]['file']));
+		$rpl_nil = array("..", "'", '"', ",", "\\", "/");
+		$rpl_ws = array(" ", "&", "+", "$", "?", "|", "%", "@", "#", "(", ")", "{", "}", "[", "]", ",", ";", ":");
 
-                            $att->fullpath = str_replace(FILE_ROOT, "", $filesystemPath . $filename);
-                            $att->update();
-                        }
-                        
-                        $file_index++;
-                    }
-                }
-                
+		if (!empty($_FILES[$requestkey]['name']) && is_array($_FILES[$requestkey]['name'])) {
+			$file_index = 0;
+			foreach ($_FILES[$requestkey]['name'] as $FILE_filename) {
+				// Files can be empty
+				if (!empty($FILE_filename['file'])) {
+					$filename = str_replace($rpl_ws, "_", str_replace($rpl_nil, "", basename($FILE_filename['file'])));
+
+					$att = new Attachment($this->w);
+					$att->filename = $filename;
+					$att->fullpath = null;
+					$att->parent_table = $parentObject->getDbTableName();
+					$att->parent_id = $parentObject->id;
+					$att->title = (!empty($titles[$file_index]) ? $titles[$file_index] : '');
+					$att->description = (!empty($descriptions[$file_index]) ? $descriptions[$file_index] : '');
+					$att->type_code = (!empty($type_codes) ? $type_codes[$file_index] : '');
+					$att->insert();
+
+					$filesystemPath = FILE_ROOT . "attachments/" . $parentObject->getDbTableName() . '/' . date('Y/m/d') . '/' . $att->id . '/';
+					$filesystem = $this->getFilesystem($filesystemPath);
+					$file = new File($filename, $filesystem);
+					$file->setContent(file_get_contents($_FILES[$requestkey]['tmp_name'][$file_index]['file']));
+
+					$att->fullpath = str_replace(FILE_ROOT, "", $filesystemPath . $filename);
+					$att->update();
+				}
+
+				$file_index++;
+			}
+		}
+
 		return true;
 	}
 
@@ -222,8 +248,8 @@ class FileService extends DbService {
 
 		$filename = (!empty($name) ? $name : (str_replace(".", "", microtime()) . getFileExtension($content_type)));
 
-		$filesystemPath = $object->getDbTableName().'/'.date('Y/m/d').'/'.$object->id . '/';
-                
+		$filesystemPath = $object->getDbTableName() . '/' . date('Y/m/d') . '/' . $object->id . '/';
+
 		$filesystem = $this->getFilesystem($filesystemPath);
 		$file = new File($filename, $filesystem);
 		$file->setContent($content);
@@ -243,24 +269,24 @@ class FileService extends DbService {
 	}
 
 	function getAttachmentTypesForObject($o) {
-		return $this->getObjects("AttachmentType",array("table_name"=>$o->getDbTableName(), "is_active"=>'1'));
+		return $this->getObjects("AttachmentType", array("table_name" => $o->getDbTableName(), "is_active" => '1'));
 	}
 
-	function getImageAttachmentTemplateForObject($object,$backUrl) {
+	function getImageAttachmentTemplateForObject($object, $backUrl) {
 		$attachments = $this->getAttachments($object);
 		$template = "";
-		foreach($attachments as $att) {
+		foreach ($attachments as $att) {
 			if ($att->isImage()) {
 				$template .= '
 				<div class="attachment">
 				<div class="thumb"><a
-					href="'.WEBROOT.'/file/atthumb/'.$att->id.'/800/600/a.jpg"
+					href="' . WEBROOT . '/file/atthumb/' . $att->id . '/800/600/a.jpg"
 					rel="gallery"><img
-					src="'.WEBROOT.'/file/atthumb/'.$att->id.'/250/250" border="0" /></a><br/>'.$att->description.'
+					src="' . WEBROOT . '/file/atthumb/' . $att->id . '/250/250" border="0" /></a><br/>' . $att->description . '
 				</div>
 				
-				<div class="actions">'.Html::a(WEBROOT."/file/atdel/".$att->id."/".$backUrl."+".$object->id,"Delete",null,null,"Do you want to delete this attachment?")
-				.' '.Html::a(WEBROOT."/file/atfile/".$att->id."/".$att->filename,"Download").'
+				<div class="actions">' . Html::a(WEBROOT . "/file/atdel/" . $att->id . "/" . $backUrl . "+" . $object->id, "Delete", null, null, "Do you want to delete this attachment?")
+						. ' ' . Html::a(WEBROOT . "/file/atfile/" . $att->id . "/" . $att->filename, "Download") . '
 				</div>
 				</div>';
 			}

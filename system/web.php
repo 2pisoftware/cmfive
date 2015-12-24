@@ -427,7 +427,7 @@ class Web {
             // send headers first
             if ($this->_headers) {
                 foreach ($this->_headers as $key => $val) {
-                    $this->reallySendHeader($key . ': ' . $val);
+                    $this->header($key . ': ' . $val);
                 }
             }
             $body = null;
@@ -779,11 +779,11 @@ class Web {
         if (file_exists($filename)) {
             $filesystem = $this->File->getFilesystem(dirname($filename));
             $file = $this->File->getFileObject($filesystem, $filename);
-            $this->reallySendHeader("Content-Type: " . $this->getMimetype($filename));
+            $this->header("Content-Type: " . $this->getMimetype($filename));
             echo $file->getContent();
             //readfile($filename);
         } else {
-            $this->reallySendHeader("HTTP/1.1 404 Not Found");
+            $this->header("HTTP/1.1 404 Not Found");
         }
         exit;
     }
@@ -935,10 +935,10 @@ class Web {
             echo "The page requested could not be found.";
         } else {
             if ($this->templateExists($this->_notFoundTemplate)) {
-                $this->reallySendHeader("HTTP/1.0 404 Not Found");
+                $this->header("HTTP/1.0 404 Not Found");
                 echo $this->fetchTemplate($this->_notFoundTemplate);
             } else {
-                $this->reallySendHeader("HTTP/1.0 404 Not Found");
+                $this->header("HTTP/1.0 404 Not Found");
                 echo '<p align="center">Sorry, page not found.</p>';
             }
         }
@@ -1562,7 +1562,7 @@ class Web {
             $this->_callPostListeners();
         }
 
-        $this->reallySendHeader("Location: " . trim($url));
+        $this->header("Location: " . trim($url));
         exit();
     }
 
@@ -1576,7 +1576,7 @@ class Web {
     /**
      *  Allow stubbing of global header function for unit tets
      */
-    function reallySendHeader($string) {
+    function header($string) {
 		header($string);
 	}
 
