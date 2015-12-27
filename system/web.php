@@ -1729,7 +1729,7 @@ class WebTemplate {
      * @return void
      */
 
-    function WebTemplate() {
+    function __construct() {
         $this->vars = array();
     }
 
@@ -1799,7 +1799,7 @@ class CachedTemplate extends WebTemplate {
      *
      * @return void
      */
-    function CachedTemplate($path, $cache_id = null, $expire = 900) {
+    function __construct($path, $cache_id = null, $expire = 900) {
         $this->WebTemplate($path);
         $this->cache_id = $cache_id ? 'cache/' . md5($cache_id) : $cache_id;
         $this->expire = $expire;
