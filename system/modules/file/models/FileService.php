@@ -58,8 +58,9 @@ class FileService extends DbService {
 				$adapter_obj = new InMemoryAdapter(array(basename($path) => $content));
 				break;
 			case "s3":
-				$client = S3Client::factory(["key" => Config::get('file.adapters.s3.key'), "secret" => Config::get('file.adapters.s3.key')]);
-				$adapter_obj = new AwsS3($client, Config::get('file.adapters.s3.bucket'));
+				$options = Config::get('file.adapters.s3.options');
+				$client = S3Client::factory(["key" => Config::get('file.adapters.s3.key'), "secret" => Config::get('file.adapters.s3.secret')]);
+				$adapter_obj = new AwsS3($client, Config::get('file.adapters.s3.bucket'), is_array($options) ? $options : []);
 				break;
 		}
 
@@ -180,12 +181,14 @@ class FileService extends DbService {
 		$att->type_code = $type_code;
 		$att->insert();
 
-		$filesystemPath = FILE_ROOT . "attachments/" . $parentObject->getDbTableName() . '/' . date('Y/m/d') . '/' . $att->id . '/';
-		$filesystem = $this->getFilesystem($filesystemPath);
-		$file = new File($filename, $filesystem);
-		$file->setContent(file_get_contents($_FILES[$requestkey]['tmp_name']));
+		$filesystemPath = "attachments/" . $parentObject->getDbTableName() . '/' . date('Y/m/d') . '/' . $att->id . '/';
+		$filesystem = $this->getFilesystem(FILE_ROOT . $filesystemPath);
+		$file = new File($filesystemPath . $filename, $filesystem);
+		
+		$content = file_get_contents($_FILES[$requestkey]['tmp_name']);
+		$file->setContent($content, ['contentType' => $this->w->getMimetypeFromString($content)]);
 
-		$att->fullpath = str_replace(FILE_ROOT, "", $filesystemPath . $filename);
+		$att->fullpath = str_replace(FILE_ROOT, "", FILE_ROOT . $filesystemPath . $filename);
 		$att->update();
 		return $att->id;
 	}

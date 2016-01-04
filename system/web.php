@@ -768,7 +768,26 @@ class Web {
         }
         return $mime;
     }
-
+	
+	/**
+	 * Returns the mime type of a binary string, only works with the finfo
+	 * extension enabled
+	 * 
+	 * @param <String> resource_string
+	 * @return <String> mimetype
+	 */
+	function getMimetypeFromString($resource_string) {
+		$mime = 'text/plain';
+		
+		if (function_exists("finfo_open")) {
+        	$finfo = finfo_open(FILEINFO_MIME_TYPE);
+        	$mime = finfo_buffer($finfo, $resource_string);
+        	finfo_close($finfo);
+        }
+		
+		return $mime;
+	}
+	
     /**
      * Send the contents of the file to the client browser
      * as raw data.
@@ -776,15 +795,17 @@ class Web {
      * @param string $filename
      */
     function sendFile($filename) {
-        if (file_exists($filename)) {
-            $filesystem = $this->File->getFilesystem(dirname($filename));
-            $file = $this->File->getFileObject($filesystem, $filename);
-            $this->header("Content-Type: " . $this->getMimetype($filename));
-            echo $file->getContent();
-            //readfile($filename);
-        } else {
-            $this->header("HTTP/1.1 404 Not Found");
-        }
+		$filesystem = $this->File->getFilesystem(dirname($filename));
+		$file = $this->File->getFileObject($filesystem, $filename);
+
+		if ($file->exists()) {
+			$this->header("Content-Type: " . $this->getMimetypeFromString($file->getContent())); // $this->getMimetype($filename));
+			echo $file->getContent();
+		} else {
+			$this->header("HTTP/1.1 404 Not Found");
+			echo $filename . " not found.";
+		}
+		
         exit;
     }
 

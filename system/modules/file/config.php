@@ -23,7 +23,8 @@ Config::set('file', [
 			'active' => false,
 			'key' => '',
 			'secret' => '',
-			'bucket' => ''
+			'bucket' => '',
+			'options' => []
 		]
 	]
 ]);
