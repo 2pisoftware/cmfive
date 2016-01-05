@@ -59,7 +59,7 @@
 					<div class="image-container">
 						<div class="image-container-overlay">
 							<div class="row-fluid">
-								<a href="#" data-reveal-id="attachment_modal_<?php echo $attachment->id; ?>" class="button expand">View</a>
+								<button href="#" data-reveal-id="attachment_modal_<?php echo $attachment->id; ?>" class="button expand">View</button>
 							</div>
 							<div class="row-fluid">
 								<?php echo Html::box("/file/edit/" . $attachment->id . "?redirect_url=" . urlencode($redirect), "Edit", true, null, null, null, null, null, "button expand secondary"); ?>
@@ -80,13 +80,15 @@
 						</div>
 					</a>
 					<div id="attachment_modal_<?php echo $attachment->id; ?>" class="reveal-modal" data-reveal role="dialog">
-						<a href="/file/atfile/<?php echo $attachment->id; ?>" target="_blank" class="button right" onclick="$('#attachment_modal_<?php echo $attachment->id; ?>').foundation('reveal', 'close');">Open in new tab/window</a>
-						<h2 id="firstModalTitle"><?php echo $attachment->title; ?></h2>
-						
-						<p><?php echo $attachment->description; ?></p>
 						<div class="row-fluid panel" style="text-align: center;">
 							<img src="/file/atfile/<?php echo $attachment->id; ?>" alt="<?php echo $attachment->title; ?>" />
 						</div>
+						
+						<h2 id="firstModalTitle" style="font-weight: lighter; text-align: center; border-bottom: 1px solid #777;"><?php echo $attachment->title; ?></h2>
+						<p style="text-align: center;"><?php echo $attachment->description; ?></p>
+						
+						<a href="/file/atfile/<?php echo $attachment->id; ?>" target="_blank" class="button expand secondary" onclick="$('#attachment_modal_<?php echo $attachment->id; ?>').foundation('reveal', 'close');">Open in new tab/window</a>
+						
 						<a class="close-reveal-modal" aria-label="Close">&#215;</a>
 					</div>
 				</li>
