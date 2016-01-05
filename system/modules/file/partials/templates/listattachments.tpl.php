@@ -80,8 +80,9 @@
 						</div>
 					</a>
 					<div id="attachment_modal_<?php echo $attachment->id; ?>" class="reveal-modal" data-reveal role="dialog">
-						<h2 id="firstModalTitle"><?php echo $attachment->title; ?></h2>
 						<a href="/file/atfile/<?php echo $attachment->id; ?>" target="_blank" class="button right" onclick="$('#attachment_modal_<?php echo $attachment->id; ?>').foundation('reveal', 'close');">Open in new tab/window</a>
+						<h2 id="firstModalTitle"><?php echo $attachment->title; ?></h2>
+						
 						<p><?php echo $attachment->description; ?></p>
 						<div class="row-fluid panel" style="text-align: center;">
 							<img src="/file/atfile/<?php echo $attachment->id; ?>" alt="<?php echo $attachment->title; ?>" />

@@ -17,10 +17,15 @@ class Attachment extends DbObject {
     public $fullpath; // publicchar(255)
     public $is_deleted; // tinyint 0/1
     public $type_code; // this is a type of attachment, eg. Receipt of Deposit, PO Variation, Sitephoto, etc.
-	
-	
+
 	public $adapter;
     
+	/**
+	 * DbObject::insert() override to set the mimetype, path and to call the
+	 * attachment hook
+	 * 
+	 * @param <bool> $force_validation
+	 */
 	function insert($force_validation = false) {
         // $this->dt_modified = time();
         // Get mimetype
@@ -46,17 +51,20 @@ class Attachment extends DbObject {
     /**
      * will return true if this attachment
      * is an image
+	 * 
+	 * @return <bool> is_image
      */
     function isImage() {
-		// Is an image when the mimetype starts with "image/"
+		// Attachment is an image when the mimetype starts with "image/"
 		return strpos($this->mimetype, "image/") === 0;
-//        return $this->File->isImage($this->fullpath);
     }
 
     /**
      * Returns a HTML <img> tag for this attachment
      * only if this attachment is an image,
      * else
+	 * 
+	 * @return <String> image_string
      */
     function getImg() {
         if ($this->isImage()) {
@@ -69,6 +77,8 @@ class Attachment extends DbObject {
     /**
      * if image, create image thumbnail
      * if any other file send an icon for this mimetype
+	 * 
+	 * @return <String> url
      */
     function getThumbnailUrl() {
         if ($this->isImage()) {
@@ -100,10 +110,17 @@ class Attachment extends DbObject {
         }
     }
 
-	/**
+	/**********
 	 * Gaufrette helper functions
-	 */
+	 **********/
 	
+	/**
+	 * Returns an assembled file path based on the adapter
+	 * The local adapter for e.g. needs an absolute reference, this absolute
+	 * prefix isn't needed when using S3 buckets
+	 * 
+	 * @return <String> filepath
+	 */
 	public function getFilePath() {
 		$path = dirname($this->fullpath);
 
@@ -125,23 +142,43 @@ class Attachment extends DbObject {
 		}
 	}
 	
+	/**
+	 * Returns Gaufrette Filsystem instance for fetching files
+	 * 
+	 * @return \Gaufrette\Filesystem
+	 */
 	public function getFilesystem() {
 		return $this->File->getSpecificFilesystem($this->adapter, $this->getFilePath());
 	}
 	
+	/**
+	 * Returns attachment mimetype
+	 * @return <String> mimetype
+	 */
 	public function getMimetype() {
 		return $this->mimetype;
 	}
 	
+	/**
+	 * Retuns Gaufrette File instance (of the attached file)
+	 * @return \Gaufrette\File
+	 */
 	public function getFile() {
 		return new \Gaufrette\File($this->filename, $this->getFilesystem());
 	}
 	
+	/**
+	 * Returns attached file content
+	 * @return <string> content
+	 */
 	public function getContent() {
 		$file = $this->getFile();
 		return $file->exists() ? $file->getContent() : "";
 	}
 	
+	/**
+	 * Sends header and content of file to browser
+	 */
 	public function displayContent() {	
 		$this->w->header("Content-Type: " . $this->getMimetype());
 		$this->w->out($this->getContent());
