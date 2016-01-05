@@ -1393,6 +1393,7 @@ class Web {
 				}
 				$this->ctx($key, $val);
 				$match[$key] = $val;
+				$match[$i] = $val;
 			}
 		} else {
 			return $this->_paths;

@@ -15,14 +15,24 @@ class FileService extends DbService {
 
 	// This will need a rethink (storing full path in Attachment but also setting the full path here) etc
 	function getFilePath($path) {
-		if (strpos($path, FILE_ROOT . "attachments/") !== FALSE) {
-			return $path;
-		}
-		if (strpos($path, "attachments/") !== FALSE) {
-			return FILE_ROOT . $path;
-		}
+		$active_adapter = $this->getActiveAdapter();
+		
+		switch($active_adapter) {
+			case "local":
+				if (strpos($path, FILE_ROOT . "attachments/") !== FALSE) {
+					return $path;
+				}
+				if (strpos($path, "attachments/") !== FALSE) {
+					return FILE_ROOT . $path;
+				}
 
-		return FILE_ROOT . "attachments/" . $path;
+				return FILE_ROOT . "attachments/" . $path;
+			default:
+				if (strpos($path, "uploads/") === FALSE) {
+					return "uploads/" . $path;
+				}
+				return $path;
+		}
 	}
 
 	function getFileObject($filesystem, $filename) {
@@ -54,7 +64,7 @@ class FileService extends DbService {
 		$adapter_obj = null;
 		switch ($adapter) {
 			case "local":
-				$adapter_obj = new LocalAdapter($this->getFilePath($path), true);
+				$adapter_obj = new LocalAdapter($path, true);
 				break;
 			case "memory":
 				$adapter_obj = new InMemoryAdapter(array(basename($path) => $content));
@@ -185,8 +195,8 @@ class FileService extends DbService {
 		$att->insert();
 
 		$filesystemPath = "attachments/" . $parentObject->getDbTableName() . '/' . date('Y/m/d') . '/' . $att->id . '/';
-		$filesystem = $this->getFilesystem(FILE_ROOT . $filesystemPath);
-		$file = new File($filesystemPath . $filename, $filesystem);
+		$filesystem = $this->getFilesystem($this->getFilePath($filesystemPath));
+		$file = new File($filename, $filesystem);
 		
 		$content = file_get_contents($_FILES[$requestkey]['tmp_name']);
 		$mime_type = $this->w->getMimetypeFromString($content);

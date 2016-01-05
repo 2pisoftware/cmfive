@@ -48,7 +48,9 @@ class Attachment extends DbObject {
      * is an image
      */
     function isImage() {
-        return $this->File->isImage($this->fullpath);
+		// Is an image when the mimetype starts with "image/"
+		return strpos($this->mimetype, "image/") === 0;
+//        return $this->File->isImage($this->fullpath);
     }
 
     /**
@@ -70,7 +72,7 @@ class Attachment extends DbObject {
      */
     function getThumbnailUrl() {
         if ($this->isImage()) {
-            return WEBROOT . "/file/thumb/" . $this->fullpath;
+            return WEBROOT . "/file/atthumb/" . $this->id;
         } else {
             return WEBROOT . "/img/document.jpg";
         }
@@ -102,9 +104,29 @@ class Attachment extends DbObject {
 	 * Gaufrette helper functions
 	 */
 	
+	public function getFilePath() {
+		$path = dirname($this->fullpath);
+
+		switch($this->adapter) {
+			case "s3":
+				if (strpos($path, "uploads/") === FALSE) {
+					return "uploads/" . $path;
+				}
+				return $path;
+			default:
+				if (strpos($path, FILE_ROOT . "attachments/") !== FALSE) {
+					return $path;
+				}
+				if (strpos($path, "attachments/") !== FALSE) {
+					return FILE_ROOT . $path;
+				}
+
+				return FILE_ROOT . "attachments/" . $path;
+		}
+	}
 	
 	public function getFilesystem() {
-		return $this->File->getSpecificFilesystem($this->adapter, dirname("uploads/" . $this->fullpath));
+		return $this->File->getSpecificFilesystem($this->adapter, $this->getFilePath());
 	}
 	
 	public function getMimetype() {
@@ -112,7 +134,7 @@ class Attachment extends DbObject {
 	}
 	
 	public function getFile() {
-		return new \Gaufrette\File(basename($this->fullpath), $this->getFilesystem());
+		return new \Gaufrette\File($this->filename, $this->getFilesystem());
 	}
 	
 	public function getContent() {
@@ -120,7 +142,7 @@ class Attachment extends DbObject {
 		return $file->exists() ? $file->getContent() : "";
 	}
 	
-	public function displayContent() {
+	public function displayContent() {	
 		$this->w->header("Content-Type: " . $this->getMimetype());
 		$this->w->out($this->getContent());
 	}
