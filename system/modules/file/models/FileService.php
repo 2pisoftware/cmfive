@@ -26,7 +26,7 @@ class FileService extends DbService {
 	}
 
 	function getFileObject($filesystem, $filename) {
-		$file = new File(basename($filename), $filesystem);
+		$file = new File($filename, $filesystem);
 		return $file;
 	}
 
@@ -46,10 +46,12 @@ class FileService extends DbService {
 		return "local";
 	}
 
-	function getFilesystem($path = null, $content = null) {
+	function getFilesystem($path = null, $content = null, $options = []) {
+		return $this->getSpecificFilesystem($this->getActiveAdapter(), $path, $content, $options);
+	}
+	
+	function getSpecificFilesystem($adapter = "local", $path = null, $content = null, $options = []) {
 		$adapter_obj = null;
-
-		$adapter = $this->getActiveAdapter();
 		switch ($adapter) {
 			case "local":
 				$adapter_obj = new LocalAdapter($this->getFilePath($path), true);
@@ -58,9 +60,10 @@ class FileService extends DbService {
 				$adapter_obj = new InMemoryAdapter(array(basename($path) => $content));
 				break;
 			case "s3":
-				$options = Config::get('file.adapters.s3.options');
+				$config_options = Config::get('file.adapters.s3.options');
+				$config_options = array_replace(is_array($config_options) ? $config_options : [], ["directory" => $path], $options);
 				$client = S3Client::factory(["key" => Config::get('file.adapters.s3.key'), "secret" => Config::get('file.adapters.s3.secret')]);
-				$adapter_obj = new AwsS3($client, Config::get('file.adapters.s3.bucket'), is_array($options) ? $options : []);
+				$adapter_obj = new AwsS3($client, Config::get('file.adapters.s3.bucket'), is_array($config_options) ? $config_options : []);
 				break;
 		}
 
@@ -186,9 +189,12 @@ class FileService extends DbService {
 		$file = new File($filesystemPath . $filename, $filesystem);
 		
 		$content = file_get_contents($_FILES[$requestkey]['tmp_name']);
-		$file->setContent($content, ['contentType' => $this->w->getMimetypeFromString($content)]);
-
-		$att->fullpath = str_replace(FILE_ROOT, "", FILE_ROOT . $filesystemPath . $filename);
+		$mime_type = $this->w->getMimetypeFromString($content);
+		$file->setContent($content, ['contentType' => $mime_type]);
+		
+		$att->mimetype = $mime_type;
+		$att->fullpath = str_replace(FILE_ROOT, "", $filesystemPath . $filename);
+		$att->adapter = $this->getActiveAdapter();
 		$att->update();
 		return $att->id;
 	}

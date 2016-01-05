@@ -1,7 +1,11 @@
 <?php
 function atfile_GET(Web &$w) {
-	$p = $w->pathMatch("id");
-	$id = str_replace(".jpg", "", $p['id']);
+	$w->setLayout(null);
+	list($id) = $w->pathMatch();
+	
 	$attachment = $w->service("File")->getAttachment($id);
-	$w->sendFile(FILE_ROOT.$attachment->fullpath);
+	
+	if ($attachment->exists()) {
+		$attachment->displayContent();
+	}
 }

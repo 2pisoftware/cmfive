@@ -793,17 +793,21 @@ class Web {
      * as raw data.
      * 
      * @param string $filename
+	 * @deprecated deprecated since 0.8.5
      */
     function sendFile($filename) {
+		$filename = str_replace(FILE_ROOT, "", $filename);
+		
 		$filesystem = $this->File->getFilesystem(dirname($filename));
 		$file = $this->File->getFileObject($filesystem, $filename);
-
+		
 		if ($file->exists()) {
-			$this->header("Content-Type: " . $this->getMimetypeFromString($file->getContent())); // $this->getMimetype($filename));
-			echo $file->getContent();
+			$content = $file->getContent();
+			$this->header("Content-Type: " . $this->getMimetypeFromString($content)); // $this->getMimetype($filename));
+			echo $content;
 		} else {
 			$this->header("HTTP/1.1 404 Not Found");
-			echo $filename . " not found.";
+			echo basename($filename) . " not found.";
 		}
 		
         exit;
@@ -1371,22 +1375,28 @@ class Web {
      */
     function pathMatch() {
         $match = array();
-        for ($i = 0; $i < func_num_args(); $i++) {
-            $param = func_get_arg($i);
+		
+		$func_num_args = func_num_args();
+		if ($func_num_args > 0) {
+			for ($i = 0; $i < $func_num_args; $i++) {
+				$param = func_get_arg($i);
 
-            $val = !empty($this->_paths[$i]) ? urldecode($this->_paths[$i]) : null;
+				$val = !empty($this->_paths[$i]) ? urldecode($this->_paths[$i]) : null;
 
-            if (is_array($param)) {
-                $key = $param[0];
-                if (is_null($val) && isset($param[1])) {
-                    $val = $param[1]; // use default parameter
-                }
-            } else {
-                $key = $param;
-            }
-            $this->ctx($key, $val);
-            $match[$key] = $val;
-        }
+				if (is_array($param)) {
+					$key = $param[0];
+					if (is_null($val) && isset($param[1])) {
+						$val = $param[1]; // use default parameter
+					}
+				} else {
+					$key = $param;
+				}
+				$this->ctx($key, $val);
+				$match[$key] = $val;
+			}
+		} else {
+			return $this->_paths;
+		}
         return $match;
     }
 

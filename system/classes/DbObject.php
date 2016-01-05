@@ -430,6 +430,16 @@ class DbObject extends DbService {
         }
     }
 
+	/**
+	 * Returns whether or not this object exists in the database
+	 * Base on the id not being null and greater than 0
+	 * 
+	 * @return <bool> exists
+	 */
+	public function exists() {
+		return !is_null($this->id) && intval($this->id) > 0;
+	}
+	
     /**
      * Utility function to decide
      * whether to insert or update

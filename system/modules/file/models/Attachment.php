@@ -17,8 +17,11 @@ class Attachment extends DbObject {
     public $fullpath; // publicchar(255)
     public $is_deleted; // tinyint 0/1
     public $type_code; // this is a type of attachment, eg. Receipt of Deposit, PO Variation, Sitephoto, etc.
-
-    function insert($force_validation = false) {
+	
+	
+	public $adapter;
+    
+	function insert($force_validation = false) {
         // $this->dt_modified = time();
         // Get mimetype
 
@@ -37,7 +40,7 @@ class Attachment extends DbObject {
     }
 
     function getParent() {
-        return $this->getObject($this->attach_table, $this->attach_id);
+        return $this->getObject($this->parent_table, $this->parent_id);
     }
 
     /**
@@ -95,4 +98,30 @@ class Attachment extends DbObject {
         }
     }
 
+	/**
+	 * Gaufrette helper functions
+	 */
+	
+	
+	public function getFilesystem() {
+		return $this->File->getSpecificFilesystem($this->adapter, dirname("uploads/" . $this->fullpath));
+	}
+	
+	public function getMimetype() {
+		return $this->mimetype;
+	}
+	
+	public function getFile() {
+		return new \Gaufrette\File(basename($this->fullpath), $this->getFilesystem());
+	}
+	
+	public function getContent() {
+		$file = $this->getFile();
+		return $file->exists() ? $file->getContent() : "";
+	}
+	
+	public function displayContent() {
+		$this->w->header("Content-Type: " . $this->getMimetype());
+		$this->w->out($this->getContent());
+	}
 }
