@@ -252,7 +252,7 @@ class Web {
 	function install() {
 		$this->_is_installing = true;
 		$this->_paths = $this->_getCommandPath();
-		if (!in_array($this->_paths[0], ["install", "install-steps"])) {
+		if (empty($this->_paths[0]) || !in_array($this->_paths[0], ["install", "install-steps"])) {
 			$this->redirect("/install-steps/details");
 		} else {
 			$this->start(false);
