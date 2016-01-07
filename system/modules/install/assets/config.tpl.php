@@ -10,7 +10,7 @@ Config::set('main.company_support_email','{{ company_support_email }}');
 
 //=============== Timezone ===================================
 
-date_default_timezone_set('{{ timezone }}');
+Config::set('system.timezone', '{{ timezone }}');
 
 //========== Database Configuration ==========================
 

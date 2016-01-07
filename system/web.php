@@ -269,6 +269,13 @@ class Web {
 			$this->initDB();
 		}
 
+		// Set the timezone from Config
+		$timezone = Config::get('system.timezone');
+		if (empty($timezone)) {
+			$timezone = 'UTC';
+		}
+		date_default_timezone_set($timezone);
+	
         // start the session
         // $sess = new SessionManager($this);
         session_name(SESSION_NAME);
