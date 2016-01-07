@@ -29,6 +29,15 @@ class ChannelService extends DbService {
 	}
 
 	/**
+	 * Returns a non-deleted email channel object
+	 * @return Object emailchannel
+	 */
+	public function getWebChannel($channel_id) {
+		$where = array('is_deleted' => 0, "channel_id" => $channel_id);
+		return $this->getObject('WebChannelOption', $where);
+	}
+
+	/**
 	 * Returns all non-deleted email channel objects
 	 * @return Array<EmailChannelOption> emailchannels
 	 */
@@ -38,6 +47,28 @@ class ChannelService extends DbService {
 	}
 
 	/**
+	 * Returns all non-deleted email channel objects
+	 * @return Array<EmailChannelOption> emailchannels
+	 */
+	public function getWebChannels() {
+		$where = array('is_deleted' => 0);
+		return $this->getObjects('WebChannelOption', $where);
+	}
+
+	/**
+	 * Returns all non-deleted email channel objects
+	 * @return Array<EmailChannelOption> emailchannels
+	 */
+	public function getChildChannel($id) {
+            $child_channel = $this->getEmailChannel($id);
+            if (!isset($child_channel)) {
+                $child_channel = $this->getWebChannel($id);
+            }
+            
+            return $child_channel;
+	}
+
+        /**
 	 * Returns all non-deleted processor objects
 	 * @return Array<ChannelProcessor> processors
 	 */

@@ -1,4 +1,5 @@
-<div class='row small-12 medium-6 left'>Add a New Channel: <?php echo Html::select("add_channel", array(array("Email", "email"))); ?></div>
+<div class='row small-12 medium-6 left'>Add a New Channel: <?php echo Html::select("add_channel", array(array("Email", "email"),array("Web","web"))); ?></div>
+
 
 <?php if (!empty($channels)) : ?>
 
@@ -20,7 +21,7 @@
                             echo (!empty($user->id) ? $user->getFullName() : ""); ?>
                         <td>
                             <?php echo Html::box("/channels-{$c->_channeltype}/edit/{$base_channel->id}", "Edit"); ?>
-                            <?php echo Html::a("/channels-email/delete/{$base_channel->id}", "Delete", null, null, "Are you sure you want to delete " . (!empty($base_channel->name) ? addslashes($base_channel->name) : "this channel") . "?"); ?>
+                            <?php echo Html::a("/channels-{$c->_channeltype}/delete/{$base_channel->id}", "Delete", null, null, "Are you sure you want to delete " . (!empty($base_channel->name) ? addslashes($base_channel->name) : "this channel") . "?"); ?>
                             <?php echo Html::a("/channels/listmessages/{$base_channel->id}", "Messages"); ?>
                         </td>
                     </tr>

@@ -5,7 +5,7 @@ function delete_GET(Web $w) {
 	$id = $p["id"];
 
 	if ($id) {
-		$channel = $w->Channel->getEmailChannel($id);
+		$channel = $w->Channel->getWebChannel($id);
 		$channel->delete();
 
 		$w->msg("Channel deleted", "/channels/listchannels");
