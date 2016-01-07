@@ -8,8 +8,8 @@ class FavoriteInitialMigration extends CmfiveMigration {
                ->setType('biginteger')
                ->setIdentity(true);
 
-		if (!$this->hasTable('favourite')) {
-			$this->table('favourite', [
+		if (!$this->hasTable('favorite')) {
+			$this->table('favorite', [
 				'id'          => false,
 				'primary_key' => 'id'
 			])->addColumn($column)
@@ -22,7 +22,7 @@ class FavoriteInitialMigration extends CmfiveMigration {
 	}
 
 	public function down() {
-		$this->hasTable('favourite') ? $this->dropTable('favourite') : null;
+		$this->hasTable('favorite') ? $this->dropTable('favorite') : null;
 	}
 
 }

@@ -35,7 +35,7 @@ class MainInitialMigration extends CmfiveMigration {
 					])->addColumn($column)
 					->addColumn('user_id', 'biginteger')
 					->addColumn('token', 'string', ['limit' => 256])
-					->addCmfiveParameters('creator_id', 'modifier_id', 'is_deleted')
+					->addCmfiveParameters(['creator_id', 'modifier_id', 'is_deleted'])
 					->create();
 		}
 		
@@ -96,6 +96,20 @@ class MainInitialMigration extends CmfiveMigration {
 				FULLTEXT KEY `object_index_content` (`content`)
 			  ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=10 ;');
 		}
+		
+		/**
+		 * OBJECT INDEX TABLE
+		 */
+		if (!$this->hasTable('object_modification')) {
+			$this->table('object_modification', [
+						'id' => false,
+						'primary_key' => 'id'
+					])->addColumn($column)
+					->addColumn('table_name', 'string', ['limit' => 255])
+					->addColumn('object_id', 'biginteger')
+					->addCmfiveParameters(['is_deleted'])
+					->create();
+		}
 //			
 //		$this->table('object_history', [
 //					'id' => false,
@@ -114,6 +128,7 @@ class MainInitialMigration extends CmfiveMigration {
 		$this->hasTable('rest_session') ? $this->dropTable('rest_session') : null;
 		$this->hasTable('sessions') ? $this->dropTable('sessions') : null;
 		$this->hasTable('object_history') ? $this->dropTable('object_history') : null;
+		$this->hasTable('object_modification') ? $this->dropTable('object_modification') : null;
 		$this->hasTable('object_history_entry') ? $this->dropTable('object_history_entry') : null;
 		$this->hasTable('object_index') ? $this->dropTable('object_index') : null;
 	}

@@ -160,18 +160,7 @@ MIGRATION;
 	public function runMigrations($module, $filename = null) {
 		$alreadyRunMigrations = $this->getInstalledMigrations($module);
 		$availableMigrations = $this->getAvailableMigrations($module);
-		
-		// Sort available into ascending order
-//		if (!empty($availableMigrations)) {
-//			foreach($availableMigrations as $module => $alreadyRunMigration) {
-//				if (!empty($alreadyRunMigration)) {
-//					uksort($alreadyRunMigration, function($a, $b) {
-//						return strcmp(basename($a), basename($b));
-//					});
-//				}
-//			}
-//		}
-		
+
 		// Return if there are no migrations to run
 		if (empty($availableMigrations)) {
 			return;
@@ -379,12 +368,17 @@ MIGRATION;
 				$migration_class = new $migration(1);
 				$migration_class->setAdapter($mysql_adapter);
 				$migration_class->up();
-
+				
+				// Reload table list in DbPDO
+				$this->w->db->getAvailableTables();
+				
 				// Insert migration record into DB
 				$migration_object = new Migration($this->w);
 				$migration_object->path = $directory . DS . $filename;
 				$migration_object->classname = $migration;
 				$migration_object->module = "admin";
+				$migration_object->dt_created = time();
+				$migration_object->creator_id = 1;
 				$migration_object->insert();
 
 				$this->w->Log->setLogger("MIGRATION")->info("Initial migration has run");

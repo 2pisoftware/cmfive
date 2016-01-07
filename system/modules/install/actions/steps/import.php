@@ -55,7 +55,7 @@ function import_GET(Web $w) {
 		// Run migrations
 		$w->Migration->installInitialMigration();
 		$w->Migration->runMigrations("all");
-
+		
 		// Create admin user
 		$statement = $pdo->prepare("INSERT INTO contact (`id`, `firstname`, `lastname`, `othername`, `title`, `homephone`, `workphone`, `mobile`, `priv_mobile`, `fax`, `email`, `notes`, `dt_created`, `dt_modified`, `is_deleted`, `private_to_user_id`, `creator_id`) VALUES (NULL, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ?, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '0', NULL, NULL);");
 		$statement->bindParam(1, $_GET['admin_firstname']);

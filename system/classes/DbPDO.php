@@ -7,6 +7,7 @@
  */
 class DbPDO extends PDO {
     private static $table_names = array();
+	
     private static $_QUERY_CLASSNAME = array("InsertQuery", "SelectQuery", "UpdateQuery"); //"PDOStatement", 
 
     private $query = null;
@@ -30,11 +31,8 @@ class DbPDO extends PDO {
         // unecessary to do on every call so maybe move it to get()
         // Setting this to static however should make this array share the memory
         // heap for this var across all instances
-        if (empty(DbPDO::$table_names)){
-            foreach($this->query("show tables")->fetchAll(PDO::FETCH_NUM) as $table) {
-                DbPDO::$table_names[] = $table[0];
-			}
-        }
+		$this->getAvailableTables();
+		
         // Instantiate a FluentPDO class and init vars
         $this->fpdo = new FluentPDO($this);
         
@@ -58,6 +56,13 @@ class DbPDO extends PDO {
     	return $this->config['driver'];
     }
     
+	public function getAvailableTables() {
+		DbPDO::$table_names = [];
+		foreach($this->query("show tables")->fetchAll(PDO::FETCH_NUM) as $table) {
+			DbPDO::$table_names[] = $table[0];
+		}
+	}
+	
     /**
      * This function sets up a FluentPDO query with the given table name, an
      * error will be thrown if the table name doesn't exist in the database
@@ -76,9 +81,9 @@ class DbPDO extends PDO {
         return $this;
     }
     
-    public function select($select){
-        if ($this->query !== NULL && !empty($select)){
-            $this->query = $this->query->select($select);
+	public function select($select = null){
+        if ($this->query !== NULL){
+			$this->query = $this->query->select($select);
         }
         return $this;
     }

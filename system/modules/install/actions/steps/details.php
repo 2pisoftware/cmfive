@@ -5,6 +5,10 @@ function details_GET(Web $w) {
 	
 	InstallService::initConfigFile();
 	
+	if (!empty($_SESSION['user_id'])) {
+		unset($_SESSION['user_id']);
+	}
+	
 	$timezones = array();
 	foreach(timezone_abbreviations_list() as $timezone_group) {
 		foreach($timezone_group as $timezone) {
