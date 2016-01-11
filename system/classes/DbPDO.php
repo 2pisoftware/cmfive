@@ -7,6 +7,7 @@
  */
 class DbPDO extends PDO {
     private static $table_names = array();
+	
     private static $_QUERY_CLASSNAME = array("InsertQuery", "SelectQuery", "UpdateQuery"); //"PDOStatement", 
 
     private $query = null;
@@ -30,11 +31,8 @@ class DbPDO extends PDO {
         // unecessary to do on every call so maybe move it to get()
         // Setting this to static however should make this array share the memory
         // heap for this var across all instances
-        if (empty(DbPDO::$table_names)){
-            foreach($this->query("show tables")->fetchAll(PDO::FETCH_NUM) as $table) {
-                DbPDO::$table_names[] = $table[0];
-			}
-        }
+		$this->getAvailableTables();
+		
         // Instantiate a FluentPDO class and init vars
         $this->fpdo = new FluentPDO($this);
         
@@ -58,6 +56,13 @@ class DbPDO extends PDO {
     	return $this->config['driver'];
     }
     
+	public function getAvailableTables() {
+		DbPDO::$table_names = [];
+		foreach($this->query("show tables")->fetchAll(PDO::FETCH_NUM) as $table) {
+			DbPDO::$table_names[] = $table[0];
+		}
+	}
+	
     /**
      * This function sets up a FluentPDO query with the given table name, an
      * error will be thrown if the table name doesn't exist in the database
@@ -68,7 +73,7 @@ class DbPDO extends PDO {
     public function get($table_name){
         if (!in_array($table_name, DbPDO::$table_names)){
 			if (!$this->install($table_name)) {
-				trigger_error("Table $table_name does not exist in the databse", E_USER_ERROR);
+				trigger_error("Table $table_name does not exist in the database", E_USER_ERROR);
 				return null;
 			}
         }  
@@ -76,9 +81,9 @@ class DbPDO extends PDO {
         return $this;
     }
     
-    public function select($select = null){
+	public function select($select = null){
         if ($this->query !== NULL){
-            $this->query = $this->query->select($select);
+			$this->query = $this->query->select($select);
         }
         return $this;
     }
@@ -113,7 +118,7 @@ class DbPDO extends PDO {
      * @return \DbPDO|null
      */
     public function where($column, $equals = null){
-        if ($this->query !== null && is_object($this->query)){
+        if ($this->query !== null){
             if (empty($column)){
                 // Resets the where part of the statement
                 $this->query = $this->query->where(null);
@@ -129,7 +134,7 @@ class DbPDO extends PDO {
     }
     
     public function orderBy($orderby){
-        if ($this->query !== null && !empty($orderby) && is_object($this->query)){
+        if ($this->query !== null && !empty($orderby)){
             $this->query = $this->query->orderBy($orderby);
         }
         return $this;

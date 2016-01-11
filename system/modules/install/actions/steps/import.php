@@ -1,5 +1,10 @@
 <?php
 
+// Load system Composer autoloader
+if (file_exists(SYSTEM_PATH . "/composer/vendor/autoload.php")) {
+    require SYSTEM_PATH . "/composer/vendor/autoload.php";
+}
+
 function import_GET(Web $w) {
 	$w->setLayout(null);
    
@@ -20,7 +25,7 @@ function import_GET(Web $w) {
 		$pdo = new DbPDO([
 			'port' => $_GET['db_port'], 
 			'driver' => $_GET['db_driver'], 
-			'hostname' => $_GET['db_hostname'],
+			'hostname' => $_GET['db_host'],
 			'username' => $_GET['db_username'],
 			'password' => $_GET['db_password'],
 			'database' => $_GET['db_database']]);
@@ -33,100 +38,25 @@ function import_GET(Web $w) {
 	// Write config details to file
 	InstallService::saveConfigData($_GET);
 	
+	// Load the config into the Config class
+	$config_exec = file_get_contents(INSTALLER_CONFIG_FILE);
+	if (!empty($config_exec)) {
+		eval($config_exec);
+	}
+	
 	// Try and import data
 	foreach($pdo->query("SHOW TABLES;") as $row) {
 		$pdo->exec("DROP TABLE {$row[0]};");
 	}
-	
-	output("Installing main database SQL<br/><hr/>");
-	
-	// Run install SQL
-	$pdo->exec(file_get_contents('system/install/db.sql'));
-	
-	output("Installing updates<br/><hr/>");
-	
-	// Run updates
-	foreach(glob('system/install/updates/*.sql') as $file) {
-		try {
-			// TODO - this is not sufficient as multi statement update files will not throw an exception unless
-			// there is a problem on the FIRST statement. See InstallService for alternative solution.
-			$pdo->exec(file_get_contents($file));
-		} catch (Exception $e) {
-			output("Error from system update:");
-			output($e->getMessage() . '<br/>in ' . $file);
-		}
-	}
-	
-	output("Creating admin user<br/><hr/>");
-		// @TODO: Install admin user 
-	
-	$pdo->exec(file_get_contents('system/install/dbseed.sql'));
-	
-	// Install system modules
-	foreach(glob('system/modules/*', GLOB_ONLYDIR) as $directory) {
-		output("Installing " . $directory . " module<br/><hr/>");
-		
-		// Install system module SQL
-		if (file_exists($directory . "/install/db.sql")) {
-			try {
-				$pdo->exec(file_get_contents($directory . "/install/db.sql"));
-			} catch (Exception $e) {
-				output("Error from module:{$directory} install:");
-				output($e->getMessage() . '<br/>in ' . $directory . '/db.sql');
-			}
-		} else {
-			continue;
-		}
-		
-		if (is_dir($directory . "/install/updates")) {
-			output("Installing " . $directory . " module updates<br/><hr/>");
-	
-			// Install system module updates
-			foreach(glob($directory . "/install/updates/*.sql") as $module_file) {
-				try {
-					$pdo->exec(file_get_contents($module_file));
-				} catch (Exception $e) {
-					output($e->getMessage() . '<br/>in ' . $module_file);
-				}
-			}
-		}
-	}
-	
-	// Install individual modules
-	foreach(glob('modules/*', GLOB_ONLYDIR) as $directory) {
-		output("Installing " . $directory . " module<br/><hr/>");
-		
-		// Run project modules install SQL
-		if (file_exists($directory . "/install/db.sql")) {
-			
-			try {
-				$pdo->exec(file_get_contents($directory . "/install/db.sql"));
-			} catch (Exception $e) {
-				output("Error from module install:");
-				output($e->getMessage() . '<br/>in ' . $directory);
-			}
-		} else {
-			continue;
-		}
-	
-		// Install project module updates
-		if (is_dir($directory . "/install/updates")) {
-			output("Installing " . $directory . " module updates<br/><hr/>");
-			
-			foreach(glob($directory . "/install/updates/*.sql") as $module_file) {
-				try {
-					$pdo->exec(file_get_contents($module_file));
-				} catch (Exception $e) {
-					output("Error from module updates import:<br/>");
-					output($e->getMessage() . '<br/>in ' . $module_file);
-				}
-			}
-		}
-	}
 
-	// Create admin user
+	$w->db = $pdo;
 	
 	try {
+		// Run migrations
+		$w->Migration->installInitialMigration();
+		$w->Migration->runMigrations("all");
+		
+		// Create admin user
 		$statement = $pdo->prepare("INSERT INTO contact (`id`, `firstname`, `lastname`, `othername`, `title`, `homephone`, `workphone`, `mobile`, `priv_mobile`, `fax`, `email`, `notes`, `dt_created`, `dt_modified`, `is_deleted`, `private_to_user_id`, `creator_id`) VALUES (NULL, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ?, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '0', NULL, NULL);");
 		$statement->bindParam(1, $_GET['admin_firstname']);
 		$statement->bindParam(2, $_GET['admin_lastname']);
@@ -159,12 +89,12 @@ function import_GET(Web $w) {
 		
 		// Write the config to the project
 		InstallService::writeConfigToProject();
+		
+		output('Import successful');
+		output('<a href="/install-steps/finish" class="button">Continue</a>');
 	} catch (Exception $e) {
-		output("Failed to create user: " . $e->getMessage());
-	}
-	
-	output('Import successful');
-	output('<a href="/install-steps/finish" class="button">Continue</a>');
+		output("Failed to install migrations: " . $e->getMessage());
+	}	
 }
 
 function output($val) {

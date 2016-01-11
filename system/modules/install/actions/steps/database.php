@@ -19,7 +19,7 @@ function database_GET(Web $w) {
 		"Database Connection" => [
 			[["Driver", "select", "db_driver", $w->request("db_driver", "mysql"), PDO::getAvailableDrivers()]],
 			[
-				["Hostname", "text", "db_hostname", $w->request("db_hostname", "localhost")],
+				["Hostname", "text", "db_host", $w->request("db_host", "localhost")],
 				["Port", "text", "db_port", $w->request("db_port", "3306")]
 			],
 			[

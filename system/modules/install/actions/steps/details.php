@@ -3,6 +3,12 @@
 function details_GET(Web $w) {
 	$w->ctx("step", 1);
 	
+	InstallService::initConfigFile();
+	
+	if (!empty($_SESSION['user_id'])) {
+		unset($_SESSION['user_id']);
+	}
+	
 	$timezones = array();
 	foreach(timezone_abbreviations_list() as $timezone_group) {
 		foreach($timezone_group as $timezone) {
@@ -21,7 +27,7 @@ function details_GET(Web $w) {
 				["Company URL", "text", "company_url", $w->request("company_url", "http://cmfive.com")]
 			],
 			[["Company Support Email", "email", "company_support_email", $w->request("company_support_email")]],
-			[["Timezone", "select", "timezone", $w->request("timezone", date_default_timezone_get()), $timezones]]
+			[["Timezone", "select", "timezone", $w->request("timezone", defaultVal(date_default_timezone_get(), 'Australia/Sydney')), $timezones]]
 		],
 		"Email Server Details" => [
 			[
@@ -53,10 +59,11 @@ function details_POST(Web $w) {
 	$_POST["db_driver"] = "{{ db_driver }}";
 	$_POST["db_database"] = "{{ db_database }}";
 	
-	$_POST['email_port'] = !empty($_POST['email_port']) ? $_POST['email_port'] : 0;
+	$_POST['email_use_auth'] = !empty($_POST['email_use_auth']) ? "true" : "false";
+	$_POST['email_port'] = !empty($_POST['email_port']) ? $_POST['email_port'] : '';
 	
 	// Render data in config
 	InstallService::saveConfigData($_POST);
-	
+
 	$w->msg("Details Saved", "/install-steps/database");
 }

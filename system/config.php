@@ -21,7 +21,13 @@ Config::set('system.allow_action', array(
 	"install-steps/finish"
 ));
 
-Config::set('system.password_salt', 'override this in your project config');
+/**
+ * The password salt is used by the AES encryption library
+ * The salt length HAS to be 16, 24, or 32 characters long (8-bit)
+ * 
+ * The easiest why to generate a 32 char salt is to use MD5
+ */
+Config::set('system.password_salt', md5('override this in your project config'));
 
 //========= REST Configuration ==============================
 // check the following configuration carefully to secure
@@ -53,5 +59,3 @@ Config::set('email.transports', array(
 	'swiftmailer' => 'SwiftMailerTransport',
 	'sendmail' => 'SwiftMailerTransport'
 ));
-// for testing
-Config::set('testing.system','fred');

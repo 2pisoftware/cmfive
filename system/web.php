@@ -5,12 +5,12 @@ ini_set('session.gc_maxlifetime', 60 * 60 * 6);
 //========== Constants =====================================
 define("CMFIVE_VERSION", "0.8.3");
 
-define("ROOT_PATH", str_replace("\\", "/", getcwd()));
-define("SYSTEM_PATH", str_replace("\\", "/", getcwd() . '/system'));
+define("ROOT_PATH", str_replace("\\", "/", $_SERVER['DOCUMENT_ROOT']));
+define("SYSTEM_PATH", str_replace("\\", "/", ROOT_PATH . '/system'));
 
-define("LIBPATH", str_replace("\\", "/", getcwd() . '/lib'));
-define("SYSTEM_LIBPATH", str_replace("\\", "/", getcwd() . '/system/lib'));
-define("FILE_ROOT", str_replace("\\", "/", getcwd() . "/uploads/")); // dirname(__FILE__)
+define("LIBPATH", str_replace("\\", "/", ROOT_PATH . '/lib'));
+define("SYSTEM_LIBPATH", str_replace("\\", "/", ROOT_PATH . '/system/lib'));
+define("FILE_ROOT", str_replace("\\", "/", ROOT_PATH . "/uploads/")); // dirname(__FILE__)
 define("MEDIA_ROOT", str_replace("\\", "/", dirname(__FILE__) . "/../media/"));
 define("ROOT", str_replace("\\", "/", dirname(__FILE__)));
 define("SESSION_NAME", "CM5_SID");
@@ -26,8 +26,8 @@ require_once __DIR__ ."/classes/Config.php";
 require_once __DIR__ ."/classes/History.php";
 
 // Load system Composer autoloader
-if (file_exists(__DIR__ . "/composer/vendor/autoload.php")) {
-    require "composer/vendor/autoload.php";
+if (file_exists(SYSTEM_PATH . "/composer/vendor/autoload.php")) {
+    require SYSTEM_PATH . "/composer/vendor/autoload.php";
 }
 
 
@@ -72,7 +72,8 @@ class Web {
     public $_partialsdir = "partials";
     public $db;
     public $_isFrontend = false;
-    
+    public $_is_installing = false;
+			
     private $_classdirectory; // used by the class auto loader
 
     public $_scripts = array();
@@ -249,8 +250,9 @@ class Web {
     }
     
 	function install() {
+		$this->_is_installing = true;
 		$this->_paths = $this->_getCommandPath();
-		if (!in_array($this->_paths[0], ["install", "install-steps"])) {
+		if (empty($this->_paths[0]) || !in_array($this->_paths[0], ["install", "install-steps"])) {
 			$this->redirect("/install-steps/details");
 		} else {
 			$this->start(false);
@@ -267,6 +269,13 @@ class Web {
 			$this->initDB();
 		}
 
+		// Set the timezone from Config
+		$timezone = Config::get('system.timezone');
+		if (empty($timezone)) {
+			$timezone = 'UTC';
+		}
+		date_default_timezone_set($timezone);
+	
         // start the session
         // $sess = new SessionManager($this);
         try {
@@ -315,7 +324,7 @@ class Web {
                 array_unshift($this->_paths, $domainmodule);
             }
         }
-        
+
         // continue as usual
         
         // first find the module file
@@ -618,6 +627,10 @@ class Web {
      */
     function getSubmodules($module) {
     	$dir = $this->getModuleDir($module)."actions";
+		if (!is_dir($dir)) {
+			return null;
+		}
+		
  		$listing = scandir($dir);
  		if (empty($listing)) {
  			return null;
@@ -646,6 +659,11 @@ class Web {
      * @return <type>
      */
     function checkAccess($msg = "Access Restricted") {
+		// If we're installing cmfive then there won't be users
+		if ($this->_module == "install" && $this->_is_installing) {
+			return true;
+		}
+		
         $submodule = $this->_submodule ? "-" . $this->_submodule : "";
         $path = $this->_module . $submodule . "/" . $this->_action;
         $actual_path = $path;
@@ -1365,6 +1383,7 @@ class Web {
             }
             $this->ctx($key, $val);
             $match[$key] = $val;
+			$match[$i] = $val;		// Use associative listing as well (so list() can work)
         }
         return $match;
     }

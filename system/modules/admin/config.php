@@ -16,7 +16,7 @@ Config::set('admin', array(
     'database' => array(
         'output' => 'sql',
         'command' => array(
-            'unix' => 'mysqldump -u "$username" -p"$password" "$dbname" | gzip > "$filename.gz"',
+            'unix' => 'mysqldump -u $username -p$password $dbname | gzip > $filename.gz',
             // 'windows' => 'J:\\xampp\\mysql\\bin\\mysqldump.exe -u $username -p$password $dbname > $filename'
         )
     ),
@@ -24,13 +24,7 @@ Config::set('admin', array(
         "swiftmailer/swiftmailer" => "@stable",
         "twig/twig" => "1.*",
         "nesbot/carbon" => "1.14",
-		"mandrill/mandrill" => "1.0.*"
-    ),
-	'email' => array(
-		'api' => array(
-			'credentials' => array(
-				'key' => ''
-			)
-		)
-	)
+		"mandrill/mandrill" => "1.0.*",
+		"robmorgan/phinx" => "^0.4.6"
+    )
 ));
