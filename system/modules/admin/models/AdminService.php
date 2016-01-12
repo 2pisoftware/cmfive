@@ -84,6 +84,7 @@ class AdminService extends DbService {
             $w->menuLink("admin/databasebackup", "Backup Database", $nav);
             $w->menuLink("admin/composer", "Install/Update Composer", $nav, null, "_blank");
             $w->menuLink("admin/email", "Email", $nav);
+            $w->menuLink("admin-migration", "Migrations", $nav);
         }
         $w->ctx("navigation", $nav);
         return $nav;
