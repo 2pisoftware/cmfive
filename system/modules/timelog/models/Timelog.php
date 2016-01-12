@@ -75,17 +75,18 @@ class Timelog extends DbObject {
     }
     
     public function start($object) {
+$this->w->Log->debug("TimeLog Start");
         if (empty($object->id)) {
             return false;
         }
-        
+       
         $this->object_class = get_class($object);
         $this->object_id = $object->id;
 
         $this->dt_start = time();
         $this->user_id = $this->w->Auth->user()->id;
-        $this->insert();
-        
+        $this->insert(false);
+                
         return true;
     }
     
