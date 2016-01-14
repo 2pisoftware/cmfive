@@ -183,4 +183,26 @@ class Attachment extends DbObject {
 		$this->w->header("Content-Type: " . $this->getMimetype());
 		$this->w->out($this->getContent());
 	}
+	
+	/**
+	 * Moves the content from one adapter to another
+	 */
+	public function moveToAdapter($adapter = "local") {
+		// Get content of file
+		$content = $this->getContent();
+		$current_file = $this->getFile();
+		
+		$this->adapter = $adapter;
+		
+		$filesystem = $this->getFilesystem();
+		$file = new Gaufrette\File($this->filename, $filesystem);
+		
+		$file->setContent($content);
+		
+		try {
+			$current_file->delete();
+		} catch (RuntimeException $ex) {
+			$this->w->Log->setLogger("FILE")->error("Cannot delete file: " . $ex->getMessage());
+		}
+	}
 }
