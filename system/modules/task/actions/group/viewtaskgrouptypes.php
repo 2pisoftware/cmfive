@@ -39,6 +39,8 @@ function viewtaskgrouptypes_ALL(Web $w) {
 	$is_active = array(array("Yes","1"), array("No","0"));
 
 	$grouptypes = $w->Task->getAllTaskGroupTypes();
+        $assignees = $w->Auth->getUsers();
+        array_unshift($assignees,array("Unassigned","unassigned"));        
 
 	// build form to create a new task group within the target group type
 	$f = Html::form(array(
@@ -53,7 +55,7 @@ function viewtaskgrouptypes_ALL(Web $w) {
 			array("Description","textarea","description",null,"26","6"),
 			array("Default Task Type","select","default_task_type",null,null),
 			array("Default Priority","select","default_priority",null,null),
-			array("Default Assignee","select","default_assignee_id",null,$w->Auth->getUsers()),
+			//array("Default Assignee","select","default_assignee_id",null,$assignees),
 	),$w->localUrl("/task-group/createtaskgroup"),"POST","Save");
 
 	// display form

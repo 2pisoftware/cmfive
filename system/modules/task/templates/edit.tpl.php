@@ -81,9 +81,12 @@
     }
     
     function getTaskGroupData(taskgroup_id) {
+        console.log("Going.."+"/task/taskAjaxSelectbyTaskGroup/" + taskgroup_id + "/<?php echo !empty($task->id) ? $task->id : null; ?>");
         $.getJSON("/task/taskAjaxSelectbyTaskGroup/" + taskgroup_id + "/<?php echo !empty($task->id) ? $task->id : null; ?>",
             function(result) {
+                    console.log("Here..."+result);
                 if (initialChange == false) {
+                    console.log(result[2]);
                     $('#task_type').parent().html(result[0]);
                     $('#priority').parent().html(result[1]);
                     $('#assignee_id').parent().html(result[2]);
