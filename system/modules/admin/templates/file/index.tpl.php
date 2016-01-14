@@ -2,33 +2,43 @@
 	
 	<?php foreach($attachments as $attachment_adapter => $sorted_attachments) : ?>
 		<h3>Files on <?php echo $attachment_adapter; ?></h3>
-		<table class="small-12 columns">
+		<table class="small-12 columns " style="margin-bottom: 50px;">
 			<thead>
-				<tr><th>Title</th><th>Location</th><th>Actions</th></tr>
+				<tr><th wdith="30%">Title</th><th width="20%">Object</th><th width="20%">Location</th><th width="30%">Actions</th></tr>
 			</thead>
 			<tbody>
 				<?php foreach($sorted_attachments as $attachment) : ?>
 					<tr>
 						<td><?php echo $attachment->title; ?></td>
+						<td><?php echo $attachment->parent_table . ' [' . $attachment->parent_id . ']'; ?></td>
 						<td><?php echo $attachment->adapter; ?></td>
 						<td>
-							<button href="#" data-dropdown="move_to_<?php echo $attachment->id; ?>" aria-controls="move_to_<?php echo $attachment->id; ?>" aria-expanded="false" class="button dropdown expand">Move to</button><br>
-							<ul id="move_to_<?php echo $attachment->id; ?>" data-dropdown-content class="f-dropdown" aria-hidden="true">
-								<?php if (!empty($adapters)) : ?>
-									<?php foreach($adapters as $adapter) : ?>
-										<?php if ($adapter != $attachment_adapter) : ?>
-											<li><a id="<?php echo $attachment->id; ?>" href="#"><?php echo $adapter; ?></a></li>
+							<div class="row-fluid">
+								<div class="small-6 columns">
+									<?php echo Html::box($attachment->getViewUrl(), "View", true, false, null, null, "isbox", null, "expand"); ?>
+								</div>
+								<div class="small-6 columns">
+									<button href="#" data-dropdown="move_to_<?php echo $attachment->id; ?>" aria-controls="move_to_<?php echo $attachment->id; ?>" aria-expanded="false" class="button dropdown expand">Move to</button><br>
+									<ul id="move_to_<?php echo $attachment->id; ?>" data-dropdown-content class="f-dropdown" aria-hidden="true" style="z-index:1000;">
+										<?php if (!empty($adapters)) : ?>
+											<?php foreach($adapters as $adapter) : ?>
+												<?php if ($adapter != $attachment_adapter) : ?>
+													<li><a id="<?php echo $attachment->id; ?>" href="#"><?php echo $adapter; ?></a></li>
+												<?php endif; ?>
+											<?php endforeach; ?>
 										<?php endif; ?>
-									<?php endforeach; ?>
-								<?php endif; ?>
-							</ul>
+									</ul>
+								</div>
+							</div>
 						</td>
 					</tr>
 				<?php endforeach; ?>
 			</tbody>
 		</table>
 	<?php endforeach;
-endif; ?>
+else : ?>
+		<h3>No attachments available</h3>
+<?php endif; ?>
 
 <script>
 	

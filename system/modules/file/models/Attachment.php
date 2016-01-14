@@ -204,5 +204,16 @@ class Attachment extends DbObject {
 		} catch (RuntimeException $ex) {
 			$this->w->Log->setLogger("FILE")->error("Cannot delete file: " . $ex->getMessage());
 		}
+		
+		// Update the adapter location
+		$this->update(false);
 	}
+	
+	/**
+	 * Returns URL to view
+	 */
+	public function getViewUrl() {
+		return "/file/atfile/" . $this->id;
+	}
+	
 }
