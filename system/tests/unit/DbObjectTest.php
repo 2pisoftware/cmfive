@@ -31,6 +31,11 @@ class DbObjectTest extends  \Codeception\TestCase\Test {
 		return $generated;
 	}
 
+	function createDbRecord($objectName,$data) {
+		$testData1=new $objectName(self::$web);
+		$testData1->fill($data);
+		$testData1->insert();
+	}
 	
 	
 	/*****************************************
@@ -227,9 +232,10 @@ class DbObjectTest extends  \Codeception\TestCase\Test {
 		// lookup db table
 		$data= new TestmoduleFoodHasName(self::$web);
 		//codecept_debug('C:'.count($data->getSelectOptions('title')));
-		$this->guy->haveInDatabase('lookup',['id'=>'1001','type'=>'testtype','code'=>'WHATMYNAME','title'=>'what is my name']);
-		$this->guy->haveInDatabase('lookup',['id'=>'1002','type'=>'testtype','code'=>'WHEREMYNAME','title'=>'where is my name']);
-		$this->guy->haveInDatabase('lookup',['id'=>'1003','type'=>'nottesttype','code'=>'WHEREELSEMYNAME','title'=>'where else is my name']);		
+		$this->createDbRecord('Lookup',['id'=>'1001','type'=>'testtype','code'=>'WHATMYNAME','title'=>'what is my name']);
+		$this->createDbRecord('Lookup',['id'=>'1002','type'=>'testtype','code'=>'WHEREMYNAME','title'=>'where is my name']);
+		$this->createDbRecord('Lookup',['id'=>'1003','type'=>'nottesttype','code'=>'WHEREELSEMYNAME','title'=>'where else is my name']);		
+		
 		TestmoduleFoodHasName::$_title_ui_select_lookup_code = "testtype"; 
 		$options=$data->getSelectOptions('title');
 		$this->assertEquals(count($options),2);
@@ -239,9 +245,9 @@ class DbObjectTest extends  \Codeception\TestCase\Test {
 		// objects lookup
 		$data= new TestmoduleFoodHasTitle(self::$web);
 		//codecept_debug('C:'.count($data->getSelectOptions('title')));
-		$this->guy->haveInDatabase('testmodule_data',['id'=>'1001','data'=>'testtype','title'=>'what is my name']);
-		$this->guy->haveInDatabase('testmodule_data',['id'=>'1002','data'=>'testtype','title'=>'where is my name']);
-		$this->guy->haveInDatabase('testmodule_data',['id'=>'1003','data'=>'nottesttype','title'=>'where else is my name']);		
+		$this->createDbRecord('TestmoduleData',['id'=>'1001','data'=>'testtype','title'=>'what is my name']);
+		$this->createDbRecord('TestmoduleData',['id'=>'1002','data'=>'testtype','title'=>'where is my name']);
+		$this->createDbRecord('TestmoduleData',['id'=>'1003','data'=>'nottesttype','title'=>'where else is my name']);		
 		TestmoduleFoodHasTitle::$_title_ui_select_objects_class = "TestmoduleData"; //"Contact";
 		TestmoduleFoodHasTitle::$_title_ui_select_objects_filter = ['data'=>'testtype']; //array("is_deleted"=>0);
 	
