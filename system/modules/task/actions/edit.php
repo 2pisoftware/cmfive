@@ -23,6 +23,7 @@ function edit_GET($w) {
     // Try and prefetch the taskgroup by given id
     $taskgroup = null;
     $taskgroup_id = $w->request("gid");
+    $assigned = 0;
     if (!empty($taskgroup_id) || !empty($task->task_group_id)) {
         $taskgroup = $w->Task->getTaskGroup(!empty($task->task_group_id) ? $task->task_group_id : $taskgroup_id);
         
@@ -31,6 +32,8 @@ function edit_GET($w) {
             $priority = $w->Task->getTaskPriority($taskgroup->task_group_type);
             $members = $w->Task->getMembersBeAssigned($taskgroup->id);
             sort($members);
+            array_unshift($members,array("Unassigned","unassigned"));
+            $assigned = (empty($task->assignee_id)) ? "unassigned" : $task->assignee_id;
         }
     }
     
@@ -43,7 +46,8 @@ function edit_GET($w) {
                         array("Task Group", "autocomplete", "task_group_id", !empty($task->task_group_id) ? $task->task_group_id : $taskgroup_id, $taskgroups),
                 !empty($p["id"]) ?
                         array("Task Type", "select", "-task_type", $task->task_type, $tasktypes) :
-                        array("Task Type", "select", "task_type", $task->task_type, $tasktypes)
+                        //array("Task Type", "select", "task_type", $task->task_type, $tasktypes)
+                        array("Task Type", "select", "task_type", (sizeof($tasktypes) === 1) ? $tasktypes[0] : null, $tasktypes)
             ),
             array(
                 array("Task Title", "text", "title", $task->title),
@@ -53,8 +57,8 @@ function edit_GET($w) {
                 array("Priority", "select", "priority", $task->priority, $priority),
                 array("Date Due", "date", "dt_due", formatDate($task->dt_due)),
                 !empty($taskgroup) && $taskgroup->getCanIAssign() ?
-                	array("Assigned To", "select", "assignee_id", $task->assignee_id, $members) :
-                	array("Assigned To", "select", "-assignee_id", $task->assignee_id, $members)
+                	array("Assigned To", "select", "assignee_id", $assigned, $members) :
+                	array("Assigned To", "select", "-assignee_id", $assigned, $members)
             ),
 			array(
 				array("Estimated hours", "text", "estimate_hours", $task->estimate_hours),
