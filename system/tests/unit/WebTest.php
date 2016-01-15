@@ -95,9 +95,9 @@
 				$overrideFunctions['sessionDestroy']=function() {
 					//codecept_debug('::SESSIONDESTROY::');
 				};
-				$overrideFunctions['reallySendHeader']=function($a) {
-					echo ('::HEADER::'.$a.':::');
-				};
+				//$overrideFunctions['reallySendHeader']=function($a) {
+				//	echo ('::HEADER::'.$a.':::');
+				//};
 				$blankFunctions=[];
 				foreach ($blankFunctions as $functionName) {
 					$overrideFunctions[$functionName]='';
@@ -346,7 +346,7 @@
 			$_SERVER['REQUEST_URI']='site/tasks/showfriends/4';
 			$_SERVER['SCRIPT_NAME']='site/index.php';
 			self::$web->_paths=self::$web->_getCommandPath();
-			$this->assertEquals(self::$web->pathMatch('module','action','id'),['module'=>'tasks','action'=>'showfriends','id'=>'4']);
+			$this->assertEquals(self::$web->pathMatch('module','action','id'),['module'=>'tasks','action'=>'showfriends','id'=>'4','0'=>'tasks','1'=>'showfriends','2'=>'4']);
 		}
 		
 		

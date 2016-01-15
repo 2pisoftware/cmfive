@@ -62,6 +62,8 @@ class TaskInitialMigration extends CmfiveMigration {
 				->addColumn('description', 'text')
 				->addColumn('task_group_type', 'string', ['limit' => 50])
 				->addColumn('default_assignee_id', 'biginteger')
+				->addColumn('default_priority', 'string', ['limit' => 255])
+				->addColumn('default_task_type', 'string', ['limit' => 255])
 				->addCmfiveParameters(['dt_created', 'dt_modified', 'creator_id', 'modifier_id'])
 				->create();
 		}

@@ -6,9 +6,6 @@
 function index_ALL(Web $w) {
 	// adding data to the template context
 	$w->ctx("message","Example Data List");
-	// get the list of data objects
-	$listdata = $w->Example->getAllData();
-	
 	
 	// prepare table data
 	$t[]=array("Title", "Data", "Checkbox", "Actions"); // table header
