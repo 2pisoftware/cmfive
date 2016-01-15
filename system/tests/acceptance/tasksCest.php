@@ -24,8 +24,19 @@ class tasksCest
 			'can_create'=>'GUEST',
 			'is_active'=>'Yes',
 			'description'=>'A test group',
-			'default_assignee_id'=>'testy tererer'
+		//	'default_assignee_id'=>'testy tererer'
 		]);
+		$I->updateTaskGroup($I,'testgroup',[
+			'title'=>'testgroup updated',
+			'can_assign'=>'MEMBER',
+			'can_view'=>'MEMBER',
+			'can_create'=>'MEMBER',
+			'is_active'=>'Yes',
+			'description'=>'A test group updated',
+		//	'default_assignee_id'=>'testy tererer'
+		]);
+		$I->addMemberToTaskGroup($I,'testgroup updated','testy tererer','MEMBER');
+		
 		$I->createTask($I,'testgroup','test task',[
 			'task_group_id'=>'testgroup',
 			'task_type'=>'To Do',
@@ -38,20 +49,8 @@ class tasksCest
 			'effort'=>11,
 			'description'=>'a test task',
 		]);
-		$I->updateTaskGroup($I,'testgroup',[
-			'title'=>'testgroup updated',
-			'can_assign'=>'MEMBER',
-			'can_view'=>'MEMBER',
-			'can_create'=>'MEMBER',
-			'is_active'=>'Yes',
-			'description'=>'A test group updated',
-			'default_assignee_id'=>'testy tererer'
-		]);
-		$I->addMemberToTaskGroup($I,'testgroup updated','testy tererer','GUEST');
 		$I->updateMemberInTaskGroup($I,'testgroup updated','testy tererer','ALL');
 		$I->removeMemberFromTaskGroup($I,'testgroup updated','testy tererer');
 		$I->deleteTaskGroup($I,'testgroup updated');
 	}
-
-	
 }
