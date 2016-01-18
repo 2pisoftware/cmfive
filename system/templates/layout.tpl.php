@@ -125,7 +125,7 @@
 			<div class="row-fluid">
 				<div class="small-12">
 					<div data-alert class="alert-box warning" style="margin-bottom: 0px; padding: 5px 0px;">
-						<h4 style="font-weight: lighter; text-align: center; color: white; padding: 5px 0px 0px 0px;">You are using a test system</h4>
+						<h4 style="font-weight: lighter; text-align: center; color: white; padding: 5px 0px 0px 0px;"><?php echo Config::get('system.test_mode_message')?></h4>
 					</div>
 				</div>
 			</div>

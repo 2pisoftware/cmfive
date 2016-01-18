@@ -7,6 +7,7 @@
     "require": {
         "codeception/codeception": "*",
         "monolog/monolog": "1.8.*@dev",
+        "robmorgan/phinx": "^0.4.6",
         "knplabs/gaufrette": "0.2.*@dev",
         "aws/aws-sdk-php": "~2",
         "dropbox-php/dropbox-php": "*",
