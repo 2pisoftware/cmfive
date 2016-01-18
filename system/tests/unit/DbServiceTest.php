@@ -48,7 +48,9 @@ class DbServiceTest extends  \Codeception\TestCase\Test {
 		$dbService=$this->dbService;
 		$dbService->buildSelect($object, $table, $class);
 		// check that correct select fields held in cache
-		$this->assertEquals($dbService::$_select_cache[$class][$table],'id,title,data,s_data,UNIX_TIMESTAMP(testmodule_data.`d_last_known`) AS `d_last_known`,t_killed,UNIX_TIMESTAMP(testmodule_data.`dt_born`) AS `dt_born`,UNIX_TIMESTAMP(testmodule_data.`dt_created`) AS `dt_created`,UNIX_TIMESTAMP(testmodule_data.`dt_modified`) AS `dt_modified`,creator_id,modifier_id,is_deleted');
+		$this->assertEquals($dbService::$_select_cache[$class][$table],'id,title,data,s_data,UNIX_TIMESTAMP(testmodule_data.`d_last_known`) AS `d_last_known`,t_killed,UNIX_TIMESTAMP(testmodule_data.`dt_born`) AS `dt_born`,is_deleted,UNIX_TIMESTAMP(testmodule_data.`dt_created`) AS `dt_created`,creator_id,UNIX_TIMESTAMP(testmodule_data.`dt_modified`) AS `dt_modified`,modifier_id');
+		//$this->assertEquals($dbService::$_select_cache[$class][$table],'id,title,data,s_data,UNIX_TIMESTAMP(testmodule_data.`d_last_known`) AS `d_last_known`,t_killed,UNIX_TIMESTAMP(testmodule_data.`dt_born`) AS `dt_born`,UNIX_TIMESTAMP(testmodule_data.`dt_created`) AS `dt_created`,UNIX_TIMESTAMP(testmodule_data.`dt_modified`) AS `dt_modified`,creator_id,modifier_id,is_deleted');
+		
 		
 	} //() {
     
