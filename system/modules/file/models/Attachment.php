@@ -1,5 +1,7 @@
 <?php
 
+define('CACHE_PATH', 'cache');
+
 class Attachment extends DbObject {
 
     // make it searchable
@@ -216,4 +218,20 @@ class Attachment extends DbObject {
 		return "/file/atfile/" . $this->id;
 	}
 	
+	/**
+	 * Returns thumbnail cache path
+	 */
+	public function getThumbnailCachePath() {
+		return ROOT_PATH . '/' . CACHE_PATH . '/' . $this->fullpath;
+	}
+	
+	/**
+	 * Returns if there is a cache thumbnail image
+	 */
+	public function hasCachedThumbnail() {
+		if ($this->isImage()) {
+			return is_file($this->getThumbnailCachePath());
+		}
+		return false;
+	}
 }
