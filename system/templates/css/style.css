@@ -358,7 +358,7 @@ button.button + button {
 }
 
 /* Loading Indicator - from: http://www.alessioatzeni.com/blog/css3-loading-animation-loop/ */
-.loading_overlay {
+.loading_overlay, .global_file_drop_overlay {
     position: fixed;
     _position: absolute;
     z-index: 99;
@@ -370,7 +370,8 @@ button.button + button {
     background-color: rgba(0, 0, 0, 0.9);
 }
 
-.loading_overlay .circle {
+.loading_overlay .circle,
+.global_file_drop_overlay_loading .circle {
     background-color: rgba(0,0,0,0);
     border: 4px solid rgba(0,183,229,0.9);
     opacity: .9;
@@ -387,7 +388,8 @@ button.button + button {
     -webkit-animation: spinPulse 1s infinite ease-in-out;
 }
 
-.loading_overlay .circle_inner {
+.loading_overlay .circle_inner,
+.global_file_drop_overlay_loading .circle_inner {
     background-color: rgba(0,0,0,0);
     border: 5px solid rgba(0,183,229,0.9);
     opacity: .9;
@@ -405,7 +407,8 @@ button.button + button {
     -webkit-animation: spinoffPulse 1s infinite linear;
 }
 
-.loading_overlay .circle_center {
+.loading_overlay .circle_center,
+.global_file_drop_overlay_loading .circle_center {
     background-color: rgba(0,0,0,0);
     border: 4px solid rgba(0,183,229,0.9);
     opacity: .9;
@@ -423,7 +426,8 @@ button.button + button {
 		-webkit-animation: spinPulse 2s infinite linear;*/
 }
 
-.loading_overlay h4 {
+.loading_overlay h4,
+.global_file_drop_overlay h4 {
     color: white;
     font-weight: lighter;
     padding-top: 100px;
