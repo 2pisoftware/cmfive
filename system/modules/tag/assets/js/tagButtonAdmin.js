@@ -128,7 +128,7 @@ var uniTag = {
 							alert('Placeholder error');
 						} else {
                             var list = $('#'+parent_id);
-                          list.append('<span data-tag="'+tagText+'" class="label radius '+(list.hasClass('limited') ? 'primary' : 'secondary') + ' tag_selection"><span class="fi-price-tag">'+tagText+'</span></span>'+(list.hasClass('limited') ? '<span class="limited_count"></span> ' : ' '));
+                          list.append('<span data-tag="'+tagText+'" class="label radius primary tag_selection"><span class="fi-price-tag">'+tagText+'</span></span>'+(list.hasClass('limited') ? '<span class="limited_count"></span> ' : ' '));
                             // how many hidden tags are there?
                             if(list.hasClass('limited'))
                             {
@@ -174,7 +174,7 @@ var uniTag = {
 			if($('#'+parent_id+' .tag_selection[data-tag="'+tag+'"]').length == 0)
             {
                 // include information for hidden tags in all tags that are generated here
-                $('#'+parent_id).append('<span data-tag="'+tag+'" class="label radius ' + (list.hasClass('limited') ? 'primary' : 'secondary') + ' tag_selection"><span class="fi-price-tag">'+tag+'</span></span>' + (list.hasClass('limited') ? '<span class="limited_count"></span> ' : ' '));
+                $('#'+parent_id).append('<span data-tag="'+tag+'" class="label radius primary tag_selection"><span class="fi-price-tag">'+tag+'</span></span>' + (list.hasClass('limited') ? '<span class="limited_count"></span> ' : ' '));
                 // Bind click action to tag
                 uniTag.bindTags(parent_id);
 			} else {
