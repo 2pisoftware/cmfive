@@ -1,10 +1,16 @@
 <div class="tabs">
     <div class="tab-head">
         <a href="#details">Task Details</a>
-        <?php if (!empty($task->id)) : ?>
-            <a href="#timelog">Time Log</a>
-            <a href="#comments">Comments</a>
-            <a href="#attachments">Attachments</a>
+        <?php if (!empty($task->id)) :
+            /*
+             partial template files changed to incorporate a class for each counting of objects
+            ./system/modules/file/partials/templates/listattachments.tpl.php
+            ./system/modules/timelog/partials/templates/listtimelog.tpl.php
+             */
+        ?>
+            <a href="#timelog">Time Log <span id='total_timelogs' class='total_number'></span></a>
+            <a href="#comments">Comments <span id='total_comments' class='total_number'></span></a>
+            <a href="#attachments">Attachments <span id='total_attachments' class='total_number'></span></a>
             <?php if ($task->getCanINotify()):?><a href="#notification">Notifications</a><?php endif;?>
         <?php endif; ?>
     </div>
@@ -65,6 +71,9 @@
 
     $(document).ready(function() {
         bindTypeChangeEvent();
+        $('#total_timelogs').text($('.timelog').length);
+        $('#total_comments').text($('.comment_section').length);
+        $('#total_attachments').text($('.attachment').length);
         
         getTaskGroupData(<?php echo !empty($task->task_group_id) ? $task->task_group_id : $w->request('gid'); ?>);
         $("#task_type").trigger("change");

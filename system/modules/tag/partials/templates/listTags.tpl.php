@@ -1,11 +1,13 @@
-<div class="tag_list" id="tag_list_<?php echo ($object_class ? $object_class : '') . ($object_id ? $object_id : ''); ?>"
-     data-url="/tag/ajaxTag/<?php echo ($object_class ? "?class=" . $object_class : '') . ($object_id ? '&id=' . $object_id : ''); ?>">
+<div class="tag_list<?php if($limit > 0){ echo ' limited'; if(!empty($tags) && count($tags) > 1) echo ' show_num_limited'; } ?>" id="tag_list_<?php echo ($object_class ? $object_class : '') . ($object_id ? $object_id : ''); ?>" data-url="/tag/ajaxTag/<?php echo ($object_class ? "?class=" . $object_class : '') . ($object_id ? '&id=' . $object_id : ''); ?>">
 	<?php if (!empty($tags)) : ?>
-		<span class="label radius secondary no_tags tag_selection" style="display:none"><span class="fi-price-tag">No tag</span></span>
-		<?php foreach($tags as $tag) : ?>
-			<span data-tag="<?php echo $tag->tag; ?>" class="label radius secondary tag_selection">
+		<span class="label radius secondary no_tags tag_selection hidetag"><span class="fi-price-tag">No tag</span></span>
+		<?php foreach($tags as $i => $tag) : ?>
+			<span data-tag="<?php echo $tag->tag; ?>" class="label radius <?php echo ($limit > 0 ? 'primary' : 'secondary'); ?> tag_selection<?php if($limit > 0 && $i==0) echo ' first'; ?>">
 				<span <?php echo (!empty($tag->tag_color) ? 'style="color: '.$tag->tag_color.'"' : '') ?> class="fi-price-tag"><?php echo $tag->tag; ?></span>
 			</span>
+            <?php if($limit > 0): ?>
+                <span class="limited_count">+<?php echo (count($tags)-1); ?></span>
+            <?php endif; ?>
 		<?php endforeach; ?>
 	<?php else: ?>
 		<span class="label radius secondary no_tags tag_selection"><span class="fi-price-tag">No tag</span></span>

@@ -1,9 +1,16 @@
 <div class="tabs">
     <div class="tab-head">
+<?php
+    /*
+     partial template files changed to incorporate a class for each counting of objects
+     ./system/modules/file/partials/templates/listattachments.tpl.php
+     ./system/modules/timelog/partials/templates/listtimelog.tpl.php
+     */
+?>
         <a href="#details">Task Details</a>
-        <a href="#timelog">Time Log</a>
-        <a href="#comments">Comments</a>
-        <a href="#documents">Documents</a>
+        <a href="#timelog">Time Log <span id='total_timelogs' class='total_number'></span></a>
+        <a href="#comments">Comments <span id='total_comments' class='total_number'></span></a>
+        <a href="#documents">Documents <span id='total_attachments' class='total_number'></span></a>
        	<?php if ($task->getCanINotify()):?><a href="#notification">Notifications</a><?php endif;?>
     </div>	
 	
@@ -36,6 +43,12 @@
 </div>
 
 <script language="javascript">
+
+    $(document).ready(function() {
+        $('#total_timelogs').text($('.timelog').length);
+        $('#total_comments').text($('.comment_section').length);
+        $('#total_attachments').text($('.attachment').length);
+    });
 
 	$(".startTime").click(function(e){
     	var url = $(this).attr("href");
