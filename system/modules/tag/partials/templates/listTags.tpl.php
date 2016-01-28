@@ -2,7 +2,7 @@
 	<?php if (!empty($tags)) : ?>
 		<span class="label radius secondary no_tags tag_selection hidetag"><span class="fi-price-tag">No tag</span></span>
 		<?php foreach($tags as $i => $tag) : ?>
-			<span data-tag="<?php echo $tag->tag; ?>" class="label radius <?php echo ($limit > 0 ? 'primary' : 'secondary'); ?> tag_selection<?php if($limit > 0 && $i==0) echo ' first'; ?>">
+			<span data-tag="<?php echo $tag->tag; ?>" class="label radius primary tag_selection<?php if($limit > 0 && $i==0) echo ' first'; ?>">
 				<span <?php echo (!empty($tag->tag_color) ? 'style="color: '.$tag->tag_color.'"' : '') ?> class="fi-price-tag"><?php echo $tag->tag; ?></span>
 			</span>
             <?php if($limit > 0): ?>
