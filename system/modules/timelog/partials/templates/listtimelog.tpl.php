@@ -8,7 +8,7 @@
 		<thead><tr><th width="10%">Name</th><th width="15%">From</th><th width="15%">To</th><th width="40%">Description</th><th width="20%">Actions</th></tr></thead>
 		<tbody>
 			<?php foreach($timelogs as $timelog) : ?>
-				<tr data-id="<?php echo $timelog->id; ?>" >
+				<tr class='timelog' data-id="<?php echo $timelog->id; ?>" >
 					<td><?php echo $timelog->getFullName(); ?></td>
 					<td><?php echo formatDate($timelog->dt_start, "d-m-Y H:i:s"); ?></td>
 					<td><?php echo formatDate($timelog->dt_end, "d-m-Y H:i:s"); ?></td>

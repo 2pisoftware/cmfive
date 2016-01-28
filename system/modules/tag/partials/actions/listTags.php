@@ -14,18 +14,21 @@ function listTags_ALL(Web $w, $params) {
 		} elseif($user->hasRole("tag_user")) {
 			$w->enqueueScript(["uri" => "/system/modules/tag/assets/js/tagButton.js", "weight" => 500]);
 		}
+        $w->enqueueStyle(["uri" => "/system/modules/tag/assets/css/tagButton.css", "weight" => 500]);
 	}
 	
 	if (!empty($params['object'])) {
 		$object_class = get_class($params['object']);
 		$object_id = ($params['object']->id === null) ? 0 : $params['object']->id; 
-                
+        $limit = (isset($params['limit']) && is_int($params['limit'])) ? $params['limit'] : -1;
+        
 		$w->ctx("object_class", $object_class);
 		$w->ctx("object_id", $object_id);
 		
 		$tags = $w->Tag->getTagsByObject($object_id, $object_class);
 		
 		$w->ctx("tags", $tags);
+        $w->ctx("limit", $limit);
 	} else {
 		$w->ctx("object_class", '');
 		$w->ctx("object_id", '');

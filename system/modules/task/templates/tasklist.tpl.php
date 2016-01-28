@@ -18,7 +18,8 @@
                     if ($task->getCanIView()) {
                         $table_line = array();
 						$table_line[] = $task->id;
-                        $table_line[] = $task->toLink(); // Html::a("/task/edit/" . $task->id, $task->title);
+                        $table_line[] = $task->toLink(). // Html::a("/task/edit/" . $task->id, $task->title);
+                        "&nbsp;".$w->partial('listTags',['object' => $task, 'limit' => 1], 'tag');
 
                         
                         // Append the rest of the data
