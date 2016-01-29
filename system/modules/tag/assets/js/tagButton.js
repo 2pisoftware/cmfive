@@ -62,7 +62,7 @@ var uniTag = {
 			}
 			uniTag.buf += '</div>';
 		 	uniTag.buildTagDialog(parent_id);
-});
+        });
 		return uniTag.buf;
 	},
 	buildTagDialog: function(parent_id) {
@@ -113,30 +113,45 @@ var uniTag = {
 	 */
 	setTag: function(obj, parent_id) {
 		var label = $(obj).find('.label');
+        var list = $(obj).closest('.tag_list'); // $('#'+parent_id)
 		var url = $('#'+parent_id).data('url');
 		var tagId = $(obj).data('id');
 		var tag = $(obj).data('tag');
 		if(label.hasClass('primary')) {
-                    console.log("Removing tag:"+$('#'+parent_id+' .tag_selection:visible').length+";")
-			$('#'+parent_id+' .tag_selection[data-tag="'+tag+'"]').hide();
-                        // If there are no more tags then show no tag
+			$('#'+parent_id+' .tag_selection[data-tag="'+tag+'"]').addClass('hidetag');
+            // If there are no more tags then show no tag
 			if($('#'+parent_id+' .tag_selection:visible').length == 0) {
-				$('#'+parent_id+' .no_tags').show();
+				$('#'+parent_id+' .no_tags').removeClass('hidetag');
 			}
 			label.removeClass('primary').addClass('secondary');
 			$.get(url+'&cmd=removeTag&tagId='+tagId);
 		} else {
-			if($('#'+parent_id+' .tag_selection[data-tag="'+tag+'"]').length == 0) {
-				$('#'+parent_id).append('<span data-tag="'+tag+'" class="label radius secondary tag_selection"><span class="fi-price-tag">'+tag+'</span></span>&nbsp;');
-                                // Bind click action to tag    
-                                uniTag.bindTags(parent_id);
+			if($('#'+parent_id+' .tag_selection[data-tag="'+tag+'"]').length == 0)
+            {
+                // include information for hidden tags in all tags that are generated here
+				$('#'+parent_id).append('<span data-tag="'+tag+'" class="label radius primary tag_selection"><span class="fi-price-tag">'+tag+'</span></span>' + (list.hasClass('limited') ? '<span class="limited_count"></span> ' : ' '));
+                // Bind click action to tag    
+                uniTag.bindTags(parent_id);
 			} else {
-				$('#'+parent_id+' .tag_selection[data-tag="'+tag+'"]').show();
+				$('#'+parent_id+' .tag_selection[data-tag="'+tag+'"]').removeClass('hidetag');
 			}
-			$('#'+parent_id+' .no_tags').hide();
+			$('#'+parent_id+' .no_tags').addClass('hidetag');
 			$.get(url+'&cmd=setTag&tagId='+tagId);
 			label.removeClass('secondary').addClass('primary');
 		}
+        // how many hidden tags are there?
+        if(list.hasClass('limited'))
+        {
+            $('.first', list).removeClass('first');
+            var tags = $('.tag_selection.primary:visible', list);
+            var numTags = tags.length-1;
+            tags.first().addClass('first');
+            $('.limited_count', list).text(" +" + numTags);
+            if(numTags >= 1)
+                list.addClass('show_num_limited');
+            else
+                list.removeClass('show_num_limited');
+        }
 	},
 	/*
 	 * 
