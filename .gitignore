@@ -8,3 +8,5 @@ storage/
 config.old.php
 config.old.*.php
 cache/
+/phpmyadmin
+/codiad
