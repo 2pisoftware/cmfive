@@ -2,6 +2,127 @@
 function selectAutocompleteCallback(event, ui) {
 }
 
+/*
+	Global file upload widget
+	Drag and drop files on any page
+*/
+var globalFileUpload = {
+	//Max upload size in bytes, should be set to php max upload size
+	MAXUPLOAD: 2097152,
+	filesToUpload: [],
+	//Initial drop target is the HTML body so we can drop anywhere
+	initalDropTarget: null,
+	//The main drop target the global file drop overlay
+	dropTarget: null,
+	targetDragLeave: function(event) {
+		event.preventDefault();
+		event.stopPropagation();
+		jQuery(globalFileUpload.dropTarget).hide();
+	},
+	targetDragOver: function(event) {
+		event.preventDefault();
+		event.stopPropagation();
+	},
+	targetDrop: function(event) {
+		event.preventDefault();
+		event.stopPropagation();
+		$('.global_file_drop_overlay_loading').show();
+		$('.global_file_drop_overlay_init').hide();
+		var dt = event.dataTransfer;
+		var files = dt.files;
+		globalFileUpload.handleFiles(files);
+	},
+	init: function() {
+		globalFileUpload.initalDropTarget = document.getElementsByTagName('body')[0];
+		globalFileUpload.dropTarget = document.getElementById('global_file_drop_overlay');
+		console.log(globalFileUpload);
+		globalFileUpload.dropTarget.addEventListener('dragleave', globalFileUpload.targetDragLeave, false);
+		globalFileUpload.dropTarget.addEventListener('dragover', globalFileUpload.targetDragOver, false);
+		globalFileUpload.dropTarget.addEventListener('drop', globalFileUpload.targetDrop, false);
+		globalFileUpload.initalDropTarget.addEventListener("dragenter", function(e) {
+			e.stopPropagation();
+			e.preventDefault();
+			$(globalFileUpload.dropTarget).show();
+		}, false);
+	},
+	handleFiles: function(files) {
+		if (files) {
+			var error = true;
+			$.each(files,function(key,file) {
+				var k = globalFileUpload.filesToUpload.push(file);
+				globalFileUpload.filesToUpload[k-1].self_id = k;
+				if(file.size > globalFileUpload.MAXUPLOAD) {
+					globalFileUpload.filesToUpload[k-1].error = true;
+				} else {
+					error = false;
+				}
+			});
+			if(!error) {
+				globalFileUpload.uploadFiles();
+			} else {
+				$(globalFileUpload.dropTarget).hide();
+				$('.global_file_drop_overlay_loading').hide();
+				$('.global_file_drop_overlay_init').show();
+			}
+		}
+	},
+	uploadFiles: function() {
+		for(i in globalFileUpload.filesToUpload) {
+			if(globalFileUpload.filesToUpload[i] != undefined) {
+				var file = globalFileUpload.filesToUpload[i];
+				var parts;
+				var mime=file.type;
+				var blob=new Blob([file],{type : mime});
+				var reader = new FileReader();
+				reader.key = parseInt(i)+1;
+				reader.fileData = file;
+				reader.onload = function(event) {
+					var fd = {};
+					var reader = this;
+					var file = reader.fileData;
+					fd["fname"] = file.name;
+					fd["description"] = '';
+					fd["data"] = event.target.result;
+					fd[$('#token').prop('name')] = $('#token').val();
+					if(file.error) {
+						delete globalFileUpload.filesToUpload[reader.key-1];
+						return;
+					}
+					$.ajax({
+						xhr: function() {
+							var xhr = new window.XMLHttpRequest();
+							xhr.upload.addEventListener("progress", function(evt) {
+								if (evt.lengthComputable) {
+									var percentComplete = Math.round(evt.loaded / evt.total * 100);
+									if(percentComplete == 100) {
+										$('.global_file_drop_overlay_loading h4').text('Processing files, please wait...');
+									} else {
+										$('.global_file_drop_overlay_loading h4').text('Uploading ('+percentComplete+'%)');
+									}
+								}
+						   }, false);
+
+						   return xhr;
+						},
+						type: 'POST',
+						url: '/file/new',
+						data: fd,
+						dataType: 'json',
+						success: function(data) {
+							console.log(data);
+							delete globalFileUpload.filesToUpload[reader.key-1];
+							$(globalFileUpload.dropTarget).hide();
+							$('.global_file_drop_overlay_loading').hide();
+							$('.global_file_drop_overlay_init').show();
+						}
+					});
+				};
+				reader.readAsDataURL(blob);
+			}
+		}
+	}
+}
+
 function changeTab(hash) {
     if (hash.length > 0) {
         $(".tab-body > div").each(function() {
