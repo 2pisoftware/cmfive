@@ -4,9 +4,9 @@ class FileAdapterMigration extends CmfiveMigration {
 	
 	public function up() {
 		
-		if ($this->hasTable("file")) {
-			if (!$this->table("file")->hasColumn("adapter")) {
-				$this->table("file")->addColumn("adapter", "string", ["default" => "local", "limit" => 255])->save();
+		if ($this->hasTable("attachment")) {
+			if (!$this->table("attachment")->hasColumn("adapter")) {
+				$this->table("attachment")->addColumn("adapter", "string", ["default" => "local", "limit" => 255])->save();
 			}
 		}
 		
@@ -14,7 +14,7 @@ class FileAdapterMigration extends CmfiveMigration {
 	
 	public function down() {
 		
-		$this->hasTable("file") && $this->table("file")->hasColumn("adapter") ? $this->table("file")->dropColumn("adapter") : null;
+		$this->hasTable("attachment") && $this->table("attachment")->hasColumn("adapter") ? $this->table("attachment")->dropColumn("adapter") : null;
 		
 	}
 	
