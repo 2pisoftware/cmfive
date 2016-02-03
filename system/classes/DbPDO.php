@@ -192,6 +192,10 @@ class DbPDO extends PDO {
         $row = $this->fetch_row();
         return (!is_null($row[$element]) ? $row[$element] : null);
     }
+	
+	public function fetchElement($element) {
+		return $this->fetch_element($element);
+	}
     
     /**
      * A grace method for our migration from Crystal
@@ -202,6 +206,10 @@ class DbPDO extends PDO {
     public function fetch_row() {
         return $this->query->fetch();
     }
+	
+	public function fetchRow() {
+		return $this->fetch_row();
+	}
     
     /**
      * A grace method for our migration from Crystal
@@ -215,6 +223,10 @@ class DbPDO extends PDO {
         }
         return array();
     }
+	
+	public function fetchAll() {
+		return $this->fetch_all();
+	}
         
     /**
      * Sets up class with a PDO insert query and required array of values
@@ -328,10 +340,10 @@ class DbPDO extends PDO {
     // PDO object
     public function last_insert_id(){
         if ($this->query !== null){
-            // This might be too much, oh well it works
             // It checks if we havent called execute yet, and calls it for us
-            if ($this->query instanceof InsertQuery)
+            if ($this->query instanceof InsertQuery) {
                 $this->execute();
+			}
 
             return $this->query;
         }
