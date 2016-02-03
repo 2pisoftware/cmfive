@@ -86,7 +86,6 @@ function task_core_dbobject_after_update_Task(Web $w, $object) {
     $w->Log->setLogger("TASK")->info("Notifying " . count($users_to_notify) . " users");
     
 	// Only send emails where the status has changed
-	$w->Log->setLogger("TASK")->debug($object->status . " <= " . $object->__old['status']);
 	if ($object->status == $object->__old['status']) {
 		return;
 	}
@@ -97,9 +96,10 @@ function task_core_dbobject_after_update_Task(Web $w, $object) {
         // send it to the inbox of the user's on our send list
         foreach ($users_to_notify as $user) {
             // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
-            $subject = "Task - " . $object->title . ": " . $event_title;
+            $subject = "Task " . $object->title . " [" . $object->id . "][" . $object->status . "] - " . $event_title;
             $message = "<b>" . $event_title . "</b><br/>\n";
             $message .= "<p>" . $object->title . " details has been updated</p>";
+			$message .= "<p>Status: " . $object->__old['status'] . " => " . $object->status . "</p>";
             
 			// Get additional details
 			$message .= $w->Task->getNotificationAdditionalDetails($object);

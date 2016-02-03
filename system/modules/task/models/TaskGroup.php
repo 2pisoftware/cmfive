@@ -31,7 +31,6 @@ class TaskGroup extends DbObject {
         "can_view" => array("required"),
         "can_create" => array("required"),
         "is_active" => array("required"),
-        "default_assignee_id" => array("required"),
         "task_group_type" => array("required"),
     );
     

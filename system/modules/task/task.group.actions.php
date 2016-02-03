@@ -26,9 +26,13 @@ function viewtaskgroup_GET(Web &$w) {
 	// unset 'ALL' given all can never assign a task
 	unset($arrassign[0]);
 
-        // Get list of possible task types and priorities
+        // Get list of possible task types and priorities adn assignees
         $tasktypes = $w->Task->getTaskTypes($group_details->task_group_type);
         $priorities = $w->Task->getTaskPriority($group_details->task_group_type);
+        $assignees = $w->Task->getMembersInGroup($p['id']);
+        array_unshift($assignees,array("Unassigned","unassigned")); 
+        // No default assignee means it is unassigned
+        $default_assignee = (empty($group_details->default_assignee_id)) ? "unassigned" : $group_details->default_assignee_id;
 	
 	// build form displaying current attributes from database
 	$f = Html::form(array(
@@ -42,7 +46,7 @@ function viewtaskgroup_GET(Web &$w) {
 	array("Description","textarea", "description",$group_details->description,"26","6"),
         array("Default Task Type","select","default_task_type",$group_details->default_task_type,$tasktypes),
         array("Default Priority","select","default_priority",$group_details->default_priority,$priorities),
-	array("Default Assignee","select", "default_assignee_id",$group_details->default_assignee_id,$w->Task->getMembersInGroup($p['id'])),
+	array("Default Assignee","select", "default_assignee_id",$default_assignee,$assignees),
 	),$w->localUrl("/task-group/updatetaskgroup/".$group_details->id),"POST"," Update ");
 
 	// display form
@@ -66,7 +70,7 @@ function createtaskgroup_POST(Web &$w) {
     );
 
     // return
-    $w->msg("<div id='saved_record_id' data-id='".$taskgroup->id."' >Task Group ".$taskgroup->title." added</div>", "/task/tasklist/?taskgroups=".$taskgroup->id);
+    $w->msg("<div id='saved_record_id' data-id='".$taskgroup->id."' >Task Group ".$taskgroup->title." added</div>", "/task-group/viewmembergroup/".$taskgroup->id."#members");
 }
 
 function updatetaskgroup_POST(Web &$w) {
@@ -84,8 +88,9 @@ function updatetaskgroup_POST(Web &$w) {
                     $w->errorMessage($group_details, "Taskgroup", $response, true, "/task-group/viewmembergroup/".$p['id']."#members");
                 }                
 
-		// if a default assignee is set, return their membership object for this group
-		if ($_REQUEST['default_assignee_id'] != "") {
+		// if a default assignee is set (other than unassigned), return their membership object for this group
+                $default_assignee_id = $_REQUEST['default_assignee_id'];
+		if (!empty($default_assignee_id) && $default_assignee_id != "unassigned") {
 			$mem = $w->Task->getMemberGroupById($group_details->id, $_REQUEST['default_assignee_id']);
 		
 			// populate an array with the required details for updating

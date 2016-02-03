@@ -10,18 +10,30 @@ class DbServiceTest extends  \Codeception\TestCase\Test {
 	protected $guy;
 	
 	
-	public static $web;
-	public static $dbService;
+	public $web;
+	public $dbService;
 	
 	public function _before() {
 		// renew sample modules for each test
 		//require_once(getenv('thisTestRun_testRunnerPath').'/src/CmFiveTestModuleGenerator.php');
 		//$gen=new \CmFiveTestModuleGenerator(getenv('thisTestRun_testIncludePath'));
 		//$gen->createTestTemplateFiles();
-		self::$web = Stub::construct("Web",[],[]);
-		self::$web->initDb();
-		self::$dbService = new DbService(self::$web);
-
+		$this->web = Stub::construct("Web",[],[]);
+		$this->web->initDb();
+		$this->dbService = new DbService($this->web);
+	}
+	
+	
+	function loadRecords($table) {
+		$query = 'select * from '.$table;
+		$results=[];
+		$statement=$this->web->db->_prepare($query);
+		if ($statement->execute(array())) {
+			while ($result=$statement->fetch()) {
+				$results[]=$result;
+			}
+		}
+		return $results;
 	}
 
 	public function _after() {
@@ -30,24 +42,32 @@ class DbServiceTest extends  \Codeception\TestCase\Test {
 	function test_buildSelect() {
 		// create stubbed Web
 				
-		$object=new TestmoduleData(self::$web);
+		$object=new TestmoduleData($this->web);
 		$table='testmodule_data';
 		$class='TestmoduleData';
-		$dbService=self::$dbService;
+		$dbService=$this->dbService;
 		$dbService->buildSelect($object, $table, $class);
-		//codecept_debug($dbService::$_select_cache[$class][$table]);
 		// check that correct select fields held in cache
-		$this->assertEquals($dbService::$_select_cache[$class][$table],'id,title,data,s_data,UNIX_TIMESTAMP(testmodule_data.`d_last_known`) AS `d_last_known`,UNIX_TIMESTAMP(testmodule_data.`t_killed`) AS `t_killed`,UNIX_TIMESTAMP(testmodule_data.`dt_born`) AS `dt_born`,is_deleted,UNIX_TIMESTAMP(testmodule_data.`dt_created`) AS `dt_created`,creator_id,UNIX_TIMESTAMP(testmodule_data.`dt_modified`) AS `dt_modified`,modifier_id');
+		$this->assertEquals($dbService::$_select_cache[$class][$table],'id,title,data,s_data,UNIX_TIMESTAMP(testmodule_data.`d_last_known`) AS `d_last_known`,t_killed,UNIX_TIMESTAMP(testmodule_data.`dt_born`) AS `dt_born`,is_deleted,UNIX_TIMESTAMP(testmodule_data.`dt_created`) AS `dt_created`,creator_id,UNIX_TIMESTAMP(testmodule_data.`dt_modified`) AS `dt_modified`,modifier_id');
+		//$this->assertEquals($dbService::$_select_cache[$class][$table],'id,title,data,s_data,UNIX_TIMESTAMP(testmodule_data.`d_last_known`) AS `d_last_known`,t_killed,UNIX_TIMESTAMP(testmodule_data.`dt_born`) AS `dt_born`,UNIX_TIMESTAMP(testmodule_data.`dt_created`) AS `dt_created`,UNIX_TIMESTAMP(testmodule_data.`dt_modified`) AS `dt_modified`,creator_id,modifier_id,is_deleted');
+		
 		
 	} //() {
     
     function test_getObject() {
-		$this->guy->haveInDatabase('testmodule_data',['id'=>'1001','title'=>'ffreda','data'=>'what is my name']);
-		$this->guy->haveInDatabase('testmodule_data',['id'=>'999','title'=>'zfreddo','data'=>'what is my name']);
-		$dbService=self::$dbService;
+		$testData1=new TestmoduleData($this->web);
+		$testData1->fill(['id'=>'1001','title'=>'ffreda','data'=>'what is my name']);
+		$testData1->insert();
+		$testData2=new TestmoduleData($this->web);
+		$testData2->fill(['id'=>'999','title'=>'zfreddo','data'=>'what is my name']);
+		$testData2->insert();
+		//$records=$this->loadRecords('testmodule_data');
+		//throw new Exception('get obj'.count($records)) ;
+		//die();
+		$dbService=$this->dbService;
 		$dbService->clearCache(); 
 		$this->assertNull($dbService::getCacheValue('TestmoduleData','1001'));
-		// get object bt scalar id
+		// get object by scalar id
 		$object=$dbService->getObject('TestmoduleData', '1001');
 		$this->assertEquals($object->title,'ffreda');
 		// check old value
@@ -81,9 +101,14 @@ class DbServiceTest extends  \Codeception\TestCase\Test {
 		
 	} //($class, $idOrWhere, $use_cache = true, $order_by = null) {
 	function test_getObjects() {
-		$this->guy->haveInDatabase('testmodule_data',['id'=>'1001','title'=>'fred','data'=>'what is my age']);
-		$this->guy->haveInDatabase('testmodule_data',['id'=>'1002','title'=>'afreddo','data'=>'what is my age']);
-		$dbService=self::$dbService;
+		$testData1=new TestmoduleData($this->web);
+		$testData1->fill(['id'=>'1001','title'=>'fred','data'=>'what is my age']);
+		$testData1->insert();
+		$testData2=new TestmoduleData($this->web);
+		$testData2->fill(['id'=>'1002','title'=>'afreddo','data'=>'what is my age']);
+		$testData2->insert();
+		
+		$dbService=$this->dbService;
 		$dbService->clearCache(); 
 		// get all
 		$objects=$dbService->getObjects('TestmoduleData',['data'=>'what is my age'],true,true);
@@ -128,17 +153,17 @@ class DbServiceTest extends  \Codeception\TestCase\Test {
     function test_transactionsObjects() {
 		// TODO fix this test
 		return;
-		$dbService=self::$dbService;
+		$dbService=$this->dbService;
 		$this->assertFalse($dbService->isActiveTransaction());
 		$dbService->startTransaction();
 		$this->assertTrue($dbService->isActiveTransaction());
-		$object=new TestmoduleData(self::$web);
+		$object=new TestmoduleData($this->web);
 		$object->fill(['title'=>'fred','data'=>'what is my age']);
 		$object->insertOrUpdate();
 		$dbService->rollbackTransaction();
 		$this->guy->dontSeeInDatabase('testmodule_data',['title'=>'fred','data'=>'what is my age']);
 		$dbService->startTransaction();
-		$object=new TestmoduleData(self::$web);
+		$object=new TestmoduleData($this->web);
 		$object->fill(['title'=>'fred','data'=>'what is my age']);
 		$object->insertOrUpdate();
 		$dbService->commitTransaction();
@@ -146,14 +171,18 @@ class DbServiceTest extends  \Codeception\TestCase\Test {
 	} //$class, $rows, $from_db = false) {
 	
     function test_lookupArray() {
-		$this->guy->haveInDatabase('lookup',['id'=>'1001','type'=>'money', 'code'=>'AUD', 'title'=>'Australian Dollars']);
-		$this->guy->haveInDatabase('lookup',['id'=>'1002','type'=>'money', 'code'=>'USD', 'title'=>'American Dollars']);
-		$dbService=self::$dbService;
+		$lookup1=new Lookup($this->web);
+		$lookup1->fill(['id'=>'1001','type'=>'money', 'code'=>'AUD', 'title'=>'Australian Dollars']);
+		$lookup1->insert();
+		$lookup2=new Lookup($this->web);
+		$lookup2->fill(['id'=>'1002','type'=>'money', 'code'=>'USD', 'title'=>'American Dollars']);
+		$lookup2->insert();
+		$dbService=$this->dbService;
 		$rows=$dbService->lookupArray('money');
 		$this->assertEquals(count($rows),2);
 		$this->assertEquals($rows['AUD'],'Australian Dollars');
 		$this->assertEquals($rows['USD'],'American Dollars');
-	} //$type) {
+	} 
 	
 }	
 	/*****************************************

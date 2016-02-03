@@ -10,14 +10,13 @@ var uniTag = {
 	buf:'',
 	ready: function(reload) {
             
-                // There can be multiple tag lists on the page, so bind tags for
-                // each individually
-                $('.tag_list').each(function (index) {
-                    uniTag.bindTags($(this).get()[0].id);
+        // There can be multiple tag lists on the page, so bind tags for
+        // each individually
+        $('.tag_list').each(function (index) {
+            uniTag.bindTags($(this).get()[0].id);
+        });       
 
-                });       
-
-                if(reload) {
+        if(reload) {
 			$('.tag_selection:visible:first').trigger('click');
 		}
 	},
@@ -63,7 +62,7 @@ var uniTag = {
 			}
 			uniTag.buf += '</div>';
 		 	uniTag.buildTagDialog(parent_id);
-});
+        });
 		return uniTag.buf;
 	},
 	buildTagDialog: function(parent_id) {
@@ -89,13 +88,13 @@ var uniTag = {
 			var tag = $(this).data('tag');
 			if(tag !== undefined) {
 				if(term.length == 0) {
-					$(this).show();
+					$(this).removeClass('hidetag');
 				} else {
 					var rE = new RegExp('.*'+term+'.*', 'i');
 					if(tag.match(rE)) {
-						$(this).show();
+						$(this).removeClass('hidetag');
 					} else {
-						$(this).hide();
+                        $(this).addClass('hidetag');
 					}
 				}
 			}
@@ -128,8 +127,22 @@ var uniTag = {
 						if(result == 'Invalid request') {
 							alert('Placeholder error');
 						} else {
-							$('#'+parent_id).append('<span data-tag="'+tagText+'" class="label radius secondary tag_selection"><span class="fi-price-tag">'+tagText+'</span></span>&nbsp;');
-							$('#'+parent_id+' .no_tags').hide();
+                            var list = $('#'+parent_id);
+                          list.append('<span data-tag="'+tagText+'" class="label radius primary tag_selection"><span class="fi-price-tag">'+tagText+'</span></span>'+(list.hasClass('limited') ? '<span class="limited_count"></span> ' : ' '));
+                            // how many hidden tags are there?
+                            if(list.hasClass('limited'))
+                            {
+                                $('.first', list).removeClass('first');
+                                var tags = $('.tag_selection.primary:visible', list);
+                                var numTags = tags.length-1;
+                                tags.first().addClass('first');
+                                $('.limited_count', list).text(" +" + numTags);
+                                if(numTags >= 1)
+                                    list.addClass('show_num_limited');
+                                else
+                                    list.removeClass('show_num_limited');
+                            }
+							$('#'+parent_id+' .no_tags').addClass('hidetag');
 							uniTag.ready(true);
 						}
 					});
@@ -145,29 +158,45 @@ var uniTag = {
 	 */
 	setTag: function(obj, parent_id) {
 		var label = $(obj).find('.label');
-		var url = $('#'+parent_id).data('url');
+        var list = $(obj).closest('.tag_list'); // $('#'+parent_id)
+        var url = $('#'+parent_id).data('url');
 		var tagId = $(obj).data('id');
 		var tag = $(obj).data('tag');
 		if(label.hasClass('primary')) {
-			$('#'+parent_id+' .tag_selection[data-tag="'+tag+'"]').hide();
-                        // If there are no more tags then show no tag
+			$('#'+parent_id+' .tag_selection[data-tag="'+tag+'"]').addClass('hidetag');
+            // If there are no more tags then show no tag
 			if($('#'+parent_id+' .tag_selection:visible').length == 0) {
-				$('#'+parent_id+' .no_tags').show();
+				$('#'+parent_id+' .no_tags').removeClass('hidetag');
 			}
 			label.removeClass('primary').addClass('secondary');
 			$.get(url+'&cmd=removeTag&tagId='+tagId);
 		} else {
-			if($('#'+parent_id+' .tag_selection[data-tag="'+tag+'"]').length == 0) {
-				$('#'+parent_id).append('<span data-tag="'+tag+'" class="label radius secondary tag_selection"><span class="fi-price-tag">'+tag+'</span></span>&nbsp;');
-                                // Bind click action to tag    
-                                uniTag.bindTags(parent_id);
+			if($('#'+parent_id+' .tag_selection[data-tag="'+tag+'"]').length == 0)
+            {
+                // include information for hidden tags in all tags that are generated here
+                $('#'+parent_id).append('<span data-tag="'+tag+'" class="label radius primary tag_selection"><span class="fi-price-tag">'+tag+'</span></span>' + (list.hasClass('limited') ? '<span class="limited_count"></span> ' : ' '));
+                // Bind click action to tag
+                uniTag.bindTags(parent_id);
 			} else {
-				$('#'+parent_id+' .tag_selection[data-tag="'+tag+'"]').show();
+				$('#'+parent_id+' .tag_selection[data-tag="'+tag+'"]').removeClass('hidetag');
 			}
-			$('#'+parent_id+' .no_tags').hide();
+			$('#'+parent_id+' .no_tags').addClass('hidetag');
 			$.get(url+'&cmd=setTag&tagId='+tagId);
 			label.removeClass('secondary').addClass('primary');
-		}
+        }
+        // how many hidden tags are there?
+        if(list.hasClass('limited'))
+        {
+            $('.first', list).removeClass('first');
+            var tags = $('.tag_selection.primary:visible', list);
+            var numTags = tags.length-1;
+            tags.first().addClass('first');
+            $('.limited_count', list).text(" +" + numTags);
+            if(numTags >= 1)
+                list.addClass('show_num_limited');
+            else
+                list.removeClass('show_num_limited');
+        }
 	},
 	/*
 	 * 

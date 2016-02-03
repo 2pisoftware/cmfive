@@ -6,6 +6,12 @@
             <a href="#comments">Comments</a>
             <a href="#attachments">Attachments</a>
             <?php if ($task->getCanINotify()):?><a href="#notification">Notifications</a><?php endif;?>
+			<?php 
+				$tab_headers = $w->callHook('core_template', 'tab_headers', $task); 
+				if (!empty($tab_headers)) {
+					echo implode('', $tab_headers);
+				}
+			?>
         <?php endif; ?>
     </div>
     <div class="tab-body">
@@ -14,16 +20,12 @@
                 <div class="row-fluid columns">
                     <?php 
                     	echo $w->Favorite->getFavoriteButton($task);
+                    	echo $w->Tag->getTagButton($task->id,"Task")."&nbsp;";
                         // Note the extra buttons only show when the task_type object
                         $tasktypeobject = $task->getTaskTypeObject();
                         echo !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null; 
-                    	//echo $w->Tag->getTagButton($task->id,"Task")."&nbsp;";
-                        echo (!empty($task->id) && $task->canDelete($w->Auth->user())) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), "Delete", "Are you sure you want to delete this task?" ) : ''; 
-                        echo (!empty($task->id)) ? Html::b($task->w->localURL('task/duplicatetask/' . $task->id), "Duplicate Task") : '';
-                        if (!empty($task->id) && ($task->id > 0)) {
-                            echo $w->partial('listTags',['object' => $task], 'tag');
-                        }
-                        ?>
+                    ?>
+                    <?php echo (!empty($task->id) && $task->canDelete($w->Auth->user())) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), "Delete", "Are you sure you want to delete this task?" ) : ''; ?>
                 </div>
                 <div class="row-fluid clearfix">
                     <div class="small-12 large-9">
@@ -55,6 +57,12 @@
                 <?php echo $tasknotify;?>
             </div>
             <?php endif;?>
+			<?php
+				$tab_content = $w->callHook('core_template', 'tab_content', ['object' => $task, 'redirect_url' => '/task/edit/' . $task->id]); 
+				if (!empty($tab_content)) {
+					echo implode('', $tab_content);
+				}
+			?>
         <?php endif; ?>
     </div>
 </div>
@@ -89,7 +97,7 @@
                     $('#assignee_id').parent().html(result[2]);
                     $('#status').html(result[4])
                 }
-                initialChange = false;
+                initialChange = true;
                 $('#tasktext').html(result[3]);
                 $("#tasktext").fadeIn();
 

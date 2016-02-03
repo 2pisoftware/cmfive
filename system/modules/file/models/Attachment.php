@@ -4,9 +4,6 @@ define('CACHE_PATH', 'cache');
 
 class Attachment extends DbObject {
 
-    // make it searchable
-    public $_searchable;
-    public $_exclude_index = array("parent_table", "parent_id", "mimetype", "fullpath", "is_deleted");
     public $parent_table;
     public $parent_id;
     public $dt_created; // datetime
