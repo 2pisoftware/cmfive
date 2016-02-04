@@ -4,6 +4,9 @@ class Form extends DbObject {
 	
 	public $title;
 	public $description;
+	public $header_template;
+	public $row_template;
+	public $summary_template;
 	
 	public function getFields() {
 		return $this->getObjects("FormField", ["form_id" => $this->id, "is_deleted" => 0]);

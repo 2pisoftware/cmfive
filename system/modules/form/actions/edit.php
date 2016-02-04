@@ -23,5 +23,7 @@ function edit_POST(Web $w) {
 	$_form_object->fill($_POST);
 	$_form_object->insertOrUpdate();
 	
-	$w->msg("Form " . ($p['id'] ? 'updated' : 'created'), "/form");
+	$redirect_url = $w->request("redirect_url");
+	$w->msg("Form " . ($p['id'] ? 'updated' : 'created'), !empty($redirect_url) ? $redirect_url : "/form");
+	
 }
