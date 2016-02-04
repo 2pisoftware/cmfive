@@ -370,6 +370,20 @@ button.button + button {
     background-color: rgba(0, 0, 0, 0.9);
 }
 
+.global_file_drop_area {
+	display:none;
+	position:absolute;
+	top:40px;
+	right:0;
+	padding:50px;
+	z-index:100000000;
+	background-color: #000000;
+    background-color: rgba(0, 0, 0, 0.9);
+}
+.global_file_drop_area:hover {
+	padding:70px;
+}
+
 .loading_overlay .circle,
 .global_file_drop_overlay_loading .circle {
     background-color: rgba(0,0,0,0);
@@ -424,6 +438,10 @@ button.button + button {
     top: 0; left: 0; bottom: 0; right: 0;
 	/*    -moz-animation: spinPulse 2s infinite linear;
 		-webkit-animation: spinPulse 2s infinite linear;*/
+}
+
+.global_file_drop_area h4 {
+	
 }
 
 .loading_overlay h4,

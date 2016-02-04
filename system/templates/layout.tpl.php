@@ -121,15 +121,17 @@
             <div class="circle_center"></div>
             <h4 class="subheader">Please wait...</h4>
         </div>
+		<div class="global_file_drop_area" id="global_file_drop_area">
+			<div class="global_file_drop_overlay_init">
+				<h4 class="subheader">Drop files here...</h4>
+			</div>
+		</div>
 		<div class="global_file_drop_overlay" id="global_file_drop_overlay" style="display:none;">
-			<div class="global_file_drop_overlay_loading" style="display:none;">
+			<div class="global_file_drop_overlay_loading">
 				<div class="circle"></div>
 				<div class="circle_inner"></div>
 				<div class="circle_center"></div>
 				<h4 class="subheader">Uploading (0%)</h4>
-			</div>
-			<div class="global_file_drop_overlay_init">
-				<h4 class="subheader">Drop files here...</h4>
 			</div>
 		</div>
 		

@@ -10,40 +10,48 @@ var globalFileUpload = {
 	//Max upload size in bytes, should be set to php max upload size
 	MAXUPLOAD: 2097152,
 	filesToUpload: [],
-	//Initial drop target is the HTML body so we can drop anywhere
-	initalDropTarget: null,
+	dragTimer: null,
 	//The main drop target the global file drop overlay
 	dropTarget: null,
 	targetDragLeave: function(event) {
 		event.preventDefault();
 		event.stopPropagation();
-		jQuery(globalFileUpload.dropTarget).hide();
 	},
 	targetDragOver: function(event) {
+		window.clearTimeout(globalFileUpload.dragTimer);
 		event.preventDefault();
 		event.stopPropagation();
 	},
 	targetDrop: function(event) {
 		event.preventDefault();
 		event.stopPropagation();
-		$('.global_file_drop_overlay_loading').show();
-		$('.global_file_drop_overlay_init').hide();
+		$(globalFileUpload.dropTarget).hide();
+		jQuery('.global_file_drop_overlay_loading').show();
+		jQuery('.global_file_drop_overlay_init').hide();
 		var dt = event.dataTransfer;
 		var files = dt.files;
 		globalFileUpload.handleFiles(files);
+		jQuery(globalFileUpload.dropTarget).hide();
 	},
 	init: function() {
-		globalFileUpload.initalDropTarget = document.getElementsByTagName('body')[0];
-		globalFileUpload.dropTarget = document.getElementById('global_file_drop_overlay');
-		console.log(globalFileUpload);
+		globalFileUpload.dropTarget = document.getElementById('global_file_drop_area');
+		document.getElementsByTagName('body')[0].addEventListener('dragenter', function(e) {
+			e.preventDefault();
+			var dt = e.dataTransfer;
+			if(dt.types != null && (dt.types.indexOf ? dt.types.indexOf('Files') != -1 : dt.types.contains('application/x-moz-file'))) {
+				jQuery(globalFileUpload.dropTarget).show();
+				window.clearTimeout(globalFileUpload.dragTimer);
+			}
+		}, false);
+		document.getElementsByTagName('body')[0].addEventListener('dragleave', function(e) {
+			e.preventDefault();
+			globalFileUpload.dragTimer = window.setTimeout(function() {
+				jQuery(globalFileUpload.dropTarget).hide();
+			}, 500);
+		}, false);
 		globalFileUpload.dropTarget.addEventListener('dragleave', globalFileUpload.targetDragLeave, false);
 		globalFileUpload.dropTarget.addEventListener('dragover', globalFileUpload.targetDragOver, false);
 		globalFileUpload.dropTarget.addEventListener('drop', globalFileUpload.targetDrop, false);
-		globalFileUpload.initalDropTarget.addEventListener("dragenter", function(e) {
-			e.stopPropagation();
-			e.preventDefault();
-			$(globalFileUpload.dropTarget).show();
-		}, false);
 	},
 	handleFiles: function(files) {
 		if (files) {
@@ -57,10 +65,11 @@ var globalFileUpload = {
 					error = false;
 				}
 			});
+			console.log(globalFileUpload.filesToUpload);
 			if(!error) {
+				jQuery('.global_file_drop_overlay').show();
 				globalFileUpload.uploadFiles();
 			} else {
-				$(globalFileUpload.dropTarget).hide();
 				$('.global_file_drop_overlay_loading').hide();
 				$('.global_file_drop_overlay_init').show();
 			}
@@ -111,7 +120,7 @@ var globalFileUpload = {
 						success: function(data) {
 							console.log(data);
 							delete globalFileUpload.filesToUpload[reader.key-1];
-							$(globalFileUpload.dropTarget).hide();
+							jQuery('.global_file_drop_overlay').hide();
 							$('.global_file_drop_overlay_loading').hide();
 							$('.global_file_drop_overlay_init').show();
 						}
