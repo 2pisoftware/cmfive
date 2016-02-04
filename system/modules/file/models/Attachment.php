@@ -43,6 +43,15 @@ class Attachment extends DbObject {
         $this->w->callHook("attachment", "attachment_added_" . $this->parent_table, $this);
     }
 
+	public function delete($force = false) {
+		
+		if ($this->hasCachedThumbnail()) {
+			unlink($this->getThumbnailCachePath());
+		}
+		
+		parent::delete($force);
+	}
+	
     function getParent() {
         return $this->getObject($this->parent_table, $this->parent_id);
     }
