@@ -67,47 +67,20 @@
 				</form>
 			</div>
 		</div>
-		<div id="row_template">
-			<form action="/form/edit/<?php echo $form->id; ?>?redirect_url=<?php echo urlencode("/form/show/" . $form->id); ?>#row_template" method="POST">
-				<div class="row-fluid clearfix">
-					<div class="small-12 columns">
-						<label>Header row template
-							<textarea id="header_template" name="header_template" placeholder="Leave empty for default" rows="4"><?php echo $form->header_template; ?></textarea>
-						</label>
-					</div>
-				</div>
-				<br/>
-				<div class="row-fluid clearfix">
-					<div class="small-12 columns">
-						<label>Item row template
-							<textarea id="row_template" name="row_template" placeholder="Leave empty for default" rows="6"><?php echo $form->row_template; ?></textarea>
-						</label>
-					</div>
-				</div>
-				<br/>
-				<div class="row-fluid clearfix">
-					<div class="small-12 columns">
-						<button type="submit">Save</button>
-					</div>
-				</div>
-			</form>
+		<div id="row_template" class="clearfix">
+			<?php echo Html::multiColForm([
+				"Row templates" => [
+					[["Header row template", "textarea", "header_template", $form->header_template, null, "4", "codemirror"]],
+					[["Item row template", "textarea", "row_template", $form->row_template, null, "6", "codemirror"]]
+				]
+			], "/form/edit/" . $form->id . "?redirect_url=" . urlencode("/form/show/" . $form->id) . "#row_template", "POST"); ?>
 		</div>
-		<div id="summary_template">
-			<form action="/form/edit/<?php echo $form->id; ?>?redirect_url=<?php echo urlencode("/form/show/" . $form->id); ?>#summary_template" method="POST">
-				<div class="row-fluid clearfix">
-					<div class="small-12 columns">
-						<label>Header row template
-							<textarea id="summary_template" name="summary_template" placeholder="Leave empty for default" rows="4"><?php echo $form->summary_template; ?></textarea>
-						</label>
-					</div>
-				</div>
-				<br/>
-				<div class="row-fluid clearfix">
-					<div class="small-12 columns">
-						<button type="submit">Save</button>
-					</div>
-				</div>
-			</form>
+		<div id="summary_template" class="clearfix">
+			<?php echo Html::multiColForm([
+				"Summary template" => [
+					[["", "textarea", "summary_template", $form->summary_template, null, "4", "codemirror"]],
+				]
+			], "/form/edit/" . $form->id . "?redirect_url=" . urlencode("/form/show/" . $form->id) . "#summary_template", "POST"); ?>
 		</div>
 	</div>
 </div>

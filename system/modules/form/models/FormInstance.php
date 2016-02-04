@@ -21,6 +21,24 @@ class FormInstance extends DbObject {
 	public function getTableRow() {
 		$form_values = $this->getSavedValues();
 		
+		$form = $this->getForm();
+		
+		// If there is a row template specified the use that to display
+		// The downside is that (for now) the template will need to implement its own
+		// masking on values
+		if (!empty($form->row_template)) {
+			// Flatten the values array
+			$template_data = [];
+			if (!empty($form_values)) {
+				foreach($form_values as $form_value) {
+					$field = $form_value->getFormField();
+					$template_data[$field->technical_name] = $form_value->value;
+				}
+			}
+			
+			return $this->w->Template->render($form->row_template, $template_data);
+		}
+		
 		$table_row = '';
 		if (!empty($form_values)) {
 			foreach($form_values as $form_value) {
