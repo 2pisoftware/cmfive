@@ -594,7 +594,7 @@ a > div#active_log_time {
  **/
 .tag_list {
 	display: inline;
-	position: absolute;
+	/*position: absolute;*/
 	padding: 0px 10px;
 	line-height: 5px;
 }

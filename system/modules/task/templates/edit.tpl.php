@@ -20,7 +20,7 @@
                 <div class="row-fluid columns">
                     <?php 
                     	echo $w->Favorite->getFavoriteButton($task);
-                    	echo $w->Tag->getTagButton($task->id,"Task")."&nbsp;";
+                    	echo $w->partial("listtags", ["object" => $task], "tag") . "&nbsp;";
                         // Note the extra buttons only show when the task_type object
                         $tasktypeobject = $task->getTaskTypeObject();
                         echo !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null; 
