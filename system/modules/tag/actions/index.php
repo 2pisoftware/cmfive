@@ -4,6 +4,8 @@ function index_ALL(Web $w) {
     $w->Tag->navigation($w, "Tag Admin");
 	$tags = $w->Tag->getAllTags();
 	$table_header = array("Tag", "Actions");
+	
+	$table_data = [];
 	if (!empty($tags)) {
 		foreach($tags as $t) {
 			$table_data[]  =array(

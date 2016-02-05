@@ -77,7 +77,8 @@ class DbObject extends DbService {
     private static $_object_vars = array();
 	private static $_columns = array();
     private $_class;
-
+	public $__use_auditing = true;
+	
     /**
      * Constructor
      *
@@ -306,7 +307,7 @@ class DbObject extends DbService {
      */
     function fill($row, $convert = false) {
         foreach ($this->getObjectVars() as $k) {
-            if (!empty($row[$k])) {
+            if (array_key_exists($k, $row)) {
                 $this->$k = ($convert ? $this->readConvert($k, $row[$k]) : $row[$k]);
             }
         }
@@ -493,17 +494,21 @@ class DbObject extends DbService {
             // set some default attributes
             if (!property_exists($this, "_modifiable")) { // $this->_modifiable) {
                 // for backwards compatibility
-                if (in_array("dt_created", $columns))
+                if (in_array("dt_created", $columns)) {
                     $this->dt_created = time();
+				}
 
-                if (in_array("creator_id", $columns) && $this->w->Auth->loggedIn())
+                if (in_array("creator_id", $columns) && $this->w->Auth->loggedIn()) {
                     $this->creator_id = $this->w->Auth->user()->id;
+				}
 
-                if (in_array("dt_modified", $columns))
+                if (in_array("dt_modified", $columns)) {
                     $this->dt_modified = time();
+				}
 
-                if (in_array("modifier_id", $columns) && $this->w->Auth->loggedIn())
+                if (in_array("modifier_id", $columns) && $this->w->Auth->loggedIn()) {
                     $this->modifier_id = $this->w->Auth->user()->id;
+				}
             }
 
             $data = array();
@@ -802,7 +807,7 @@ class DbObject extends DbService {
     }
 
     function _tn() {
-        return $this->getTableName();
+        return $this->getDbTableName();
     }
 
     function _cn($attr) {
@@ -1066,7 +1071,7 @@ class DbObject extends DbService {
                         // Case insensitive field check against an array of predefined values
                         if (is_array($rule_array)) {
                             $this->$vr_key = filter_var($this->$vr_key, FILTER_SANITIZE_STRING);
-                            if (!in_array(ucfirst(strtolower($this->$vr_key)), $rule_array)) {
+                            if (!in_array($this->$vr_key, $rule_array)) {
                                 $response["invalid"]["$vr_key"][] = "Invalid value, allowed are " . implode(", ", $rule_array);
                             } else {
                                 $response["valid"][] = $vr_key;
@@ -1141,7 +1146,7 @@ class DbObject extends DbService {
                 return null;
         } else if (strpos($k, "s_") === 0) {
             if (!empty($v)) {
-                return AESencrypt($v, $this->__password);
+                return AESencrypt($v, Config::get('system.password_salt'));
             }
         }
         return $v;

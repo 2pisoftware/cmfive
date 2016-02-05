@@ -4,6 +4,8 @@ class ChannelMessage extends DbObject {
 
     public $channel_id;
     public $message_type;
+    
+    public $__use_auditing = false;
 
     // public $is_processed;
 

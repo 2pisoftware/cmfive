@@ -42,7 +42,7 @@ class Config {
             $register = &self::$register;
             // Loop through each key
             foreach($exploded_key as $ekey) {
-                if (!array_key_exists($ekey, $register)) {
+                if (is_array($register) && !array_key_exists($ekey, $register)) {
                     $register[$ekey] = array();
                 }
                 $register = &$register[$ekey];
@@ -156,4 +156,3 @@ class Config {
     	self::$register = json_decode($string,true);
     }
 }
-    

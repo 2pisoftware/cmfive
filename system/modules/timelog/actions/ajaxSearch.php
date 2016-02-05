@@ -26,7 +26,7 @@ function ajaxSearch_GET(Web $w) {
                     foreach($query_objects as $query_object) {
                         if ($query_object->canList($w->Auth->user()) || $query_object->canView($w->Auth->user())) {
                             $autocomplete = new stdClass();
-                            $autocomplete->value = $query_object->getSelectOptionTitle();
+                            $autocomplete->value = $query_object->id . " - " . $query_object->getSelectOptionTitle();
                             $autocomplete->id = $query_object->id; //getSelectOptionValue();
                             $result_objects[] = $autocomplete;
                         }

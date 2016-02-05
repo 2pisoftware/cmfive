@@ -644,17 +644,17 @@ class TaskService extends DbService {
      * 
      * @param task_group_type, eg. "TaskGroupType_TaskTodo"
      * @param title, the task group title
-     * @param description, a description
-     * @param default_assignee_id, a user_id or null
      * @param can_assign, OWNER|MEMBER|GUEST
      * @param can_view, OWNER|MEMBER|GUEST
      * @param can_create, OWNER|MEMBER|GUEST
      * @param is_active, 0|1
      * @param is_deleted, 0|1
+     * @param description, a description
+     * @param default_assignee_id, a user_id or null
      *  
      * @return TaskGroup
      */
-    function createTaskGroup($type, $title, $description, $default_assignee_id, $can_assign = "OWNER", $can_view = "OWNER", $can_create = "OWNER", $is_active = 1, $is_deleted = 0) {
+    function createTaskGroup($type, $title, $description, $default_assignee_id, $can_assign = "OWNER", $can_view = "OWNER", $can_create = "OWNER", $is_active = 1, $is_deleted = 0, $default_task_type = null, $default_priority = null) {
         // title should be unique!
         $taskgroup = $this->getTaskGroupByUniqueTitle($title);
         if (null != $taskgroup) {
@@ -672,6 +672,8 @@ class TaskService extends DbService {
         $taskgroup->is_active = $is_active;
         $taskgroup->is_deleted = $is_deleted;
         $taskgroup->default_assignee_id = $default_assignee_id;
+        $taskgroup->default_task_type = $default_task_type;
+        $taskgroup->default_priority = $default_priority;
         $response = $taskgroup->insert();
         
         // Check the validation
@@ -822,6 +824,21 @@ class TaskService extends DbService {
         return $notifyUsers;
     }
     
+	public function getNotificationAdditionalDetails(Task $task) {
+		$additional_details = $this->w->callHook("task", "notification_additional_details", $task);
+		$message = '';
+		
+		if (!empty($additional_details)) {
+//			$message .= "<br/><p>Additional details:</p>";
+			foreach($additional_details as $additional_detail) {
+				if (!empty($additional_detail)) {
+					$message .= "<p>" . $additional_detail . "</p>";
+				}
+			}
+		}
+		
+		return !empty($message) ? "<br/><p>Additional details:</p>" . $message : '';
+	}
     
     public function navigation(Web $w, $title = null, $nav = null) {
         if ($title) {

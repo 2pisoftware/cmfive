@@ -50,6 +50,9 @@ function task_core_dbobject_after_insert_Task(Web $w, $object) {
 			$message .= "<p><b>Subject:</b> " . $object->title . "</p>";
 			$message .= "<p><b>Body:</b>" . $object->description . "</p>";
 			
+			// Get additional details
+			$message .= $w->Task->getNotificationAdditionalDetails($object);
+			
             $user_object = $w->Auth->getUser($user);
             $message .= "<br/><p>Access the task here: " . $object->toLink(null, null, $user_object) . "</p>";
             $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
@@ -82,16 +85,25 @@ function task_core_dbobject_after_update_Task(Web $w, $object) {
     $users_to_notify = $w->Task->getNotifyUsersForTask($object, TASK_NOTIFICATION_TASK_DETAILS);
     $w->Log->setLogger("TASK")->info("Notifying " . count($users_to_notify) . " users");
     
+	// Only send emails where the status has changed
+	if ($object->status == $object->__old['status']) {
+		return;
+	}
+	
     if (!empty($users_to_notify)) {
         $event_title = $object->getHumanReadableAttributeName(TASK_NOTIFICATION_TASK_DETAILS);
         
         // send it to the inbox of the user's on our send list
         foreach ($users_to_notify as $user) {
             // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
-            $subject = "Task - " . $object->title . ": " . $event_title;
+            $subject = "Task " . $object->title . " [" . $object->id . "][" . $object->status . "] - " . $event_title;
             $message = "<b>" . $event_title . "</b><br/>\n";
             $message .= "<p>" . $object->title . " details has been updated</p>";
+			$message .= "<p>Status: " . $object->__old['status'] . " => " . $object->status . "</p>";
             
+			// Get additional details
+			$message .= $w->Task->getNotificationAdditionalDetails($object);
+			
             $user_object = $w->Auth->getUser($user);
             $message .= $object->toLink(null, null, $user_object);
             $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
@@ -112,7 +124,7 @@ function task_comment_comment_added_task(Web $w, $object) {
     
     $task = $w->Task->getTask($object->obj_id);
     
-    if (empty($task->id)) {
+    if (empty($task->id) || (!empty($object->is_system) && $object->is_system == 1)) {
         return;
     }
     
@@ -131,7 +143,10 @@ function task_comment_comment_added_task(Web $w, $object) {
             $user_object = $w->Auth->getUser($user);
             $message = $task->toLink(null, null, $user_object);
             $message .= $w->partial("displaycomment", array("object" => $object, "displayOnly" => true, 'redirect' => '/inbox'), "admin");
-            
+
+			// Get additional details
+			$message .= $w->Task->getNotificationAdditionalDetails($task);
+			
             $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
 
             $w->Inbox->addMessage($subject, $message, $user, null, null, true);
@@ -206,10 +221,13 @@ function task_comment_comment_added_comment(Web $w, $object) {
             
             $user_object = $w->Auth->getUser($user);
             if ($task->canView($user_object)) {
-                $message .= "<a href='/task/edit/" . $task->id . "?scroll_comment_id=" . $object->id . "#comments'><p>Click here to view the comment</p></a>";            
+                $message .= "<a href='" .  $w->localUrl("/task/edit/" . $task->id . "?scroll_comment_id=" . $object->id . "#comments") . "'><p>Click here to view the comment</p></a>";            
             } else {
                 $message .= "<p><b>You are unable to view this task</b></p>";
             }
+			
+			// Get additional details
+			$message .= $w->Task->getNotificationAdditionalDetails($task);
             
             $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
 
@@ -238,8 +256,11 @@ function task_core_dbobject_after_insert_TaskTime(Web $w, $object) {
             // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
             $subject = "Task - " . $task->title . ": " . $event_title;
             $message = "<b>" . $event_title . "</b><br/>\n";
-            $message .= "<p>" . $task->title . " as had a new time log entry</p>";
+            $message .= "<p>" . $task->title . " has had a new time log entry</p>";
             
+			// Get additional details
+			$message .= $w->Task->getNotificationAdditionalDetails($task);
+			
             $user_object = $w->Auth->getUser($user);
             $message .= $task->toLink(null, null, $user_object);
             $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
@@ -269,8 +290,11 @@ function task_attachment_attachment_added_task(Web $w, $object) {
             // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
             $subject = "Task - " . $task->title . ": " . $event_title;
             $message = "<b>" . $event_title . "</b><br/>\n";
-            $message .= "<p>" . $task->title . " as got a new attachment</p>";
+            $message .= "<p>" . $task->title . " has got a new attachment</p>";
             
+			// Get additional details
+			$message .= $w->Task->getNotificationAdditionalDetails($task);
+			
             $user_object = $w->Auth->getUser($user);
             $message .= $task->toLink(null, null, $user_object);
             $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";

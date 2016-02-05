@@ -15,7 +15,7 @@ function users_GET(Web &$w) {
 				$firstName=$contact->firstname;
 				$lastName=$contact->lastname;
 			}
-            $data[] = array(
+            $data[$user->id] = array(
                 $user->login, $firstName, $lastName,
                 array($user->is_admin ? "X" : "", true),
                 array($user->is_active ? "X" : "", true),

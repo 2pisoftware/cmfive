@@ -125,7 +125,7 @@
 			<div class="row-fluid">
 				<div class="small-12">
 					<div data-alert class="alert-box warning" style="margin-bottom: 0px; padding: 5px 0px;">
-						<h4 style="font-weight: lighter; text-align: center; color: white; padding: 5px 0px 0px 0px;">You are using a test system</h4>
+						<h4 style="font-weight: lighter; text-align: center; color: white; padding: 5px 0px 0px 0px;"><?php echo Config::get('system.test_mode_message')?></h4>
 					</div>
 				</div>
 			</div>
@@ -210,7 +210,7 @@
                             }
                         
                             if ($w->Auth->allowed('help/view')) : ?>
-                                <li><?php echo Html::box(WEBROOT . "/help/view/" . $w->_module . ($w->_submodule ? "-" . $w->_submodule : "") . "/" . $w->_action, "<span class='fi-q show-for-medium-up'>?</span><span class='show-for-small'>Help</span>", false, true, 750, 500); ?> </li>
+                                <li><?php echo Html::box(WEBROOT . "/help/view/" . $w->_module . ($w->_submodule ? "-" . $w->_submodule : "") . "/" . $w->_action, "<span class='fi-q show-for-medium-up'>?</span><span class='show-for-small'>Help</span>", false, true, 750, 500, "isbox", null, null, null, 'cmfive-help-modal'); ?> </li>
                             <?php endif;
                         endif; ?>
                     </ul> <!-- End left nav section -->
@@ -252,6 +252,7 @@
         </div>
 
         <div id="cmfive-modal" class="reveal-modal xlarge" data-reveal></div>
+        <div id="cmfive-help-modal" class="reveal-modal xlarge" data-reveal></div>
         
         <script type="text/javascript" src="/system/templates/js/foundation-5.5.0/js/foundation.min.js"></script>
         <script type="text/javascript" src="/system/templates/js/foundation-5.5.0/js/foundation/foundation.clearing.js"></script>
@@ -260,15 +261,18 @@
                 reveal : {
                     animation_speed: 150,
                     animation: 'fade'
-                }
-            });
+                },
+				accordion: {
+					multi_expand: true,
+				}
+			});
             
             var modal_history = [];
             var modal_history_pop = false;
             
             // Automatically append the close 'x' to reveal modals
             $(document).on('opened', '[data-reveal]', function () {
-                $("#cmfive-modal").append("<a class=\"close-reveal-modal\">&#215;</a>");
+                $(this).append("<a class=\"close-reveal-modal\">&#215;</a>");
                 modal_history.push();
                 bindModalLinks();
             });
@@ -282,22 +286,30 @@
 						// No one is using the help system at the moment
 						// Therefore no real need for a dynamic modal history
 						return true;
-//                        if ($(this).attr('href')[0] === "#") {
-//                            return true;
-//                        } else {
-//                            // Add href to history if the href wasnt the last item in the stack and that we arent the back link
-//                            if (modal_history.indexOf($(this).attr('href')) !== modal_history.length) {
-//                                modal_history.push($(this).attr('href'));
-//                                modal_history_pop = true;
-//                            }
-//                            changeModalWindow($(this).attr('href'));
-//                        }
+                    }
+                    return false;
+                });
+                
+				$("#cmfive-help-modal a:not(#modal-back)").click(function(event) {                    
+                    if ($(this).hasClass("close-reveal-modal")) {
+                        $("#cmfive-modal").foundation("reveal", "close");
+                    } else {
+                        if ($(this).attr('href')[0] === "#") {
+                            return true;
+                        } else {
+                            // Add href to history if the href wasnt the last item in the stack and that we arent the back link
+                            if (modal_history.indexOf($(this).attr('href')) !== modal_history.length) {
+                                modal_history.push($(this).attr('href'));
+                                modal_history_pop = true;
+                            }
+                            changeModalWindow($(this).closest('.reveal-modal'), $(this).attr('href'));
+                        }
                     }
                     return false;
                 });
                 
                 // Bind back traversal to modal window
-                $("#cmfive-modal #modal-back").click(function(event) {
+                $("#cmfive-modal #modal-back, #cmfive-help-modal #modal-back").click(function(event) {
                     // event.preventDefault();
                     if (modal_history.length > 0) {
                         // When you click a link, THAT link goes onto the stack.
@@ -309,7 +321,7 @@
                             modal_history_pop = false;
                         }
                         if (modal_history.length > 0) {
-                            changeModalWindow(modal_history.pop());
+                            changeModalWindow($(this).closest('.reveal-modal'), modal_history.pop());
                         }
 //                        console.log(modal_history);
                     } 
@@ -318,9 +330,9 @@
             }
             
             // Updates the modal window by content from ajax request to uri
-            function changeModalWindow(uri) {
+            function changeModalWindow(object, uri) {
                 $.get(uri, function(data) {
-                    $("#cmfive-modal").html(data + "<a class=\"close-reveal-modal\">&#215;</a>");
+                    object.html(data + "<a class=\"close-reveal-modal\">&#215;</a>");
                     bindModalLinks();
                 });
             }

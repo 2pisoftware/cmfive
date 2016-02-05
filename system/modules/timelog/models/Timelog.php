@@ -14,7 +14,29 @@ class Timelog extends DbObject {
     public $dt_created;
     public $dt_modified;
     public $is_deleted;
+    
+    public static $_validation = array(
+        "object_class" => array('required'),
+        "object_id" => array('required'),
+        "dt_start" => array('required'),
+        "dt_end" => array('required'),
+        // "time_type" => array('required') Only required in some cases??!!
+    );    
 
+	public function getUser() {
+		return $this->getObject("User", $this->user_id);
+	}
+	
+	public function getFullName() {
+		$user = $this->getUser();
+		if (!empty($user->id)) {
+			$contact = $user->getContact();
+			if (!empty($contact->id)) {
+				return $contact->getFullName();
+			}
+		}
+		return '';
+	}
 
     public function getDuration() {
         if (!empty($this->dt_start) and !empty($this->dt_end)) {
@@ -53,17 +75,18 @@ class Timelog extends DbObject {
     }
     
     public function start($object) {
+$this->w->Log->debug("TimeLog Start");
         if (empty($object->id)) {
             return false;
         }
-        
+       
         $this->object_class = get_class($object);
         $this->object_id = $object->id;
 
         $this->dt_start = time();
         $this->user_id = $this->w->Auth->user()->id;
-        $this->insert();
-        
+        $this->insert(false);
+                
         return true;
     }
     

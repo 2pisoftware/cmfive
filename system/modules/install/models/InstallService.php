@@ -1,5 +1,9 @@
 <?php
 
+define("INSTALLER_CONFIG_FILE", "config.installer.php");
+define("INSTALLER_TEMPLATE_CONFIG_FILE", "system/modules/install/assets/config.tpl.php");
+define("PROJECT_CONFIG_FILE", "config.php");
+
 class InstallService extends DbService {
 	
 	/**
@@ -9,7 +13,7 @@ class InstallService extends DbService {
 	 * @return int or FALSE
 	 */
 	public static function saveConfigData($data) {
-		$template_path = "system/modules/install/assets/config.php";
+		$template_path = INSTALLER_CONFIG_FILE;
 		require_once 'Twig-1.13.2/lib/Twig/Autoloader.php';
 		Twig_Autoloader::register();
 
@@ -39,12 +43,31 @@ class InstallService extends DbService {
 	 * @return null
 	 */
 	public static function writeConfigToProject() {
-		copy("system/modules/install/assets/config.php", "config.php");
-		file_put_contents("config.php", "<?php\n\n" . file_get_contents("config.php"));
+		copy(INSTALLER_CONFIG_FILE, PROJECT_CONFIG_FILE);
+		file_put_contents(PROJECT_CONFIG_FILE, "<?php\n\n" . file_get_contents(PROJECT_CONFIG_FILE));
+		unlink(INSTALLER_CONFIG_FILE);
 	}
 	
+	/**
+	 * Puts the template config file from the assets folder into the project directory
+	 * only if it doesn't already exist
+	 * 
+	 * @return null
+	 */
+	public static function initConfigFile() {
+		if (!file_exists(INSTALLER_CONFIG_FILE)) {
+			copy(INSTALLER_TEMPLATE_CONFIG_FILE, INSTALLER_CONFIG_FILE);
+		}
+	}
+
+	
+	/**
+	 * Puts the template config file from the assets folder into the project directory
+	 * 
+	 * @return null
+	 */
 	public static function resetConfigFile() {
-		
+		copy(INSTALLER_TEMPLATE_CONFIG_FILE, INSTALLER_CONFIG_FILE);
 	}
 	
 }

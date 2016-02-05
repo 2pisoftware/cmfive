@@ -45,8 +45,10 @@ class Html {
             }
             
             $buffer .= "<tbody>";
-            foreach($data as $row) {
-                $buffer .= "<tr>";
+            foreach($data as $key => $row) {
+				// add a data-id attribute to each table row
+				$rowId=' data-id="'.$key.'" ';
+				$buffer .= "<tr ".$rowId.">";
                 foreach($row as $column) {
                     if (!is_array($column)) {
                         $buffer .= "<td>{$column}</td>";
@@ -208,8 +210,8 @@ class Html {
      * @param <type> $button (O) if true create a buttin instead of a link
      * @param <type> $iframe (O) whether to use an iframe to display the html contents (default: false)
      */
-    public static function box($href, $title, $button = false, $iframe = false, $width = null, $height = null, $param = "isbox", $id = null, $class = null, $confirm = null) {
-        $onclick = Html::boxOnClick($href, $iframe, $width, $height, $param, $confirm,false);
+    public static function box($href, $title, $button = false, $iframe = false, $width = null, $height = null, $param = "isbox", $id = null, $class = null, $confirm = null, $modal_window_id = 'cmfive-modal') {
+        $onclick = Html::boxOnClick($href, $iframe, $width, $height, $param, $confirm, false, $modal_window_id);
         $element = null;
         if ($button) {
             // $tag = "button";
@@ -222,7 +224,7 @@ class Html {
 //        return "<" . $tag . (!empty($id) ? " id=$id " : "") . (!empty($class) ? " class=$class " : "") . ($tag == 'a' ? ' href="#" ' : '') . $onclick . "><span>" . $title . "</span></" . $tag . ">";
     }
 
-    public static function boxOnClick($href, $iframe = false, $width = null, $height = null, $param = "isbox", $confirm = null, $include_tag = true) {
+    public static function boxOnClick($href, $iframe = false, $width = null, $height = null, $param = "isbox", $confirm = null, $include_tag = true, $modal_window_id = 'cmfive-modal') {
         if ($iframe) {
             $width = ", innerWidth:" . $width;
             $height = ", innerHeight:" . $height;
@@ -244,7 +246,7 @@ class Html {
         	$tag_end = "";
         }
         
-        return $tag_start."{$confirm_str}modal_history.push(&quot;{$href}&quot;); \$(&quot;#cmfive-modal&quot;).foundation(&quot;reveal&quot;, &quot;open&quot;, &quot;{$href}&quot;);return false;" . ($confirm ? "}" : "").$tag_end;
+		return $tag_start."{$confirm_str}modal_history.push(&quot;{$href}&quot;); \$(&quot;#{$modal_window_id}&quot;).foundation(&quot;reveal&quot;, &quot;open&quot;, &quot;{$href}&quot;);return false;" . ($confirm ? "}" : "").$tag_end;
     }
 
     /**
@@ -546,14 +548,14 @@ class Html {
         }
         
         // Set up shell layout
-        $buffer .= "<div class='row-fluid clearfix small-12 multicolform'>";
+        $buffer .= "<div class='row-fluid small-12 multicolform'>";
         
         // Print internals
         foreach ($data as $section => $rows) {
             
             // Print section header
             $buffer .= "<div class='panel'>";
-            $buffer .= "<div class='row-fluid clearfix section-header'><h4>{$section}</h4></div>";
+            $buffer .= "<div class='row-fluid section-header'><h4>{$section}</h4></div>";
             
             // Loop through each row
             foreach ($rows as $row) {
@@ -574,7 +576,8 @@ class Html {
                     if (!empty($validation[$name])) {
                         if (in_array("required", $validation[$name])) {
                             $required = "required";
-                        }
+                            $title .= ' <small>Required</small>';
+                        } 
                     }
 
                     $readonly = "";
@@ -925,7 +928,7 @@ class Html {
         $buf = "<ul class='pagination'>";
         if (isNumber($currentpage) && isNumber($numpages) && isNumber($pagesize) && isNumber($totalresults)) {
             // Check that we're within range
-            if ($currentpage > 0 and $currentpage <= $numpages and $numpages > 1) {
+            if ($currentpage > 0 && $currentpage <= $numpages && $numpages > 1) {
 
                 // Build pagination links
                 for ($page = 1; $page <= $numpages; $page++) {

@@ -24,6 +24,7 @@ Config::set('admin', array(
         "swiftmailer/swiftmailer" => "@stable",
         "twig/twig" => "1.*",
         "nesbot/carbon" => "1.14",
-		"mandrill/mandrill" => "1.0.*"
+		"mandrill/mandrill" => "1.0.*",
+		"robmorgan/phinx" => "^0.4.6"
     )
 ));

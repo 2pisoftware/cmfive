@@ -7,6 +7,7 @@
  */
 class DbPDO extends PDO {
     private static $table_names = array();
+	
     private static $_QUERY_CLASSNAME = array("InsertQuery", "SelectQuery", "UpdateQuery"); //"PDOStatement", 
 
     private $query = null;
@@ -22,7 +23,7 @@ class DbPDO extends PDO {
         // Set up our PDO class
         $port = isset($config['port']) && !empty($config['port']) ? ";port=".$config['port'] : "";
         $url = "{$config['driver']}:host={$config['hostname']};dbname={$config['database']}{$port}";
-        parent::__construct($url,$config["username"],$config["password"], null);
+        parent::__construct($url,$config["username"],$config["password"], array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'"));
         $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
         // Since you cant bind table names, maybe its a good idea to
@@ -30,11 +31,8 @@ class DbPDO extends PDO {
         // unecessary to do on every call so maybe move it to get()
         // Setting this to static however should make this array share the memory
         // heap for this var across all instances
-        if (empty(DbPDO::$table_names)){
-            foreach($this->query("show tables")->fetchAll(PDO::FETCH_NUM) as $table) {
-                DbPDO::$table_names[] = $table[0];
-			}
-        }
+		$this->getAvailableTables();
+		
         // Instantiate a FluentPDO class and init vars
         $this->fpdo = new FluentPDO($this);
         
@@ -58,6 +56,13 @@ class DbPDO extends PDO {
     	return $this->config['driver'];
     }
     
+	public function getAvailableTables() {
+		DbPDO::$table_names = [];
+		foreach($this->query("show tables")->fetchAll(PDO::FETCH_NUM) as $table) {
+			DbPDO::$table_names[] = $table[0];
+		}
+	}
+	
     /**
      * This function sets up a FluentPDO query with the given table name, an
      * error will be thrown if the table name doesn't exist in the database
@@ -68,7 +73,7 @@ class DbPDO extends PDO {
     public function get($table_name){
         if (!in_array($table_name, DbPDO::$table_names)){
 			if (!$this->install($table_name)) {
-				trigger_error("Table $table_name does not exist in the databse", E_USER_ERROR);
+				trigger_error("Table $table_name does not exist in the database", E_USER_ERROR);
 				return null;
 			}
         }  
@@ -76,9 +81,9 @@ class DbPDO extends PDO {
         return $this;
     }
     
-    public function select($select){
-        if ($this->query !== NULL && !empty($select)){
-            $this->query = $this->query->select($select);
+	public function select($select = null){
+        if ($this->query !== NULL){
+			$this->query = $this->query->select($select);
         }
         return $this;
     }
@@ -187,6 +192,10 @@ class DbPDO extends PDO {
         $row = $this->fetch_row();
         return (!is_null($row[$element]) ? $row[$element] : null);
     }
+	
+	public function fetchElement($element) {
+		return $this->fetch_element($element);
+	}
     
     /**
      * A grace method for our migration from Crystal
@@ -197,6 +206,10 @@ class DbPDO extends PDO {
     public function fetch_row() {
         return $this->query->fetch();
     }
+	
+	public function fetchRow() {
+		return $this->fetch_row();
+	}
     
     /**
      * A grace method for our migration from Crystal
@@ -210,6 +223,10 @@ class DbPDO extends PDO {
         }
         return array();
     }
+	
+	public function fetchAll() {
+		return $this->fetch_all();
+	}
         
     /**
      * Sets up class with a PDO insert query and required array of values
@@ -323,10 +340,10 @@ class DbPDO extends PDO {
     // PDO object
     public function last_insert_id(){
         if ($this->query !== null){
-            // This might be too much, oh well it works
             // It checks if we havent called execute yet, and calls it for us
-            if ($this->query instanceof InsertQuery)
+            if ($this->query instanceof InsertQuery) {
                 $this->execute();
+			}
 
             return $this->query;
         }

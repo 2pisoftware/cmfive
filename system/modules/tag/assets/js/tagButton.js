@@ -1,56 +1,90 @@
 /**
  * 
  * @author Robert Lockerbie, robert@lockerbie.id.au, 2015
+ * 
+ *  amended by Ged Nash November 2015 to allow multiple objects to have tags
+ *  on page. 
+ *  
  **/
 var uniTag = {
-	availableTags: [],
-	ready: function() {
-		var url = $('.tag_list').data('url');
-		$.get(url+'&cmd=getAll', function(result) {
-			uniTag.availableTags = result;
-			uniTag.bindTags();
-		});
+	buf:'',
+	ready: function(reload) {
+                // There can be multiple tag lists on the page, so bind tags for
+                // each individually
+                $('.tag_list').each(function (index) {
+                    uniTag.bindTags($(this).get()[0].id);
+
+                });       
+
+                if(reload) {
+			$('.tag_selection:visible:first').trigger('click');
+		}
 	},
 	/*
 	 * Builds the tag dialog
 	 * This is a list of all available tags and highlights which ones are already attached
 	 */
-	buildTagDialog: function(tags) {
-		var buf = '<div class="available_tags">';
-		buf += '<div class="available_tags_list">';
-		if(uniTag.availableTags.length == 0) {
-			buf += '<div class="custom_tag"><div class="label radius secondary"><span class="fi-price-tag">No tags found</span></div></div>';
-		} else {
-			for(tagId in uniTag.availableTags) {
-				if(uniTag.availableTags.hasOwnProperty(tagId)) {
-					var tag = uniTag.availableTags[tagId];
-					var cl = 'secondary';
-					//tags here is the list of attached tags
-					for(selectedTagId in tags) {
-						if(tags.hasOwnProperty(selectedTagId)) {
-							if(tags[selectedTagId].tag == tag.tag) {
-								cl = 'primary';
-								break;
+	loadTagDialog: function(tags,parent_id) {
+            
+                // Clicking tags for current dialog will close the dialog
+		$("#"+parent_id+' .tag_selection').unbind('click');
+		$("#"+parent_id+' .tag_selection').bind('click',function(e) {
+                        $('.tag_list_dialog').hide();
+                        uniTag.bindTags(parent_id);
+                });
+		var url = $('#'+parent_id).data('url');
+		$.get(url+'&cmd=getAll', function(availableTags) {
+			uniTag.buf = '<div class="available_tags">';
+			uniTag.buf += '<div class="available_tags_list">';
+			if(availableTags.length == 0) {
+				uniTag.buf += '<div class="custom_tag"><div class="label radius secondary"><span class="fi-price-tag">No tags found</span></div></div>';
+			} else {
+				for(tagId in availableTags) {
+					if(availableTags.hasOwnProperty(tagId)) {
+						var tag = availableTags[tagId];
+						var cl = 'secondary';
+						//tags here is the list of attached tags
+						for(selectedTagId in tags) {
+							if(tags.hasOwnProperty(selectedTagId)) {
+								if(tags[selectedTagId].tag == tag.tag) {
+									cl = 'primary';
+									break;
+								}
 							}
 						}
+						uniTag.buf += '<div class="tag" data-id="'+tag.id+'" data-tag="'+tag.tag+'"><div class="label radius '+cl+'"><span ';
+						if(tag.tag_color != '') {
+							uniTag.buf += 'style="color:'+tag.tag_color+';';
+						}
+						uniTag.buf += ' class="fi-price-tag">'+tag.tag+'</span></div></div> ';
 					}
-					buf += '<div class="tag" data-id="'+tag.id+'" data-tag="'+tag.tag+'"><div class="label radius '+cl+'"><span ';
-					if(tag.tag_color != '') {
-						buf += 'style="color:'+tag.tag_color+';';
-					}
-					buf += ' class="fi-price-tag">'+tag.tag+'</span></div></div> ';
 				}
 			}
+			uniTag.buf += '</div>';
+		 	uniTag.buildTagDialog(parent_id);
+        });
+		return uniTag.buf;
+	},
+	buildTagDialog: function(parent_id) {
+		$('#'+parent_id+' .tag_list_dialog .tag_list_body').html(uniTag.buf);
+                $('#'+parent_id+' .tag_list_dialog').show();
+		if($('#'+parent_id+' .tag_list_dialog').offset().left < 0) {
+			$('#'+parent_id+' .tag_list_dialog').css('left', Math.abs($('#'+parent_id+' .tag_list_dialog').offset().left/2));
+			$('#'+parent_id+' .tag_list_dialog').css('right', 'auto');
 		}
-		buf += '</div>';
-		return buf;
+		$('#'+parent_id+' .tag_list_dialog .tag').bind('click', function(e) {
+			uniTag.setTag(this,parent_id);
+		});
+		$('#'+parent_id+' .tag_list_header .search_tags').keyup(function() {
+			uniTag.filterTagDialog(parent_id, $(this).val());
+		});
 	},
 	/*
 	 * Filters the list of available tags
 	 * No option is provided to create new tags here
 	 */
-	filterTagDialog: function(term) {
-		$('.available_tags_list .tag').each(function() {
+	filterTagDialog: function(parent_id, term) {
+		$('#'+parent_id+' .available_tags_list .tag').each(function() {
 			var tag = $(this).data('tag');
 			if(tag !== undefined) {
 				if(term.length == 0) {
@@ -65,60 +99,68 @@ var uniTag = {
 				}
 			}
 		});
-		if($('.available_tags_list .tag:visible').length == 0) {
-			if($('.available_tags_list .custom_tag').length == 0) {
-				$('.available_tags_list').prepend('<div class="custom_tag"><div class="label radius secondary"><span class="fi-price-tag">No tags found</span></div></div>');
+		if($('#'+parent_id+' .available_tags_list .tag:visible').length == 0) {
+			if($('#'+parent_id+' .available_tags_list .custom_tag').length == 0) {
+				$('#'+parent_id+' .available_tags_list').prepend('<div class="custom_tag"><div class="label radius secondary"><span class="fi-price-tag">No tags found</span></div></div>');
 			}
 		} else {
-			$('.available_tags_list .custom_tag').remove();
+			$('#'+parent_id+' .available_tags_list .custom_tag').remove();
 		}
 	},
+
 	/*
 	 * Adds or removes a tag
 	 */
-	setTag: function(obj) {
+	setTag: function(obj, parent_id) {
 		var label = $(obj).find('.label');
-		var url = $('.tag_list').data('url');
+        var list = $(obj).closest('.tag_list'); // $('#'+parent_id)
+		var url = $('#'+parent_id).data('url');
 		var tagId = $(obj).data('id');
 		var tag = $(obj).data('tag');
 		if(label.hasClass('primary')) {
-			$('.tag_list .tag_selection[data-tag="'+tag+'"]').hide();
-			if($('.tag_list .tag_selection:visible').length == 0) {
-				$('.tag_list .no_tags').show();
+			$('#'+parent_id+' .tag_selection[data-tag="'+tag+'"]').addClass('hidetag');
+            // If there are no more tags then show no tag
+			if($('#'+parent_id+' .tag_selection:visible').length == 0) {
+				$('#'+parent_id+' .no_tags').removeClass('hidetag');
 			}
 			label.removeClass('primary').addClass('secondary');
 			$.get(url+'&cmd=removeTag&tagId='+tagId);
 		} else {
-			if($('.tag_list .tag_selection[data-tag="'+tag+'"]').length == 0) {
-				$('.tag_list').append('<span data-tag="'+tag+'" class="label radius secondary tag_selection"><span class="fi-price-tag">'+tag+'</span></span>&nbsp;');
+			if($('#'+parent_id+' .tag_selection[data-tag="'+tag+'"]').length == 0)
+            {
+                // include information for hidden tags in all tags that are generated here
+				$('#'+parent_id).append('<span data-tag="'+tag+'" class="label radius primary tag_selection"><span class="fi-price-tag">'+tag+'</span></span>' + (list.hasClass('limited') ? '<span class="limited_count"></span> ' : ' '));
+                // Bind click action to tag    
+                uniTag.bindTags(parent_id);
 			} else {
-				$('.tag_list .tag_selection[data-tag="'+tag+'"]').show();
+				$('#'+parent_id+' .tag_selection[data-tag="'+tag+'"]').removeClass('hidetag');
 			}
-			$('.tag_list .no_tags').hide();
+			$('#'+parent_id+' .no_tags').addClass('hidetag');
 			$.get(url+'&cmd=setTag&tagId='+tagId);
 			label.removeClass('secondary').addClass('primary');
 		}
+        // how many hidden tags are there?
+        if(list.hasClass('limited'))
+        {
+            $('.first', list).removeClass('first');
+            var tags = $('.tag_selection.primary:visible', list);
+            var numTags = tags.length-1;
+            tags.first().addClass('first');
+            $('.limited_count', list).text(" +" + numTags);
+            if(numTags >= 1)
+                list.addClass('show_num_limited');
+            else
+                list.removeClass('show_num_limited');
+        }
 	},
 	/*
 	 * 
 	 */
-	bindTags: function() {
+	bindTagsOld: function() {
 		$('.tag_selection').unbind('click');
 		$('.tag_selection').bind('click',function(e) {
 			$.get($(this).parent().data('url')+'&cmd=get', function(result) {
-				var buf = uniTag.buildTagDialog(result);
-				$('.tag_list_dialog .tag_list_body').html(buf);
-				$('.tag_list_dialog').show();
-				if($('.tag_list_dialog').offset().left < 0) {
-					$('.tag_list_dialog').css('left', Math.abs($('.tag_list_dialog').offset().left/2));
-					$('.tag_list_dialog').css('right', 'auto');
-				}
-				$('.tag_list_dialog .tag').bind('click', function(e) {
-					uniTag.setTag(this);
-				});
-				$('.tag_list_header .search_tags').keyup(function() {
-					uniTag.filterTagDialog($(this).val());
-				});
+                                uniTag.loadTagDialog(result,$("#"+e.currentTarget.parentNode.id+" .tag_list_dialog"));
 			});
 			e.preventDefault();
 			e.stopImmediatePropagation();
@@ -127,8 +169,24 @@ var uniTag = {
 		$('.hide_tag_list').bind('click', function(e) {
 			$(this).parent().parent().parent().hide();
 		});
+	},
+	bindTags: function(parent_id) {
+		$("#"+parent_id+' .tag_selection').unbind('click');
+		$("#"+parent_id+' .tag_selection').bind('click',function(e) {
+                        // First, hide any other open dialog
+                        $('.tag_list_dialog').hide();
+			$.get($("#"+parent_id).data('url')+'&cmd=get', function(result) {
+                                uniTag.loadTagDialog(result,parent_id);
+			});
+			e.preventDefault();
+			e.stopImmediatePropagation();
+			return false;
+		});
+		$("#"+parent_id+' .hide_tag_list').bind('click', function(e) {
+			$("#"+parent_id+' .tag_list_dialog').hide();
+		});
 	}
 };
 $(document).ready(function() {
-	uniTag.ready();
+	uniTag.ready(false);
 });

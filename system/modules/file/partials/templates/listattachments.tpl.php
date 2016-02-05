@@ -7,7 +7,7 @@
         <?php foreach ($attachments as $att) : ?>
             <?php if ($att->isImage()) : ?>
                 <!--<li><a class="th" href="/uploads/<?php echo $att->fullpath; ?>"><img data-caption="<?php echo $att->title; ?>" src="<?php echo $att->getThumbnailUrl(); ?>"></a></li>-->
-				<li><a class="th" href="/file/atfile/<?php echo $att->id; ?>"><img data-caption="<?php echo $att->title; ?>" src="<?php echo $att->getThumbnailUrl(); ?>"></a></li>
+				<li class='attachment'><a class="th" href="/file/atfile/<?php echo $att->id; ?>"><img data-caption="<?php echo $att->title; ?>" src="<?php echo $att->getThumbnailUrl(); ?>"></a></li>
             <?php else :
                 $notImages[] = $att;
             endif;
@@ -27,7 +27,7 @@
             </thead>
             <tbody>
                 <?php foreach ($notImages as $att): ?>
-                    <tr>
+                    <tr class='attachment'>
                         <td>
                             <a target="_blank" href="<?php echo WEBROOT; ?>/file/atfile/<?php echo $att->id; ?>/<?php echo $att->filename; ?>"><?php echo $att->filename; ?></a>
                         </td>
@@ -38,4 +38,4 @@
                 <?php endforeach; ?>
             </tbody>
         </table>
-    <?php endif; ?>
+    <?php endif; 

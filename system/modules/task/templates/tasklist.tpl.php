@@ -18,7 +18,8 @@
                     if ($task->getCanIView()) {
                         $table_line = array();
 						$table_line[] = $task->id;
-                        $table_line[] = Html::a("/task/edit/" . $task->id, $task->title);
+                        $table_line[] = $task->toLink(). // Html::a("/task/edit/" . $task->id, $task->title);
+                        "&nbsp;".$w->partial('listTags',['object' => $task, 'limit' => 1], 'tag');
 
                         
                         // Append the rest of the data
@@ -65,7 +66,6 @@
             <?php echo !empty($filter_data) ? Html::filter("Search Tasks", $filter_data, "/task/tasklist") : ""; ?>
             <form id="updatestatus" action="<?php echo $webroot . "/task/updatestatus"; ?>" method="POST">
                 <input type="hidden" name="<?php echo CSRF::getTokenID(); ?>" value="<?php echo CSRF::getTokenValue(); ?>" />
-                <?php echo $mytasks; ?>
             </form>
         </div>
         <div id="notifications" class="clearfix">

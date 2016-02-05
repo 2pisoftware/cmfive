@@ -27,7 +27,7 @@ class Channel extends DbObject {
     }
 
     public function read() {
-        $channelImpl = $this->Channel->getEmailChannel($this->id);
+        $channelImpl = $this->Channel->getChildChannel($this->id);
         if (!empty($channelImpl)) {
             $channelImpl->read();
         }
