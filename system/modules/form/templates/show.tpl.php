@@ -7,6 +7,8 @@
 		<a href="#fields">Fields</a>
 		<a href="#preview">Preview</a>
 		<a href="#mapping">Mapping</a>
+		<a href="#row_template">Row Templates</a>
+		<a href="#summary_template">Summary Template</a>
 	</div>
 	<div class="tab-body">
 		<div id="fields">
@@ -16,13 +18,14 @@
 				<table class="table small-12">
 					<thead>
 						<tr>
-							<th>Name</th><th>Type</th><th>Additional Details</th><th>Actions</th>
+							<th>Name</th><th>Technical Name</th><th>Type</th><th>Additional Details</th><th>Actions</th>
 						</tr>
 					</thead>
 					<tbody>
 						<?php foreach($fields as $field) : ?>
 							<tr>
 								<td><?php echo $field->name; ?></td>
+								<td><?php echo $field->technical_name; ?></td>
 								<td><?php echo $field->type; ?></td>
 								<td><?php echo $field->getAdditionalDetails(); ?></td>
 								<td>
@@ -63,6 +66,21 @@
 					</div>
 				</form>
 			</div>
+		</div>
+		<div id="row_template" class="clearfix">
+			<?php echo Html::multiColForm([
+				"Row templates" => [
+					[["Header row template", "textarea", "header_template", $form->header_template, null, "4", "codemirror"]],
+					[["Item row template", "textarea", "row_template", $form->row_template, null, "6", "codemirror"]]
+				]
+			], "/form/edit/" . $form->id . "?redirect_url=" . urlencode("/form/show/" . $form->id) . "#row_template", "POST"); ?>
+		</div>
+		<div id="summary_template" class="clearfix">
+			<?php echo Html::multiColForm([
+				"Summary template" => [
+					[["", "textarea", "summary_template", $form->summary_template, null, "4", "codemirror"]],
+				]
+			], "/form/edit/" . $form->id . "?redirect_url=" . urlencode("/form/show/" . $form->id) . "#summary_template", "POST"); ?>
 		</div>
 	</div>
 </div>
