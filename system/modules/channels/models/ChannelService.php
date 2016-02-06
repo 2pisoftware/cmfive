@@ -123,6 +123,18 @@ class ChannelService extends DbService {
 
 		return $this->getObjects("ChannelMessage", $where, false, true, "dt_created desc");
 	}
+	
+	public function getNewMessages($channel_id, $processor_id) {
+		$query = $this->w->db->get("channel_message")->where("channel_message.channel_id", $channel_id)
+								->leftJoin("channel_message_status on channel_message_status.message_id = channel_message.id")
+								->where("channel_message_status.id IS NULL OR channel_message_status.processor_id != ?", $processor_id)
+								->fetch_all();
+					
+		if (!empty($query)) {
+			return $this->getObjectsFromRows("ChannelMessage", $query);
+		}
+		return null;
+	}
 
 	public function getMessage($id) {
 		return $this->getObject("ChannelMessage", $id);

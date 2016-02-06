@@ -18,6 +18,11 @@ Config::set('task', array(
     )
 ));
 
+// Set form mapping objects
+Config::append('form.mapping', [
+	'Task', 'TaskGroup'
+]);
+
 //========= Properties of Task Type Todo ==================
 
 Config::set('task.TaskType_Todo',array(
