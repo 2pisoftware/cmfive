@@ -1129,7 +1129,11 @@ class Web {
             $partial_action = $name . "_" . $method;
             if (function_exists($partial_action)) {
                 $partial_action($this, $params);
-            }
+            } else if (function_exists($name)) {
+				$name($this, $params);
+			} else {
+				$this->Log->error("Required partial action not found, expected {$partial_action}");
+			}
         } else {
             $this->Log->error("Could not find partial file at: {$partial_action_file}");
         }
