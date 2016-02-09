@@ -48,7 +48,9 @@
 <?php
 //    echo Html::box(WEBROOT."/file/attach/".get_class($object)."/{$object->id}/".(str_replace("/", "+", $redirect)), "Attach a File", true);
 	echo Html::box("/file/new/" . get_class($object) . "/{$object->id}?redirect_url=" . urlencode($redirect), "Attach a File", true);
-	
+?>
+<div class="enable_drop_attachments" data-object="<?php echo get_class($object); ?>" data-id="<?php echo $object->id; ?>" style="display:none;"></div>
+<?php
     $notImages = array();
     if (!empty($attachments)) : ?>
         <br/><br/>
@@ -56,7 +58,7 @@
         <?php foreach ($attachments as $attachment) : ?>
             <?php if ($attachment->isImage()) : ?>
 				<li>
-					<div class="image-container">
+					<div class="image-container attachment">
 						<div class="image-container-overlay">
 							<div class="row-fluid">
 								<button href="#" data-reveal-id="attachment_modal_<?php echo $attachment->id; ?>" class="button expand">View</button>
@@ -111,7 +113,7 @@
             </thead>
             <tbody>
                 <?php foreach ($notImages as $att): ?>
-                    <tr>
+                    <tr class="attachment">
                         <td>
                             <a target="_blank" href="<?php echo WEBROOT; ?>/file/atfile/<?php echo $att->id; ?>/<?php echo $att->filename; ?>"><?php echo $att->filename; ?></a>
                         </td>

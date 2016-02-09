@@ -100,7 +100,9 @@
                         return false;
                     }
                 });
-				globalFileUpload.init();
+				if(jQuery('.enable_drop_attachments').length !== 0) {
+					globalFileUpload.init();
+				}
             });
 
             // Try and prevent multiple form submissions

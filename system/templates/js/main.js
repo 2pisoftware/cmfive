@@ -11,6 +11,8 @@ var globalFileUpload = {
 	MAXUPLOAD: 2097152,
 	filesToUpload: [],
 	dragTimer: null,
+	objectClass: null,
+	objectId: null,
 	//The main drop target the global file drop overlay
 	dropTarget: null,
 	targetDragLeave: function(event) {
@@ -34,6 +36,11 @@ var globalFileUpload = {
 		jQuery(globalFileUpload.dropTarget).hide();
 	},
 	init: function() {
+		if(jQuery('.enable_drop_attachments').length === 0) {
+			return;
+		}
+		globalFileUpload.objectClass = jQuery('.enable_drop_attachments').data('object');
+		globalFileUpload.objectId = jQuery('.enable_drop_attachments').data('id');
 		globalFileUpload.dropTarget = document.getElementById('global_file_drop_area');
 		document.getElementsByTagName('body')[0].addEventListener('dragenter', function(e) {
 			e.preventDefault();
@@ -49,7 +56,7 @@ var globalFileUpload = {
 				jQuery(globalFileUpload.dropTarget).hide();
 			}, 500);
 		}, false);
-		globalFileUpload.dropTarget.addEventListener('dragleave', globalFileUpload.targetDragLeave, false);
+		globalFileUpload.dropTarget.addEventListener('dragexit', globalFileUpload.targetDragLeave, false);
 		globalFileUpload.dropTarget.addEventListener('dragover', globalFileUpload.targetDragOver, false);
 		globalFileUpload.dropTarget.addEventListener('drop', globalFileUpload.targetDrop, false);
 	},
@@ -65,7 +72,6 @@ var globalFileUpload = {
 					error = false;
 				}
 			});
-			console.log(globalFileUpload.filesToUpload);
 			if(!error) {
 				jQuery('.global_file_drop_overlay').show();
 				globalFileUpload.uploadFiles();
@@ -83,18 +89,20 @@ var globalFileUpload = {
 				var mime=file.type;
 				var blob=new Blob([file],{type : mime});
 				var reader = new FileReader();
-				reader.key = parseInt(i)+1;
+				reader.key = parseInt(i);
 				reader.fileData = file;
 				reader.onload = function(event) {
 					var fd = {};
 					var reader = this;
 					var file = reader.fileData;
 					fd["fname"] = file.name;
+					fd["key"] = reader.key;
 					fd["description"] = '';
-					fd["data"] = event.target.result;
+					fd["title"] = file.name;
+					fd["file"] = event.target.result;
 					fd[$('#token').prop('name')] = $('#token').val();
 					if(file.error) {
-						delete globalFileUpload.filesToUpload[reader.key-1];
+						globalFileUpload.filesToUpload.splice(reader.key, 1);
 						return;
 					}
 					$.ajax({
@@ -114,15 +122,18 @@ var globalFileUpload = {
 						   return xhr;
 						},
 						type: 'POST',
-						url: '/file/new',
+						url: '/file/new/'+globalFileUpload.objectClass+'/'+globalFileUpload.objectId,
 						data: fd,
 						dataType: 'json',
-						success: function(data) {
-							console.log(data);
-							delete globalFileUpload.filesToUpload[reader.key-1];
-							jQuery('.global_file_drop_overlay').hide();
-							$('.global_file_drop_overlay_loading').hide();
-							$('.global_file_drop_overlay_init').show();
+						complete: function(data) {
+							var key = parseInt(data.responseJSON.key);
+							globalFileUpload.filesToUpload.splice(key, 1);
+							if(globalFileUpload.filesToUpload.length === 0) {
+								jQuery('.global_file_drop_overlay').hide();
+								window.location.reload();
+								jQuery('.global_file_drop_overlay_loading').hide();
+								jQuery('.global_file_drop_overlay_init').show();
+							}
 						}
 					});
 				};
