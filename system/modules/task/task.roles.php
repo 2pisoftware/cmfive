@@ -16,7 +16,9 @@ function role_task_user_allowed(Web $w,$path) {
         $w->checkUrl($path, "task", null, "updateusergroupnotify") || 
         $w->checkUrl($path, "task", null, "updateusertasknotify") || 
         $w->checkUrl($path, "task", null, "taskweek") ||
-        $w->checkUrl($path, "task", null, "taskAjaxSelectbyTaskGroup");
+        $w->checkUrl($path, "task", null, "deletetime") ||
+        $w->checkUrl($path, "task", null, "taskAjaxSelectbyTaskGroup") ||
+        $w->checkUrl($path, "task", null, "ical");
 }
 
 function role_task_group_allowed(Web $w,$path) {

@@ -79,12 +79,14 @@
                 }
                 
                 // Search function shortcut listener
+                <?php if ($w->Auth->allowed("search")):?>
                 $(document).on('keydown', function ( e ) {
                     if ((e.ctrlKey || e.metaKey) && e.which === 70) {
                         $('#cmfive_search_button').click();
                         return false;
                     }
                 });
+                <?php endif;?>
             });
 
             // Try and prevent multiple form submissions
@@ -117,9 +119,10 @@
                 <section class="top-bar-section">
                     <!-- Right Nav Section -->
                     <ul class="right">
-                        <!-- Search bar -->
-                        <li><?php echo Html::box("/search", "<span class='fi-magnifying-glass'></span>", false, false, null, null, null, "cmfive_search_button"); ?></li>
-                        
+                    	<?php if ($w->Auth->allowed("search")):?>
+                        	<!-- Search bar -->
+                        	<li><?php echo Html::box("/search", "<span class='fi-magnifying-glass'></span>", false, false, null, null, null, "cmfive_search_button"); ?></li>
+                        <?php endif;?>
                         <!-- User Profile drop down -->
                         <?php if ($w->Auth->user()): ?>
                             <li class="has-dropdown">

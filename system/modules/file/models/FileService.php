@@ -14,8 +14,12 @@ class FileService extends DbService {
     // This will need a rethink (storing full path in Attachment but also setting the full path here) etc
     function getFilePath($path) {
     	if (strpos($path, FILE_ROOT . "attachments/") !== FALSE){
-    		return $path;
+            return $path;
     	}
+        if (strpos($path, "attachments/") !== FALSE) {
+            return FILE_ROOT . $path;
+        }
+    
     	return FILE_ROOT . "attachments/" . $path;
     }
 
@@ -215,7 +219,7 @@ class FileService extends DbService {
 
 		$att = new Attachment($this->w);
 		$att->filename = $filename;
-		$att->fullpath = str_replace(FILE_ROOT, "", $this->getFilePath($filesystemPath) . "/" . $att->filename);
+		$att->fullpath = str_replace(FILE_ROOT, "", $this->getFilePath($filesystemPath) . (substr($this->getFilePath($filesystemPath), -1) !== '/' ? '/' : '') . $att->filename);
 		$att->parent_table = $object->getDbTableName();
 		$att->parent_id = $object->id;
 		$att->title = $filename;

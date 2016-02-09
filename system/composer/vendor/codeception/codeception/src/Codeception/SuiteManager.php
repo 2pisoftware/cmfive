@@ -40,6 +40,7 @@ class SuiteManager
     protected $path = '';
     protected $printer = null;
     protected $env = null;
+    protected $settings;
 
     public function __construct(EventDispatcher $dispatcher, $name, array $settings)
     {
@@ -127,6 +128,10 @@ class SuiteManager
 
         $groups = $this->groupManager->groupsForTest($test);
         $this->suite->addTest($test, $groups);
+
+        if (!empty($groups) && $test instanceof TestCase\Interfaces\ScenarioDriven && null !== $test->getScenario()) {
+            $test->getScenario()->group($groups);
+        }
     }
     
     protected function createSuite($name)

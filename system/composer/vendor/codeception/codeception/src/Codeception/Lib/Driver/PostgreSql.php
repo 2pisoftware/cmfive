@@ -120,7 +120,7 @@ class PostgreSql extends Db
     public function lastInsertId($table)
     {
         /*We make an assumption that the sequence name for this table is based on how postgres names sequences for SERIAL columns */
-        $sequenceName = $table . '_id_seq';
+        $sequenceName = $this->getQuotedName($table . '_id_seq');
         return $this->getDbh()->lastInsertId($sequenceName);
     }
 
@@ -129,5 +129,16 @@ class PostgreSql extends Db
         $name = explode('.', $name);
         $name = array_map(function($data) { return '"' . $data . '"'; }, $name);
         return implode('.', $name);
+    }
+    
+    /**
+     * @param string $tableName
+     *
+     * @return string
+     */
+    public function getPrimaryColumn($tableName)
+    {
+        // @TODO: Implement this for PostgreSQL later
+        return 'id';
     }
 }

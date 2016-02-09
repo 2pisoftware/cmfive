@@ -43,12 +43,11 @@ class Report extends DbObject {
         }
     }
 
-    // build form of parameters for generating report
+    /**
+     *  build form of parameters for generating report
+     */
     function getReportCriteria() {
-        // set form header
-        $arr = array(array("Select Report Criteria", "section"));
-        $arr[] = array("Description", "static", "description", $this->description);
-
+    	
         // build array of all contents within any [[...]]
         preg_match_all("/\[\[.*?\]\]/", preg_replace("/\n/", " ", $this->report_code), $form);
 
@@ -78,9 +77,13 @@ class Report extends DbObject {
                         $label = trim(!empty($split_arr[2]) ? $split_arr[2] : '');
                         $sql = trim(!empty($split_arr[3]) ? $split_arr[3] : '');
 
-                        if ($sql !== "")
+                        if ($sql !== "") {
                             $sql = $this->Report->putSpecialSQL($sql);
+                        }
 
+                        if (empty($arr)) {
+                        	$arr = array(array("Select Report Criteria", "section"));
+                        }
                         // do something different based on form element type
                         switch ($type) {
                             case "autocomplete":
@@ -129,9 +132,12 @@ class Report extends DbObject {
             }
         }
         // merge arrays to give all parameter form requirements
-        $arr = array_merge($arr, array(array("Format", "select", "format", null, $template_values)));
+        if (!empty($template_values)) {
+        	$arr[] = array("Select an Optional Template", "section");
+        	$arr[] =array("Format", "select", "format", null, $template_values);
+        }
         // return form
-        return $arr;
+        return !empty($arr) ? $arr : null;
     }
 
     // generate the report based on selected parameters
