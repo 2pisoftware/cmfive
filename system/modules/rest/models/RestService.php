@@ -116,12 +116,17 @@ class RestService extends RestSearchableService {
 					// convert json into array and update object
 					//$ar = json_decode($json,true);
 					$o->fill($record);
-					$o->update();
-					//http_response_code(204);
-					//header('Location: '.$this->w->webroot().'/rest/index/'.$classname.'/id/'.$o->id."/?token=".$this->token);
-					// convert to timestamp
-					$oJson=$o->toArray();
-					return $this->successJson($oJson);
+					$saveResult=$o->update();
+					// validation
+					if (!empty($saveResult) && (empty($saveResult['invalid']) || count($saveResult['invalid'])==0)) { 
+						//http_response_code(204);
+						//header('Location: '.$this->w->webroot().'/rest/index/'.$classname.'/id/'.$o->id."/?token=".$this->token);
+						// convert to timestamp
+						$oJson=$o->toArray();
+						return $this->successJson($oJson);
+					} else {
+						return $this->errorJson($saveResult['invalid']);
+					}
 				} else {
 					return $this->_saveNew($classname,$record);
 				}
