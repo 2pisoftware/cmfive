@@ -1,6 +1,6 @@
 
 <?php if (!empty($tasks) || !empty($task_group_membership)) : ?>
-	<h4 class="text-center">Task</h4>
+	<h4>Task</h4>
 
 	<form action="/task-user/unassign/<?php echo $user->id; ?>?redirect=<?php echo urlencode($redirect); ?>" method="POST">
 		<?php if (!empty($tasks)) : ?>

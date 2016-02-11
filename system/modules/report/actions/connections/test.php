@@ -18,7 +18,7 @@ function test_ALL(Web $w) {
         $dbo = $connection->getDb();
         echo "Connected to DB<br/>Fetching databases to test connection...<br/>";
         
-        $results;
+        $results = null;
         switch ($connection->db_driver) {
             case "pgsql":
                 $results = $dbo->query("SELECT datname FROM pg_database")->fetchAll();

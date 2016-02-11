@@ -1,6 +1,6 @@
-<?php
+<?php namespace System\Modules\Admin;
 
-function displaycomment_ALL(Web $w, $params) {
+function displaycomment(\Web $w, $params) {
     if (!empty($params['redirect'])) {
         $w->ctx("redirect", $params['redirect']);
     }

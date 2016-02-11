@@ -20,7 +20,7 @@ function remove_GET(Web $w) {
 	$hook_output = '';
 	if (!empty($hook_results)) {
 		$hook_output = array_reduce($hook_results, function($carry, $element) {
-			return $carry .= strlen(trim($element)) ? '<div class=\'row-fluid panel\'>' . $element . '</div>' : "";
+			return $carry .= strlen(trim($element)) ? '<div class=\'small-12 columns panel\'>' . $element . '</div>' : "";
 		});
 	}
 	

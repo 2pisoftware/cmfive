@@ -13,15 +13,14 @@ function index_ALL(Web &$w) {
 
     // organise criteria
     $who = $w->session('user_id');
-    $where = array();
-
+    
     $module = $w->request("module");
     $reset = $w->request("reset");
     
     $where = '';
     if (empty($reset)){
         if (!empty($module)) {
-			$where .= " and r.module = " . $w->_db->quote($module);        	
+			$where .= " and r.module = " . $w->db->quote($module);        	
             $w->ctx("reqModule", $module);
         }
     }

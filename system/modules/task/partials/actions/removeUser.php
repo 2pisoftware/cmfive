@@ -1,6 +1,6 @@
-<?php
+<?php namespace System\Modules\Task;
 
-function removeUser(Web $w, $params = []) {
+function removeUser(\Web $w, $params = []) {
 	$user = $params['user'];
 	$redirect = $params['redirect'];
 	
