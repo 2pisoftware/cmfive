@@ -19,14 +19,14 @@
 	 * 
 	 * @author Steve Ryan
  */
-class QueryPart {
+class RestQueryPart {
 	public $filter='';
 	public $parameters=[];
 }
  
-class SearchableService extends DbService {
+class RestSearchableService extends DbService {
 	
-	function search($class,$restQuery=[],$allowDeleted=false) {				
+	function search($class,$restQuery=[],$allowDeleted=false) {		
 		if ($class && count(trim($class))>0 &&class_exists($class)) {			
 			$whereString='';
 			$skip='';
@@ -42,9 +42,8 @@ class SearchableService extends DbService {
 					$deletedCondition=array('AND','is_deleted___equal','0');
 					$parts['rules']=array_merge($deletedCondition,$parts['rules']);
 				} 
-				//print_r($parts['rules']);
-				
 				$parts['rules']=$this->generateSearchQueryFromRestUrl($parts['rules']);
+				
 				$parts['logic']='AND';
 				$where=$this->generateSQLWhere($parts);
 				if (strlen(trim($where->filter))>0) $whereString='WHERE '.$where->filter;
@@ -142,11 +141,9 @@ class SearchableService extends DbService {
 	}
 	
 	function generateSearchQueryRule($ruleConfig) {
-		//echo "genrule\n";
-		//print_r($ruleConfig);
 		// now we expect pairs
 		$filter='';
-		$queryPart=new QueryPart();
+		$queryPart=new RestQueryPart();
 		$queryPart->filter='';
 		$queryPart->parameters=[];
 		$keyParts=explode('___',$ruleConfig[0]);
@@ -245,8 +242,6 @@ class SearchableService extends DbService {
 				if ($this->haveValue($ruleConfig[1])) $queryPart->filter= $keyParts[0]." IS NOT NULL ";
 			}			 
 		}
-		//echo "QP\n";
-		//print_r($queryPart);
 		return $queryPart;
 	} 
 	
@@ -261,26 +256,21 @@ class SearchableService extends DbService {
 		if (is_array($ruleSet['rules']) && count($ruleSet['rules'])>0) {
 			foreach ($ruleSet['rules'] as $k => $rule) {
 				if (is_array($rule) && array_key_exists('rules',$rule)) {
-					//echo "array\n";
 					$iRule=$this->generateSQLWhereRecursive($rule);
-					//print_r($iRule);				
-					if (get_class($iRule)=="QueryPart" && strlen($iRule->filter)>0) {
+					if (get_class($iRule)=="RestQueryPart" && strlen($iRule->filter)>0) {
 						$whereParts[]=$iRule->filter;
 						$parameters=array_merge($parameters,$iRule->parameters);
 					}
-				} else if (get_class($rule)=="QueryPart" && strlen($rule->filter)>0) {
-					//echo "QP\n";
-					//print_r($rule);
+				} else if (get_class($rule)=="RestQueryPart" && strlen($rule->filter)>0) {
 					$whereParts[]=$rule->filter;
 					$parameters=array_merge($parameters,$rule->parameters);
 				}
 			}
 			if (count($whereParts)>0) $where='('.implode(' '.$ruleSet['logic'].' ',$whereParts).')';
 		}
-		$ret=new QueryPart();
+		$ret=new RestQueryPart();
 		$ret->filter=$where;
 		$ret->parameters=$parameters;
-		//print_r(array($ret->filter,$ret->parameters));
 		return $ret;
 	} 
 	 

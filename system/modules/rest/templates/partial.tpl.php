@@ -1,3 +1,3 @@
 <?php 
-echo $w->partial($partial,array("results"=>$results,"module" =>$module,"partial"=>$partial,"classname"=>$classname), $module); 
+echo $w->partial($partial,array('params'=>$params), $module); 
 

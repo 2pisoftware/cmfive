@@ -1,15 +1,21 @@
 <?php
-class RestService extends SearchableService {
+class RestService extends RestSearchableService {
 
 	private $token;
-	
+	/********************************************
+	 * Check if the requested lass is allowed access via the REST api
+	 ********************************************/
 	function checkModuleAccess($className) {
-		// STEVER: TODO I am having problems using Config. It is not returning the expected values as per config.php. Changes are not reflected. New values are ??????
-		//if (!in_array('rest',Config::get('system.allow_module'))) return $this->errorJSON('REST module is disabled');
-		//if (!in_array($className,Config::get('system.rest_allow'))) return $this->errorJSON('REST module is not enabled for this type of record');
+		if (in_array($className,Config::get('system.rest_allow'))) {
+			return true;
+		}
+		return false;
 	}
 	
-	// only require API key if user is not already logged in
+	/********************************************
+	 * Get a token for the rest api.
+	 * Only return a token if the user is not already logged in.
+	 ********************************************/
 	function getTokenJson($api,$username, $password) {
 		$user=$this->w->Auth->_user;
 		if (intval($user->id) > 0) { 
@@ -58,10 +64,12 @@ class RestService extends SearchableService {
 	}
 
 	function listJson($classname, $query, $token,$allowDeleted=false) {
-		$error = $this->checkTokenJson($token);
-		if (!$error) $error = $this->checkModuleAccess($classname);
-		if ($error) {
-			return $error;
+		$checkToken=$this->checkTokenJson($token);
+		if (!empty($checkToken)) {
+			return $checkToken;
+		}
+		if (!$this->checkModuleAccess($classname)) {
+			return $this->errorJson('No access to '.$classname);
 		}
 		try {
 			$os = $this->search($classname, $query,$allowDeleted);
@@ -75,6 +83,7 @@ class RestService extends SearchableService {
 					$ar[] = $oJson;
 				}
 			}
+			
 			return $this->successJson($ar);
 		} else {
 			return $this->successJson([]);
@@ -92,11 +101,14 @@ class RestService extends SearchableService {
 	} 
 	
 	function saveJson($classname, $id, $record, $token) {
-		$error = $this->checkTokenJson($token);
-		//if (!$error) $error = $this->checkModuleAccess($classname);
-		if ($error) {
-			return $this->errorJson('No token');
+		$checkToken=$this->checkTokenJson($token);
+		if (!empty($checkToken)) {
+			return $checkToken;
 		}
+		if (!$this->checkModuleAccess($classname)) {
+			return $this->errorJson('No access to '.$classname);
+		}
+		
 		if (intval($id)>0) { 
 			$o = $this->getObject($classname, $id);
 			if ($o->canEdit($this->w->Auth->user())) {
@@ -122,10 +134,12 @@ class RestService extends SearchableService {
 	
 	
 	function deleteJson($classname, $id, $token) {
-		$error = $this->checkTokenJson($token);
-		if (!$error) $error = $this->checkModuleAccess($classname);
-		if ($error) {
-			return $error;
+		$checkToken=$this->checkTokenJson($token);
+		if (!empty($checkToken)) {
+			return $checkToken;
+		}
+		if (!$this->checkModuleAccess($classname)) {
+			return $this->errorJson('No access to '.$classname);
 		}
 				
 		$o = $this->getObject($classname, $id);

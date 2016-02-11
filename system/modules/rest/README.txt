@@ -1,8 +1,29 @@
-REST module.
+#REST module
 
-[] indicates an optional value
+The rest module implements an HTTP interface to generic CRUD persistence.
+It is particularly useful in the development of ajax applications to load data subsets in the background.
 
-<> indicate a required value
+##QuickStart
+
+1. Configure the rest module in the global config file. 
+		// use the API_KEY to authenticate with username and password
+		Config::set('system.rest_api_key', "abcdefghijklmnopqrstuv");
+
+		// exclude any objects that you do NOT want available via REST
+		// note: only DbObjects which have the $_rest; property are 
+		// accessible via REST anyway!
+		Config::set('system.rest_allow', array(
+			"User",
+			"Contact"
+			"WikiPage",
+		));
+
+
+
+
+
+- [] indicates an optional value
+- <> indicate a required value
 
 To start, you need an authentication token which can be retrieved from the by sending a GET request to token
 
@@ -54,4 +75,11 @@ To delete records, send a POST request to
 To save records POST record data to 
 
 /rest/save/<classname>/?token=<authtoken>
+-----------------------------------------------
+
+To request HTML rendered from a partial set a GET request to
+
+/rest/partial/<module>/<classname>/<partial>/[query as per index]?token=<authtoken>
+
+/rest/partial/favorite/Favorite/listfavorite/id/1 
 

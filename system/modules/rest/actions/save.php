@@ -1,5 +1,5 @@
 <?php
-function save_ALL(Web &$w) {
+function save_POST(Web &$w) {
 	$w->setLayout(null);
 	$p = $w->pathMatch("classname");
 	$token = $w->request("token");
