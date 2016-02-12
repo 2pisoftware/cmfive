@@ -3,7 +3,7 @@ class RestService extends RestSearchableService {
 
 	private $token;
 	/********************************************
-	 * Check if the requested lass is allowed access via the REST api
+	 * Check if the requested class is allowed access via the REST api
 	 ********************************************/
 	function checkModuleAccess($className) {
 		if (in_array($className,Config::get('system.rest_allow'))) {

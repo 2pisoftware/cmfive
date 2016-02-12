@@ -4,7 +4,7 @@ The rest module implements an HTTP interface to generic CRUD persistence. It can
 
 It is particularly useful in the development of ajax applications to load data subsets in the background.
 
-CmFive object based access controls canEdit, canDelete, canView are respected by requests to the API.
+Additional CmFive record based access controls canEdit, canDelete, canView are respected by requests to the API.
 
 Validation rules on CmFive objects are supported and the save endpoint returns the errors as JSON.
 
@@ -14,9 +14,6 @@ Validation rules on CmFive objects are supported and the save endpoint returns t
 1. Configure the rest module in the global config file so that the object you want included is in the system.rest_allow array. 
 >		// use the API_KEY to authenticate with username and password
 >		Config::set('system.rest_api_key', "abcdefghijklmnopqrstuv");
->		// exclude any objects that you do NOT want available via REST
->		// note: only DbObjects which have the $_rest; property are 
->		// accessible via REST anyway!
 >		Config::set('system.rest_allow', array(
 >			"User",
 >			"Contact"
