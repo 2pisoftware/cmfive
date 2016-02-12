@@ -8,12 +8,6 @@ CmFive object based access controls canEdit, canDelete, canView are respected by
 
 Validation rules on CmFive objects are supported and the save endpoint returns the errors as JSON.
 
-By implementing content that may need to be refreshed without triggering a full page reload as partials, the content can be injected directly into other templates using the $w->partial function and the same content can be accessed without the rest of the page using the rest api.
-
-Partial rendering is supported in two ways
-- Using the /rest/partial/<module>/<classname>/<partial> endpoint that directly renders the partial with no parameters.
-- Using the /rest/searchpartial/<module>/<classname>/<partial>/[QUERY] endpoint that searches for objects based on the QUERY part of the url and makes them available to the partial template in $w->ctx('results')
-
 
 ##QuickStart
 
@@ -72,24 +66,17 @@ This token needs to be appended to every subsequent request.
 - [] indicates an optional value
 - <> indicate a required value
 
-----------------------------------------------
+To get records send a GET request to 
 
-To get a single record send a GET request to 
-
-/rest/index/<classname>/id/<id>?token=<authtoken>
-
-----------------------------------------------
-
-To search/retrieve multiple records send a GET request to 
-
-/rest/index/<classname>/[fieldname]/[value]?token=<authtoken>
+`/rest/index/<classname>/[fieldname]/[value]?token=<authtoken>`
 
 Fields marked deleted are excluded from the list request, to access all records regardless of deleted status use the deleted request.
 
-/rest/deleted/<classname>/[fieldname]/[value]?token=<authtoken>
+`/rest/deleted/<classname>/[fieldname]/[value]?token=<authtoken>`
 
 Both index and delete support advanced search criteria ie /rest/index/<classname>/<advanced criteria>?token=<authtoken>
 where <advancecriteria> works as follows
+
 - if it starts with /SKIP/<integer> search results are skipped according to the parameter
 - if it starts with or skip is followed by /LIMIT/<integer> a limit is applied to the number of search results (by default 10)
 - if AND or OR is found, a query group is created
@@ -97,36 +84,22 @@ where <advancecriteria> works as follows
 	- otherwise config pairs are processed as <field__operator>, <data1__data2> until AND or OR is found or the end of the configuration
 	- if AND or OR is found again, a sub query group is created
 - if criteria pairs are found before AND or OR, the default condition is AND
+
 eg
-# fred and age 4-60
-/LIMIT/10/name___like/fred/age___between/40___60
-# freds aged 0-20,80+ or jill
-/SKIP/10/LIMIT/10/AND/name___like/fred/OR/age__between/0___20/age___greater/80/END/name___like/jill
+># fred and age 4-60
+>/LIMIT/10/name___like/fred/age___between/40___60
+># freds aged 0-20,80+ or jill
+>/SKIP/10/LIMIT/10/AND/name___like/fred/OR/age__between/0___20/age___greater/80/END/name___like/jill
 	 
 ----------------------------------------------
 
 To delete records, send a POST request to 
 
-/rest/delete/<classname>/[id]?token=<authtoken>
+`/rest/delete/<classname>/[id]?token=<authtoken>`
 
 ----------------------------------------------
 
 To save records POST record data to 
 
-/rest/save/<classname>/?token=<authtoken>
------------------------------------------------
-
-To request HTML rendered from a partial send a GET request to
-
-/rest/partial/<module>/<classname>/<partial>?token=<authtoken>
-eg
-/rest/partial/favorite/Favorite/listfavorite?token=567890
------------------------------------------------
-
-To request HTML rendered from a partial that sources data from the REST URL query send a GET request to
-
-/rest/searchpartial/<module>/<classname>/<partial>/[query as per index]?token=<authtoken>
-eg
-/rest/searchpartial/favorite/Favorite/listfavorite/name___like/fred?token=567890
-
+`/rest/save/<classname>/?token=<authtoken>`
 
