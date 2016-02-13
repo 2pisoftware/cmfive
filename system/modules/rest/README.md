@@ -2,6 +2,8 @@
 
 The rest module implements an HTTP interface to generic CRUD persistence. It can be used to search, save and delete records.
 
+All endpoints in the rest API return JSON responses.
+
 It is particularly useful in the development of ajax applications to load data subsets in the background.
 
 Additional CmFive record based access controls canEdit, canDelete, canView are respected by requests to the API.
@@ -99,4 +101,33 @@ To delete records, send a POST request to
 To save records POST record data to 
 
 `/rest/save/<classname>/?token=<authtoken>`
+
+----------------------------------------------
+
+## Dates and other data manipulations in the rest module
+Cmfive provides automatic data conversions  when getObject or getObjects is called on a Service and when insert and update are called on a DbObject.
+
+Fields are identified as date fields if their name starts with dt_, d_ or t_.
+
+Date fields inside cmfive DbObjects are stored as timestamps. 
+
+Records are stored in the database as MYSQL date types.
+
+`getObject()` and `getObjects()` query timestamps from mysql and do no automatic conversions.
+
+`$obj->fill($array,$doConversion)`  can be used with a true value for $doConversion to convert date strings back into timestamps.
+
+`insert()` always converts values from timestamps to formatted dates for mysql date fields to inject into queries.
+`update()` calls the updateConvert method which also converts values from timestamps to formatted dates  for mysql date fields.
+
+
+In the rest module -
+- All dates in the rest module are expected to be timestamps.
+- Search request parameters are interpreted as timestamps.
+- Search queries return timestamps inside the JSON success records.
+- Save requests expect dates as timestamps inside the post data.
+- Save responses return timestamps inside the JSON success records.
+
+The timestamps for query responses are derived from mysql unix_timestamp(dt_dateField) 
+
 

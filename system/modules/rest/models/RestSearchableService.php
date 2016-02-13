@@ -66,12 +66,19 @@ class RestSearchableService extends DbService {
 				}
 			}
 			$objects=[];
-			$sql='select * from '.$o->getDbTableName().' '.$whereString.$groupBy.$orderBy.$limit.$skip;
+			$o=new $class($this->w);
+			$columns=$o->getDbTableColumnNames();
+			foreach ($columns as $a =>$column) { 
+				if (startsWith($column,'dt_') || startsWith($column,'d_') ||startsWith($column,'t_')) {
+					$columns[$a]='unix_timestamp('.$column.') '.$column;
+				}
+			}
+			$sql='select '.implode(",",$columns).' from '.$o->getDbTableName().' '.$whereString.$groupBy.$orderBy.$limit.$skip;
 			$statement=$this->_db->prepare($sql); 
 			$statement->execute($parameters);
 			foreach ($statement->fetchAll() as $k =>$rowValue) {
 				$o=new $class($this->w);
-				$o->fill($rowValue,true);
+				$o->fill($rowValue);
 				$objects[]=$o;
 			}
 			return $objects;
