@@ -122,6 +122,7 @@ Records are stored in the database as MYSQL date types.
 
 
 In the rest module -
+
 - All dates in the rest module are expected to be timestamps.
 - Search request parameters are interpreted as timestamps.
 - Search queries return timestamps inside the JSON success records.
