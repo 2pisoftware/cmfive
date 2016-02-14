@@ -155,9 +155,10 @@ class RestSearchableService extends DbService {
 		$queryPart->parameters=[];
 		$keyParts=explode('___',$ruleConfig[0]);
 		$valueParts=$ruleConfig[1];
-		// deal with timestamps
+		// query with with timestamps
 		if (startsWith($keyParts[0],'dt_') || startsWith($keyParts[0],'d_')) {
-			$valueParts=date("Y-m-d H:i:s",$valueParts);
+			//$valueParts=date("Y-m-d H:i:s",$valueParts);
+			$keyParts[0]='unix_timestamp('.$keyParts[0].')';
 		}
 		
 		if (count($keyParts)==2) {

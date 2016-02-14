@@ -116,15 +116,22 @@ class RestService extends RestSearchableService {
 					$o->fill($record);
 					$saveResult=$o->update();
 					// validation
-					if (!empty($saveResult) && (empty($saveResult['invalid']) || count($saveResult['invalid'])==0)) { 
-						//http_response_code(204);
-						//header('Location: '.$this->w->webroot().'/rest/index/'.$classname.'/id/'.$o->id."/?token=".$this->token);
-						$oJson=$o->toArray();
-						return $this->successJson($oJson);
+					if ($saveResult) {
+						if (empty($saveResult['invalid'])) { 
+							//http_response_code(204);
+							//header('Location: '.$this->w->webroot().'/rest/index/'.$classname.'/id/'.$o->id."/?token=".$this->token);
+							// reload database data
+							$o=$this->getObjects($classname,['id'=>$id]);
+							$oJson=$o[0]->toArray();
+							return $this->successJson($oJson);
+						} else {
+							return $this->errorJson($saveResult['invalid']);
+						}
 					} else {
-						return $this->errorJson($saveResult['invalid']);
+						return $this->errorJson('No feedback from save.');
 					}
-				} else {
+
+					} else {
 					return $this->_saveNew($classname,$record);
 				}
 			} else {
