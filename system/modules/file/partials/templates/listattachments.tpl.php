@@ -44,13 +44,13 @@
 	}
 	
 </style>
-	
-<?php
-//    echo Html::box(WEBROOT."/file/attach/".get_class($object)."/{$object->id}/".(str_replace("/", "+", $redirect)), "Attach a File", true);
-	echo Html::box("/file/new/" . get_class($object) . "/{$object->id}?redirect_url=" . urlencode($redirect), "Attach a File", true);
-?>
 <div class="enable_drop_attachments" data-object="<?php echo get_class($object); ?>" data-id="<?php echo $object->id; ?>" style="display:none;"></div>
+
 <?php
+	if ($w->Auth->user()->hasRole("file_upload")) {
+		echo Html::box("/file/new/" . get_class($object) . "/{$object->id}?redirect_url=" . urlencode($redirect), "Attach a File", true);
+	}
+	
     $notImages = array();
     if (!empty($attachments)) : ?>
         <br/><br/>
