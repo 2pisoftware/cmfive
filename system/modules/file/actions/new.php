@@ -22,7 +22,6 @@ function new_GET(Web $w) {
 }
 
 function new_POST(Web $w) {
-	
 	$redirect_url = $w->request("redirect_url");
 	$redirect_url = defaultVal($redirect_url, defaultVal($_SERVER["REQUEST_URI"], "/"));
 	
@@ -38,6 +37,9 @@ function new_POST(Web $w) {
 	}
 	
 	$w->File->uploadAttachment("file", $object, $_POST['title'], $_POST['description'], !empty($_POST['type_code']) ? $_POST['type_code'] : null);
-	
-	$w->msg("File attached", $redirect_url);
+	if(!empty($_POST['file'])) {
+		$w->out(json_encode(array('success'=> 'true', 'key' => $_POST['key'])));
+	} else {
+		$w->msg("File attached", $redirect_url);
+	}
 }

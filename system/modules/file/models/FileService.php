@@ -181,8 +181,13 @@ class FileService extends DbService {
 
 		$replace_empty = array("..", "'", '"', ",", "\\", "/");
 		$replace_underscore = array(" ", "&", "+", "$", "?", "|", "%", "@", "#", "(", ")", "{", "}", "[", "]", ",", ";", ":");
-
-		$filename = str_replace($replace_underscore, "_", str_replace($replace_empty, "", basename($_FILES[$requestkey]['name'])));
+		
+		//Check for posted content
+		if(!empty($_POST[$requestkey])) {
+			$filename = str_replace($replace_underscore, "_", str_replace($replace_empty, "", $_POST['fname']));
+		} else {
+			$filename = str_replace($replace_underscore, "_", str_replace($replace_empty, "", basename($_FILES[$requestkey]['name'])));
+		}
 
 		$att = new Attachment($this->w);
 		$att->filename = $filename;
@@ -198,8 +203,16 @@ class FileService extends DbService {
 		$filesystem = $this->getFilesystem($this->getFilePath($filesystemPath));
 		$file = new File($filename, $filesystem);
 		
-		$content = file_get_contents($_FILES[$requestkey]['tmp_name']);
-		$mime_type = $this->w->getMimetypeFromString($content);
+		//Check for posted content
+		if(!empty($_POST[$requestkey])) {
+			preg_match('%data:(.*);base%', substr($_POST[$requestkey], 0, 25), $mime);
+			$data = substr($_POST[$requestkey], strpos($_POST[$requestkey], ",") + 1);
+			$mime_type = $mime[1];
+			$content = base64_decode($data);
+		} else {
+			$content = file_get_contents($_FILES[$requestkey]['tmp_name']);
+			$mime_type = $this->w->getMimetypeFromString($content);
+		}
 		$file->setContent($content, ['contentType' => $mime_type]);
 		
 		$att->mimetype = $mime_type;

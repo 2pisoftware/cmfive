@@ -372,9 +372,9 @@ button.button + button {
 
 .global_file_drop_area {
 	display:none;
-	position:absolute;
+	position:fixed;
 	top:40px;
-	right:0;
+	right:40px;
 	padding:50px;
 	z-index:100000000;
 	background-color: #000000;
