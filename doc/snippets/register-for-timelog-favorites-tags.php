@@ -1,4 +1,4 @@
-// Register for timelog
+// Register for timelog timer and new timelog
 $w->Timelog->registerTrackingObject($wiki);
 		
 // list tags		
