@@ -203,6 +203,9 @@ class FileService extends DbService {
 		$filesystem = $this->getFilesystem($this->getFilePath($filesystemPath));
 		$file = new File($filename, $filesystem);
 		
+		$att->adapter = $this->getActiveAdapter();
+		$att->fullpath = str_replace(FILE_ROOT, "", $filesystemPath . $filename);
+		
 		//Check for posted content
 		if(!empty($_POST[$requestkey])) {
 			preg_match('%data:(.*);base%', substr($_POST[$requestkey], 0, 25), $mime);
@@ -211,13 +214,17 @@ class FileService extends DbService {
 			$content = base64_decode($data);
 		} else {
 			$content = file_get_contents($_FILES[$requestkey]['tmp_name']);
-			$mime_type = $this->w->getMimetypeFromString($content);
+			
+			switch($this->adapter) {
+				case "local":
+					$mime_type = $this->w->getMimetype(FILE_ROOT . $att->fullpath);
+				default:
+					$mime_type = $this->w->getMimetypeFromString($content);
+			}
 		}
 		$file->setContent($content, ['contentType' => $mime_type]);
 		
-		$att->mimetype = $mime_type;
-		$att->fullpath = str_replace(FILE_ROOT, "", $filesystemPath . $filename);
-		$att->adapter = $this->getActiveAdapter();
+		$att->mimetype = $mime_type;		
 		$att->update();
 		return $att->id;
 	}
