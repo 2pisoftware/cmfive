@@ -113,21 +113,25 @@ class RestService extends RestSearchableService {
 			$o = $this->getObject($classname, $id);
 			if ($o->canEdit($this->w->Auth->user())) {
 				if ($o) {
-					// convert json into array and update object
-					//$ar = json_decode($json,true);
 					$o->fill($record);
 					$saveResult=$o->update();
 					// validation
-					if (!empty($saveResult) && (empty($saveResult['invalid']) || count($saveResult['invalid'])==0)) { 
-						//http_response_code(204);
-						//header('Location: '.$this->w->webroot().'/rest/index/'.$classname.'/id/'.$o->id."/?token=".$this->token);
-						// convert to timestamp
-						$oJson=$o->toArray();
-						return $this->successJson($oJson);
+					if ($saveResult) {
+						if (empty($saveResult['invalid'])) { 
+							//http_response_code(204);
+							//header('Location: '.$this->w->webroot().'/rest/index/'.$classname.'/id/'.$o->id."/?token=".$this->token);
+							// reload database data
+							$o=$this->getObjects($classname,['id'=>$id]);
+							$oJson=$o[0]->toArray();
+							return $this->successJson($oJson);
+						} else {
+							return $this->errorJson($saveResult['invalid']);
+						}
 					} else {
-						return $this->errorJson($saveResult['invalid']);
+						return $this->errorJson('No feedback from save.');
 					}
-				} else {
+
+					} else {
 					return $this->_saveNew($classname,$record);
 				}
 			} else {
