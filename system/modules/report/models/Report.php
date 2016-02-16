@@ -17,6 +17,10 @@ class Report extends DbObject {
     public function getTemplates() {
         return $this->getObjects("ReportTemplate", array("report_id" => $this->id, "is_deleted" => 0));
     }
+	
+	public function getMembers() {
+		return $this->getObjects("ReportMember", ["report_id" => $this->id, "is_deleted" => 0]);
+	}
     
     /**
      * return the database object to call the report on.
