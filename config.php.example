@@ -16,7 +16,7 @@ Config::set('system.test_mode_message', "You are using a test system");
 
 //=============== Timezone ===================================
 
-date_default_timezone_set('Australia/Sydney');
+Config.set('system.timezone','Australia/Sydney');
 
 //========== Database Configuration ==========================
 
@@ -77,7 +77,7 @@ Config::set('system.rest_api_key', "abcdefghijklmnopqrstuvwxyz1234567890");
 // be aware that only the listed objects will be available via
 // the REST API
 
-Config::set('system.rest_allow',array_merge((is_array(Config::get('system.rest_allow')) ? Config::get('system.rest_allow') : []), array(
+Config::append('system.rest_allow',array(
     "User",
     "Contact"
-)));
+));
