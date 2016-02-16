@@ -16,7 +16,7 @@ Config::set('system.test_mode_message', "You are using a test system");
 
 //=============== Timezone ===================================
 
-Config.set('system.timezone','Australia/Sydney');
+Config::set('system.timezone','Australia/Sydney');
 
 //========== Database Configuration ==========================
 
