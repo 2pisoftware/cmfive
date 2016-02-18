@@ -119,7 +119,10 @@
                         </td>
                         <td><?php echo $att->title; ?></td>
                         <td><?php echo $att->description; ?></td>                    
-                        <td><?php echo Html::a(WEBROOT . "/file/atdel/" . $att->id . "/" . (str_replace("/", "+", $redirect)), "Delete", null, null, "Do you want to delete this attachment?"); ?></td>
+                        <td>
+						<?php echo Html::abox("/file/edit/" . $att->id . "?redirect_url=" . urlencode($redirect), "Edit", true, null, null, null, null, null, "button expand secondary"); ?>
+                        <?php echo Html::ab(WEBROOT . "/file/atdel/" . $att->id . "/" . (str_replace("/", "+", $redirect)), "Delete", null, null, "Do you want to delete this attachment?"); ?>&nbsp;&nbsp;&nbsp;&nbsp;
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

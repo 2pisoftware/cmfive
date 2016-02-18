@@ -97,7 +97,7 @@ class Attachment extends DbObject {
     }
 
     /**
-     *
+     *	
      * Returns html code for a thumbnail link to download this attachment
      */
     function getThumb() {

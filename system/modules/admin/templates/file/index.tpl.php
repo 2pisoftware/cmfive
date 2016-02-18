@@ -15,7 +15,7 @@
 						<td>
 							<div class="row-fluid">
 								<div class="small-6 columns">
-									<?php echo Html::box($attachment->getViewUrl(), "View", true, false, null, null, "isbox", null, "expand"); ?>
+									<a class="button tiny expand" href="<?php echo $attachment->getViewUrl() ?>" target="_new" >View</a>
 								</div>
 								<div class="small-6 columns">
 									<button href="#" data-dropdown="move_to_<?php echo $attachment->id; ?>" aria-controls="move_to_<?php echo $attachment->id; ?>" aria-expanded="false" class="button dropdown expand">Move to</button><br>
