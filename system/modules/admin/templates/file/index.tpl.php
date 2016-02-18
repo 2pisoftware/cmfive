@@ -22,7 +22,7 @@
 									<ul id="move_to_<?php echo $attachment->id; ?>" data-dropdown-content class="f-dropdown" aria-hidden="true" style="z-index:1000;">
 										<?php if (!empty($adapters)) : ?>
 											<?php foreach($adapters as $adapter) : ?>
-												<?php if ($adapter != $attachment_adapter) : ?>
+												<?php if ($adapter != $attachment_adapter && Config::get('file.adapters.'.$adapter.'.active')===true) : ?>
 													<li><a id="<?php echo $attachment->id; ?>" href="#"><?php echo $adapter; ?></a></li>
 												<?php endif; ?>
 											<?php endforeach; ?>
