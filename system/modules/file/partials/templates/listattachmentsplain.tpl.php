@@ -55,7 +55,7 @@
             <?php if ($attachment->isImage()) : ?>
 				<li>
 					<div class="image-container attachment">
-						<img class="image-cropped" data-caption="<?php echo $attachment->title; ?>" src="<?php echo $attachment->getThumbnailUrl(); ?>">
+						<a href="<?php  echo $attachment->getDownloadUrl() ?>" target="_new"  ><img class="image-cropped" data-caption="<?php echo $attachment->title; ?>" src="<?php echo $attachment->getThumbnailUrl(); ?>"></a>
 					</div>
 				</li>
             <?php else :
