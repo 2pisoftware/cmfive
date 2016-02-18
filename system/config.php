@@ -29,17 +29,6 @@ Config::set('system.allow_action', array(
  */
 Config::set('system.password_salt', md5('override this in your project config'));
 
-//========= REST Configuration ==============================
-// check the following configuration carefully to secure
-// access to the REST infrastructure.
-
-// use the API_KEY to authenticate with username and password
-Config::set('system.rest_api_key', "abcdefghijklmnopqrstuvwxyz1234567890");
-
-// include class of objects that you want available via REST
-Config::set('system.rest_include', array(
-	// "Contact"
-));
 
 /**
  * Syntax for csrf config

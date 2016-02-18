@@ -680,6 +680,7 @@ public function fillAutocomplete($I,$field,$value) {
 		//$id=$dbRec['id'];
 		
 		$I->click('.editbutton[href^="'.$editButtonUrl.$id.'"]');
+		$I->wait(3);
 		$I->fillForm($I,$updateData);
 		
 		$I->click($saveButtonSelector);
