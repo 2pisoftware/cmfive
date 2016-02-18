@@ -18,7 +18,7 @@ function edit_GET(Web $w) {
 	$_form = [
 		'Edit Attachment' => [
 			[["Title", "text", "title", $attachment->title]],
-			[["Description", "textarea", "description", $attachment->description]]
+			[["Description", "textarea", "description", $attachment->description,null,null,'justtext']]
 		]
 	];
 	

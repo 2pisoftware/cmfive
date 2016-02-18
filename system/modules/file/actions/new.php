@@ -14,7 +14,7 @@ function new_GET(Web $w) {
 		'New Attachment' => [
 			[["File", "file", "file"]],
 			[["Title", "text", "title"]],
-			[["Description", "text", "description"]]
+			[["Description", "textarea", "description", $attachment->description,null,null,'justtext']]
 		]
 	];
 	
