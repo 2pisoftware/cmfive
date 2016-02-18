@@ -7,6 +7,8 @@ function show_GET(Web $w) {
 		$w->error("Form not found", "/form");
 	}
 	
+	$w->enqueueStyle(["uri" => "/system/modules/form/assets/css/form-style.css", "weight" => 500]);
+	
 	$_form_object = $w->Form->getForm($p['id']);
 	
 	$w->ctx("title", "Form: " . $_form_object->printSearchTitle());

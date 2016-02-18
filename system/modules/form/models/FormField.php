@@ -8,7 +8,12 @@ class FormField extends DbObject {
 	public $interface_class;
 	public $type;
 	public $mask;
+	public $ordering;
 
+	public function getForm() {
+		return $this->getObject("Form", $this->form_id);
+	}
+	
 	public function insert($force_validation = true) {
 		$this->technical_name = strtolower(str_replace(" ", "_", $this->name));
 		$this->setInterfaceClass();

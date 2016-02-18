@@ -9,7 +9,7 @@ class Form extends DbObject {
 	public $summary_template;
 	
 	public function getFields() {
-		return $this->getObjects("FormField", ["form_id" => $this->id, "is_deleted" => 0]);
+		return $this->getObjects("FormField", ["form_id" => $this->id, "is_deleted" => 0], false, true, "ordering ASC");
 	}
 	
 	public function getTableHeaders() {
@@ -29,9 +29,9 @@ class Form extends DbObject {
 		return $header_string;
 	}
 	
-	public function getSummaryRow() {
+	public function getSummaryRow($object) {
 		if (!empty($this->summary_template)) {
-			$instances = $this->getFormInstances();
+			$instances = $this->getFormInstancesForObject($object);
 			
 			// Generate a more accessible structure of the form instances and its data
 			$structure = [];
@@ -58,6 +58,10 @@ class Form extends DbObject {
 	
 	public function getFormInstances() {
 		return $this->getObjects("FormInstance", ["form_id" => $this->id, "is_deleted" => 0]);
+	}
+	
+	public function getFormInstancesForObject($object) {
+		return $this->w->Form->getFormInstancesForFormAndObject($this, $object);
 	}
 	
 	public function getSelectOptionTitle() {
