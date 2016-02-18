@@ -9,6 +9,23 @@ The module has two roles that control access.
 
 The module allows for different storage layers. By default only file system storage is available. Alternatives include memory storage and amazon s3 storage. Dropbox and google storage services are under development.
 
+By default only the local storage module is enabled. To enable Amazon S3 storage you need to configure the adapter by adding configuration value.
+
+>Config::set('file.adapters' => [
+>		's3' => [
+>			'active' => true,
+>			'key' => '',
+>			'secret' => '',
+>			'bucket' => '',
+>			'options' => []
+>		],
+>		'local' => [
+>			'active' => true
+>		]
+>	]
+>)
+
+
 The file module is visible as the attachments tab for many types of records through the use of partials.
 
 The module provides two partials that can be used to manage files in other modules. The listattachments partial lists all documents and provides view, edit and delete links for each file. The listattachmentsplain partial lists all documents without links.

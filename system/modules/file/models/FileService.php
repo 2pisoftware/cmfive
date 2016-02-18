@@ -6,14 +6,21 @@ use Gaufrette\Adapter\Local as LocalAdapter;
 use Gaufrette\Adapter\InMemory as InMemoryAdapter;
 use Gaufrette\Adapter\AwsS3 as AwsS3;
 use Aws\S3\S3Client as S3Client;
-
+/*********************************************
+ * Service class with functions to help managing files and attachment records.
+ * Encapsulate the use of Gaufrette file system adapters.
+ *********************************************/
 class FileService extends DbService {
 
 	public static $_thumb_height = 200;
 	public static $_thumb_width = 200;
 	public static $_stream_name = "attachment";
 
-	// This will need a rethink (storing full path in Attachment but also setting the full path here) etc
+	/*********************************************
+	 * Return the path adjusted to the currently active adapter.
+	 * !! This will need a rethink (storing full path in Attachment but also setting the full path here) etc
+	 * @return string
+	 ********************************************/
 	function getFilePath($path) {
 		$active_adapter = $this->getActiveAdapter();
 		
@@ -35,11 +42,21 @@ class FileService extends DbService {
 		}
 	}
 
+	/*******************************************
+	 * Create a new Gaufrette File object from a filename and path
+	 * @return File
+	 ******************************************/
 	function getFileObject($filesystem, $filename) {
 		$file = new File($filename, $filesystem);
 		return $file;
 	}
 
+	/*******************************************
+	 * Get the currently active filesystem adapter
+	 * The first adapter listed in configuration that is not local is returned.
+	 * If local is the only choice (or there are no choices), local is returned as the adapter.
+	 * @return string (name of adapter)
+	 ******************************************/
 	function getActiveAdapter() {
 		$adapters = Config::get('file.adapters');
 		if (!empty($adapters)) {
@@ -56,10 +73,17 @@ class FileService extends DbService {
 		return "local";
 	}
 
+	/*************************************************************
+	 * Get a Gaufrette Filesystem for the currently active adapter and selected path
+	 * @return FileSystem
+	 ************************************************************/
 	function getFilesystem($path = null, $content = null, $options = []) {
 		return $this->getSpecificFilesystem($this->getActiveAdapter(), $path, $content, $options);
 	}
-	
+	/*************************************************************
+	 * Get a Gaufrette Filesystem for a given adapter and path
+	 * @return FileSystem
+	 ************************************************************/	
 	function getSpecificFilesystem($adapter = "local", $path = null, $content = null, $options = []) {
 		$adapter_obj = null;
 		switch ($adapter) {
@@ -83,6 +107,10 @@ class FileService extends DbService {
 		return null;
 	}
 
+	/*************************************************************
+	 * Register a gaufrette stream wrapper
+	 * @return 
+	 ************************************************************/	
 	function registerStreamWrapper($filesystem = null) {
 		if (!empty($filesystem)) {
 			$map = \Gaufrette\StreamWrapper::getFilesystemMap();
@@ -92,6 +120,10 @@ class FileService extends DbService {
 		}
 	}
 
+	/*************************************************************
+	 * Create a HTML image tag for the image specified by $path
+	 * @return string(html img tag)
+	 ************************************************************/	
 	function getImg($path) {
 		$file = FILE_ROOT . $path;
 		if (!file_exists($file))
@@ -103,6 +135,10 @@ class FileService extends DbService {
 		return $tag;
 	}
 
+	/*************************************************************
+	 * Create a HTML image tag for a thumbnail of the image specified by $path
+	 * @return string(html img tag)
+	 ************************************************************/	
 	function getThumbImg($path) {
 		$file = FILE_ROOT . $path;
 		if (!file_exists($file))
@@ -113,7 +149,11 @@ class FileService extends DbService {
 		$tag = "<img src='" . WEBROOT . "/file/thumb/" . $path . "' height='" . self::$_thumb_height . "' width='" . self::$_thumb_width . "' />";
 		return $tag;
 	}
-
+	
+	/*************************************************************
+	 * Check if an attachment is an image
+	 * @return boolean
+	 ************************************************************/	
 	function isImage($path) {
 		if (file_exists(str_replace("'", "\\'", FILE_ROOT . "/" . $path))) {
 			$path = str_replace("'", "\\'", FILE_ROOT . "/" . $path);
@@ -126,11 +166,19 @@ class FileService extends DbService {
 			return false;
 		}
 	}
-
+	
+	/*************************************************************
+	 * Get a url to the file specified by $path
+	 * @return string(html img tag)
+	 ************************************************************/	
 	function getDownloadUrl($path) {
 		return WEBROOT . "/file/path/" . $path;
 	}
 
+	/*************************************************************
+	 * Lookup the attachments for a given object
+	 * @return [string]  (full paths to attachments)
+	 ************************************************************/	
 	function getAttachmentsFileList($objectOrTable, $id = null) {
 		$attachments = $this->getAttachments($objectOrTable, $id);
 		if (!empty($attachments)) {
@@ -142,7 +190,11 @@ class FileService extends DbService {
 		}
 		return array();
 	}
-
+	
+	/*************************************************************
+	 * Lookup the attachments for a given object
+	 * @return [Attachment]
+	 ************************************************************/	
 	function getAttachments($objectOrTable, $id = null) {
 		if (is_scalar($objectOrTable)) {
 			$table = $objectOrTable;
@@ -157,23 +209,28 @@ class FileService extends DbService {
 		return null;
 	}
 
+	/*************************************************************
+	 * Load a single attachment
+	 * @return Attachment
+	 ************************************************************/	
 	function getAttachment($id) {
 		return $this->getObject("Attachment", $id);
 	}
 
-	/**
-	 * moves an uploaded file from the temp location
+	/*************************************************************
+	 * Move an uploaded file from the temp location
 	 * to
-	 *
 	 *  /files/attachments/<attachTable>/<year>/<month>/<day>/<attachId>/<filename>
-	 *
+	 * 
+	 * and create an Attachment record.
+	 * 
 	 * @param <type> $filename
 	 * @param <type> $attachTable
 	 * @param <type> $attachId
 	 * @param <type> $title
 	 * @param <type> $description
 	 * @return the id of the attachment object or null
-	 */
+	 *************************************************************/
 	function uploadAttachment($requestkey, $parentObject, $title = null, $description = null, $type_code = null) {
 		if (!is_a($parentObject, "DbObject")) {
 			$this->w->error("Parent not found.");
@@ -283,6 +340,10 @@ class FileService extends DbService {
 		return true;
 	}
 
+	/*************************************************************
+	 * Save an attachment and create a file based on content passed as a parameter
+	 * @return integer  (new attachment id)
+	 ************************************************************/	
 	function saveFileContent($object, $content, $name = null, $type_code = null, $content_type = null) {
 
 		$filename = (!empty($name) ? $name : (str_replace(".", "", microtime()) . getFileExtension($content_type)));
@@ -306,11 +367,19 @@ class FileService extends DbService {
 
 		return $att->id;
 	}
-
+	
+	/*************************************************************
+	 * Get the attachment types for a given object type
+	 * @return [AttachmentType]
+	 ************************************************************/	
 	function getAttachmentTypesForObject($o) {
 		return $this->getObjects("AttachmentType", array("table_name" => $o->getDbTableName(), "is_active" => '1'));
 	}
 
+	/*************************************************************
+	 * Render a template showing an attachment
+	 * @return string  
+	 ************************************************************/	
 	function getImageAttachmentTemplateForObject($object, $backUrl) {
 		$attachments = $this->getAttachments($object);
 		$template = "";
