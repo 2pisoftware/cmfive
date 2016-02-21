@@ -28,7 +28,12 @@ function tasklist_ALL(Web $w) {
     
     // Repeat above for everything else
     if (!empty($assignee_id)) {
-        $query_object->where("task.assignee_id", $assignee_id);
+        // Unassigned has a value of 'unassigned' in filter but 0 in db
+        if ($assignee_id == 'unassigned') {
+            $query_object->where("task.assignee_id", 0);
+        } else {
+            $query_object->where("task.assignee_id", $assignee_id);
+        }
     }
     if (!empty($creator_id)) {
         // $query_object->where("task.creator_id", $creator_id);
@@ -42,17 +47,25 @@ function tasklist_ALL(Web $w) {
     if (!empty($task_status)) {
         $query_object->where("task.status", $task_status);
     }
-    if (!empty($is_closed)) {
-        $query_object->where("task.is_closed", ((is_null($is_closed) || $is_closed == 0) ? 0 : 1));
-    } else {
-        $query_object->where("task.is_closed", 0);
-    }
+//    if (!empty($is_closed)) {
+//        $query_object->where("task.is_closed", ((is_null($is_closed) || $is_closed == 0) ? 0 : 1));
+//    } else {
+//        $query_object->where("task.is_closed", 0);
+//    }
     // This part is why we want to make our query manually
     if (!empty($dt_from)) {
-        $query_object->where("task.dt_due >= ?", $dt_from);
+        if ($dt_from == "NULL") {
+            $query_object->where("task.dt_due", null);
+        } else {
+            $query_object->where("task.dt_due >= ?", $dt_from);
+        }
     }
     if (!empty($dt_to)) {
-        $query_object->where("task_dt_due <= ?", $dt_to);
+        if ($dt_to == "NULL") {
+            $query_object->where("task.dt_due", null);
+        } else {
+            $query_object->where("task.dt_due <= ?", $dt_to);
+        }
     }
     
     // Standard wheres
@@ -62,12 +75,21 @@ function tasklist_ALL(Web $w) {
     $tasks_result_set = $query_object->fetch_all();
     $task_objects = $w->Task->getObjectsFromRows("Task", $tasks_result_set);
     
+	// Filter in or out closed tasks based on given is_closed filter parameter
+	if (!empty($task_objects)) {
+		$task_objects = array_filter($task_objects, function($task) use ($is_closed) {
+			return (is_null($is_closed) || $is_closed == 0) ? !$task->getisTaskClosed() : $task->getisTaskClosed();
+		});
+	}
+	
     $w->ctx("tasks", $task_objects);
     
     // Build the filter and its data
     $taskgroup_data = $w->Task->getTaskGroupDetailsForUser();
+    $filter_assignees = $taskgroup_data["members"];
+    array_unshift($filter_assignees,array("Unassigned","unassigned"));
     $filter_data = array(
-        array("Assignee", "select", "assignee_id", !empty($assignee_id) ? $assignee_id : null, $taskgroup_data["members"]),
+        array("Assignee", "select", "assignee_id", !empty($assignee_id) ? $assignee_id : null, $filter_assignees),
         array("Creator", "select", "creator_id", !empty($creator_id) ? $creator_id : null, $taskgroup_data["members"]),
         array("Task Group", "select", "task_group_id", !empty($task_group_id) ? $task_group_id : null, $taskgroup_data["taskgroups"]),
         array("Task Type", "select", "task_type", !empty($task_type) ? $task_type : null, $taskgroup_data["types"]),

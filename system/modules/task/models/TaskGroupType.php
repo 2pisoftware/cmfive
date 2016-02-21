@@ -15,47 +15,68 @@ abstract class TaskGroupType {
 	
 	/**
 	 * Returns the title for the type
-	 * 
+	 * - override in subclass
+	 * - or specify in config.php using key 'task.<subclassname>.can-task-reopen'
 	 */
 	function getTaskGroupTypeTitle() {
+		$value = Config::get("task.".get_class($this).".title");
+		return !empty($value) ? $value : false;
 	}
 	
+	/**
+	 * Specifies if a closed task can be reopened
+	 * - override in subclass
+	 * - or specify in config.php using key 'task.<subclassname>.can-task-reopen'
+	 * 
+	 * @return boolean
+	 */
 	function getCanTaskGroupReopen() {
-		return false;
+		$value = Config::get("task.".get_class($this).".can-task-reopen");
+		return !empty($value) ? $value : false;
 	}
 	
 	/**
 	 * Return the description for this type
-	 * 
+	 * - override in subclass
+	 * - or specify in config.php with key 'task.<subclassname>.description'
 	 */
 	function getTaskGroupTypeDescription() {
-		
+		$value = Config::get("task.".get_class($this).".description");
+		return !empty($value) ? $value : false;
 	}
 	
 	/**
 	 * Return array of php class names of concrete
 	 * implementations of abstract TaskType
-	 * 
+	 * - override in subclass
+	 * - or specify in config.php with key 'task.<subclassname>.tasktypes'
 	 */
 	function getTaskTypeArray() {
+		$value = Config::get("task.".get_class($this).".tasktypes");
+		return !empty($value) ? $value : false;
 	}
 	
 	/**
 	 * Return array containing all
 	 * available statuses for tasks in 
 	 * this group
-	 * 
-         
+	 * - override in subclass
+	 * - or specify in config.php with key 'task.<subclassname>.statuses'
 	 */
-        function getStatusArray() {}
+	function getStatusArray() {
+		$value = Config::get("task.".get_class($this).".statuses");
+		return !empty($value) ? $value : false;
+	}
 	
 	/**
 	 * Return array of all available
 	 * priorities in this group
-	 * 
+	 * - override in subclass
+	 * - or specify in config.php with key 'task.<subclassname>.priorities'
 	 */
-	function getPriorityArray() {
-		
+	function getTaskPriorityArray() {
+		$value = Config::get("task.".get_class($this).".priorities");
+		return !empty($value) ? $value : false;
 	}
 
 	/**
@@ -77,50 +98,81 @@ abstract class TaskGroupType {
 	/**
 	 * By default returns the very first status of the
 	 * status array if defined. Otherwise "".
+	 * - override in subclass
+	 * - or specify in config.php with key 'task.<subclassname>.default-status'
 	 */
 	function getDefaultStatus() {
-		$statusarray = $this->getStatusArray();
-		if (!empty($statusarray) && sizeof($statusarray) > 0) {
-			return $statusarray[0][0];
+		$value = Config::get("task.".get_class($this).".default-status");
+		if (!empty($value)) {
+			return $value;
 		} else {
-			return "";
+			$statusarray = $this->getStatusArray();
+			if (!empty($statusarray) && sizeof($statusarray) > 0) {
+				return $statusarray[0][0];
+			} else {
+				return "";
+			}
 		}
 	}
 	/**
 	 * Executed before a task is inserted into DB
-	 *
+	 * 
 	 * @param Task $task
 	 */
-	function on_before_insert(Task $task) {}
+	function on_before_insert(Task $task) {
+		if (!empty($task)) {
+			$task->w->callHook("task", get_class($this)."_on_before_insert", $task);
+		}
+	}	
 	/**
 	 * Executed after a task has been inserted into DB
-	 *
+	 * 
 	 * @param Task $task
 	 */
-	function on_after_insert(Task $task) {}
+	function on_after_insert(Task $task) {
+		if (!empty($task)) {
+			$task->w->callHook("task", get_class($this)."_on_after_insert", $task);
+		}
+	}	
 	/**
 	 * Executed before a task is updated in the DB
-	 *
+	 * 
 	 * @param Task $task
 	 */
-	function on_before_update(Task $task) {}
+	function on_before_update(Task $task) {
+		if (!empty($task)) {
+			$task->w->callHook("task", get_class($this)."_on_before_update", $task);
+		}
+	}	
 	/**
 	 * Executed after a task has been updated in the DB
-	 *
+	 * 
 	 * @param Task $task
 	 */
-	function on_after_update(Task $task) {}
+	function on_after_update(Task $task) {
+		if (!empty($task)) {
+			$task->w->callHook("task", get_class($this)."_on_after_update", $task);
+		}
+	}	
 	/**
 	 * Executed before a task is deleted from the DB
-	 *
+	 * 
 	 * @param Task $task
 	 */
-	function on_before_delete(Task $task) {}
+	function on_before_delete(Task $task) {
+		if (!empty($task)) {
+			$task->w->callHook("task", get_class($this)."_on_before_delete", $task);
+		}
+	}	
 	/**
 	 * Executed after a task has been deleted from the DB
-	 *
+	 * 
 	 * @param Task $task
 	 */
-	function on_after_delete(Task $task) {}
-	
+	function on_after_delete(Task $task) {
+		if (!empty($task)) {
+			$task->w->callHook("task", get_class($this)."_on_after_delete", $task);
+		}
+	}
+		
 }

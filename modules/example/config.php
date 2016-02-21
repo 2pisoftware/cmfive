@@ -10,3 +10,4 @@ Config::set('example', array(
     'hooks' => array('core_dbobject','example'),
     'processors' => array(),
 ));
+

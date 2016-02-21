@@ -20,9 +20,13 @@ function taskAjaxSelectbyTaskGroup_ALL(Web $w) {
     $members = ($taskgroup->getCanIAssign()) ? $members : array(array("Default",""));
 
     // create dropdowns loaded with respective data
-    $ttype = Html::select("task_type",$tasktypes,null);
-    $prior = Html::select("priority",$priority,null);
-    $mem = Html::select("assignee_id",$members,null); // first_
+    //$ttype = Html::select("task_type",$tasktypes,null);
+    $ttype = Html::select("task_type",$tasktypes,$taskgroup->default_task_type);
+    //$prior = Html::select("priority",$priority,null);
+    $prior = Html::select("priority",$priority,$taskgroup->default_priority);
+    //$mem = Html::select("assignee_id",$members,null); // first_
+    array_unshift($members, array("Unassigned","unassigned"));
+    $mem = Html::select("assignee_id",$members,(empty($taskgroup->default_assignee_id)) ? "unassigned" : $taskgroup->default_assignee_id); // first_
     
     $taskgroup_link = $taskgroup->isOwner($w->Auth->user()) ? "<a href=\"".$w->localUrl("task-group/viewmembergroup/".$taskgroup->id)."\">".$taskgroup->title."</a>" : $taskgroup->title; 
     $tasktext = "<table style='width: 100%;'>" .

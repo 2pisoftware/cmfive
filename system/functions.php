@@ -1,17 +1,19 @@
 <?php
+
 /**
  * deduplicates arrays of arrays, something that array_unique can't do.
+ * Given an array of arrays, this function will return an array containing only 
+ * unique arrays having removed any duplicate arrays.
  * 
  * Thanks to http://stackoverflow.com/a/308955/1082633
  * 
  * @param unknown $input
  * @return multitype:
  */
-function array_unique_multidimensional($input)
-{
-	$serialized = array_map('serialize', $input);
-	$unique = array_unique($serialized);
-	return array_intersect_key($input, $unique);
+function array_unique_multidimensional($input) {
+    $serialized = array_map('serialize', $input);
+    $unique = array_unique($serialized);
+    return array_intersect_key($input, $unique);
 }
 
 function humanReadableBytes($input, $rounding = 2, $bytesValue = true) {
@@ -26,6 +28,7 @@ function humanReadableBytes($input, $rounding = 2, $bytesValue = true) {
         $input /= $barrier;
         array_shift($ext);
         if ($ext[0] === end($ext)) {
+			$input = round($input, $rounding);
             return "$input $ext[0]";
         }
     }
@@ -62,11 +65,12 @@ function getFileExtension($contentType) {
  * wihtout having to write
  */
 function isNumber($var) {
-    if (!isset($var))
-        return false;
-    if ($var === null)
-        return false;
-    return is_numeric($var);
+    return (!empty($var) && is_numeric($var));
+//    if (!isset($var))
+//        return false;
+//    if ($var === null)
+//        return false;
+//    return is_numeric($var);
 }
 
 function defaultVal($val, $default = null, $forceNull = false) {
@@ -232,7 +236,7 @@ function startsWith($haystack, $needle) {
     if (empty($haystack) || empty($needle)) {
         return false;
     }
-    
+
     if (is_scalar($needle)) {
         return strpos($haystack, $needle) === 0;
     } else if (is_array($needle) && sizeof($needle) > 0) {
@@ -297,9 +301,8 @@ function getTimeSelect($start = 8, $end = 19) {
 }
 
 function formatDate($date, $format = "d/m/Y", $usetimezone = true) {
-    if (!$date)
-        return null;
-    if (!is_long($date)) {
+    if (!$date) return NULL;
+    if (!is_long($date) && !is_numeric($date)) {
         $date = strtotime(str_replace("/", "-", $date));
     }
     /*
@@ -340,7 +343,7 @@ function formatMoney($format, $number) {
     if (empty($locale['mon_thousands_sep'])) {
         $locale['mon_thousands_sep'] = ",";
     }
-    
+
     preg_match_all($regex, $format, $matches, PREG_SET_ORDER);
 
     foreach ($matches as $fmatch) {
@@ -427,7 +430,7 @@ function recursiveArraySearch($haystack, $needle, $index = null) {
     $it = new RecursiveIteratorIterator($aIt);
 
     while ($it->valid()) {
-        if (((isset($index) && ( $it->key() == $index)) || ( !isset($index))) && ( $it->current() == $needle)) {
+        if (((isset($index) && ( $it->key() == $index)) || (!isset($index))) && ( $it->current() == $needle)) {
             return $aIt->key();
         }
 
@@ -482,24 +485,35 @@ function returncorrectdates(Web &$w, $dm_var, $from_date, $to_date) {
     }
 }
 
-// find a value in a multidimension array
+/**
+ * Find a value in a multidimension array
+ * NOTE: This function uses strict type comparison, with one exception where
+ * a string $value will match it's integer equivalent (i.e. '1' == 1, but '1s' != 1)
+ * 
+ * Setting the value to an integer will match against non-associative array keys of
+ * the same value
+ * 
+ * @param <Mixed> $value
+ * @param <Mixed> $array
+ * @return <boolean> $in_multiarray
+ */
 function in_multiarray($value, $array) {
     if (is_array($array)) {
-        if (in_array($value, $array)) {
+        if (in_array($value, $array, true) || array_key_exists($value, $array)) {
             return true;
         } else {
             foreach ($array as $key => $arr_value) {
-                if (in_multiarray($value, $key)) {
-                    return true;
-                } else {
-                    if (in_multiarray($value, $arr_value)) {
+//                if (in_multiarray($value, $key)) {
+//                    return true;
+//                } else {
+                    if (is_array($arr_value) && in_multiarray($value, $arr_value)) {
                         return true;
                     }
-                }
+//                }
             }
         }
     } else {
-        if ($value == $array) {
+        if ($value === $array) {
             return true;
         }
     }
@@ -514,18 +528,22 @@ function in_modified_multiarray($value, $array, $levels = 3) {
         if (in_array($value, $array)) {
             return true;
         } else {
-            --$levels;
-            if ($levels <= 0)
+			if (--$levels < 0) {
                 return false;
-
+			}
+			
             foreach ($array as $key => $arr_value) {
-                if (in_multiarray($value, $key, $levels)) {
+				if ($value === $key) {
+					return true;
+				}
+				
+                if (is_array($arr_value) && in_modified_multiarray($value, $arr_value, $levels)) {
                     return true;
                 }
             }
         }
     } else {
-        if ($value == $array) {
+        if ($value === $array) {
             return true;
         }
     }
@@ -553,9 +571,9 @@ function AESdecrypt($text, $password) {
  * @param String $end
  * @return string
  */
-function getBetween($content, $start, $end){
+function getBetween($content, $start, $end) {
     $r = explode($start, $content);
-    if (isset($r[1])){
+    if (isset($r[1])) {
         $r = explode($end, $r[1]);
         return $r[0];
     }
@@ -580,4 +598,77 @@ function is_associative_array($array) {
  */
 function is_complete_associative_array($array) {
     return (bool) (count(array_filter(array_keys($array), 'is_string')) == count($array));
+}
+
+/**
+ * Returns whether or not a given number ($subject) is within the bounds
+ * $min and $max. $include is for whether or not to include $min and $max 
+ * in boundary.
+ * 
+ * I.e. If $min = 1, $max = 10 and $subject is 10:
+ *      $include == true will return true (1 <= 10 <= 10 is true)
+ *      $include == false will return false (1 < 10 < 10 is false)
+ * 
+ * @param <float> $subject
+ * @param <float> $min
+ * @param <float> $max
+ * @param <boolean> $include
+ * @return <boolean>
+ */
+function in_numeric_range($subject, $min, $max, $include = true) {
+    // Sanity checks
+    if (!is_numeric($subject) || !is_numeric($min) || !is_numeric($max)) {
+        return false;
+    }
+
+    // Check if bounds given in wrong order
+    // Has effect of checking outside the boundary
+    if ($max < $min) {
+        if (true === $include) {
+            return ($subject <= $min || $subject >= $max);
+        } else {
+            return ($subject < $min || $subject > $max);
+        }
+    }
+    // For cases where for some reason all given vars are the same
+    if ($min === $max && $min === $subject) {
+        return $include;
+    }
+
+    // Check
+    if (true === $include) {
+        return ($subject >= $min && $subject <= $max);
+    } else {
+        return $subject > $min && $subject < $max;
+    }
+}
+
+/**
+ * Class casting
+ * From: http://stackoverflow.com/questions/2226103/how-to-cast-objects-in-php
+ * 
+ * @param string|object $destination
+ * @param object $sourceObject
+ * @return object
+ */
+function cast($destination, $sourceObject) {
+    if (is_string($destination)) {
+        $destination = new $destination();
+    }
+    $sourceReflection = new ReflectionObject($sourceObject);
+    $destinationReflection = new ReflectionObject($destination);
+    $sourceProperties = $sourceReflection->getProperties();
+    foreach ($sourceProperties as $sourceProperty) {
+        $sourceProperty->setAccessible(true);
+        $name = $sourceProperty->getName();
+        $value = $sourceProperty->getValue($sourceObject);
+        if ($destinationReflection->hasProperty($name)) {
+            $propDest = $destinationReflection->getProperty($name);
+            $propDest->setAccessible(true);
+            $propDest->setValue($destination,$value);
+        } else {
+            $destination->$name = $value;
+        }
+    }
+    return $destination;
 }

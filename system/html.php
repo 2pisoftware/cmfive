@@ -45,8 +45,10 @@ class Html {
             }
             
             $buffer .= "<tbody>";
-            foreach($data as $row) {
-                $buffer .= "<tr>";
+            foreach($data as $key => $row) {
+				// add a data-id attribute to each table row
+				$rowId=' data-id="'.$key.'" ';
+				$buffer .= "<tr ".$rowId.">";
                 foreach($row as $column) {
                     if (!is_array($column)) {
                         $buffer .= "<td>{$column}</td>";
@@ -156,6 +158,48 @@ class Html {
         $button->href($href)->text($title)->confirm($confirm)->id($id)->setClass($class)->newtab($newtab)->type($type);
         return $button->__toString();
     }
+    /**
+     * Create an a link styled as a button
+     * */
+    public static function ab($href, $title, $class = null, $id = null,$confirm = null) {
+		$classParam=' button tiny ';
+		if (strlen($class)>0) {
+			$classParam.=$class;
+		} 
+		$classParam=" class='".$classParam."' ";
+		$idParam='';
+		if (strlen($id)>0)  {
+			$idParam=" id='".$id."' ";
+		}
+		$confirmParam='';
+		if (strlen($confirm)>0)  {
+			$confirmParam=" onclick=\"return confirm('".$confirm."')\" ";
+		}
+		
+        return '<a href="'.$href.'" '.$classParam.' '.$idParam.' '.$confirmParam.'>'.$title.'</a>';
+    }
+    
+    /**
+     * Create an a link styled as a button that pops up a reveal dialog
+     * */
+    public static function abox($href, $title, $class = null, $id = null,$confirm = null) {	
+		$classParam=' button tiny ';
+		if (strlen($class)>0) {
+			$classParam.=$class;
+		} 
+		$classParam=" class='".$classParam."' ";
+		$idParam='';
+		if (strlen($id)>0)  {
+			$idParam=" id='".$id."' ";
+		}
+		$confirmParam='';
+		if (strlen($confirm)>0)  {
+			$confirmParam=" onclick='return(\"".$confirm."\");' ";
+		}
+		
+        return '<a href="'.$href.'" data-reveal-id="cmfive-modal" data-reveal-ajax="true" '.$classParam.' '.$idParam.' '.$confirmParam.'>'.$title.'</a>';
+    }
+    
 
     /**
      * Creates a link (or button) which will pop up a colorbox
@@ -166,8 +210,8 @@ class Html {
      * @param <type> $button (O) if true create a buttin instead of a link
      * @param <type> $iframe (O) whether to use an iframe to display the html contents (default: false)
      */
-    public static function box($href, $title, $button = false, $iframe = false, $width = null, $height = null, $param = "isbox", $id = null, $class = null, $confirm = null) {
-        $onclick = Html::boxOnClick($href, $iframe, $width, $height, $param, $confirm,false);
+    public static function box($href, $title, $button = false, $iframe = false, $width = null, $height = null, $param = "isbox", $id = null, $class = null, $confirm = null, $modal_window_id = 'cmfive-modal') {
+        $onclick = Html::boxOnClick($href, $iframe, $width, $height, $param, $confirm, false, $modal_window_id);
         $element = null;
         if ($button) {
             // $tag = "button";
@@ -180,7 +224,7 @@ class Html {
 //        return "<" . $tag . (!empty($id) ? " id=$id " : "") . (!empty($class) ? " class=$class " : "") . ($tag == 'a' ? ' href="#" ' : '') . $onclick . "><span>" . $title . "</span></" . $tag . ">";
     }
 
-    public static function boxOnClick($href, $iframe = false, $width = null, $height = null, $param = "isbox", $confirm = null, $include_tag = true) {
+    public static function boxOnClick($href, $iframe = false, $width = null, $height = null, $param = "isbox", $confirm = null, $include_tag = true, $modal_window_id = 'cmfive-modal') {
         if ($iframe) {
             $width = ", innerWidth:" . $width;
             $height = ", innerHeight:" . $height;
@@ -202,7 +246,7 @@ class Html {
         	$tag_end = "";
         }
         
-        return $tag_start."{$confirm_str}modal_history.push('{$href}'); \$('#cmfive-modal').foundation('reveal', 'open', '{$href}');return false;" . ($confirm ? "}" : "").$tag_end;
+		return $tag_start."{$confirm_str}modal_history.push(&quot;{$href}&quot;); \$(&quot;#{$modal_window_id}&quot;).foundation(&quot;reveal&quot;, &quot;open&quot;, &quot;{$href}&quot;);return false;" . ($confirm ? "}" : "").$tag_end;
     }
 
     /**
@@ -379,7 +423,7 @@ class Html {
         }
         $buffer .= "</div>";
         $buffer .= "<script>$(function(){try{\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})}catch(err){}});</script>";
-        // $buffer .= "<script>$(function(){try{\$('textarea.codemirror').each(function(){CodeMirror.fromTextArea(this, {lineNumbers: true, mode: 'text/html', matchBrackets: true, viewportMargin: Infinity})})}catch(err){}});</script>";
+        $buffer .= "<script>$(function(){try{\$('textarea.codemirror').each(function(){CodeMirror.fromTextArea(this, {lineNumbers: true, mode: 'text/html', matchBrackets: true, viewportMargin: Infinity})})}catch(err){}});</script>";
   
         if (null !== $action) {
             $buffer .= $form->close($submitTitle);
@@ -424,7 +468,7 @@ class Html {
         $buffer .= "<div class='row-fluid small-12 multicolform'>";
         $buffer .= "<div class='row-fluid'>";// "<ul class='small-block-grid-1 medium-block-grid-2 large-block-grid-3 section-body'>";
         foreach ($data as $section => $rows) {
-            $buffer .= "<div class='item'><div class='panel'><h4>{$section}</h4><table>";
+            $buffer .= "<div class='item ".toSlug($section)."'><div class='panel'><h4>{$section}</h4><table>";
             foreach($rows as $row) {
                 
                 foreach($row as $field) {
@@ -449,12 +493,12 @@ class Html {
     //                $buffer .= "<li class='display-row'>";
 
                     // Add title field
-                    $buffer .= "<tr>";
+                    $buffer .= "<tr class='".toSlug($title)."' >";
                     if (!empty($title)) {
                         $buffer .= "<td class='small-6 large-4'><b>{$title}</b></td>";
                     }
 
-                    $buffer .= "<td class='small-6 large-8'>{$value}</td></tr>";
+                    $buffer .= "<td class='small-6 large-8 type_".toSlug($type)."'>{$value}</td></tr>";
                 }
             }
             $buffer .= "</table></div></div>";
@@ -494,7 +538,7 @@ class Html {
         // If form tag is needed print it
         if ($includeFormTag) {
             $class .= " small-12 columns";
-            $form->id($id)->setClass($class)->method($method)->action($action)->target($target);
+            $form->id($id)->name($id)->setClass($class)->method($method)->action($action)->target($target);
                 
             if (in_multiarray("file", $data)) {
                 $form->enctype("multipart/form-data");
@@ -532,7 +576,8 @@ class Html {
                     if (!empty($validation[$name])) {
                         if (in_array("required", $validation[$name])) {
                             $required = "required";
-                        }
+                            $title .= ' <small>Required</small>';
+                        } 
                     }
 
                     $readonly = "";
@@ -554,6 +599,7 @@ class Html {
                     switch($type) {
                         case "text":
                         case "password":
+						case "email":
                             $size = !empty($field[4]) ? $field[4] : null;
                             $buffer .= '<input' . $readonly . ' style="width:100%;" type="' . $type . '" name="' . $name . '" value="' . htmlspecialchars($value) . '" size="' . $size . '" id="' . $name . '" ' . $required . " />";
                         break;
@@ -880,22 +926,23 @@ class Html {
         // See functions.php for implementation of isNumber
         // Prepare buffer
         $buf = "<ul class='pagination'>";
-        if (isNumber($currentpage) and isNumber($numpages) and isNumber($pagesize) and isNumber($totalresults)) {
+        if (isNumber($currentpage) && isNumber($numpages) && isNumber($pagesize) && isNumber($totalresults)) {
             // Check that we're within range
-            if ($currentpage > 0 and $currentpage <= $numpages and $numpages > 1) {
+            if ($currentpage > 0 && $currentpage <= $numpages && $numpages > 1) {
 
                 // Build pagination links
                 for ($page = 1; $page <= $numpages; $page++) {
-                    $buf .= "<li>";
-
                     // Check if the current page
                     if ($currentpage == $page) {
-                        $buf .= "<a href='#' class='active'>$page</a>";
+                        $buf .= "<li class='current'>";
                     } else {
-                        $buf .= "<a href='{$baseurl}";
-                        $buf .= (strpos($baseurl, "?") == 0 ? "?" : "&");
-                        $buf .= "{$pageparam}={$page}&{$pagesizeparam}={$pagesize}&{$totalresultsparam}={$totalresults}'>" . $page . "</a>";
-                    }
+						$buf .= "<li>";
+					}
+					
+					$buf .= "<a href='{$baseurl}";
+					$buf .= (strpos($baseurl, "?") == 0 ? "?" : "&");
+					$buf .= "{$pageparam}={$page}&{$pagesizeparam}={$pagesize}&{$totalresultsparam}={$totalresults}'>" . $page . "</a>";
+
                     $buf .= "</li>";
                 }
             }

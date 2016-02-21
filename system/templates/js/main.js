@@ -2,6 +2,147 @@
 function selectAutocompleteCallback(event, ui) {
 }
 
+/*
+	Global file upload widget
+	Drag and drop files on any page
+*/
+var globalFileUpload = {
+	//Max upload size in bytes, should be set to php max upload size
+	MAXUPLOAD: 2097152,
+	filesToUpload: [],
+	dragTimer: null,
+	objectClass: null,
+	objectId: null,
+	//The main drop target the global file drop overlay
+	dropTarget: null,
+	targetDragLeave: function(event) {
+		event.preventDefault();
+		event.stopPropagation();
+	},
+	targetDragOver: function(event) {
+		window.clearTimeout(globalFileUpload.dragTimer);
+		event.preventDefault();
+		event.stopPropagation();
+	},
+	targetDrop: function(event) {
+		event.preventDefault();
+		event.stopPropagation();
+		$(globalFileUpload.dropTarget).hide();
+		jQuery('.global_file_drop_overlay_loading').show();
+		jQuery('.global_file_drop_overlay_init').hide();
+		var dt = event.dataTransfer;
+		var files = dt.files;
+		globalFileUpload.handleFiles(files);
+		jQuery(globalFileUpload.dropTarget).hide();
+	},
+	init: function() {
+		if(jQuery('.enable_drop_attachments').length === 0) {
+			return;
+		}
+		globalFileUpload.objectClass = jQuery('.enable_drop_attachments').data('object');
+		globalFileUpload.objectId = jQuery('.enable_drop_attachments').data('id');
+		globalFileUpload.dropTarget = document.getElementById('global_file_drop_area');
+		document.getElementsByTagName('body')[0].addEventListener('dragenter', function(e) {
+			e.preventDefault();
+			var dt = e.dataTransfer;
+			if(dt.types != null && (dt.types.indexOf ? dt.types.indexOf('Files') != -1 : dt.types.contains('application/x-moz-file'))) {
+				jQuery(globalFileUpload.dropTarget).show();
+				window.clearTimeout(globalFileUpload.dragTimer);
+			}
+		}, false);
+		document.getElementsByTagName('body')[0].addEventListener('dragleave', function(e) {
+			e.preventDefault();
+			globalFileUpload.dragTimer = window.setTimeout(function() {
+				jQuery(globalFileUpload.dropTarget).hide();
+			}, 500);
+		}, false);
+		globalFileUpload.dropTarget.addEventListener('dragexit', globalFileUpload.targetDragLeave, false);
+		globalFileUpload.dropTarget.addEventListener('dragover', globalFileUpload.targetDragOver, false);
+		globalFileUpload.dropTarget.addEventListener('drop', globalFileUpload.targetDrop, false);
+	},
+	handleFiles: function(files) {
+		if (files) {
+			var error = true;
+			$.each(files,function(key,file) {
+				var k = globalFileUpload.filesToUpload.push(file);
+				globalFileUpload.filesToUpload[k-1].self_id = k;
+				if(file.size > globalFileUpload.MAXUPLOAD) {
+					globalFileUpload.filesToUpload[k-1].error = true;
+				} else {
+					error = false;
+				}
+			});
+			if(!error) {
+				jQuery('.global_file_drop_overlay').show();
+				globalFileUpload.uploadFiles();
+			} else {
+				$('.global_file_drop_overlay_loading').hide();
+				$('.global_file_drop_overlay_init').show();
+			}
+		}
+	},
+	uploadFiles: function() {
+		for(i in globalFileUpload.filesToUpload) {
+			if(globalFileUpload.filesToUpload[i] != undefined) {
+				var file = globalFileUpload.filesToUpload[i];
+				var parts;
+				var mime=file.type;
+				var blob=new Blob([file],{type : mime});
+				var reader = new FileReader();
+				reader.key = parseInt(i);
+				reader.fileData = file;
+				reader.onload = function(event) {
+					var fd = {};
+					var reader = this;
+					var file = reader.fileData;
+					fd["fname"] = file.name;
+					fd["key"] = reader.key;
+					fd["description"] = '';
+					fd["title"] = file.name;
+					fd["file"] = event.target.result;
+					fd[$('#token').prop('name')] = $('#token').val();
+					if(file.error) {
+						globalFileUpload.filesToUpload.splice(reader.key, 1);
+						return;
+					}
+					$.ajax({
+						xhr: function() {
+							var xhr = new window.XMLHttpRequest();
+							xhr.upload.addEventListener("progress", function(evt) {
+								if (evt.lengthComputable) {
+									var percentComplete = Math.round(evt.loaded / evt.total * 100);
+									if(percentComplete == 100) {
+										$('.global_file_drop_overlay_loading h4').text('Processing files, please wait...');
+									} else {
+										$('.global_file_drop_overlay_loading h4').text('Uploading ('+percentComplete+'%)');
+									}
+								}
+						   }, false);
+
+						   return xhr;
+						},
+						type: 'POST',
+						url: '/file/new/'+globalFileUpload.objectClass+'/'+globalFileUpload.objectId,
+						data: fd,
+						dataType: 'json',
+						complete: function(data) {
+							var key = parseInt(data.responseJSON.key);
+							globalFileUpload.filesToUpload.splice(key, 1);
+							if(globalFileUpload.filesToUpload.length === 0) {
+								jQuery('.global_file_drop_overlay').hide();
+								window.location.reload();
+								jQuery('.global_file_drop_overlay_loading').hide();
+								jQuery('.global_file_drop_overlay_init').show();
+							}
+						}
+					});
+				};
+				reader.readAsDataURL(blob);
+			}
+		}
+	}
+}
+
 function changeTab(hash) {
     if (hash.length > 0) {
         $(".tab-body > div").each(function() {
@@ -54,7 +195,9 @@ function bindCodeMirror() {
                     mode: 'text/html',
                     matchBrackets: true,
                     autoCloseTags: true,
-                    wordWrap: true
+                    wordWrap: true,
+					viewportMargin: Infinity,
+					
                 });
                 if (codeInstanceCount < (maxCodeInstances - 1)) {
                     codeInstanceCount++;

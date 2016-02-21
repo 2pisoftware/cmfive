@@ -72,6 +72,7 @@ class AdminService extends DbService {
         if ($title) {
             $w->ctx("title", $title);
         }
+		
         $nav = $prenav ? $prenav : array();
         if ($w->Auth->loggedIn()) {
             $w->menuLink("admin/users", "List Users", $nav);
@@ -83,7 +84,11 @@ class AdminService extends DbService {
             $w->menuLink("admin/printqueue", "Print Queue", $nav);
             $w->menuLink("admin/databasebackup", "Backup Database", $nav);
             $w->menuLink("admin/composer", "Install/Update Composer", $nav, null, "_blank");
+            $w->menuLink("admin/email", "Email", $nav);
+            $w->menuLink("admin-migration", "Migrations", $nav);
+			$w->menuLink("admin-file", "File transfer", $nav);
         }
+		
         $w->ctx("navigation", $nav);
         return $nav;
     }

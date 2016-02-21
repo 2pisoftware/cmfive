@@ -10,18 +10,20 @@ function groupmember_GET(Web $w)
 
 	$users = $w->Auth->getUsersAndGroups();
 
-	foreach ($users as $user)
-	{
+	$select = [0 => [], 1 => []];
+	foreach ($users as $user) {
+            // We do not list ourselves as an option 
+            if ($user->id != $option["group_id"]) {
 		$name = $user->is_group == 1 ? strtoupper($user->login) : $user->getContact()->getFullName();
-
-		$select[$user->is_group][$name] = array($name,$user->id);
+		$select[!empty($user->is_group)][$name] = array($name, $user->id);
+            }
 	}
+	
 	ksort($select[0]);
 	ksort($select[1]);
 
-	$template['New Member'] = array(array(array("Select Member: ","select","member_id",null,array_merge($select[0],$select[1]))));
-	if ($w->Auth->user()->is_admin)
-	{
+	$template['New Member'] = [[["Select Member: ", "select", "member_id", null, $select[0] + $select[1]]]];
+	if ($w->Auth->user()->is_admin) {
 		$template['New Member'][0][] = array("Owner","checkbox","is_owner");
 	}
 		

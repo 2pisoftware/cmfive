@@ -41,14 +41,14 @@ EOF;
 
     // return the comment for display and edit
     $w->setLayout(null);
-    $w->out(Html::form($form, $w->localUrl("/admin/comment/{$p["comment_id"]}/{$p["tablename"]}/{$p["object_id"]}"), "POST", "Save"));
+    $w->out(Html::form($form, $w->localUrl("/admin/comment/{$comment_id}/{$p["tablename"]}/{$p["object_id"]}"), "POST", "Save"));
 }
 
 function comment_POST(Web $w){
     $p = $w->pathMatch("comment_id", "tablename","object_id");
     $comment_id = intval($p["comment_id"]);
     
-    $comment = $comment_id > 0 ? $w->Comment->getComment($comment_id) : new Comment($w);
+    $comment = ($comment_id > 0 ? $w->Comment->getComment($comment_id) : new Comment($w));
     if ($comment === null){
         $comment = new Comment($w);
     }

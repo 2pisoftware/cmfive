@@ -1,11 +1,24 @@
 <div class="tabs">
     <div class="tab-head">
         <a href="#details">Task Details</a>
-        <?php if (!empty($task->id)) : ?>
-            <a href="#timelog">Time Log</a>
-            <a href="#comments">Comments</a>
-            <a href="#attachments">Attachments</a>
+		<?php if (!empty($task->id)) :
+            /*
+             partial template files changed to incorporate a class for each counting of objects
+            ./system/modules/file/partials/templates/listattachments.tpl.php
+            ./system/modules/timelog/partials/templates/listtimelog.tpl.php
+             */
+        ?>
+            <a href="#timelog">Time Log <span id='total_timelogs' class='total_number'></span></a>
+            <a href="#comments">Comments <span id='total_comments' class='total_number'></span></a>
+            <a href="#attachments">Attachments <span id='total_attachments' class='total_number'></span></a>
+
             <?php if ($task->getCanINotify()):?><a href="#notification">Notifications</a><?php endif;?>
+			<?php 
+				$tab_headers = $w->callHook('core_template', 'tab_headers', $task); 
+				if (!empty($tab_headers)) {
+					echo implode('', $tab_headers);
+				}
+			?>
         <?php endif; ?>
     </div>
     <div class="tab-body">
@@ -13,12 +26,14 @@
             <div class="row-fluid clearfix">
                 <div class="row-fluid columns">
                     <?php 
-                    	echo $w->Favorite->getFavoriteButton($task->id,"Task")."&nbsp;";
+                    	echo $w->Favorite->getFavoriteButton($task);
                         // Note the extra buttons only show when the task_type object
                         $tasktypeobject = $task->getTaskTypeObject();
                         echo !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null; 
-                    ?>
-                    <?php echo (!empty($task->id) && $task->canDelete($w->Auth->user())) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), "Delete", "Are you sure you want to delete this task?" ) : ''; ?>
+                    	//echo $w->Tag->getTagButton($task->id,"Task")."&nbsp;";
+                        echo (!empty($task->id) && $task->canDelete($w->Auth->user())) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), "Delete", "Are you sure you want to delete this task?" ) : ''; 
+                        echo $w->partial('listTags',['object' => $task], 'tag');
+					?>
                 </div>
                 <div class="row-fluid clearfix">
                     <div class="small-12 large-9">
@@ -34,20 +49,7 @@
         </div>
         <?php if (!empty($task->id)) : ?>
             <div id="timelog">
-                <?php 
-                	$tg = $task->getTaskGroup();
-                	// time log entries can be added by the user who is currently assigned to the task
-                	// OR by any taskgroup member who can assign tasks (depending on member role and taskgroup
-                	// can_assign setting
-                    if (($task->assignee_id == $w->Auth->user()->id) || (!empty($tg) && ($tg->getCanIAssign()))) :
-			             echo Html::box(WEBROOT."/task/addtime/".$task->id," Add Time Log entry ",true);
-                    else : ?>
-                        <p>Note: you can only add time logs when you can assign tasks.</p>
-                    <?php endif;
-                    if (!empty($timelog)) {
-                        echo $timelog;
-                    }
-                ?>
+				<?php echo $w->partial("listtimelog", ["object_class" => "Task", "object_id" => $task->id, "redirect" => "task/edit/{$task->id}#timelog"], "timelog"); ?>
             </div>
             <div id="comments">
                 <?php echo $w->partial("listcomments",array("object"=>$task,"redirect"=>"task/edit/{$task->id}#comments"), "admin"); ?>
@@ -63,6 +65,12 @@
                 <?php echo $tasknotify;?>
             </div>
             <?php endif;?>
+			<?php
+				$tab_content = $w->callHook('core_template', 'tab_content', ['object' => $task, 'redirect_url' => '/task/edit/' . $task->id]); 
+				if (!empty($tab_content)) {
+					echo implode('', $tab_content);
+				}
+			?>
         <?php endif; ?>
     </div>
 </div>
@@ -74,7 +82,11 @@
 
     $(document).ready(function() {
         bindTypeChangeEvent();
-        
+		
+		$('#total_timelogs').text($('.timelog').length);
+        $('#total_comments').text($('.comment_section').length);
+        $('#total_attachments').text($('.attachment').length);
+
         getTaskGroupData(<?php echo !empty($task->task_group_id) ? $task->task_group_id : $w->request('gid'); ?>);
         $("#task_type").trigger("change");
     });

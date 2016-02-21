@@ -21,6 +21,7 @@ function exereport_ALL(Web &$w) {
     $btnxml = Html::b($urlxml, "Export as XML");
     $btnrun = Html::b($runurl, "Edit Report Parameters");
     $btnview = Html::b($viewurl, "Edit Report");
+	$btnpdf = Html::b($repurl . $strREQ . "&format=pdf", "Export as PDF");
     $results = "";
     // if there is a report ID in the URL ...
     if (!empty($p['id'])) {
@@ -47,7 +48,7 @@ function exereport_ALL(Web &$w) {
             // if we have records, present them in the requested format
             else {
             	// default to a web page
-            	$report_template = $w->Report->getReportTemplate($w->request('format'));
+            	$report_template = $w->Report->getReportTemplate($w->request('template'));
             	
                 // Below ifs will no longer work
                 $request_format = $w->request('format');
@@ -59,7 +60,7 @@ function exereport_ALL(Web &$w) {
                 // as a PDF file for download
                 elseif ($request_format == "pdf") {
                     $w->setLayout(null);
-                    $w->Report->exportpdf($tbl, $rep->title);
+                    $w->Report->exportpdf($tbl, $rep->title, $report_template);
                 }
                 // as XML document for download
                 elseif ($request_format == "xml") {
@@ -164,6 +165,7 @@ function exereport_ALL(Web &$w) {
                     // display export and function buttons
                     $w->ctx("exportcsv", $btncsv);
                     $w->ctx("exportxml", $btnxml);
+					$w->ctx("exportpdf", $btnpdf);
                     $w->ctx("btnrun", $btnrun);
                     $w->ctx("showreport", $results);
 

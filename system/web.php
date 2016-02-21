@@ -1,15 +1,36 @@
 <?php
+// ========= Session ========================
+ini_set('session.gc_maxlifetime', 60 * 60 * 6);
+
+//========== Constants =====================================
+define("CMFIVE_VERSION", "0.8.3");
+
+define("ROOT_PATH", str_replace("\\", "/", getcwd()));
+define("SYSTEM_PATH", str_replace("\\", "/", getcwd() . '/system'));
+
+define("LIBPATH", str_replace("\\", "/", getcwd() . '/lib'));
+define("SYSTEM_LIBPATH", str_replace("\\", "/", getcwd() . '/system/lib'));
+define("FILE_ROOT", str_replace("\\", "/", getcwd() . "/uploads/")); // dirname(__FILE__)
+define("MEDIA_ROOT", str_replace("\\", "/", dirname(__FILE__) . "/../media/"));
+define("ROOT", str_replace("\\", "/", dirname(__FILE__)));
+define("SESSION_NAME", "CM5_SID");
+
+set_include_path(get_include_path() . PATH_SEPARATOR . LIBPATH);
+set_include_path(get_include_path() . PATH_SEPARATOR . SYSTEM_LIBPATH);
+
+require_once __DIR__ ."/db.php";
+require_once __DIR__ ."/html.php";
+require_once __DIR__ ."/functions.php";
+require_once __DIR__ ."/classes/CSRF.php";
+require_once __DIR__ ."/classes/Config.php";
+require_once __DIR__ ."/classes/History.php";
 
 // Load system Composer autoloader
 if (file_exists(__DIR__ . "/composer/vendor/autoload.php")) {
     require "composer/vendor/autoload.php";
 }
 
-require_once "html.php";
-require_once "functions.php";
-require_once "classes/CSRF.php";
-require_once "classes/Config.php";
-require_once "classes/History.php";
+
 
 class PermissionDeniedException extends Exception {
     
@@ -51,6 +72,8 @@ class Web {
     public $_partialsdir = "partials";
     public $db;
     public $_isFrontend = false;
+    
+    private $_classdirectory; // used by the class auto loader
 
     public $_scripts = array();
     public $_styles = array();
@@ -73,43 +96,75 @@ class Web {
         $this->_module = null;
         $this->_submodule = null;
         $this->_hooks = array();
-        $this->_webroot = "http://" . $_SERVER['HTTP_HOST'];
+        
+        // if using IIS then value is "off" for non ssl requests
+        if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == "off") {
+        	$this->_webroot = "http://" . $_SERVER['HTTP_HOST'];
+        } else {
+        	$this->_webroot = "https://" . $_SERVER['HTTP_HOST'];
+        }
         $this->_actionMethod = null;
-        
-        $this->loadConfigurationFiles();
-        spl_autoload_register(array($this, 'modelLoader'));
-        
-        define("WEBROOT", $this->_webroot);
+
+		// The order of the following three lines are important
+		spl_autoload_register(array($this, 'modelLoader'));
+		defined("WEBROOT") ||  define("WEBROOT", $this->_webroot);
+		$this->loadConfigurationFiles();
     }
 
     private function modelLoader($className) {
+    	// 1. check if class directory has to be loaded from cache
+    	$classdirectory_cache_file = ROOT_PATH."/cache/classdirectory.cache";
+    	
+    	if (empty($this->_classdirectory) && file_exists($classdirectory_cache_file)) {
+    		require_once $classdirectory_cache_file;
+    	}
+    	// 2. if filename is stored in $this->_classdirectory
+    	if (!empty($this->_classdirectory[$className])) {
+    		if (file_exists($this->_classdirectory[$className])) {
+    			require_once $this->_classdirectory[$className];
+    			return true;
+    		}
+    	}
+    	// 3. class has to be found the hard way
         $modules = $this->modules();
+        
+        // create the class cache file
+        if (!file_exists($classdirectory_cache_file)) {
+        	file_put_contents($classdirectory_cache_file,"<?php\n");
+        }
         foreach ($modules as $model) {
             // Check if the hosting module is active before we autoload it
             if (Config::get("{$model}.active") === true) {
                 $file = $this->getModuleDir($model) . 'models/' . ucfirst($className) . ".php";
                 if (file_exists($file)) {
-                    include $file;
+                    require_once $file;
+                    // add this class file to the cache file
+                    file_put_contents($classdirectory_cache_file,'$this->_classdirectory["'.$className.'"]="'.$file.'";'."\n", FILE_APPEND);
                     return true;
                 } else {
                     // Try a lower case version
                     $file = $this->getModuleDir($model) . 'models/' . $className . ".php";
                     if (file_exists($file)) {
-                        include $file;
+                        require_once $file;
+                        // add this class file to the cache file
+                    	file_put_contents($classdirectory_cache_file,'$this->_classdirectory["'.$className.'"]="'.$file.'";'."\n", FILE_APPEND);
                         return true;
                     }
                 }
             }
         }
-        $this->service('log')->debug("Class " . $file . " not found.");
+        // $this->Log->debug("Class " . $file . " not found.");
         return false;
     }
 
     /**
+     * This function returns an array of the $_SERVER['REQUEST_URI'] parts split by /
+     * Where the $_SERVER['SCRIPT_NAME'] split by / has parts in common at the beginning, these are removed
+     * eg /site/users/do/2 + site/index.php  => [users,do,2]
      * Thanks to:
      * http://www.phpaddiction.com/tags/axial/url-routing-with-php-part-one/
      */
-    private function _getCommandPath($url = null) {    	
+    public function _getCommandPath($url = null) {    	
         $uri = explode('?', empty($url) ? $_SERVER['REQUEST_URI'] : $url); // get rid of parameters
         $uri = $uri[0];
         // get rid of trailing slashes
@@ -118,6 +173,7 @@ class Web {
         }
         $requestURI = explode('/', $uri);
         $scriptName = explode('/', $_SERVER['SCRIPT_NAME']);
+        
         for ($i = 0; $i < sizeof($scriptName); $i++) {
             // Checking is these vars are set makes the logout function not work
             // So we can just supress the warnings
@@ -192,26 +248,42 @@ class Web {
         return ($aw === $bw ? 0 : ($aw < $bw ? 1 : -1));
     }
     
+	function install() {
+		$this->_paths = $this->_getCommandPath();
+		if (!in_array($this->_paths[0], ["install", "install-steps"])) {
+			$this->redirect("/install-steps/details");
+		} else {
+			$this->start(false);
+		}
+	}
+	
     /**
      * start processing of request
      * 1. look at the request parameter if the action parameter was set
      * 2. if not set, look at the pathinfo and use first
      */
-    function start() {
-        $this->initDB();
+    function start($init_database = true) {
+		if ($init_database) {
+			$this->initDB();
+		}
 
         // start the session
         // $sess = new SessionManager($this);
-        session_name(SESSION_NAME);
-        session_start();
-
+        try {
+			session_name(SESSION_NAME);
+			session_start();
+		} catch (Exception  $e) {
+			$this->Log->info("Error starting session ".$e->getMessage());
+		}
         // Initialise the logger (needs to log "info" to include the request data, see LogService __call function)
         $this->Log->info("info");
         
         // Generate CSRF tokens and store them in the $_SESSION
-        CSRF::getTokenID();
-        CSRF::getTokenValue();
-
+        if (Config::get('system.csrf.enabled') === true) {
+            CSRF::getTokenID();
+            CSRF::getTokenValue();
+        }
+        
         $_SESSION['last_request'] = time();
 
         //$this->debug("Start processing: ".$_SERVER['REQUEST_URI']);        
@@ -291,11 +363,16 @@ class Web {
         $actionmethods[] = $this->_action . '_ALL';
 
         // Check/validate CSRF token 
-        $this->validateCSRF();
-        // Taking out the CSRF regeneration until more testing can be done
-        // if ($this->_requestMethod == 'post') {
-        //     CSRF::regenerate();
-        // }
+        if (Config::get('system.csrf.enabled') === true) {
+            $allowed = Config::get('system.csrf.protected');
+            if (!empty($allowed[$this->_module]) || (!empty($this->_submodule) && !empty($allowed[$this->_module . '-' . $this->_submodule]))) {
+                if (in_array($this->_action, $allowed[$this->_module]) || (!empty($this->_submodule) && in_array($this->_action, $allowed[$this->_module . '-' . $this->_submodule]))) {
+                    // If we get here then we are configured to enforce CSRF checking
+                    $this->Log->debug("Checking CSRF");
+                    $this->validateCSRF();
+                }
+            }
+        }
         
         //
         // if a module file for this url exists, then start processing
@@ -350,7 +427,7 @@ class Web {
             // send headers first
             if ($this->_headers) {
                 foreach ($this->_headers as $key => $val) {
-                    header($key . ': ' . $val);
+                    $this->header($key . ': ' . $val);
                 }
             }
             $body = null;
@@ -374,8 +451,6 @@ class Web {
         } else {
             $this->notFoundPage();
         }
-        
-        exit();
     }
 
     /**
@@ -406,7 +481,12 @@ class Web {
      * 
      * @param unknown $type eg. before / after
      */
-    private function _callWebHooks($type) {
+    public function _callWebHooks($type) {
+		// If there isn't a database connection, this will crash
+		if (empty($this->db)) {
+			return;
+		}
+		
         $request_method = strtolower($this->_requestMethod);
         
         // call hooks, generic to specific
@@ -437,7 +517,7 @@ class Web {
     /**
      * Connect to the database
      */
-    private function initDB() {
+    public function initDB() {
     	try {
         	$this->db = new DbPDO(Config::get("database"));
     	} catch (Exception $ex) {
@@ -457,7 +537,20 @@ class Web {
         return Config::get("{$module}.{$key}");
     }
 
-    private function loadConfigurationFiles() {
+    public function loadConfigurationFiles() {
+    	$cachefile = ROOT_PATH . "/cache/config.cache";
+    	
+    	// check for config cache file. If exists, then load the config
+    	// from this file!
+    	if (file_exists($cachefile)) {
+    		// load the cache file
+    		Config::fromJson(file_get_contents($cachefile));
+    		return;
+    	}
+    	
+    	// first load the system config file
+    	require SYSTEM_PATH . "/config.php";
+    	
         // Load System config first
         $baseDir = SYSTEM_PATH . '/modules';
         $this->scanModuleDirForConfigurationFiles($baseDir);
@@ -465,11 +558,24 @@ class Web {
         // Load project module config second
         $baseDir = ROOT_PATH . '/modules';
         $this->scanModuleDirForConfigurationFiles($baseDir);
+        
+        // load the root level config file last because it can override everything
+	    if (!file_exists("config.php")) {
+			$this->install();
+		}
+        require ROOT_PATH . "/config.php";
+        
+        // if config cache file doesn't exist, then
+        // create it new
+		if(!is_dir(ROOT_PATH . '/cache')) {
+			mkdir(ROOT_PATH . '/cache');
+		}
+        file_put_contents($cachefile, Config::toJson());
     }
 
     // Helper function for the above, scans a directory for config files in child folders
     private function scanModuleDirForConfigurationFiles($dir = "") {
-        // Check that dir is dir
+		// Check that dir is dir
         if (is_dir($dir)) {
 
             // Scan directory
@@ -491,14 +597,12 @@ class Web {
         }
     }
 
-    private function validateCSRF() {
+    public function validateCSRF() {
         // Check for CSRF token and that we have a valid request method
-        if (Config::get("system.checkCSRF") == true && !CSRF::isValid($this->_requestMethod)) {
-            if (!CSRF::inHistory($this->_requestMethod)) {
+        if (Config::get("system.csrf.enabled") == true && !CSRF::isValid($this->_requestMethod)) {
+            if (!CSRF::inHistory()) {
                 @$this->service('log')->error("System: CSRF Detected from " . $this->requestIpAddress());
-                header("HTTP/1.0 403 Forbidden");
-                echo "Cross site request forgery detected. Your IP has been logged";
-                die();
+                throw new CSRFException("Cross site request forgery detected. Your IP has been logged");
             } else {
                 $this->msg("Duplicate form submission detected, make sure you only click buttons once");
             }
@@ -532,8 +636,11 @@ class Web {
     }
 
     /**
-     * Check if the currently logged in user
-     * has access to this path
+     * Check if the currently logged in user has access to this path
+     * Return true if access is allowed
+     * Redirect back a page or logout and show an error if access is denied
+     * 
+     * Save LAST_ALLOWED_URI to session
      *
      * @param <type> $msg
      * @return <type>
@@ -552,8 +659,9 @@ class Web {
             if (!$this->Auth->allowed($path)) {
                 $this->Log->info("System: Access Denied to " . $path . $usrmsg . " from " . $this->requestIpAddress());
                 // redirect to the last allowed page 
-                if ($this->Auth->allowed($_SESSION['LAST_ALLOWED_URI'])) {
-                    $this->error($msg, $_SESSION['LAST_ALLOWED_URI']);
+                $lastAllowed=(is_array($_SESSION) && array_key_exists('LAST_ALLOWED_URI',$_SESSION)) ? $_SESSION['LAST_ALLOWED_URI'] : '';
+                if ($this->Auth->allowed($lastAllowed)) {
+                    $this->error($msg, $lastAllowed);
                 } else {
                     // Logout user
                     $this->sessionDestroy();
@@ -660,22 +768,48 @@ class Web {
         }
         return $mime;
     }
-
+	
+	/**
+	 * Returns the mime type of a binary string, only works with the finfo
+	 * extension enabled
+	 * 
+	 * @param <String> resource_string
+	 * @return <String> mimetype
+	 */
+	function getMimetypeFromString($resource_string) {
+		$mime = 'text/plain';
+		
+		if (function_exists("finfo_open")) {
+        	$finfo = finfo_open(FILEINFO_MIME_TYPE);
+        	$mime = finfo_buffer($finfo, $resource_string);
+        	finfo_close($finfo);
+        }
+		
+		return $mime;
+	}
+	
     /**
      * Send the contents of the file to the client browser
      * as raw data.
      * 
      * @param string $filename
+	 * @deprecated deprecated since 0.8.5
      */
     function sendFile($filename) {
-        if (file_exists($filename)) {
-            $filesystem = $this->File->getFilesystem(dirname($filename));
-            $file = $this->File->getFileObject($filesystem, $filename);
-            header("Content-Type: " . $this->getMimetype($filename));
-            echo $file->getContent();
-        } else {
-            header("HTTP/1.1 404 Not Found");
-        }
+		$filename = str_replace(FILE_ROOT, "", $filename);
+		
+		$filesystem = $this->File->getFilesystem(dirname($filename));
+		$file = $this->File->getFileObject($filesystem, $filename);
+		
+		if ($file->exists()) {
+			$content = $file->getContent();
+			$this->header("Content-Type: " . $this->getMimetypeFromString($content)); // $this->getMimetype($filename));
+			echo $content;
+		} else {
+			$this->header("HTTP/1.1 404 Not Found");
+			echo basename($filename) . " not found.";
+		}
+		
         exit;
     }
 
@@ -826,10 +960,10 @@ class Web {
             echo "The page requested could not be found.";
         } else {
             if ($this->templateExists($this->_notFoundTemplate)) {
-                header("HTTP/1.0 404 Not Found");
+                $this->header("HTTP/1.0 404 Not Found");
                 echo $this->fetchTemplate($this->_notFoundTemplate);
             } else {
-                header("HTTP/1.0 404 Not Found");
+                $this->header("HTTP/1.0 404 Not Found");
                 echo '<p align="center">Sorry, page not found.</p>';
             }
         }
@@ -889,7 +1023,6 @@ class Web {
         // This function will need to reject service calls when the active flag is false
         // To do this we need to check the config for the module housing the service call
         // As the service may not be the module, see Log in Main
-         
         $name = ucfirst($name);
         if (!key_exists($name, $this->_services)) {
             $cname = $name . "Service";
@@ -907,6 +1040,7 @@ class Web {
 //                throw new Exception("Class $name not found!");
             }
         }
+		
         return $this->_services[$name];
     }
 
@@ -1026,19 +1160,20 @@ class Web {
      * @param String module
      * @param String $function
      * @param Mixed $data
-     * @return anything that the hook function wants to return
+     * @return an array of return values from all functions that answer to this hool
      */
     public function callHook($module, $function, $data = null) {
-        if (empty($module) or empty($function)) {
+        if (empty($module) || empty($function)) {
             return null;
         }
 
         // Build _hook registry if empty
         if (empty($this->_hooks)) {
-            foreach ($this->modules() as $modulename) {
+           foreach ($this->modules() as $modulename) {
             	// only include active modules!
             	if (Config::get("$modulename.active") !== false) {
 	                $hooks = Config::get("{$modulename}.hooks");
+	               
 	                if (!empty($hooks)) {
 	                    foreach ($hooks as $hook) {
 	                        $this->_hooks[$hook][] = $modulename;
@@ -1047,7 +1182,6 @@ class Web {
             	}
             }
         }
-        
         // Check that the module calling has subscribed to hooks
         if (!array_key_exists($module, $this->_hooks)) {
             return null;
@@ -1057,7 +1191,6 @@ class Web {
         if (Config::get("$module.active") === false) {
             return null;
         }
-        
         // Loop through each registered module to try and invoke the function
         $buffer = array();
         foreach ($this->_hooks[$module] as $toInvoke) {
@@ -1096,6 +1229,7 @@ class Web {
         $this->_layout = $l;
     }
 
+	/** TODO - Fix this to GET value **/
     function getLayout($l) {
         $this->_layout = $l;
     }
@@ -1124,13 +1258,12 @@ class Web {
      */
     function templateExists($name) {
         if ($this->_submodule) {
-            $paths[] = implode("/", array($this->getModuleDir($this->_module), $this->_templatePath, $this->_submodule));
+            $paths[] = implode("/", array(rtrim($this->getModuleDir($this->_module),'/'), $this->_templatePath, $this->_submodule));
         }
-        $paths[] = implode("/", array($this->getModuleDir($this->_module), $this->_templatePath));
-        $paths[] = implode("/", array($this->getModuleDir($this->_module)));
+        $paths[] = implode("/", array(rtrim($this->getModuleDir($this->_module),'/'), $this->_templatePath));
+        $paths[] = implode("/", array(rtrim($this->getModuleDir($this->_module),'/')));
         $paths[] = implode("/", array($this->_templatePath, $this->_module));
         $paths[] = $this->_templatePath;
-        
         // Add system fallback
         $paths[] = SYSTEM_PATH . "/" . $this->_templatePath;
 
@@ -1146,7 +1279,7 @@ class Web {
                 $names[] = $this->_module;
             }
         }
-
+        
         // we need to find a template from a combination of paths and names
         // in the above arrays from the most specific to the most broad
         $template = null;
@@ -1242,22 +1375,29 @@ class Web {
      */
     function pathMatch() {
         $match = array();
-        for ($i = 0; $i < func_num_args(); $i++) {
-            $param = func_get_arg($i);
+		
+		$func_num_args = func_num_args();
+		if ($func_num_args > 0) {
+			for ($i = 0; $i < $func_num_args; $i++) {
+				$param = func_get_arg($i);
 
-            $val = !empty($this->_paths[$i]) ? urldecode($this->_paths[$i]) : null;
+				$val = !empty($this->_paths[$i]) ? urldecode($this->_paths[$i]) : null;
 
-            if (is_array($param)) {
-                $key = $param[0];
-                if (is_null($val) && isset($param[1])) {
-                    $val = $param[1]; // use default parameter
-                }
-            } else {
-                $key = $param;
-            }
-            $this->ctx($key, $val);
-            $match[$key] = $val;
-        }
+				if (is_array($param)) {
+					$key = $param[0];
+					if (is_null($val) && isset($param[1])) {
+						$val = $param[1]; // use default parameter
+					}
+				} else {
+					$key = $param;
+				}
+				$this->ctx($key, $val);
+				$match[$key] = $val;
+				$match[$i] = $val;
+			}
+		} else {
+			return $this->_paths;
+		}
         return $match;
     }
 
@@ -1272,7 +1412,7 @@ class Web {
     function request($key, $default = null) {
         if (array_key_exists($key, $_REQUEST) && is_array($_REQUEST[$key])) {
             foreach ($_REQUEST[$key] as &$k) {
-                urldecode($k);
+                $k=urldecode($k);
             }
             return $_REQUEST[$key];
         }
@@ -1280,7 +1420,7 @@ class Web {
     }
 
     function requestIpAddress() {
-        return $_SERVER['REMOTE_ADDR'];
+        return array_key_exists('REMOTE_ADDR',$_SERVER) ? $_SERVER['REMOTE_ADDR'] : '';
     }
 
     /**
@@ -1454,7 +1594,7 @@ class Web {
             $this->_callPostListeners();
         }
 
-        header("Location: " . trim($url));
+        $this->header("Location: " . trim($url));
         exit();
     }
 
@@ -1464,6 +1604,13 @@ class Web {
     function sendHeader($key, $value) {
         $this->_headers[$key] = $value;
     }
+    
+    /**
+     *  Allow stubbing of global header function for unit tets
+     */
+    function header($string) {
+		header($string);
+	}
 
     /**
      * returns a string representation of everything

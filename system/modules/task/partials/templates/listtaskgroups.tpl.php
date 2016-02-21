@@ -1,11 +1,13 @@
 <?php if (!empty($taskgroups)) : ?>
 	<div class="taskgroups_container">
-            <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
-		<?php foreach($taskgroups as $tg) : ?>
-                    <?php if ($tg->canView($w->Auth->user())) : ?>
-                        <li><?php echo $w->partial("showtaskgroup", array("taskgroup" => $tg, "redirect" => (!empty($redirect) ? $redirect : "/")), "task"); ?></li>
-                    <?php endif; ?>
+		<?php foreach($taskgroups as $taskgroup) : ?>
+			<?php if ($taskgroup->canView($w->Auth->user())) : ?>
+				<div class="row-fluid"><div class="columns small-12"><?php echo $w->partial("showtaskgroup", array("taskgroup" => $taskgroup, "redirect" => (!empty($redirect) ? $redirect : "/")), "task"); ?></div></div>
+			<?php endif; ?>
+			<?php if ($taskgroup->getCanICreate()) : ?> 
+				<div class="row-fluid"><div class="columns small-12"><a target="_blank" href="/task/edit/?gid=<?php echo $taskgroup->id; ?>">New Task</a> </div></div> 
+			<?php endif; ?>
 		<?php endforeach; ?>
-            </ul>
-	</div>
+	</div>	
+			
 <?php endif; ?>

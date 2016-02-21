@@ -1,8 +1,14 @@
 /log/*.log
 /uploads/*
 .project
+/nbproject
 /config.php
 /system/composer/*
-cache/
+/cache
 phpMyAdmin/
 config.old.*.php
+storage/
+config.old.php
+config.old.*.php
+/codiad
+/phpMyAdmin
