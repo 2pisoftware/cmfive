@@ -3,3 +3,6 @@
 .project
 /config.php
 /system/composer/*
+cache/
+phpMyAdmin/
+config.old.*.php
