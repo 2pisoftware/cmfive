@@ -533,13 +533,17 @@ class ReportService extends DbService {
     }
 
     // function to substitute special terms
-    function putSpecialSQL($sql) {
+    function putSpecialSQL($sql,$user_id=null) {
         if ($sql != "") {
             $special = array();
             $replace = array();
 
             // get user roles
-            $usr = $this->w->Auth->user();
+            if ($user_id>0) {
+				$usr = $this->w->Auth->getUser($user_id);
+			} else {
+				$usr = $this->w->Auth->user();
+			}
             $roles = '';
             foreach ($usr->getRoles() as $role) {
                 $roles .= "'" . $role . "',";
@@ -548,7 +552,7 @@ class ReportService extends DbService {
 
             // $special must be in terms of a regexp for preg_match
             $special[0] = "/\{\{current_user_id\}\}/";
-            $replace[0] = $_SESSION["user_id"];
+            $replace[0] = !empty($user_id) ? $user_id : $_SESSION["user_id"];
             $special[1] = "/\{\{roles\}\}/";
             $replace[1] = $roles;
             $special[2] = "/\{\{webroot\}\}/";
