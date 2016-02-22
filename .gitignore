@@ -10,3 +10,4 @@ config.old.*.php
 cache/
 /phpmyadmin
 /codiad
+phpMyAdmin/
