@@ -11,6 +11,9 @@
  * @param <Web> $w
  */
 function email_GET(Web $w) {
+	// sender config default empty
+	$emailFrom='';
+	if (strlen(trim(Config::get('report.emailreport.sender')))>0) $emailFrom= Config::get('report.emailreport.sender');
 	
 	// Get report
 	@list($report_id) = $w->pathMatch();
@@ -55,19 +58,54 @@ function email_GET(Web $w) {
 			$recipients[$user->login] = $user;
 		}
 	}
-	
+	@mkdir(ROOT_PATH.'/cache/report',0777,true);
 	// Generate report attachments from templates
-	$data = $report->getReportData();
-	if (empty($data)) {
-		$w->Log->setLogger("AUTOMATED_REPORT")->error("Report {$report_id} generated no data");
-		return;
+	foreach ($recipients as $login => $recipient) {
+		$email='';
+		$name='';
+		$user=null;
+		$results='';
+		$attachments=[];
+		try {
+			$user=$w->Auth->getUserForLogin($login);
+			$email=$user->getContact()->email;
+			$name=$user->getContact()->getFullName();
+		} catch (Exception $e) {
+			$w->Log->setLogger("AUTOMATED_REPORT")->error("Failed to load user email for ".$login." ".$e->getMessage());
+		}
+		if (strlen(trim($email))==0) {
+			$w->Log->setLogger("AUTOMATED_REPORT")->error("Missing email address for user ".$login);
+		} else {
+			$templatedata = $report->getReportData($recipient->id);
+			if (empty($templatedata)) {
+				$w->Log->setLogger("AUTOMATED_REPORT")->error("Report {$report_id} generated no data for user ".$login);
+			} else {
+				foreach($templates as $report_template) {
+					
+					if (!empty($report_template) && !empty($templatedata)) {
+						$results = $w->Template->render(
+								$report_template->template_id,
+								array("data" => $templatedata, "w" => $w, "POST" => $_POST)
+						);   
+						// write report file
+						$template=$w->Template->getTemplate($report_template->template_id);
+						$fileName=ROOT_PATH.'/cache/report/'.toSlug($template->title).".html";
+						file_put_contents($fileName,$results);
+						$attachments[]=$fileName;
+					}
+				}
+				// Send email
+				$w->Mail->sendMail($email,$emailFrom,$report->title,$results,'','',$attachments);
+				// clear report files
+				foreach ($attachments as $attachment) {
+					unlink($attachment);
+				}
+				echo "<pre>"."Report Sent to ".$email."\n</pre>";
+				
+			}
+		}
 	}
-	
-	foreach($templates as $template) {
-		
-	}
-	
-	// Send email
+	die();
 	
 }
 

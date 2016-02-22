@@ -158,7 +158,7 @@ class Report extends DbObject {
     }
 
     // generate the report based on selected parameters
-    function getReportData() {
+    function getReportData($user_id=null) {
         // build array of all contents within any @@...@@
         //		preg_match_all("/@@[a-zA-Z0-9_\s\|,;\(\)\{\}<>\/\-='\.@:%\+\*\$]*?@@/",preg_replace("/\n/"," ",$this->report_code), $arrsql);
         preg_match_all("/@@.*?@@/", preg_replace("/\n/", " ", $this->report_code), $arrsql);
@@ -203,7 +203,7 @@ class Report extends DbObject {
                         // if our SQL is still intact ...
                         if ($sql != "") {
                             // check the SQL statement for special parameter replacements
-                            $sql = $this->Report->putSpecialSQL($sql);
+                            $sql = $this->Report->putSpecialSQL($sql,$user_id);
                             // check the SQL statement for validity
                             $flgsql = $this->Report->getcheckSQL($sql, $this->getDb());
                             
