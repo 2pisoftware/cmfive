@@ -6,7 +6,7 @@
 function listfavorite_ALL(Web $w,$params) {
 	$user = $w->Auth->user();
 	if (!empty($user))  {
-		$results = $w->Favorite->getDataByUser($user->id );
+		$results = $w->Favorite->getFavoritesForUser($user->id );
 		$favoritesCategorised=array();
 		$service=new DBService($w);
 		if (!empty($results)) {

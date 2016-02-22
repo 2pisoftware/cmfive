@@ -91,6 +91,8 @@ class AuthService extends DbService {
 	/**
      * 
      * Check if the current user can access the specified path
+     * @ return false if the login user is not allowed access to this path
+     *  OR return string url if it is provided as a parameter
      */
     function allowed($path, $url = null) {
 		$key = $path.'::'.$url;
