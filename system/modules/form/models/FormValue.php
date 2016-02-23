@@ -62,8 +62,11 @@ class FormValue extends DbObject {
 		$field = $this->getFormField();
 		$row = $field->getFormRow();
 		$value = $this->getMaskedValue();
-		
-		array_push($row, $value);
+		if (count($row)==3) {
+			array_push($row, $value);
+		} else if (count($row)>3) {
+			$row=array_merge(array_slice($row,0,3),[$value],array_slice($row,4));
+		}
 		return $row;
 	}
 	

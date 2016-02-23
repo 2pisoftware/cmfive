@@ -127,11 +127,26 @@ class FormField extends DbObject {
 		if (empty($this->type)) {
 			return null;
 		}
-		
 		$interface = $this->interface_class;
-		return [
-			$this->name, $interface::formType($this->type), $this->technical_name
+		$row=[
+			$this->name, $interface::formType($this->type), $this->technical_name,""
 		];
+		$metaData=$this->getMetadata();
+		if (is_array($metaData) && count($metaData)>0) {
+			$metaArray=[];
+			foreach ($metaData as $meta) {
+				$metaArray[$meta->meta_key]=$meta->meta_value;
+			}
+			
+			$formConfig=$interface::formConfig($this->type,$metaArray,$this->w);
+			if (is_array($formConfig) && count($formConfig)>0) {
+				foreach ($formConfig as $v) {
+					$row[]=$v;
+				}
+			}
+		}
+		
+		return $row;
 	}
 	
 	/************************************************
