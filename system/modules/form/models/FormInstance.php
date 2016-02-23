@@ -46,7 +46,7 @@ class FormInstance extends DbObject {
 		
 		$form = $this->getForm();
 		
-		// If there is a row template specified the use that to display
+		// If there is a row template specified then use that to display
 		// The downside is that (for now) the template will need to implement its own
 		// masking on values
 		if (!empty($form->row_template)) {
@@ -61,13 +61,27 @@ class FormInstance extends DbObject {
 			
 			return $this->w->Template->render($form->row_template, $template_data);
 		}
-		
+		// NO TEMPLATE
 		$table_row = '';
+		$formValueCollated=[];
+		// collate available form values
 		if (!empty($form_values)) {
-			foreach($form_values as $form_value) {
-				$table_row .= "<td>" . $form_value->getMaskedValue() . "</td>";
+			foreach($form_values as $value) {
+				$formValueCollated[$value->form_field_id]=$value;
 			}
 		}
+		
+		$form_fields = $form->getFields();
+		if (!empty($form_fields)) {
+			foreach($form_fields as $field) {
+				if (!empty($formValueCollated[$field->id])) {
+					$table_row .= "<td>" . $formValueCollated[$field->id]->getMaskedValue() . "</td>";
+				} else {
+					$table_row .= "<td>&nbsp;</td>";
+				}
+			}
+		}
+		
 		return $table_row;
 	}
 	
@@ -86,15 +100,20 @@ class FormInstance extends DbObject {
 		
 		$form_values = $this->getSavedValues();
 		$form_structure = []; // $w->Form->buildForm($this);
-		
+		$formValueCollated=[];
+		// collate available form values
 		if (!empty($form_values)) {
 			foreach($form_values as $value) {
-				$form_structure[] = array($value->getFormRow());
+				$formValueCollated[$value->form_field_id]=$value;
 			}
-		} else {
-			$form_fields = $form->getFields();
-			if (!empty($form_fields)) {
-				foreach($form_fields as $field) {
+		}
+		
+		$form_fields = $form->getFields();
+		if (!empty($form_fields)) {
+			foreach($form_fields as $field) {
+				if (!empty($formValueCollated[$field->id])) {
+					$form_structure[] = array($formValueCollated[$field->id]->getFormRow());
+				} else {
 					$form_structure[] = array($field->getFormRow());
 				}
 			}
