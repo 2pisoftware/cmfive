@@ -10,7 +10,8 @@ class FormStandardInterface extends FormFieldInterface {
 		["Text", "text"],
 		["Decimal", "decimal"],
 		["Date", "date"],
-		["Date & Time", "datetime"]
+		["Date & Time", "datetime"],
+		["Auto Complete", "autocomplete"]
 	];
 	
 	/************************************************
@@ -27,12 +28,40 @@ class FormStandardInterface extends FormFieldInterface {
 				return "date"; 
 			case "datetime":
 				return "datetime";
+			case "autocomplete":
+				return "autocomplete";
 			case "decimal":
 			case "text":
 			default:
 				return "text";
 		}
 		return null;
+	}
+	
+	/************************************************
+	 * Map Form metadata to an array of extra parameters to Html::multiColForm() 
+	 * 
+	 * @return []
+	 ************************************************/
+	public static function formConfig($type,$metaData,$w) {
+		//print_r([$type,$metaData]);
+		$options=[];
+		if ($type=="autocomplete")  {
+			if (!empty($metaData['object_type'])) {
+				try {
+					$service = new DbService($w);
+					$objects=$service->getObjects($metaData['object_type']);
+					foreach ($objects as $option) {
+						$options[]=$option->getSelectOptionTitle();
+					}
+				} catch (Exception $e) {
+					//silently fail no options
+				}
+			} else if (!empty($metaData['options'])) {
+				$options=explode(",",$metaData['options']);
+			}
+		}
+		return [$options];
 	}
 	
 	/************************************************
@@ -48,6 +77,8 @@ class FormStandardInterface extends FormFieldInterface {
 		switch(strtolower($type)) {
 			case "decimal":
 				return [["Decimal Places", "text", "decimal_places"]];
+			case "autocomplete":
+				return [["Object", "text", "object_type"],["Filter", "text", "object_filter"],["Options", "text", "options"]];
 			default:
 				return null;
 		}
