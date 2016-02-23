@@ -23,7 +23,7 @@ abstract class FormFieldInterface {
 	 * This will be used to generate a listing of the available form
 	 * fields, therefore they can be anything
 	 * 
-	 * @return Array
+	 * @return array
 	 */
 	public static function respondsTo() {
 		return static::$_respondsTo;
@@ -57,8 +57,8 @@ abstract class FormFieldInterface {
 	/**
 	 * Returns a form for adding metadata to a field
 	 * 
-	 * @param String $type
-	 * @return null|Array
+	 * @param string $type
+	 * @return null|array
 	 */
 	public static function metadataForm($type) {
 		return null;
@@ -72,9 +72,9 @@ abstract class FormFieldInterface {
 	 * The recommendation is to return the $value in the event of an error (like
 	 * an unknown type)
 	 * 
-	 * @param String $type
-	 * @param Mixed $value
-	 * @return Mixed
+	 * @param string $type
+	 * @param mixed $value
+	 * @return mixed
 	 */
 	public static function modifyForDisplay($type, $value) {
 		return $value;
@@ -102,14 +102,21 @@ abstract class FormFieldInterface {
 	 * a unix timestamp using strtotime()
 	 * 
 	 * @see FormFieldInterface::modifyForDisplay()
-	 * @param String $type
-	 * @param Mixed $value
-	 * @return Mixed
+	 * @param string $type
+	 * @param mixed $value
+	 * @return mixed
 	 */
 	public static function modifyForPersistance($type, $value) {
 		return $value;
 	}
 	
+	/**
+	 * Filter form metadata matching key
+	 * 
+	 * @param FormMetaData[] $metadata  metadata array to search for matching keys
+	 * @param String $key  key to seek matching metadata
+	 * @return FormMetaData|null
+	 */
 	public static function getMetadataForKey($metadata, $key) {
 		if (!empty($metadata)) {
 			foreach($metadata as $_meta) {

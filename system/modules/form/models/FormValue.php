@@ -1,7 +1,7 @@
 <?php
-/************************************************
+/**
  * This class stores the user entered data for a single form field.
- ************************************************/
+ */
 class FormValue extends DbObject {
 	
 	public $form_instance_id;	// form record created when the use entered data
@@ -10,54 +10,59 @@ class FormValue extends DbObject {
 	public $field_type;			// the type of the field eg text,date
 	public $mask;				// 
 
-	/************************************************
+	/**
 	 * Override insert to prep fields for persistence based on field type
-	 * @return
-	 ************************************************/
+	 * s
+	 * @return  boolean|array true or Array of validation errors
+	 */
 	public function insert($force_validation = true) {
 		$field = $this->getFormField();
 		
 		$interface = $field->interface_class;
 		$this->value = $interface::modifyForPersistance($field->type, $this->value);
 		
-		parent::insert($force_validation);
+		return parent::insert($force_validation);
 	}
 	
-	/************************************************
+	/**
 	 * Override update to prep fields for persistence based on field type
-	 * @return
-	 ************************************************/
+	 * 
+	 * @return  boolean|array true or Array of validation errors
+	 */
 	public function update($force_null_values = false, $force_validation = true) {
 		$field = $this->getFormField();
 		
 		$interface = $field->interface_class;
 		$this->value = $interface::modifyForPersistance($field->type, $this->value);
 		
-		parent::update($force_validation);
+		return parent::update($force_validation);
 	}
 	
-	/************************************************
+	/**
 	 * Get the name of the form field associated with this value
+	 * 
 	 * @return string
-	 ************************************************/
+	 */
 	public function getFieldName() {
 		$field = $this->getFormField();
 		return $field->name;
 	}
 	
-	/************************************************
+	/**
 	 * Get the FormField associated with this value
+	 * 
 	 * @return FormField
 	 ************************************************/
 	public function getFormField() {
 		return $this->getObject("FormField", $this->form_field_id);
 	}
 	
-	/************************************************
+	/**
 	 * Return an array representing a form row with the masked value 
 	 * provided as the field data
-	 * @return []
-	 ************************************************/
+	 * 
+	 * @return array
+	 */
 	public function getFormRow() {
 		$field = $this->getFormField();
 		$row = $field->getFormRow();
@@ -70,10 +75,11 @@ class FormValue extends DbObject {
 		return $row;
 	}
 	
-	/************************************************
+	/**
 	 * Get the value of this record after modifying for display
+	 * 
 	 * @return string
-	 ************************************************/
+	 */
 	public function getMaskedValue() {
 		if (empty($this->field_type)) {
 			return null;
