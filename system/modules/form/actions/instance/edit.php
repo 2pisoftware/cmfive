@@ -68,6 +68,7 @@ function edit_POST(Web $w) {
 			if (array_key_exists($field_name, $_POST)) {
 				$instance_value->value = $_POST[$field_name];
 				unset($_POST[$field_name]);
+				$instance_value->update();
 			} else {
 				$instance_value->delete();
 			}
