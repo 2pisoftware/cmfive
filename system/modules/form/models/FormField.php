@@ -1,7 +1,7 @@
 <?php
-/*************************************
+/**
  * This class represents a form field definition that is used in a form
- *************************************/
+ */
 class FormField extends DbObject {
 	
 	public $form_id;
@@ -12,19 +12,19 @@ class FormField extends DbObject {
 	public $mask;
 	public $ordering;
 
-	/************************************************
+	/**
 	 * Load the form definition associated with this form field
 	 * @return Form
-	 ************************************************/
+	 */
 	public function getForm() {
 		return $this->getObject("Form", $this->form_id);
 	}
 	
-	/************************************************
+	/**
 	 * Override insert to allow munging of technical name and setting
 	 * the FormField interface class eg FormStandardInterface 
 	 * @return 
-	 ************************************************/
+	 */
 	public function insert($force_validation = true) {
 		$this->technical_name = strtolower(str_replace(" ", "_", $this->name));
 		$this->setInterfaceClass();
@@ -32,11 +32,11 @@ class FormField extends DbObject {
 		parent::insert($force_validation);
 	}
 	
-	/************************************************
+	/**
 	 * Override update to allow munging of technical name and setting
 	 * the FormField interface class eg FormStandardInterface 
 	 * @return
-	 ************************************************/
+	 */
 	public function update($force_null_values = false, $force_validation = true) {
 		$this->technical_name = strtolower(str_replace(" ", "_", $this->name));
 		$this->setInterfaceClass();
