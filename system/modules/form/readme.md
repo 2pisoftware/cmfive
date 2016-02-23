@@ -44,14 +44,19 @@ To show forms in a tab based view, call the hooks
 
 There are a number of objects used to represent forms and form data.
 
-- Form - represents the custom form that can be attached to records
-- FormField - represents a field in a custom form
-- FormFieldInterface - abstract class defining methods required to implement a form field
-- FormStandardInterface - standard base implementation of FormFieldInterface providing text, decimal, date and datetime field types
-- FormFieldMetadata - additional information that can be provided for a form field eg decimal places for decimal field types
-- FormMapping - represents associations between forms and record types that they are enabled for.
+- records that describe the forms
+	- Form - represents the custom form that can be attached to records
+	- FormField - represents a field in a custom form
+	- FormFieldMetadata - additional information that defines a form field eg decimal places for decimal field types
+	- FormFieldInterface - abstract class defining methods required to implement a form field
+	- FormStandardInterface - standard base implementation of FormFieldInterface providing text, decimal, date and datetime field types
+	- FormMapping - represents associations between forms and record types that they are enabled for.
 - and data submitted into form records is stored in
-- FormInstance - represents a form that has been saved
-- FormValue - a form value stores the actual for each field of a form instance.
+	- FormInstance - represents a form that has been saved
+	- FormValue - a form value stores the actual for each field of a form instance.
 
 The FormService class provides a range of lookup functions for Form records.
+
+Currently neither the forms nor the data stored in the forms is searchable although this could be implemented with an appropriate addToIndex function for FormValue to enable searching the data entered into forms. Generating the links to the appropriate view/edit pages will be the hardest bit.
+
+

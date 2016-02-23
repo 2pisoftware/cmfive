@@ -1,23 +1,46 @@
 <?php
-
+/*************************************
+ * This class represents a single record of information stored in a form.
+ *************************************/
 class FormInstance extends DbObject {
 	
 	public $form_id;
 	public $object_class;
 	public $object_id;
 	
+	/************************************************
+	 * Load the object that this form instance is related to eg Task
+	 * @return DbObject
+	 ************************************************/
 	public function getLinkedObject() {
 		return $this->getObject($this->object_class, $this->object_id);
 	}
 	
+	/************************************************
+	 * Load the form that this form instance is related to 
+	 * @return
+	 ************************************************/
 	public function getForm() {
 		return $this->getObject("Form", $this->form_id);
 	}
 	
+	/************************************************
+	 * Load the values that have been entered into all form fields
+	 * for this instance.
+	 * @return [FormValue]
+	 ************************************************/
 	public function getSavedValues() {
 		return $this->getObjects("FormValue", ["form_instance_id" => $this->id, "is_deleted" => 0]);
 	}
 	
+	/************************************************
+	 * Generate the contents of a table row as HTML
+	 * Use a template associated with the form if available.
+	 * Template is parsed using system based twig parser.
+	 * The form values are available as template data keyed against their
+	 * technical names. eg <td>{{title}}</td>
+	 * @return string 
+	 ************************************************/
 	public function getTableRow() {
 		$form_values = $this->getSavedValues();
 		
@@ -48,6 +71,11 @@ class FormInstance extends DbObject {
 		return $table_row;
 	}
 	
+	/************************************************
+	 * Return an array representing the complete structure of a form to 
+	 * use with Html::multiColForm()
+	 * @return  [[]]
+	 ************************************************/
 	public function getEditForm($form) {
 		if (empty($form->id)) {
 			$form = $this->getForm();
