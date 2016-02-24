@@ -21,7 +21,7 @@
 							<th width="5%">Ordering</th><th>Name</th><th>Technical Name</th><th>Type</th><th>Additional Details</th><th>Actions</th>
 						</tr>
 					</thead>
-					<tbody>
+					<tbody id="sortable" >
 						<?php foreach ($fields as $field) : ?>
 							<tr id="field_<?php echo $field->id; ?>" >
 								<td><i class="draggable-icon fi-list large"></i></td>
@@ -40,121 +40,29 @@
 					</tbody>
 				</table>
 				<script>
+				var handleDrop = function (e) {
+					console.log('drop');
+					// Get new ordering and update via ajax
+					var ordering = [];
+					// var rows = document.querySelectorAll("#fields tbody tr");
 					
-					// Code from: http://www.html5rocks.com/en/tutorials/dnd/basics/
-					
-					(function() {
-						var dragSrcEl_ = null;
-						var rows = document.querySelectorAll('#fields tbody tr');
+					$("#fields tbody tr").each(function(index, element) {
+						var id_split = $(element).attr("id").split("_");
+						var id = id_split[1];
 						
-						this.handleDragStart = function (e) {
-							e.dataTransfer.effectAllowed = 'move';
-							e.dataTransfer.setData('text/html', this.outerHTML);
-
-							dragSrcEl_ = this;
-
-							// this/e.target is the source node.
-//							$(this).addClass('moving');
-						};
-
-						this.handleDragOver = function (e) {
-							if (e.preventDefault) {
-								e.preventDefault(); // Allows us to drop.
-							}
-
-							e.dataTransfer.dropEffect = 'move';
-
-							return false;
-						};
-
-						this.handleDragEnter = function (e) {
-//							$(this).addClass('over');
-						};
-
-						this.handleDragLeave = function (e) {
-							// this/e.target is previous target element.
-//							$(this).removeClass('over');
-						};
-
-						this.handleDrop = function (e) {
-							// this/e.target is current target element.
-
-							if (e.stopPropagation) {
-								e.stopPropagation(); // stops the browser from redirecting.
-							}
-
-							// Don't do anything if we're dropping on the same column we're dragging.
-							if (dragSrcEl_ != this) {
-								dragSrcEl_.outerHTML = this.outerHTML;
-								this.outerHTML = e.dataTransfer.getData('text/html');
-							}
-
-							return false;
-						};
-
-						this.handleDragEnd = function (e) {
-							// Get new ordering and update via ajax
-							var ordering = [];
-							// var rows = document.querySelectorAll("#fields tbody tr");
-							
-							$("#fields tbody tr").each(function(index, element) {
-								var id_split = $(element).attr("id").split("_");
-								var id = id_split[1];
-								
-								ordering.push(id);
-							});
-							
-							$.post("/form-field/move/<?php echo $form->id; ?>", {ordering: ordering}, function() {
-								// Rebinding the events doesn't work...
-								window.location.reload();
-							});
-						};
-						
-						for(var i = 0; i < rows.length; i++) {
-							rows[i].setAttribute('draggable', 'true');  // Enable columns to be draggable.
-							rows[i].addEventListener('dragstart', this.handleDragStart, false);
-							rows[i].addEventListener('dragenter', this.handleDragEnter, false);
-							rows[i].addEventListener('dragover', this.handleDragOver, false);
-							rows[i].addEventListener('dragleave', this.handleDragLeave, false);
-							rows[i].addEventListener('drop', this.handleDrop, false);
-							rows[i].addEventListener('dragend', this.handleDragEnd, false);
-						}
-					})();
+						ordering.push(id);
+					});
 					
-	//				function allowDrop(ev) {
-	//					ev.preventDefault();
-	//				}
-	//
-	//				var dragSrcEl = null;
-	//
-	//				function drag(e) {
-	//					// Target (this) element is the source node.
-	//					e.dataTransfer.effectAllowed = 'move';
-	//					e.dataTransfer.setData('text/html', this.innerHTML);
-	//				}
-	//
-	//				function drop(ev) {
-	//					ev.preventDefault();
-	//					var data = ev.dataTransfer.getData("text/html");
-	//					
-	//					var element = ev.target;
-	//					var foundTbody = (element.nodeName.toLowerCase() === 'tbody');
-	//					
-	//					// Find tbody parent
-	//					if (!foundTbody) {
-	//						while(element && element.parentNode && !foundTbody) {
-	//							console.log(element.nodeName);
-	//							element = element.parentNode;
-	//							if (element.nodeName.toLowerCase() === 'tbody') {
-	//								foundTbody = true;
-	//							}
-	//						}
-	//					}
-	//					
-	//					if (foundTbody) {
-	//						element.appendChild(document.getElementById(data));
-	//					}
-	//				}
+					$.post("/form-field/move/<?php echo $form->id; ?>", {ordering: ordering}, function() {
+						// Rebinding the events doesn't work...
+						//window.location.reload();
+					});
+				};
+				$(function() {
+					$( "#sortable" ).sortable({update: handleDrop});
+					$( "#sortable" ).disableSelection();
+				});
+					
 				</script>
 			<?php endif; ?>
 		</div>
