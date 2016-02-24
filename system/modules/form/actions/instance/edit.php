@@ -1,6 +1,7 @@
 <?php
 
 function edit_GET(Web $w) {
+	
 	$p = $w->pathMatch("id");
 	$form_id = $w->request("form_id");
 	$redirect_url = $w->request("redirect_url");
@@ -33,7 +34,7 @@ function edit_POST(Web $w) {
 	$redirect_url = $w->request("redirect_url");
 	$object_class = $w->request("object_class");
 	$object_id = $w->request("object_id");
-	
+	$form=null;
 	if (empty($form_id) && empty($p['id'])) {
 		$w->msg("Form instance data missing");
 		return;
@@ -58,7 +59,6 @@ function edit_POST(Web $w) {
 	if (array_key_exists(CSRF::getTokenID(), $_POST)) {
 		unset($_POST[CSRF::getTokenID()]);
 	}
-	
 	// Get existing values to update
 	$instance_values = $instance->getSavedValues();
 	if (!empty($instance_values)) {
@@ -67,14 +67,13 @@ function edit_POST(Web $w) {
 			
 			if (array_key_exists($field_name, $_POST)) {
 				$instance_value->value = $_POST[$field_name];
-				unset($_POST[$field_name]);
 				$instance_value->update();
+				unset($_POST[$field_name]);
 			} else {
 				$instance_value->delete();
 			}
 		}
 	}
-	
 	// Add new values
 	if (!empty($_POST)) {
 		foreach($_POST as $key => $value) {
@@ -91,5 +90,5 @@ function edit_POST(Web $w) {
 			}
 		}
 	}
-	$w->msg($form->title . (!empty($p['id']) ? " updated" : " created"), $redirect_url . "#form");
+	$w->msg($form->title . (!empty($p['id']) ? " updated" : " created"), $redirect_url . "#".toSlug($form->title));
 }

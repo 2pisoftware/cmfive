@@ -122,9 +122,6 @@ class FormInstance extends DbObject {
 				}
 			}
 		}
-		echo "<pre>";
-		//print_r($form_structure);
-		echo "</pre>";
 		return array($form->title => $form_structure);
 	}
 	

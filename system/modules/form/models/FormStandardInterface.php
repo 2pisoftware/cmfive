@@ -11,7 +11,8 @@ class FormStandardInterface extends FormFieldInterface {
 		["Decimal", "decimal"],
 		["Date", "date"],
 		["Date & Time", "datetime"],
-		["Auto Complete", "autocomplete"]
+		["Select", "select"],
+		["Autocomplete", "autocomplete"]
 	];
 	
 	/**
@@ -31,6 +32,8 @@ class FormStandardInterface extends FormFieldInterface {
 				return "datetime";
 			case "autocomplete":
 				return "autocomplete";
+			case "select":
+				return "select";
 			case "decimal":
 			case "text":
 			default:
@@ -47,19 +50,36 @@ class FormStandardInterface extends FormFieldInterface {
 	public static function formConfig($type,$metaData,$w) {
 		//print_r([$type,$metaData]);
 		$options=[];
-		if ($type=="autocomplete")  {
+		if ($type=="autocomplete" || $type=="select")  {
 			if (!empty($metaData['object_type'])) {
 				try {
 					$service = new DbService($w);
-					$objects=$service->getObjects($metaData['object_type']);
-					foreach ($objects as $option) {
-						$options[]=$option->getSelectOptionTitle();
+					$filter='';
+					// eg {"login like ?": "%e%"}
+					if (!empty($metaData['object_filter'])) {
+						try {
+							$filter=json_decode($metaData['object_filter'],true);
+						} catch (Exception $e) {
+							// fallback to following test
+						}
+						if (!is_array($filter)) {
+							$filter=$metaData['object_filter'];
+						}						
 					}
+					$options=$service->getObjects($metaData['object_type'],$filter);
+					//foreach ($options as $option) {
+					//	$options[]=$option->getSelectOptionTitle();
+					//}
 				} catch (Exception $e) {
 					//silently fail no options
 				}
 			} else if (!empty($metaData['options'])) {
 				$options=explode(",",$metaData['options']);
+				foreach ($options as $k=>$option) {
+					if (is_int($k)) {
+						$options[$k]=[$option,$k+1];
+					}
+				}
 			}
 		}
 		return [$options];
@@ -81,6 +101,9 @@ class FormStandardInterface extends FormFieldInterface {
 				return [["Decimal Places", "text", "decimal_places"]];
 			case "autocomplete":
 				return [["Object", "text", "object_type"],["Filter", "text", "object_filter"],["Options", "text", "options"]];
+			case "select":
+				return [["Object", "text", "object_type"],["Filter", "text", "object_filter"],["Options", "text", "options"]];
+			
 			default:
 				return null;
 		}
@@ -94,7 +117,7 @@ class FormStandardInterface extends FormFieldInterface {
 	 * 
 	 * @return string
 	 */
-	public static function modifyForDisplay($type, $value, $metadata = null) {
+	public static function modifyForDisplay($type, $value, $metadata = null,$w) {
 		if (!static::doesRespondTo($type)) {
 			return $value;
 		}
@@ -108,6 +131,9 @@ class FormStandardInterface extends FormFieldInterface {
 				} else {
 					return $value * 1.0;
 				}
+			case "autocomplete":
+			case "select":
+				return static::modifyAutocompleteForDisplay($value,$metadata,$w);
 			case "date":
 				return date("d/m/Y", $value);
 			case "datetime":
@@ -116,6 +142,56 @@ class FormStandardInterface extends FormFieldInterface {
 				return $value;
 		}
 	}
+	
+	public static function modifyAutocompleteForDisplay($value,$metadataObjects,$w) {
+		if (is_array($metadataObjects)) {
+			$metaData=[];
+			foreach ($metadataObjects as $meta) {
+				$metaData[$meta->meta_key] = $meta->meta_value;
+			}
+			// DB LOOKUP
+			if (!empty($metaData['object_type'])) {
+				try {
+					$service = new DbService($w);
+					$filter='';
+					// eg {"login like ?": "%e%"}
+					if (!empty($metaData['object_filter'])) {
+						try {
+							$filter = json_decode($metaData['object_filter'],true);
+						} catch (Exception $e) {
+							// silent fallback to following test
+							//echo $e->getMessage();
+						}
+						if (!is_array($filter)) {
+							$filter = $metaData['object_filter'];
+						}	
+					}
+					$options = $service->getObjects($metaData['object_type'],$filter);
+					foreach ($options as $option) {
+						if ($option->id == $value)  {
+							return $option->getSelectOptionTitle();
+						}
+					}
+				} catch (Exception $e) {
+					//silently fail no options
+					//echo $e->getMessage();
+				}
+			// CSV OPTIONS
+			} else if (!empty($metaData['options'])) {
+				$options=explode(",",$metaData['options']);
+				foreach ($options as $k=>$option) {
+					if ($k+1==$value) {
+						return $option;
+					}
+				}
+			} else {
+				// missing metadata no object_type OR options
+			}
+		} else {
+			// missing metadata
+		}
+	}
+	
 
 	/**
 	 * Transform date values into a format useful for DbObject based

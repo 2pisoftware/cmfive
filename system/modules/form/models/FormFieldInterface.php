@@ -76,7 +76,7 @@ abstract class FormFieldInterface {
 	 * @param mixed $value
 	 * @return mixed
 	 */
-	public static function modifyForDisplay($type, $value) {
+	public static function modifyForDisplay($type, $value, $metadata = null,$w) {
 		return $value;
 	}
 	

@@ -87,7 +87,7 @@ class FormValue extends DbObject {
 		
 		$field = $this->getFormField();
 		$interface = $field->interface_class;
-		return $interface::modifyForDisplay($this->field_type, $this->value, $field->getMetadata());
+		return $interface::modifyForDisplay($this->field_type, $this->value, $field->getMetadata(),$this->w);
 //		
 //		switch($this->type) {
 //			case "date": 
