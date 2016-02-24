@@ -73,9 +73,16 @@ class Web {
         $this->_module = null;
         $this->_submodule = null;
         $this->_hooks = array();
-        $this->_webroot = "http://" . $_SERVER['HTTP_HOST'];
+        //$this->_webroot = "http://" . $_SERVER['HTTP_HOST'];
         $this->_actionMethod = null;
         
+		// if using IIS then value is "off" for non ssl requests
+        if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == "off") {
+        	$this->_webroot = "http://" . $_SERVER['HTTP_HOST'];
+        } else {
+        	$this->_webroot = "https://" . $_SERVER['HTTP_HOST'];
+        }
+		
         $this->loadConfigurationFiles();
         spl_autoload_register(array($this, 'modelLoader'));
         
