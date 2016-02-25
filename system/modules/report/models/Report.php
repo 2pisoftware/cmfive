@@ -22,10 +22,6 @@ class Report extends DbObject {
 		return $this->getObjects("ReportMember", ["report_id" => $this->id, "is_deleted" => 0]);
 	}
     
-	public function getMembers() {
-		return $this->getObjects("ReportMember", ["report_id" => $this->id, "is_deleted" => 0]);
-	}
-	
 	public function getOwners() {
 		$members = $this->getMembers();
 		return array_filter($members ? : [], function($member) {
