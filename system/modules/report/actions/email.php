@@ -1,5 +1,7 @@
 <?php
 
+define("REPORT_CACHE_PATH", "/cache/report");
+
 /** 
  * Action to email reports, will send to users that are marked in the ReportMember
  * object, templates are enabled in the ReportTemplate object and one attachment
@@ -12,8 +14,10 @@
  */
 function email_GET(Web $w) {
 	// sender config default empty
-	$emailFrom='';
-	if (strlen(trim(Config::get('report.emailreport.sender')))>0) $emailFrom= Config::get('report.emailreport.sender');
+	if (Config::get("main.company_support_url") === null) {
+		$w->Log->setLogger("AUTOMATED_REPORT")->error("No send from email address given");
+		return;
+	}
 	
 	// Get report
 	@list($report_id) = $w->pathMatch();
@@ -58,54 +62,86 @@ function email_GET(Web $w) {
 			$recipients[$user->login] = $user;
 		}
 	}
-	@mkdir(ROOT_PATH.'/cache/report',0777,true);
+	
+	// Check of cache directory exists, create if not
+	if (!is_dir(ROOT_PATH . REPORT_CACHE_PATH)) {
+		mkdir(ROOT_PATH . REPORT_CACHE_PATH, 0777, true);
+	}
+	
+	if (empty($recipients)) {
+		$w->Log->setLogger("AUTOMATED_REPORT")->error("No recipients for report ID: " . $report_id);
+		return;
+	}
+	
 	// Generate report attachments from templates
-	foreach ($recipients as $login => $recipient) {
-		$email='';
-		$name='';
-		$user=null;
-		$results='';
-		$attachments=[];
-		try {
-			$user=$w->Auth->getUserForLogin($login);
-			$email=$user->getContact()->email;
-			$name=$user->getContact()->getFullName();
-		} catch (Exception $e) {
-			$w->Log->setLogger("AUTOMATED_REPORT")->error("Failed to load user email for ".$login." ".$e->getMessage());
+	foreach ($recipients as $login => $user) {
+		
+		// Get user contact object
+		$contact = $user->getContact();
+		if (empty($contact->id) || empty($contact->email)) {
+			$w->Log->setLogger("AUTOMATED_REPORT")->error("No contact object/email address for user: " . $login);
+			continue;
 		}
-		if (strlen(trim($email))==0) {
-			$w->Log->setLogger("AUTOMATED_REPORT")->error("Missing email address for user ".$login);
+		
+		// Generate report
+		$templatedata = $report->getReportData($user->id);
+		if (empty($templatedata)) {
+			$w->Log->setLogger("AUTOMATED_REPORT")->error("Report {$report_id} generated no data for user " . $login);
+			continue;
 		} else {
-			$templatedata = $report->getReportData($recipient->id);
-			if (empty($templatedata)) {
-				$w->Log->setLogger("AUTOMATED_REPORT")->error("Report {$report_id} generated no data for user ".$login);
-			} else {
-				foreach($templates as $report_template) {
-					
-					if (!empty($report_template) && !empty($templatedata)) {
-						$results = $w->Template->render(
-								$report_template->template_id,
-								array("data" => $templatedata, "w" => $w, "POST" => $_POST)
-						);   
-						// write report file
-						$template=$w->Template->getTemplate($report_template->template_id);
-						$fileName=ROOT_PATH.'/cache/report/'.toSlug($template->title).".html";
-						file_put_contents($fileName,$results);
-						$attachments[]=$fileName;
-					}
-				}
-				// Send email
-				$w->Mail->sendMail($email,$emailFrom,$report->title,$results,'','',$attachments);
-				// clear report files
-				foreach ($attachments as $attachment) {
-					unlink($attachment);
-				}
-				echo "<pre>"."Report Sent to ".$email."\n</pre>";
+			foreach($templates as $report_template) {
+				$results = $w->Template->render($report_template->template_id, ["data" => $templatedata, "w" => $w]);   
 				
+				// Generate PDF
+				$template = $report_template->getTemplate();
+				if (empty($template->id)) {
+					$w->Log->setLogger("AUTOMATED_REPORT")->error("Report {$report_id} generated no data for user " . $login);
+					continue;
+				}
+				
+				
+				$filename = ROOT_PATH . REPORT_CACHE_PATH . '/' . $template->title . "_" . date("Ymd-H-i") . ".pdf";
+
+				// Using TCPDF library
+				require_once('tcpdf/tcpdf.php');
+
+				// Set up PDF
+				$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+				$pdf->SetCreator(PDF_CREATOR);
+				$pdf->SetTitle($report->title);
+				$pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+				$pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+				$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+				$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+				$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+				$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+				$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+				$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+				//$pdf->setLanguageArray($l);
+				// no header, set font and create a page
+				$pdf->setPrintHeader(false);
+				$pdf->SetFont("helvetica", "B", 9);
+				$pdf->AddPage();
+
+				$pdf->writeHTML($results, true, false, true, false);
+				$pdf->Output($filename, 'F');
+
+				$attachments[] = $filename;
 			}
+			
+			// Send email
+			$w->Mail->sendMail($contact->email, Config::get("main.company_support_email"), $report->title, $results, null, null, $attachments);
+			
+			// Clear report cached files
+			foreach ($attachments as $attachment) {
+				unlink($attachment);
+			}
+			
+			$w->Log->setLogger("AUTOMATED_REPORT")->info("Automated report send to " . $contact->email . " with " . count($attachments) . " attachment" . (count($attachments) == 1 ? '' : 's'));
 		}
 	}
-	die();
+	
+	$w->redirect("/report");
 	
 }
 
