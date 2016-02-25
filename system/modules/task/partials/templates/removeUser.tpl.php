@@ -3,9 +3,8 @@
 	<h4>Task</h4>
 
 	<form action="/task-user/unassign/<?php echo $user->id; ?>?redirect=<?php echo urlencode($redirect); ?>" method="POST">
-		<?php if (!empty($tasks)) : ?>
-			<p>This user has <strong><?php echo count($tasks); ?></strong> task<?php echo (count($tasks) == 1 ? '' : 's'); ?> assigned to them.</p>
-		<?php endif; ?>
+		<p>This user has <strong><?php echo count($tasks); ?></strong> task<?php echo (count($tasks) == 1 ? '' : 's'); ?> assigned to them.</p>
+		
 		<?php if (!empty($task_group_membership)) : ?>
 			<p>This user is a member of <strong><?php echo count($task_group_membership); ?></strong> task group<?php echo (count($task_group_membership) == 1 ? '' : 's'); ?>
 				<?php if ($default_taskgroup_assignee > 0): ?> 
