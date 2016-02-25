@@ -8,10 +8,22 @@
 		<?php endif; ?>
 		<?php if (!empty($task_group_membership)) : ?>
 			<p>This user is a member of <strong><?php echo count($task_group_membership); ?></strong> task group<?php echo (count($task_group_membership) == 1 ? '' : 's'); ?>
-			<?php if ($default_taskgroup_assignee > 0): ?> 
-				and they are the default assignee for <strong><?php echo $default_taskgroup_assignee; ?></strong> of these
-			<?php endif; ?>
+				<?php if ($default_taskgroup_assignee > 0): ?> 
+					and they are the default assignee for <strong><?php echo $default_taskgroup_assignee; ?></strong> of these
+				<?php endif; ?>
 			</p>
+			<?php if (!empty($single_member_taskgroups)) : ?>
+			<div class="alert-box alert">
+				WARNING: Revoking this users Taskgroup membership will leave <strong><?php echo count($single_member_taskgroups) . " taskgroup" . (count($single_member_taskgroups) == 1 ? '' : 's'); ?></strong>
+				without any members!
+			
+				<br/>Please add members to the following Taskgroups before proceeding:<br/>
+				
+				<?php foreach($single_member_taskgroups as $single_member_taskgroup) :
+					echo Html::b("/task-group/viewmembergroup/" . $single_member_taskgroup->id . "#members", $single_member_taskgroup->title, null, null, true, "warning") . '<br/>';
+				endforeach; ?>
+			</div>
+			<?php endif; ?>
 		<?php endif; ?>
 
 		<p>The following actions will be carried out:</p>
