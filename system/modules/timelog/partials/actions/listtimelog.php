@@ -1,6 +1,6 @@
-<?php
+<?php namespace System\Modules\Timelog;
 
-function listtimelog_ALL($w, $params) {
+function listtimelog(\Web $w, $params) {
 	if (empty($params['object_class']) || empty($params['object_id'])) {
 		return;
 	}

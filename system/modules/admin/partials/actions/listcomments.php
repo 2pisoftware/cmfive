@@ -1,5 +1,6 @@
-<?php
-function listcomments_ALL(Web $w, $params) {
+<?php namespace System\Modules\Admin;
+
+function listcomments(\Web $w, $params) {
     $object = $params['object'];
     $redirect = $params['redirect'];
     $w->ctx("comments", $w->Comment->getCommentsForTable($object->getDbTableName(), $object->id));

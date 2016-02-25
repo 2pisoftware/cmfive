@@ -1,6 +1,6 @@
-<?php
+<?php namespace System\Modules\Tag;
 
-function listTags_ALL(Web $w, $params) {
+function listTags(\Web $w, $params) {
 	// Check roles access
 	// Admin gets to add new tags globally
 	// User can attach an existing tag

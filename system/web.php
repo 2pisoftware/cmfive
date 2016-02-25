@@ -1123,13 +1123,41 @@ class Web {
         $partial_action_file = implode("/", array($moduleDir, $this->_partialsdir, "actions", $name . ".php"));
 
         if (file_exists($partial_action_file)) {
+			
             require_once($partial_action_file);
 
-            // now execute the action
-            $partial_action = $name . "_" . $method;
-            if (function_exists($partial_action)) {
-                $partial_action($this, $params);
-            }
+            // Execute the action, accounting for the use of namespaces
+			// Work out the namespace
+			$module_path = Config::get($module . '.path');
+			$namespace = '';
+			if (empty($module_path)) {
+				$namespace = '\System\Modules\\' . ucfirst(strtolower($module)) . '\\';
+			} else {
+				// Path will almost 100% of the time be either 'modules' or 'system/modules'
+				// But we want this in the form '\Modules\\$module' or '\System\\Modules\\$module'
+				$namespace = '\\' . ucwords(strtolower(str_replace('/', '\\', $module_path))) . '\\' . ucfirst(strtolower($module)) . '\\';
+			}
+			
+			// The following will call:
+			// 1. \System\Modules\$module\$action_ALL()
+			// 2. \System\Modules\$module\$action()
+			// 3. removeUser_ALL()
+			// 4. removeUser()
+
+            $partial_action = $name . '_' . $method;
+            if (function_exists($namespace . $partial_action)) {
+				$function = $namespace . $partial_action;
+                $function($this, $params);
+            } else if (function_exists($namespace . $name)) {
+				$function = $namespace . $name;
+				$function($this, $params);
+			} else if (function_exists($partial_action)) {
+				$partial_action($this, $params);
+			} else if (function_exists($name)) {
+				$name($this, $params);
+			} else {
+				$this->Log->error("Required partial action not found, expected {$partial_action}");
+			}
         } else {
             $this->Log->error("Could not find partial file at: {$partial_action_file}");
         }
@@ -1529,6 +1557,11 @@ class Web {
      * @param boolean $append
      */
     function ctx($key, $value = null, $append = false) {
+		if (!is_numeric($key) && !is_scalar($key)) {
+			$this->Log->error("Key given to ctx() was not numeric or scalar");
+			return;
+		}
+		
         // There was a massive bug here, using == over === is BAD as $x == null
         // will be true for 0, "", null, false, etc. keep this in mind
         if ($value === null) {

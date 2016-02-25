@@ -1,6 +1,6 @@
-<?php
+<?php namespace System\Modules\File;
 
-function listattachments_ALL($w, $params) {
+function listattachments(\Web $w, $params) {
 	$object = $params['object'];
 	$redirect = $params['redirect'];
 	

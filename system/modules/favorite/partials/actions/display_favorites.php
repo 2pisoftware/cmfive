@@ -1,8 +1,8 @@
-<?php
+<?php namespace System\Modules\Favorite;
 
 // Replacement function for listFavourite!
 
-function display_favorites_ALL(Web $w) {	
+function display_favorites(\Web $w) {	
 	$results = $w->Favorite->getFavoritesForUser($w->Auth->user()->id);
 	$categorisedFavorites = array();
 	if (!empty($results)) {

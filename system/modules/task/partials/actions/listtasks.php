@@ -1,6 +1,6 @@
-<?php
+<?php namespace System\Modules\Task;
 
-function listtasks_ALL(Web $w, $params = array()) {
+function listtasks(\Web $w, $params = array()) {
     $w->ctx("redirect", $params['redirect']);
     
     $taskgroup = null;
@@ -147,7 +147,7 @@ function listtasks_ALL(Web $w, $params = array()) {
                     !empty($value_array[$role]["creator"]) ? $value_array[$role]["creator"] : null,
                     !empty($value_array[$role]["assignee"]) ? $value_array[$role]["assignee"] : null,
                     !empty($value_array[$role]["other"]) ? $value_array[$role]["other"] : null,
-                    Html::box(WEBROOT . "/task/updateusergroupnotify/" . $member->task_group_id, " Edit ", true)
+                    \Html::box(WEBROOT . "/task/updateusergroupnotify/" . $member->task_group_id, " Edit ", true)
                 );
             }
             unset($value_array);
@@ -155,6 +155,6 @@ function listtasks_ALL(Web $w, $params = array()) {
         
 
         // display list
-        $w->ctx("notify", Html::table($line, null, "tablesorter", true));
+        $w->ctx("notify", \Html::table($line, null, "tablesorter", true));
     }
 }
