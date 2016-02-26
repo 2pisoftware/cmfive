@@ -272,7 +272,7 @@ class Web {
         if(is_file(ROOT_PATH.'/config.php')) {
             $this->setLayout('install-exists-layout');
             $this->start(false);
-            return;
+            exit();
         }
         
         // clear config cache
@@ -304,6 +304,8 @@ class Web {
             $this->setLayout('install-layout');
             $this->start(false);
         }
+        
+        exit();
     }
     
     /**
@@ -312,7 +314,7 @@ class Web {
      * 2. if not set, look at the pathinfo and use first
      */
     function start($init_database = true) {
-		if ($init_database) {
+        if ($init_database && !$this->_is_installing) {
 			$this->initDB();
 		}
 
@@ -642,9 +644,9 @@ class Web {
         $this->scanModuleDirForConfigurationFiles($baseDir);
         
         // load the root level config file last because it can override everything
-	    if (!file_exists("config.php")) {
-			$this->install();
-		}
+	    //if (!file_exists("config.php")) {
+		//	$this->install();
+		//}
         require ROOT_PATH . "/config.php";
         
         // if config cache file doesn't exist, then
