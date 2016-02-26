@@ -72,6 +72,7 @@ class Web {
     public $_partialsdir = "partials";
     public $db;
     public $_isFrontend = false;
+    public $_is_installing = false;
     
     private $_classdirectory; // used by the class auto loader
 
@@ -108,7 +109,17 @@ class Web {
 		// The order of the following three lines are important
 		spl_autoload_register(array($this, 'modelLoader'));
 		defined("WEBROOT") ||  define("WEBROOT", $this->_webroot);
-		$this->loadConfigurationFiles();
+		
+        // conditions to start the installer
+        $this->_is_installing = strpos($_SERVER['REQUEST_URI'], '/install') === 0 ||
+                                !file_exists(ROOT_PATH . "/config.php");
+
+        $this->loadConfigurationFiles();
+         
+        if($this->_is_installing)
+        {
+            $this->install();
+        }
     }
 
     private function modelLoader($className) {
@@ -248,15 +259,53 @@ class Web {
         return ($aw === $bw ? 0 : ($aw < $bw ? 1 : -1));
     }
     
-	function install() {
-		$this->_paths = $this->_getCommandPath();
-		if (!in_array($this->_paths[0], ["install", "install-steps"])) {
-			$this->redirect("/install-steps/details");
-		} else {
-			$this->start(false);
-		}
-	}
-	
+    /**
+     * Called to install cmfive only if pre-determined that installation 
+	 * is needed due to a lack of config file
+     * Sometimes the config file is cached and cmfive's cache must be cleared 
+	 * to trigger installation
+     */
+    function install() {
+        $this->_is_installing = true;
+        
+        // config file exists
+        if(is_file(ROOT_PATH.'/config.php')) {
+            $this->setLayout('install-exists-layout');
+            $this->start(false);
+            return;
+        }
+        
+        // clear config cache
+        if(is_file(ROOT_PATH.'/cache/config.cache')) {
+            unlink(ROOT_PATH.'/cache/config.cache');
+        }
+        if(is_file(ROOT_PATH.'/cache/classdirectory.cache')) {
+            unlink(ROOT_PATH.'/cache/classdirectory.cache');
+        }
+        
+        $this->_paths = $this->_getCommandPath();
+        $is_ajax = !empty($this->_paths[1]) && strcmp($this->_paths[1], 'ajax') === 0;
+        
+        if(!$is_ajax && (empty($this->_paths[0]) || empty($this->_paths[1]) || !preg_match('/^[0-9]+$/', $this->_paths[1]))) {
+            $this->redirect("/install/1/general");
+        }
+        else if(!$is_ajax && empty($this->_paths[2])) {
+            $submodule = $this->Install->findInstallStepName(intval($this->_paths[1]));
+            if(empty($submodule))
+            {
+                $this->redirect("/install/1/general");
+            }
+            else
+            {
+                $path = DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, array($this->_paths[0], $this->_paths[1], $submodule));
+                $this->redirect($path);
+            }
+        } else {
+            $this->setLayout('install-layout');
+            $this->start(false);
+        }
+    }
+    
     /**
      * start processing of request
      * 1. look at the request parameter if the action parameter was set
@@ -267,6 +316,13 @@ class Web {
 			$this->initDB();
 		}
 
+		// Set the timezone from Config
+		$timezone = Config::get('system.timezone');
+		if (empty($timezone)) {
+			$timezone = 'UTC';
+		}
+		date_default_timezone_set($timezone);
+		
         // start the session
         // $sess = new SessionManager($this);
         try {
@@ -362,6 +418,26 @@ class Web {
         $actionmethods[] = $this->_action . '_' . $this->_requestMethod;
         $actionmethods[] = $this->_action . '_ALL';
 
+        // change the submodule and action for installation
+        if($this->_is_installing) {
+        	if(is_file(ROOT_PATH.'/config.php')) {
+        		unset($this->_submodule);
+        		$this->_action = 'index';
+        	}
+        	else {
+        		$step = $this->_action;
+        
+        		// step name is either still in the paths array, or needs to be found
+        		$step_name = sizeof($this->_paths) > 0 ?
+        		array_shift($this->_paths) :
+        		$this->Install->findInstallStepName($step);
+        
+        		$this->_submodule = $step . '-' . $step_name; // 1-general
+        		$this->_action = $step_name; // general
+        	}
+        	$actionmethods[] = $this->_defaultAction . '_ALL'; // index_ALL
+        }
+        
         // Check/validate CSRF token 
         if (Config::get('system.csrf.enabled') === true) {
             $allowed = Config::get('system.csrf.protected');
@@ -538,6 +614,12 @@ class Web {
     }
 
     public function loadConfigurationFiles() {
+    	if ($this->_is_installing) {
+    		// Load System config
+    		$baseDir = SYSTEM_PATH . '/modules';
+    		$this->scanModuleDirForConfigurationFiles($baseDir);
+   			return;
+    	}
     	$cachefile = ROOT_PATH . "/cache/config.cache";
     	
     	// check for config cache file. If exists, then load the config
@@ -646,6 +728,12 @@ class Web {
      * @return <type>
      */
     function checkAccess($msg = "Access Restricted") {
+    	// If we're installing cmfive then there won't be users
+    	// TODO this may need refactoring
+    	if ($this->_module == "install" && $this->_is_installing) {
+    		return true;
+    	}
+    	 
         $submodule = $this->_submodule ? "-" . $this->_submodule : "";
         $path = $this->_module . $submodule . "/" . $this->_action;
         $actual_path = $path;
