@@ -245,6 +245,7 @@ class InstallService
         }
         catch(Exception $e){}
         
+        ksort($steps);
         return $steps;
     }
     
