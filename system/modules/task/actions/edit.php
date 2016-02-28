@@ -4,6 +4,9 @@ function edit_GET($w) {
     $p = $w->pathMatch("id");
     $task = (!empty($p["id"]) ? $w->Task->getTask($p["id"]) : new Task($w));
     
+    // Register for timelog
+    $w->Timelog->registerTrackingObject($task);
+    
     if (!empty($task->id) && !$task->canView($w->Auth->user())) {
         $w->error("You do not have permission to edit this Task", "/task/tasklist");
     }
@@ -20,6 +23,7 @@ function edit_GET($w) {
     // Try and prefetch the taskgroup by given id
     $taskgroup = null;
     $taskgroup_id = $w->request("gid");
+    $assigned = 0;
     if (!empty($taskgroup_id) || !empty($task->task_group_id)) {
         $taskgroup = $w->Task->getTaskGroup(!empty($task->task_group_id) ? $task->task_group_id : $taskgroup_id);
         
@@ -28,20 +32,23 @@ function edit_GET($w) {
             $priority = $w->Task->getTaskPriority($taskgroup->task_group_type);
             $members = $w->Task->getMembersBeAssigned($taskgroup->id);
             sort($members);
+            array_unshift($members,array("Unassigned","unassigned"));
+            $assigned = (empty($task->assignee_id)) ? "unassigned" : $task->assignee_id;
         }
     }
     
     // Create form
     $form = array(
-        (!empty($p["id"]) ? "Edit task" : "Create a new task") => array(
+        (!empty($p["id"]) ? 'Edit task [' . $task->id . ']' : "Create a new task") => array(
             array(
-            	!empty($p["id"]) ?
-            		array("Task Group", "text", "-task_group_id_text", $taskgroup->title) :
-                	array("Task Group", "autocomplete", "task_group_id", !empty($task->task_group_id) ? $task->task_group_id : $taskgroup_id, $taskgroups),
-            	!empty($p["id"]) ?
-                	array("Task Type", "select", "-task_type", $task->task_type, $tasktypes) :
-            		array("Task Type", "select", "task_type", $task->task_type, $tasktypes)
-        	),
+				!empty($p["id"]) ?
+                        array("Task Group", "text", "-task_group_id_text", $taskgroup->title) :
+                        array("Task Group", "autocomplete", "task_group_id", !empty($task->task_group_id) ? $task->task_group_id : $taskgroup_id, $taskgroups),
+                !empty($p["id"]) ?
+                        array("Task Type", "select", "-task_type", $task->task_type, $tasktypes) :
+                        //array("Task Type", "select", "task_type", $task->task_type, $tasktypes)
+                        array("Task Type", "select", "task_type", (sizeof($tasktypes) === 1) ? $tasktypes[0] : null, $tasktypes)
+            ),
             array(
                 array("Task Title", "text", "title", $task->title),
                 array("Status", "select", "status", $task->status, $task->getTaskGroupStatus()),
@@ -50,22 +57,30 @@ function edit_GET($w) {
                 array("Priority", "select", "priority", $task->priority, $priority),
                 array("Date Due", "date", "dt_due", formatDate($task->dt_due)),
                 !empty($taskgroup) && $taskgroup->getCanIAssign() ?
-                	array("Assigned To", "select", "assignee_id", $task->assignee_id, $members) :
-                	array("Assigned To", "select", "-assignee_id", $task->assignee_id, $members)
+                	array("Assigned To", "select", "assignee_id", $assigned, $members) :
+                	array("Assigned To", "select", "-assignee_id", $assigned, $members)
             ),
+			array(
+				array("Estimated hours", "text", "estimate_hours", $task->estimate_hours),
+				array("Effort", "text", "effort", $task->effort)
+			),
             array(array("Description", "textarea", "description", $task->description)),
         		        	
         )
     );
-    
+	
+	if (!empty($p['id'])) {
+		$form['Edit task [' . $task->id . ']'][5][] = array("Task Group ID", "hidden", "task_group_id", $task->task_group_id);
+	}
+
     if (empty($p['id'])) {
     	History::add("New Task");
     } else {
     	History::add("Task: {$task->title}");
     }
     $w->ctx("task", $task);
-    $w->ctx("form", Html::multiColForm($form, $w->localUrl("/task/edit/{$task->id}"), "POST", "Save", "edit_form"));
-    
+    $w->ctx("form", Html::multiColForm($form, $w->localUrl("/task/edit/{$task->id}"), "POST", "Save", "edit_form", null, null, "_self", true, Task::$_validation));
+   
     //////////////////////////
     // Build time log table //
     //////////////////////////
@@ -216,4 +231,44 @@ function edit_POST($w) {
         }
     }
     
+	
+	if (empty($p['id']) && Config::get('task.ical.send') == true) {		
+        $data = $task->getIcal();
+        $user = $w->Auth->getUser($task->assignee_id);
+        $contact = $user->getContact();
+
+        $messageObject = Swift_Message::newInstance();
+		$messageObject->setTo(array($contact->email));
+        $messageObject->setSubject("Invite to: " . $task->title)
+            ->setFrom($w->Auth->user()->getContact()->email);
+
+        $messageObject->addPart("Your iCal is attached<br/>View Task at: " . $task->toLink(null, null, $user), "text/html");
+        $ics_content = $data;
+		$messageObject->addPart($ics_content, "text/calendar");
+		
+		file_put_contents(FILE_ROOT . "invite.ics", $data);
+		
+        $ics_attachment = Swift_Attachment::newInstance()
+                ->setBody(trim($ics_content), "application/ics; name=\"invite.ics\"")
+                ->setEncoder(Swift_Encoding::get7BitEncoding());
+        $headers = $ics_attachment->getHeaders();
+        $content_type_header = $headers->get("Content-Type");
+        $content_type_header->setValue("application/ics; name=\"invite.ics\"");
+        $content_type_header->setParameters(array(
+            'charset' => 'UTF-8',
+            'method' => 'REQUEST'
+        ));
+		
+		$content_disposition_header = $headers->get("Content-Disposition");
+		$content_disposition_header->setValue("attachment; filename=\"invite.ics\"");
+		
+		$messageObject->attach($ics_attachment);
+
+		$email_layer = Config::get('email.layer');
+		$swiftmailer_transport = new SwiftMailerTransport($w, $email_layer);
+        $mailObject = Swift_Mailer::newInstance($swiftmailer_transport->getTransport($email_layer));
+        $mailObject->send($messageObject);
+
+		unlink(FILE_ROOT . "invite.ics");
+    }
 }

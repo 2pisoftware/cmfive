@@ -86,5 +86,5 @@ function updatetask_POST(Web &$w) {
 	}
 
 	// return
-	$w->msg("Task: " . $task->title . " updated.","/task/edit/".$task->id."?tab=1");
+	$w->msg("<div id='saved_record_id' data-id='".$task->id."' >Task: " . $task->title . " updated.</div>","/task/edit/".$task->id."?tab=1");
 }

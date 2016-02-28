@@ -49,7 +49,6 @@
         ?>
         <script type="text/javascript">
             var $ = jQuery;
-
             $(document).ready(function() {
                 $("table.tablesorter").tablesorter({dateFormat: "uk", widthFixed: true, widgets: ['zebra']});
                 $(".tab-head").children("a").each(function() {
@@ -77,7 +76,23 @@
                         breadcrumbs.css('height', (breadcrumbs.height() + 20) + "px");
                     }
                 }
-                
+
+				// Admin clear cache button function
+				$('#admin_clear_cache').bind('click', function(e) {
+					$('#admin_clear_cache').css('color', '#CD0000');
+					$.get($(this).attr('href'), function() {
+						setTimeout(function() {
+							$('#admin_clear_cache').css('color', '#4B6995');
+							$('#admin_clear_cache .clear_cache_icon').removeClass('fi-refresh').addClass('fi-check');
+							setTimeout(function() {
+								$('#admin_clear_cache').css('color', '#FFF');
+								$('#admin_clear_cache .clear_cache_icon').removeClass('fi-check').addClass('fi-refresh');
+							}, 500);
+						}, 500);
+					});
+					e.preventDefault();
+					return false;
+				});
                 // Search function shortcut listener
                 $(document).on('keydown', function ( e ) {
                     if ((e.ctrlKey || e.metaKey) && e.which === 70) {
@@ -85,6 +100,9 @@
                         return false;
                     }
                 });
+				if(jQuery('.enable_drop_attachments').length !== 0) {
+					globalFileUpload.init();
+				}
             });
 
             // Try and prevent multiple form submissions
@@ -105,7 +123,31 @@
             <div class="circle_center"></div>
             <h4 class="subheader">Please wait...</h4>
         </div>
-        <div class="row-fluid">
+		<div class="global_file_drop_area" id="global_file_drop_area">
+			<div class="global_file_drop_overlay_init">
+				<h4 class="subheader">Drop files here...</h4>
+			</div>
+		</div>
+		<div class="global_file_drop_overlay" id="global_file_drop_overlay" style="display:none;">
+			<div class="global_file_drop_overlay_loading">
+				<div class="circle"></div>
+				<div class="circle_inner"></div>
+				<div class="circle_center"></div>
+				<h4 class="subheader">Uploading (0%)</h4>
+			</div>
+		</div>
+		
+		<?php if (Config::get('system.test_mode') === true) : ?>
+			<div class="row-fluid">
+				<div class="small-12">
+					<div data-alert class="alert-box warning" style="margin-bottom: 0px; padding: 5px 0px;">
+						<h4 style="font-weight: lighter; text-align: center; color: white; padding: 5px 0px 0px 0px;"><?php echo Config::get('system.test_mode_message')?></h4>
+					</div>
+				</div>
+			</div>
+		<?php endif; ?>
+        
+		<div class="row-fluid">
             <nav class="top-bar" data-topbar><!-- To make it that you need to click to activate dropdown use  data-options="is_hover: false" -->
                 <ul class="title-area">
                     <li class="name">
@@ -117,13 +159,35 @@
                 <section class="top-bar-section">
                     <!-- Right Nav Section -->
                     <ul class="right">
-                        <!-- Search bar -->
-                        <li><?php echo Html::box("/search", "<span class='fi-magnifying-glass'></span>", false, false, null, null, null, "cmfive_search_button"); ?></li>
+                        <!-- Module template injection -->
+                        <?php 
+                            $inject = $w->callHook('core_template', 'menu');
+                            if (!empty($inject)) :
+                                foreach($inject as $i) : ?>
+                                    <li><?php echo $i; ?></li>
+                                <?php endforeach;
+                            endif;
+                        ?>
                         
-                        <!-- User Profile drop down -->
+                        <!-- Search bar -->
+                        <li><?php echo Html::box("/search", "<span class='fi-magnifying-glass show-for-medium-up'></span><span class='show-for-small'>Search</span>", false, false, null, null, null, "cmfive_search_button"); ?></li>
+                        
                         <?php if ($w->Auth->user()): ?>
+						<!-- Clear cache button -->
+							<?php if ($w->Auth->user()->is_admin): ?>
+							<li>
+								<a id="admin_clear_cache" href="/admin/ajaxClearCache" onclick="return false;" title="Clear configuration cache">
+									<span class="clear_cache_icon fi-refresh show-for-medium-up"></span>
+									<span class="show-for-small">Clear cache</span>
+								</a>
+							</li>
+							<?php endif; ?>
+                        <!-- User Profile drop down -->
                             <li class="has-dropdown">
-                                <a href="#"><span  class="fi-torso"></span></a>
+                                <a href="#">
+									<span class="fi-torso show-for-medium-up"></span>
+									<span class="show-for-small">Account</span>
+								</a>
                                 <?php
                                 echo Html::ul(
                                     array(
@@ -138,7 +202,7 @@
                     <!-- Left Nav Section -->
                     <ul class="left">
                         <?php if ($w->Auth->loggedIn()) : ?>
-                            <li><?php echo $w->menuLink($w->Main->getUserRedirectURL(), "<span class='fi-home'></span>"); ?></li>
+                            <li><?php echo $w->menuLink($w->Main->getUserRedirectURL(), "<span class='fi-home show-for-medium-up'></span><span class='show-for-small'>Home</span>"); ?></li>
                             <li class="divider"></li>
                             <?php foreach ($w->modules() as $module) {
                                 // Check if config is set to display on topmenu
@@ -162,7 +226,7 @@
                             }
                         
                             if ($w->Auth->allowed('help/view')) : ?>
-                                <li><?php echo Html::box(WEBROOT . "/help/view/" . $w->_module . ($w->_submodule ? "-" . $w->_submodule : "") . "/" . $w->_action, "<span class='fi-q'>?</span>", false, true, 750, 500); ?> </li>
+                                <li><?php echo Html::box(WEBROOT . "/help/view/" . $w->_module . ($w->_submodule ? "-" . $w->_submodule : "") . "/" . $w->_action, "<span class='fi-q show-for-medium-up'>?</span><span class='show-for-small'>Help</span>", false, true, 750, 500, "isbox", null, null, null, 'cmfive-help-modal'); ?> </li>
                             <?php endif;
                         endif; ?>
                     </ul> <!-- End left nav section -->
@@ -178,9 +242,11 @@
         <div class="row-fluid body">
             <?php // Body section w/ message and body from template ?>
             <div class="row-fluid <?php // if(!empty($boxes)) echo "medium-10 small-12 "; ?>">
+                <?php if (empty($hideTitle) && !empty ($title)):?>
                 <div class="row-fluid small-12">
-                    <h3 class="header"><?php echo !empty($title) ? $title : ucfirst($w->currentModule()); ?></h3>
+                    <h3 class="header"><?php echo $title; ?></h3>
                 </div>
+                <?php endif;?>
                 <?php if (!empty($error) || !empty($msg)) : ?>
                     <?php $type = !empty($error) ? array("name" => "error", "class" => "warning") : array("name" => "msg", "class" => "info"); ?>
                     <div data-alert class="alert-box <?php echo $type["class"]; ?>">
@@ -201,7 +267,8 @@
             </div>
         </div>
 
-        <div id="cmfive-modal" class="reveal-modal xlarge" data-reveal style="top: 30px !important;"></div>
+        <div id="cmfive-modal" class="reveal-modal xlarge" data-reveal></div>
+        <div id="cmfive-help-modal" class="reveal-modal xlarge" data-reveal></div>
         
         <script type="text/javascript" src="/system/templates/js/foundation-5.5.0/js/foundation.min.js"></script>
         <script type="text/javascript" src="/system/templates/js/foundation-5.5.0/js/foundation/foundation.clearing.js"></script>
@@ -210,22 +277,36 @@
                 reveal : {
                     animation_speed: 150,
                     animation: 'fade'
-                }
-            });
+                },
+				accordion: {
+					multi_expand: true,
+				}
+			});
             
             var modal_history = [];
             var modal_history_pop = false;
             
             // Automatically append the close 'x' to reveal modals
             $(document).on('opened', '[data-reveal]', function () {
-                $("#cmfive-modal").append("<a class=\"close-reveal-modal\">&#215;</a>");
-                modal_history.push()
+                $(this).append("<a class=\"close-reveal-modal\">&#215;</a>");
+                modal_history.push();
                 bindModalLinks();
             });
             
             function bindModalLinks() {
                 // Stop a links and follow them inside the reveal modal
                 $("#cmfive-modal a:not(#modal-back)").click(function(event) {                    
+                    if ($(this).hasClass("close-reveal-modal")) {
+                        $("#cmfive-modal").foundation("reveal", "close");
+                    } else {
+						// No one is using the help system at the moment
+						// Therefore no real need for a dynamic modal history
+						return true;
+                    }
+                    return false;
+                });
+                
+				$("#cmfive-help-modal a:not(#modal-back)").click(function(event) {                    
                     if ($(this).hasClass("close-reveal-modal")) {
                         $("#cmfive-modal").foundation("reveal", "close");
                     } else {
@@ -237,14 +318,14 @@
                                 modal_history.push($(this).attr('href'));
                                 modal_history_pop = true;
                             }
-                            changeModalWindow($(this).attr('href'));
+                            changeModalWindow($(this).closest('.reveal-modal'), $(this).attr('href'));
                         }
                     }
                     return false;
                 });
                 
                 // Bind back traversal to modal window
-                $("#cmfive-modal #modal-back").click(function(event) {
+                $("#cmfive-modal #modal-back, #cmfive-help-modal #modal-back").click(function(event) {
                     // event.preventDefault();
                     if (modal_history.length > 0) {
                         // When you click a link, THAT link goes onto the stack.
@@ -256,7 +337,7 @@
                             modal_history_pop = false;
                         }
                         if (modal_history.length > 0) {
-                            changeModalWindow(modal_history.pop());
+                            changeModalWindow($(this).closest('.reveal-modal'), modal_history.pop());
                         }
 //                        console.log(modal_history);
                     } 
@@ -265,9 +346,9 @@
             }
             
             // Updates the modal window by content from ajax request to uri
-            function changeModalWindow(uri) {
+            function changeModalWindow(object, uri) {
                 $.get(uri, function(data) {
-                    $("#cmfive-modal").html(data + "<a class=\"close-reveal-modal\">&#215;</a>");
+                    object.html(data + "<a class=\"close-reveal-modal\">&#215;</a>");
                     bindModalLinks();
                 });
             }

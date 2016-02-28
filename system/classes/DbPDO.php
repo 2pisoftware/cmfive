@@ -7,6 +7,7 @@
  */
 class DbPDO extends PDO {
     private static $table_names = array();
+	
     private static $_QUERY_CLASSNAME = array("InsertQuery", "SelectQuery", "UpdateQuery"); //"PDOStatement", 
 
     private $query = null;
@@ -22,7 +23,7 @@ class DbPDO extends PDO {
         // Set up our PDO class
         $port = isset($config['port']) && !empty($config['port']) ? ";port=".$config['port'] : "";
         $url = "{$config['driver']}:host={$config['hostname']};dbname={$config['database']}{$port}";
-        parent::__construct($url,$config["username"],$config["password"], null);
+        parent::__construct($url,$config["username"],$config["password"], array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'"));
         $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
         // Since you cant bind table names, maybe its a good idea to
@@ -30,10 +31,8 @@ class DbPDO extends PDO {
         // unecessary to do on every call so maybe move it to get()
         // Setting this to static however should make this array share the memory
         // heap for this var across all instances
-        if (empty(DbPDO::$table_names)){
-            foreach($this->query("show tables")->fetchAll(PDO::FETCH_NUM) as $table)
-                DbPDO::$table_names[] = $table[0];
-        }
+		$this->getAvailableTables();
+		
         // Instantiate a FluentPDO class and init vars
         $this->fpdo = new FluentPDO($this);
         
@@ -57,6 +56,13 @@ class DbPDO extends PDO {
     	return $this->config['driver'];
     }
     
+	public function getAvailableTables() {
+		DbPDO::$table_names = [];
+		foreach($this->query("show tables")->fetchAll(PDO::FETCH_NUM) as $table) {
+			DbPDO::$table_names[] = $table[0];
+		}
+	}
+	
     /**
      * This function sets up a FluentPDO query with the given table name, an
      * error will be thrown if the table name doesn't exist in the database
@@ -66,16 +72,18 @@ class DbPDO extends PDO {
      */
     public function get($table_name){
         if (!in_array($table_name, DbPDO::$table_names)){
-            trigger_error("Table $table_name does not exist in the databse", E_USER_ERROR);
-            return null;
+			if (!$this->install($table_name)) {
+				trigger_error("Table $table_name does not exist in the database", E_USER_ERROR);
+				return null;
+			}
         }  
         $this->query = $this->fpdo->from($table_name);
         return $this;
     }
     
-    public function select($select){
-        if ($this->query !== NULL && !empty($select)){
-            $this->query = $this->query->select($select);
+	public function select($select = null){
+        if ($this->query !== NULL){
+			$this->query = $this->query->select($select);
         }
         return $this;
     }
@@ -133,10 +141,7 @@ class DbPDO extends PDO {
     }
     
     public function order_by($orderby){
-        if ($this->query !== null && !empty($orderby)){
-            $this->query = $this->query->orderBy($orderby);
-        }
-        return $this;
+        return $this->orderBy($orderby);
     }
     
     public function limit($limit){
@@ -145,6 +150,13 @@ class DbPDO extends PDO {
         }
         return $this;
     }
+	
+	public function offset($offset) {
+		if ($this->query !== null and !is_null($offset)){
+            $this->query = $this->query->offset($offset);
+        }
+        return $this;
+	}
     
     public function groupBy($grouping) {
         if ($this->query !== null and !is_null($grouping)){
@@ -180,6 +192,10 @@ class DbPDO extends PDO {
         $row = $this->fetch_row();
         return (!is_null($row[$element]) ? $row[$element] : null);
     }
+	
+	public function fetchElement($element) {
+		return $this->fetch_element($element);
+	}
     
     /**
      * A grace method for our migration from Crystal
@@ -190,6 +206,10 @@ class DbPDO extends PDO {
     public function fetch_row() {
         return $this->query->fetch();
     }
+	
+	public function fetchRow() {
+		return $this->fetch_row();
+	}
     
     /**
      * A grace method for our migration from Crystal
@@ -203,6 +223,10 @@ class DbPDO extends PDO {
         }
         return array();
     }
+	
+	public function fetchAll() {
+		return $this->fetch_all();
+	}
         
     /**
      * Sets up class with a PDO insert query and required array of values
@@ -276,7 +300,7 @@ class DbPDO extends PDO {
     
     // Returns the SQL query string
     public function getSql(){
-        if (!empty($this->query) and in_array(get_class($this->query), DbPDO::$_QUERY_CLASSNAME)) {
+        if (!empty($this->query) && in_array(get_class($this->query), DbPDO::$_QUERY_CLASSNAME)) {
             return $this->query->getQuery();
         }
         return null;
@@ -289,10 +313,18 @@ class DbPDO extends PDO {
     public function getColumnMeta($i) {
         return $this->query->getColumnMeta($i);
     }
-
+    
+    // Completely clears the select statement (removes table.*)
+    public function clearSelect() {
+        if (!empty($this->query) && is_a($this->query, "SelectQuery")) {
+            $this->query = $this->query->select(null);
+        }
+        return $this;
+    }
+    
     public function clear_sql(){
         // Clear everything
-        if (!empty($this->query) and is_a($this->query, "PDOStatement")) {
+        if (!empty($this->query) && is_a($this->query, "PDOStatement")) {
             $this->query = $this->query->where(null);
             $this->query = $this->query->orderBy(null);
             $this->query = $this->query->limit(null);
@@ -308,10 +340,10 @@ class DbPDO extends PDO {
     // PDO object
     public function last_insert_id(){
         if ($this->query !== null){
-            // This might be too much, oh well it works
             // It checks if we havent called execute yet, and calls it for us
-            if ($this->query instanceof InsertQuery)
+            if ($this->query instanceof InsertQuery) {
                 $this->execute();
+			}
 
             return $this->query;
         }
@@ -371,4 +403,37 @@ class DbPDO extends PDO {
 		return self::$trx_token > 0;
 	} 
     
+	/**
+	 * A self healing function when a table doesn't exist
+	 * This class will check the Config definition for a module and try and load
+	 * it's install SQL file
+	 */
+	public function install($table) {
+		if (!class_exists("Config")) {
+			return false;
+		}
+		
+		// Check if $table happens to be an entry in Config, i.e. a module
+		$config = Config::get($table);
+		if (empty($config)) {
+			return false;
+		}
+		
+		// Get install path
+		$sql_folder_path = ROOT_PATH . '/' . $config['path'] . '/' . $table . '/install';
+		if (!is_dir($sql_folder_path) || !file_exists($sql_folder_path . '/db.sql')) {
+			return false;
+		}
+		
+		try {
+			$statement = $this->prepare(file_get_contents($sql_folder_path . '/db.sql'));
+			$statement->execute();
+		} catch (Exception $e) {
+			echo $e->getMessage();
+			return false;
+		}
+		
+		
+		return true;
+	}
 }

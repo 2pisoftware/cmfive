@@ -25,6 +25,14 @@ function viewtaskgroup_GET(Web &$w) {
 	$arrassign = $w->Task->getTaskGroupPermissions();
 	// unset 'ALL' given all can never assign a task
 	unset($arrassign[0]);
+
+        // Get list of possible task types and priorities adn assignees
+        $tasktypes = $w->Task->getTaskTypes($group_details->task_group_type);
+        $priorities = $w->Task->getTaskPriority($group_details->task_group_type);
+        $assignees = $w->Task->getMembersInGroup($p['id']);
+        array_unshift($assignees,array("Unassigned","unassigned")); 
+        // No default assignee means it is unassigned
+        $default_assignee = (empty($group_details->default_assignee_id)) ? "unassigned" : $group_details->default_assignee_id;
 	
 	// build form displaying current attributes from database
 	$f = Html::form(array(
@@ -36,7 +44,9 @@ function viewtaskgroup_GET(Web &$w) {
 	array("Who Can Create","select","can_create",$group_details->can_create,$w->Task->getTaskGroupPermissions()),
 	array("Is Active","select", "is_active", $group_details->is_active,$is_active),
 	array("Description","textarea", "description",$group_details->description,"26","6"),
-	array("Default Assignee","select", "default_assignee_id",$group_details->default_assignee_id,$w->Task->getMembersInGroup($p['id'])),
+        array("Default Task Type","select","default_task_type",$group_details->default_task_type,$tasktypes),
+        array("Default Priority","select","default_priority",$group_details->default_priority,$priorities),
+	array("Default Assignee","select", "default_assignee_id",$default_assignee,$assignees),
 	),$w->localUrl("/task-group/updatetaskgroup/".$group_details->id),"POST"," Update ");
 
 	// display form
@@ -54,11 +64,13 @@ function createtaskgroup_POST(Web &$w) {
         $w->request('can_view'),
         $w->request('can_create'),
         $w->request('is_active'),
-        $w->request('is_deleted')
+        $w->request('is_deleted'),
+        $w->request('default_task_type'),
+        $w->request('default_priority')
     );
 
     // return
-    $w->msg("Task Group ".$taskgroup->title." added", "/task/tasklist/?taskgroups=".$taskgroup->id);
+    $w->msg("<div id='saved_record_id' data-id='".$taskgroup->id."' >Task Group ".$taskgroup->title." added</div>", "/task-group/viewmembergroup/".$taskgroup->id."#members");
 }
 
 function updatetaskgroup_POST(Web &$w) {
@@ -69,10 +81,16 @@ function updatetaskgroup_POST(Web &$w) {
 	// if group exists, update the details
 	if ($group_details) {
 		$group_details->fill($_REQUEST);
-		$group_details->update();
+		$response = $group_details->update();
 
-		// if a default assignee is set, return their membership object for this group
-		if ($_REQUEST['default_assignee_id'] != "") {
+                // Check the validation
+                if ($response !== true) {
+                    $w->errorMessage($group_details, "Taskgroup", $response, true, "/task-group/viewmembergroup/".$p['id']."#members");
+                }                
+
+		// if a default assignee is set (other than unassigned), return their membership object for this group
+                $default_assignee_id = $_REQUEST['default_assignee_id'];
+		if (!empty($default_assignee_id) && $default_assignee_id != "unassigned") {
 			$mem = $w->Task->getMemberGroupById($group_details->id, $_REQUEST['default_assignee_id']);
 		
 			// populate an array with the required details for updating
@@ -223,24 +241,18 @@ function updategroupmember_POST(Web &$w) {
 function addgroupmembers_GET(Web &$w) {
 	$p = $w->pathMatch("task_group_id");
 
-	// get all users
+	// get all users (getUsers strips out users that are groups)
 	$users = $w->Auth->getUsers();
-	
-	// not interested in users who are really groups
-	foreach ($users as $user) {
-		if ($user->is_group == "0")
-			$usr[] = $user;
-	}
 	
 	// build 'add members' form given task group ID, the list of group roles and the list of users.
 	// if current members are added as if new, their membership will be updated, not recreated, with the selected role
 	$addUserForm['Add Group Members'] = array(
-	array(array("","hidden", "task_group_id",$p['task_group_id'])),
-	array(array("As Role","select","role","",$w->Task->getTaskGroupPermissions())),
-	array(array("Add Group Members","select","member",null,$usr)));
+		array(array("","hidden", "task_group_id", $p['task_group_id'])),
+		array(array("As Role", "select", "role", null, $w->Task->getTaskGroupPermissions())),
+		array(array("Add Group Members", "select", "member", null, $users))
+	);
 
-//	$w->setLayout(null);
-	$w->out(Html::multiColForm($addUserForm,$w->localUrl("/task-group/updategroupmembers/"),"POST"," Submit "));
+	$w->out(Html::multiColForm($addUserForm,$w->localUrl("/task-group/updategroupmembers/"),"POST","Submit"));
 }
 
 function updategroupmembers_POST(Web &$w) {
@@ -321,5 +333,3 @@ function deletegroupmember_POST(Web &$w) {
 		$w->msg("Task Group Members no longer exists?","/task-group/viewmembergroup/".$tgid);
 	}
 }
-
-?>

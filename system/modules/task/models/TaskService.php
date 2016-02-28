@@ -317,53 +317,6 @@ class TaskService extends DbService {
         return $this->getObjects("Task", $where);
     }
     
-    // given a where clause, return all resulting tasks from the database
-//    function getTasks($id = null, $where = null) {
-//        $assign = "";
-//        $grps = "";
-//
-//        // if no user ID given, show all tasks in groups of which logged in user is a member
-//        // get list of groups for inclusion in where clause
-//        $groups = $this->getMemberGroups($_SESSION['user_id']);
-//        if ($groups) {
-//            $grplist = "";
-//            foreach ($groups as $group) {
-//                $grplist .= $group->task_group_id . ",";
-//            }
-//            $grplist = rtrim($grplist, ",");
-//            $grps = "t.task_group_id in (" . $grplist . ") and ";
-//        }
-//
-//        // if where is array, do this
-//        if (is_array($where)) {
-//            if (($id) && ($id = ""))
-//                $where['t.assignee_id'] = $id;
-//            $where['g.is_active'] = 1;
-//            $where['g.is_deleted'] = 0;
-//            $where['t.is_deleted'] = 0;
-//        }
-//        // if where is not blank string, do this
-//        elseif ($where != "") {
-//            if (($id) && ($id != "")) {
-//                $assign = "(t.assignee_id = " . $id . " or t.assignee_id = 0) and ";
-//            }
-//            $where = "where " . $assign . $grps . $where . " and t.is_deleted = 0 and g.is_active = 1 and g.is_deleted = 0";
-//        }
-//        // if where is blank string, do this
-//        elseif ($where == "") {
-//            if (($id) && ($id != "")) {
-//                $assign = "(t.assignee_id = " . $id . " or t.assignee_id = 0) and ";
-//            }
-//            $where = "where " . $assign . $grps . " t.is_closed = 0 and t.is_deleted = 0 and g.is_active = 1 and g.is_deleted = 0";
-//        }
-//
-////		return $this->getObjects("Task",$clause);
-//        // need to check if task group is deleted
-//        $rows = $this->_db->sql("SELECT t.* from " . Task::$_db_table . " as t inner join " . TaskGroup::$_db_table . " as g on t.task_group_id = g.id " . $where . " order by t.task_group_id")->fetch_all();
-//        $rows = $this->fillObjects("Task", $rows);
-//        return $rows;
-//    }
-
     // return a task group from the database given its ID
     function getTasksbyGroupId($id) {
         $where = ($id) ? array("task_group_id" => $id) : null;
@@ -517,10 +470,14 @@ class TaskService extends DbService {
         return $this->w->Auth->getObject("TaskComment", array("obj_table" => Task::$_db_table, "id" => $id));
     }
 
+//    function getTaskTimes() {
+//        return $this->getObjects("TaskTime", array("is_deleted" => 0, "user_id" => $this->w->Auth->user()->id));
+//    }
+    
     // return a time log entry by log entry ID
-    function getTimeLogEntry($id) {
-        return $this->getObject("TaskTime", array("id" => $id, "is_deleted" => 0));
-    }
+//    function getTimeLogEntry($id) {
+//        return $this->getObject("TaskTime", array("id" => $id, "is_deleted" => 0));
+//    }
 
     // return an array of the owners of a task group from the database
     function getTaskGroupOwners($id) {
@@ -687,17 +644,17 @@ class TaskService extends DbService {
      * 
      * @param task_group_type, eg. "TaskGroupType_TaskTodo"
      * @param title, the task group title
-     * @param description, a description
-     * @param default_assignee_id, a user_id or null
      * @param can_assign, OWNER|MEMBER|GUEST
      * @param can_view, OWNER|MEMBER|GUEST
      * @param can_create, OWNER|MEMBER|GUEST
      * @param is_active, 0|1
      * @param is_deleted, 0|1
+     * @param description, a description
+     * @param default_assignee_id, a user_id or null
      *  
      * @return TaskGroup
      */
-    function createTaskGroup($type, $title, $description, $default_assignee_id, $can_assign = "OWNER", $can_view = "OWNER", $can_create = "OWNER", $is_active = 1, $is_deleted = 0) {
+    function createTaskGroup($type, $title, $description, $default_assignee_id, $can_assign = "OWNER", $can_view = "OWNER", $can_create = "OWNER", $is_active = 1, $is_deleted = 0, $default_task_type = null, $default_priority = null) {
         // title should be unique!
         $taskgroup = $this->getTaskGroupByUniqueTitle($title);
         if (null != $taskgroup) {
@@ -715,6 +672,8 @@ class TaskService extends DbService {
         $taskgroup->is_active = $is_active;
         $taskgroup->is_deleted = $is_deleted;
         $taskgroup->default_assignee_id = $default_assignee_id;
+        $taskgroup->default_task_type = $default_task_type;
+        $taskgroup->default_priority = $default_priority;
         $response = $taskgroup->insert();
         
         // Check the validation
@@ -865,6 +824,21 @@ class TaskService extends DbService {
         return $notifyUsers;
     }
     
+	public function getNotificationAdditionalDetails(Task $task) {
+		$additional_details = $this->w->callHook("task", "notification_additional_details", $task);
+		$message = '';
+		
+		if (!empty($additional_details)) {
+//			$message .= "<br/><p>Additional details:</p>";
+			foreach($additional_details as $additional_detail) {
+				if (!empty($additional_detail)) {
+					$message .= "<p>" . $additional_detail . "</p>";
+				}
+			}
+		}
+		
+		return !empty($message) ? "<br/><p>Additional details:</p>" . $message : '';
+	}
     
     public function navigation(Web $w, $title = null, $nav = null) {
         if ($title) {
@@ -875,7 +849,7 @@ class TaskService extends DbService {
 
         if ($w->Auth->loggedIn()) {
             $w->menuLink("task/edit", "New Task", $nav);
-            $w->menuLink("task/index", "Task Dashboard", $nav);
+//          $w->menuLink("task/index", "Task Dashboard", $nav);
             $w->menuLink("task/tasklist", "Task List", $nav);
             $w->menuLink("task/tasklist#notifications", "Notifications", $nav);
             $w->menuLink("task/taskweek", "Activity", $nav);

@@ -9,6 +9,7 @@ class Task extends DbObject {
     public $task_group_id;  // can be null!
     public $status;   // text
     public $priority;   // text
+	public $effort;		// float (null)
     public $task_type;   // text
     public $assignee_id;  // who is currently assigned
     public $dt_assigned;  // date & time of current (last) assignment
@@ -25,7 +26,7 @@ class Task extends DbObject {
     public $is_deleted;  // is_deleted flag
     public $_modifiable;  // Modifiable Aspect
     public $_searchable;
-    public $_validation = array(
+    public static $_validation = array(
         "title" => array('required'),
         "task_group_id" => array('required'),
         "status" => array('required'),
@@ -233,6 +234,10 @@ class Task extends DbObject {
     // get status types for a task group given a task group ID
     // given a status, return true| false ... $c[<status>] = true|false
     function getisTaskClosed() {
+		if ($this->is_closed !== NULL) {
+			return $this->is_closed;
+		}
+		
         if (!empty($this->_taskgroup->id)) {
             $statlist = $this->_taskgroup->getStatus(); //Task->getTaskStatus($this->w->Task->getTaskGroupTypeById($this->task_group_id));
             if ($statlist) {
@@ -254,7 +259,8 @@ class Task extends DbObject {
         if (empty($id)) {
             $id = $this->id;
         }
-        return $this->getObjects("TaskTime", array("task_id" => $id, "is_deleted" => 0));
+        return $this->getObjects("timelog", array("object_class" => "Task", "object_id" => $id, "is_deleted" => 0));
+            
     }
 
     // return list of task time log entries, sort by start date
@@ -270,13 +276,14 @@ class Task extends DbObject {
 
     // return due date in bold red for display, if it is on or past the due date
     function isTaskLate() {
-        if (($this->dt_due == "0000-00-00 00:00:00") || ($this->dt_due == ""))
+        if (($this->dt_due == "0000-00-00 00:00:00") || ($this->dt_due == "")) {
             return "Not given";
-
-        if ((!$this->getisTaskClosed()) && (date("U") > $this->dt_due)) {
-            return "<font color=red><b>" . formatDateTime($this->dt_due) . "</b></font>";
+		}
+		
+        if ((!$this->getisTaskClosed()) && (time() > $this->dt_due)) {
+            return "<font color=red><b>" . formatDate($this->dt_due) . "</b></font>";
         } else {
-            return formatDateTime($this->dt_due);
+            return formatDate($this->dt_due);
         }
     }
 
@@ -288,7 +295,7 @@ class Task extends DbObject {
     }
 
     function printSearchTitle() {
-        $buf = $this->title . ', ' . strtoupper($this->status);
+        $buf = (!empty($this->title) ? $this->title : 'Task [' . $this->id . ']') . ', ' . strtoupper($this->status);
         return $buf;
     }
 
@@ -314,6 +321,16 @@ class Task extends DbObject {
         return "task/edit/" . $this->id;
     }
 
+	function toLink($class = null, $target = null, $user = null) {
+        if (empty($user)) {
+            $user = $this->w->Auth->user();
+        }
+        if ($this->canView($user)) {
+            return Html::a($this->w->localUrl($this->printSearchUrl()), (!empty($this->title) ? htmlentities($this->title) : 'Task [' . $this->id . ']'), null, $class, null, $target);
+        }
+        return (!empty($this->title) ? htmlentities($this->title) : 'Task [' . $this->id . ']');
+    }
+	
     function getAssignee() {
         if ($this->assignee_id) {
             return $this->getObject("User", $this->assignee_id);
@@ -334,15 +351,14 @@ class Task extends DbObject {
             $this->startTransaction();
 
             // 1. Call on_before_insert of the TaskGroupType
-
+			
             $tg = $this->getTaskGroup();
             if (!empty($tg)) {
 
-                // if no assignee selected for newly created task, use task group default assignee
-                if (empty($this->assignee_id)) {
-                    $this->first_assignee_id = $this->assignee_id = $tg->default_assignee_id;
+                if ($this->isStatusClosed()) {
+                    $this->is_closed = 1;
                 } else {
-                    $this->first_assignee_id = $this->assignee_id;
+                	$this->is_closed = 0;
                 }
 
                 $tg_type = $tg->getTaskGroupTypeObject();
@@ -355,7 +371,7 @@ class Task extends DbObject {
                 $tg_type->on_before_insert($this);
             }
 
-            // 2. Call on_before_update of the Tasktype
+            // 2. Call on_before_insert of the Tasktype
 
             if ($this->task_type) {
                 $this->getTaskTypeObject()->on_before_insert($this);
@@ -368,11 +384,16 @@ class Task extends DbObject {
                 $this->w->errorMessage($this, "Task", $validation_response, false, "/tasks/edit");
             }
 
+			if (empty($this->title)) {
+				$this->update();
+			}
+			
             // run any post-insert routines
             // add a comment upon task creation
             $comm = new TaskComment($this->w);
             $comm->obj_table = $this->getDbTableName();
             $comm->obj_id = $this->id;
+			$comm->is_system = 1;
             $comm->comment = "Task Created";
             $comm->insert();
 
@@ -386,7 +407,7 @@ class Task extends DbObject {
                 $this->getTaskTypeObject()->on_after_insert($this);
             }
 
-            // 5. Call on_after_update of the TaskGroupType
+            // 5. Call on_after_insert of the TaskGroupType
 
             if (!empty($tg_type)) {
                 $tg_type->on_after_insert($this);
@@ -405,6 +426,14 @@ class Task extends DbObject {
      */
     function update($force = false, $force_validation = false) {
 
+    	// 0. set the is_closed flag to make sure the task can be queried easily
+    	
+    	if ($this->isStatusClosed()) {
+    		$this->is_closed = 1;
+    	} else {
+    		$this->is_closed = 0;
+    	}
+    	
         try {
             $this->startTransaction();
 
@@ -423,7 +452,10 @@ class Task extends DbObject {
             }
 
             // 3. update the task
-
+			if (empty($this->title)) {
+				$this->title = 'Task [' . $this->id . ']';
+			}
+			
             $validation_response = parent::update($force, $force_validation);
             if ($validation_response !== true) {
                 $this->rollbackTransaction();
@@ -499,4 +531,38 @@ class Task extends DbObject {
         return $this->Task->getTaskGroup($this->task_group_id);
     }
 
+    function getIcal() {
+        if (empty($this->id) || empty($this->dt_due)) {
+            return null;
+        }
+        
+        $date = date("Ymd", strtotime(str_replace('/', '-', $this->dt_due)));
+
+		$task_creator = $this->getCreator();
+		$task_assignee = $this->getAssignee();
+		
+        // Borrowed from here http://stackoverflow.com/questions/1463480/how-can-i-use-php-to-dynamically-publish-an-ical-file-to-be-read-by-google-calen
+        $ical = "BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//hacksw/handcal//NONSGML v1.0//EN
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:" . $date . "
+DTEND;VALUE=DATE:" . $date . "
+DTSTAMP:" . gmdate('Ymd').'T'. gmdate('His') . "Z
+ORGANIZER;CN=" . $task_creator->getFullName() . ":mailto:" . $task_creator->getContact()->email . "
+UID:" . md5(uniqid(mt_rand(), true)) . "@2pisoftware.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+  TRUE;CN=" . $task_assignee->getFullName() . ";X-NUM-GUESTS=0:mailto:" . $task_assignee->getContact()->email . "
+SUMMARY:" . $this->title . "
+DESCRIPTION:" . htmlentities($this->description) . "
+SEQUENCE:0
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR";
+        
+        return $ical;
+    }
+    
 }

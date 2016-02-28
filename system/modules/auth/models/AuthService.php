@@ -6,6 +6,7 @@ class AuthService extends DbService {
     public $_roles_loaded = false;
     public $_user = null;
     public $_rest_user = null;
+	private static $_cache = array();
 
     function login($login, $password, $client_timezone, $skip_session = false) {
         // $password = User::encryptPassword($password);
@@ -56,15 +57,7 @@ class AuthService extends DbService {
 
     function getUserForLogin($login) {
         $user = $this->db->get("user")->where("login", $login)->fetch_row();
-        $user_obj = $this->getObjectFromRow("User", $user);
-        // Could someone tell me why getObject instantly returns "admin" and not the user im after?
-
-        // var_dump($user);
-        // echo $login;
-        // $result = $this->getObject("User", array("login", $login));
-        // echo $result->login; die();
-
-        return $user_obj;
+		return $this->getObjectFromRow("User", $user);
     }
 
     function getUserForToken($token) {
@@ -95,19 +88,30 @@ class AuthService extends DbService {
         return $this->user() ? $this->user()->hasRole($role) : false;
     }
 
+	/**
+     * 
+     * Check if the current user can access the specified path
+     * @ return false if the login user is not allowed access to this path
+     *  OR return string url if it is provided as a parameter
+     */
     function allowed($path, $url = null) {
-
+		$key = $path.'::'.$url;
+		if(!empty(self::$_cache[$key])) {
+			return self::$_cache[$key];
+		}
         $parts = $this->w->parseUrl($path);
         if (!in_array($parts['module'], $this->w->modules())) {
             $this->Log->error("Denied access: module '". urlencode($parts['module']). "' doesn't exist");
+			self::$_cache[$key] = false;
             return false;
         }
 
         if ((function_exists("anonymous_allowed") && anonymous_allowed($this->w, $path)) || 
         	($this->user() && $this->user()->allowed($path))) {
-        	return $url ? $url : true;
+			self::$_cache[$key] = $url ? $url : true;
+        	return self::$_cache[$key];
         }
-        
+        self::$_cache[$key] = false;
         return false;
     }
 

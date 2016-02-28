@@ -1,11 +1,12 @@
-<?php
+<?php namespace System\Modules\Main;
 
-function listwidgets_ALL(Web $w, $params) {
+function listwidgets(\Web $w, $params) {
     $module = null;
+	
     if (!empty($params["module"])) {
         $module = $params["module"];
     } else {
-        $module = $w->_module;
+        $module = $w->_module ? : "main";
     }
 
     $widgets = $w->Widget->getWidgetsForModule($module, $w->Auth->user()->id);
@@ -20,7 +21,6 @@ function listwidgets_ALL(Web $w, $params) {
 
         foreach ($filter_widgets as &$widget) {
             // Give each widget_config db object an instance of the matching class
-            $widget_class = null;
             $widgetname = $widget->widget_name;
             $widget->widget_class = new $widgetname($w, $widget);
         }

@@ -21,10 +21,20 @@ function ajaxGetFieldForm_ALL(Web $w) {
     if (!empty($p['task_id'])) {
         $task = $w->Task->getTask($p['task_id']);
     }
-    
+	
+	$task_type_form = $task_type->getFieldFormArray($task_group, $task);
+//	if (!empty($task_type_form)) {
+//		foreach($task_type_form as &$row) {
+//			$task_data = $w->Task->getObject("TaskData", array("task_id" => $task->id, "data_key" => $row[2]));
+//			if (!empty($task_data)) {
+//				$row[3] = $task_data->value;
+//			}
+//		}
+//	}
+	
     $w->out(
       json_encode(array(
-        Html::form($task_type->getFieldFormArray($task_group, $task), "/task/edit", null, null, "form_fields_form")
+        Html::form($task_type_form, "/task/edit", null, null, "form_fields_form")
       ))
     );
 }

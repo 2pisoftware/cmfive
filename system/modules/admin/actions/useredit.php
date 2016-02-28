@@ -63,5 +63,5 @@ function useredit_POST(Web &$w) {
     }
     $w->callHook("admin", "account_changed", $user);
 
-    $w->msg("User " . $user->login . " updated.", "/admin/users");
+    $w->msg("<div id='saved_record_id' data-id='".$user->id."' >User " . $user->login . " updated.</div>", "/admin/users");
 }

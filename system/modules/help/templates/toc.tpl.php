@@ -4,4 +4,4 @@
     <li><a href="<?php echo WEBROOT; ?>/help/view/help/onhelp">Help on Help</a></li>
 </ul>
 <h2>Table of Contents</h2>
-<?php echo !empty($ul) ? $ul : null; ?>
+<?php echo !empty($ul) ? $ul : null;

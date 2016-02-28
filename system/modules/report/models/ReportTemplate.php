@@ -4,6 +4,7 @@ class ReportTemplate extends DbObject {
     
     public $report_id;
     public $template_id;
+	public $is_email_template;
     public $type;
     
     public function getReportTypes() {
@@ -23,4 +24,5 @@ class ReportTemplate extends DbObject {
     public function getTemplate() {
         return $this->getObject("Template", array("id" => $this->template_id, "is_deleted" => 0));
     }
+	
 }

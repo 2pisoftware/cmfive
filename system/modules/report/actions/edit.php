@@ -18,15 +18,24 @@ function edit_GET(Web &$w) {
     
     $w->ctx("report", $report);
     
-    // If we're creating this is the table
     $form = array(
         array((!empty($report->id) ? "Edit" : "Create a New") . " Report", "section"),
         array("Title", "text", "title", $report->title),
         array("Module", "select", "module", $report->module, $w->Report->getModules()),
         array("Description", "textarea", "description", $report->description, "110", "2"),
-        array("Code", "textarea", "report_code", $report->report_code, "110", "22", "codemirror"),
+//        array("Code", "textarea", "report_code", $report->report_code, "110", "22", "codemirror"),
         array("Connection", "select", "report_connection_id", $report->report_connection_id, $w->Report->getConnections())
     );
+    
+    if (!empty($report)) {
+	    $sqlform = array(
+	    		array("", "hidden", "title", $report->title),
+	    		array("", "hidden", "module", $report->module),
+	    		array("", "hidden", "description", $report->description),
+	    		array("Code", "textarea", "report_code", $report->report_code, "110", "82", "codemirror"),
+	    		array("", "hidden", "report_connection_id", $report->report_connection_id, $w->Report->getConnections())
+	    );
+    }
 
     // DB view table
     $db_table = Html::form(array(
@@ -44,7 +53,9 @@ function edit_GET(Web &$w) {
     if (!empty($report->id)) {
     	$btnrun = Html::b("/report/runreport/" . $report->id, "Execute Report");
     	$w->ctx("btnrun", $btnrun);
-    }    
+    } else {
+    	$w->ctx("btnrun", "");
+    }
     
     // Check access rights
     // If user is editing, we need to check multiple things, detailed in the helper function
@@ -58,18 +69,19 @@ function edit_GET(Web &$w) {
         }
     } else {
         // If we're creating a report, check that the user has rights
-        if ($w->Auth->user()->is_admin == 0 and !$w->Auth->user()->hasAnyRole(array('report_admin', 'report_editor'))) {
+        if ($w->Auth->user()->is_admin == 0 && !$w->Auth->user()->hasAnyRole(array('report_admin', 'report_editor'))) {
             $w->error("You do not have create report permissions", "/report");
         }
     }
     
     // Access checked and OK, add approval to form only if is report_admin or admin
-    if ($w->Auth->user()->is_admin == 1 or $w->Auth->user()->hasRole("report_admin")) {
+    if ($w->Auth->user()->is_admin == 1 || $w->Auth->user()->hasRole("report_admin")) {
         $form[0][] = array("Approved", "checkbox", "is_approved", $report->is_approved);
     }
     
     $w->ctx("report_form", Html::form($form, $w->localUrl("/report/edit/{$report->id}"), "POST", "Save Report"));
-       
+    $w->ctx("sql_form", !empty($sqlform) ? Html::form($sqlform, $w->localUrl("/report/edit/{$report->id}"), "POST", "Save Report") : "");
+    
     if (!empty($report->id)) {
     	
     	// ============= Members tab ===================
@@ -77,13 +89,14 @@ function edit_GET(Web &$w) {
         $members = $w->Report->getReportMembers($report->id);
         
         // set columns headings for display of members
-        $line[] = array("Member","Role","");
+        $line[] = array("Member","Is Email Recipient", "Role", "");
 
         // if there are members, display their full name, role and button to delete the member
         if ($members) {
             foreach ($members as $member) {
                 $line[] = array(
                     $w->Report->getUserById($member->user_id),
+					$member->is_email_recipient ? "Yes" : "No",
                     $member->role,
                     Html::box("/report/editmember/".$report->id . "/". $member->user_id," Edit ", true) .
                     Html::box("/report/deletemember/".$report->id."/".$member->user_id," Delete ", true)
@@ -102,7 +115,7 @@ function edit_GET(Web &$w) {
         $report_templates = $report->getTemplates();
         
         // Build table
-        $table_header = array("Title", "Category", "Type", "Actions");
+        $table_header = array("Title", "Category", "Is Email Template", "Type", "Actions");
         $table_data = array();
         
         if (!empty($report_templates)) {
@@ -113,6 +126,7 @@ function edit_GET(Web &$w) {
         		$table_data[] = array(
         				$template->title,
         				$template->category,
+						$report_template->is_email_template ? "Yes" : "No",
         				$report_template->type,
         				Html::box("/report-templates/edit/{$report->id}/{$report_template->id}", "Edit", true) .
         				Html::b("/report-templates/delete/{$report_template->id}", "Delete", "Are you sure you want to delete this Report template entry?")

@@ -17,7 +17,24 @@ class Report extends DbObject {
     public function getTemplates() {
         return $this->getObjects("ReportTemplate", array("report_id" => $this->id, "is_deleted" => 0));
     }
+	
+	public function getMembers() {
+		return $this->getObjects("ReportMember", ["report_id" => $this->id, "is_deleted" => 0]);
+	}
     
+	public function getOwners() {
+		$members = $this->getMembers();
+		return array_filter($members ? : [], function($member) {
+			return strtoupper($member->role) === "OWNER";
+		});
+	}
+	
+	public function getNumberOfOwners() {
+		return $this->db->get("report_member")->where("report_id", $this->id)
+				->where("is_deleted", 0)
+				->where("role", "OWNER")->count();
+	}
+	
     /**
      * return the database object to call the report on.
      * 
@@ -43,12 +60,11 @@ class Report extends DbObject {
         }
     }
 
-    // build form of parameters for generating report
+    /**
+     *  build form of parameters for generating report
+     */
     function getReportCriteria() {
-        // set form header
-        $arr = array(array("Select Report Criteria", "section"));
-        $arr[] = array("Description", "static", "description", $this->description);
-
+    	
         // build array of all contents within any [[...]]
         preg_match_all("/\[\[.*?\]\]/", preg_replace("/\n/", " ", $this->report_code), $form);
 
@@ -78,9 +94,13 @@ class Report extends DbObject {
                         $label = trim(!empty($split_arr[2]) ? $split_arr[2] : '');
                         $sql = trim(!empty($split_arr[3]) ? $split_arr[3] : '');
 
-                        if ($sql !== "")
+                        if ($sql !== "") {
                             $sql = $this->Report->putSpecialSQL($sql);
+                        }
 
+                        if (empty($arr)) {
+                        	$arr = array(array("Select Report Criteria", "section"));
+                        }
                         // do something different based on form element type
                         switch ($type) {
                             case "autocomplete":
@@ -129,9 +149,12 @@ class Report extends DbObject {
             }
         }
         // merge arrays to give all parameter form requirements
-        $arr = array_merge($arr, array(array("Format", "select", "format", null, $template_values)));
+        if (!empty($template_values)) {
+        	$arr[] = array("Select an Optional Template", "section");
+        	$arr[] =array("Format", "select", "template", null, $template_values);
+        }
         // return form
-        return $arr;
+        return !empty($arr) ? $arr : null;
     }
 
     // generate the report based on selected parameters
@@ -272,7 +295,7 @@ class Report extends DbObject {
             $connection = $this->getDb();
             $return = $connection->query($sql)->fetchAll();
         } else {
-            $return = $this->_db->sql($sql)->fetch_all();
+            $return = $this->_db->sql($sql)->fetch_all(PDO::FETCH_BOTH);
         }
         
         if (!empty($return)) {

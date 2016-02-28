@@ -1,13 +1,22 @@
 <?php
 
-// Override Main Module Company Parameters
+//======= Override Main Module Company Parameters ============
+
 Config::set('main.application_name', 'Cmfive');
 Config::set('main.company_name', '2pi Software');
+Config::set('main.application_logo', '/system/templates/img/cmfive-logo.png');
 Config::set('main.company_url', 'http://2pisoftware.com');
 
-//=============== Timezone ==================================
+// enter a valid email address
+Config::set('main.company_support_email','');
 
-date_default_timezone_set('Australia/Sydney');
+// set this to true to display a big notice bar at the top of each page
+Config::set('system.test_mode', false);
+Config::set('system.test_mode_message', "You are using a test system");
+
+//=============== Timezone ===================================
+
+Config::set('system.timezone','Australia/Sydney');
 
 //========== Database Configuration ==========================
 
@@ -22,23 +31,31 @@ Config::set("database", array(
 //=========== Email Layer Configuration =====================
 
 Config::set('email', array(
-    "layer"	=> "smtp",		// smtp, sendmail
+    "layer"	=> "smtp",		// smtp or sendmail
+    "command" => "",		// used for sendmail layer only
     "host"	=> "smtp.gmail.com",
     "port"	=> 465,
     "auth"	=> true,
     "username"	=> '<email>',
-    "password"	=> '<password>'
+    "password"	=> '<password>',
 ));
 
 //========= Anonymous Access ================================
 
 // bypass authentication if sent from the following IP addresses
-Config::set("system.allow_from_ip", array());
+// specify an IP address and an array of allowed actions from that IP
+
+Config::set("system.allow_from_ip", array(
+	"10.0.0.0" => array("action1", "action2"),
+));
 
 // or bypass authentication for the following modules
+
 Config::set("system.allow_module", array(
-    // "rest", // uncomment this to switch on REST access to the database objects. Tread with CAUTION!
+    // "rest", // uncomment this to switch on REST access to the database objects.
 ));
+
+// or bypass authentication for the following actions
 
 Config::set('system.allow_action', array(
     "auth/login",
@@ -50,11 +67,17 @@ Config::set('system.allow_action', array(
 //========= REST Configuration ==============================
 // check the following configuration carefully to secure
 // access to the REST infrastructure.
+//===========================================================
 
 // use the API_KEY to authenticate with username and password
+
 Config::set('system.rest_api_key', "abcdefghijklmnopqrstuvwxyz1234567890");
 
 // include class of objects that you want available via REST
-Config::set('system.rest_include', array(
-	// "Contact"
+// be aware that only the listed objects will be available via
+// the REST API
+
+Config::append('system.rest_allow',array(
+    "User",
+    "Contact"
 ));

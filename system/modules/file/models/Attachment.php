@@ -1,10 +1,9 @@
 <?php
 
+define('CACHE_PATH', 'cache');
+
 class Attachment extends DbObject {
 
-    // make it searchable
-    public $_searchable;
-    public $_exclude_index = array("parent_table", "parent_id", "mimetype", "fullpath", "is_deleted");
     public $parent_table;
     public $parent_id;
     public $dt_created; // datetime
@@ -18,7 +17,15 @@ class Attachment extends DbObject {
     public $is_deleted; // tinyint 0/1
     public $type_code; // this is a type of attachment, eg. Receipt of Deposit, PO Variation, Sitephoto, etc.
 
-    function insert($force_validation = false) {
+	public $adapter;
+    
+	/**
+	 * DbObject::insert() override to set the mimetype, path and to call the
+	 * attachment hook
+	 * 
+	 * @param <bool> $force_validation
+	 */
+	function insert($force_validation = false) {
         // $this->dt_modified = time();
         // Get mimetype
 
@@ -36,22 +43,36 @@ class Attachment extends DbObject {
         $this->w->callHook("attachment", "attachment_added_" . $this->parent_table, $this);
     }
 
+	public function delete($force = false) {
+		
+		if ($this->hasCachedThumbnail()) {
+			unlink($this->getThumbnailCachePath());
+		}
+		
+		parent::delete($force);
+	}
+	
     function getParent() {
-        return $this->getObject($this->attach_table, $this->attach_id);
+        return $this->getObject($this->parent_table, $this->parent_id);
     }
 
     /**
      * will return true if this attachment
      * is an image
+	 * 
+	 * @return <bool> is_image
      */
     function isImage() {
-        return $this->File->isImage($this->fullpath);
+		// Attachment is an image when the mimetype starts with "image/"
+		return strpos($this->mimetype, "image/") === 0;
     }
 
     /**
      * Returns a HTML <img> tag for this attachment
      * only if this attachment is an image,
      * else
+	 * 
+	 * @return <String> image_string
      */
     function getImg() {
         if ($this->isImage()) {
@@ -64,17 +85,19 @@ class Attachment extends DbObject {
     /**
      * if image, create image thumbnail
      * if any other file send an icon for this mimetype
+	 * 
+	 * @return <String> url
      */
     function getThumbnailUrl() {
         if ($this->isImage()) {
-            return WEBROOT . "/file/thumb/" . $this->fullpath;
+            return WEBROOT . "/file/atthumb/" . $this->id;
         } else {
             return WEBROOT . "/img/document.jpg";
         }
     }
 
     /**
-     *
+     *	
      * Returns html code for a thumbnail link to download this attachment
      */
     function getThumb() {
@@ -95,4 +118,126 @@ class Attachment extends DbObject {
         }
     }
 
+	/**********
+	 * Gaufrette helper functions
+	 **********/
+	
+	/**
+	 * Returns an assembled file path based on the adapter
+	 * The local adapter for e.g. needs an absolute reference, this absolute
+	 * prefix isn't needed when using S3 buckets
+	 * 
+	 * @return <String> filepath
+	 */
+	public function getFilePath() {
+		$path = dirname($this->fullpath);
+
+		switch($this->adapter) {
+			case "s3":
+				if (strpos($path, "uploads/") === FALSE) {
+					return "uploads/" . $path;
+				}
+				return $path;
+			default:
+				if (strpos($path, FILE_ROOT . "attachments/") !== FALSE) {
+					return $path;
+				}
+				if (strpos($path, "attachments/") !== FALSE) {
+					return FILE_ROOT . $path;
+				}
+
+				return FILE_ROOT . "attachments/" . $path;
+		}
+	}
+	
+	/**
+	 * Returns Gaufrette Filsystem instance for fetching files
+	 * 
+	 * @return \Gaufrette\Filesystem
+	 */
+	public function getFilesystem() {
+		return $this->File->getSpecificFilesystem($this->adapter, $this->getFilePath());
+	}
+	
+	/**
+	 * Returns attachment mimetype
+	 * @return <String> mimetype
+	 */
+	public function getMimetype() {
+		return $this->mimetype;
+	}
+	
+	/**
+	 * Retuns Gaufrette File instance (of the attached file)
+	 * @return \Gaufrette\File
+	 */
+	public function getFile() {
+		return new \Gaufrette\File($this->filename, $this->getFilesystem());
+	}
+	
+	/**
+	 * Returns attached file content
+	 * @return <string> content
+	 */
+	public function getContent() {
+		$file = $this->getFile();
+		return $file->exists() ? $file->getContent() : "";
+	}
+	
+	/**
+	 * Sends header and content of file to browser
+	 */
+	public function displayContent() {	
+		$this->w->header("Content-Type: " . $this->getMimetype());
+		$this->w->out($this->getContent());
+	}
+	
+	/**
+	 * Moves the content from one adapter to another
+	 */
+	public function moveToAdapter($adapter = "local") {
+		// Get content of file
+		$content = $this->getContent();
+		$current_file = $this->getFile();
+		
+		$this->adapter = $adapter;
+		
+		$filesystem = $this->getFilesystem();
+		$file = new Gaufrette\File($this->filename, $filesystem);
+		
+		$file->setContent($content);
+		
+		try {
+			$current_file->delete();
+		} catch (RuntimeException $ex) {
+			$this->w->Log->setLogger("FILE")->error("Cannot delete file: " . $ex->getMessage());
+		}
+		
+		// Update the adapter location
+		$this->update(false);
+	}
+	
+	/**
+	 * Returns URL to view
+	 */
+	public function getViewUrl() {
+		return "/file/atfile/" . $this->id;
+	}
+	
+	/**
+	 * Returns thumbnail cache path
+	 */
+	public function getThumbnailCachePath() {
+		return ROOT_PATH . '/' . CACHE_PATH . '/' . $this->fullpath;
+	}
+	
+	/**
+	 * Returns if there is a cache thumbnail image
+	 */
+	public function hasCachedThumbnail() {
+		if ($this->isImage()) {
+			return is_file($this->getThumbnailCachePath());
+		}
+		return false;
+	}
 }

@@ -83,7 +83,7 @@ function createtask_POST(Web &$w) {
 		}
 
 		// return to task dashboard
-		$w->msg("Task ".$task->title." added","/task/viewtask/".$task->id);
+		$w->msg("<div id='saved_record_id' data-id='".$task->id."' >Task ".$task->title." added</div>","/task/viewtask/".$task->id);
 	}
 	else {
 		// if task insert was unsuccessful, say as much

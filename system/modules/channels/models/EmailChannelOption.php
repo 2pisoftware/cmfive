@@ -2,7 +2,14 @@
 
 use \Zend\Mail\Storage as Zend_Mail_Storage;
 use \Zend\Mail\Message as Zend_Mail_Message;
-use \Zend\Mail\Storage\Imap as Zend_Mail_Storage_Imap;
+//use \Zend\Mail\Storage\Imap as Zend_Mail_Storage_Imap;
+
+//
+// The purpose of this class is to expose protocol
+//
+class Zend_Mail_Storage_Imap extends \Zend\Mail\Storage\Imap {
+    public $protocol;
+}
 
 class EmailChannelOption extends DbObject {
 
@@ -114,7 +121,7 @@ class EmailChannelOption extends DbObject {
                     $channel_message->insert();
 
                     // Save raw email
-                    $attachment_id = $this->w->File->saveFileContent($channel_message, $rawmessage, str_replace(".", "", microtime()) . ".txt", "channel_email_raw", "text/plain");
+                    $attachment_id = $this->w->File->saveFileContent($channel_message, $rawmessage, "rawemail.txt", "channel_email_raw", "text/plain");
                     if ($message->isMultipart()) {
                         foreach (new RecursiveIteratorIterator($message) as $part) {
                             try {
