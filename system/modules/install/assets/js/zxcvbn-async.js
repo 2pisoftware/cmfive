@@ -9,7 +9,7 @@
 // (this script assumes index.html and zxcvbn.js sit next to each other.)
 
 (function() {
-  var ZXCVBN_SRC = '/system/templates/js/zxcvbn.js';
+  var ZXCVBN_SRC = '/system/modules/install/assets/js/zxcvbn.js';
 
   var async_load = function() {
     var first, s;
