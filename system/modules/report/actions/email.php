@@ -14,7 +14,7 @@ define("REPORT_CACHE_PATH", "/cache/report");
  */
 function email_GET(Web $w) {
 	// sender config default empty
-	if (Config::get("main.company_support_url") === null) {
+	if (Config::get("main.company_support_email") === null) {
 		$w->Log->setLogger("AUTOMATED_REPORT")->error("No send from email address given");
 		return;
 	}
@@ -89,6 +89,9 @@ function email_GET(Web $w) {
 			$w->Log->setLogger("AUTOMATED_REPORT")->error("Report {$report_id} generated no data for user " . $login);
 			continue;
 		} else {
+			// Always initialise variables!!!
+			$attachments = [];
+			
 			foreach($templates as $report_template) {
 				$results = $w->Template->render($report_template->template_id, ["data" => $templatedata, "w" => $w]);   
 				
@@ -129,8 +132,17 @@ function email_GET(Web $w) {
 				$attachments[] = $filename;
 			}
 			
+			// Render body
+			$body_template = $w->Template->findTemplate("report", "email");
+			$body_content = '';
+			if (!empty($body_template)) {
+				$body_content = $w->Template->render($body_template, ["name" => $contact->getFullName(), "module" => $report->module, "report_name" => $report->title]);
+			} else {
+				$body_content = "Dear " . $contact->getFullName() . ", <br/>Please find attached your reports<br/>Kind regards";
+			}
+			
 			// Send email
-			$w->Mail->sendMail($contact->email, Config::get("main.company_support_email"), $report->title, $results, null, null, $attachments);
+			$w->Mail->sendMail($contact->email, Config::get("main.company_support_email"), $report->title, $body_content, null, null, $attachments);
 			
 			// Clear report cached files
 			foreach ($attachments as $attachment) {
