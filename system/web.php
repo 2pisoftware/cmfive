@@ -1,9 +1,9 @@
 <?php
 // ========= Session ========================
-ini_set('session.gc_maxlifetime', 60 * 60 * 6);
+ini_set('session.gc_maxlifetime', 21600);
 
 //========== Constants =====================================
-define("CMFIVE_VERSION", "0.8.3");
+define("CMFIVE_VERSION", "0.8.4");
 
 define("ROOT_PATH", str_replace("\\", "/", getcwd()));
 define("SYSTEM_PATH", str_replace("\\", "/", getcwd() . '/system'));
@@ -452,9 +452,7 @@ class Web {
             }
         }
         
-        //
         // if a module file for this url exists, then start processing
-        //
         if (file_exists($reqpath)) {
             $this->ctx('webroot', $this->_webroot);
             $this->ctx('module', $this->_module);
@@ -510,7 +508,7 @@ class Web {
             }
             $body = null;
             // evaluate template only when buffer is empty
-            if (sizeof($this->_buffer) == 0) {
+            if (sizeof($this->_buffer) == 0 && !is_null($this->_layout)) {
                 $body = $this->fetchTemplate();
             } else {
                 $body = $this->_buffer;
