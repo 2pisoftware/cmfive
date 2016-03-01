@@ -508,7 +508,7 @@ class Web {
             }
             $body = null;
             // evaluate template only when buffer is empty
-            if (sizeof($this->_buffer) == 0 && !is_null($this->_layout)) {
+            if (sizeof($this->_buffer) == 0) {
                 $body = $this->fetchTemplate();
             } else {
                 $body = $this->_buffer;
