@@ -32,7 +32,7 @@
                         echo !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null; 
                     	//echo $w->Tag->getTagButton($task->id,"Task")."&nbsp;";
                         echo (!empty($task->id) && $task->canDelete($w->Auth->user())) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), "Delete", "Are you sure you want to delete this task?" ) : ''; 
-                        echo $w->partial('listTags',['object' => $task], 'tag');
+                        echo (!empty($task->id) ? $w->partial('listTags',['object' => $task], 'tag') : '');
 					?>
                 </div>
                 <div class="row-fluid clearfix">
