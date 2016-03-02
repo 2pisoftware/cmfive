@@ -19,6 +19,8 @@ Config::set('admin', array(
             'unix' => 'mysqldump -u $username -p\'$password\' $dbname | gzip > $filename.gz',
             // 'windows' => 'J:\\xampp\\mysql\\bin\\mysqldump.exe -u $username -p$password $dbname > $filename'
         )
+		// Example to back up off site (only dropbox support currently)
+		// 'backuplocations' => ['dropbox' => ['key' => '<KEY>', 'secret' => '<SECRET>']]
     ),
     "dependencies" => array(
         "swiftmailer/swiftmailer" => "@stable",
