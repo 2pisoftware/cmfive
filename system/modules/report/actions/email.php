@@ -89,7 +89,6 @@ function email_GET(Web $w) {
 			$w->Log->setLogger("AUTOMATED_REPORT")->error("Report {$report_id} generated no data for user " . $login);
 			continue;
 		} else {
-			// Always initialise variables!!!
 			$attachments = [];
 			
 			foreach($templates as $report_template) {
@@ -153,7 +152,7 @@ function email_GET(Web $w) {
 		}
 	}
 	
-	$w->redirect("/report");
+	// $w->redirect("/report");
 	
 }
 
