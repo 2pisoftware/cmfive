@@ -14,6 +14,18 @@
 [[dt_from||date||From Date (opt)]]
 [[dt_to||date||To Date (opt)]]
 
+[[type||select||Time Type (opt)||
+  select distinct tt.time_type as title, tt.time_type as value 
+  from task_group tg, timelog tt, task t, task_group_member tm
+  where 
+  tg.id = t.task_group_id and 
+  tt.object_id = t.id and
+  tt.object_class = 'Task' and
+  tt.is_deleted = 0 and
+  tm.task_group_id = tg.id and
+  t.is_deleted = 0 and
+  tt.user_id = '{{current_user_id}}'
+]]
 
 @@Summary||
 select 
@@ -32,7 +44,31 @@ tt.user_id = '{{current_user_id}}' and
 ('{{dt_from}}' = '' OR tt.dt_start >= '{{dt_from}} 00:00:00') and
 ('{{dt_to}}' = '' OR tt.dt_end <= '{{dt_to}} 23:59:59') and
 tt.is_deleted = 0 and
+('{{type}}' = '' OR tt.time_type = '{{type}}') and 
 ('{{group}}' = '' OR tg.id = '{{group}}')                                  
+@@
+
+@@Time Type Summary||
+select 
+concat(c.firstname,' ',c.lastname) as User,
+tt.time_type as Type,                                  
+sec_to_time(sum(unix_timestamp(dt_end) - unix_timestamp(dt_start))) as Hours
+
+from timelog tt
+join user u on u.id = tt.user_id
+join contact c on u.contact_id = c.id
+join task t on tt.object_id = t.id and tt.object_class = 'Task'
+join task_group tg on t.task_group_id = tg.id
+
+where 
+('{{group}}' = '' OR tg.id = '{{group}}') and
+('{{dt_from}}' = '' OR tt.dt_start >= '{{dt_from}} 00:00:00') and
+('{{dt_to}}' = '' OR tt.dt_end <= '{{dt_to}} 23:59:59') and
+('{{type}}' = '' OR tt.time_type = '{{type}}') and                                  
+tt.is_deleted = 0 and
+tt.user_id = '{{current_user_id}}'
+group by tt.user_id, tt.time_type
+order by User, Type
 @@
 
 @@Task Group Summary||
@@ -53,6 +89,7 @@ tt.object_class = 'Task' and
 ('{{dt_from}}' = '' OR tt.dt_start >= '{{dt_from}} 00:00:00') and
 ('{{dt_to}}' = '' OR tt.dt_end <= '{{dt_to}} 23:59:59') and
 tt.is_deleted = 0 and
+('{{type}}' = '' OR tt.time_type = '{{type}}') and 
 ('{{group}}' = '' OR tg.id = '{{group}}')                                                                    
 
 group by tg.id
@@ -80,6 +117,7 @@ tt.object_class = 'Task' and
 ('{{dt_from}}' = '' OR tt.dt_start >= '{{dt_from}} 00:00:00') and
 ('{{dt_to}}' = '' OR tt.dt_end <= '{{dt_to}} 23:59:59') and
 tt.is_deleted = 0 and
+('{{type}}' = '' OR tt.time_type = '{{type}}') and 
 ('{{group}}' = '' OR tg.id = '{{group}}')                                                                    
 
 group by tt.object_id
@@ -94,6 +132,7 @@ sec_to_time(unix_timestamp(dt_end) - unix_timestamp(dt_start)) as 'Hours',
 t.title as Task,
 concat('{{webroot}}task/edit/',t.id) as Task_link,
 tg.title as 'Group',
+tt.time_type as Type,
 substring(co.comment,1,50) as 'Comment'                                  
 
 from timelog tt
@@ -101,7 +140,7 @@ join user u on u.id = tt.user_id
 join contact c on u.contact_id = c.id
 join task t on tt.object_id = t.id
 join task_group tg on t.task_group_id = tg.id
-join comment co on co.obj_id = tt.id and co.obj_table = 'timelog'                                 
+left join comment co on co.obj_id = tt.id and co.obj_table = 'timelog'                                 
 
 where 
 tt.object_class = 'Task' and                                  
@@ -109,6 +148,7 @@ tt.user_id = '{{current_user_id}}' and
 ('{{dt_from}}' = '' OR tt.dt_start >= '{{dt_from}} 00:00:00') and
 ('{{dt_to}}' = '' OR tt.dt_end <= '{{dt_to}} 23:59:59') and
 tt.is_deleted = 0 and
+('{{type}}' = '' OR tt.time_type = '{{type}}') and 
 ('{{group}}' = '' OR tg.id = '{{group}}')                                                                    
 
 order by dt_start desc
