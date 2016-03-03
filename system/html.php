@@ -423,7 +423,6 @@ class Html {
         }
         $buffer .= "</div>";
         $buffer .= "<script>$(function(){try{\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})}catch(err){}});</script>";
-        $buffer .= "<script>$(function(){try{\$('textarea.codemirror').each(function(){CodeMirror.fromTextArea(this, {lineNumbers: true, mode: 'text/html', matchBrackets: true, viewportMargin: Infinity})})}catch(err){}});</script>";
   
         if (null !== $action) {
             $buffer .= $form->close($submitTitle);
