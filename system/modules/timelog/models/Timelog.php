@@ -75,7 +75,7 @@ class Timelog extends DbObject {
     }
     
     public function start($object) {
-$this->w->Log->debug("TimeLog Start");
+		$this->w->Log->debug("TimeLog Start");
         if (empty($object->id)) {
             return false;
         }
@@ -99,4 +99,9 @@ $this->w->Log->debug("TimeLog Start");
         }
     }
     
+	public function insert($force_validation = true) {
+		$this->user_id = $this->w->Auth->user()->id;
+	
+		parent::insert($force_validation);
+	}
 }

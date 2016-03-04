@@ -81,7 +81,6 @@ function edit_POST(Web $w) {
 	$timelog->time_type = !empty($_POST['time_type']) ? $_POST['time_type'] : null;
 	$timelog->dt_start = $w->Timelog->dt2Time($_POST['dt_start']);
 	$timelog->dt_end = $w->Timelog->dt2Time($_POST['dt_end']);
-	$timelog->user_id = $w->Auth->user()->id;
 	$timelog->insertOrUpdate();
 	
 	// Save comment
