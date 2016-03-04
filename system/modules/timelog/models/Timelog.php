@@ -23,6 +23,23 @@ class Timelog extends DbObject {
         // "time_type" => array('required') Only required in some cases??!!
     );    
 
+	// Getters
+	public function getDateStart() {
+		
+	}
+	
+	public function getTimeStart() {
+		
+	}
+	
+	public function getHoursWorked() {
+		
+	}
+	
+	public function getMinutesWorked() {
+		
+	}
+	
 	public function getUser() {
 		return $this->getObject("User", $this->user_id);
 	}
@@ -100,8 +117,21 @@ class Timelog extends DbObject {
     }
     
 	public function insert($force_validation = true) {
-		$this->user_id = $this->w->Auth->user()->id;
-	
+		// If user is admin try and set the user_id to the given one from the timelog form
+		if ($this->w->Auth->user()->is_admin) {
+			$this->user_id = !empty($_POST['user_id']) ? intval($_POST['user_id']) : $this->w->Auth->user()->id;
+		} else {
+			$this->user_id = $this->w->Auth->user()->id;
+		}
+		
 		parent::insert($force_validation);
+	}
+	
+	public function update($force_null_values = false, $force_validation = true) {
+		if ($this->w->Auth->user()->is_admin) {
+			$this->user_id = !empty($_POST['user_id']) ? intval($_POST['user_id']) : $this->w->Auth->user()->id;
+		}
+		
+		parent::update($force_null_values, $force_validation);
 	}
 }

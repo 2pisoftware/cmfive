@@ -2,6 +2,14 @@
 
 function edit_GET(Web $w) {
 	
+//	var_dump(strtotime("2016-03-04 11:30"));
+//	var_dump(strtotime("2016-03-04 11:30 AM") );
+//	var_dump(strtotime("2016-03-04 2:30 PM") );
+//	var_dump(strtotime("2016-03-04 23:30") );
+//	var_dump(strtotime("2016-03-04 11:30PM") );
+//	var_dump(strtotime("2016-03-04 11:30AM") ); // ALl VALID ABOVE
+//	var_dump(strtotime("2016-03-04 23:30pm") ); // INVALID
+	
 	$p = $w->pathMatch("id");
 	
 	$timelog = !empty($p['id']) ? $w->Timelog->getTimelog($p['id']) : new Timelog($w);
@@ -21,25 +29,34 @@ function edit_GET(Web $w) {
 	$tracking_class = $w->request("class");
 	$tracking_id = $w->request("id");
 	
-        // If timelog.object_id is required then we must require the search field
-        $validation = Timelog::$_validation;
-        if (!empty($validation["object_id"])) {
-            if (in_array("required", $validation["object_id"])) {
-                $validation["search"] = array('required');
-            } 
-        }
-        $form = [
+	// If timelog.object_id is required then we must require the search field
+	$validation = Timelog::$_validation;
+	if (!empty($validation["object_id"])) {
+		if (in_array("required", $validation["object_id"])) {
+			$validation["search"] = array('required');
+		} 
+	}
+	
+	$form = [
 		'Timelog' => [
+			[
+				["Assigned user", $w->Auth->user()->is_admin ? "autocomplete" : "hidden", "user_id", empty($timelog->id) ? $w->Auth->user()->id : $timelog->user_id, $w->Auth->getUsers()]
+			],
 			[
 				["Module", "select", "object_class", $timelog->object_class ? : $tracking_class, $select_indexes],
 				["Search", "autocomplete", "search", !empty($timelog->object_id) ? $timelog->object_id : $tracking_id, (!empty($timelog->object_class) || !empty($tracking_class) ? $w->Timelog->getObjects($timelog->object_class ? : $tracking_class) : '')]
 			],
-//				["Search", empty($timelog->object_id) && empty($tracking_id) ? "text" : "autocomplete", (empty($timelog->object_id) && empty($tracking_id) ? '-' : '') . "search", !empty($timelog->object_id) ? $timelog->object_id : $tracking_id, (!empty($timelog->object_class) || !empty($tracking_class) ? $w->Timelog->getObjects($timelog->object_class ? : $tracking_class) : '')]
-//			],
             [["object id", 'hidden', "object_id", $timelog->object_id ? : $tracking_id]],
 			[
-				["From", "datetime", "dt_start", formatDateTime($timelog->dt_start)],
-				["To", "datetime", "dt_end", formatDateTime($timelog->dt_end)]
+				['Date', 'date', 'date_start', $timelog->getDateStart()],
+			],
+			[
+				//['Time started', 'text', 'time_start', $timelog->getTimeStart()],
+				(new \Html\Form\InputField())->setLabel("Time Started")
+						->setName("hours_worked")
+						->setValue($timelog->getHoursWorked()),
+				['Hours worked', 'text', 'hours_worked', $timelog->getHoursWorked()],
+				['Minutes worked', 'text', 'minutes_worked', $timelog->getMinutesWorked()]
 			],
 			[["Description", "text", "description", !empty($comment) ? $comment->comment : null]]
 		]
