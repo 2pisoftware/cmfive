@@ -16,7 +16,7 @@
 						</td>
 					</tr>
 				<?php endforeach; ?>
-				<?php echo $form->getSummaryRow(); ?>
+				<?php echo $form->getSummaryRow($object); ?>
 			</tbody>
 		</table>
 	<?php else : ?>

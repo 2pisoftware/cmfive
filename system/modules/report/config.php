@@ -6,5 +6,7 @@ Config::set('report', array(
     'path' => 'system/modules',
     '__password' => 'maybeconsiderchangingthis',
 	'topmenu' => true,
-	'emailreport' => ['sender' => '']
+	'hooks' => [
+		'admin'
+	]
 ));

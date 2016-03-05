@@ -1,9 +1,9 @@
 <?php
 // ========= Session ========================
-ini_set('session.gc_maxlifetime', 60 * 60 * 6);
+ini_set('session.gc_maxlifetime', 21600);
 
 //========== Constants =====================================
-define("CMFIVE_VERSION", "0.8.3");
+define("CMFIVE_VERSION", "0.8.4");
 
 define("ROOT_PATH", str_replace("\\", "/", getcwd()));
 define("SYSTEM_PATH", str_replace("\\", "/", getcwd() . '/system'));
@@ -72,6 +72,7 @@ class Web {
     public $_partialsdir = "partials";
     public $db;
     public $_isFrontend = false;
+    public $_is_installing = false;
     
     private $_classdirectory; // used by the class auto loader
 
@@ -108,7 +109,17 @@ class Web {
 		// The order of the following three lines are important
 		spl_autoload_register(array($this, 'modelLoader'));
 		defined("WEBROOT") ||  define("WEBROOT", $this->_webroot);
-		$this->loadConfigurationFiles();
+		
+        // conditions to start the installer
+        $this->_is_installing = strpos($_SERVER['REQUEST_URI'], '/install') === 0 ||
+                                !file_exists(ROOT_PATH . "/config.php");
+
+        $this->loadConfigurationFiles();
+         
+        if($this->_is_installing)
+        {
+            $this->install();
+        }
     }
 
     private function modelLoader($className) {
@@ -248,25 +259,72 @@ class Web {
         return ($aw === $bw ? 0 : ($aw < $bw ? 1 : -1));
     }
     
-	function install() {
-		$this->_paths = $this->_getCommandPath();
-		if (!in_array($this->_paths[0], ["install", "install-steps"])) {
-			$this->redirect("/install-steps/details");
-		} else {
-			$this->start(false);
-		}
-	}
-	
+    /**
+     * Called to install cmfive only if pre-determined that installation 
+	 * is needed due to a lack of config file
+     * Sometimes the config file is cached and cmfive's cache must be cleared 
+	 * to trigger installation
+     */
+    function install() {
+        $this->_is_installing = true;
+        
+        // config file exists
+        if(is_file(ROOT_PATH.'/config.php')) {
+            $this->setLayout('install-exists-layout');
+            $this->start(false);
+            exit();
+        }
+        
+        // clear config cache
+        if(is_file(ROOT_PATH.'/cache/config.cache')) {
+            unlink(ROOT_PATH.'/cache/config.cache');
+        }
+        if(is_file(ROOT_PATH.'/cache/classdirectory.cache')) {
+            unlink(ROOT_PATH.'/cache/classdirectory.cache');
+        }
+        
+        $this->_paths = $this->_getCommandPath();
+        $is_ajax = !empty($this->_paths[1]) && strcmp($this->_paths[1], 'ajax') === 0;
+        
+        if(!$is_ajax && (empty($this->_paths[0]) || empty($this->_paths[1]) || !preg_match('/^[0-9]+$/', $this->_paths[1]))) {
+            $this->redirect("/install/1/general");
+        }
+        else if(!$is_ajax && empty($this->_paths[2])) {
+            $submodule = $this->Install->findInstallStepName(intval($this->_paths[1]));
+            if(empty($submodule))
+            {
+                $this->redirect("/install/1/general");
+            }
+            else
+            {
+                $path = DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, array($this->_paths[0], $this->_paths[1], $submodule));
+                $this->redirect($path);
+            }
+        } else {
+            $this->setLayout('install-layout');
+            $this->start(false);
+        }
+        
+        exit();
+    }
+    
     /**
      * start processing of request
      * 1. look at the request parameter if the action parameter was set
      * 2. if not set, look at the pathinfo and use first
      */
     function start($init_database = true) {
-		if ($init_database) {
+        if ($init_database && !$this->_is_installing) {
 			$this->initDB();
 		}
 
+		// Set the timezone from Config
+		$timezone = Config::get('system.timezone');
+		if (empty($timezone)) {
+			$timezone = 'UTC';
+		}
+		date_default_timezone_set($timezone);
+		
         // start the session
         // $sess = new SessionManager($this);
         try {
@@ -362,6 +420,26 @@ class Web {
         $actionmethods[] = $this->_action . '_' . $this->_requestMethod;
         $actionmethods[] = $this->_action . '_ALL';
 
+        // change the submodule and action for installation
+        if($this->_is_installing) {
+        	if(is_file(ROOT_PATH.'/config.php')) {
+        		unset($this->_submodule);
+        		$this->_action = 'index';
+        	}
+        	else {
+        		$step = $this->_action;
+        
+        		// step name is either still in the paths array, or needs to be found
+        		$step_name = sizeof($this->_paths) > 0 ?
+        		array_shift($this->_paths) :
+        		$this->Install->findInstallStepName($step);
+        
+        		$this->_submodule = $step . '-' . $step_name; // 1-general
+        		$this->_action = $step_name; // general
+        	}
+        	$actionmethods[] = $this->_defaultAction . '_ALL'; // index_ALL
+        }
+        
         // Check/validate CSRF token 
         if (Config::get('system.csrf.enabled') === true) {
             $allowed = Config::get('system.csrf.protected');
@@ -374,9 +452,7 @@ class Web {
             }
         }
         
-        //
         // if a module file for this url exists, then start processing
-        //
         if (file_exists($reqpath)) {
             $this->ctx('webroot', $this->_webroot);
             $this->ctx('module', $this->_module);
@@ -538,6 +614,12 @@ class Web {
     }
 
     public function loadConfigurationFiles() {
+    	if ($this->_is_installing) {
+    		// Load System config
+    		$baseDir = SYSTEM_PATH . '/modules';
+    		$this->scanModuleDirForConfigurationFiles($baseDir);
+   			return;
+    	}
     	$cachefile = ROOT_PATH . "/cache/config.cache";
     	
     	// check for config cache file. If exists, then load the config
@@ -560,9 +642,9 @@ class Web {
         $this->scanModuleDirForConfigurationFiles($baseDir);
         
         // load the root level config file last because it can override everything
-	    if (!file_exists("config.php")) {
-			$this->install();
-		}
+	    //if (!file_exists("config.php")) {
+		//	$this->install();
+		//}
         require ROOT_PATH . "/config.php";
         
         // if config cache file doesn't exist, then
@@ -646,6 +728,12 @@ class Web {
      * @return <type>
      */
     function checkAccess($msg = "Access Restricted") {
+    	// If we're installing cmfive then there won't be users
+    	// TODO this may need refactoring
+    	if ($this->_module == "install" && $this->_is_installing) {
+    		return true;
+    	}
+    	 
         $submodule = $this->_submodule ? "-" . $this->_submodule : "";
         $path = $this->_module . $submodule . "/" . $this->_action;
         $actual_path = $path;
@@ -1123,13 +1211,41 @@ class Web {
         $partial_action_file = implode("/", array($moduleDir, $this->_partialsdir, "actions", $name . ".php"));
 
         if (file_exists($partial_action_file)) {
+			
             require_once($partial_action_file);
 
-            // now execute the action
-            $partial_action = $name . "_" . $method;
-            if (function_exists($partial_action)) {
-                $partial_action($this, $params);
-            }
+            // Execute the action, accounting for the use of namespaces
+			// Work out the namespace
+			$module_path = Config::get($module . '.path');
+			$namespace = '';
+			if (empty($module_path)) {
+				$namespace = '\System\Modules\\' . ucfirst(strtolower($module)) . '\\';
+			} else {
+				// Path will almost 100% of the time be either 'modules' or 'system/modules'
+				// But we want this in the form '\Modules\\$module' or '\System\\Modules\\$module'
+				$namespace = '\\' . ucwords(strtolower(str_replace('/', '\\', $module_path))) . '\\' . ucfirst(strtolower($module)) . '\\';
+			}
+			
+			// The following will call:
+			// 1. \System\Modules\$module\$action_ALL()
+			// 2. \System\Modules\$module\$action()
+			// 3. removeUser_ALL()
+			// 4. removeUser()
+
+            $partial_action = $name . '_' . $method;
+            if (function_exists($namespace . $partial_action)) {
+				$function = $namespace . $partial_action;
+                $function($this, $params);
+            } else if (function_exists($namespace . $name)) {
+				$function = $namespace . $name;
+				$function($this, $params);
+			} else if (function_exists($partial_action)) {
+				$partial_action($this, $params);
+			} else if (function_exists($name)) {
+				$name($this, $params);
+			} else {
+				$this->Log->error("Required partial action not found, expected {$partial_action}");
+			}
         } else {
             $this->Log->error("Could not find partial file at: {$partial_action_file}");
         }
@@ -1529,6 +1645,11 @@ class Web {
      * @param boolean $append
      */
     function ctx($key, $value = null, $append = false) {
+		if (!is_numeric($key) && !is_scalar($key)) {
+			$this->Log->error("Key given to ctx() was not numeric or scalar");
+			return;
+		}
+		
         // There was a massive bug here, using == over === is BAD as $x == null
         // will be true for 0, "", null, false, etc. keep this in mind
         if ($value === null) {

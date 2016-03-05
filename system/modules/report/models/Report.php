@@ -22,6 +22,19 @@ class Report extends DbObject {
 		return $this->getObjects("ReportMember", ["report_id" => $this->id, "is_deleted" => 0]);
 	}
     
+	public function getOwners() {
+		$members = $this->getMembers();
+		return array_filter($members ? : [], function($member) {
+			return strtoupper($member->role) === "OWNER";
+		});
+	}
+	
+	public function getNumberOfOwners() {
+		return $this->db->get("report_member")->where("report_id", $this->id)
+				->where("is_deleted", 0)
+				->where("role", "OWNER")->count();
+	}
+	
     /**
      * return the database object to call the report on.
      * 

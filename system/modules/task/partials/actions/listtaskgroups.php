@@ -1,6 +1,6 @@
-<?php 
+<?php namespace System\Modules\Task;
 
-function listtaskgroups_ALL(Web $w, $params = array()) {
+function listtaskgroups(\Web $w, $params = array()) {
     $taskgroups = $params['taskgroups'];
     
     $should_filter = !empty($params['should_filter']) ? $params['should_filter'] : false;

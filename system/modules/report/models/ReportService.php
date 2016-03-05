@@ -25,10 +25,6 @@ class ReportService extends DbService {
     
     // Helper function to decide whether or not a user has access to a given report
     function canUserEditReport($report, $member) {
-        if (empty($report->id) or empty($member->id)) {
-            return false;
-        }
-        
         // First, is logged in user a system admin
         if ($this->w->Auth->user()->is_admin == 1) {
             return true;
@@ -37,6 +33,10 @@ class ReportService extends DbService {
         // Check if logged in user is report_admin
         if ($this->w->Auth->user()->hasRole("report_admin")) {
             return true;
+        }
+        
+		if (empty($report->id) || empty($member->id)) {
+            return false;
         }
         
         // Then check if the user has report_editor role
@@ -125,6 +125,12 @@ class ReportService extends DbService {
 
     // return list of APPROVED and NOT DELETED report IDs for a given a user ID and a where clause
     function getReportsbyUserWhere($id, $where) {
+		
+		// Clause for admin user
+		if ($this->w->Auth->user()->is_admin == '1' || $this->w->Auth->user()->hasRole("report_admin")) {
+			return $this->getReports();
+		}
+		
         // need to get reports for me and my groups
         // me
         $myid[] = $id;
@@ -171,9 +177,9 @@ class ReportService extends DbService {
 
         if ($groups) {
             foreach ($groups as $group) {
-                $flg = $this->w->Auth->user()->inGroup($group);
-                if ($flg)
+                if ($this->w->Auth->user()->inGroup($group)) {
                     $myid[$group->id] = $group->id;
+				}
             }
         }
         // list of IDs to check for report membership, my ID and my group IDs

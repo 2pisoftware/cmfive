@@ -1,6 +1,6 @@
-<?php
+<?php namespace System\Modules\Form;
 
-function listform_ALL(Web $w, $params) {
+function listform(\Web $w, $params) {
 	
 	$w->ctx("redirect_url", $params['redirect_url']);
 	$w->ctx("form", $params['form']);

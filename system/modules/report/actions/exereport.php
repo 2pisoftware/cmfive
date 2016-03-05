@@ -39,7 +39,7 @@ function exereport_ALL(Web &$w) {
 
             // if we have an empty return, say as much
             if (!$tbl) {
-                $w->error("No Data found for selections. Please try again....", "/report/runreport/" . $rep->id);
+                $w->error("No Data found for selections. Please try again....", "/report");
             }
             // if an ERROR is returned, say as much
             elseif ($tbl[0][0] == "ERROR") {

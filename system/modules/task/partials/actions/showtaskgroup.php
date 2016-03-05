@@ -1,6 +1,6 @@
-<?php
+<?php namespace System\Modules\Task;
 
-function showtaskgroup_ALL(Web $w, $params) {
+function showtaskgroup(\Web $w, $params) {
 	$taskgroup = $params["taskgroup"];
 
 	if (!empty($taskgroup)) {

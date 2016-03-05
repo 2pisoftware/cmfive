@@ -482,6 +482,7 @@ class DbObject extends DbService {
      *
      * @param <type> $table
      * @throws Exception e
+     * @return  boolean|array true or Array of validation errors
      */
     function insert($force_validation = true) {
         try {
@@ -601,7 +602,7 @@ class DbObject extends DbService {
      *
      * @param boolean $force_null_values        	
      * @param boolean $force_validation        	
-     * @return true or array("success"=>false,"invalid"=>array()) if validation failed
+     * @return  boolean|array true or Array of validation errors
      */
     function update($force_null_values = false, $force_validation = true) {
         try {
