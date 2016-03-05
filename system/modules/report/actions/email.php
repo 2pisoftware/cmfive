@@ -99,8 +99,10 @@ function email_GET(Web $w) {
 				// Generate PDF
 				$template = $report_template->getTemplate();
 				$title='';
-				if (empty($template->id)) {
+				if (!empty($template)) {
 					$title=$template->title;
+				} else {
+					$title=$report->title;
 				}
 				$reportTemplateType=strtolower($report_template->type);
 				$rows=$templatedata;

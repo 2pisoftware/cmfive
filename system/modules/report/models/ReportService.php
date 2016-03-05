@@ -498,7 +498,7 @@ class ReportService extends DbService {
 				}
 
 				$csv = new parseCSV();
-				$result[]=$csv->output($filename, $row, $hds);
+				$result[]=$csv->unparse( $row, $hds);
 				unset($ukey);
 			}
 		}
