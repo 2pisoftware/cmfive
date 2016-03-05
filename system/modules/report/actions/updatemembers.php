@@ -17,10 +17,12 @@ function updatemembers_POST(Web &$w) {
 	if (!$mem) {
 		$mem = new ReportMember($w);
 		$mem->fill($arrdb);
+		$mem->is_email_recipient = intval(!empty($_POST['is_email_recipient']));
 		$mem->insert();
 	}
 	else {
 		$mem->fill($arrdb);
+		$mem->is_email_recipient = intval(!empty($_POST['is_email_recipient']));
 		$mem->update();
 	}
 

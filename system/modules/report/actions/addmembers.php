@@ -22,6 +22,7 @@ function addmembers_GET(Web &$w) {
 	array("","hidden", "report_id",$p['id']),
 	array("Add Member","select","member",null,$members),
 	array("With Role","select","role","",$w->Report->getReportPermissions()),
+	array("Is email recipient", "checkbox", "is_email_recipient", $member->is_email_recipient)
 	);
 
 	$w->setLayout(null);

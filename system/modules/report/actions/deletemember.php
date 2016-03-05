@@ -32,10 +32,10 @@ function deletemember_POST(Web &$w) {
 		$member->fill($_POST);
 		$member->update();
 
-		$w->msg("Member deleted","/report/viewreport/".$p['report_id']."?tab=2");
+		$w->msg("Member deleted","/report/edit/".$p['report_id']."#members");
 	}
 	else {
 		// if member somehow no longer exists, say as much
-		$w->msg("Member no longer exists?","/report/edit/".$p['report_id']."?tab=2");
+		$w->msg("Member no longer exists?","/report/edit/".$p['report_id']."#members");
 	}
 }

@@ -364,59 +364,159 @@ class ReportService extends DbService {
         return array(array("Format", "select", "format", null, $arr));
     }
 
+	function generatehtml($tbl,$title,$report_template) {
+		// allowing multiple SQL statements, each returns a recordset as a seperate array element, ie. iterate
+		// array: report parameters > report title > data columns > recordset
+		foreach ($tbl as $t) {
+			
+			$crumbs = array_shift($t);
+			$title = array_shift($t);
+			
+			if (!empty($report_template)) {
+				$templatedata[] = array("title"=>$title,"headers"=>array_values(array_shift($t)),"results"=>$t);
+			} else {
+				// first row is our column headings
+				$hds[] = array_shift($t);
+				
+				// first row has column names as associative. change keys to numeric to match recordset
+				$tvalues = array_values($hds[0]);
+				
+				// find key of any links
+				foreach ($tvalues as $h) {
+					if (stripos($h, "_link")) {
+						list($fld, $lnk) = preg_split("/_/", $h);
+						$f = array_search($fld . "_link", $tvalues);
+						$ukey[$f] = $fld;
+						unset($hds[0][$h]);
+					}
+				}
+
+				if (!empty($ukey)) {
+					// now need to find key of fields to link
+					foreach ($tvalues as $m => $h) {
+						foreach ($ukey as $n => $u) {
+							if ($u == $h)
+								$fkey[$n] = array_search($u, $tvalues);
+						}
+					}
+
+					// iterate row to create link and dump URL related fields
+					foreach ($t as $v) {
+						// keys points to fields so need to maintain array and create all URLS
+						// before we start dumping fields and splicing links
+						foreach ($fkey as $n => $u) {
+							$a[$n] = "<a href=\"" . $v[$n] . "\">" . $v[$u] . "</a>";
+							$dump[] = $n;
+							$dump[] = $u;
+						}
+
+
+						// dump url related fields
+						foreach ($dump as $num) {
+							unset($v[$num]);
+						}
+
+						// add completed URL(s)
+						foreach ($a as $num => $url) {
+							$v[$num] = $url;
+						}
+
+						// we now have gaps from our unsetting and inserting of links
+						// eg. $v[3], $v[4], $v[6], $v[0]
+						// get array_keys into new array:
+						$sortv = array_keys($v);
+						// sort so keys are now in order despite the gaps
+						sort($sortv);
+						// create new - ordered - array setting our original array values
+						foreach ($sortv as $num => $val) {
+							$sorted[] = $v[$val];
+						}
+
+						$arr[] = $sorted;
+						unset($a);
+						unset($dump);
+						unset($sorted);
+					}
+					// recreate $t
+					$t = $arr;
+					unset($ukey);
+					unset($fkey);
+				}
+				// put headings back into array
+				$t = array_merge($hds, $t);
+
+				// Render selected template
+				$results .= "<b>" . $title . "</b>" . Html::table($t, null, "tablesorter", true);
+			}
+			// reset parameters string
+			$strcrumb = "";
+			unset($hds);
+			unset($arr);
+		}
+
+		if (!empty($report_template) && !empty($templatedata)) {
+			$results = $this->w->Template->render(
+					$report_template->template_id,
+					array("data" => $templatedata, "w" => $this->w, "POST" => $_POST));                    	
+		}
+		return $results;
+	}
+    
+	 function generatecsv($rows, $title) {
+		// require the necessary library
+		require_once("parsecsv/parsecsv.lib.php");
+		$result=[];
+		// if we have records, comma delimit the fields/columns and carriage return delimit the rows
+		if (!empty($rows)) {
+			foreach ($rows as $row) {
+				//throw away the first line which list the form parameters
+				$crumbs = array_shift($row);
+				$title = array_shift($row);
+				$hds = array_shift($row);
+				$hvals = array_values($hds);
+
+				// find key of any links
+				foreach ($hvals as $h) {
+					if (stripos($h, "_link")) {
+						list($fld, $lnk) = preg_split("/_/", $h);
+						$ukey[] = array_search($h, $hvals);
+						unset($hds[$h]);
+					}
+				}
+
+				// iterate row to build URL. if required
+				if (!empty($ukey)) {
+					foreach ($row as $r) {
+						foreach ($ukey as $n => $u) {
+							// dump the URL related fields for display
+							unset($r[$u]);
+						}
+						$arr[] = $r;
+					}
+					$row = $arr;
+					unset($arr);
+				}
+
+				$csv = new parseCSV();
+				$result[]=$csv->output($filename, $row, $hds);
+				unset($ukey);
+			}
+		}
+		return implode("",$result);
+	}
+    
     // export a recordset as CSV
     function exportcsv($rows, $title) {
-        // require the necessary library
-        require_once("parsecsv/parsecsv.lib.php");
-
         // set filename
-        $filename = str_replace(" ", "_", $title) . "_" . date("Y.m.d-H.i") . ".csv";
-
-        // if we have records, comma delimit the fields/columns and carriage return delimit the rows
-        if (!empty($rows)) {
-            foreach ($rows as $row) {
-                //throw away the first line which list the form parameters
-                $crumbs = array_shift($row);
-                $title = array_shift($row);
-                $hds = array_shift($row);
-                $hvals = array_values($hds);
-
-                // find key of any links
-                foreach ($hvals as $h) {
-                    if (stripos($h, "_link")) {
-                        list($fld, $lnk) = preg_split("/_/", $h);
-                        $ukey[] = array_search($h, $hvals);
-                        unset($hds[$h]);
-                    }
-                }
-
-                // iterate row to build URL. if required
-                if (!empty($ukey)) {
-                    foreach ($row as $r) {
-                        foreach ($ukey as $n => $u) {
-                            // dump the URL related fields for display
-                            unset($r[$u]);
-                        }
-                        $arr[] = $r;
-                    }
-                    $row = $arr;
-                    unset($arr);
-                }
-
-                $csv = new parseCSV();
-                $this->w->out($csv->output($filename, $row, $hds));
-                unset($ukey);
-            }
-            $this->w->sendHeader("Content-type", "application/csv");
-            $this->w->sendHeader("Content-Disposition", "attachment; filename=" . $filename);
-            $this->w->setLayout(null);
-        }
-    }
+		$filename = str_replace(" ", "_", $title) . "_" . date("Y.m.d-H.i") . ".csv";
+		$this->w->out($this->generatecsv($rows,$title));
+		$this->w->sendHeader("Content-type", "application/csv");
+		$this->w->sendHeader("Content-Disposition", "attachment; filename=" . $filename);
+		$this->w->setLayout(null);
+	}
 
     // export a recordset as PDF
-    function exportpdf($rows, $title, $report_template = null) {
-        $filename = str_replace(" ", "_", $title) . "_" . date("Y.m.d-H.i") . ".pdf";
-
+    function generatepdf($rows, $title, $report_template = null) {
         // using TCPDF so grab includes
         require_once('tcpdf/tcpdf.php');
 
@@ -445,9 +545,7 @@ class ReportService extends DbService {
         $pdf->writeHTMLCell(0, 10, 60, 25, $created, 0, 1, 0, true);
 		
         // display recordset
-		
-		
-        if (!empty($rows)) {
+		if (!empty($rows)) {
 			if (empty($report_template)) {
 				foreach ($rows as $row) {
 					//throw away the first line which list the form parameters
@@ -491,19 +589,25 @@ class ReportService extends DbService {
 				}
 			}
 		}
-
+		return $pdf;
+    }
+    
+    // export a recordset as PDF
+    function exportpdf($rows, $title, $report_template = null) {
+        $filename = str_replace(" ", "_", $title) . "_" . date("Y.m.d-H.i") . ".pdf";
+		$pdf=$this->generatepdf($rows, $title, $report_template);
         // set for 'open/save as...' dialog
         $pdf->Output($filename, 'D');
     }
 
     // export a recordset as XML
-    function exportxml($rows, $title) {
+    function generatexml($rows, $title) {
         $filename = str_replace(" ", "_", $title) . "_" . date("Y.m.d-H.i") . ".xml";
-
-        $this->w->out("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        $this->w->out("<report>\n");
-        $this->w->out("\t<title>" . $title . "</title>\n");
-        $this->w->out("\t<created>" . date("d/m/Y h:i:s") . "</created>\n");
+		$result=[];
+        $result[]="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+        $result[]="<report>\n";
+        $result[]="\t<title>" . $title . "</title>\n";
+        $result[]="\t<created>" . date("d/m/Y h:i:s") . "</created>\n";
 
         // if we have records ...
         if (!empty($rows)) {
@@ -514,24 +618,31 @@ class ReportService extends DbService {
                 $hds = array_shift($row);
                 $hds = array_values($hds);
 
-                $this->w->out("\t<rows title=\"" . $title . "\">\n");
+                $result[]="\t<rows title=\"" . $title . "\">\n";
 
                 foreach ($row as $r) {
-                    $this->w->out("\t\t<row>\n");
+                    $result[]="\t\t<row>\n";
                     $i = 0;
                     foreach ($r as $field) {
                         if (!stripos($hds[$i], "_link")) {
-                            $this->w->out("\t\t\t<" . preg_replace("/\s+/", "", $hds[$i]) . ">" . htmlentities($field) . "</" . preg_replace("/\s+/", "", $hds[$i]) . ">\n");
+                            $result[]="\t\t\t<" . preg_replace("/\s+/", "", $hds[$i]) . ">" . htmlentities($field) . "</" . preg_replace("/\s+/", "", $hds[$i]) . ">\n";
                         }
                         $i++;
                     }
-                    $this->w->out("\t\t</row>\n");
+                    $result[]="\t\t</row>\n";
                 }
-                $this->w->out("\t</rows>\n");
+                $result[]="\t</rows>\n";
             }
         }
-        $this->w->out("</report>\n");
-
+        $result[]="</report>\n";
+		return implode("",$result);
+    }
+    
+    // export a recordset as XML
+    function exportxml($rows, $title) {
+        $filename = str_replace(" ", "_", $title) . "_" . date("Y.m.d-H.i") . ".xml";
+		$content=$this->generatexml($rows,$title);
+        $this->w->out($content);
         // set header for 'open/save as...' dialog
         $this->w->sendHeader("Content-type", "application/xml");
         $this->w->sendHeader("Content-Disposition", "attachment; filename=" . $filename);

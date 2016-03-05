@@ -13,7 +13,7 @@ class ReportTemplate extends DbObject {
             "CSV",
             "XML",
             "PDF",
-            "Image"
+        //    "Image"
         );
     }
     

@@ -55,11 +55,13 @@ function email_GET(Web $w) {
 	// Normalise member list
 	$recipients = [];
 	foreach($members as $recipient_member) {
-		$user = $recipient_member->getUser();
-		if ($user->is_group) {
-			$recipients = array_merge($recipients, getGroupMembers($user->id));
-		} else {
-			$recipients[$user->login] = $user;
+		if ($recipient_member->is_email_recipient) {
+			$user = $recipient_member->getUser();
+			if ($user->is_group) {
+				$recipients = array_merge($recipients, getGroupMembers($user->id));
+			} else {
+				$recipients[$user->login] = $user;
+			}
 		}
 	}
 	
@@ -96,38 +98,34 @@ function email_GET(Web $w) {
 				
 				// Generate PDF
 				$template = $report_template->getTemplate();
+				$title='';
 				if (empty($template->id)) {
-					$w->Log->setLogger("AUTOMATED_REPORT")->error("Report {$report_id} generated no data for user " . $login);
-					continue;
+					$title=$template->title;
 				}
-				
-				
-				$filename = ROOT_PATH . REPORT_CACHE_PATH . '/' . $template->title . "_" . date("Ymd-H-i") . ".pdf";
-
-				// Using TCPDF library
-				require_once('tcpdf/tcpdf.php');
-
-				// Set up PDF
-				$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-				$pdf->SetCreator(PDF_CREATOR);
-				$pdf->SetTitle($report->title);
-				$pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-				$pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
-				$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
-				$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-				$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-				$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-				$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-				$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-				//$pdf->setLanguageArray($l);
-				// no header, set font and create a page
-				$pdf->setPrintHeader(false);
-				$pdf->SetFont("helvetica", "B", 9);
-				$pdf->AddPage();
-
-				$pdf->writeHTML($results, true, false, true, false);
-				$pdf->Output($filename, 'F');
-
+				$reportTemplateType=strtolower($report_template->type);
+				$rows=$templatedata;
+				// pdf
+				if ($reportTemplateType=="pdf") {
+					$filename = ROOT_PATH . REPORT_CACHE_PATH . '/' .str_replace(" ", "_", $title) . "_" . date("Y.m.d-H.i") . ".pdf";
+					$pdf=$w->Report->generatepdf($rows, $title, $report_template);
+					// set for 'open/save as...' dialog
+					$pdf->Output($filename, 'F');
+				// xml	
+				} else if ($reportTemplateType=="xml") {
+					$filename = ROOT_PATH . REPORT_CACHE_PATH . '/' .str_replace(" ", "_", $title) . "_" . date("Y.m.d-H.i") . ".xml";
+					$content=$w->Report->generatexml($rows,$title);
+					file_put_contents($filename,$content);
+				// csv	
+				} else if ($reportTemplateType=="csv") {
+					$filename = ROOT_PATH . REPORT_CACHE_PATH . '/' .str_replace(" ", "_", $title) . "_" . date("Y.m.d-H.i") . ".csv";
+					$content=$w->Report->generatecsv($rows,$title);
+					file_put_contents($filename,$content);
+				// html	
+				} else {
+					$filename = ROOT_PATH . REPORT_CACHE_PATH . '/' .str_replace(" ", "_", $title) . "_" . date("Y.m.d-H.i") . ".html";
+					$content=$w->Report->generatehtml($rows,$title,$report_template);
+					file_put_contents($filename,$content);
+				} 
 				$attachments[] = $filename;
 			}
 			
@@ -151,8 +149,6 @@ function email_GET(Web $w) {
 			$w->Log->setLogger("AUTOMATED_REPORT")->info("Automated report send to " . $contact->email . " with " . count($attachments) . " attachment" . (count($attachments) == 1 ? '' : 's'));
 		}
 	}
-	
-	// $w->redirect("/report");
 	
 }
 
