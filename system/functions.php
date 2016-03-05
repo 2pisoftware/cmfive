@@ -16,6 +16,17 @@ function array_unique_multidimensional($input) {
     return array_intersect_key($input, $unique);
 }
 
+/**
+ * Translation shortcut
+ */
+function t($w,$key,$parameters=[]) {
+	return $w->Translation->translate($key,$parameters); 
+} 
+function e($w,$key,$parameters=[]) {
+	echo $w->Translation->translate($key,$parameters); 
+} 
+
+
 function humanReadableBytes($input, $rounding = 2, $bytesValue = true) {
     $ext = array("B", "KB", "MB", "GB", "TB");
     $barrier = 1024;

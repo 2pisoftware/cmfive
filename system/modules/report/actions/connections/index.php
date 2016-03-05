@@ -1,6 +1,15 @@
 <?php
 
 function index_ALL(Web $w) {
+   	echo "PM:". t($w,'permodule');
+	echo "PS:". t($w,'persub');
+	echo "PA:".t($w,'peraction');
+	echo "PSA:".t($w,'persubaction');
+//	echo $w->Translation->translate('name');
+	echo "asdfasdf";
+	die();
+
+   
     $connections = $w->Report->getConnections();
     
     $table_header = array("Driver", "Host", "Database", "Port", "Username", "Actions");
