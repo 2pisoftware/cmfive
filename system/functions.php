@@ -17,14 +17,22 @@ function array_unique_multidimensional($input) {
 }
 
 /**
- * Translation shortcut
+ * Translations shortcuts (for POT marker identification
  */
-function t($w,$key,$parameters=[]) {
-	return $w->Translation->translate($key,$parameters); 
+ 
+function __($key) {
+	return  _($key);
 } 
-function e($w,$key,$parameters=[]) {
-	echo $w->Translation->translate($key,$parameters); 
+function _e($key) {
+	echo _($key); 
 } 
+function _n($key1,$key2,$n) {
+	return ngettext($key1,$key2,$n);
+}
+function _en($key1,$key2,$n) {
+	return ngettext($key1,$key2,$n);
+}
+
 
 
 function humanReadableBytes($input, $rounding = 2, $bytesValue = true) {

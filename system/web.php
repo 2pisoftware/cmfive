@@ -101,12 +101,10 @@ class Web {
         $this->_hooks = array();
         
         // if using IIS then value is "off" for non ssl requests
-        $sHttps=array_key_exists('HTTPS',$_SERVER) ? $_SERVER['HTTPS'] : '';
-        $sHttpHost=array_key_exists('HTTP_HOST',$_SERVER) ? $_SERVER['HTTP_HOST'] : '';
-        if (empty($sHttps) || $sHttps == "off") {
-        	$this->_webroot = "http://" . $sHttpHost;
+        if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == "off") {
+        	$this->_webroot = "http://" . $_SERVER['HTTP_HOST'];
         } else {
-        	$this->_webroot = "https://" . $sHttpHost;
+        	$this->_webroot = "https://" . $_SERVER['HTTP_HOST'];
         }
         $this->_actionMethod = null;
 
@@ -115,7 +113,8 @@ class Web {
 		defined("WEBROOT") ||  define("WEBROOT", $this->_webroot);
 		
         // conditions to start the installer
-        $this->_is_installing = array_key_exists('REQUEST_URI',$_SERVER) && strpos($_SERVER['REQUEST_URI'], '/install') === 0 ||!file_exists(ROOT_PATH . "/config.php");
+        $this->_is_installing = strpos($_SERVER['REQUEST_URI'], '/install') === 0 ||
+                                !file_exists(ROOT_PATH . "/config.php");
 
         $this->loadConfigurationFiles();
          
@@ -126,22 +125,20 @@ class Web {
     }
 
     private function modelLoader($className) {
-		// 1. check if class directory has to be loaded from cache
+    	// 1. check if class directory has to be loaded from cache
     	$classdirectory_cache_file = ROOT_PATH."/cache/classdirectory.cache";
     	
     	if (empty($this->_classdirectory) && file_exists($classdirectory_cache_file)) {
     		require_once $classdirectory_cache_file;
     	}
-    	
-		// 2. if filename is stored in $this->_classdirectory
+    	// 2. if filename is stored in $this->_classdirectory
     	if (!empty($this->_classdirectory[$className])) {
     		if (file_exists($this->_classdirectory[$className])) {
-    			require $this->_classdirectory[$className];
+    			require_once $this->_classdirectory[$className];
     			return true;
     		}
     	}
-    	
-		// 3. class has to be found the hard way
+    	// 3. class has to be found the hard way
         $modules = $this->modules();
         
         // create the class cache file
@@ -153,7 +150,7 @@ class Web {
             if (Config::get("{$model}.active") === true) {
                 $file = $this->getModuleDir($model) . 'models/' . ucfirst($className) . ".php";
                 if (file_exists($file)) {
-                    require $file;
+                    require_once $file;
                     // add this class file to the cache file
                     file_put_contents($classdirectory_cache_file,'$this->_classdirectory["'.$className.'"]="'.$file.'";'."\n", FILE_APPEND);
                     return true;
@@ -161,7 +158,7 @@ class Web {
                     // Try a lower case version
                     $file = $this->getModuleDir($model) . 'models/' . $className . ".php";
                     if (file_exists($file)) {
-                        require	 $file;
+                        require_once $file;
                         // add this class file to the cache file
                     	file_put_contents($classdirectory_cache_file,'$this->_classdirectory["'.$className.'"]="'.$file.'";'."\n", FILE_APPEND);
                         return true;
@@ -214,6 +211,36 @@ class Web {
         }
         return array_values($requestURI);
     }
+	/**
+	 * Initialise gettext for this module
+	 */
+	function initTranslations()  {
+		
+		
+		$user=$this->Auth->user();
+		$language=Config::get('system.language');
+		if (!empty($user)) {
+			$lang=$user->getLanguage();
+			if (!empty($lang))  {
+				$language=$lang;
+			}
+			
+		}
+		
+		$locale = $language;
+		$locale ='fr_FR';
+		$domain = $this->currentModule();
+		putenv("LC_ALL=$locale");
+		$results = setlocale(LC_ALL, $locale);
+		if (!$results) {
+			$this->Log->info('setlocale failed: locale function is not available on this platform, or the given locale ('.$locale.') does not exist in this environment');
+		}
+		//putenv("LANGUAGE=$locale");
+		bindtextdomain($domain, "/var/www/cmfive/modules/example/translations");
+		///echo 'new text domain is set: ' . $results. "\n";
+		textdomain($domain);
+		//echo 'current message domain is set: ' . $results. "\n";
+}
 
     /**
      * Enqueue script adds the script entry to the Webs _script var which maintains
@@ -436,7 +463,8 @@ class Web {
         if (null !== Config::get("{$this->_module}.active") && !Config::get("{$this->_module}.active") && $this->_module !== "main") {
             $this->error("The {$this->_module} module is not active, you can change it's active state in it's config file.", "/");
         }
-        
+        // configure translations lookup for this module
+        $this->initTranslations();
         
         if (!$this->_action) {
             $this->_action = $this->_defaultAction;
@@ -461,7 +489,6 @@ class Web {
 		
         $actionmethods[] = $this->_action . '_' . $this->_requestMethod;
         $actionmethods[] = $this->_action . '_ALL';
-        $actionmethods[] = 'default_ALL';
 
         // change the submodule and action for installation
         if($this->_is_installing) {
@@ -572,8 +599,7 @@ class Web {
             } else {
                 $this->_buffer = $body;
             }
-			
-			echo $this->_buffer;
+            echo $this->_buffer;
         } else {
             $this->notFoundPage();
         }

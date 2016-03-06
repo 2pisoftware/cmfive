@@ -1,0 +1,133 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.7\n"
+"Project-Id-Version: cmfive\n"
+"Language: de\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: Steve Ryan <steve@2pisoftware.com>\n"
+"Language-Team: \n"
+
+#: actions/delete.php:25
+msgid "Object Deleted"
+msgstr "Objekt gelöscht"
+
+#: actions/delete.php:30
+msgid "This object does not exist."
+msgstr "Diese Aufgabe ist nicht vorhanden."
+
+#: actions/edit.php:28
+msgid "Edit Example Data"
+msgstr "Bearbeiten Beispieldaten"
+
+#: actions/edit.php:29 actions/index.php:11
+msgid "Title"
+msgstr "Titel"
+
+#: actions/edit.php:30 actions/index.php:11
+msgid "Data"
+msgstr "Daten"
+
+#: actions/edit.php:31
+msgid "Check"
+msgstr "Prüfen"
+
+#: actions/edit.php:32
+msgid "select field"
+msgstr "Auswahlfeld"
+
+#: actions/edit.php:33
+msgid "autocomplete field"
+msgstr "Auto-Vervollständigen-Feld"
+
+#: actions/edit.php:34
+msgid "multiselect field"
+msgstr "Multiselect-Feld"
+
+#: actions/edit.php:35
+msgid "radio field"
+msgstr "Funkfeld"
+
+#: actions/edit.php:36
+msgid "password field"
+msgstr "Passwort-Feld"
+
+#: actions/edit.php:37
+msgid "email field"
+msgstr "E-Mail-Feld"
+
+#: actions/edit.php:38
+msgid "hidden field"
+msgstr "verstecktes Feld"
+
+#: actions/edit.php:39
+msgid "date field"
+msgstr "Datumsfeld"
+
+#: actions/edit.php:40
+msgid "datetime field"
+msgstr "Datetime-Feld"
+
+#: actions/edit.php:41
+msgid "time field"
+msgstr "Zeitfeld"
+
+#: actions/edit.php:42
+msgid "file field"
+msgstr "Dateifeld"
+
+#: actions/edit.php:43
+msgid "multifile field"
+msgstr "Multifile-Feld"
+
+#: actions/edit.php:44
+msgid " Save "
+msgstr " sparen"
+
+#: actions/edit.php:75
+msgid "ExampleData updated"
+msgstr "ExampleData aktualisiert"
+
+#: actions/index.php:8
+msgid "Example Data List"
+msgstr "Beispiel Datenliste"
+
+#: actions/index.php:11
+msgid "Checkbox"
+msgstr "Checkbox"
+
+#: actions/index.php:11
+msgid "Actions"
+msgstr "Aktionen"
+
+#: actions/index.php:17
+msgid "Yes"
+msgstr "ja"
+
+#: actions/index.php:17
+msgid "No"
+msgstr "Nein"
+
+#: actions/index.php:22
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: actions/index.php:25
+msgid "Delete"
+msgstr "Löschen"
+
+#: actions/index.php:25
+msgid "Really delete?"
+msgstr "Wirklich löschen?"
+
+#: models/ExampleService.php:36
+msgid "Home"
+msgstr "Zuhause"
+
+#: templates/index.tpl.php:2
+msgid "New Data"
+msgstr "Neue Daten"

@@ -1,0 +1,133 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.7\n"
+"Project-Id-Version: cmfive\n"
+"Language: fr_FR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: Steve Ryan <steve@2pisoftware.com>\n"
+"Language-Team: \n"
+
+#: actions/delete.php:25
+msgid "Object Deleted"
+msgstr "objet supprimé"
+
+#: actions/delete.php:30
+msgid "This object does not exist."
+msgstr "Cet objet n'existe pas."
+
+#: actions/edit.php:28
+msgid "Edit Example Data"
+msgstr "Modifier Exemple de données"
+
+#: actions/edit.php:29 actions/index.php:11
+msgid "Title"
+msgstr "Titre"
+
+#: actions/edit.php:30 actions/index.php:11
+msgid "Data"
+msgstr "Données"
+
+#: actions/edit.php:31
+msgid "Check"
+msgstr "Vérifier"
+
+#: actions/edit.php:32
+msgid "select field"
+msgstr "sélectionner le champ"
+
+#: actions/edit.php:33
+msgid "autocomplete field"
+msgstr "champ autocomplete"
+
+#: actions/edit.php:34
+msgid "multiselect field"
+msgstr "champ multiselect"
+
+#: actions/edit.php:35
+msgid "radio field"
+msgstr "champ radio"
+
+#: actions/edit.php:36
+msgid "password field"
+msgstr "champ de mot de passe"
+
+#: actions/edit.php:37
+msgid "email field"
+msgstr "champ email"
+
+#: actions/edit.php:38
+msgid "hidden field"
+msgstr "champ caché"
+
+#: actions/edit.php:39
+msgid "date field"
+msgstr "champ de date"
+
+#: actions/edit.php:40
+msgid "datetime field"
+msgstr "champ datetime"
+
+#: actions/edit.php:41
+msgid "time field"
+msgstr "champ de temps"
+
+#: actions/edit.php:42
+msgid "file field"
+msgstr "champ de fichier"
+
+#: actions/edit.php:43
+msgid "multifile field"
+msgstr "champ multifichier"
+
+#: actions/edit.php:44
+msgid " Save "
+msgstr " sauvegarder"
+
+#: actions/edit.php:75
+msgid "ExampleData updated"
+msgstr "ExampleData mise à jour"
+
+#: actions/index.php:8
+msgid "Example Data List"
+msgstr "Liste des données Exemple"
+
+#: actions/index.php:11
+msgid "Checkbox"
+msgstr "Checkbox"
+
+#: actions/index.php:11
+msgid "Actions"
+msgstr "actes"
+
+#: actions/index.php:17
+msgid "Yes"
+msgstr "Oui"
+
+#: actions/index.php:17
+msgid "No"
+msgstr "Non"
+
+#: actions/index.php:22
+msgid "Edit"
+msgstr "modifier"
+
+#: actions/index.php:25
+msgid "Delete"
+msgstr "Effacer"
+
+#: actions/index.php:25
+msgid "Really delete?"
+msgstr "Vraiment supprimer?"
+
+#: models/ExampleService.php:36
+msgid "Home"
+msgstr "Accueil"
+
+#: templates/index.tpl.php:2
+msgid "New Data"
+msgstr "Nouvelles données"

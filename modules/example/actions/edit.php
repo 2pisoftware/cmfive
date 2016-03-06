@@ -25,23 +25,23 @@ function edit_GET(Web $w) {
 	/*	*/			  
 	// create the edit form
 	$f = Html::form(array(
-		array("Edit Example Data","section"),
-		array("Title","text","title", $data->title),
-		array("Data","textarea","data",$data->data),
-		array("Check","checkbox","example_checkbox",$data->example_checkbox),
-		array("select field", "select", "select_field", $data->select_field, ['fred','john']) ,
-		array("autocomplete field", "autocomplete", "autocomplete_field", $data->autocomplete_field, ['fred','john']) ,
-		array("multiselect field", "multiselect", "multiselect_field", $data->multiselect_field, ['fred','john']) ,
-		array("radio field", "radio", "radio_field", $data->radio_field, ['fred','john']) ,
-		array("password field","password","password_field", $data->password_field),
-		array("email field","email","email", $data->email_field),
-		array("hidden field","hidden","hidden", $data->hidden_field),
-		array("date field", "date", "d_date_field", formatDate($data->d_date_field)),
-		array("datetime field", "datetime", "dt_datetime_field", formatDate($data->dt_datetime_field)),
-		array("time field", "time", "t_time_field", formatDate($data->t_time_field,'H:i:s')),
-		array("file field","file","file_field", $data->file_field),
-		array("multifile field","multifile","multifile_field", $data->multifile_field)
-	),$w->localUrl("/example/edit/".$p['id']),"POST"," Save ");
+		array(_("Edit Example Data"),"section"),
+		array(_("Title"),"text","title", $data->title),
+		array(_("Data"),"textarea","data",$data->data),
+		array(_("Check"),"checkbox","example_checkbox",$data->example_checkbox),
+		array(_("select field"), "select", "select_field", $data->select_field, ['fred','john']) ,
+		array(_("autocomplete field"), "autocomplete", "autocomplete_field", $data->autocomplete_field, ['fred','john']) ,
+		array(_("multiselect field"), "multiselect", "multiselect_field", $data->multiselect_field, ['fred','john']) ,
+		array(_("radio field"), "radio", "radio_field", $data->radio_field, ['fred','john']) ,
+		array(_("password field"),"password","password_field", $data->password_field),
+		array(_("email field"),"email","email", $data->email_field),
+		array(_("hidden field"),"hidden","hidden", $data->hidden_field),
+		array(_("date field"), "date", "d_date_field", formatDate($data->d_date_field)),
+		array(_("datetime field", "datetime"), "dt_datetime_field", formatDate($data->dt_datetime_field)),
+		array(_("time field", "time"), "t_time_field", formatDate($data->t_time_field,'H:i:s')),
+		array(_("file field","file"),"file_field", $data->file_field),
+		array(_("multifile field"),"multifile","multifile_field", $data->multifile_field)
+	),$w->localUrl("/example/edit/".$p['id']),"POST",_(" Save "));
 	
 	// circumvent the template and print straight into the layout
 	$w->out($f);
@@ -72,5 +72,5 @@ function edit_POST(Web $w) {
 	$data->insertOrUpdate();
 	
 	// go back to the list view
-	$w->msg("ExampleData updated","example/index");
+	$w->msg(_("ExampleData updated"),"example/index");
 }

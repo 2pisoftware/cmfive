@@ -1,0 +1,135 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2016-03-06 13:19+1100\n"
+"PO-Revision-Date: 2016-03-06 22:15+1100\n"
+"Last-Translator: Steve Ryan <steve@2pisoftware.com>\n"
+"Language-Team: \n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.7\n"
+"X-Poedit-Basepath: ../docks/docker-cmfive/web/cmfive/modules/example\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: actions/delete.php:25
+msgid "Object Deleted"
+msgstr "Killed it"
+
+#: actions/delete.php:30
+msgid "This object does not exist."
+msgstr "Nada dude."
+
+#: actions/edit.php:28
+msgid "Edit Example Data"
+msgstr "Mess with it"
+
+#: actions/edit.php:29 actions/index.php:11
+msgid "Title"
+msgstr "Da Title"
+
+#: actions/edit.php:30 actions/index.php:11
+msgid "Data"
+msgstr "Da goods"
+
+#: actions/edit.php:31
+msgid "Check"
+msgstr "Pick me"
+
+#: actions/edit.php:32
+msgid "select field"
+msgstr "What can i choose "
+
+#: actions/edit.php:33
+msgid "autocomplete field"
+msgstr "fill me in "
+
+#: actions/edit.php:34
+msgid "multiselect field"
+msgstr "grab heaps"
+
+#: actions/edit.php:35
+msgid "radio field"
+msgstr "dotty"
+
+#: actions/edit.php:36
+msgid "password field"
+msgstr "hide me!!@!@"
+
+#: actions/edit.php:37
+msgid "email field"
+msgstr "mail"
+
+#: actions/edit.php:38
+msgid "hidden field"
+msgstr "zap!"
+
+#: actions/edit.php:39
+msgid "date field"
+msgstr "when"
+
+#: actions/edit.php:40
+msgid "datetime field"
+msgstr "exactly when"
+
+#: actions/edit.php:41
+msgid "time field"
+msgstr "what time"
+
+#: actions/edit.php:42
+msgid "file field"
+msgstr "gimme data"
+
+#: actions/edit.php:43
+msgid "multifile field"
+msgstr "gimme lots of data"
+
+#: actions/edit.php:44
+msgid " Save "
+msgstr " Keep This Stuff "
+
+#: actions/edit.php:75
+msgid "ExampleData updated"
+msgstr "Changed forevor dude"
+
+#: actions/index.php:8
+msgid "Example Data List"
+msgstr "Da List"
+
+#: actions/index.php:11
+msgid "Checkbox"
+msgstr "Tick me"
+
+#: actions/index.php:11
+msgid "Actions"
+msgstr "Can do"
+
+#: actions/index.php:17
+msgid "Yes"
+msgstr "Yep"
+
+#: actions/index.php:17
+msgid "No"
+msgstr "Nope"
+
+#: actions/index.php:22
+msgid "Edit"
+msgstr "Change me"
+
+#: actions/index.php:25
+msgid "Delete"
+msgstr "Kill Me"
+
+#: actions/index.php:25
+msgid "Really delete?"
+msgstr "Really splatter me ?"
+
+#: models/ExampleService.php:36
+msgid "Home"
+msgstr "Back to Safety"
+
+#: templates/index.tpl.php:2
+msgid "New Data"
+msgstr "Gimme a new one"

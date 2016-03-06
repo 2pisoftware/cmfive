@@ -33,7 +33,7 @@ class ExampleService extends DbService {
 	public function navigation(Web $w, $title = null, $nav = null) {
 		$nav = array();
 		if ($w->Auth->loggedIn()) {
-			$w->menuLink("example/index", "Home", $nav);
+			$w->menuLink("example/index", _("Home"), $nav);
 		}
 		return $nav;
 	}	
