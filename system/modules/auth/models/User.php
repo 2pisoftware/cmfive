@@ -21,6 +21,7 @@ class User extends DbObject {
     public $password_reset_token;
     public $dt_password_reset_at;
     public $redirect_url;
+    public $language;
     public $_roles;
     public $_contact;
     public $_modifiable;
@@ -122,7 +123,7 @@ class User extends DbObject {
     }
 
 	public function getLanguage() {
-		return null;
+		return $this->$language;
 	}
 
     /**
