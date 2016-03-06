@@ -8,6 +8,7 @@
 function useredit_GET(Web &$w) {
     $p = $w->pathMatch("id", "box");
     $user = $w->Auth->getObject("User", $p["id"]);
+    $w->ctx('availableLocales',["en_US","de_DE","fr_FR","ja_JP"]);
     if ($user) {
         $w->Admin->navigation($w, "Administration - Edit User - " . $user->login);
     } else {

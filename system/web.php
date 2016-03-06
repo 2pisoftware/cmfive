@@ -215,32 +215,26 @@ class Web {
 	 * Initialise gettext for this module
 	 */
 	function initTranslations()  {
-		
-		
 		$user=$this->Auth->user();
+		// default language
 		$language=Config::get('system.language');
+		// per user language s
 		if (!empty($user)) {
-			$lang=$user->getLanguage();
+			$lang=$user->language;
 			if (!empty($lang))  {
 				$language=$lang;
 			}
-			
 		}
 		
-		$locale = $language;
-		$locale ='fr_FR';
 		$domain = $this->currentModule();
-		putenv("LC_ALL=$locale");
-		$results = setlocale(LC_ALL, $locale);
+		putenv("LC_ALL=$language");
+		$results = setlocale(LC_ALL, $language);
 		if (!$results) {
-			$this->Log->info('setlocale failed: locale function is not available on this platform, or the given locale ('.$locale.') does not exist in this environment');
+			$this->Log->info('setlocale failed: locale function is not available on this platform, or the given locale ('.$language.') does not exist in this environment');
 		}
-		//putenv("LANGUAGE=$locale");
 		bindtextdomain($domain, "/var/www/cmfive/modules/example/translations");
-		///echo 'new text domain is set: ' . $results. "\n";
 		textdomain($domain);
-		//echo 'current message domain is set: ' . $results. "\n";
-}
+	}
 
     /**
      * Enqueue script adds the script entry to the Webs _script var which maintains
