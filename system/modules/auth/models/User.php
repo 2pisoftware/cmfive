@@ -134,6 +134,10 @@ class User extends DbObject {
 		return $this->$language;
 	}
 
+	public function getAvailableLanguages() {
+		return ["en_US","de_DE","fr_FR","ja_JP"];
+	}
+
     /**
      * @return string, either the login or first name
      */

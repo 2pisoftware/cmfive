@@ -25,6 +25,7 @@ function profile_GET(Web &$w) {
 	$lines[] = array("Fax","text","fax",$contact ? $contact->fax : "");
 	$lines[] = array("Email","text","email",$contact ? $contact->email : "");
 	$lines[] = array("Redirect URL", "text", "redirect_url", $user->redirect_url);
+	$lines[] = array("Language", "autocomplete", "language", $user->language,$user->getAvailableLanguages());
 
 	$f = Html::form($lines,$w->localUrl("/auth/profile"),"POST","Update");
 	if ($p['box']) {
