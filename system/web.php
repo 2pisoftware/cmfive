@@ -194,6 +194,36 @@ class Web {
         }
         return array_values($requestURI);
     }
+	/**
+	 * Initialise gettext for this module
+	 */
+	function initTranslations()  {
+		
+		
+		$user=$this->Auth->user();
+		$language=Config::get('system.language');
+		if (!empty($user)) {
+			$lang=$user->getLanguage();
+			if (!empty($lang))  {
+				$language=$lang;
+			}
+			
+		}
+		
+		$locale = $language;
+		$locale ='fr_FR';
+		$domain = $this->currentModule();
+		putenv("LC_ALL=$locale");
+		$results = setlocale(LC_ALL, $locale);
+		if (!$results) {
+			$this->Log->info('setlocale failed: locale function is not available on this platform, or the given locale ('.$locale.') does not exist in this environment');
+		}
+		//putenv("LANGUAGE=$locale");
+		bindtextdomain($domain, "/var/www/cmfive/modules/example/translations");
+		///echo 'new text domain is set: ' . $results. "\n";
+		textdomain($domain);
+		//echo 'current message domain is set: ' . $results. "\n";
+}
 
     /**
      * Enqueue script adds the script entry to the Webs _script var which maintains
@@ -317,7 +347,6 @@ class Web {
         if ($init_database && !$this->_is_installing) {
 			$this->initDB();
 		}
-
 		// Set the timezone from Config
 		$timezone = Config::get('system.timezone');
 		if (empty($timezone)) {
@@ -400,7 +429,8 @@ class Web {
         if (null !== Config::get("{$this->_module}.active") && !Config::get("{$this->_module}.active") && $this->_module !== "main") {
             $this->error("The {$this->_module} module is not active, you can change it's active state in it's config file.", "/");
         }
-        
+        // configure translations lookup for this module
+        $this->initTranslations();
         
         if (!$this->_action) {
             $this->_action = $this->_defaultAction;

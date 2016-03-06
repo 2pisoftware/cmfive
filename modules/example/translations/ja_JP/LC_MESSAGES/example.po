@@ -1,0 +1,133 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.7\n"
+"Project-Id-Version: cmfive\n"
+"Language: ja_JP\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: Steve Ryan <steve@2pisoftware.com>\n"
+"Language-Team: \n"
+
+#: actions/delete.php:25
+msgid "Object Deleted"
+msgstr "オブジェクトは削除します"
+
+#: actions/delete.php:30
+msgid "This object does not exist."
+msgstr "このオブジェクトは存在しません。"
+
+#: actions/edit.php:28
+msgid "Edit Example Data"
+msgstr "編集データ例"
+
+#: actions/edit.php:29 actions/index.php:11
+msgid "Title"
+msgstr "タイトル"
+
+#: actions/edit.php:30 actions/index.php:11
+msgid "Data"
+msgstr "データ"
+
+#: actions/edit.php:31
+msgid "Check"
+msgstr "チェック"
+
+#: actions/edit.php:32
+msgid "select field"
+msgstr "選択フィールド"
+
+#: actions/edit.php:33
+msgid "autocomplete field"
+msgstr "オートコンプリートフィールド"
+
+#: actions/edit.php:34
+msgid "multiselect field"
+msgstr "複数選択フィールド"
+
+#: actions/edit.php:35
+msgid "radio field"
+msgstr "電波"
+
+#: actions/edit.php:36
+msgid "password field"
+msgstr "パスワード欄"
+
+#: actions/edit.php:37
+msgid "email field"
+msgstr "電子メールフィールド"
+
+#: actions/edit.php:38
+msgid "hidden field"
+msgstr "非表示フィールド"
+
+#: actions/edit.php:39
+msgid "date field"
+msgstr "日付フィールド"
+
+#: actions/edit.php:40
+msgid "datetime field"
+msgstr "日時フィールド"
+
+#: actions/edit.php:41
+msgid "time field"
+msgstr "時間フィールド"
+
+#: actions/edit.php:42
+msgid "file field"
+msgstr "ファイルのフィールド"
+
+#: actions/edit.php:43
+msgid "multifile field"
+msgstr "マルチフィールド"
+
+#: actions/edit.php:44
+msgid " Save "
+msgstr " セーブ"
+
+#: actions/edit.php:75
+msgid "ExampleData updated"
+msgstr "ExampleData更新"
+
+#: actions/index.php:8
+msgid "Example Data List"
+msgstr "例データ一覧"
+
+#: actions/index.php:11
+msgid "Checkbox"
+msgstr "チェックボックス"
+
+#: actions/index.php:11
+msgid "Actions"
+msgstr "行動"
+
+#: actions/index.php:17
+msgid "Yes"
+msgstr "はい"
+
+#: actions/index.php:17
+msgid "No"
+msgstr "いいえ"
+
+#: actions/index.php:22
+msgid "Edit"
+msgstr "編集"
+
+#: actions/index.php:25
+msgid "Delete"
+msgstr "削除"
+
+#: actions/index.php:25
+msgid "Really delete?"
+msgstr "本当に削除しますか？"
+
+#: models/ExampleService.php:36
+msgid "Home"
+msgstr "ホーム"
+
+#: templates/index.tpl.php:2
+msgid "New Data"
+msgstr "新しいデータ"

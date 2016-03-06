@@ -121,6 +121,10 @@ class User extends DbObject {
         return $this->id;
     }
 
+	public function getLanguage() {
+		return null;
+	}
+
     /**
      * @return string, either the login or first name
      */
