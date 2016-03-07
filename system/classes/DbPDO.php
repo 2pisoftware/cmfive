@@ -131,7 +131,7 @@ class DbPDO extends PDO {
      * @param String $equals
      * @return \DbPDO|null
      */
-    public function where($column, $equals = null){
+    public function where($column, $equals){
         if ($this->query !== null){
             if (empty($column)){
                 // Resets the where part of the statement
@@ -140,7 +140,7 @@ class DbPDO extends PDO {
                 if (is_array($column)){
                     $this->query = $this->query->where($column);
                 } else {
-                if ($equals) {
+                if (count(func_get_args()) == 2) {
                     $this->query = $this->query->where($column, $equals);
                 } else {
                     $this->query = $this->query->where($column);
