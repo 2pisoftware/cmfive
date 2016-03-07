@@ -28,7 +28,7 @@ class DbPDO extends PDO {
 				$url = "{$config['driver']}:Server={$config['hostname']}{$port};Database={$config['database']}";
 				break;
 			//linux apache2 driver
-                            echo("Here in dblib ");
+			case 'dblib':
 				$port = isset($config['port']) && !empty($config['port']) ? ":".$config['port'] : "";
 				$url = "{$config['driver']}:host={$config['hostname']}{$port};dbname={$config['database']}";
 				break;			
