@@ -1,9 +1,12 @@
 <?php
+	$empty=[];
     if ($w->Auth->user()->allowed("/inbox/send")) {
-        echo $w->menuButton("inbox/send/"."$message->id","Reply");
+        echo $w->menuButton("inbox/send/"."$message->id","Reply",$empty,'replybutton');
     }
-    echo $w->menuButton("inbox/archive/".$type."/".$message->id,"Archive");
-    echo $w->menuButton("inbox/delete/".$type."/".$message->id,"Delete");
+    $empty=[];
+    echo $w->menuButton("inbox/archive/".$type."/".$message->id,"Archive",$empty,'archivebutton');
+    $empty=[];
+    echo $w->menuButton("inbox/delete/".$type."/".$message->id,"Delete",$empty,'deletebutton');
 ?>
 <div class='panel'>
     <h3>From: <?php echo $message->sender_id ? $message->getSender()->getFullName() : "Unknown"; ?></h3>

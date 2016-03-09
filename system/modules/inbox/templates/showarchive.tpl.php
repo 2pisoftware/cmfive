@@ -1,7 +1,7 @@
 <?php
 
 $button = new \Html\button();
-echo $button->text("Delete")->onclick("deleteMessage()")->__toString(); // print "<button onclick='deleteMessage()'>Delete</button>";
+    echo $button->id('deletebutton')->text("Delete")->onclick("deleteMessage()")->__toString(); // print "<button onclick='deleteMessage()'>Delete</button>";
 
 if (!empty($arch_table)) {
     echo $arch_table;
