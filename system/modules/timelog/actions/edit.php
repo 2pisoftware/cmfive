@@ -57,9 +57,11 @@ function edit_GET(Web $w) {
 			],
 			[
 				(new InputField())->setLabel("Time Started")->setName("time_start")->setValue($timelog->getTimeStart())
-							->setPattern("^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9](\s+)?(AM|PM|am|pm)?$")->setPlaceholder("e.g. 11:30, 11:30am, 23:30, 11:30pm"),
+							->setPattern("^(0?[0-9]|1[0-9]|2[0-3]):[0-5][0-9](\s+)?(AM|PM|am|pm)?$")
+							->setPlaceholder("e.g. 11:30, 11:30am, 23:30, 11:30pm")
+							->setRequired("true"),
 				(new InputField())->setLabel("Hours Worked")->setName("hours_worked")->setValue($timelog->getHoursWorked())
-							->setType("number")->setMin(0)->setMax(23)->setStep(1)->setPlaceHolder("0-23"),
+							->setType("number")->setMin(0)->setMax(23)->setStep(1)->setPlaceHolder("0-23")->setRequired("true"),
 				(new InputField())->setLabel("Minutes Worked")->setName("minutes_worked")->setValue($timelog->getMinutesWorked())
 							->setType("number")->setMin(0)->setMax(59)->setStep(1)->setPlaceHolder("0-59"),
 			],
