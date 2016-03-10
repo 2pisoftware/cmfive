@@ -129,5 +129,5 @@ function edit_POST(Web $w) {
 	// Save comment
 	$timelog->setComment($_POST['description']);
 
-	$w->msg("<div id='saved_record_id' data-id='".$timelog->id."' >Timelog saved</div>", (!empty($redirect) ? $redirect : "/timelog"));
+	$w->msg("<div id='saved_record_id' data-id='".$timelog->id."' >Timelog saved</div>", (!empty($redirect) ? $redirect . "#timelog" : "/timelog"));
 }
