@@ -17,10 +17,8 @@ class inboxCest
 	public function testInbox($I) {
 		$I->login($I,$this->username,$this->password);
 		
-		// test validation for missing to addres
-		// disabled because bug in chromium driver breaks popup handling
-		// TODO implement JS error message as error block in same style as server
-		// $this->inboxCreateMessage($I,'','test message','content of test message');
+		// test validation for missing to address
+		 $this->inboxCreateMessage($I,'','test message','content of test message');
 		
 		// test access restrictions
 		$I->createUser($I,'inboxreader','password','inboxreader','jones','fred@jones.com');
@@ -32,7 +30,7 @@ class inboxCest
 			$I->dontSee('#createmessagebutton');
 		});
 		
-		
+		$I->navigateTo($I,'inbox','Inbox');
 		// send myself some messages
 		$this->inboxCreateMessage($I,'Administrator','test message','content of test message');
 		$this->inboxCreateMessage($I,'Administrator','another test message','content of another test message');
@@ -122,7 +120,10 @@ class inboxCest
 		
 		// mark all read
 		$I->navigateTo($I,'inbox','Inbox');
+		// disable dialog
+		$I->executeJS('window.confirm = function(){return true;}');
 		$I->click('#markallreadbutton');
+		//$I->acceptPopup();
 		$this->findMessage($I,'tm5','Read Messages');
 		$this->findMessage($I,'tm6','Read Messages');
 		
@@ -138,9 +139,11 @@ class inboxCest
 				'subject'=>$subject,
 				'rte:message'=>$message
 			]);
+			// disable dialog
+			$I->executeJS('window.alert = function(){return true;}');
 			$I->click('.savebutton');
-			$I->seeInPopup('You must enter a message recipient');
-			$I->cancelPopup();
+			//$I->seeInPopup('You must enter a message recipient');
+			//$I->cancelPopup();
 		} else {
 			$I->fillForm($I,[
 				'autocomplete:receiver_id'=>$to,
