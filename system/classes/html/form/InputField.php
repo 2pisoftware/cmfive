@@ -54,6 +54,23 @@ class InputField {
 	// Default to text input field
     public $type = 'text';
 	
+	/**
+	 * This constructor will take an associative array where the keys match any
+	 * field given above and set the field value to the corresponding array
+	 * key value.
+	 * 
+	 * @param Array $fields
+	 */
+	public function __construct($fields = []) {
+		if (!empty($fields) && is_array($fields)) {
+			foreach($fields as $key => $value) {
+				if (property_exists($this, $key)) {
+					$this->{$key} = $value;
+				}
+			}
+		}
+	}
+	
 	// Returns built string of input field
 	public function __toString() {
 		$buffer = '<input ';

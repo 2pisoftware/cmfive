@@ -1,5 +1,7 @@
 <?php
 
+use \Html\Form\InputField as InputField;
+
 function edit_GET(Web $w) {
 	
 //	var_dump(strtotime("2016-03-04 11:30"));
@@ -46,19 +48,22 @@ function edit_GET(Web $w) {
 				["Module", "select", "object_class", $timelog->object_class ? : $tracking_class, $select_indexes],
 				["Search", "autocomplete", "search", !empty($timelog->object_id) ? $timelog->object_id : $tracking_id, (!empty($timelog->object_class) || !empty($tracking_class) ? $w->Timelog->getObjects($timelog->object_class ? : $tracking_class) : '')]
 			],
-            [["object id", 'hidden', "object_id", $timelog->object_id ? : $tracking_id]],
+            [
+				(new InputField(["label" => "Object ID", "type" => "hidden", "name" => "object_id", "id" => "object_id", "value" => $timelog->object_id ? : $tracking_id]))
+				//["object id", 'hidden', "object_id", $timelog->object_id ? : $tracking_id],
+			],
 			[
 				['Date', 'date', 'date_start', $timelog->getDateStart()],
 			],
 			[
-				//['Time started', 'text', 'time_start', $timelog->getTimeStart()],
-				(new \Html\Form\InputField())->setLabel("Time Started")
-						->setName("hours_worked")
-						->setValue($timelog->getHoursWorked()),
-				['Hours worked', 'text', 'hours_worked', $timelog->getHoursWorked()],
-				['Minutes worked', 'text', 'minutes_worked', $timelog->getMinutesWorked()]
+				(new InputField())->setLabel("Time Started")->setName("time_start")->setValue($timelog->getTimeStart())
+							->setPattern("^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9](\s+)?(AM|PM|am|pm)?$")->setPlaceholder("e.g. 11:30, 11:30am, 23:30, 11:30pm"),
+				(new InputField())->setLabel("Hours Worked")->setName("hours_worked")->setValue($timelog->getHoursWorked())
+							->setType("number")->setMin(0)->setMax(23)->setStep(1)->setPlaceHolder("0-23"),
+				(new InputField())->setLabel("Minutes Worked")->setName("minutes_worked")->setValue($timelog->getMinutesWorked())
+							->setType("number")->setMin(0)->setMax(59)->setStep(1)->setPlaceHolder("0-59"),
 			],
-			[["Description", "text", "description", !empty($comment) ? $comment->comment : null]]
+			[(new InputField())->setLabel("Description")->setName("description")->setValue(!empty($comment) ? $comment->comment : null)]
 		]
 	];
 	
@@ -88,16 +93,34 @@ function edit_POST(Web $w) {
 	$redirect = $w->request("redirect", '');
 	
 	// Get and save timelog
-	if (empty($_POST['object_class']) || empty($_POST['object_id']) || empty($_POST['dt_start'])) {
-		$w->error('Missing data', '/timelog');
+	if (empty($_POST['object_class']) || empty($_POST['object_id'])) {
+		$w->error('Missing data', $redirect ? : '/timelog');
 	}
+	
+	if (!array_key_exists("date_start", $_POST) || !array_key_exists("time_start", $_POST) || !array_key_exists("hours_worked", $_POST)) {
+		$w->error('Missing data', $redirect ? : '/timelog');
+	}
+	
+	// Get start and end date/time
+	$time_object = null;
+	try {
+		$time_object = new DateTime($_POST['date_start'] . ' ' . $_POST['time_start']);
+	} catch (Exception $e) {
+		$w->error('Invalid start date or time', $redirect ? : '/timelog');
+	} 
+	
 	
 	$timelog = !empty($p['id']) ? $w->Timelog->getTimelog($p['id']) : new Timelog($w);
 	$timelog->object_class = $_POST['object_class'];
 	$timelog->object_id = $_POST['object_id'];
 	$timelog->time_type = !empty($_POST['time_type']) ? $_POST['time_type'] : null;
-	$timelog->dt_start = $w->Timelog->dt2Time($_POST['dt_start']);
-	$timelog->dt_end = $w->Timelog->dt2Time($_POST['dt_end']);
+	
+	$timelog->dt_start = $time_object->format('Y-m-d H:i:s');
+	$time_object->add(new DateInterval("PT" . intval($_POST['hours_worked']) . "H" . (!empty($_POST['minutes_worked']) ? intval($_POST['minutes_worked']) : 0) . "M0S"));
+	$timelog->dt_end = $time_object->format('Y-m-d H:i:s');
+//	var_dump($timelog); die();
+//	$timelog->dt_start = $w->Timelog->dt2Time($_POST['dt_start']);
+//	$timelog->dt_end = $w->Timelog->dt2Time($_POST['dt_end']);
 	$timelog->insertOrUpdate();
 	
 	// Save comment
