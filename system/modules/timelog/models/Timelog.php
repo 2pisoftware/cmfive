@@ -25,11 +25,17 @@ class Timelog extends DbObject {
 
 	// Getters
 	public function getDateStart() {
-		return date('d/m/Y', $this->dt_start);
+		if (!empty($this->dt_start)) {
+			return date('d/m/Y', $this->dt_start);
+		}
+		return null;
 	}
 	
 	public function getTimeStart() {
-		return date('H:i', $this->dt_start);
+		if (!empty($this->dt_start)) {
+			return date('H:i', $this->dt_start);
+		}
+		return null;
 	}
 	
 	public function getHoursWorked() {
@@ -37,7 +43,7 @@ class Timelog extends DbObject {
 			$date_time_diff = $this->dt_end - $this->dt_start;
 			return intval($date_time_diff / 3600);
 		}
-		return 0;
+		return null;
 	}
 	
 	public function getMinutesWorked() {
@@ -46,7 +52,7 @@ class Timelog extends DbObject {
 			$date_time_diff -= intval($date_time_diff / 3600) * 3600;
 			return $date_time_diff / 60;
 		}
-		return 0;
+		return null;
 	}
 	
 	public function getUser() {
