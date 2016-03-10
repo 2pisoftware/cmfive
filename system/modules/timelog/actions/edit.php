@@ -106,7 +106,7 @@ function edit_POST(Web $w) {
 	// Get start and end date/time
 	$time_object = null;
 	try {
-		$time_object = new DateTime($_POST['date_start'] . ' ' . $_POST['time_start']);
+		$time_object = new DateTime(str_replace('/', '-', $_POST['date_start']) . ' ' . $_POST['time_start']);
 	} catch (Exception $e) {
 		$w->Log->setLogger("TIMELOG")->error($e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
 		$w->error('Invalid start date or time', $redirect ? : '/timelog');
