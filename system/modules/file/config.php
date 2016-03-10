@@ -25,6 +25,10 @@ Config::set('file', [
 			'secret' => '',
 			'bucket' => '',
 			'options' => []
+		],
+		'dropbox' => [
+			'active' => false,
+			'app_id' => ''
 		]
 	]
 ]);

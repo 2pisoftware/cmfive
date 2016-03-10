@@ -23,6 +23,38 @@ class Timelog extends DbObject {
         // "time_type" => array('required') Only required in some cases??!!
     );    
 
+	// Getters
+	public function getDateStart() {
+		if (!empty($this->dt_start)) {
+			return date('d/m/Y', $this->dt_start);
+		}
+		return null;
+	}
+	
+	public function getTimeStart() {
+		if (!empty($this->dt_start)) {
+			return date('H:i', $this->dt_start);
+		}
+		return null;
+	}
+	
+	public function getHoursWorked() {
+		if (!empty($this->dt_end)) {
+			$date_time_diff = $this->dt_end - $this->dt_start;
+			return intval($date_time_diff / 3600);
+		}
+		return null;
+	}
+	
+	public function getMinutesWorked() {
+		if (!empty($this->dt_end)) {
+			$date_time_diff = $this->dt_end - $this->dt_start;
+			$date_time_diff -= intval($date_time_diff / 3600) * 3600;
+			return $date_time_diff / 60;
+		}
+		return null;
+	}
+	
 	public function getUser() {
 		return $this->getObject("User", $this->user_id);
 	}
@@ -75,7 +107,7 @@ class Timelog extends DbObject {
     }
     
     public function start($object) {
-$this->w->Log->debug("TimeLog Start");
+		$this->w->Log->debug("TimeLog Start");
         if (empty($object->id)) {
             return false;
         }
@@ -99,4 +131,22 @@ $this->w->Log->debug("TimeLog Start");
         }
     }
     
+	public function insert($force_validation = true) {
+		// If user is admin try and set the user_id to the given one from the timelog form
+		if ($this->w->Auth->user()->is_admin) {
+			$this->user_id = !empty($_POST['user_id']) ? intval($_POST['user_id']) : $this->w->Auth->user()->id;
+		} else {
+			$this->user_id = $this->w->Auth->user()->id;
+		}
+		
+		parent::insert($force_validation);
+	}
+	
+	public function update($force_null_values = false, $force_validation = true) {
+		if ($this->w->Auth->user()->is_admin) {
+			$this->user_id = !empty($_POST['user_id']) ? intval($_POST['user_id']) : $this->w->Auth->user()->id;
+		}
+		
+		parent::update($force_null_values, $force_validation);
+	}
 }

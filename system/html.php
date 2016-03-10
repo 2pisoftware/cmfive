@@ -2,6 +2,7 @@
 require_once "classes/html/a.php";
 require_once "classes/html/button.php";
 require_once "classes/html/form.php";
+require_once "classes/html/form/InputField.php";
 
 class Html {
 
@@ -565,6 +566,16 @@ class Html {
                 
                 foreach($row as $field) {
                     
+					// Check if the row is an object like an InputField
+					if (!is_array($field) && is_object($field)) {
+						if ($field->type !== "hidden") {
+							$buffer .= '<li><label class=\'small-12 columns\'>' . $field->label . '<div>' . $field->__toString() . '</div></label></li>';
+						} else {
+							$buffer .= $field->__toString();
+						}
+						continue;
+					}
+				
                     $title = !empty($field[0]) ? $field[0] : null;
                     $type = !empty($field[1]) ? $field[1] : null;
                     $name = !empty($field[2]) ? $field[2] : null;
