@@ -932,8 +932,8 @@ class Web {
      * @param string $array
      * @return string html code
      */
-    function menuButton($path, $title, &$array = null) {
-        $link = $this->Auth->allowed($path, Html::b($this->localUrl($path), $title));
+    function menuButton($path, $title, &$array = null,$id) {
+        $link = $this->Auth->allowed($path, Html::b($this->localUrl($path), $title,null,$id));
         if ($array !== null) {
             $array[] = $link;
         }

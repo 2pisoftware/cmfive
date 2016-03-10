@@ -10,6 +10,7 @@ function archive_ALL(Web $w) {
 		$mess_obj = $w->Inbox->getMessage($message);
 		$mess_obj->is_archived = 1;
 		$mess_obj->dt_archived = time();
+		$mess_obj->is_new=false;
 		$mess_obj->update();
 	}
 	$w->msg("Message(s) Archived","/inbox/".$type );

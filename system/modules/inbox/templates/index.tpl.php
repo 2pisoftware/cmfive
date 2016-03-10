@@ -1,15 +1,15 @@
 <?php
 if ($w->Auth->user()->allowed("/inbox/send")) {
-    echo Html::b($webroot."/inbox/send","Create Message");
+    echo Html::b($webroot."/inbox/send","Create Message",null,'createmessagebutton');
 }
 $button = new \Html\button();
 if (!empty($new)) {
-    echo $button->text("Archive")->onclick("sendArch()")->__toString(); // print "<button onclick='sendArch()'>Archive</button>";
-    echo $button->text("Delete")->onclick("deleteMessage()")->__toString(); // print "<button onclick='deleteMessage()'>Delete</button>";
+    echo $button->id('archivebutton')->text("Archive")->onclick("sendArch()")->__toString(); // print "<button onclick='sendArch()'>Archive</button>";
+    echo $button->id('deletebutton')->text("Delete")->onclick("deleteMessage()")->__toString(); // print "<button onclick='deleteMessage()'>Delete</button>";
 }
 
 if($w->service('Inbox')->inboxCountMarker()){
-    echo Html::b($w->localUrl("/inbox/allread"),"Mark all read","Are you sure to mark all messages as read?");
+    echo Html::b($w->localUrl("/inbox/allread"),"Mark all read","Are you sure to mark all messages as read?",'markallreadbutton');
 }
 
 if (!empty($new)) {

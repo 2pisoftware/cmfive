@@ -1,11 +1,11 @@
 <?php
 if ($w->Auth->user()->allowed("/inbox/send")) {
-    echo Html::b($webroot."/inbox/send","Create Message");
+    echo Html::b($webroot."/inbox/send","Create Message",null,'createmessagebutton');
 }
 $button = new \Html\button();
 if (!empty($read)) {
-    echo $button->text("Archive")->onclick("sendArch()")->__toString(); // print "<button onclick='sendArch()'>Archive</button>";
-    echo $button->text("Delete")->onclick("deleteMessage()")->__toString(); // print "<button onclick='deleteMessage()'>Delete</button>";
+	echo $button->id('archivebutton')->text("Archive")->onclick("sendArch()")->__toString(); // print "<button onclick='sendArch()'>Archive</button>";
+    echo $button->id('deletebutton')->text("Delete")->onclick("deleteMessage()")->__toString(); // print "<button onclick='deleteMessage()'>Delete</button>";
 }
 if ($read) {
     echo $read_table;
