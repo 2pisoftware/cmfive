@@ -65,7 +65,7 @@ if ($messageid){
     
     $('.savebutton').bind('click',function() {
 		if ($.trim($('#acp_receiver_id').val()).length==0) {
-			alert("You must enter a message recipient.");
+			alert("You must enter a message recipient");
 			return false;
 		}
 	});
