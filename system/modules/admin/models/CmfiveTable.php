@@ -1,36 +1,34 @@
-<?php
-
-namespace Cmfive;
+<?php namespace Cmfive;
 
 class Table extends \Phinx\Db\Table {
-
+	
 	public function addCmfiveParameters($exclude = []) {
 		// dt_created
 		if (!in_array("dt_created", $exclude)) {
 			$this->addDatetimeColumn("dt_created");
 		}
-
+		
 		// dt_modified
 		if (!in_array("dt_modified", $exclude)) {
 			$this->addDateTimeColumn("dt_modified");
 		}
-
+		
 		// creator_id
 		if (!in_array("creator_id", $exclude)) {
 			$this->addIdColumn("creator_id");
 		}
-
+		
 		// modifier_id
 		if (!in_array("modifier_id", $exclude)) {
 			$this->addIdColumn("modifier_id");
 		}
-
+		
 		// is_deleted
 		if (!in_array("is_deleted", $exclude)) {
 			$this->addBooleanColumn("is_deleted", false, 0);
 			$this->addIndex('is_deleted');
 		}
-
+		
 		return $this;
 	}
 

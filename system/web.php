@@ -214,7 +214,7 @@ class Web {
 	/**
 	 * Initialise gettext for this module
 	 */
-	function initTranslations()  {
+	function initTranslations($domain=null)  {
 		$user=$this->Auth->user();
 		// default language
 		$language=Config::get('system.language');
@@ -225,15 +225,21 @@ class Web {
 				$language=$lang;
 			}
 		}
+		if (empty($domain)) {
+			$domain = $this->currentModule();
+		}
 		
-		$domain = $this->currentModule();
-		putenv("LC_ALL=$language");
 		$results = setlocale(LC_ALL, $language);
 		if (!$results) {
-			$this->Log->info('setlocale failed: locale function is not available on this platform, or the given locale ('.$language.') does not exist in this environment');
+			if (true || $domain=="file") $this->Log->info('setlocale failed: locale function is not available on this platform, or the given locale ('.$language.') does not exist in this environment');
 		}
-		bindtextdomain($domain, "/var/www/cmfive/modules/example/translations");
+		$path=ROOT_PATH."/".$this->getModuleDir($domain)."translations";
+		$results=bindtextdomain($domain, $path);
+		if (!$results) {
+			//$this->Log->info('setlocale bindtextdomain failed: '.$domain.' : '.$path);
+		}
 		textdomain($domain);
+		bind_textdomain_codeset($domain, 'UTF-8');
 	}
 
     /**
@@ -1257,6 +1263,12 @@ class Web {
             $module = $this->_module;
         }
         
+        // set translations to partial module
+        $oldModule=$this->currentModule();
+		if ($oldModule!=$module)  {
+			$this->initTranslations($module);
+		}
+		
         // Check if the module if active or not
 //        if (!Config::get("{$name}.active") && $name !== "main") {
 //            // Do we want to do something else?
@@ -1336,7 +1348,12 @@ class Web {
         // restore output buffer and context
         $this->_buffer = $oldbuf;
         $this->_context = $oldctx;
-
+		
+		// restore translations module
+		if ($oldModule!=$module)  {
+			$this->initTranslations($oldModule);
+		}
+		
         return $currentbuf;
     }
 
@@ -1352,7 +1369,13 @@ class Web {
         if (empty($module) || empty($function)) {
             return null;
         }
-
+		
+		// set translations to hook module
+        $oldModule=$this->currentModule();
+		if ($oldModule!=$module)  {
+			$this->initTranslations($module);
+		}
+		
         // Build _hook registry if empty
         if (empty($this->_hooks)) {
            foreach ($this->modules() as $modulename) {
@@ -1406,6 +1429,12 @@ class Web {
 	            }
             }
         }
+        
+		// restore translations module
+		if ($oldModule!=$module)  {
+			$this->initTranslations($oldModule);
+		}
+		
         return $buffer;
     }
 

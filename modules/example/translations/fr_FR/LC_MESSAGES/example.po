@@ -11,6 +11,7 @@ msgstr ""
 "PO-Revision-Date: \n"
 "Last-Translator: Steve Ryan <steve@2pisoftware.com>\n"
 "Language-Team: \n"
+"X-Poedit-SourceCharset: UTF-8\n"
 
 #: actions/delete.php:25
 msgid "Object Deleted"
@@ -50,7 +51,7 @@ msgstr "champ multiselect"
 
 #: actions/edit.php:35
 msgid "radio field"
-msgstr "champ radio"
+msgstr "champ radios"
 
 #: actions/edit.php:36
 msgid "password field"
@@ -94,7 +95,7 @@ msgstr "ExampleData mise à jour"
 
 #: actions/index.php:8
 msgid "Example Data List"
-msgstr "Liste des données Exemple"
+msgstr "Le Liste des données Exemple"
 
 #: actions/index.php:11
 msgid "Checkbox"
