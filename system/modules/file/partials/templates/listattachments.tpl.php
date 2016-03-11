@@ -48,7 +48,7 @@
 
 <?php
 	if ($w->Auth->user()->hasRole("file_upload")) {
-		echo Html::box("/file/new/" . get_class($object) . "/{$object->id}?redirect_url=" . urlencode($redirect), "Attach a File", true);
+		echo Html::box("/file/new/" . get_class($object) . "/{$object->id}?redirect_url=" . urlencode($redirect), __("Attach a File"), true);
 	}
 	
     $notImages = array();
@@ -61,13 +61,13 @@
 					<div class="image-container attachment">
 						<div class="image-container-overlay">
 							<div class="row-fluid">
-								<button href="#" data-reveal-id="attachment_modal_<?php echo $attachment->id; ?>" class="button expand">View</button>
+								<button href="#" data-reveal-id="attachment_modal_<?php echo $attachment->id; ?>" class="button expand"><?php echo __("View") ?></button>
 							</div>
 							<div class="row-fluid">
-								<?php echo Html::box("/file/edit/" . $attachment->id . "?redirect_url=" . urlencode($redirect), "Edit", true, null, null, null, null, null, "button expand secondary"); ?>
+								<?php echo Html::box("/file/edit/" . $attachment->id . "?redirect_url=" . urlencode($redirect), __("Edit"), true, null, null, null, null, null, "button expand secondary"); ?>
 							</div>
 							<div class="row-fluid">
-								<?php echo Html::b("/file/delete/" . $attachment->id . "?redirect_url=" . urlencode($redirect), "Delete", "Are you sure you want to delete this attachment?", null, false, "expand alert ");?>
+								<?php echo Html::b("/file/delete/" . $attachment->id . "?redirect_url=" . urlencode($redirect), __("Delete"), __("Are you sure you want to delete this attachment?"), null, false, "expand alert ");?>
 							</div>
 						</div>
 						<img class="image-cropped" data-caption="<?php echo $attachment->title; ?>" src="<?php echo $attachment->getThumbnailUrl(); ?>">
@@ -89,7 +89,7 @@
 						<h2 id="firstModalTitle" style="font-weight: lighter; text-align: center; border-bottom: 1px solid #777;"><?php echo $attachment->title; ?></h2>
 						<p style="text-align: center;"><?php echo $attachment->description; ?></p>
 						
-						<a href="/file/atfile/<?php echo $attachment->id; ?>" target="_blank" class="button expand secondary" onclick="$('#attachment_modal_<?php echo $attachment->id; ?>').foundation('reveal', 'close');">Open in new tab/window</a>
+						<a href="/file/atfile/<?php echo $attachment->id; ?>" target="_blank" class="button expand secondary" onclick="$('#attachment_modal_<?php echo $attachment->id; ?>').foundation('reveal', 'close');"><?php echo __("Open in new tab/window") ?></a>
 						
 						<a class="close-reveal-modal" aria-label="Close">&#215;</a>
 					</div>
@@ -105,10 +105,10 @@
         <table class="tablesorter">
             <thead>
                 <tr>
-                    <th>Filename</th>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Action</th>
+                    <th><?php _e("Filename") ?></th>
+                    <th><?php _e("Title") ?></th>
+                    <th><?php _e("Description") ?></th>
+                    <th><?php _e("Action") ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -120,8 +120,8 @@
                         <td><?php echo $att->title; ?></td>
                         <td><?php echo $att->description; ?></td>                    
                         <td>
-						<?php echo Html::abox("/file/edit/" . $att->id . "?redirect_url=" . urlencode($redirect), "Edit", true, null, null, null, null, null, "button expand secondary"); ?>
-                        <?php echo Html::ab(WEBROOT . "/file/atdel/" . $att->id . "/" . (str_replace("/", "+", $redirect)), "Delete", null, null, "Do you want to delete this attachment?"); ?>&nbsp;&nbsp;&nbsp;&nbsp;
+						<?php echo Html::abox("/file/edit/" . $att->id . "?redirect_url=" . urlencode($redirect), __("Edit"), true, null, null, null, null, null, "button expand secondary"); ?>
+                        <?php echo Html::ab(WEBROOT . "/file/atdel/" . $att->id . "/" . (str_replace("/", "+", $redirect)), __("Delete"), null, null, __("Do you want to delete this attachment?")); ?>&nbsp;&nbsp;&nbsp;&nbsp;
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -129,7 +129,7 @@
         </table>
     <?php endif; ?>
 
-	<script>
+	<script>`
 		
 		$(document).ready(function() {
 			$(".image-container-overlay button").removeClass("tiny");

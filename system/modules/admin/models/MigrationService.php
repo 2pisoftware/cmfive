@@ -103,7 +103,7 @@ class MigrationService extends DbService {
 	
 	public function createMigration($module, $name) {
 		if (empty($module) || !in_array($module, $this->w->modules())) {
-			return 'Missing module or it doesn\'t exist';
+			return __('Missing module or it doesn\'t exist');
 		}
 		
 		$module = strtolower($module);
@@ -120,7 +120,7 @@ class MigrationService extends DbService {
 		} else if (is_dir(SYSTEM_MODULE_DIRECTORY . DS . $module)) {
 			$directory = SYSTEM_MODULE_DIRECTORY . DS . $module;
 		} else {
-			return 'Could not find module directory';
+			return __('Could not find module directory');
 		}
 		
 		// Create migration directory if it doesn't exist
@@ -154,7 +154,7 @@ class {$classname} extends CmfiveMigration {
 MIGRATION;
 		file_put_contents($directory . DS . MIGRATION_DIRECTORY . DS . $filename, $data);
 		
-		return "Migration created";
+		return __("Migration created");
 	}
 	
 	public function runMigrations($module, $filename = null) {
@@ -240,14 +240,14 @@ MIGRATION;
 
 				// Finalise transaction
 				$this->w->db->commitTransaction();
-				return count($runMigrations) . ' migration' . (count($runMigrations) == 1 ? ' has' : 's have') . ' run'; 
+				return count($runMigrations) . __(' migration') . (count($runMigrations) == 1 ? __(' has') : __('s have')) . __(' run'); 
 			} catch (Exception $e) {
-				$this->w->out("Error with a migration: " . $e->getMessage() . "<br/>More info: " . var_export($e));
+				$this->w->out(__("Error with a migration: ") . $e->getMessage() . "<br/>".__("More info: ") . var_export($e));
 				$this->w->Log->setLogger("MIGRATION")->error("Error with a migration: " . $e->getMessage());
 				$this->w->db->rollbackTransaction();
 			}
 		} else {
-			return "No migrations to run!";
+			return __("No migrations to run!");
 		}
 	}
 	
@@ -264,16 +264,16 @@ MIGRATION;
 	 */
 	public function rollback($module, $filename) {
 		if (empty($module) || empty($filename)) {
-			return "Missing parameters required for a rollback";
+			return __("Missing parameters required for a rollback");
 		}
 		
 		if (!in_array($module, $this->w->modules())) {
-			return "Module doesn't exist";
+			return __("Module doesn't exist");
 		}
 		
 		$installed_migrations = $this->getInstalledMigrations($module);
 		if (empty($installed_migrations[$module])) {
-			return "There are no installed migrations to rollback";
+			return __("There are no installed migrations to rollback");
 		}
 		
 		$offset_index = 0;
@@ -321,9 +321,9 @@ MIGRATION;
 
 				// Finalise transaction
 				$this->w->db->commitTransaction();
-				return count($migrations_to_rollback) . ' migration' . (count($migrations_to_rollback) == 1 ? ' has' : 's have') . ' rolled back'; 
+				return count($migrations_to_rollback) . __(' migration') . (count($migrations_to_rollback) == 1 ? __(' has') : __('s have')) . __(' rolled back'); 
 			} catch (Exception $e) {
-				$this->w->out("Error with a migration: " . $e->getMessage());
+				$this->w->out(__("Error with a migration: ") . $e->getMessage());
 				$this->w->Log->setLogger("MIGRATION")->error("Error with a migration: " . $e->getMessage());
 				$this->w->db->rollbackTransaction();
 			}
@@ -344,7 +344,7 @@ MIGRATION;
 			}
 		}
 		
-		return $migrations_rolled_back . " migration" . ($migrations_rolled_back == 1 ? '' : 's') . " rolled back";
+		return $migrations_rolled_back . __(" migration") . ($migrations_rolled_back == 1 ? '' : 's') . __(" rolled back");
 	}
 	
 	public function installInitialMigration() {

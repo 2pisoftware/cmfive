@@ -32,16 +32,16 @@ Horizontal Line:
 EOF;
     
     $form = array(
-        array("Comment","section"),
+        array(__("Comment"),"section"),
         array("", "textarea", "comment", $comment->comment, 100, 15, false),
-    	array("Help","section"),
+    	array(__("Help"),"section"),
     	array("", "textarea", "-help",$help, 100, 5, false),
         array("", "hidden", "redirect_url", $w->request("redirect_url"))
     );
 
     // return the comment for display and edit
     $w->setLayout(null);
-    $w->out(Html::form($form, $w->localUrl("/admin/comment/{$comment_id}/{$p["tablename"]}/{$p["object_id"]}"), "POST", "Save"));
+    $w->out(Html::form($form, $w->localUrl("/admin/comment/{$comment_id}/{$p["tablename"]}/{$p["object_id"]}"), "POST", __("Save")));
 }
 
 function comment_POST(Web $w){
@@ -61,8 +61,8 @@ function comment_POST(Web $w){
     $redirectUrl = $w->request("redirect_url");
 
     if (!empty($redirectUrl)){
-        $w->msg("Comment saved", urldecode($redirectUrl));
+        $w->msg(__("Comment saved"), urldecode($redirectUrl));
     } else {
-        $w->msg("Comment saved", $w->localUrl($_SERVER["REQUEST_URI"]));
+        $w->msg(__("Comment saved"), $w->localUrl($_SERVER["REQUEST_URI"]));
     }
 }

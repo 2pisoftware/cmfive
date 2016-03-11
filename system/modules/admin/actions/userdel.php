@@ -5,9 +5,9 @@ function userdel_GET(Web $w) {
 	if ($user) {
 		$user->is_deleted = 1;
 		$user->update();
-		$w->msg("User ".$user->login." deleted.","/admin/users");
+		$w->msg(__("User ").$user->login.__(" deleted."),"/admin/users");
 	} else {
-		$w->error("User ".$w->ctx("id")." does not exist.","/admin/users");
+		$w->error(__("User ").$w->ctx("id").__(" does not exist."),"/admin/users");
 	}
 
 }

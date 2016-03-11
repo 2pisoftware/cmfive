@@ -61,5 +61,5 @@ function composer_ALL(Web $w) {
     chdir(ROOT_PATH);
     
     // This doesn't happen for some reason
-    $w->msg("Composer update return exit code " . $exitcode . " (0 is OK)<br/>Check the /log/composer.log for output", "/admin");
+    $w->msg(__("Composer update return exit code ") . $exitcode . __(" (0 is OK)<br/>Check the /log/composer.log for output"), "/admin");
 }

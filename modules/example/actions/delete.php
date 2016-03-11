@@ -22,10 +22,10 @@ function delete_GET(Web $w) {
 			$d->delete();
 			
 			// return to the list
-			$w->msg(_("Object Deleted"),"/example/index");
+			$w->msg(__("Object Deleted"),"/example/index");
 		}
 	}
 	
 	// in error, display this straight to layout
-	$w->out(_("This object does not exist."));
+	$w->out(__("This object does not exist."));
 }
