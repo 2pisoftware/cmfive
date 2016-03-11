@@ -127,7 +127,7 @@ class User extends DbObject {
 	}
 
 	public function getAvailableLanguages() {
-		return [["English","en_US.UTF-8"],["German","de_DE.UTF-8"],["French","fr_FR.UTF-8"],["Chinese","zh_CN.UTF-8"],["Japanese","ja_JP.UTF-8"],["Spanish","es_ES.UTF-8"],["Dutch","nl_NL.UTF-8"],["Russian","ru_RU.UTF-8"],["Gaelic","gd_GB.UTF-8"]];
+		return [[__("English"),"en_US.UTF-8"],[__("German"),"de_DE.UTF-8"],[__("French"),"fr_FR.UTF-8"],[__("Chinese"),"zh_CN.UTF-8"],[__("Japanese"),"ja_JP.UTF-8"],[__("Spanish"),"es_ES.UTF-8"],[__("Dutch"),"nl_NL.UTF-8"],[__("Russian"),"ru_RU.UTF-8"],[__("Gaelic"),"gd_GB.UTF-8"]];
 	}
 
     /**
