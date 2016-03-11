@@ -16,6 +16,21 @@ class inboxCest
 
 	public function testInbox($I) {
 		$I->login($I,$this->username,$this->password);
+		
+		// test validation for missing to address
+		 $this->inboxCreateMessage($I,'','test message','content of test message');
+		
+		// test access restrictions
+		$I->createUser($I,'inboxreader','password','inboxreader','jones','fred@jones.com');
+		$I->setUserPermissions($I,'inboxreader',['user','inbox_reader']);
+		$inboxreader = $I->haveFriend('inboxreader');
+		$inboxreader->does(function(AcceptanceGuy $I) {
+			$I->login($I,'inboxreader','password');
+			$I->navigateTo($I,'inbox','Inbox');
+			$I->dontSee('#createmessagebutton');
+		});
+		
+		$I->navigateTo($I,'inbox','Inbox');
 		// send myself some messages
 		$this->inboxCreateMessage($I,'Administrator','test message','content of test message');
 		$this->inboxCreateMessage($I,'Administrator','another test message','content of another test message');
@@ -28,7 +43,7 @@ class inboxCest
 		$I->see('content of another test message');
 		// is message now in read list
 		$row=$this->findMessage($I,'another test message',"Read");
-		
+			
 		// archive message and check that it moves to the Archive list
 		$I->checkOption('.tablesorter tbody tr:nth-child('.$row.') input[type="checkbox"]');
 		$I->click('#archivebutton');
@@ -87,8 +102,8 @@ class inboxCest
 		
 		// multi archive
 		$tm1=$this->findMessage($I,'tm1','Inbox');
-		$I->checkOption('.tablesorter tbody tr:nth-child('.$tm1.') input[type="checkbox"]');
 		$tm3=$this->findMessage($I,'tm3','Inbox');
+		$I->checkOption('.tablesorter tbody tr:nth-child('.$tm1.') input[type="checkbox"]');
 		$I->checkOption('.tablesorter tbody tr:nth-child('.$tm3.') input[type="checkbox"]');
 		$I->click('#archivebutton');
 		$this->findMessage($I,'tm1','Archive');
@@ -96,15 +111,19 @@ class inboxCest
 		
 		// multi delete
 		$tm2=$this->findMessage($I,'tm2','Inbox');
-		$I->checkOption('.tablesorter tbody tr:nth-child('.$tm2.') input[type="checkbox"]');
 		$tm4=$this->findMessage($I,'tm4','Inbox');
+		$I->checkOption('.tablesorter tbody tr:nth-child('.$tm2.') input[type="checkbox"]');
 		$I->checkOption('.tablesorter tbody tr:nth-child('.$tm4.') input[type="checkbox"]');
 		$I->click('#deletebutton');
 		$this->findMessage($I,'tm2','Bin');
 		$this->findMessage($I,'tm4','Bin');
 		
 		// mark all read
+		$I->navigateTo($I,'inbox','Inbox');
+		// disable dialog
+		$I->executeJS('window.confirm = function(){return true;}');
 		$I->click('#markallreadbutton');
+		//$I->acceptPopup();
 		$this->findMessage($I,'tm5','Read Messages');
 		$this->findMessage($I,'tm6','Read Messages');
 		
@@ -115,13 +134,25 @@ class inboxCest
 	private function inboxCreateMessage($I,$to,$subject,$message) {
 		$I->navigateTo($I,'inbox','Inbox');
 		$I->click('#createmessagebutton');
-		$I->fillForm($I,[
-			'autocomplete:receiver_id'=>$to,
-			'subject'=>$subject,
-			'rte:message'=>$message
-		]);
-		$I->click('.savebutton');
-		$I->see('Message Sent');
+		if (empty($to)) {
+			$I->fillForm($I,[
+				'subject'=>$subject,
+				'rte:message'=>$message
+			]);
+			// disable dialog
+			$I->executeJS('window.alert = function(){return true;}');
+			$I->click('.savebutton');
+			//$I->seeInPopup('You must enter a message recipient');
+			//$I->cancelPopup();
+		} else {
+			$I->fillForm($I,[
+				'autocomplete:receiver_id'=>$to,
+				'subject'=>$subject,
+				'rte:message'=>$message
+			]);
+			$I->click('.savebutton');
+			$I->see('Message Sent');
+		}
 	}
 	
 	/**
