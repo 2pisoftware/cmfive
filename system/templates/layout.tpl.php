@@ -117,6 +117,7 @@
         </script>
     </head>
     <body>
+		<?php /** @var Web */ ?>
         <div class="loading_overlay" <?php echo $w->request('show_overlay') == null ? 'style="display:none;"' : ''; ?>>
             <div class="circle"></div>
             <div class="circle_inner"></div>
@@ -215,7 +216,16 @@
                                             <li class="has-dropdown <?php echo $w->_module == $module ? 'active' : ''; ?>" id="topnav_<?php echo $module; ?>">
                                             <?php // Try and get a badge count for the menu item
                                                 echo $menu_link;
-                                                echo Html::ul($w->service($module)->navigation($w), null, "dropdown"); ?>
+                                                $module_navigation = $w->service($module)->navigation($w);
+												
+												// Invoke hook to inject extra navigation
+												$hook_navigation_items = $w->callHook($module, "extra_navigation_items", $module_navigation);
+												if (!empty($hook_navigation_items)) {
+													foreach($hook_navigation_items as $hook_navigation_item) {
+														$module_navigation[] = $hook_navigation_item[0];
+													}
+												}
+												echo Html::ul($module_navigation, null, "dropdown"); ?>
                                             </li>
                                         <?php else: ?>
                                             <li <?php echo $w->_module == $module ? 'class="active"' : ''; ?>><?php echo $menu_link; ?></li>

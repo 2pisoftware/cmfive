@@ -12,6 +12,9 @@ Config::set('file', [
 		"aws/aws-sdk-php" => "~2",
         "dropbox-php/dropbox-php" => "*"
     ],
+	'hooks' => [
+		'admin'
+	],
 	'adapters' => [
 		'local' => [
 			'active' => true
