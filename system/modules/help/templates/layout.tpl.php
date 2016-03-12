@@ -16,8 +16,8 @@
                     <?php if (!empty($module_toc)): ?>
                         <a href="<?php echo WEBROOT . '/help/view/' . $module_toc ?>"><?php echo $module_title; ?></a>&nbsp;:&nbsp;
                     <?php endif; ?>
-                    <a href="<?php echo WEBROOT . '/help/toc'; ?>">Contents</a>&nbsp;:&nbsp;
-                    <a href="<?php echo WEBROOT . '/help/view/help/onhelp'; ?>">Help on Help</a>&nbsp;:&nbsp;
+                    <a href="<?php echo WEBROOT . '/help/toc'; ?>"><?php _e('Contents'); ?></a>&nbsp;:&nbsp;
+                    <a href="<?php echo WEBROOT . '/help/view/help/onhelp'; ?>"><?php _e('Help on Help'); ?></a>&nbsp;:&nbsp;
                     <hr />
                 </td>
             </tr>
@@ -26,7 +26,7 @@
             </tr>
             <tr>
                 <td valign="bottom"><hr/>
-                    Copyright <?php echo date('Y'); ?> <a href="<?php echo $w->moduleConf('main', 'company_url'); ?>"><?php echo $w->moduleConf('main', 'company_name'); ?></a>
+                    <?php _e('Copyright'); ?> <?php echo date('Y'); ?> <a href="<?php echo $w->moduleConf('main', 'company_url'); ?>"><?php echo $w->moduleConf('main', 'company_name'); ?></a>
                 </td>
             </tr>
         </table>

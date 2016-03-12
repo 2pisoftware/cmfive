@@ -12,5 +12,5 @@ function archive_ALL(Web $w) {
 		$mess_obj->dt_archived = time();
 		$mess_obj->update();
 	}
-	$w->msg("Message(s) Archived","/inbox/".$type );
+	$w->msg(__("Message(s) Archived"),"/inbox/".$type );
 }

@@ -1,6 +1,6 @@
 <?php
 function send_GET(Web $w) {
-	$w->Inbox->navigation($w,"Create Message");
+	$w->Inbox->navigation($w,__("Create Message"));
 }
 function send_POST(Web &$w) {
 	$p = $w->pathMatch('id');
@@ -19,5 +19,5 @@ function send_POST(Web &$w) {
 			$w->Inbox->addMessage($subject, $message, $receiver_id);
 		}
 	}
-	$w->msg("Message Sent.","/inbox/index");
+	$w->msg(__("Message Sent."),"/inbox/index");
 }
