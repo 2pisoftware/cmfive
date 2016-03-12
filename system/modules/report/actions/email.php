@@ -137,7 +137,8 @@ function email_GET(Web $w) {
 			if (!empty($body_template)) {
 				$body_content = $w->Template->render($body_template, ["name" => $contact->getFullName(), "module" => $report->module, "report_name" => $report->title]);
 			} else {
-				$body_content = "Dear " . $contact->getFullName() . ", <br/>Please find attached your reports<br/>Kind regards";
+				// TODO - work out user language and set locale etc
+				$body_content = __("Dear ") . $contact->getFullName() . ", <br/>".__("Please find attached your reports")."<br/>".__("Kind regards");
 			}
 			
 			// Send email
