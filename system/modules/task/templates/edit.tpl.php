@@ -1,6 +1,6 @@
 <div class="tabs">
     <div class="tab-head">
-        <a href="#details">Task Details</a>
+        <a href="#details"><?php _e('Task Details'); ?></a>
 		<?php if (!empty($task->id)) :
             /*
              partial template files changed to incorporate a class for each counting of objects
@@ -8,11 +8,11 @@
             ./system/modules/timelog/partials/templates/listtimelog.tpl.php
              */
         ?>
-            <a href="#timelog">Time Log <span id='total_timelogs' class='total_number'></span></a>
-            <a href="#comments">Comments <span id='total_comments' class='total_number'></span></a>
-            <a href="#attachments">Attachments <span id='total_attachments' class='total_number'></span></a>
+            <a href="#timelog"><?php _e('Time Log'); ?> <span id='total_timelogs' class='total_number'></span></a>
+            <a href="#comments"><?php _e('Comments'); ?> <span id='total_comments' class='total_number'></span></a>
+            <a href="#attachments"><?php _e('Attachments'); ?> <span id='total_attachments' class='total_number'></span></a>
 
-            <?php if ($task->getCanINotify()):?><a href="#notification">Notifications</a><?php endif;?>
+            <?php if ($task->getCanINotify()):?><a href="#notification"><?php _e('Notifications'); ?></a><?php endif;?>
 			<?php 
 				$tab_headers = $w->callHook('core_template', 'tab_headers', $task); 
 				if (!empty($tab_headers)) {
@@ -31,8 +31,8 @@
                         $tasktypeobject = $task->getTaskTypeObject();
                         echo !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null; 
                     	//echo $w->Tag->getTagButton($task->id,"Task")."&nbsp;";
-                        echo (!empty($task->id) && $task->canDelete($w->Auth->user())) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), "Delete", "Are you sure you want to delete this task?" ) : ''; 
-                        echo (!empty($task->id)) ? Html::b($task->w->localURL('task/duplicatetask/' . $task->id), "Duplicate Task") : '';
+                        echo (!empty($task->id) && $task->canDelete($w->Auth->user())) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), __("Delete"), __("Are you sure you want to delete this task?" )) : ''; 
+                        echo (!empty($task->id)) ? Html::b($task->w->localURL('task/duplicatetask/' . $task->id), __("Duplicate Task")) : '';
                         echo (!empty($task->id) ? $w->partial('listTags',['object' => $task], 'tag') : '');
 					?>
                 </div>
@@ -61,7 +61,7 @@
             <?php if ($task->getCanINotify()):?>
             <div id="notification" class="clearfix">
                 <div class="row small-12">
-                    <h4>If you do not set notifications for this Task then the default settings for this Task group will be used</h4>
+                    <h4><?php _e('If you do not set notifications for this Task then the default settings for the this Task group will be used.'); ?></h4>
                 </div>
                 <?php echo $tasknotify;?>
             </div>

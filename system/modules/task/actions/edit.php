@@ -8,7 +8,7 @@ function edit_GET($w) {
     $w->Timelog->registerTrackingObject($task);
     
     if (!empty($task->id) && !$task->canView($w->Auth->user())) {
-        $w->error("You do not have permission to edit this Task", "/task/tasklist");
+        $w->error(__("You do not have permission to edit this Task"), "/task/tasklist");
     }
     
     // Get a list of the taskgroups and filter by what can be used
@@ -32,54 +32,54 @@ function edit_GET($w) {
             $priority = $w->Task->getTaskPriority($taskgroup->task_group_type);
             $members = $w->Task->getMembersBeAssigned($taskgroup->id);
             sort($members);
-            array_unshift($members,array("Unassigned","unassigned"));
+            array_unshift($members,array(__("Unassigned"),"unassigned"));
             $assigned = (empty($task->assignee_id)) ? "unassigned" : $task->assignee_id;
         }
     }
     
     // Create form
     $form = array(
-        (!empty($p["id"]) ? 'Edit task [' . $task->id . ']' : "Create a new task") => array(
+        (!empty($p["id"]) ? __('Edit task').' [' . $task->id . ']' : __("Create a new task")) => array(
             array(
 				!empty($p["id"]) ?
-                        array("Task Group", "text", "-task_group_id_text", $taskgroup->title) :
-                        array("Task Group", "autocomplete", "task_group_id", !empty($task->task_group_id) ? $task->task_group_id : $taskgroup_id, $taskgroups),
+                        array(__("Task Group"), "text", "-task_group_id_text", $taskgroup->title) :
+                        array(__("Task Group"), "autocomplete", "task_group_id", !empty($task->task_group_id) ? $task->task_group_id : $taskgroup_id, $taskgroups),
                 !empty($p["id"]) ?
-                        array("Task Type", "select", "-task_type", $task->task_type, $tasktypes) :
+                        array(__("Task Type"), "select", "-task_type", $task->task_type, $tasktypes) :
                         //array("Task Type", "select", "task_type", $task->task_type, $tasktypes)
-                        array("Task Type", "select", "task_type", (sizeof($tasktypes) === 1) ? $tasktypes[0] : null, $tasktypes)
+                        array(__("Task Type"), "select", "task_type", (sizeof($tasktypes) === 1) ? $tasktypes[0] : null, $tasktypes)
             ),
             array(
-                array("Task Title", "text", "title", $task->title),
-                array("Status", "select", "status", $task->status, $task->getTaskGroupStatus()),
+                array(__("Task Title"), "text", "title", $task->title),
+                array(__("Status"), "select", "status", $task->status, $task->getTaskGroupStatus()),
             ),
             array(
-                array("Priority", "select", "priority", $task->priority, $priority),
-                array("Date Due", "date", "dt_due", formatDate($task->dt_due)),
+                array(__("Priority"), "select", "priority", $task->priority, $priority),
+                array(__("Date Due"), "date", "dt_due", formatDate($task->dt_due)),
                 !empty($taskgroup) && $taskgroup->getCanIAssign() ?
-                	array("Assigned To", "select", "assignee_id", $assigned, $members) :
-                	array("Assigned To", "select", "-assignee_id", $assigned, $members)
+                	array(__("Assigned To"), "select", "assignee_id", $assigned, $members) :
+                	array(__("Assigned To"), "select", "-assignee_id", $assigned, $members)
             ),
 			array(
-				array("Estimated hours", "text", "estimate_hours", $task->estimate_hours),
-				array("Effort", "text", "effort", $task->effort)
+				array(__("Estimated hours"), "text", "estimate_hours", $task->estimate_hours),
+				array(__("Effort"), "text", "effort", $task->effort)
 			),
-            array(array("Description", "textarea", "description", $task->description)),
+            array(array(__("Description"), "textarea", "description", $task->description)),
         		        	
         )
     );
 	
 	if (!empty($p['id'])) {
-		$form['Edit task [' . $task->id . ']'][5][] = array("Task Group ID", "hidden", "task_group_id", $task->task_group_id);
+		$form['Edit task'.' [' . $task->id . ']'][5][] = array(__("Task Group ID"), "hidden", "task_group_id", $task->task_group_id);
 	}
 
     if (empty($p['id'])) {
-    	History::add("New Task");
+    	History::add(__("New Task"));
     } else {
-    	History::add("Task: {$task->title}");
+    	History::add(__("Task:")." {$task->title}");
     }
     $w->ctx("task", $task);
-    $w->ctx("form", Html::multiColForm($form, $w->localUrl("/task/edit/{$task->id}"), "POST", "Save", "edit_form", null, null, "_self", true, Task::$_validation));
+    $w->ctx("form", Html::multiColForm($form, $w->localUrl("/task/edit/{$task->id}"), "POST", __("Save"), "edit_form", null, null, "_self", true, Task::$_validation));
    
     //////////////////////////
     // Build time log table //
@@ -88,7 +88,7 @@ function edit_GET($w) {
     $timelog = $task->getTimeLog();
     $total_seconds = 0;
     
-    $table_header = array("Assignee", "Start", "Period (hours)", "Comment","Actions");
+    $table_header = array(__("Assignee"), __("Start"), __("Period (hours)"), __("Comment"),__("Actions"));
     $table_data = array();
     if (!empty($timelog)) {
         // for each entry display, calculate period and display total time on task
@@ -109,20 +109,20 @@ function edit_GET($w) {
             $buttons = '';
             if ($log->is_suspect == "0") {
                 $total_seconds += $seconds;
-                $buttons .= Html::box($w->localUrl("/task/addtime/".$task->id."/".$log->id)," Edit ",true);
+                $buttons .= Html::box($w->localUrl("/task/addtime/".$task->id."/".$log->id),__(" Edit "),true);
             }
 
             if ($w->Task->getIsOwner($task->task_group_id, $w->Auth->user()->id)) {
-                $buttons .= Html::b($w->localUrl("/task/suspecttime/".$task->id."/".$log->id), ((empty($log->is_suspect) || $log->is_suspect == "0") ? "Review" : "Accept"));
+                $buttons .= Html::b($w->localUrl("/task/suspecttime/".$task->id."/".$log->id), ((empty($log->is_suspect) || $log->is_suspect == "0") ? __("Review") : __("Accept")));
             }
             
-            $buttons .= Html::b($w->localUrl("/task/deletetime/".$task->id."/".$log->id), "Delete", "Are you sure you wish to DELETE this Time Log Entry?");
+            $buttons .= Html::b($w->localUrl("/task/deletetime/".$task->id."/".$log->id), __("Delete"), __("Are you sure you wish to DELETE this Time Log Entry?"));
             
             $table_row[] = $buttons;
             
             $table_data[] = $table_row;
         }
-        $table_data[] = array("<b>Total</b>", "","<b>".$w->Task->getFormatPeriod($total_seconds)."</b>","","");
+        $table_data[] = array("<b>".__("Total")."</b>", "","<b>".$w->Task->getFormatPeriod($total_seconds)."</b>","","");
     }
     // display the task time log
     $w->ctx("timelog",Html::table($table_data, null, "tablesorter", $table_header));
@@ -158,17 +158,17 @@ function edit_GET($w) {
 
         // create form. if still no 'notify' all boxes are unchecked
         $form = array(
-            "Notification Events" => array(
+            __("Notification Events") => array(
                 array(array("","hidden","task_creation", "0")),
                 array(
-                    array("Task Details Update","checkbox","task_details", !empty($notify->task_details) ? $notify->task_details : null),
-                    array("Comments Added","checkbox","task_comments", !empty($notify->task_comments) ? $notify->task_comments : null)
+                    array(__("Task Details Update"),"checkbox","task_details", !empty($notify->task_details) ? $notify->task_details : null),
+                    array(__("Comments Added"),"checkbox","task_comments", !empty($notify->task_comments) ? $notify->task_comments : null)
                 ),
                 array(
-                    array("Time Log Entry","checkbox","time_log", !empty($notify->time_log) ? $notify->time_log : null),
-                    array("Task Data Updated","checkbox","task_data", !empty($notify->task_data) ? $notify->task_data : null)
+                    array(__("Time Log Entry"),"checkbox","time_log", !empty($notify->time_log) ? $notify->time_log : null),
+                    array(__("Task Data Updated"),"checkbox","task_data", !empty($notify->task_data) ? $notify->task_data : null)
                 ),
-                array(array("Documents Added","checkbox","task_documents", !empty($notify->task_documents) ? $notify->task_documents : null))
+                array(array(__("Documents Added"),"checkbox","task_documents", !empty($notify->task_documents) ? $notify->task_documents : null))
             )
         );
 
@@ -242,7 +242,7 @@ function edit_POST($w) {
         $messageObject->setSubject("Invite to: " . $task->title)
             ->setFrom($w->Auth->user()->getContact()->email);
 
-        $messageObject->addPart("Your iCal is attached<br/>View Task at: " . $task->toLink(null, null, $user), "text/html");
+        $messageObject->addPart(__("Your iCal is attached")."<br/>".__("View Task at: ") . $task->toLink(null, null, $user), "text/html");
         $ics_content = $data;
 		$messageObject->addPart($ics_content, "text/calendar");
 		

@@ -60,7 +60,7 @@
 				$.get('/timelog/ajaxGetExtraData/' + $("#object_class").val() + '/' + $("#object_id").val())
 					.done(function(response) {
                                             if (response != '') {
-						var append_panel = "<div class='panel'><div class='row-fluid section-header'><h4>Additional Fields"+$("#object_class").val()+"</h4></div><ul class='small-block-grid-1 medium-block-grid-1 section-body'><li>" + response + "</li></ul></div>";
+						var append_panel = "<div class='panel'><div class='row-fluid section-header'><h4><?php _e('Additional Fields'); ?>"+$("#object_class").val()+"</h4></div><ul class='small-block-grid-1 medium-block-grid-1 section-body'><li>" + response + "</li></ul></div>";
 						$("#timelog_edit_form .panel").after(append_panel);
                                             }
 					});

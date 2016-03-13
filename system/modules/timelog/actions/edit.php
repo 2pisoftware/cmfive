@@ -29,19 +29,19 @@ function edit_GET(Web $w) {
             } 
         }
         $form = [
-		'Timelog' => [
+		__('Timelog') => [
 			[
-				["Module", "select", "object_class", $timelog->object_class ? : $tracking_class, $select_indexes],
-				["Search", "autocomplete", "search", !empty($timelog->object_id) ? $timelog->object_id : $tracking_id, (!empty($timelog->object_class) || !empty($tracking_class) ? $w->Timelog->getObjects($timelog->object_class ? : $tracking_class) : '')]
+				[__("Module"), "select", "object_class", $timelog->object_class ? : $tracking_class, $select_indexes],
+				[__("Search"), "autocomplete", "search", !empty($timelog->object_id) ? $timelog->object_id : $tracking_id, (!empty($timelog->object_class) || !empty($tracking_class) ? $w->Timelog->getObjects($timelog->object_class ? : $tracking_class) : '')]
 			],
 //				["Search", empty($timelog->object_id) && empty($tracking_id) ? "text" : "autocomplete", (empty($timelog->object_id) && empty($tracking_id) ? '-' : '') . "search", !empty($timelog->object_id) ? $timelog->object_id : $tracking_id, (!empty($timelog->object_class) || !empty($tracking_class) ? $w->Timelog->getObjects($timelog->object_class ? : $tracking_class) : '')]
 //			],
             [["object id", 'hidden', "object_id", $timelog->object_id ? : $tracking_id]],
 			[
-				["From", "datetime", "dt_start", formatDateTime($timelog->dt_start)],
-				["To", "datetime", "dt_end", formatDateTime($timelog->dt_end)]
+				[__("From"), "datetime", "dt_start", formatDateTime($timelog->dt_start)],
+				[__("To"), "datetime", "dt_end", formatDateTime($timelog->dt_end)]
 			],
-			[["Description", "text", "description", !empty($comment) ? $comment->comment : null]]
+			[[__("Description"), "text", "description", !empty($comment) ? $comment->comment : null]]
 		]
 	];
 	
@@ -62,7 +62,7 @@ function edit_GET(Web $w) {
 		}
 	}
 	
-	$w->ctx("form", Html::multiColForm($form, "/timelog/edit/" . $timelog->id . (!empty($redirect) ? "?redirect=$redirect" : ''), "POST", "Save", "timelog_edit_form", null, null, "_self", true, $validation));
+	$w->ctx("form", Html::multiColForm($form, "/timelog/edit/" . $timelog->id . (!empty($redirect) ? "?redirect=$redirect" : ''), "POST", __("Save"), "timelog_edit_form", null, null, "_self", true, $validation));
 }
 
 function edit_POST(Web $w) {
@@ -87,5 +87,5 @@ function edit_POST(Web $w) {
 	// Save comment
 	$timelog->setComment($_POST['description']);
 
-	$w->msg("<div id='saved_record_id' data-id='".$timelog->id."' >Timelog saved</div>", (!empty($redirect) ? $redirect : "/timelog"));
+	$w->msg("<div id='saved_record_id' data-id='".$timelog->id."' >".__("Timelog saved")."</div>", (!empty($redirect) ? $redirect : "/timelog"));
 }

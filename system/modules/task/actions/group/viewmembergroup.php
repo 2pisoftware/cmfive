@@ -12,26 +12,26 @@ function viewmembergroup_GET(Web $w) {
 	$group = $w->Task->getTaskGroup($p['id']);
 
 	// put the group title into the page heading
-	$w->Task->navigation($w, "Task Group - " . $group->title);
+	$w->Task->navigation($w, __("Task Group - ") . $group->title);
 
-	History::add("Task Group: ".$group->title);
+	History::add(__("Task Group: ").$group->title);
 		
 	// set columns headings for display of members
-	$line[] = array("Member","Role","");
+	$line[] = array(__("Member"),__("Role"),"");
 
 	// if their are members, display their full name, role and buttons to edit or delete the member
 	if ($member_group) {
 		foreach ($member_group as $member) {
 			$line[] = array($w->Task->getUserById($member->user_id), $member->role,
-					Html::box(WEBROOT."/task-group/viewmember/".$member->id," Edit ", true) .
+					Html::box(WEBROOT."/task-group/viewmember/".$member->id,__(" Edit "), true) .
 					"&nbsp;&nbsp;" .
-					Html::box(WEBROOT."/task-group/deletegroupmember/".$member->id," Delete ", true)
+					Html::box(WEBROOT."/task-group/deletegroupmember/".$member->id,__(" Delete "), true)
 			);
 		}
 	}
 	else {
 		// if there are no members, say as much
-		$line[] = array("Group currently has no members. Please Add New Members.", "", "");
+		$line[] = array(__("Group currently has no members. Please Add New Members."), "", "");
 	}
 
 	// enter task group attributes sa query string for buttons providing group specific functions such as delete or add members
@@ -63,26 +63,26 @@ function viewmembergroup_GET(Web $w) {
 			array(array("","hidden", "task_group_id",$group->id)),
 			array(
 					array("","static",""),
-					array("Creator","static","creator"),
-					array("Assignee","static","assignee"),
-					array("All Others","static","others"),
+					array(__("Creator"),"static","creator"),
+					array(__("Assignee"),"static","assignee"),
+					array(__("All Others"),"static","others"),
 			),
 			array(
-					array("Guest","static","guest"),
+					array(__("Guest"),"static","guest"),
 					array("","checkbox","guest_creator",$v['guest']['creator'])
 			),
 			array(
-					array("Member","static","member"),
+					array(__("Member"),"static","member"),
 					array("","checkbox","member_creator",$v['member']['creator']),
 					array("","checkbox","member_assignee",$v['member']['assignee']),
 			),
 			array(
-					array("Owner","static","owner"),
+					array(__("Owner"),"static","owner"),
 					array("","checkbox","owner_creator",$v['owner']['creator']),
 					array("","checkbox","owner_assignee",$v['owner']['assignee']),
 					array("","checkbox","owner_other",$v['owner']['other']),
 			),
 	);
 
-	$w->ctx("notifymatrix",Html::multiColForm($notifyForm,$w->localUrl("/task-group/updategroupnotify/"),"POST"," Submit "));
+	$w->ctx("notifymatrix",Html::multiColForm($notifyForm,$w->localUrl("/task-group/updategroupnotify/"),"POST",__(" Submit ")));
 }

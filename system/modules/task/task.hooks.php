@@ -18,7 +18,7 @@ function task_timelog_type_options_for_Task(Web $w, $object) {
 		$task_type = $w->Task->getTaskTypeObject($object->task_type);
 		$time_types = $task_type->getTimeTypes();
 		if (!empty($time_types)) {
-			return [["Task time", "select", "time_type", $object->time_type, $time_types]];
+			return [[__("Task time"), "select", "time_type", $object->time_type, $time_types]];
 		}
 	}
 }
@@ -45,17 +45,17 @@ function task_core_dbobject_after_insert_Task(Web $w, $object) {
 		
         foreach ($users_to_notify as $user) {
             $message = "<b>" . $event_title . " [" . $object->id . "]</b><br/>\n";
-            $message .= "<p>A new task has been created</p>";
+            $message .= "<p>".__("A new task has been created")."</p>";
             
-			$message .= "<p><b>Subject:</b> " . $object->title . "</p>";
-			$message .= "<p><b>Body:</b>" . $object->description . "</p>";
+			$message .= "<p><b>".__("Subject").":</b> " . $object->title . "</p>";
+			$message .= "<p><b>".__("Body").":</b>" . $object->description . "</p>";
 			
 			// Get additional details
 			$message .= $w->Task->getNotificationAdditionalDetails($object);
 			
             $user_object = $w->Auth->getUser($user);
-            $message .= "<br/><p>Access the task here: " . $object->toLink(null, null, $user_object) . "</p>";
-            $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
+            $message .= "<br/><p>".__("Access the task here: ") . $object->toLink(null, null, $user_object) . "</p>";
+            $message .= "<br/><br/><b>".__("Note")."</b>: ".__("Go to ") . Html::a(WEBROOT . "/task/tasklist#notifications", __("Task > Task List > Notifications")) . __(", to edit the types of notifications you will receive.");
 
 			$attachments = $w->File->getAttachmentsFileList($object);
 			
@@ -96,17 +96,17 @@ function task_core_dbobject_after_update_Task(Web $w, $object) {
         // send it to the inbox of the user's on our send list
         foreach ($users_to_notify as $user) {
             // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
-            $subject = "Task " . $object->title . " [" . $object->id . "][" . $object->status . "] - " . $event_title;
+            $subject = __("Task ") . $object->title . " [" . $object->id . "][" . $object->status . "] - " . $event_title;
             $message = "<b>" . $event_title . "</b><br/>\n";
-            $message .= "<p>" . $object->title . " details has been updated</p>";
-			$message .= "<p>Status: " . $object->__old['status'] . " => " . $object->status . "</p>";
+            $message .= "<p>" . $object->title . __(" details has been updated")."</p>";
+			$message .= "<p>".__("Status: ") . $object->__old['status'] . " => " . $object->status . "</p>";
             
 			// Get additional details
 			$message .= $w->Task->getNotificationAdditionalDetails($object);
 			
             $user_object = $w->Auth->getUser($user);
             $message .= $object->toLink(null, null, $user_object);
-            $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
+            $message .= "<br/><br/><b>".__("Note")."</b>: ".__("Go to ") . Html::a(WEBROOT . "/task/tasklist#notifications", __("Task > Task List > Notifications")) . __(", to edit the types of notifications you will receive.");
 
             $w->Inbox->addMessage($subject, $message, $user);
         }
@@ -138,7 +138,7 @@ function task_comment_comment_added_task(Web $w, $object) {
         // send it to the inbox of the user's on our send list
         foreach ($users_to_notify as $user) {
             // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
-            $subject = (!empty($comment_user->id) ? $comment_user->getFullName() : 'Someone') . ' has commented on a task that you\'re apart of ('.$task->title.')';
+            $subject = (!empty($comment_user->id) ? $comment_user->getFullName() : __('Someone')) . __(' has commented on a task that you\'re a part of').' ('.$task->title.')';
 
             $user_object = $w->Auth->getUser($user);
             $message = $task->toLink(null, null, $user_object);
@@ -147,7 +147,7 @@ function task_comment_comment_added_task(Web $w, $object) {
 			// Get additional details
 			$message .= $w->Task->getNotificationAdditionalDetails($task);
 			
-            $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
+            $message .= "<br/><br/><b>".__("Note")."</b>: ".__("Go to ") . Html::a(WEBROOT . "/task/tasklist#notifications", __("Task > Task List > Notifications")) . __(", to edit the types of notifications you will receive.");
 
             $w->Inbox->addMessage($subject, $message, $user, null, null, true);
         }
@@ -215,21 +215,21 @@ function task_comment_comment_added_comment(Web $w, $object) {
         // send it to the inbox of the user's on our send list
         foreach ($users_to_notify as $user) {
             // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
-            $subject = $comment_user->getFullName() . " replied to a comment " . (in_array($w->Auth->user()->id, $comment_thread_users) ? "that you're a part of " : "") . "for ". $task->title;
-            $message = "<p>Comment</p>";
+            $subject = $comment_user->getFullName() . __(" replied to a comment ")) . (in_array($w->Auth->user()->id, $comment_thread_users) ? __("that you're a part of ") : "") . __("for "). $task->title;
+            $message = "<p>".__("Comment")."</p>";
             $message .= $w->partial("displaycomment", array("object" => $object, "displayOnly" => true, 'redirect' => '/inbox'), "admin");
             
             $user_object = $w->Auth->getUser($user);
             if ($task->canView($user_object)) {
-                $message .= "<a href='" .  $w->localUrl("/task/edit/" . $task->id . "?scroll_comment_id=" . $object->id . "#comments") . "'><p>Click here to view the comment</p></a>";            
+                $message .= "<a href='" .  $w->localUrl("/task/edit/" . $task->id . "?scroll_comment_id=" . $object->id . "#comments") . "'><p>".__("Click here to view the comment")."</p></a>";            
             } else {
-                $message .= "<p><b>You are unable to view this task</b></p>";
+                $message .= "<p><b>".__("You are unable to view this task")."</b></p>";
             }
 			
 			// Get additional details
 			$message .= $w->Task->getNotificationAdditionalDetails($task);
             
-            $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
+            $message .= "<br/><br/><b>".__("Note")."</b>: ".__("Go to ") . Html::a(WEBROOT . "/task/tasklist#notifications", __("Task > Task List > Notifications")) . __(", to edit the types of notifications you will receive.");
 
             $w->Inbox->addMessage($subject, $message, $user, null, null, true);
         }
@@ -254,16 +254,16 @@ function task_core_dbobject_after_insert_TaskTime(Web $w, $object) {
         // send it to the inbox of the user's on our send list
         foreach ($users_to_notify as $user) {
             // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
-            $subject = "Task - " . $task->title . ": " . $event_title;
+            $subject = __("Task - ") . $task->title . ": " . $event_title;
             $message = "<b>" . $event_title . "</b><br/>\n";
-            $message .= "<p>" . $task->title . " has had a new time log entry</p>";
+            $message .= "<p>" . $task->title . __(" has had a new time log entry")."</p>";
             
 			// Get additional details
 			$message .= $w->Task->getNotificationAdditionalDetails($task);
 			
             $user_object = $w->Auth->getUser($user);
             $message .= $task->toLink(null, null, $user_object);
-            $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
+            $message .= "<br/><br/><b>".__("Note")."</b>: ".__("Go to ") . Html::a(WEBROOT . "/task/tasklist#notifications", __("Task > Task List > Notifications")) . __(", to edit the types of notifications you will receive.");
 
             $w->Inbox->addMessage($subject, $message, $user);
         }
@@ -288,16 +288,16 @@ function task_attachment_attachment_added_task(Web $w, $object) {
         // send it to the inbox of the user's on our send list
         foreach ($users_to_notify as $user) {
             // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
-            $subject = "Task - " . $task->title . ": " . $event_title;
+            $subject = __("Task - ") . $task->title . ": " . $event_title;
             $message = "<b>" . $event_title . "</b><br/>\n";
-            $message .= "<p>" . $task->title . " has got a new attachment</p>";
+            $message .= "<p>" . $task->title . __(" has got a new attachment")."</p>";
             
 			// Get additional details
 			$message .= $w->Task->getNotificationAdditionalDetails($task);
 			
             $user_object = $w->Auth->getUser($user);
             $message .= $task->toLink(null, null, $user_object);
-            $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
+            $message .= "<br/><br/><b>".__("Note")."</b>: ".__("Go to ") . Html::a(WEBROOT . "/task/tasklist#notifications", __("Task > Task List > Notifications")) . __(", to edit the types of notifications you will receive.");
 
             $w->Inbox->addMessage($subject, $message, $user);
         }

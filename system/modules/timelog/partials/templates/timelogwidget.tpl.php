@@ -1,7 +1,7 @@
 <div class="row-fluid" id="timelog_container">
     <div id="start_timer">
         <?php if ($w->Timelog->hasTrackingObject()) : ?>
-            <a onclick="openDescription();">Start Timer</a>
+            <a onclick="openDescription();"><?php _e('Start Timer'); ?></a>
         <?php else : ?>
             
         <?php endif; ?>
@@ -14,15 +14,15 @@
     <div id="timerModal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
 		<div class="row">
 			<div class="large-12 columns">
-				<label><font style='font-size: 14pt;'>Enter Description</font>
+				<label><font style='font-size: 14pt;'><?php _e('Enter Description'); ?></font>
 					<input type="text" id="timelog_description" name="timelog_description" />
 				</label>
 			</div>
 		</div>
 		<div class="row">
 			<div class="large-12 columns">
-				<button onclick="saveTimer();">Start</button>
-				<button onclick="$('#timerModal').foundation('reveal', 'close');">Close</button>
+				<button onclick="saveTimer();"><?php _e('Start'); ?></button>
+				<button onclick="$('#timerModal').foundation('reveal', 'close');"><?php _e('Close'); ?></button>
 			</div>
 		</div>
 	</div>    

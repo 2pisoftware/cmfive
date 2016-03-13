@@ -17,21 +17,21 @@ function ajaxGetExtraData_GET(Web $w) {
 
 	if (!empty($form_data[0][0][4])) {
             // Add title field
-            $title = "<label class='small-12 columns'>Time Type";
+            $title = "<label class='small-12 columns'>".__("Time Type");
 
             // IS this required?
             $required = null;
             if (!empty(Timelog::$_validation["time_type"])) {
                 if (in_array("required", Timelog::$_validation["time_type"])) {
                     $required = "required";
-                    $title .= ' <small>Required</small>';
+                    $title .= ' <small>'.__('Required').'</small>';
                 } 
             }
 
             echo $title;
 	
             // We dont want the structure for multiColForm, we want it for a select
-            echo Html::select($form_data[0][0][2], $form_data[0][0][4], null, null, null, "-- Select --", null, $required);
+            echo Html::select($form_data[0][0][2], $form_data[0][0][4], null, null, null, __("-- Select --"), null, $required);
 	}
 	return;
 	

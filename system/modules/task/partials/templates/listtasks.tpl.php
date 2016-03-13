@@ -1,8 +1,8 @@
 <?php 
-echo Html::filter("Filter Tasks", $filter_data, '/' . $redirect, "GET", "Filter", "task_list");
+echo Html::filter(__("Filter Tasks"), $filter_data, '/' . $redirect, "GET", "Filter", "task_list");
 
 if (!empty($tasks)) {
-    $table_header = array("Title", "Created By", "Assigned To", "Group", "Type", "Priority", "Status", "Due");
+    $table_header = array(__("Title"), __("Created By"), __("Assigned To"), __("Group"), __("Type"), __("Priority"), __("Status"), __("Due"));
     $table_data = array();
 
     // Build table data
@@ -30,5 +30,5 @@ if (!empty($tasks)) {
     echo Html::table($table_data, null, "tablesorter", $table_header);
 
 } else { ?>
-    <h3><small>No tasks found.</small></h3>
+    <h3><small><?php _e('No tasks found'); ?>.</small></h3>
 <?php }
