@@ -215,7 +215,7 @@ function task_comment_comment_added_comment(Web $w, $object) {
         // send it to the inbox of the user's on our send list
         foreach ($users_to_notify as $user) {
             // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
-            $subject = $comment_user->getFullName() . __(" replied to a comment ")) . (in_array($w->Auth->user()->id, $comment_thread_users) ? __("that you're a part of ") : "") . __("for "). $task->title;
+            $subject = $comment_user->getFullName() . __(" replied to a comment ") . (in_array($w->Auth->user()->id, $comment_thread_users) ? __("that you're a part of ") : "") . __("for "). $task->title;
             $message = "<p>".__("Comment")."</p>";
             $message .= $w->partial("displaycomment", array("object" => $object, "displayOnly" => true, 'redirect' => '/inbox'), "admin");
             

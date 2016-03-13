@@ -11,6 +11,12 @@ msgstr ""
 "Last-Translator: Steve Ryan <steve@2pisoftware.com>\n"
 "Language-Team: \n"
 
+msgid "eek"
+msgstr "SeeK"
+
+msgid "asfriend::::eek"
+msgstr "MeeK"
+
 #: modules/example/actions/delete.php:25
 msgid "Object Deleted"
 msgstr "objet supprimé"

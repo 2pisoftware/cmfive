@@ -20,21 +20,55 @@ function array_unique_multidimensional($input) {
  * Translations shortcuts (for POT marker identification
  */
 
-function _($key) {
-	throw new Exception('You must use double underscores in gettext lookups - '.$key) ;
+// ensure that developers use double underscore  !! requires ADP php module
+//override_function('__', '$key,$context', 'throw new Exception("You must use double underscores in gettext lookups - ".$key."-".$context) ;');
+
+/**
+ * Lookup translation 
+ */
+function __($key,$domain='') {
+	if (strlen(trim($domain))>0) {
+		return dcgettext($domain,$key,LC_MESSAGES);
+	}
+	return  dcgettext('main',$key,LC_MESSAGES);
+} 
+/**
+ * Echo a translation lookup
+ */
+
+function _e($key,$domain='') {
+	echo __($key,$domain);
+} 
+/**
+ * Lookup a plural translation
+ */
+
+function _n($key1,$key2,$n,$domain='') {
+	if (strlen(trim($domain))>0) {
+		return dngettext($domain,$key1,$key2,$n);
+	} else {
+		return ngettext($key1,$key2,$n);
+	}
 }
 
-function __($key,$context='') {
-	return  gettext($key);
-} 
-function _e($key,$context='') {
-	echo gettext($key); 
-} 
-function _n($key1,$key2,$n,$context='') {
-	return ngettext($key1,$key2,$n);
+/**
+ * Echo a plural translation
+ */
+function _en($key1,$key2,$n,$domain='') {
+	echo _n($domain,$key1,$key2,$n);
 }
-function _en($key1,$key2,$n,$context='') {
-	echo ngettext($key1,$key2,$n);
+
+/**
+ * Lookup translation with context
+ */
+function _x($key,$context,$domain='') {
+	$contextString = "{$context}::::{$key}";
+	$translation=__($contextString,$domain);
+	// fallback without context ??
+	if ($translation == $contextString)  {
+		$translation=__($key,$domain);
+	}
+	return $translation;
 }
 
 

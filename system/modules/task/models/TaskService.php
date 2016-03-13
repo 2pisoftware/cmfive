@@ -837,7 +837,7 @@ class TaskService extends DbService {
 			}
 		}
 		
-		return !empty($message) ? "<br/><p>Additional details:</p>" . $message : '';
+		return !empty($message) ? "<br/><p>".__("Additional details:")."</p>" . $message : '';
 	}
     
     public function navigation(Web $w, $title = null, $nav = null) {
@@ -848,12 +848,12 @@ class TaskService extends DbService {
         $nav = $nav ? $nav : array();
 
         if ($w->Auth->loggedIn()) {
-            $w->menuLink("task/edit", "New Task", $nav);
+            $w->menuLink("task/edit", __("New Task"), $nav);
 //          $w->menuLink("task/index", "Task Dashboard", $nav);
-            $w->menuLink("task/tasklist", "Task List", $nav);
-            $w->menuLink("task/tasklist#notifications", "Notifications", $nav);
-            $w->menuLink("task/taskweek", "Activity", $nav);
-            $w->menuLink("task-group/viewtaskgrouptypes", "Task Groups", $nav);
+            $w->menuLink("task/tasklist", __("Task List"), $nav);
+            $w->menuLink("task/tasklist#notifications", __("Notifications"), $nav);
+            $w->menuLink("task/taskweek", __("Activity"), $nav);
+            $w->menuLink("task-group/viewtaskgrouptypes", __("Task Groups"), $nav);
         }
         $w->ctx("navigation", $nav);
         return $nav;
