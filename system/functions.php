@@ -19,18 +19,22 @@ function array_unique_multidimensional($input) {
 /**
  * Translations shortcuts (for POT marker identification
  */
- 
-function __($key) {
-	return  _($key);
+
+function _($key) {
+	throw new Exception('You must use double underscores in gettext lookups - '.$key) ;
+}
+
+function __($key,$context='') {
+	return  gettext($key);
 } 
-function _e($key) {
-	echo _($key); 
+function _e($key,$context='') {
+	echo gettext($key); 
 } 
-function _n($key1,$key2,$n) {
+function _n($key1,$key2,$n,$context='') {
 	return ngettext($key1,$key2,$n);
 }
-function _en($key1,$key2,$n) {
-	return ngettext($key1,$key2,$n);
+function _en($key1,$key2,$n,$context='') {
+	echo ngettext($key1,$key2,$n);
 }
 
 

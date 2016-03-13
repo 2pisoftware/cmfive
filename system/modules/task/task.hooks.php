@@ -180,17 +180,17 @@ function task_core_dbobject_after_update_Task(Web $w, $object) {
         // send it to the inbox of the user's on our send list
         foreach ($users_to_notify as $user) {
             // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
-            $subject = "Task " . $object->title . " [" . $object->id . "][" . $object->status . "] - " . $event_title;
+            $subject = __("Task ") . $object->title . " [" . $object->id . "][" . $object->status . "] - " . $event_title;
             $message = "<b>" . $event_title . "</b><br/>\n";
-            $message .= "<p>" . $object->title . " details has been updated</p>";
-			$message .= "<p>Status: " . $object->__old['status'] . " => " . $object->status . "</p>";
+            $message .= "<p>" . $object->title . __(" details has been updated")."</p>";
+			$message .= "<p>".__("Status: ") . $object->__old['status'] . " => " . $object->status . "</p>";
             
 			// Get additional details
 			$message .= $w->Task->getNotificationAdditionalDetails($object);
 			
             $user_object = $w->Auth->getUser($user);
             $message .= $object->toLink(null, null, $user_object);
-            $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
+            $message .= "<br/><br/><b>".__("Note")."</b>: ".__("Go to ") . Html::a(WEBROOT . "/task/tasklist#notifications", __("Task > Task List > Notifications")) . __(", to edit the types of notifications you will receive.");
 
             if (Config::get('inbox.active') === true) {
                 $w->Inbox->addMessage($subject, $message, $user);
@@ -340,16 +340,16 @@ function task_core_dbobject_after_insert_TaskTime(Web $w, $object) {
         // send it to the inbox of the user's on our send list
         foreach ($users_to_notify as $user) {
             // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
-            $subject = "Task - " . $task->title . ": " . $event_title;
+            $subject = __("Task - ") . $task->title . ": " . $event_title;
             $message = "<b>" . $event_title . "</b><br/>\n";
-            $message .= "<p>" . $task->title . " has had a new time log entry</p>";
+            $message .= "<p>" . $task->title . __(" has had a new time log entry")."</p>";
             
 			// Get additional details
 			$message .= $w->Task->getNotificationAdditionalDetails($task);
 			
             $user_object = $w->Auth->getUser($user);
             $message .= $task->toLink(null, null, $user_object);
-            $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
+            $message .= "<br/><br/><b>".__("Note")."</b>: ".__("Go to ") . Html::a(WEBROOT . "/task/tasklist#notifications", __("Task > Task List > Notifications")) . __(", to edit the types of notifications you will receive.");
 
             $w->Inbox->addMessage($subject, $message, $user);
         }
@@ -374,16 +374,16 @@ function task_attachment_attachment_added_task(Web $w, $object) {
         // send it to the inbox of the user's on our send list
         foreach ($users_to_notify as $user) {
             // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
-            $subject = "Task - " . $task->title . ": " . $event_title;
+            $subject = __("Task - ") . $task->title . ": " . $event_title;
             $message = "<b>" . $event_title . "</b><br/>\n";
-            $message .= "<p>" . $task->title . " has got a new attachment</p>";
+            $message .= "<p>" . $task->title . __(" has got a new attachment")."</p>";
             
 			// Get additional details
 			$message .= $w->Task->getNotificationAdditionalDetails($task);
 			
             $user_object = $w->Auth->getUser($user);
             $message .= $task->toLink(null, null, $user_object);
-            $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
+            $message .= "<br/><br/><b>".__("Note")."</b>: ".__("Go to ") . Html::a(WEBROOT . "/task/tasklist#notifications", __("Task > Task List > Notifications")) . __(", to edit the types of notifications you will receive.");
 
             $w->Inbox->addMessage($subject, $message, $user);
         }
@@ -393,84 +393,4 @@ function task_attachment_attachment_added_task(Web $w, $object) {
 // Admin user remove hook
 function task_admin_remove_user(Web $w, User $user) {
 	return $w->partial("removeUser", ["user" => $user, "redirect" => "/admin-user/remove/" . $user->id], "task");
-}
-
-/*
- * sends a list of potential notification receivers to the comment partial
- * must return array if this format
- * array = [
- *      'user_id'=>boolean (sets the default option for user. i.e. are they to receive notifications by default)
- * ]
- */
-function task_comment_get_notification_recipients_task(Web $w, $params) {
-    $results = [];
-    $task = $w->task->getTask($params['object_id']);
-    if (!empty($task)) {
-        //get task group members
-        $members = $w->task->getMembersInGroup($task->task_group_id);
-        //add members to users array
-        if (!empty($members)) {
-            foreach($members as $member) {
-                //check if member is active
-                if (!empty($member)) {
-                    $results[$member[1]] = 1;
-
-                }
-            }
-        }
-        return $results;
-    }
-    return false;
-}
-
-
-/*
- * receives parameters for users to notify from comments
- * $params = array(
- *      'recipients'=>['user_ids'],
- *      'commentor_id=>int (user_id of comment author),
- *      'object_id'=>int (id of object comment is attached to. class included in funtion name),
- *      'comment'=>comment Object
- * )
- */
-function task_comment_send_notification_recipients_task(Web $w, $params) {
-    
-    if (!empty($params['recipients'])) {
-        $commentor = $w->auth->getUser($params['commentor_id']);
-        if (!empty($commentor)) {
-            foreach($params['recipients'] as $key=>$user_id) {
-                $user = $w->auth->getUser($user_id);
-                if (!empty($user)) {
-                    //$booking = $w->booking->getBookingForId($params['object_id']);
-                    $task = $w->task->getTask($params['object_id']);
-                    if (!empty($task)) {
-                        // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
-                        if ($params['is_new'] == true) {
-                            $subject = (!empty($commentor->id) ? $commentor->getFullName() : 'Someone') . ' has commented on a task that you\'re apart of ('.$task->title.')';
-                        } else {
-                            $subject = (!empty($commentor->id) ? $commentor->getFullName() : 'Someone') . ' has edited commented on a task that you\'re apart of ('.$task->title.')';
-                        }
-                        $message = $task->toLink(null, null, $user_object);
-                        $message .= $w->partial("displaycomment", array("object" => $params['comment'], "displayOnly" => true, 'redirect' => '/inbox'), "admin");
-                        // Get additional details
-                        $message .= $w->Task->getNotificationAdditionalDetails($task);
-                        $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
-                        $w->Mail->sendMail($user->getContact()->email, $commentor->getContact()->email, $subject, $message);
-                    } else {
-                        //no task
-                        $w->log->error("Task: No task found for comment notifications");
-                    }
-                } else {
-                    //no user for recipient
-                    $w->log->error("Task: No user found for recipient in comment notifications");
-                }
-            }
-        } else {
-            //no commentor
-            $w->log->error("Task: No user found for commentor in comment notifications");
-        }
-    } else {
-        //no recipients
-        $w->log->error("Task: No recipients found for comment notifications");
-    }
 }
