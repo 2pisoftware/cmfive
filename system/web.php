@@ -80,6 +80,7 @@ class Web {
 
     public $_scripts = array();
     public $_styles = array();
+    public $_languageModulesLoaded=[];
     
     /**
      * Constructor
@@ -211,10 +212,8 @@ class Web {
         }
         return array_values($requestURI);
     }
-	/**
-	 * Initialise gettext for this module
-	 */
-	function initTranslations($domain=null)  {
+    
+    function initLocale() { 
 		$user=$this->Auth->user();
 		// default language
 		$language=Config::get('system.language');
@@ -225,21 +224,50 @@ class Web {
 				$language=$lang;
 			}
 		}
-		if (empty($domain)) {
-			$domain = $this->currentModule();
-		}
+		$this->Log->info('init locale '.$language);
+		
 		
 		$results = setlocale(LC_ALL, $language);
 		if (!$results) {
-			if (true || $domain=="file") $this->Log->info('setlocale failed: locale function is not available on this platform, or the given locale ('.$language.') does not exist in this environment');
+			$this->Log->info('setlocale failed: locale function is not available on this platform, or the given locale ('.$language.') does not exist in this environment');
 		}
-		$path=ROOT_PATH."/".$this->getModuleDir($domain)."translations";
-		$results=bindtextdomain($domain, $path);
-		if (!$results) {
-			//$this->Log->info('setlocale bindtextdomain failed: '.$domain.' : '.$path);
+	}
+    
+  
+	
+	/**
+	 * Set the default translation domain (module name)
+	 * Initialise gettext for this module if not already loaded
+	 */
+	function setTranslationDomain($domain) {
+		if (!in_array($domain,$this->_languageModulesLoaded)) {
+			$this->Log->info('init translations for '.$domain);
+			$path=ROOT_PATH."/".$this->getModuleDir($domain)."translations";
+			if (file_exists($path.".".$domain.".mo")) {
+				$results=bindtextdomain($domain, $path);
+				if (!$results) {
+					$this->Log->info('setlocale bindtextdomain failed try again with main domain: '.$domain.' : '.$path);
+					$path=ROOT_PATH."/".$this->getModuleDir('main')."translations";
+					$results=bindtextdomain($domain, $path);
+					if (!$results) {
+						$this->Log->info('setlocale bindtextdomain failed on retry with main');
+					} else {
+						$domain='main';
+					}
+				}
+			// fallback to main module
+			} else {
+				$path=ROOT_PATH."/".$this->getModuleDir('main')."translations";
+				$results=bindtextdomain($domain, $path);
+				if (!$results) {
+					$this->Log->info('setlocale bindtextdomain failed on  main where .mo file missing');
+				} else {
+					$domain='main';
+				}
+			}
 		}
+		bind_textdomain_codeset($domain, 'UTF-8');	
 		textdomain($domain);
-		bind_textdomain_codeset($domain, 'UTF-8');
 	}
 
     /**
@@ -464,7 +492,9 @@ class Web {
             $this->error("The {$this->_module} module is not active, you can change it's active state in it's config file.", "/");
         }
         // configure translations lookup for this module
-        $this->initTranslations();
+        $this->initLocale();
+        $this->setTranslationDomain('main');
+        $this->setTranslationDomain($this->currentModule());
         
         if (!$this->_action) {
             $this->_action = $this->_defaultAction;
@@ -1266,7 +1296,7 @@ class Web {
         // set translations to partial module
         $oldModule=$this->currentModule();
 		if ($oldModule!=$module)  {
-			$this->initTranslations($module);
+			$this->setTranslationDomain($module);
 		}
 		
         // Check if the module if active or not
@@ -1351,7 +1381,7 @@ class Web {
 		
 		// restore translations module
 		if ($oldModule!=$module)  {
-			$this->initTranslations($oldModule);
+			$this->setTranslationDomain($oldModule);
 		}
 		
         return $currentbuf;
@@ -1373,7 +1403,7 @@ class Web {
 		// set translations to hook module
         $oldModule=$this->currentModule();
 		if ($oldModule!=$module)  {
-			$this->initTranslations($module);
+			$this->setTranslationDomain($module);
 		}
 		
         // Build _hook registry if empty
@@ -1432,7 +1462,7 @@ class Web {
         
 		// restore translations module
 		if ($oldModule!=$module)  {
-			$this->initTranslations($oldModule);
+			$this->setTranslationDomain($oldModule);
 		}
 		
         return $buffer;

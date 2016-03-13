@@ -85,7 +85,7 @@
 												<?php if ($w->Migration->isInstalled($a_migration_class)) :
 													$installedMigration = $w->Migration->getMigrationByClassname($a_migration_class); ?>
 													<span data-tooltip aria-haspopup="true" title="<?php echo @formatDate($installedMigration->dt_created, "d-M-Y \a\\t H:i"); ?>">
-														Run <?php echo Carbon::createFromTimeStamp($installedMigration->dt_created)->diffForHumans(); ?> by <?php echo !empty($installedMigration->creator_id) ? $w->Auth->getUser($installedMigration->creator_id)->getContact()->getFullName() : __(__(__("System"); ?>
+														Run <?php echo Carbon::createFromTimeStamp($installedMigration->dt_created)->diffForHumans(); ?> <?php _e('by'); ?> <?php echo !empty($installedMigration->creator_id) ? $w->Auth->getUser($installedMigration->creator_id)->getContact()->getFullName() : __("System"); ?>
 													</span>
 												<?php endif; ?> 
 											</td>
@@ -93,7 +93,7 @@
 											<?php
 												$filename = basename($a_migration_path, ".php");
 												if ($w->Migration->isInstalled($a_migration_class)) {
-													echo Html::b('/admin-migration/rollback/' . $module . '/' . $filename, __(__("Rollback to here"), __("Are you 110% sure you want to rollback a migration? DATA COULD BE LOST PERMANENTLY!"), null, false, "warning expand");
+													echo Html::b('/admin-migration/rollback/' . $module . '/' . $filename, __("Rollback to here"), __("Are you 110% sure you want to rollback a migration? DATA COULD BE LOST PERMANENTLY!"), null, false, "warning expand");
 												} else {
 													echo Html::b('/admin-migration/run/' . $module . '/' . $filename, __("Migrate to here"), __("Are you sure you want to run a migration?"), null, false, "info expand");
 												}

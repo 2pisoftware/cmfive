@@ -4,7 +4,7 @@ function users_GET(Web &$w) {
 	$w->Admin->navigation($w, "Users");
 
 	$header = [__("Login"), __("First Name"), __("Last Name"), [__("Admin"), true], [__("Active"), true], [__("Created"), true], [__("Last Login"), true], __("Operations")];
-	$users = $w->Admin->getObjects(__("User"), ["is_deleted" => 0, "is_group" => 0]);
+	$users = $w->Admin->getObjects("User", ["is_deleted" => 0, "is_group" => 0]);
 	$data = [];
 	foreach ($users as $user) {
             $contact = $user->getContact();

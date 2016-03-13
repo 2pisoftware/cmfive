@@ -668,8 +668,10 @@ class TaskService extends DbService {
     }
 
     function removeMemberFromTaskGroup($taskgroup_id, $user_id) {
+    	$this->Log->debug("before delete Taskgroupmember(".$taskgroup_id."), user({$user_id})");
     	$tgm = $this->getObject("TaskGroupMember", array("task_group_id"=>$taskgroup_id, "user_id"=>$user_id));
     	if (!empty($tgm)) {
+    		$this->Log->debug("delete Taskgroupmember(".$tgm->id."), user({$user_id})");
     		$tgm->delete();
     	}
     }
