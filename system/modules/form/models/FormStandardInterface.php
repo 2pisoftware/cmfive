@@ -6,13 +6,14 @@
  */
 class FormStandardInterface extends FormFieldInterface {
 	
+	// cannot use __()  for static
 	protected static $_respondsTo = [
-		[__("Text"), "text"],
-		[__("Decimal"), "decimal"],
-		[__("Date"), "date"],
-		[__("Date & Time"), "datetime"],
-		[__("Select"), "select"],
-		[__("Autocomplete"), "autocomplete"]
+		["Text", "text"],
+		["Decimal", "decimal"],
+		["Date", "date"],
+		["Date & Time", "datetime"],
+		["Select", "select"],
+		["Autocomplete", "autocomplete"]
 	];
 	
 	/**
