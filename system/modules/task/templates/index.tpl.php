@@ -35,7 +35,7 @@
         <div style='position: relative; top: 50%; transform: translateY(-50%);'>
             <h2 class="text-center">
                 <?php if ($count_todo_urgent == 0) : ?>
-                    <?php echo $count_todo_urgent; ?> <?php echo n_('task','tasks',$count_todo_urgent); ?> <?php _e('marked'); ?> <strong><?php _e('urgent'); ?></strong>
+                    <?php echo $count_todo_urgent; ?> <?php echo _n('task','tasks',$count_todo_urgent); ?> <?php _e('marked'); ?> <strong><?php _e('urgent'); ?></strong>
                 <?php else : ?>
                     <?php echo Html::a($w->localUrl("/task/tasklist?assignee_id=" . $w->Auth->user()->id . "&task_priority=Urgent"), $count_todo_urgent . _n('task','tasks',$count_todo_urgent)); ?> <?php _e('marked'); ?> <strong><?php _e('urgent'); ?></strong>
                 <?php endif; ?>
@@ -47,10 +47,10 @@
 <div class="row-fluid show-for-medium-down">
     <div class="row-fluid panel clearfix">
         <div class="small-12 medium-6 columns text-center"><?php _e("You're a member of "); ?> <b><?php echo count($taskgroups); ?> <? echo _n('taskgroup','taskgroups',count($taskgroups)); ?> </b></div>
-        <div class="small-12 medium-6 columns text-center">With <b><?php echo Html::a($w->localUrl("/task/tasklist"), $count_taskgroup_tasks . _n('task','tasks',$count_taskgroup_tasks) ?></b> <?php _e('overall'); ?></div>
+        <div class="small-12 medium-6 columns text-center"><?php _e('With'); ?> <b><?php echo Html::a($w->localUrl("/task/tasklist"), $count_taskgroup_tasks . _n('task','tasks',$count_taskgroup_tasks)); ?></b> <?php _e('overall'); ?></div>
     </div>
     <div class="row-fluid clearfix panel">
-        <div class="small-12 columns text-center"><?php echo Html::a($w->localUrl("/task/tasklist?assignee_id=" . $w->Auth->user()->id), (count($tasks) . _n("Task","Tasks",count($tasks))))); ?> <?php _e('assigned to you'); ?></div>
+        <div class="small-12 columns text-center"><?php echo Html::a($w->localUrl("/task/tasklist?assignee_id=" . $w->Auth->user()->id), (count($tasks) . _n("Task","Tasks",count($tasks)))); ?> <?php _e('assigned to you'); ?></div>
         <div class="small-12">
             <div class="row-fluid clearfix">
                 <?php if ($count_overdue > 0) : ?>
@@ -67,7 +67,7 @@
                 <?php if ($count_todo_urgent == 0) : ?>
                     <div class="small-12 medium-6 columns text-center"><?php echo $count_todo_urgent; ?> <?php echo _n('Task','Tasks',$count_todo_urgent); ?> <?php _e('marked'); ?> <strong><?php _e('urgent'); ?></strong></div>
                 <?php else : ?>
-                    <div class="small-12 medium-6 columns text-center"><?php echo Html::a($w->localUrl("/task/tasklist?assignee_id=" . $w->Auth->user()->id . "&task_priority=Urgent"), $count_todo_urgent . " task" . _n("task","tasks",$count_todo_urgent); ?> <?php _e('marked'); ?> <strong><?php _e('urgent'); ?></strong></div>
+                    <div class="small-12 medium-6 columns text-center"><?php echo Html::a($w->localUrl("/task/tasklist?assignee_id=" . $w->Auth->user()->id . "&task_priority=Urgent"), $count_todo_urgent . " task" . _n("task","tasks",$count_todo_urgent)); ?> <?php _e('marked'); ?> <strong><?php _e('urgent'); ?></strong></div>
                 <?php endif; ?>
             </div>
         </div>
