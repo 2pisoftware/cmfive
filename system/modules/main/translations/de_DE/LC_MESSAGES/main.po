@@ -1,15 +1,34 @@
 msgid ""
 msgstr ""
+"Project-Id-Version: cmfive\n"
+"POT-Creation-Date: 2016-03-14 01:34+1100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Steve Ryan <steve@2pisoftware.com>\n"
+"Language-Team: \n"
+"Language: de_AT\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.8.7\n"
-"Project-Id-Version: cmfive\n"
-"Language: de_AT\n"
-"POT-Creation-Date: \n"
-"PO-Revision-Date: \n"
-"Last-Translator: Steve Ryan <steve@2pisoftware.com>\n"
-"Language-Team: \n"
+"X-Poedit-KeywordsList: __:1;__:1,2c;_e:1;_e:1,2c;_n:1,2;_n:1,2,4c;_en:1,2;"
+"_en:1,2,4c\n"
+"X-Poedit-Basepath: ../../../../../..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-SearchPath-0: system/modules\n"
+"X-Poedit-SearchPath-1: modules\n"
+
+#: modules/frontend/assets/js/vendor/jquery.js:14
+msgid "<iframe frameborder='0' width='0' height='0'/>"
+msgstr "<Iframe frameborder = \"0\" width = \"0\" height = '0' />"
+
+#: modules/frontend/assets/js/vendor/jquery.js:26
+msgid "<script>"
+msgstr "<Script>"
+
+#: modules/frontend/assets/js/vendor/jquery.js:26
+msgid "<div>"
+msgstr "<Div>"
 
 #: modules/example/actions/delete.php:25
 msgid "Object Deleted"
@@ -101,10 +120,14 @@ msgid "datetime field"
 msgstr "Datetime-Feld"
 
 #: modules/example/actions/edit.php:41
+#, fuzzy
+msgctxt "time"
 msgid "time field"
 msgstr "Zeitfeld"
 
 #: modules/example/actions/edit.php:42
+#, fuzzy
+msgctxt "file"
 msgid "file field"
 msgstr "Dateifeld"
 
@@ -181,7 +204,8 @@ msgstr "ja"
 msgid "No"
 msgstr "Nein"
 
-#: modules/example/actions/index.php:22
+#: modules/example/actions/index.php:22 modules/wiki/templates/view.tpl.php:11
+#: modules/wiki/templates/view.tpl.php:333
 #: system/modules/admin/actions/groups/edit.php:9
 #: system/modules/admin/actions/groups/index.php:32
 #: system/modules/admin/actions/printers.php:11
@@ -209,6 +233,7 @@ msgid "Edit"
 msgstr "Bearbeiten"
 
 #: modules/example/actions/index.php:25 modules/wiki/templates/index.tpl.php:29
+#: modules/wiki/templates/view.tpl.php:334
 #: system/modules/admin/actions/groups.php:39
 #: system/modules/admin/actions/groups/index.php:35
 #: system/modules/admin/actions/moreInfo.php:39
@@ -251,87 +276,6 @@ msgstr "Zuhause"
 #: modules/example/templates/index.tpl.php:2
 msgid "New Data"
 msgstr "Neue Daten"
-
-#: system/modules/file/partials/templates/listattachments.tpl.php:51
-msgid "Attach a File"
-msgstr "Eine Datei anhängen"
-
-#: modules/wiki/templates/pagehistory.tpl.php:11
-#: system/modules/admin/templates/file/index.tpl.php:18
-#: system/modules/file/partials/templates/listattachments.tpl.php:64
-msgid "View"
-msgstr "Aussicht"
-
-#: system/modules/file/partials/templates/listattachments.tpl.php:70
-msgid "Are you sure you want to delete this attachment?"
-msgstr "Sind Sie sicher, dass Sie diesen Anhang löschen?"
-
-#: system/modules/file/partials/templates/listattachments.tpl.php:92
-msgid "Open in new tab/window"
-msgstr "In neuer Registerkarte öffnen / Fenster"
-
-#: system/modules/admin/actions/printfile.php:10
-#: system/modules/file/partials/templates/listattachments.tpl.php:108
-#: system/modules/file/partials/templates/listattachmentsplain.tpl.php:72
-msgid "Filename"
-msgstr "Dateiname"
-
-#: system/modules/admin/actions/templates/edit.php:21
-#: system/modules/file/actions/edit.php:21
-#: system/modules/file/actions/new.php:17
-#: system/modules/file/partials/templates/listattachments.tpl.php:110
-#: system/modules/file/partials/templates/listattachmentsplain.tpl.php:74
-#: system/modules/file/templates/attach.tpl.php:10
-#: system/modules/form/actions/edit.php:11
-#: system/modules/form/templates/index.tpl.php:10
-#: system/modules/report/actions/createfeed.php:21
-#: system/modules/report/actions/createreport.php:16
-#: system/modules/report/actions/edit.php:25
-#: system/modules/report/actions/editfeed.php:28
-#: system/modules/report/actions/feedAjaxGetReportText.php:11
-#: system/modules/report/actions/index.php:33
-#: system/modules/report/actions/index.php:34
-#: system/modules/report/actions/listfeed.php:11
-#: system/modules/task/actions/createtask.php:35
-#: system/modules/task/actions/createtask.php:49
-#: system/modules/task/actions/edit.php:67
-#: system/modules/task/actions/group/viewtaskgrouptypes.php:11
-#: system/modules/task/actions/group/viewtaskgrouptypes.php:55
-#: system/modules/task/actions/taskAjaxSelectbyTaskGroup.php:36
-#: system/modules/task/actions/viewtask.php:64
-#: system/modules/task/actions/viewtask.php:68
-#: system/modules/task/actions/viewtask.php:79
-#: system/modules/task/actions/viewtask.php:83
-#: system/modules/task/task.actions.php:80
-#: system/modules/task/task.group.actions.php:46
-#: system/modules/task/task.group.actions.php:144
-#: system/modules/timelog/actions/edit.php:44
-#: system/modules/timelog/actions/start.php:17
-#: system/modules/timelog/partials/templates/listtimelog.tpl.php:8
-#: system/modules/timelog/templates/index.tpl.php:6
-msgid "Description"
-msgstr "Beschreibung"
-
-#: modules/wiki/templates/pagehistory.tpl.php:5
-#: system/modules/file/partials/templates/listattachments.tpl.php:111
-msgid "Action"
-msgstr "Aktion"
-
-#: system/modules/file/partials/templates/listattachments.tpl.php:124
-msgid "Do you want to delete this attachment?"
-msgstr "Wollen Sie diesen Anhang löschen?"
-
-#: modules/frontend/assets/js/vendor/jquery.js:14
-msgid "<iframe frameborder='0' width='0' height='0'/>"
-msgstr "<Iframe frameborder = \"0\" width = \"0\" height = '0' />"
-
-#: modules/frontend/assets/js/vendor/jquery.js:26
-msgid "<script>"
-msgstr "<Script>"
-
-#: modules/frontend/assets/js/vendor/jquery.js:26
-msgid "<div>"
-msgstr "<Div>"
 
 #: modules/wiki/actions/createwiki.php:17
 msgid "Wiki "
@@ -391,6 +335,7 @@ msgid "New Page."
 msgstr "Neue Seite."
 
 #: modules/wiki/actions/view.php:65 modules/wiki/templates/editmember.tpl.php:6
+#: modules/wiki/templates/view.tpl.php:29
 #: system/modules/admin/actions/comment.php:44
 #: system/modules/admin/actions/groupadd.php:11
 #: system/modules/admin/actions/groupedit.php:15
@@ -492,8 +437,9 @@ msgstr "Wiki-Mitglied"
 #: modules/wiki/templates/editmember.tpl.php:3
 #: modules/wiki/templates/history.tpl.php:4
 #: modules/wiki/templates/pagehistory.tpl.php:5
-#: system/modules/admin/actions/useradd.php:66
-#: system/modules/admin/actions/users.php:7
+#: modules/wiki/templates/view.tpl.php:79
+#: modules/wiki/templates/view.tpl.php:99
+#: system/modules/admin/actions/useradd.php:67
 #: system/modules/report/actions/createreport.php:23
 #: system/modules/report/actions/edit.php:43
 #: system/modules/task/templates/taskweek.tpl.php:11
@@ -501,6 +447,7 @@ msgid "User"
 msgstr "Benutzer"
 
 #: modules/wiki/templates/editmember.tpl.php:4
+#: modules/wiki/templates/view.tpl.php:322
 #: system/modules/admin/actions/moreInfo.php:20
 #: system/modules/report/actions/edit.php:92
 #: system/modules/report/actions/editmember.php:13
@@ -513,7 +460,8 @@ msgstr "Rolle"
 
 #: modules/wiki/templates/history.tpl.php:4
 #: modules/wiki/templates/pagehistory.tpl.php:5
-#: system/modules/form/models/FormStandardInterface.php:12
+#: modules/wiki/templates/view.tpl.php:79
+#: modules/wiki/templates/view.tpl.php:99
 #: system/modules/inbox/actions/index.php:14
 #: system/modules/inbox/actions/read.php:10
 #: system/modules/inbox/actions/showarchive.php:13
@@ -523,12 +471,15 @@ msgid "Date"
 msgstr "Datum"
 
 #: modules/wiki/templates/history.tpl.php:4
+#: modules/wiki/templates/view.tpl.php:79
 #: system/modules/task/task.actions.php:139
 msgid "Page"
 msgstr "Seite"
 
 #: modules/wiki/templates/history.tpl.php:14
 #: modules/wiki/templates/pagehistory.tpl.php:16
+#: modules/wiki/templates/view.tpl.php:89
+#: modules/wiki/templates/view.tpl.php:109
 msgid "No changes yet."
 msgstr "Keine Änderungen vor."
 
@@ -564,6 +515,90 @@ msgstr "Es sind keine Wikis noch."
 #: modules/wiki/templates/index.tpl.php:45
 msgid "Create a wiki"
 msgstr "Erstelle ein Wiki"
+
+#: modules/wiki/templates/pagehistory.tpl.php:5
+#: modules/wiki/templates/view.tpl.php:99
+#: modules/wiki/templates/view.tpl.php:323
+#: system/modules/file/partials/templates/listattachments.tpl.php:111
+msgid "Action"
+msgstr "Aktion"
+
+#: modules/wiki/templates/pagehistory.tpl.php:11
+#: modules/wiki/templates/view.tpl.php:104
+#: system/modules/admin/templates/file/index.tpl.php:18
+#: system/modules/file/partials/templates/listattachments.tpl.php:64
+msgid "View"
+msgstr "Aussicht"
+
+#: modules/wiki/templates/view.tpl.php:8
+#, fuzzy
+msgid "Wiki History"
+msgstr "Wiki-Liste"
+
+#: modules/wiki/templates/view.tpl.php:9
+msgid "Page History"
+msgstr "Seite aktualisiert."
+
+#: modules/wiki/templates/view.tpl.php:14
+#: system/modules/report/templates/approvereport.tpl.php:19
+#: system/modules/report/templates/edit.tpl.php:7
+msgid "Members"
+msgstr "Mitglieder"
+
+#: modules/wiki/templates/view.tpl.php:17
+#: system/modules/task/task.actions.php:234
+#: system/modules/task/task.actions.php:235
+#: system/modules/task/task.actions.php:451
+#: system/modules/task/task.actions.php:533
+#: system/modules/task/templates/edit.tpl.php:12
+#: system/modules/task/templates/viewtask.tpl.php:12
+msgid "Comments"
+msgstr "Bemerkungen"
+
+#: modules/wiki/templates/view.tpl.php:20
+#: system/modules/task/templates/edit.tpl.php:13
+msgid "Attachments"
+msgstr "Zubehör"
+
+#: modules/wiki/templates/view.tpl.php:29
+#: modules/wiki/templates/viewhistoryversion.tpl.php:5
+#: system/modules/form/templates/field/edit.tpl.php:34
+msgid "Cancel"
+msgstr "Stornieren"
+
+#: modules/wiki/templates/view.tpl.php:31
+msgid "Saving"
+msgstr ""
+
+#: modules/wiki/templates/view.tpl.php:321
+#: system/modules/admin/actions/migration/create.php:13
+#: system/modules/admin/actions/moreInfo.php:20
+#: system/modules/admin/actions/printers.php:6
+#: system/modules/admin/actions/printqueue.php:18
+#: system/modules/admin/templates/migration/index.tpl.php:76
+#: system/modules/channels/actions/processor/edit.php:16
+#: system/modules/channels/models/Channel.php:15
+#: system/modules/channels/templates/listchannels.tpl.php:8
+#: system/modules/channels/templates/listprocessors.tpl.php:7
+#: system/modules/form/templates/field/edit.tpl.php:4
+#: system/modules/form/templates/field/edit.tpl.php:5
+#: system/modules/form/templates/show.tpl.php:21
+#: system/modules/report/actions/deletemember.php:13
+#: system/modules/report/actions/editmember.php:12
+#: system/modules/task/task.group.actions.php:221
+#: system/modules/task/task.group.actions.php:300
+#: system/modules/timelog/partials/templates/listtimelog.tpl.php:8
+msgid "Name"
+msgstr "Name"
+
+#: modules/wiki/templates/viewhistoryversion.tpl.php:5
+msgid "Load this version"
+msgstr ""
+
+#: modules/wiki/templates/viewhistoryversion.tpl.php:6
+#, fuzzy
+msgid "Preview as at"
+msgstr "Vorschau"
 
 #: system/modules/admin/actions/comment.php:35
 #: system/modules/task/actions/edit.php:91
@@ -858,7 +893,51 @@ msgstr "erstellt"
 msgid "Groups"
 msgstr "Gruppen"
 
-#: system/modules/admin/actions/index.php:3
+#: system/modules/admin/actions/index.php:4
+msgid "chair"
+msgstr "der Stuhlhlhlhlhlhlhl"
+
+#. TRANSLATORS: THIS IS A KITCHEN CHAIR
+#: system/modules/admin/actions/index.php:6
+#: system/modules/admin/actions/index.php:7
+msgctxt "kitchen"
+msgid "chair"
+msgstr "Vororororororsitz:"
+
+#: system/modules/admin/actions/index.php:8
+msgid "freezer"
+msgstr "Gefrierschrank"
+
+#: system/modules/admin/actions/index.php:12
+#, php-format
+msgid "%d cat "
+msgid_plural "%d cats"
+msgstr[0] "%d Kat"
+msgstr[1] "%d Katten"
+
+#: system/modules/admin/actions/index.php:13
+#, php-format
+msgid "%d frog "
+msgid_plural "%d frogs"
+msgstr[0] "%d Frosch"
+msgstr[1] "%d Froschen"
+
+#: system/modules/admin/actions/index.php:14
+#, php-format
+msgid "%d dog"
+msgid_plural "%d dogs"
+msgstr[0] "%d Hund"
+msgstr[1] "%d Hunden"
+
+#: system/modules/admin/actions/index.php:16
+#, php-format
+msgctxt "french people"
+msgid "%d frog "
+msgid_plural "%d smelly froggies"
+msgstr[0] "%d französisch "
+msgstr[1] "%d französischen"
+
+#: system/modules/admin/actions/index.php:24
 msgid "Dashboard"
 msgstr "Instrumententafel"
 
@@ -925,26 +1004,6 @@ msgstr "Fehlende angegebene Modul oder es existiert nicht"
 msgid "Enter the migration name (camel case)"
 msgstr "Geben Sie den Migrationsnamen (Kamel Fall)"
 
-#: system/modules/admin/actions/migration/create.php:13
-#: system/modules/admin/actions/moreInfo.php:20
-#: system/modules/admin/actions/printers.php:6
-#: system/modules/admin/actions/printqueue.php:18
-#: system/modules/admin/templates/migration/index.tpl.php:76
-#: system/modules/channels/actions/processor/edit.php:16
-#: system/modules/channels/models/Channel.php:15
-#: system/modules/channels/templates/listchannels.tpl.php:8
-#: system/modules/channels/templates/listprocessors.tpl.php:7
-#: system/modules/form/templates/field/edit.tpl.php:4
-#: system/modules/form/templates/field/edit.tpl.php:5
-#: system/modules/form/templates/show.tpl.php:21
-#: system/modules/report/actions/deletemember.php:13
-#: system/modules/report/actions/editmember.php:12
-#: system/modules/task/task.group.actions.php:221
-#: system/modules/task/task.group.actions.php:300
-#: system/modules/timelog/partials/templates/listtimelog.tpl.php:8
-msgid "Name"
-msgstr "Name"
-
 #: system/modules/admin/actions/migration/rollback.php:8
 msgid "Missing parameters required for rollback"
 msgstr "Fehlende Parameter, die für Rollback"
@@ -998,6 +1057,12 @@ msgstr "Kein Dateiname angegeben"
 msgid "Printer"
 msgstr "Drucker"
 
+#: system/modules/admin/actions/printfile.php:10
+#: system/modules/file/partials/templates/listattachments.tpl.php:108
+#: system/modules/file/partials/templates/listattachmentsplain.tpl.php:72
+msgid "Filename"
+msgstr "Dateiname"
+
 #: system/modules/admin/actions/printfile.php:13
 #: system/modules/admin/actions/printqueue.php:32
 msgid "Print"
@@ -1017,7 +1082,8 @@ msgstr "Größe"
 
 #: system/modules/admin/actions/printqueue.php:33
 msgid "Are you sure you want to remove this file? (This is irreversible)"
-msgstr "Sind Sie sicher, dass Sie diese Datei zu entfernen? (Dies ist irreversibel)"
+msgstr ""
+"Sind Sie sicher, dass Sie diese Datei zu entfernen? (Dies ist irreversibel)"
 
 #: system/modules/admin/actions/templates/edit.php:7
 #: system/modules/admin/actions/templates/index.php:3
@@ -1055,6 +1121,42 @@ msgstr "Modul"
 #: system/modules/report/actions/edit.php:118
 msgid "Category"
 msgstr "Kategorie"
+
+#: system/modules/admin/actions/templates/edit.php:21
+#: system/modules/file/actions/edit.php:21
+#: system/modules/file/actions/new.php:17
+#: system/modules/file/partials/templates/listattachments.tpl.php:110
+#: system/modules/file/partials/templates/listattachmentsplain.tpl.php:74
+#: system/modules/file/templates/attach.tpl.php:10
+#: system/modules/form/actions/edit.php:11
+#: system/modules/form/templates/index.tpl.php:10
+#: system/modules/report/actions/createfeed.php:21
+#: system/modules/report/actions/createreport.php:16
+#: system/modules/report/actions/edit.php:25
+#: system/modules/report/actions/editfeed.php:28
+#: system/modules/report/actions/feedAjaxGetReportText.php:11
+#: system/modules/report/actions/index.php:33
+#: system/modules/report/actions/index.php:34
+#: system/modules/report/actions/listfeed.php:11
+#: system/modules/task/actions/createtask.php:35
+#: system/modules/task/actions/createtask.php:49
+#: system/modules/task/actions/edit.php:67
+#: system/modules/task/actions/group/viewtaskgrouptypes.php:11
+#: system/modules/task/actions/group/viewtaskgrouptypes.php:55
+#: system/modules/task/actions/taskAjaxSelectbyTaskGroup.php:36
+#: system/modules/task/actions/viewtask.php:64
+#: system/modules/task/actions/viewtask.php:68
+#: system/modules/task/actions/viewtask.php:79
+#: system/modules/task/actions/viewtask.php:83
+#: system/modules/task/task.actions.php:80
+#: system/modules/task/task.group.actions.php:46
+#: system/modules/task/task.group.actions.php:144
+#: system/modules/timelog/actions/edit.php:44
+#: system/modules/timelog/actions/start.php:17
+#: system/modules/timelog/partials/templates/listtimelog.tpl.php:8
+#: system/modules/timelog/templates/index.tpl.php:6
+msgid "Description"
+msgstr "Beschreibung"
 
 #: system/modules/admin/actions/templates/edit.php:29
 msgid "Template Title"
@@ -1133,30 +1235,30 @@ msgstr "suspendiert"
 msgid " does not exist."
 msgstr " ist nicht vorhanden."
 
-#: system/modules/admin/actions/useradd.php:11
+#: system/modules/admin/actions/useradd.php:12
 msgid "Add User"
 msgstr "Benutzer hinzufügen"
 
-#: system/modules/admin/actions/useradd.php:24
+#: system/modules/admin/actions/useradd.php:25
 #: system/modules/admin/actions/useredit.php:35
 msgid "Login is mandatory"
 msgstr "Eine Anmeldung ist obligatorisch"
 
-#: system/modules/admin/actions/useradd.php:25
+#: system/modules/admin/actions/useradd.php:26
 msgid "Password is mandatory"
 msgstr "Das Passwort ist obligatorisch"
 
-#: system/modules/admin/actions/useradd.php:26
+#: system/modules/admin/actions/useradd.php:27
 msgid "Password2 is mandatory"
 msgstr "Password2 ist obligatorisch"
 
-#: system/modules/admin/actions/useradd.php:29
+#: system/modules/admin/actions/useradd.php:30
 #: system/modules/admin/actions/useredit.php:38
 #: system/modules/auth/actions/profile.php:50
 msgid "Passwords don't match"
 msgstr "Passwörter stimmen nicht überein"
 
-#: system/modules/admin/actions/useradd.php:66
+#: system/modules/admin/actions/useradd.php:67
 #: system/modules/task/actions/createtask.php:86
 #: system/modules/task/task.group.actions.php:73
 msgid " added"
@@ -1365,8 +1467,8 @@ msgid "Add Comment"
 msgstr "Einen Kommentar hinzufügen"
 
 #: system/modules/admin/templates/file/index.tpl.php:7
-#: system/modules/form/models/FormStandardInterface.php:103
-#: system/modules/form/models/FormStandardInterface.php:105
+#: system/modules/form/models/FormStandardInterface.php:104
+#: system/modules/form/models/FormStandardInterface.php:106
 #: system/modules/timelog/templates/index.tpl.php:6
 msgid "Object"
 msgstr "Objekt"
@@ -1437,8 +1539,11 @@ msgid " migrations"
 msgstr " Migrationen"
 
 #: system/modules/admin/templates/migration/index.tpl.php:73
-msgid "Are you sure you want to run all outstanding migrations for this module?"
-msgstr "Sind Sie sicher, dass Sie alle ausstehenden Migrationen für dieses Modul zu laufen?"
+msgid ""
+"Are you sure you want to run all outstanding migrations for this module?"
+msgstr ""
+"Sind Sie sicher, dass Sie alle ausstehenden Migrationen für dieses Modul zu "
+"laufen?"
 
 #: system/modules/admin/templates/migration/index.tpl.php:76
 msgid "Path"
@@ -1449,6 +1554,10 @@ msgid "Date run"
 msgstr "Datum Lauf"
 
 #: system/modules/admin/templates/migration/index.tpl.php:87
+msgid "by"
+msgstr ""
+
+#: system/modules/admin/templates/migration/index.tpl.php:87
 msgid "System"
 msgstr "System"
 
@@ -1457,8 +1566,13 @@ msgid "Rollback to here"
 msgstr "Rollback hier"
 
 #: system/modules/admin/templates/migration/index.tpl.php:95
-msgid "Are you 110% sure you want to rollback a migration? DATA COULD BE LOST PERMANENTLY!"
-msgstr "Sind Sie 110% sicher, dass Sie eine Migration rückgängig zu machen möchten? Daten könnten unwiederbringlich verloren!"
+#, php-format
+msgid ""
+"Are you 110% sure you want to rollback a migration? DATA COULD BE LOST "
+"PERMANENTLY!"
+msgstr ""
+"Sind Sie 110% sicher, dass Sie eine Migration rückgängig zu machen möchten? "
+"Daten könnten unwiederbringlich verloren!"
 
 #: system/modules/admin/templates/migration/index.tpl.php:97
 msgid "Migrate to here"
@@ -1580,12 +1694,20 @@ msgid "Forgot Password"
 msgstr "Passwort vergessen"
 
 #: system/modules/auth/actions/forgotpassword.php:21
-msgid "Cannot send recovery email. This site has not been configured with a default email address"
-msgstr "Kann nicht alternative E-Mail senden. Diese Seite wurde nicht mit einer Standard-E-Mail-Adresse konfiguriert"
+msgid ""
+"Cannot send recovery email. This site has not been configured with a default "
+"email address"
+msgstr ""
+"Kann nicht alternative E-Mail senden. Diese Seite wurde nicht mit einer "
+"Standard-E-Mail-Adresse konfiguriert"
 
 #: system/modules/auth/actions/forgotpassword.php:26
-msgid "If this account exists then a password reset email has been just sent to the associated email address."
-msgstr "Wenn dieses Konto ein Passwort-Reset-E-Mail gesendet einfach an die zugehörige E-Mail-Adresse wurde existiert dann."
+msgid ""
+"If this account exists then a password reset email has been just sent to the "
+"associated email address."
+msgstr ""
+"Wenn dieses Konto ein Passwort-Reset-E-Mail gesendet einfach an die "
+"zugehörige E-Mail-Adresse wurde existiert dann."
 
 #: system/modules/auth/actions/forgotpassword.php:45
 msgid "Hello"
@@ -1613,7 +1735,8 @@ msgstr " Passwort zurücksetzen"
 
 #: system/modules/auth/actions/forgotpassword.php:55
 msgid "There was a problem sending an email, check your settings."
-msgstr "Es gab ein Problem eine E-Mail senden, Ihre Einstellungen zu überprüfen."
+msgstr ""
+"Es gab ein Problem eine E-Mail senden, Ihre Einstellungen zu überprüfen."
 
 #: system/modules/auth/actions/login.php:10
 msgid "Application Login"
@@ -1709,7 +1832,9 @@ msgstr "Profil aktualisiert."
 #: system/modules/auth/actions/resetpassword.php:13
 #: system/modules/auth/actions/resetpassword.php:53
 msgid "Your token has expired (max 24 hours), please submit for a new one"
-msgstr "Ihr Token abgelaufen ist (maximal 24 Stunden), geben Sie bitte für einen neuen"
+msgstr ""
+"Ihr Token abgelaufen ist (maximal 24 Stunden), geben Sie bitte für einen "
+"neuen"
 
 #: system/modules/auth/actions/resetpassword.php:22
 msgid "Enter new password"
@@ -2152,6 +2277,22 @@ msgstr "Objekt nicht gefunden"
 msgid "File attached"
 msgstr "Datei angehängt"
 
+#: system/modules/file/partials/templates/listattachments.tpl.php:51
+msgid "Attach a File"
+msgstr "Eine Datei anhängen"
+
+#: system/modules/file/partials/templates/listattachments.tpl.php:70
+msgid "Are you sure you want to delete this attachment?"
+msgstr "Sind Sie sicher, dass Sie diesen Anhang löschen?"
+
+#: system/modules/file/partials/templates/listattachments.tpl.php:92
+msgid "Open in new tab/window"
+msgstr "In neuer Registerkarte öffnen / Fenster"
+
+#: system/modules/file/partials/templates/listattachments.tpl.php:124
+msgid "Do you want to delete this attachment?"
+msgstr "Wollen Sie diesen Anhang löschen?"
+
 #: system/modules/file/templates/attach.tpl.php:4
 msgid "Attache a File"
 msgstr "Attache einer Datei"
@@ -2224,37 +2365,17 @@ msgstr "Formularzuordnungen aktualisiert"
 msgid "Form: "
 msgstr "Bilden:"
 
-#: system/modules/form/models/FormStandardInterface.php:10
-msgid "Text"
-msgstr "Text"
-
-#: system/modules/form/models/FormStandardInterface.php:11
-msgid "Decimal"
-msgstr "Dezimal"
-
-#: system/modules/form/models/FormStandardInterface.php:13
-msgid "Date & Time"
-msgstr "Terminzeit"
-
-#: system/modules/form/models/FormStandardInterface.php:14
-msgid "Select"
-msgstr "Wählen"
-
-#: system/modules/form/models/FormStandardInterface.php:15
-msgid "Autocomplete"
-msgstr "Automatische Vervollständigung"
-
-#: system/modules/form/models/FormStandardInterface.php:101
+#: system/modules/form/models/FormStandardInterface.php:102
 msgid "Decimal Places"
 msgstr "Nachkommastellen"
 
-#: system/modules/form/models/FormStandardInterface.php:103
-#: system/modules/form/models/FormStandardInterface.php:105
+#: system/modules/form/models/FormStandardInterface.php:104
+#: system/modules/form/models/FormStandardInterface.php:106
 msgid "Filter"
 msgstr "Filter"
 
-#: system/modules/form/models/FormStandardInterface.php:103
-#: system/modules/form/models/FormStandardInterface.php:105
+#: system/modules/form/models/FormStandardInterface.php:104
+#: system/modules/form/models/FormStandardInterface.php:106
 msgid "Options"
 msgstr "Optionen"
 
@@ -2270,17 +2391,17 @@ msgstr "Sind Sie sicher, dass Sie diesen Inhalt löschen?"
 msgid "form data found"
 msgstr "Formulardaten gefunden"
 
-#: system/modules/form/templates/field/edit.tpl.php:34
-msgid "Cancel"
-msgstr "Stornieren"
-
 #: system/modules/form/templates/index.tpl.php:3
 msgid "Add a form"
 msgstr "Fügen Sie ein Formular"
 
 #: system/modules/form/templates/index.tpl.php:19
-msgid "Are you sure you want to delete this form? (WARNING: there may be existing data saved to this form!)"
-msgstr "Sind Sie sicher, dass Sie dieses Formular zu löschen? (ACHTUNG: Es können bestehende Daten zu dieser Form gespeichert sein!)"
+msgid ""
+"Are you sure you want to delete this form? (WARNING: there may be existing "
+"data saved to this form!)"
+msgstr ""
+"Sind Sie sicher, dass Sie dieses Formular zu löschen? (ACHTUNG: Es können "
+"bestehende Daten zu dieser Form gespeichert sein!)"
 
 #: system/modules/form/templates/show.tpl.php:7
 #: system/modules/report/actions/edit.php:48
@@ -2320,8 +2441,12 @@ msgid "Additional Details"
 msgstr "Weitere Details"
 
 #: system/modules/form/templates/show.tpl.php:35
-msgid "Are you sure you want to delete this form field? (WARNING: there may be existing data saved to this form field!)"
-msgstr "Sind Sie sicher, dass Sie dieses Formular Feld zu löschen? (ACHTUNG: Es können bestehende Daten zu dieser Formularfeld gespeichert sein!)"
+msgid ""
+"Are you sure you want to delete this form field? (WARNING: there may be "
+"existing data saved to this form field!)"
+msgstr ""
+"Sind Sie sicher, dass Sie dieses Formular Feld zu löschen? (ACHTUNG: Es "
+"können bestehende Daten zu dieser Formularfeld gespeichert sein!)"
 
 #: system/modules/form/templates/show.tpl.php:101
 msgid "Row templates"
@@ -2698,8 +2823,12 @@ msgid "Your Feed has been created"
 msgstr "Ihr Feed wurde erstellt"
 
 #: system/modules/report/actions/createfeed.php:64
-msgid "Use the URL below, with actual query parameter values, to access this report feed."
-msgstr "Verwenden Sie die URL unten, mit aktuellen Abfrage-Parameterwerte, diesen Bericht Feed zuzugreifen."
+msgid ""
+"Use the URL below, with actual query parameter values, to access this report "
+"feed."
+msgstr ""
+"Verwenden Sie die URL unten, mit aktuellen Abfrage-Parameterwerte, diesen "
+"Bericht Feed zuzugreifen."
 
 #: system/modules/report/actions/createreport.php:7
 #: system/modules/report/models/ReportService.php:617
@@ -3172,18 +3301,17 @@ msgstr "genehmigen Berichte"
 msgid "View Report"
 msgstr "Zeige Bericht"
 
-#: system/modules/report/templates/approvereport.tpl.php:19
-#: system/modules/report/templates/edit.tpl.php:7
-msgid "Members"
-msgstr "Mitglieder"
-
 #: system/modules/report/templates/connections/index.tpl.php:1
 msgid "Add a Connection"
 msgstr "Fügen Sie eine Verbindung"
 
 #: system/modules/report/templates/createreport.tpl.php:8
-msgid "Please review the <b>Help</b> file for full instructions on the special syntax used to create reports."
-msgstr "Bitte überprüfen Sie die <b> Hilfe </ b> Datei für eine vollständige Anleitung zur spezielle Syntax verwendet, um Berichte zu erstellen."
+msgid ""
+"Please review the <b>Help</b> file for full instructions on the special "
+"syntax used to create reports."
+msgstr ""
+"Bitte überprüfen Sie die <b> Hilfe </ b> Datei für eine vollständige "
+"Anleitung zur spezielle Syntax verwendet, um Berichte zu erstellen."
 
 #: system/modules/report/templates/deletereport.tpl.php:4
 msgid "Delete Report"
@@ -3195,19 +3323,26 @@ msgstr "SQL"
 
 #: system/modules/report/templates/edit.tpl.php:20
 msgid ""
-"You can add special templates to render the data. Create a <a href=\"/admin-templates\">System Template in Admin</a> and set the \n"
+"You can add special templates to render the data. Create a <a href=\"/admin-"
+"templates\">System Template in Admin</a> and set the \n"
 "\t        \tmodule to <b>report</b>, it can then be selected here.</p>\n"
-"\t        \t<p>The template processer uses the Twig language, you can find more information about this on\n"
+"\t        \t<p>The template processer uses the Twig language, you can find "
+"more information about this on\n"
 "\t        \tthe <a href=\"\">Twig Website</a>.</p>\n"
-"\t        \t<p>A good first step when creating a new template, is to look at the data. You can use the following\n"
+"\t        \t<p>A good first step when creating a new template, is to look at "
+"the data. You can use the following\n"
 "\t        \ttwig statement in your template to do this:</p>\n"
 "\t        \t<pre>{{dump(data)}}</pre>"
 msgstr ""
-"Sie können spezielle Vorlagen hinzufügen, um die Daten zu machen. Erstellen Sie ein <a href=\"/admin-templates\"> Systemvorlage in Admin </a> und stellen Sie die\n"
+"Sie können spezielle Vorlagen hinzufügen, um die Daten zu machen. Erstellen "
+"Sie ein <a href=\"/admin-templates\"> Systemvorlage in Admin </a> und "
+"stellen Sie die\n"
 "Modul <b> Bericht </ b>, kann sie dann hier ausgewählt werden. </ p>\n"
-"<P> Die Vorlage processer der Zweig Sprache verwendet, können Sie mehr Informationen zu diesem auf finden\n"
+"<P> Die Vorlage processer der Zweig Sprache verwendet, können Sie mehr "
+"Informationen zu diesem auf finden\n"
 "die <a href=\"\"> Zweig Webseite </a>. </ p>\n"
-"<P> Ein guter erster Schritt, wenn eine neue Vorlage erstellen, ist in den Daten zu suchen. Sie können die folgenden Befehle verwenden\n"
+"<P> Ein guter erster Schritt, wenn eine neue Vorlage erstellen, ist in den "
+"Daten zu suchen. Sie können die folgenden Befehle verwenden\n"
 "Zweig-Anweisung in der Vorlage, dies zu tun: </ p>\n"
 "<Pre> {{Dump (data)}} </ pre>"
 
@@ -3421,7 +3556,8 @@ msgstr "Aufgabe"
 
 #: system/modules/task/actions/createtask.php:90
 msgid "The Task could not be created. Please inform the IT Group"
-msgstr "Die Aufgabe konnte nicht erstellt werden. Bitte informieren Sie die IT Group"
+msgstr ""
+"Die Aufgabe konnte nicht erstellt werden. Bitte informieren Sie die IT Group"
 
 #: system/modules/task/actions/delete.php:14
 #: system/modules/task/actions/updatestatus.php:40
@@ -3477,6 +3613,7 @@ msgid "Task Group ID"
 msgstr "Task Group ID"
 
 #: system/modules/task/actions/edit.php:77
+#: system/modules/task/models/TaskService.php:851
 #: system/modules/task/partials/templates/listtaskgroups.tpl.php:8
 msgid "New Task"
 msgstr "Neue Aufgabe"
@@ -3601,7 +3738,9 @@ msgstr "Standard Zessionar"
 
 #: system/modules/task/actions/group/viewtaskgrouptypes.php:26
 msgid "There are no Task Groups Configured. Please create a New Task Group."
-msgstr "Es gibt keine Aufgabengruppen konfiguriert. Erstellen Sie eine neue Task Group."
+msgstr ""
+"Es gibt keine Aufgabengruppen konfiguriert. Erstellen Sie eine neue Task "
+"Group."
 
 #: system/modules/task/actions/group/viewtaskgrouptypes.php:47
 msgid "Task Group Attributes"
@@ -3632,7 +3771,6 @@ msgid "Who Can Create"
 msgstr "Wer kann erstellen"
 
 #: system/modules/task/actions/group/viewtaskgrouptypes.php:56
-#: system/modules/task/task.group.actions.php:47
 msgid "Default Task Type"
 msgstr "Standardaufgabentyp"
 
@@ -3675,7 +3813,9 @@ msgstr "Deine Rolle"
 
 #: system/modules/task/actions/tasktypeform.php:24
 msgid "No further information required.<p>Please save your task."
-msgstr "Keine weiteren Informationen erforderlich. <P> Bitte speichern Sie Ihre Aufgabe."
+msgstr ""
+"Keine weiteren Informationen erforderlich. <P> Bitte speichern Sie Ihre "
+"Aufgabe."
 
 #: system/modules/task/actions/taskweek.php:22
 #: system/modules/task/templates/portal.tpl.php:13
@@ -3935,6 +4075,32 @@ msgstr "Die Aktualisierung der Aufgabe"
 msgid "Deleting Task"
 msgstr "Löschen von Aufgaben"
 
+#: system/modules/task/models/TaskService.php:840
+#, fuzzy
+msgid "Additional details:"
+msgstr "Weitere Details"
+
+#: system/modules/task/models/TaskService.php:853
+#: system/modules/task/templates/tasktypeform.tpl.php:16
+msgid "Task List"
+msgstr "Aufgabenliste"
+
+#: system/modules/task/models/TaskService.php:854
+#: system/modules/task/templates/edit.tpl.php:15
+#: system/modules/task/templates/viewtask.tpl.php:14
+msgid "Notifications"
+msgstr "Benachrichtigungen"
+
+#: system/modules/task/models/TaskService.php:855
+#, fuzzy
+msgid "Activity"
+msgstr "Keine Aufgabe Aktivität für bestimmte Auswahlen gefunden."
+
+#: system/modules/task/models/TaskService.php:856
+#, fuzzy
+msgid "Task Groups"
+msgstr "Verwalten Aufgabengruppen"
+
 #: system/modules/task/partials/templates/listtasks.tpl.php:2
 msgid "Filter Tasks"
 msgstr "filtern von Aufgaben"
@@ -3960,16 +4126,22 @@ msgstr "Dieser Benutzer hat"
 #: system/modules/task/templates/index.tpl.php:40
 #: system/modules/task/templates/index.tpl.php:50
 #: system/modules/task/templates/index.tpl.php:70
+#, fuzzy
 msgid "task"
-msgstr "Aufgabe"
+msgid_plural "tasks"
+msgstr[0] "Aufgabe"
+msgstr[1] "Aufgabe"
 
 #: system/modules/task/partials/templates/removeUser.tpl.php:6
 msgid "assigned to them"
 msgstr "die ihnen zugewiesen"
 
 #: system/modules/task/partials/templates/removeUser.tpl.php:9
+#, fuzzy
 msgid "task group"
-msgstr "Aufgabengruppe"
+msgid_plural "task groups"
+msgstr[0] "Aufgabengruppe"
+msgstr[1] "Aufgabengruppe"
 
 #: system/modules/task/partials/templates/removeUser.tpl.php:11
 msgid "and they are the default assignee for"
@@ -3981,13 +4153,18 @@ msgstr "von diesen"
 
 #: system/modules/task/partials/templates/removeUser.tpl.php:16
 msgid "WARNING: Revoking this users Taskgroup membership will leave"
-msgstr "WARNUNG: Entziehen Sie dieses Benutzer Taskgroup-Mitgliedschaft wird verlassen"
+msgstr ""
+"WARNUNG: Entziehen Sie dieses Benutzer Taskgroup-Mitgliedschaft wird "
+"verlassen"
 
 #: system/modules/task/partials/templates/removeUser.tpl.php:16
 #: system/modules/task/templates/index.tpl.php:6
 #: system/modules/task/templates/index.tpl.php:49
+#, fuzzy
 msgid "taskgroup"
-msgstr "Taskgroup"
+msgid_plural "taskgroups"
+msgstr[0] "Taskgroup"
+msgstr[1] "Taskgroup"
 
 #: system/modules/task/partials/templates/removeUser.tpl.php:17
 msgid "without any members!"
@@ -3995,7 +4172,8 @@ msgstr "ohne Mitglieder!"
 
 #: system/modules/task/partials/templates/removeUser.tpl.php:19
 msgid "Please add members to the following Taskgroups before proceeding:"
-msgstr "Bitte fügen Sie Mitglieder zu folgenden Taskgroups, bevor Sie fortfahren:"
+msgstr ""
+"Bitte fügen Sie Mitglieder zu folgenden Taskgroups, bevor Sie fortfahren:"
 
 #: system/modules/task/partials/templates/removeUser.tpl.php:28
 msgid "The following actions will be carried out:"
@@ -4006,12 +4184,22 @@ msgid "Remove user membership from any taskgroups"
 msgstr "Entfernen von Benutzer Mitgliedschaft von allen taskgroups"
 
 #: system/modules/task/partials/templates/removeUser.tpl.php:31
-msgid "Remove user from any taskgroup default assignee (WARNING: result will be that taskgroup has no default assignee)"
-msgstr "Entfernen Sie Benutzer von jedem Taskgroup Standard Zessionar (ACHTUNG: Ergebnis wird sein, dass Taskgroup hat keinen Standard Zessionar)"
+msgid ""
+"Remove user from any taskgroup default assignee (WARNING: result will be "
+"that taskgroup has no default assignee)"
+msgstr ""
+"Entfernen Sie Benutzer von jedem Taskgroup Standard Zessionar (ACHTUNG: "
+"Ergebnis wird sein, dass Taskgroup hat keinen Standard Zessionar)"
 
 #: system/modules/task/partials/templates/removeUser.tpl.php:32
-msgid "Reassign any tasks assigned to the user to the default user (As with above, if the user is assigned and also the default assignee, the result will be tasks become unassigned)"
-msgstr "Umhängen alle dem Benutzer den Standardbenutzer zugewiesenen Aufgaben (wie bei oben, wenn der Benutzer zugeordnet ist und auch die Standard-Anmelder, wird das Ergebnis sein, Aufgaben werden nicht zugeordnet)"
+msgid ""
+"Reassign any tasks assigned to the user to the default user (As with above, "
+"if the user is assigned and also the default assignee, the result will be "
+"tasks become unassigned)"
+msgstr ""
+"Umhängen alle dem Benutzer den Standardbenutzer zugewiesenen Aufgaben (wie "
+"bei oben, wenn der Benutzer zugeordnet ist und auch die Standard-Anmelder, "
+"wird das Ergebnis sein, Aufgaben werden nicht zugeordnet)"
 
 #: system/modules/task/partials/templates/removeUser.tpl.php:35
 msgid "Remove from Task"
@@ -4095,6 +4283,8 @@ msgid "Hours"
 msgstr "Stunden"
 
 #: system/modules/task/task.actions.php:232
+#, fuzzy
+msgctxt "time in minutes"
 msgid "Min"
 msgstr "Min"
 
@@ -4102,15 +4292,6 @@ msgstr "Min"
 #: system/modules/timelog/actions/ajaxGetExtraData.php:20
 msgid "Time Type"
 msgstr "Time Type"
-
-#: system/modules/task/task.actions.php:234
-#: system/modules/task/task.actions.php:235
-#: system/modules/task/task.actions.php:451
-#: system/modules/task/task.actions.php:533
-#: system/modules/task/templates/edit.tpl.php:12
-#: system/modules/task/templates/viewtask.tpl.php:12
-msgid "Comments"
-msgstr "Bemerkungen"
 
 #: system/modules/task/task.actions.php:278
 msgid "Start is greater than End. Please enter again."
@@ -4203,6 +4384,12 @@ msgstr "Taskgroup:"
 #: system/modules/task/task.group.actions.php:137
 msgid "Task Group Details"
 msgstr "Task-Gruppen-Details"
+
+#: system/modules/task/task.group.actions.php:47
+#, fuzzy
+msgctxt "select"
+msgid "Default Task Type"
+msgstr "Standardaufgabentyp"
 
 #: system/modules/task/task.group.actions.php:73
 #: system/modules/task/task.group.actions.php:119
@@ -4380,7 +4567,8 @@ msgstr "Bitte füllen Sie alle Schritte, um eine Aufgabe zu registrieren."
 
 #: system/modules/task/templates/createtask.tpl.php:7
 msgid "You need to set up a Task Group first, that can be done"
-msgstr "Sie müssen zuerst eine Arbeitsgruppe einzurichten, die getan werden kann"
+msgstr ""
+"Sie müssen zuerst eine Arbeitsgruppe einzurichten, die getan werden kann"
 
 #: system/modules/task/templates/createtask.tpl.php:7
 msgid "here"
@@ -4391,15 +4579,6 @@ msgstr "Hier"
 msgid "Time Log"
 msgstr "Protokoll"
 
-#: system/modules/task/templates/edit.tpl.php:13
-msgid "Attachments"
-msgstr "Zubehör"
-
-#: system/modules/task/templates/edit.tpl.php:15
-#: system/modules/task/templates/viewtask.tpl.php:14
-msgid "Notifications"
-msgstr "Benachrichtigungen"
-
 #: system/modules/task/templates/edit.tpl.php:34
 msgid "Are you sure you want to delete this task?"
 msgstr "Sind Sie sicher, dass Sie diese Aufgabe zu löschen?"
@@ -4409,8 +4588,12 @@ msgid "Duplicate Task"
 msgstr "Doppelte Aufgabe"
 
 #: system/modules/task/templates/edit.tpl.php:64
-msgid "If you do not set notifications for this Task then the default settings for the this Task group will be used."
-msgstr "Wenn Sie Benachrichtigungen für diese Aufgabe nicht setzen Sie dann die Standardeinstellungen für die dieser Aufgabengruppe verwendet."
+msgid ""
+"If you do not set notifications for this Task then the default settings for "
+"the this Task group will be used."
+msgstr ""
+"Wenn Sie Benachrichtigungen für diese Aufgabe nicht setzen Sie dann die "
+"Standardeinstellungen für die dieser Aufgabengruppe verwendet."
 
 #: system/modules/task/templates/group/createtaskgroup.tpl.php:3
 msgid "Task Group successfully created"
@@ -4485,10 +4668,6 @@ msgstr "mit 7 Tagen"
 msgid "No Task Activity found for given date span"
 msgstr "Keine Aufgabe Aktivität für bestimmte Zeitraum gefunden"
 
-#: system/modules/task/templates/tasktypeform.tpl.php:16
-msgid "Task List"
-msgstr "Aufgabenliste"
-
 #: system/modules/task/templates/taskweek.tpl.php:7
 #: system/modules/task/templates/taskweek.tpl.php:14
 msgid "Search Tasks"
@@ -4503,8 +4682,12 @@ msgid "Documents"
 msgstr "Unterlagen"
 
 #: system/modules/task/templates/viewtask.tpl.php:38
-msgid "Set your Notifications specific to this Task, otherwise your notifications for this Task Group will be employed."
-msgstr "Stellen Sie Ihre Benachrichtigungen, die für diese Aufgabe, da ansonsten Ihre Mitteilungen für diese Arbeitsgruppe eingesetzt werden."
+msgid ""
+"Set your Notifications specific to this Task, otherwise your notifications "
+"for this Task Group will be employed."
+msgstr ""
+"Stellen Sie Ihre Benachrichtigungen, die für diese Aufgabe, da ansonsten "
+"Ihre Mitteilungen für diese Arbeitsgruppe eingesetzt werden."
 
 #: system/modules/task/templates/viewtask.tpl.php:69
 msgid "Please END TIME on your current Task"
@@ -4599,3 +4782,18 @@ msgstr "Ansicht Zeit Log"
 #: system/modules/timelog/templates/index.tpl.php:25
 msgid "No time logs found"
 msgstr "Keine Zeit Protokolle gefunden"
+
+#~ msgid "Text"
+#~ msgstr "Text"
+
+#~ msgid "Decimal"
+#~ msgstr "Dezimal"
+
+#~ msgid "Date & Time"
+#~ msgstr "Terminzeit"
+
+#~ msgid "Select"
+#~ msgstr "Wählen"
+
+#~ msgid "Autocomplete"
+#~ msgstr "Automatische Vervollständigung"
