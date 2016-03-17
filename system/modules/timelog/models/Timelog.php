@@ -19,10 +19,14 @@ class Timelog extends DbObject {
         "object_class" => array('required'),
         "object_id" => array('required'),
         "dt_start" => array('required'),
-        "dt_end" => array('required'),
+//        "dt_end" => array('÷required'),
         // "time_type" => array('required') Only required in some cases??!!
     );    
 
+	public function isRunning() {
+		return !empty($this->dt_start) && empty($this->dt_end);
+	}
+	
 	// Getters
 	public function getDateStart() {
 		if (!empty($this->dt_start)) {

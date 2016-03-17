@@ -60,10 +60,10 @@ function edit_GET(Web $w) {
 							->setPattern("^(0?[0-9]|1[0-9]|2[0-3]):[0-5][0-9](\s+)?(AM|PM|am|pm)?$")
 							->setPlaceholder("e.g. 11:30, 11:30am, 23:30, 11:30pm")
 							->setRequired("true"),
-				(new InputField())->setLabel("Hours Worked")->setName("hours_worked")->setValue($timelog->getHoursWorked())
-							->setType("number")->setMin(0)->setMax(23)->setStep(1)->setPlaceHolder("0-23")->setRequired("true"),
-				(new InputField())->setLabel("Minutes Worked")->setName("minutes_worked")->setValue($timelog->getMinutesWorked())
-							->setType("number")->setMin(0)->setMax(59)->setStep(1)->setPlaceHolder("0-59"),
+				!$timelog->isRunning() ? (new InputField())->setLabel("Hours Worked")->setName("hours_worked")->setValue($timelog->getHoursWorked())
+							->setType("number")->setMin(0)->setMax(23)->setStep(1)->setPlaceHolder("0-23")->setRequired("true") : null,
+				!$timelog->isRunning() ? (new InputField())->setLabel("Minutes Worked")->setName("minutes_worked")->setValue($timelog->getMinutesWorked())
+							->setType("number")->setMin(0)->setMax(59)->setStep(1)->setPlaceHolder("0-59") : null,
 			],
 			[(new InputField())->setLabel("Description")->setName("description")->setValue(!empty($comment) ? $comment->comment : null)]
 		]
@@ -94,12 +94,14 @@ function edit_POST(Web $w) {
 	
 	$redirect = $w->request("redirect", '');
 	
-	// Get and save timelog
+	$timelog = !empty($p['id']) ? $w->Timelog->getTimelog($p['id']) : new Timelog($w);
+	
+// Get and save timelog
 	if (empty($_POST['object_class']) || empty($_POST['object_id'])) {
 		$w->error('Missing data', $redirect ? : '/timelog');
 	}
 	
-	if (!array_key_exists("date_start", $_POST) || !array_key_exists("time_start", $_POST) || !array_key_exists("hours_worked", $_POST)) {
+	if (!array_key_exists("date_start", $_POST) || !array_key_exists("time_start", $_POST) || (!$timelog->isRunning() && !array_key_exists("hours_worked", $_POST))) {
 		$w->error('Missing data', $redirect ? : '/timelog');
 	}
 	
@@ -113,14 +115,16 @@ function edit_POST(Web $w) {
 	} 
 	
 	
-	$timelog = !empty($p['id']) ? $w->Timelog->getTimelog($p['id']) : new Timelog($w);
 	$timelog->object_class = $_POST['object_class'];
 	$timelog->object_id = $_POST['object_id'];
 	$timelog->time_type = !empty($_POST['time_type']) ? $_POST['time_type'] : null;
 	
 	$timelog->dt_start = $time_object->format('Y-m-d H:i:s');
-	$time_object->add(new DateInterval("PT" . intval($_POST['hours_worked']) . "H" . (!empty($_POST['minutes_worked']) ? intval($_POST['minutes_worked']) : 0) . "M0S"));
-	$timelog->dt_end = $time_object->format('Y-m-d H:i:s');
+	
+	if (!$timelog->isRunning()) {
+		$time_object->add(new DateInterval("PT" . intval($_POST['hours_worked']) . "H" . (!empty($_POST['minutes_worked']) ? intval($_POST['minutes_worked']) : 0) . "M0S"));
+		$timelog->dt_end = $time_object->format('Y-m-d H:i:s');
+	}
 //	var_dump($timelog); die();
 //	$timelog->dt_start = $w->Timelog->dt2Time($_POST['dt_start']);
 //	$timelog->dt_end = $w->Timelog->dt2Time($_POST['dt_end']);

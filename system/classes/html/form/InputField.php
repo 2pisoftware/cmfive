@@ -71,7 +71,11 @@ class InputField {
 		}
 	}
 	
-	// Returns built string of input field
+	/**
+	 * Returns built string of input field
+	 * 
+	 * @return string string representation
+	 */
 	public function __toString() {
 		$buffer = '<input ';
 
