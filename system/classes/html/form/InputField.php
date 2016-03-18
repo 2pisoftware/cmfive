@@ -9,9 +9,9 @@
  * @author Adam Buckley <adam@2pisoftware.com>
  * @see \Html\GlobalAttribtues
  */
-class InputField {
+class InputField extends \Html\Element {
 	
-	use \Html\GlobalAttributes;
+	use \Html\GlobalAttributes, \Html\Events;
 	
     public $accept;
 	public $autocomplete;
@@ -46,16 +46,13 @@ class InputField {
 	public $value;
 	public $width;
 	
-	// Cmfive non standard paramters
-	public $label;
-	
 	// Default to text input field
     public $type = 'text';
 	
 	/**
 	 * This constructor will take an associative array where the keys match any
 	 * field given above and set the field value to the corresponding array
-	 * key value.
+	 * key value (implementation in parent).
 	 * 
 	 * @param Array $fields
 	 */
@@ -63,14 +60,7 @@ class InputField {
 		// Set default GlobalAttribute's $class
 		$this->setClass("small-12 columns");
 	
-		
-		if (!empty($fields) && is_array($fields)) {
-			foreach($fields as $key => $value) {
-				if (property_exists($this, $key)) {
-					$this->{$key} = $value;
-				}
-			}
-		}
+		parent::__construct($fields);
 	}
 	
 	/**
@@ -122,19 +112,6 @@ class InputField {
 		"url" => "url",							// HTML5
 		"week" => "week"						// HTML5
 	];
-    
-	// Cmfive Setters
-	
-	/**
-	 * 
-	 * @param String $label
-	 * @return 
-	 */
-	public function setLabel($label) {
-		$this->label = $label;
-		
-		return $this;
-	}
 	
 	// HTML5 Setters
 	

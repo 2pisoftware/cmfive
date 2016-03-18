@@ -1,6 +1,7 @@
 <?php
 
 use \Html\Form\InputField as InputField;
+use \Html\Form\InputField\Number as Number;
 
 function edit_GET(Web $w) {
 	
@@ -60,10 +61,10 @@ function edit_GET(Web $w) {
 							->setPattern("^(0?[0-9]|1[0-9]|2[0-3]):[0-5][0-9](\s+)?(AM|PM|am|pm)?$")
 							->setPlaceholder("e.g. 11:30, 11:30am, 23:30, 11:30pm")
 							->setRequired("true"),
-				!$timelog->isRunning() ? (new InputField())->setLabel("Hours Worked")->setName("hours_worked")->setValue($timelog->getHoursWorked())
-							->setType("number")->setMin(0)->setMax(23)->setStep(1)->setPlaceHolder("0-23")->setRequired("true") : null,
-				!$timelog->isRunning() ? (new InputField())->setLabel("Minutes Worked")->setName("minutes_worked")->setValue($timelog->getMinutesWorked())
-							->setType("number")->setMin(0)->setMax(59)->setStep(1)->setPlaceHolder("0-59") : null,
+				!$timelog->isRunning() ? (new Number())->setLabel("Hours Worked")->setName("hours_worked")->setValue($timelog->getHoursWorked())
+							->setMin(0)->setMax(23)->setStep(1)->setPlaceHolder("0-23")->setRequired("true") : null,
+				!$timelog->isRunning() ? (new Number())->setLabel("Minutes Worked")->setName("minutes_worked")->setValue($timelog->getMinutesWorked())
+							->setMin(0)->setMax(59)->setStep(1)->setPlaceHolder("0-59") : null,
 			],
 			[(new InputField())->setLabel("Description")->setName("description")->setValue(!empty($comment) ? $comment->comment : null)]
 		]

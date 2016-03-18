@@ -1,4 +1,4 @@
-<?php namespace \Html\Form\InputField;
+<?php namespace Html\Form\InputField;
 
 /**
  * A helper InputField class for search bars

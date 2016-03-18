@@ -8,9 +8,9 @@
  * 
  * @author Adam Buckley <adam@2pisoftware.com>
  */
-class Select {
+class Select extends \Html\Form\FormElement {
 	
-	use \Html\GlobalAttribtues;
+	use \Html\GlobalAttributes;
 	
 	public $autofocus;
 	public $disabled;
@@ -19,6 +19,56 @@ class Select {
 	public $name;
 	public $required;
 	public $size;
+	
+	// Cmfive attributes
+	public $options = [];
+	
+	static $_excludeFromOutput = [
+		"options"
+	];
+	
+	// Cmfive setters
+	
+	/**
+	 * This helper function is designed
+	 * 
+	 * @param Array $options
+	 * @return \Html\Form\Select this
+	 */
+	public function setOptions($options = []) {
+		if (!is_null($options) && is_array($options) && count($options) > 0) {
+			foreach($options as $option) {
+				array_push($this->options, new Option($option));
+			}
+		}
+		
+		return $this;
+	}
+	
+	public function __toString() {
+		$buffer = '<select ';
+
+		foreach(get_object_vars($this) as $field => $value) {
+			if (!is_null($value) && !in_array($field, static::$_excludeFromOutput)) {
+				$buffer .= $field . '=\'' . $this->{$field} . '\' ';
+			}
+		}
+
+		/**
+		 * Print the options if they exist, this assumes that the options are
+		 * an {@see \Html\Form\Option} object class type
+		 */
+		$options_buffer = '';
+		if (!empty($this->options)) {
+			$options_buffer = implode("\n", array_map(function($option) {
+				return $option->__toString();
+			}, $this->options));
+		}
+		
+		return $buffer . '>' . $options_buffer . '</select>';
+	}
+	
+	// HTML5 setters
 	
 	/**
 	 * This attribute lets you specify that a form control should have input

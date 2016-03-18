@@ -8,10 +8,7 @@
  * @author Adam Buckley <adam@2pisoftware.com>
  */
 trait GlobalAttributes {
-	
-	// Global DOM Events trait
-	use Events;
-	
+
 	public $accesskey;
 	public $class;
 	public $contenteditable;
