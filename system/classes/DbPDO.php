@@ -123,7 +123,7 @@ class DbPDO extends PDO {
                 // Resets the where part of the statement
                 $this->query = $this->query->where(null);
             } else {
-                if (is_array($column)){
+                if (is_array($column) || is_null($equals)){
                     $this->query = $this->query->where($column);
                 } else {
                     $this->query = $this->query->where($column, $equals);
