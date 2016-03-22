@@ -16,7 +16,7 @@ function edit_GET(Web $w) {
 	$p = $w->pathMatch("id");
 	
 	$timelog = !empty($p['id']) ? $w->Timelog->getTimelog($p['id']) : new Timelog($w);
-	
+	 
 	$redirect = $w->request("redirect", '');
 	
 	$indexes = $w->search->getIndexes();
@@ -122,11 +122,11 @@ function edit_POST(Web $w) {
 	
 	$timelog->dt_start = $time_object->format('Y-m-d H:i:s');
 	
-	if (!$timelog->isRunning()) {
+	if (!empty($_POST['hours_worked']) || !empty($_POST['minutes_worked'])) {
 		$time_object->add(new DateInterval("PT" . intval($_POST['hours_worked']) . "H" . (!empty($_POST['minutes_worked']) ? intval($_POST['minutes_worked']) : 0) . "M0S"));
 		$timelog->dt_end = $time_object->format('Y-m-d H:i:s');
 	}
-//	var_dump($timelog); die();
+	// var_dump($timelog); die();
 //	$timelog->dt_start = $w->Timelog->dt2Time($_POST['dt_start']);
 //	$timelog->dt_end = $w->Timelog->dt2Time($_POST['dt_end']);
 	$timelog->insertOrUpdate();
