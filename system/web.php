@@ -218,6 +218,15 @@ class Web {
      * already registered scripts and helps prevent multiple additions of the same
      * library
      * 
+	 * A script entry should be in the form:
+	 * Array(
+	 *		"name" => "<name>",
+	 *		"uri" => "<uri>"
+	 *		"weight" => "<weight>" (used to order the loading of scripts, scripts
+	 *			are loaded in descending order of weight, e.g a script with a 1000 
+	 *			weight will load before one with 600)
+	 * )
+	 * 
      * @param Array $script
      */
     function enqueueScript($script) {

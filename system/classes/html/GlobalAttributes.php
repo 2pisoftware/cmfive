@@ -36,6 +36,28 @@ trait GlobalAttributes {
 	public $title;
 	public $translate;
 	
+	// Non standard Cmfive setters
+	
+	/**
+	 * Sets any attribute by adding it as a parameter to the class using this
+	 * trait.
+	 * 
+	 * WARNING: may cause issues where there are naming collisions. This
+	 * function is best used to include non-standard attributes such as the ones
+	 * used by Angular JS.
+	 * 
+	 * @param string $name
+	 * @param Mixed $value
+	 * @return this
+	 */
+	public function setAttribute($name, $value) {
+		$this->{$name} = $value;
+		
+		return $this;
+	}
+	
+	// HTML5 setters
+	
 	/**
 	 * Provides a hint for generating a keyboard shortcut for the current 
 	 * element. This attribute consists of a space-separated list of characters.
