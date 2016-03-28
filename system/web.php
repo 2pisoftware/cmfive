@@ -419,6 +419,7 @@ class Web {
         $this->_requestMethod = $_SERVER['REQUEST_METHOD'];
         $actionmethods[] = $this->_action . '_' . $this->_requestMethod;
         $actionmethods[] = $this->_action . '_ALL';
+        $actionmethods[] = 'default_ALL';
 
         // change the submodule and action for installation
         if($this->_is_installing) {

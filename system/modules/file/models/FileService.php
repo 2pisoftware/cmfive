@@ -399,28 +399,49 @@ class FileService extends DbService {
 	 * @param Mixed $content_type
 	 * @return int Attachment ID
 	 */	
-	function saveFileContent($object, $content, $name = null, $type_code = null, $content_type = null) {
+	function saveFileContent($parentObject, $content, $name = null, $type_code = null, $content_type = null) {
 
 		$filename = (!empty($name) ? $name : (str_replace(".", "", microtime()) . getFileExtension($content_type)));
 
-		$filesystemPath = $object->getDbTableName() . '/' . date('Y/m/d') . '/' . $object->id . '/';
-
-		$filesystem = $this->getFilesystem($filesystemPath);
-		$file = new File($filename, $filesystem);
-		$file->setContent($content);
-
 		$att = new Attachment($this->w);
 		$att->filename = $filename;
-		$att->fullpath = str_replace(FILE_ROOT, "", $this->getFilePath($filesystemPath) . (substr($this->getFilePath($filesystemPath), -1) !== '/' ? '/' : '') . $att->filename);
-		$att->parent_table = $object->getDbTableName();
-		$att->parent_id = $object->id;
+		$att->fullpath = null;
+		$att->parent_table = $parentObject->getDbTableName();
+		$att->parent_id = $parentObject->id;
 		$att->title = $filename;
+		$att->description = $name;
 		$att->type_code = $type_code;
-		$att->mimetype = $content_type;
-//                $att->modifier_user_id = $this->w->Auth->user()->id;
 		$att->insert();
 
+		$filesystemPath = "attachments/" . $parentObject->getDbTableName() . '/' . date('Y/m/d') . '/' . $att->id . '/';
+		$filesystem = $this->getFilesystem($this->getFilePath($filesystemPath));
+		if (empty($filesystem)) {
+			$this->w->Log->setLogger("FILE_SERVICE")->error("Cannot save file, no filesystem returned");
+			return null;
+		}
+		
+		$file = new File($filename, $filesystem);
+		
+		$att->adapter = $this->getActiveAdapter();
+		$att->fullpath = str_replace(FILE_ROOT, "", $filesystemPath . $filename);
+		$mime_type='';
+		switch($this->adapter) {
+			case "local":
+				$mime_type = $this->w->getMimetype(FILE_ROOT . $att->fullpath);
+			default:
+				$mime_type = $this->w->getMimetypeFromString($content);
+		}
+
+		$file->setContent($content, ['contentType' => $mime_type]);
+		$att->mimetype = $mime_type;
+		$att->update();
 		return $att->id;
+
+
+
+
+
+
 	}
 	
 	/**

@@ -29,13 +29,11 @@ function anonymous_allowed(Web $w,$path) {
 	}
 
 	$allowed=false;
-	if (is_array($path)) {
-		$path_explode = explode("/", $path);
-		$module = $path_explode[0];
-		// $action = $path_explode[1];
-		if (is_array(Config::get('system.allow_module'))) {
-			$allowed = in_array($module,Config::get('system.allow_module'));
-		}
+	$path_explode = explode("/", $path);
+	$module = $path_explode[0];
+	// $action = $path_explode[1];
+	if (is_array(Config::get('system.allow_module'))) {
+		$allowed = in_array($module,Config::get('system.allow_module'));
 	}
 	return $allowed || $in_path;
 }

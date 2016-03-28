@@ -24,7 +24,8 @@ class User extends DbObject {
     public $_roles;
     public $_contact;
     public $_modifiable;
-
+	public $password_digest;
+	
     public function delete($force = false) {
         $contact = $this->getContact();
         if ($contact) {
@@ -304,6 +305,7 @@ class User extends DbObject {
      */
     public function setPassword($password) {
         $this->password = $this->encryptPassword($password);
+        $this->w->callHook('auth','setpassword',[$password,$this]);
     }
 
 	public static function generateSalt() {

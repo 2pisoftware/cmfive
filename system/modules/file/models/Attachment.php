@@ -240,4 +240,18 @@ class Attachment extends DbObject {
 		}
 		return false;
 	}
+	
+	/**
+	 * Automagic label
+	 */
+	function getSelectOptionTitle() {
+		return $this->filename;
+	}
+	
+	/**
+	 * Automagic label
+	 */
+	function getSelectOptionValue() {
+		return $this->filename;
+	}
 }
