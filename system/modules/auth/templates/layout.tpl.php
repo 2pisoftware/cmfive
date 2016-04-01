@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+		<link rel="shortcut icon" href="/system/templates/img/favicon.ico" type="image/x-icon"/>
         <title><?php echo ucfirst($w->currentModule()); ?><?php echo !empty($title) ? ' - ' . $title : ''; ?></title>
         
         <?php
