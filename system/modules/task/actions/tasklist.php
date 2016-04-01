@@ -36,7 +36,8 @@ function tasklist_ALL(Web $w) {
         }
     }
     if (!empty($creator_id)) {
-        // $query_object->where("task.creator_id", $creator_id);
+		$query_object->leftJoin("object_modification on object_modification.object_id = task.id and object_modification.table_name = 'task'")
+					 ->where("object_modification.creator_id", $creator_id);
     }
     if (!empty($task_type)) {
         $query_object->where("task.task_type", $task_type);
