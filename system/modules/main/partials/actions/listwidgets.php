@@ -16,7 +16,10 @@ function listwidgets(\Web $w, $params) {
 
         // Filter out widgets in an inactive class
         $filter_widgets = array_filter($widgets, function($widget) use ($w) {
-            return $w->isClassActive($widget->widget_name);
+			// Also filter out widgets that the user is not allowed to use
+//			$widget_required_roles = (new $widget->widget_name($w))->getRequiredRoles();
+			
+            return $w->isClassActive($widget->widget_name); // && (empty($widget_required_roles) || $w->Auth->user()->hasAnyRole($widget_required_roles));
         });
 
         foreach ($filter_widgets as &$widget) {

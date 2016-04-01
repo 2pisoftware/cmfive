@@ -31,16 +31,27 @@ abstract class ModuleWidget extends DbService {
 	 * @return Array
 	 */
 	public function getSettingsForm($current_settings = null) {
-		return array();
+		return [];
 	}
 
 	/**
-	 * This is where the widgets prints out its content
+	 * This is where the widget prints out its content
 	 *
-	 * @return none
+	 * @return null
 	 */
 	public function display() {
-		
+		return null;
 	}
 
+	/**
+	 * This function defines the roles that are required (at least one) to access
+	 * the widget.
+	 * 
+	 * WARNING: If the widget doesn't define one it will be available to everyone!
+	 * 
+	 * @return Array
+	 */
+	public function getRequiredRoles() {
+		return [];
+	}
 }
