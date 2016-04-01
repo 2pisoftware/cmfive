@@ -35,7 +35,7 @@ function addwidget_POST(Web $w) {
 	// }
 
 	$widget = new WidgetConfig($w);
-        $widget->destination_module = $module;
+	$widget->destination_module = $module;
 	$widget->fill($_POST);
 	$widget->user_id = $w->Auth->user()->id;
 	$response = $widget->insert();
