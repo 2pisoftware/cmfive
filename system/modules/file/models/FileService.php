@@ -403,7 +403,7 @@ class FileService extends DbService {
 
 		$filename = (!empty($name) ? $name : (str_replace(".", "", microtime()) . getFileExtension($content_type)));
 
-		$filesystemPath = $object->getDbTableName() . '/' . date('Y/m/d') . '/' . $object->id . '/';
+		$filesystemPath = FILE_ROOT . "attachments/" . $object->getDbTableName() . '/' . date('Y/m/d') . '/' . $object->id . '/';
 
 		$filesystem = $this->getFilesystem($filesystemPath);
 		$file = new File($filename, $filesystem);
