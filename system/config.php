@@ -48,3 +48,6 @@ Config::set('email.transports', array(
 	'swiftmailer' => 'SwiftMailerTransport',
 	'sendmail' => 'SwiftMailerTransport'
 ));
+
+// For SendGrid API integration (also used for Mandrill integration)
+// Config::append('email.api.credentials.key', '<your key>');

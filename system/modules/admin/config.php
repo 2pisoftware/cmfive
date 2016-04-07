@@ -27,6 +27,7 @@ Config::set('admin', array(
         "twig/twig" => "1.*",
         "nesbot/carbon" => "1.14",
 		"mandrill/mandrill" => "1.0.*",
-		"robmorgan/phinx" => "^0.4.6"
+		"robmorgan/phinx" => "^0.4.6",
+		"sendgrid/sendgrid" => "~4.0"
     )
 ));
