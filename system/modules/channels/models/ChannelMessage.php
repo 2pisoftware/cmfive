@@ -19,10 +19,10 @@ class ChannelMessage extends DbObject {
             foreach($attachments as $attachment) {
                 // return the serialised email object
                 if ($attachment->filename == "email.txt") {
-                    return file_get_contents(FILE_ROOT . $attachment->fullpath);
+                    return $attachment->getContent();
                 }
             }
-            return file_get_contents(FILE_ROOT . $attachments[0]->fullpath);
+            return $attachments[0]->getContent();
         }
         return null;
     }

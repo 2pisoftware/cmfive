@@ -36,7 +36,43 @@ class CmfiveMigration extends Phinx\Migration\AbstractMigration {
 
 //		parent::dropTable($tableName);
 	}
-
+	
+	/**
+	 * Helper methods
+	 */
+	
+	/**
+	 * Adds a column to a table. Takes care of checking for table/column existance
+	 * 
+	 * @param string $table
+	 * @param string $column
+	 * @param string $datatype
+	 * @param Array $options
+	 * @return null
+	 */
+	public function addColumnToTable($table, $column, $datatype, $options = []) {
+		if ($this->hasTable($table)) {
+			if (!$this->table($table)->hasColumn($column)) {
+				$this->table($table)->addColumn($column, $datatype, $options)->save();
+			}
+		}
+	}
+	
+	/**
+	 * Removes a column from a table. Takes care of checking for table/column
+	 * existance
+	 * 
+	 * @param string $table
+	 * @param string $column
+	 * @return null
+	 */
+	public function removeColumnFromTable($table, $column) {
+		if ($this->hasTable($table)) {
+			if ($this->table($table)->hasColumn($column)) {
+				$this->table($table)->removeColumn($column);
+			}
+		}
+	}
 }
 
 class MigrationException extends Exception {
