@@ -496,6 +496,16 @@ ul.cmfive_breadcrumbs > li {
     font-size: 160%;
 }
 
+.cmfive_breadcrumbs .breadcrumb-content {
+	max-width: 120px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	display: inline-block;
+	text-align: center;
+	vertical-align: middle;
+}
+
 .multiFileUploadRow {
     padding: 5px;
     border: 1px solid grey;

@@ -1220,7 +1220,7 @@ class Html {
                                 continue;
                             }
                         }
-                        $buffer .= "<li" . (!$isFirst ? "><a href='" . $path . "'>" . $value['name'] . "</a>" : " class='current'>" . $value['name']) . "</li>";
+                        $buffer .= "<li" . (!$isFirst ? "><a href='" . $path . "'><span data-tooltip aria-haspopup='true' title='" . $value['name'] . "' ><div class='breadcrumb-content'>" . $value['name'] . "</div></span></a>" : " class='current'><span data-tooltip aria-haspopup='true' title='" . $value['name'] . "' ><div class='breadcrumb-content'>" . $value['name'] . "</div></span>") . "</li>";
                         $isFirst = false;
                     }
                 } else {
