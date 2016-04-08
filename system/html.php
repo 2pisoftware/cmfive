@@ -2,6 +2,7 @@
 require_once "classes/html/a.php";
 require_once "classes/html/button.php";
 require_once "classes/html/form.php";
+require_once "classes/html/form/InputField.php";
 
 class Html {
 
@@ -423,7 +424,6 @@ class Html {
         }
         $buffer .= "</div>";
         $buffer .= "<script>$(function(){try{\$('textarea.ckeditor').each(function(){CKEDITOR.replace(this)})}catch(err){}});</script>";
-        $buffer .= "<script>$(function(){try{\$('textarea.codemirror').each(function(){CodeMirror.fromTextArea(this, {lineNumbers: true, mode: 'text/html', matchBrackets: true, viewportMargin: Infinity})})}catch(err){}});</script>";
   
         if (null !== $action) {
             $buffer .= $form->close($submitTitle);
@@ -566,6 +566,16 @@ class Html {
                 
                 foreach($row as $field) {
                     
+					// Check if the row is an object like an InputField
+					if (!is_array($field) && is_object($field)) {
+						if ($field->type !== "hidden") {
+							$buffer .= '<li><label class=\'small-12 columns\'>' . $field->label . '<div>' . $field->__toString() . '</div></label></li>';
+						} else {
+							$buffer .= $field->__toString();
+						}
+						continue;
+					}
+				
                     $title = !empty($field[0]) ? $field[0] : null;
                     $type = !empty($field[1]) ? $field[1] : null;
                     $name = !empty($field[2]) ? $field[2] : null;
@@ -1210,7 +1220,7 @@ class Html {
                                 continue;
                             }
                         }
-                        $buffer .= "<li" . (!$isFirst ? "><a href='" . $path . "'>" . $value['name'] . "</a>" : " class='current'>" . $value['name']) . "</li>";
+                        $buffer .= "<li" . (!$isFirst ? "><a href='" . $path . "'><span data-tooltip aria-haspopup='true' title='" . $value['name'] . "' ><div class='breadcrumb-content'>" . $value['name'] . "</div></span></a>" : " class='current'><span data-tooltip aria-haspopup='true' title='" . $value['name'] . "' ><div class='breadcrumb-content'>" . $value['name'] . "</div></span>") . "</li>";
                         $isFirst = false;
                     }
                 } else {

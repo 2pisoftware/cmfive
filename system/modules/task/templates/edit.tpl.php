@@ -26,13 +26,16 @@
             <div class="row-fluid clearfix">
                 <div class="row-fluid columns">
                     <?php 
-                    	echo $w->Favorite->getFavoriteButton($task);
-                        // Note the extra buttons only show when the task_type object
-                        $tasktypeobject = $task->getTaskTypeObject();
-                        echo !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null; 
-                    	//echo $w->Tag->getTagButton($task->id,"Task")."&nbsp;";
-                        echo (!empty($task->id) && $task->canDelete($w->Auth->user())) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), "Delete", "Are you sure you want to delete this task?" ) : ''; 
-                        echo $w->partial('listTags',['object' => $task], 'tag');
+						if (!empty($task->id)) {
+							echo $w->Favorite->getFavoriteButton($task);
+							// Note the extra buttons only show when the task_type object
+							$tasktypeobject = $task->getTaskTypeObject();
+							echo !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null; 
+							//echo $w->Tag->getTagButton($task->id,"Task")."&nbsp;";
+							echo $task->canDelete($w->Auth->user()) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), "Delete", "Are you sure you want to delete this task?" ) : ''; 
+							echo Html::b($task->w->localURL('task/duplicatetask/' . $task->id), "Duplicate Task");
+							echo $w->partial('listTags',['object' => $task], 'tag');
+						}
 					?>
                 </div>
                 <div class="row-fluid clearfix">

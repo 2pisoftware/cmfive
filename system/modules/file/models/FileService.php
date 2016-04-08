@@ -6,21 +6,23 @@ use Gaufrette\Adapter\Local as LocalAdapter;
 use Gaufrette\Adapter\InMemory as InMemoryAdapter;
 use Gaufrette\Adapter\AwsS3 as AwsS3;
 use Aws\S3\S3Client as S3Client;
-/*********************************************
+
+/**
  * Service class with functions to help managing files and attachment records.
- * Encapsulate the use of Gaufrette file system adapters.
- *********************************************/
+ * Encapsulates the Gaufrette library of file system adapters.
+ */
 class FileService extends DbService {
 
 	public static $_thumb_height = 200;
 	public static $_thumb_width = 200;
 	public static $_stream_name = "attachment";
 
-	/*********************************************
+	/**
 	 * Return the path adjusted to the currently active adapter.
-	 * !! This will need a rethink (storing full path in Attachment but also setting the full path here) etc
-	 * @return string
-	 ********************************************/
+	 *
+	 * @param string file path
+	 * @return string resulting file path
+	 */
 	function getFilePath($path) {
 		$active_adapter = $this->getActiveAdapter();
 		
@@ -42,21 +44,25 @@ class FileService extends DbService {
 		}
 	}
 
-	/*******************************************
+	/**
 	 * Create a new Gaufrette File object from a filename and path
-	 * @return File
-	 ******************************************/
+	 * 
+	 * @param \Gaufrette\Filesystem
+	 * @param string filename
+	 * @return \Gaufrette\File
+	 */
 	function getFileObject($filesystem, $filename) {
 		$file = new File($filename, $filesystem);
 		return $file;
 	}
 
-	/*******************************************
-	 * Get the currently active filesystem adapter
-	 * The first adapter listed in configuration that is not local is returned.
-	 * If local is the only choice (or there are no choices), local is returned as the adapter.
-	 * @return string (name of adapter)
-	 ******************************************/
+	/**
+	 * Returns the first adapter maked as active that isn't "local".
+	 * 
+	 * The local filesystem is the default adapter if none are specified.
+	 * 
+	 * @return string adapter
+	 */
 	function getActiveAdapter() {
 		$adapters = Config::get('file.adapters');
 		if (!empty($adapters)) {
@@ -73,17 +79,27 @@ class FileService extends DbService {
 		return "local";
 	}
 
-	/*************************************************************
+	/**
 	 * Get a Gaufrette Filesystem for the currently active adapter and selected path
-	 * @return FileSystem
-	 ************************************************************/
+	 * 
+	 * @param Mixed $path base path to load the filesystem adapter at
+	 * @param Mixed $content content to load into the filesystem (mainly used for the "memory" adapter
+	 * @param Array $options options to give to the filesystem
+	 * @return \Gaufrette\Filesystem
+	 */
 	function getFilesystem($path = null, $content = null, $options = []) {
 		return $this->getSpecificFilesystem($this->getActiveAdapter(), $path, $content, $options);
 	}
-	/*************************************************************
+	
+	/**
 	 * Get a Gaufrette Filesystem for a given adapter and path
+	 * 
+	 * @param string $adapter adapter to load
+	 * @param string $path base path to load the filesystem adapter at
+	 * @param Mixed $content content to load into the filesystem (mainly used for the "memory" adapter
+	 * @param Array $options options to give to the filesystem
 	 * @return FileSystem
-	 ************************************************************/	
+	 */	
 	function getSpecificFilesystem($adapter = "local", $path = null, $content = null, $options = []) {
 		$adapter_obj = null;
 		switch ($adapter) {
@@ -99,6 +115,18 @@ class FileService extends DbService {
 				$client = S3Client::factory(["key" => Config::get('file.adapters.s3.key'), "secret" => Config::get('file.adapters.s3.secret')]);
 				$adapter_obj = new AwsS3($client, Config::get('file.adapters.s3.bucket'), is_array($config_options) ? $config_options : []);
 				break;
+			case "dropbox":
+				if (!function_exists("oauth")) {
+					$this->w->Log->setLogger("FILE_SERVICE")->error("The Dropbox API requires the oAuth extension to be installed.");
+					return null;
+				}
+				$app_id = Config::get('file.adapters.dropbox.app_id');
+				if (!empty($app_id)) {
+					$adapter_obj = new \Gaufrette\Adapter\Dropbox(new Dropbox_API(new Dropbox_OAuth_PHP($app_id, '')));
+				} else {
+					$this->w->Log->setLogger("FILE_SERVICE")->error("Dropbox adapter requested but no app ID has been provided in the config.");
+				}
+				break;
 		}
 
 		if ($adapter_obj !== null) {
@@ -107,10 +135,12 @@ class FileService extends DbService {
 		return null;
 	}
 
-	/*************************************************************
+	/**
 	 * Register a gaufrette stream wrapper
-	 * @return 
-	 ************************************************************/	
+	 * 
+	 * @param \Gaufrette\Filesystem
+	 * @return null
+	 */	
 	function registerStreamWrapper($filesystem = null) {
 		if (!empty($filesystem)) {
 			$map = \Gaufrette\StreamWrapper::getFilesystemMap();
@@ -120,10 +150,12 @@ class FileService extends DbService {
 		}
 	}
 
-	/*************************************************************
+	/**
 	 * Create a HTML image tag for the image specified by $path
-	 * @return string(html img tag)
-	 ************************************************************/	
+	 * 
+	 * @param string $path image file path
+	 * @return string html image tag
+	 */	
 	function getImg($path) {
 		$file = FILE_ROOT . $path;
 		if (!file_exists($file))
@@ -135,10 +167,12 @@ class FileService extends DbService {
 		return $tag;
 	}
 
-	/*************************************************************
+	/**
 	 * Create a HTML image tag for a thumbnail of the image specified by $path
-	 * @return string(html img tag)
-	 ************************************************************/	
+	 * 
+	 * @param string $path image file path
+	 * @return string thumbnail image url
+	 */	
 	function getThumbImg($path) {
 		$file = FILE_ROOT . $path;
 		if (!file_exists($file))
@@ -150,10 +184,12 @@ class FileService extends DbService {
 		return $tag;
 	}
 	
-	/*************************************************************
+	/**
 	 * Check if an attachment is an image
-	 * @return boolean
-	 ************************************************************/	
+	 * 
+	 * @param string $path image file path
+	 * @return bool
+	 */	
 	function isImage($path) {
 		if (file_exists(str_replace("'", "\\'", FILE_ROOT . "/" . $path))) {
 			$path = str_replace("'", "\\'", FILE_ROOT . "/" . $path);
@@ -167,18 +203,21 @@ class FileService extends DbService {
 		}
 	}
 	
-	/*************************************************************
+	/**
 	 * Get a url to the file specified by $path
-	 * @return string(html img tag)
-	 ************************************************************/	
+	 * @return string URL to download file
+	 */	
 	function getDownloadUrl($path) {
 		return WEBROOT . "/file/path/" . $path;
 	}
 
-	/*************************************************************
+	/**
 	 * Lookup the attachments for a given object
-	 * @return [string]  (full paths to attachments)
-	 ************************************************************/	
+	 * 
+	 * @param Mixed $objectOrTable
+	 * @param Mixed $id
+	 * @return string
+	 */	
 	function getAttachmentsFileList($objectOrTable, $id = null) {
 		$attachments = $this->getAttachments($objectOrTable, $id);
 		if (!empty($attachments)) {
@@ -191,10 +230,13 @@ class FileService extends DbService {
 		return array();
 	}
 	
-	/*************************************************************
+	/**
 	 * Lookup the attachments for a given object
-	 * @return [Attachment]
-	 ************************************************************/	
+	 * 
+	 * @param Mixed $objectOrTable
+	 * @param Mixed $id
+	 * @return Attachment
+	 */	
 	function getAttachments($objectOrTable, $id = null) {
 		if (is_scalar($objectOrTable)) {
 			$table = $objectOrTable;
@@ -209,15 +251,17 @@ class FileService extends DbService {
 		return null;
 	}
 
-	/*************************************************************
+	/**
 	 * Load a single attachment
+	 * 
+	 * @param Mixed $id attachment ID
 	 * @return Attachment
-	 ************************************************************/	
+	 */	
 	function getAttachment($id) {
 		return $this->getObject("Attachment", $id);
 	}
 
-	/*************************************************************
+	/**
 	 * Move an uploaded file from the temp location
 	 * to
 	 *  /files/attachments/<attachTable>/<year>/<month>/<day>/<attachId>/<filename>
@@ -229,8 +273,8 @@ class FileService extends DbService {
 	 * @param <type> $attachId
 	 * @param <type> $title
 	 * @param <type> $description
-	 * @return the id of the attachment object or null
-	 *************************************************************/
+	 * @return Mixed the id of the attachment object or null
+	 */
 	function uploadAttachment($requestkey, $parentObject, $title = null, $description = null, $type_code = null) {
 		if (!is_a($parentObject, "DbObject")) {
 			$this->w->error("Parent not found.");
@@ -258,6 +302,11 @@ class FileService extends DbService {
 
 		$filesystemPath = "attachments/" . $parentObject->getDbTableName() . '/' . date('Y/m/d') . '/' . $att->id . '/';
 		$filesystem = $this->getFilesystem($this->getFilePath($filesystemPath));
+		if (empty($filesystem)) {
+			$this->w->Log->setLogger("FILE_SERVICE")->error("Cannot save file, no filesystem returned");
+			return null;
+		}
+		
 		$file = new File($filename, $filesystem);
 		
 		$att->adapter = $this->getActiveAdapter();
@@ -291,12 +340,12 @@ class FileService extends DbService {
 	 *
 	 *  Stores in /uploads/attachments/<ObjectTableName>/<year>/<month>/<day>/<attachId>/<filename>
 	 *
-	 * @param <string> $requestKey
-	 * @param <DbObject> $parentObject
-	 * @param <Array> $titles
-	 * @param <Array> $descriptions
-	 * @param <Array> $type_codes
-	 * @return <bool> if upload was successful
+	 * @param string $requestKey
+	 * @param DbObject $parentObject
+	 * @param Array $titles
+	 * @param Array $descriptions
+	 * @param Array $type_codes
+	 * @return bool if upload was successful
 	 */
 	function uploadMultiAttachment($requestkey, $parentObject, $titles = null, $descriptions = null, $type_codes = null) {
 		if (!is_a($parentObject, "DbObject")) {
@@ -340,15 +389,21 @@ class FileService extends DbService {
 		return true;
 	}
 
-	/*************************************************************
+	/**
 	 * Save an attachment and create a file based on content passed as a parameter
-	 * @return integer  (new attachment id)
-	 ************************************************************/	
+	 * 
+	 * @param DbObject $object object to save content to
+	 * @param string $content file content
+	 * @param Mixed $name
+	 * @param Mixed $type_code
+	 * @param Mixed $content_type
+	 * @return int Attachment ID
+	 */	
 	function saveFileContent($object, $content, $name = null, $type_code = null, $content_type = null) {
 
 		$filename = (!empty($name) ? $name : (str_replace(".", "", microtime()) . getFileExtension($content_type)));
 
-		$filesystemPath = $object->getDbTableName() . '/' . date('Y/m/d') . '/' . $object->id . '/';
+		$filesystemPath = FILE_ROOT . "attachments/" . $object->getDbTableName() . '/' . date('Y/m/d') . '/' . $object->id . '/';
 
 		$filesystem = $this->getFilesystem($filesystemPath);
 		$file = new File($filename, $filesystem);
@@ -368,18 +423,23 @@ class FileService extends DbService {
 		return $att->id;
 	}
 	
-	/*************************************************************
+	/**
 	 * Get the attachment types for a given object type
-	 * @return [AttachmentType]
-	 ************************************************************/	
-	function getAttachmentTypesForObject($o) {
-		return $this->getObjects("AttachmentType", array("table_name" => $o->getDbTableName(), "is_active" => '1'));
+	 * 
+	 * @param DbObejct $object
+	 * @return Array<AttachmentType>
+	 */	
+	function getAttachmentTypesForObject($object) {
+		return $this->getObjects("AttachmentType", array("table_name" => $object->getDbTableName(), "is_active" => '1'));
 	}
 
-	/*************************************************************
+	/**
 	 * Render a template showing an attachment
+	 * 
+	 * @param DbObject $object
+	 * @param string $backUrl
 	 * @return string  
-	 ************************************************************/	
+	 */	
 	function getImageAttachmentTemplateForObject($object, $backUrl) {
 		$attachments = $this->getAttachments($object);
 		$template = "";

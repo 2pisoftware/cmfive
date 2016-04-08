@@ -17,4 +17,12 @@ class favorites_widget extends ModuleWidget {
     public function display() {
 		echo $this->w->partial("listfavorite", array('classname' => 'Favorite'), "favorites");
 	}
+	
+	public function canView(User $user) {
+		if (empty($user)) {
+			$user = $this->w->Auth->user();
+		}
+		
+		return $user->hasRole("favorites_user");
+	}
 }

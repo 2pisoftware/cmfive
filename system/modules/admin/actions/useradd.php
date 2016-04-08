@@ -41,15 +41,17 @@ function useradd_POST(Web &$w) {
 	// now saving the user
 	$user = new User($w);
 	$user->login = $_REQUEST['login'];
-	$user->setPassword($_REQUEST['password']);
-
+	
 	$user->is_active = !empty($_REQUEST['is_active']) ? $_REQUEST['is_active'] : 0;
 	$user->is_admin = !empty($_REQUEST['is_admin']) ? $_REQUEST['is_admin'] : 0;
     $user->is_group = 0;
 	$user->dt_created = time();
 	$user->contact_id = $contact->id;
 	$user->insert();
-	$w->ctx("user",$user);
+	
+	$user->setPassword($_REQUEST['password']);
+
+	$w->ctx("user", $user);
 
 	// now saving the roles
 	$roles = $w->Auth->getAllRoles();

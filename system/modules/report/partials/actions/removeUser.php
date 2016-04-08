@@ -23,8 +23,8 @@ function removeUser(\Web $w, $params = []) {
 		return strtoupper($instance['role']) !== "OWNER";
 	});
 	
-	$w->ctx("owned_reports", $owned_reports);
-	$w->ctx("member_reports", array_diff($report_member, $owned_reports));
+	$w->ctx("owned_reports", $owned_reports);	
+	$w->ctx("member_reports", $report_member);
 	$w->ctx("user", $user);
 	
 }

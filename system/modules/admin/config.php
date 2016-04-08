@@ -16,15 +16,18 @@ Config::set('admin', array(
     'database' => array(
         'output' => 'sql',
         'command' => array(
-            'unix' => 'mysqldump -u $username -p$password $dbname | gzip > $filename.gz',
+            'unix' => 'mysqldump -u $username -p\'$password\' $dbname | gzip > $filename.gz',
             // 'windows' => 'J:\\xampp\\mysql\\bin\\mysqldump.exe -u $username -p$password $dbname > $filename'
         )
+		// Example to back up off site (only dropbox support currently)
+		// 'backuplocations' => ['dropbox' => ['key' => '<KEY>', 'secret' => '<SECRET>']]
     ),
     "dependencies" => array(
         "swiftmailer/swiftmailer" => "@stable",
         "twig/twig" => "1.*",
         "nesbot/carbon" => "1.14",
 		"mandrill/mandrill" => "1.0.*",
-		"robmorgan/phinx" => "^0.4.6"
+		"robmorgan/phinx" => "^0.4.6",
+		"sendgrid/sendgrid" => "~4.0"
     )
 ));

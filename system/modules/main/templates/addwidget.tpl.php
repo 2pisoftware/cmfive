@@ -14,14 +14,17 @@
 				type: "GET",
 				success: function(data) {
 					var parsed = JSON.parse(data);
+					jQuery("#widget_name").empty();
 					for(var i in parsed) {
 						jQuery("#widget_name").append("<option value='" + parsed[i] + "'>" + parsed[i] + "</option>");
 					}
 
 					jQuery("#widget_name").parent("tr").fadeIn();
-					$.fn.colorbox.resize({});
 				}
 			});
+		} else {
+			jQuery("#widget_name").empty();
+			jQuery("#widget_name").append("<option>-- Select --</option>");
 		}
 	});
 

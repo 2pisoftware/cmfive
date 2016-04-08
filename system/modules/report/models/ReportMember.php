@@ -8,6 +8,9 @@ class ReportMember extends DbObject {
 	public $is_email_recipient;
 	public $is_deleted; 	// deleted flag
 
+	// Dont remove this, used in ReportService
+	public static $_db_table = "report_member";
+
 	public function getReport() {
 		return $this->getObject("Report", $this->report_id);
 	}

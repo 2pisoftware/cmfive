@@ -33,8 +33,8 @@ if ($messageid){
 	//	print_r($message);
 	$lines =  array(
 	array("","section"),
-	array("To","autocomplete","receiver_id",$message->user_id,$w->Auth->getUsers()),
-	array("Subject","text","subject",$message->subject),
+	array("To","autocomplete","receiver_id",$message->sender_id,$w->Auth->getUsers()),
+	array("Subject","text","subject",'Re:'.$message->subject),
 	array("","section"),
 	array("","textarea","message",null,120,10),
 	);
@@ -62,4 +62,11 @@ if ($messageid){
     {
         toolbar : 'Basic'
     });
+    
+    $('.savebutton').bind('click',function() {
+		if ($.trim($('#acp_receiver_id').val()).length==0) {
+			alert("You must enter a message recipient");
+			return false;
+		}
+	});
 </script>

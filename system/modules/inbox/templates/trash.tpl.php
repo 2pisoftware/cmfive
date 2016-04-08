@@ -1,7 +1,7 @@
 <?php
 if (!empty($del_table)) {
     $button = new \Html\button();
-    echo $button->text("Delete Forever")->onclick("deleteMessage()")->__toString(); // print "<button onclick='deleteMessage()'>Delete</button>";
+    echo $button->id('deleteforevorbutton')->text("Delete Forever")->onclick("deleteMessage()")->__toString(); // print "<button onclick='deleteMessage()'>Delete</button>";
 
     echo $del_table;
 } else {

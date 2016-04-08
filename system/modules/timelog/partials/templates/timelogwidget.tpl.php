@@ -2,30 +2,37 @@
     <div id="start_timer">
         <?php if ($w->Timelog->hasTrackingObject()) : ?>
             <a onclick="openDescription();">Start Timer</a>
-        <?php else : ?>
-            
         <?php endif; ?>
     </div>
+	
     <div id="stop_timer">
         <span data-tooltip aria-haspopup="true" class="has-tip tip-bottom radius" title="<?php echo !empty($active_log) ? $active_log->object_class . ": " . $active_log->getLinkedObject()->getSelectOptionTitle() : ''; ?>">
             <a id="stop_timelog" class="button"><div id="active_log_time"></div></a>
         </span>
     </div>
+	
     <div id="timerModal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
 		<div class="row">
 			<div class="large-12 columns">
-				<label><font style='font-size: 14pt;'>Enter Description</font>
+				<h2>Start timer</h2>
+			</div>
+		</div>
+		<div class="row">
+			<div class="large-12 columns">
+				<label>Enter Description
 					<input type="text" id="timelog_description" name="timelog_description" />
 				</label>
 			</div>
 		</div>
+		<br/>
 		<div class="row">
 			<div class="large-12 columns">
-				<button onclick="saveTimer();">Start</button>
-				<button onclick="$('#timerModal').foundation('reveal', 'close');">Close</button>
+				<button class="button" onclick="saveTimer();">Start</button>
+				<button class="button secondary right" onclick="$('#timerModal').foundation('reveal', 'close');">Close</button>
 			</div>
 		</div>
-	</div>    
+	</div>
+	
     <script>    
         var timer = null;
         var start_time = <?php echo (!empty($active_log) && $active_log->dt_start) ? $active_log->dt_start : time(); ?>;
@@ -68,7 +75,10 @@
             if (_object.class && _object.id) {
                 jQuery.ajax("/timelog/ajaxStart/" + _object.class + "/" + _object.id, {
 					method: "POST",
-					data: {'description': $("#timelog_description").val()},
+					data: {
+						'description': $("#timelog_description").val(),
+						'start_time': $("#start_time").val()
+					},
                     success: function(data) {
                         var object_data = JSON.parse(data);
                         

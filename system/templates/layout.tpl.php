@@ -4,6 +4,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="shortcut icon" href="/system/templates/img/favicon.ico" type="image/x-icon"/>
         <title><?php echo ucfirst($w->currentModule()); ?><?php echo!empty($title) ? ' - ' . $title : ''; ?></title>
 <!--        <link rel="icon" href="<?php // echo WEBROOT; ?>/templates/img/favicon.png" type="image/png"/>-->
 
@@ -117,11 +118,11 @@
         </script>
     </head>
     <body>
+		<?php /** @var Web */ ?>
         <div class="loading_overlay" <?php echo $w->request('show_overlay') == null ? 'style="display:none;"' : ''; ?>>
             <div class="circle"></div>
-            <div class="circle_inner"></div>
-            <div class="circle_center"></div>
-            <h4 class="subheader">Please wait...</h4>
+			<img class="center_image" width="100px" height="100px" src="/system/templates/img/cmfive_V_logo.png" />
+            <h4 class="subheader">Please wait</h4>
         </div>
 		<div class="global_file_drop_area" id="global_file_drop_area">
 			<div class="global_file_drop_overlay_init">
@@ -131,8 +132,7 @@
 		<div class="global_file_drop_overlay" id="global_file_drop_overlay" style="display:none;">
 			<div class="global_file_drop_overlay_loading">
 				<div class="circle"></div>
-				<div class="circle_inner"></div>
-				<div class="circle_center"></div>
+				<img class="center_image" width="100px" height="100px" src="/system/templates/img/cmfive_V_logo.png" />
 				<h4 class="subheader">Uploading (0%)</h4>
 			</div>
 		</div>
@@ -215,7 +215,16 @@
                                             <li class="has-dropdown <?php echo $w->_module == $module ? 'active' : ''; ?>" id="topnav_<?php echo $module; ?>">
                                             <?php // Try and get a badge count for the menu item
                                                 echo $menu_link;
-                                                echo Html::ul($w->service($module)->navigation($w), null, "dropdown"); ?>
+                                                $module_navigation = $w->service($module)->navigation($w);
+												
+												// Invoke hook to inject extra navigation
+												$hook_navigation_items = $w->callHook($module, "extra_navigation_items", $module_navigation);
+												if (!empty($hook_navigation_items)) {
+													foreach($hook_navigation_items as $hook_navigation_item) {
+														$module_navigation[] = $hook_navigation_item[0];
+													}
+												}
+												echo Html::ul($module_navigation, null, "dropdown"); ?>
                                             </li>
                                         <?php else: ?>
                                             <li <?php echo $w->_module == $module ? 'class="active"' : ''; ?>><?php echo $menu_link; ?></li>

@@ -384,71 +384,43 @@ button.button + button {
 	padding:70px;
 }
 
+/* New circle animation */
 .loading_overlay .circle,
 .global_file_drop_overlay_loading .circle {
     background-color: rgba(0,0,0,0);
-    border: 4px solid rgba(0,183,229,0.9);
+    border: 10px solid rgba(0,183,229,0.9);
     opacity: .9;
-    border-right: 5px solid rgba(0,0,0,0);
-    border-left: 5px solid rgba(0,0,0,0);
-    border-radius: 40px;
-    /*box-shadow: 0 0 35px #008cba;*/
-    width: 45px;
-    height: 45px;
+    border-radius: 200px;
+    width: 150px;
+    height: 150px;
     margin: auto;
     position: absolute;
     top: 0; left: 0; bottom: 0; right: 0;
-    -moz-animation: spinPulse 1s infinite ease-in-out;
-    -webkit-animation: spinPulse 1s infinite ease-in-out;
+    -moz-animation: circlePulse 2s infinite linear;
+    -webkit-animation: circlePulse 2s infinite linear;
+	animation: circlePulse 2s infinite linear;
 }
 
-.loading_overlay .circle_inner,
-.global_file_drop_overlay_loading .circle_inner {
+.loading_overlay .center_image,
+.global_file_drop_overlay_loading .center_image {
     background-color: rgba(0,0,0,0);
-    border: 5px solid rgba(0,183,229,0.9);
-    opacity: .9;
-    border-left: 5px solid rgba(0,0,0,0);
-    border-right: 5px solid rgba(0,0,0,0);
-    border-radius: 50px;
-    /*box-shadow: 0 0 15px #008cba;*/
-    width: 30px;
-    height: 30px;
+    width: 100px;
+    height: 100px;
     position: relative;
     margin: auto;
     position: absolute;
     top: 0; left: 0; bottom: 0; right: 0;
-    -moz-animation: spinoffPulse 1s infinite linear;
-    -webkit-animation: spinoffPulse 1s infinite linear;
+    -moz-animation: bounceImage 2s infinite linear;
+    -webkit-animation: bounceImage 2s infinite linear;
+	animation: bounceImage 2s linear infinite;
 }
 
-.loading_overlay .circle_center,
-.global_file_drop_overlay_loading .circle_center {
-    background-color: rgba(0,0,0,0);
-    border: 4px solid rgba(0,183,229,0.9);
-    opacity: .9;
-	/*    border-left: 2px solid rgba(0,0,0,0);
-		border-right: 2px solid rgba(0,0,0,0);*/
-    border-radius: 50px;
-    /*box-shadow: 0 0 15px #008cba;*/
-    width: 15px;
-    height: 15px;
-    position: relative;
-    margin: auto;
-    position: absolute;
-    top: 0; left: 0; bottom: 0; right: 0;
-	/*    -moz-animation: spinPulse 2s infinite linear;
-		-webkit-animation: spinPulse 2s infinite linear;*/
-}
-
-.global_file_drop_area h4 {
-	
-}
 
 .loading_overlay h4,
 .global_file_drop_overlay h4 {
     color: white;
     font-weight: lighter;
-    padding-top: 100px;
+    padding-top: 150px;
     text-align: center;
     width: 200px;
     height: 60px;
@@ -524,6 +496,16 @@ ul.cmfive_breadcrumbs > li {
     font-size: 160%;
 }
 
+.cmfive_breadcrumbs .breadcrumb-content {
+	max-width: 120px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	display: inline-block;
+	text-align: center;
+	vertical-align: middle;
+}
+
 .multiFileUploadRow {
     padding: 5px;
     border: 1px solid grey;
@@ -549,46 +531,73 @@ a > div#active_log_time {
     position: fixed;
 }
 
-@-moz-keyframes spinPulse {
+@-moz-keyframes bounceImage {
     0% {
-        -webkit-transform: rotate(360deg);
+        -webkit-transform: scale(1);
     }
-
-    100% {
-        -webkit-transform: rotate(0deg);
+	45% {
+        -webkit-transform: scale(1.2);
     }
+    50% {
+        -webkit-transform: scale(1);
+    }
+	100% {
+		-webkit-transform: scale(1);
+	}
 }
 
-@-moz-keyframes spinoffPulse {
+@-webkit-keyframes bounceImage {
     0% {
-        -moz-transform: rotate(0deg);
+        -webkit-transform: scale(1);
     }
-
-    100% {
-        -moz-transform: rotate(360deg);
-    };
+	45% {
+        -webkit-transform: scale(1.2);
+    }
+    50% {
+        -webkit-transform: scale(1);
+    }
+	100% {
+		-webkit-transform: scale(1);
+	}
 }
 
-@-webkit-keyframes spinPulse {
+@-moz-keyframes circlePulse {
     0% {
-        -webkit-transform: rotate(360deg);
-    }
-
-    100% {
-        -webkit-transform: rotate(0deg);
-    }
+		-webkit-transform: scale(0.5);
+		opacity: 0.0;
+	}
+	40% {
+		-webkit-transform: scale(0.5);
+		opacity: 0.0;
+	}
+	45% {
+		-webkit-transform: scale(0.8);
+		opacity: 1.0;
+	}
+	100% {
+		-webkit-transform: scale(1.5);
+		opacity: 0.0;
+	}
 }
 
-@-webkit-keyframes spinoffPulse {
-    0% {
-        -webkit-transform: rotate(0deg);
-    }
-
-    100% {
-        -webkit-transform: rotate(360deg);
-    }
+@-webkit-keyframes circlePulse {
+	0% {
+		-webkit-transform: scale(0.5);
+		opacity: 0.0;
+	}
+	40% {
+		-webkit-transform: scale(0.5);
+		opacity: 0.0;
+	}
+	45% {
+		-webkit-transform: scale(0.8);
+		opacity: 1.0;
+	}
+	100% {
+		-webkit-transform: scale(1.5);
+		opacity: 0.0;
+	}
 }
-
 
 @media screen and (max-width: 640px) {
     .responsive-icon-bar .item {

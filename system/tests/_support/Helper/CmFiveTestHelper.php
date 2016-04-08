@@ -11,7 +11,10 @@ class CmFiveTestHelper extends \Codeception\Module
 	/****************************
 	 * MISC FUNCTIONS
 	 ****************************/
-
+	public function navigateTo($I,$menu,$submenu) {
+		$I->moveMouseOver(['css'=>'#topnav_'.$menu]);
+		$I->click($submenu);
+	}
 	
 	public function findTableRowMatching($I,$columnNumber,$matchValue) {
 		$rows=$I->grabMultiple('.tablesorter tbody tr td:nth-child('.$columnNumber.')');
@@ -23,7 +26,7 @@ class CmFiveTestHelper extends \Codeception\Module
 				}
 			}
 		}
-		return 0;
+		return false;
 	}
 
 	/**
@@ -104,6 +107,7 @@ class CmFiveTestHelper extends \Codeception\Module
 	 * Create a new user
 	 */
 	public function createUser($I,$username,$password,$firstName,$lastName,$email) {
+		$I->moveMouseOver(['css' => '#topnav_admin']);
 		$I->click('List Users');
 		$I->click('Add New User');
 		$I->fillForm($I,[
@@ -123,6 +127,7 @@ class CmFiveTestHelper extends \Codeception\Module
 	 */
 	public function deleteUser($I,$username) {
 		$actionCompleted=false; // make sure we do find the user
+		$I->moveMouseOver(['css' => '#topnav_admin']);
 		$I->click('List Users');
 		$usernames=$I->grabMultiple('.tablesorter tbody tr td:nth-child(1)');
 		//codecept_debug(array('got'=>'users'));
@@ -150,6 +155,7 @@ class CmFiveTestHelper extends \Codeception\Module
 	 */
 	public function setUserPermissions($I,$username,$permissions) {
 		$actionCompleted=false;  // make sure we do find the user
+		$I->moveMouseOver(['css' => '#topnav_admin']);
 		$I->click('List Users');
 		$usernames=$I->grabMultiple('.tablesorter tbody tr td:nth-child(1)');
 		//codecept_debug(array('got'=>'users'));
@@ -193,6 +199,7 @@ class CmFiveTestHelper extends \Codeception\Module
 	 */
 	public function updateUser($I,$username,$data) {
 		$actionCompleted=false;  // make sure we do find the user
+		$I->moveMouseOver(['css' => '#topnav_admin']);
 		$I->click('List Users');
 		$usernames=$I->grabMultiple('.tablesorter tbody tr td:nth-child(1)');
 		//codecept_debug(array('got'=>'users'));
@@ -227,6 +234,7 @@ class CmFiveTestHelper extends \Codeception\Module
 	 * Create a new user group
 	 */
 	public function createUserGroup($I,$title) {
+		$I->moveMouseOver(['css' => '#topnav_admin']);
 		$I->click('List Groups');
 		$I->click('New Group');
 		$I->fillField('#title',$title);
@@ -240,6 +248,7 @@ class CmFiveTestHelper extends \Codeception\Module
 	 */
 	public function deleteUserGroup($I,$title) {
 		$actionCompleted=false; // make sure we do find the user
+		$I->moveMouseOver(['css' => '#topnav_admin']);
 		$I->click('List Groups');
 		$titles=$I->grabMultiple('.tablesorter tbody tr td:nth-child(1)');
 		//codecept_debug(array('got'=>'users'));
@@ -266,6 +275,7 @@ class CmFiveTestHelper extends \Codeception\Module
 	 */
 	public function updateUserGroup($I,$oldTitle,$newTitle) {
 		$actionCompleted=false;  // make sure we do find the user
+		$I->moveMouseOver(['css' => '#topnav_admin']);
 		$I->click('List Groups');
 		$groups=$I->grabMultiple('.tablesorter tbody tr td:nth-child(1)');
 		if (is_array($groups))  {
@@ -288,6 +298,7 @@ class CmFiveTestHelper extends \Codeception\Module
 	 */
 	public function addUserToUserGroup($I,$user,$userLabel,$userGroup,$isOwner='') {
 		$actionCompleted=false;  // make sure we do find the user
+		$I->moveMouseOver(['css' => '#topnav_admin']);
 		$I->click('List Groups');
 		$groups=$I->grabMultiple('.tablesorter tbody tr td:nth-child(1)');
 		if (is_array($groups))  {
@@ -311,6 +322,7 @@ class CmFiveTestHelper extends \Codeception\Module
 	 */
 	public function removeUserFromUserGroup($I,$user,$userLabel,$userGroup) {
 		$actionCompleted=false;  // make sure we do find the user
+		$I->moveMouseOver(['css' => '#topnav_admin']);
 		$I->click('List Groups');
 		$groups=$I->grabMultiple('.tablesorter tbody tr td:nth-child(1)');
 		if (is_array($groups))  {
@@ -344,6 +356,7 @@ class CmFiveTestHelper extends \Codeception\Module
 	 */
 	public function setUserGroupPermissions($I,$userGroup,$permissions) {
 		$actionCompleted=false;  // make sure we do find the user
+		$I->moveMouseOver(['css' => '#topnav_admin']);
 		$I->click('List Groups');
 		$groups=$I->grabMultiple('.tablesorter tbody tr td:nth-child(1)');
 		//codecept_debug(array('got'=>'users'));
@@ -369,6 +382,7 @@ class CmFiveTestHelper extends \Codeception\Module
 		$I->assertTrue($actionCompleted);
 	}
 	
+
 	
 		
 	/****************************
@@ -379,6 +393,7 @@ class CmFiveTestHelper extends \Codeception\Module
 	 * Create a Task Group
 	 ****************************/
 	public function createTaskGroup($I,$taskGroup,$data) {
+		$I->moveMouseOver('Task');
 		$I->click('Task Groups');
 		$I->click('New Task Group');
 		$fields=[];
@@ -396,6 +411,7 @@ class CmFiveTestHelper extends \Codeception\Module
 	}
 
 	public function updateTaskGroup($I,$taskGroup,$data) {
+		$I->moveMouseOver('Task');
 		$I->click("Task Groups");
 		$actionCompleted=false;	
 		if ($rowNumber=$this->findTableRowMatching($I,1,$taskGroup) > 0)  {
@@ -418,6 +434,7 @@ class CmFiveTestHelper extends \Codeception\Module
 	}
 	
 	public function deleteTaskGroup($I,$taskGroup) {
+		$I->moveMouseOver('Task');
 		$I->click("Task Groups");
 		$actionCompleted=false;	
 		if ($rowNumber=$this->findTableRowMatching($I,1,$taskGroup) > 0)  {
@@ -433,6 +450,7 @@ class CmFiveTestHelper extends \Codeception\Module
 	}
 	
 	public function addMemberToTaskGroup($I,$taskGroup,$userLabel,$role) {
+		$I->moveMouseOver('Task');
 		$I->click("Task Groups");
 		$actionCompleted=false;	
 		if ($rowNumber=$this->findTableRowMatching($I,1,$taskGroup) > 0)  {
@@ -451,6 +469,7 @@ class CmFiveTestHelper extends \Codeception\Module
 	}
 	
 	public function updateMemberInTaskGroup($I,$taskGroup,$userLabel,$role) {
+		$I->moveMouseOver('Task');
 		$I->click("Task Groups");
 		$actionCompleted=false;	
 		if ($rowNumber=$this->findTableRowMatching($I,1,$taskGroup) > 0)  {
@@ -467,6 +486,7 @@ class CmFiveTestHelper extends \Codeception\Module
 		$I->assertTrue($actionCompleted);
 	}
 	public function removeMemberFromTaskGroup($I,$taskGroup,$userLabel) {
+		$I->moveMouseOver('Task');
 		$I->click("Task Groups");
 		$actionCompleted=false;	
 		if ($rowNumber=$this->findTableRowMatching($I,1,$taskGroup) > 0)  {
@@ -494,6 +514,7 @@ class CmFiveTestHelper extends \Codeception\Module
 	 * Create a task
 	 ****************************/
 	public function createTask($I,$taskGroup,$task,$data) {
+		$I->click("Task","section.top-bar-section ul.left");
 		$I->click('New Task');
 		$this->fillForm($I,[
 			'autocomplete:task_group_id'=>$taskGroup,
@@ -551,7 +572,7 @@ public function fillTimePicker($I,$field,$date) {
 
 public function fillAutocomplete($I,$field,$value) {
 	$I->fillField("#".$field,$value);
-	$I->waitForElement(".ui-autocomplete a",5);
+	$I->waitForElement(".ui-autocomplete a",2);
 	// down
 	$I->pressKey("#acp_".$field,"\xEE\x80\x95");
 	// select
@@ -680,7 +701,7 @@ public function fillAutocomplete($I,$field,$value) {
 		//$id=$dbRec['id'];
 		
 		$I->click('.editbutton[href^="'.$editButtonUrl.$id.'"]');
-		$I->wait(3);
+		$I->wait(1);
 		$I->fillForm($I,$updateData);
 		
 		$I->click($saveButtonSelector);
