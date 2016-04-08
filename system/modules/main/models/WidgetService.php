@@ -21,11 +21,10 @@ class WidgetService extends DbService {
 
 	public function getWidgetNamesForModule($module) {
 		$w = $this->w;
-		return array_filter($this->w->moduleConf($module, "widgets") ? : [], function($widget) use ($w) {
-			// Also filter out widgets that the user is not allowed to use
-			$widget_required_roles = (new $widget($w))->getRequiredRoles();
-			
-            return $w->isClassActive($widget) && (empty($widget_required_roles) || $w->Auth->user()->hasAnyRole($widget_required_roles));
+		$user = $w->Auth->user();
+		
+		return array_filter($this->w->moduleConf($module, "widgets") ? : [], function($widget) use ($w, $user) {
+			return $w->isClassActive($widget) && (new $widget($w))->canView($user);
 		});
 	}
 

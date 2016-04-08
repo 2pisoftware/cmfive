@@ -51,7 +51,7 @@ abstract class ModuleWidget extends DbService {
 	 * 
 	 * @return Array
 	 */
-	public function getRequiredRoles() {
-		return [];
+	public function canView(User $user) {
+		return true;
 	}
 }
