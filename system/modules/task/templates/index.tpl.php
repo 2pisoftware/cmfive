@@ -37,7 +37,7 @@
                 <?php if ($count_todo_urgent == 0) : ?>
                     <?php echo $count_todo_urgent; ?> task<?php echo $count_todo_urgent == 1 ? "" : "s"; ?> marked <strong>urgent</strong>
                 <?php else : ?>
-                    <?php echo Html::a($w->localUrl("/task/tasklist?assignee_id=" . $w->Auth->user()->id . "&task_priority=Urgent"), $count_todo_urgent . " task" . ($count_todo_urgent == 1 ? "" : "s")); ?> marked <strong>urgent</strong>
+                    <?php echo Html::a($w->localUrl("/task/tasklist?assignee_id=" . $w->Auth->user()->id . "&filter_urgent=true"), $count_todo_urgent . " task" . ($count_todo_urgent == 1 ? "" : "s")); ?> marked <strong>urgent</strong>
                 <?php endif; ?>
             </h2>
         </div>

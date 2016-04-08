@@ -45,6 +45,7 @@ Config::set('task.TaskGroupType_TaskTodo', array(
             array("Done", true), // is closing
             array("Rejected", true)), // is closing
 	'priorities' => array("Urgent", "Normal", "Nice to have"),
+	'urgent-priorities' => array("Urgent")
 ));
 
 //========= Properties of Task Type Programming Task =================
@@ -73,4 +74,5 @@ Config::set('task.TaskGroupType_SoftwareDevelopment', array(
 		array("Live", true), // is closing
 		array("Rejected", true)), // is closing
 	'priorities' => array("Urgent", "Normal", "Nice to have"),
+	'urgent-priorities' => array("Urgent")
 ));

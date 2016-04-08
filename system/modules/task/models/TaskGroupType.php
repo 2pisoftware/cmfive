@@ -80,6 +80,20 @@ abstract class TaskGroupType {
 	}
 
 	/**
+	 * Returns whether or not the given tasks priority is urgent
+	 * 
+	 * @param String priority
+	 * @return boolean
+	 */
+	function isUrgentPriority($priority) {
+		$urgent_priorities = Config::get("task.".get_class($this).".urgent-priorities");
+		if (is_array($urgent_priorities) && count($urgent_priorities) > 0 && !empty($priority)) {
+			return in_array($priority, $urgent_priorities);
+		}
+		return false;
+	}
+	
+	/**
 	 * Return array of task permissions
 	 * 
 	 */

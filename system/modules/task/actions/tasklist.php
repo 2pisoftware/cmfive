@@ -16,6 +16,7 @@ function tasklist_ALL(Web $w) {
         $is_closed = $w->request("is_closed");
         $dt_from = $w->request('dt_from');
         $dt_to = $w->request('dt_to');
+		$filter_urgent = $w->request('filter_urgent');
     }
     
     // Make the query manually
@@ -78,7 +79,10 @@ function tasklist_ALL(Web $w) {
     
 	// Filter in or out closed tasks based on given is_closed filter parameter
 	if (!empty($task_objects)) {
-		$task_objects = array_filter($task_objects, function($task) use ($is_closed) {
+		$task_objects = array_filter($task_objects, function($task) use ($is_closed, $filter_urgent) {
+			if (!is_null($filter_urgent)) {
+				return $task->isUrgent();
+			}
 			return (is_null($is_closed) || $is_closed == 0) ? !$task->getisTaskClosed() : $task->getisTaskClosed();
 		});
 	}
