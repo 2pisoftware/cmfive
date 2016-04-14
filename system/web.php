@@ -3,6 +3,7 @@
 ini_set('session.gc_maxlifetime', 21600);
 
 //========== Constants =====================================
+defined("DS") || define("DS", DIRECTORY_SEPARATOR);
 define("CMFIVE_VERSION", "0.8.4");
 
 define("ROOT_PATH", str_replace("\\", "/", getcwd()));
@@ -123,20 +124,22 @@ class Web {
     }
 
     private function modelLoader($className) {
-    	// 1. check if class directory has to be loaded from cache
+		// 1. check if class directory has to be loaded from cache
     	$classdirectory_cache_file = ROOT_PATH."/cache/classdirectory.cache";
     	
     	if (empty($this->_classdirectory) && file_exists($classdirectory_cache_file)) {
     		require_once $classdirectory_cache_file;
     	}
-    	// 2. if filename is stored in $this->_classdirectory
+    	
+		// 2. if filename is stored in $this->_classdirectory
     	if (!empty($this->_classdirectory[$className])) {
     		if (file_exists($this->_classdirectory[$className])) {
-    			require_once $this->_classdirectory[$className];
+    			require $this->_classdirectory[$className];
     			return true;
     		}
     	}
-    	// 3. class has to be found the hard way
+    	
+		// 3. class has to be found the hard way
         $modules = $this->modules();
         
         // create the class cache file
@@ -148,7 +151,7 @@ class Web {
             if (Config::get("{$model}.active") === true) {
                 $file = $this->getModuleDir($model) . 'models/' . ucfirst($className) . ".php";
                 if (file_exists($file)) {
-                    require_once $file;
+                    require $file;
                     // add this class file to the cache file
                     file_put_contents($classdirectory_cache_file,'$this->_classdirectory["'.$className.'"]="'.$file.'";'."\n", FILE_APPEND);
                     return true;
@@ -156,7 +159,7 @@ class Web {
                     // Try a lower case version
                     $file = $this->getModuleDir($model) . 'models/' . $className . ".php";
                     if (file_exists($file)) {
-                        require_once $file;
+                        require	 $file;
                         // add this class file to the cache file
                     	file_put_contents($classdirectory_cache_file,'$this->_classdirectory["'.$className.'"]="'.$file.'";'."\n", FILE_APPEND);
                         return true;
@@ -164,6 +167,21 @@ class Web {
                 }
             }
         }
+		
+		// Also autoload the html namespace
+		if (strstr($className, "Html") !== FALSE) {
+			$filePath = explode('\\', $className);
+			$class = array_pop($filePath);
+			$file = 'system' . DS . 'classes' . DS . strtolower(implode("/", $filePath)) . DS . $class . ".php";
+			
+			// echo $file; var_dump(file_exists($file)); die();
+			
+			if (file_exists($file)) {
+				require_once $file;
+				file_put_contents($classdirectory_cache_file,'$this->_classdirectory["'.$className.'"]="'.$file.'";'."\n", FILE_APPEND);
+				return true;
+			}
+		}
         // $this->Log->debug("Class " . $file . " not found.");
         return false;
     }
@@ -200,6 +218,15 @@ class Web {
      * already registered scripts and helps prevent multiple additions of the same
      * library
      * 
+	 * A script entry should be in the form:
+	 * Array(
+	 *		"name" => "<name>",
+	 *		"uri" => "<uri>"
+	 *		"weight" => "<weight>" (used to order the loading of scripts, scripts
+	 *			are loaded in descending order of weight, e.g a script with a 1000 
+	 *			weight will load before one with 600)
+	 * )
+	 * 
      * @param Array $script
      */
     function enqueueScript($script) {

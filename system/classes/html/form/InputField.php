@@ -7,15 +7,17 @@
  * Developer Network <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input>
  * 
  * @author Adam Buckley <adam@2pisoftware.com>
+ * @see \Html\GlobalAttribtues
  */
-class InputField {
+class InputField extends \Html\Element {
+	
+	use \Html\GlobalAttributes, \Html\Events;
 	
     public $accept;
 	public $autocomplete;
     public $autofocus;
 	public $autosave;
 	public $checked;
-	public $class = "small-12 columns";
 	public $disabled;
 	public $form;
 	public $formaction;
@@ -24,7 +26,6 @@ class InputField {
 	public $formnovalidate;
 	public $formtarget;
 	public $height;
-	public $id;
 	public $inputmode;
 	public $list;
 	public $max;
@@ -39,17 +40,11 @@ class InputField {
 	public $required;
 	public $selectionDirection;
 	public $size;
-	public $spellcheck;
-	public $style;
 	public $src;
 	public $step;
-	public $tabindex;
 	public $usemap;
 	public $value;
 	public $width;
-	
-	// Cmfive non standard paramters
-	public $label;
 	
 	// Default to text input field
     public $type = 'text';
@@ -57,18 +52,15 @@ class InputField {
 	/**
 	 * This constructor will take an associative array where the keys match any
 	 * field given above and set the field value to the corresponding array
-	 * key value.
+	 * key value (implementation in parent).
 	 * 
 	 * @param Array $fields
 	 */
 	public function __construct($fields = []) {
-		if (!empty($fields) && is_array($fields)) {
-			foreach($fields as $key => $value) {
-				if (property_exists($this, $key)) {
-					$this->{$key} = $value;
-				}
-			}
-		}
+		// Set default GlobalAttribute's $class
+		$this->setClass("small-12 columns");
+	
+		parent::__construct($fields);
 	}
 	
 	/**
@@ -120,19 +112,6 @@ class InputField {
 		"url" => "url",							// HTML5
 		"week" => "week"						// HTML5
 	];
-    
-	// Cmfive Setters
-	
-	/**
-	 * 
-	 * @param String $label
-	 * @return 
-	 */
-	public function setLabel($label) {
-		$this->label = $label;
-		
-		return $this;
-	}
 	
 	// HTML5 Setters
 	
@@ -225,19 +204,6 @@ class InputField {
 	 */
 	public function setChecked($checked) {
 		$this->checked = (bool) $checked;
-		
-		return $this;
-	}
-	
-	/**
-	 * Sets the class attribute for the field. Cmfive default to the "small-12"
-	 * Foundation class.
-	 * 
-	 * @param String $class
-	 * @return \Html\Form\InputField this
-	 */
-	public function setClass($class) {
-		$this->class = $class;
 		
 		return $this;
 	}
@@ -389,18 +355,6 @@ class InputField {
 	 */
 	public function setHeight($height) {
 		$this->height = $height;
-		
-		return $this;
-	}
-	
-	/**
-	 * Sets the ID field
-	 * 
-	 * @param String $id
-	 * @return \Html\Form\InputField this
-	 */
-	public function setId($id) {
-		$this->id = $id;
 		
 		return $this;
 	}
@@ -616,22 +570,6 @@ class InputField {
 	}
 	
 	/**
-	 * Setting the value of this attribute to true indicates that the element 
-	 * needs to have its spelling and grammar checked. The value default 
-	 * indicates that the element is to act according to a default behavior, 
-	 * possibly based on the parent element's own spellcheck value. The value 
-	 * false indicates that the element should not be checked.
-	 * 
-	 * @param Mixed $spellcheck
-	 * @return \Html\Form\InputField this
-	 */
-	public function setSpellcheck($spellcheck) {
-		$this->spellcheck = $spellcheck;
-		
-		return $this;
-	}
-	
-	/**
 	 * If the value of the type attribute is image, this attribute specifies a 
 	 * URI for the location of an image to display on the graphical submit 
 	 * button; otherwise it is ignored.
@@ -662,35 +600,10 @@ class InputField {
 	}
 	
 	/**
-	 * Sets the style attribute so that this element can be styled with CSS
-	 * 
-	 * @param String $style
-	 * @return \Html\Form\InputField this
-	 */
-	public function setStyle($style) {
-		$this->style = $style;
-		
-		return $this;
-	}
-	
-	/**
-	 * The position of the element in the tabbing navigation order for the 
-	 * current document.
-	 * 
-	 * @param Mixed $tabindex
-	 * @return \Html\Form\InputField this
-	 */
-	public function setTabindex($tabindex) {
-		$this->tabindex = $tabindex;
-		
-		return $this;
-	}
-	
-	/**
 	 * The type of control to display. The default type is text, if this 
 	 * attribute is not specified. Possible values are: button, checkbox, color,
 	 * date, datetime, datetime-local, email, file, hidden, image, month,
-	 * number, password, radio, range, reset, search, submid, tel, text, time,
+	 * number, password, radio, range, reset, search, submit, tel, text, time,
 	 * url, week.
 	 * 
 	 * @param String $type
