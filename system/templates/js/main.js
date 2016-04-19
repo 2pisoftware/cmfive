@@ -181,6 +181,18 @@ function toggleModalLoading() {
     }
 }
 
+function showModalLoading() {
+	if (!$(".loading_overlay").is(":visible")) {
+		$(".loading_overlay").show();
+	}
+}
+
+function hideModalLoading() {
+	if ($(".loading_overlay").is(":visible")) {
+		$(".loading_overlay").hide();
+	}
+}
+
 function bindCodeMirror() {
     var _codeMirror = [];
     //setup code-mirror

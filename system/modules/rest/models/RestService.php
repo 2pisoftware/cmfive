@@ -16,7 +16,7 @@ class RestService extends RestSearchableService {
 	 * Get a token for the rest api.
 	 * Only return a token if the user is not already logged in.
 	 ********************************************/
-	function getTokenJson($api,$username, $password) {
+	function getTokenJson($api,$username = null, $password = null) {
 		$user=$this->w->Auth->_user;
 		if (intval($user->id) > 0) { 
 			// OK
