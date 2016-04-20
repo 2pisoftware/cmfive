@@ -51,6 +51,10 @@
         <script type="text/javascript">
             var $ = jQuery;
             $(document).ready(function() {
+				
+				// Focus first field
+				$('form:first *:input[type!=hidden]:first').focus();
+				
                 $("table.tablesorter").tablesorter({dateFormat: "uk", widthFixed: true, widgets: ['zebra']});
                 $(".tab-head").children("a").each(function() {
                     $(this).bind("click", {alink: this}, function(event) {
@@ -110,11 +114,19 @@
             $("input[type=submit]").click(function() {
                 $(this).hide();
             });
+			
             $(document).bind('cbox_complete', function() {
                 $("input[type=submit]").click(function() {
                     $(this).hide();
                 });
             });
+			
+			// Focus first form element when the modal opens
+			$(document).ready(function() {
+				$(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
+					$('form:first :input:visible:enabled:first', $(this)).focus();
+				});
+			});
         </script>
     </head>
     <body>

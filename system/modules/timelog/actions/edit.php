@@ -2,16 +2,9 @@
 
 use \Html\Form\InputField as InputField;
 use \Html\Form\InputField\Number as Number;
+use \Html\Form\Textarea as Textarea;
 
 function edit_GET(Web $w) {
-	
-//	var_dump(strtotime("2016-03-04 11:30"));
-//	var_dump(strtotime("2016-03-04 11:30 AM") );
-//	var_dump(strtotime("2016-03-04 2:30 PM") );
-//	var_dump(strtotime("2016-03-04 23:30") );
-//	var_dump(strtotime("2016-03-04 11:30PM") );
-//	var_dump(strtotime("2016-03-04 11:30AM") ); // ALl VALID ABOVE
-//	var_dump(strtotime("2016-03-04 23:30pm") ); // INVALID
 	
 	$p = $w->pathMatch("id");
 	
@@ -66,7 +59,7 @@ function edit_GET(Web $w) {
 				!$timelog->isRunning() ? (new Number())->setLabel("Minutes Worked")->setName("minutes_worked")->setValue($timelog->getMinutesWorked())
 							->setMin(0)->setMax(59)->setStep(1)->setPlaceHolder("0-59") : null,
 			],
-			[(new InputField())->setLabel("Description")->setName("description")->setValue(!empty($comment) ? $comment->comment : null)]
+			[(new Textarea())->setLabel("Description")->setName("description")->setValue(!empty($comment) ? $comment->comment : null)->setRows(8)]
 		]
 	];
 	

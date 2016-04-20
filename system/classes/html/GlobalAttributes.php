@@ -322,7 +322,7 @@ trait GlobalAttributes {
 	/**
 	 * Is an enumerated attribute defines whether the element may be checked for
 	 * spelling errors. It may have the following values: true, false
-	 * 
+	 *
 	 * @param string $spellcheck
 	 * @return this
 	 */

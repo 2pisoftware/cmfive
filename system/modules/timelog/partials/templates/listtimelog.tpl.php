@@ -12,7 +12,7 @@
 					<td><?php echo $timelog->getFullName(); ?></td>
 					<td><?php echo formatDate($timelog->dt_start, "d-m-Y H:i:s"); ?></td>
 					<td><?php echo formatDate($timelog->dt_end, "d-m-Y H:i:s"); ?></td>
-					<td><?php echo $timelog->getComment()->comment; ?></td>
+					<td><pre style="font-family: sans-serif;"><?php echo $timelog->getComment()->comment; ?></pre></td>
 					<td>
 						<?php echo Html::box('/timelog/edit/' . $timelog->id . (!empty($redirect) ? "?redirect=$redirect" : ''), 'Edit', true); ?>
 						<?php echo Html::b('/timelog/delete/' . $timelog->id . (!empty($redirect) ? "?redirect=$redirect" : ''), 'Delete', 'Are you sure you want to delete this timelog?'); ?>

@@ -20,7 +20,7 @@
 		<div class="row">
 			<div class="large-12 columns">
 				<label>Enter Description
-					<input type="text" id="timelog_description" name="timelog_description" />
+					<?php echo (new \Html\Form\Textarea())->setId("timelog_description")->setName("timelog_description")->setRows(8); ?>
 				</label>
 			</div>
 		</div>

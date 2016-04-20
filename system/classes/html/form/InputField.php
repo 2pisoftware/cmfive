@@ -9,7 +9,7 @@
  * @author Adam Buckley <adam@2pisoftware.com>
  * @see \Html\GlobalAttribtues
  */
-class InputField extends \Html\Element {
+class InputField extends \Html\Form\FormElement {
 	
 	use \Html\GlobalAttributes, \Html\Events;
 	

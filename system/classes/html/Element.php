@@ -8,8 +8,6 @@
  */
 abstract class Element {
 	
-	public $label;
-	
 	/**
 	 * Constructor to set fields for subclassed object
 	 * 
@@ -25,15 +23,4 @@ abstract class Element {
 		}
 	}
 
-	/**
-	 * Sets the label for Cmfive used by form builders
-	 * @param string $label
-	 * @return \Html\Element this
-	 */
-	public function setLabel($label) {
-		$this->label = $label;
-		
-		return $this;
-	}
-	
 }
