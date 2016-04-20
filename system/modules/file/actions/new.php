@@ -12,7 +12,7 @@ function new_GET(Web $w) {
 	
 	$_form = [
 		'New Attachment' => [
-			[["File", "file", "file"]],
+			[(new \Html\Form\InputField\File())->setName("file")->setId("file")->setAttribute("capture", "camera")], // ["File", "file", "file"]
 			[["Title", "text", "title"]],
 			[["Description", "textarea", "description", "",null,null,'justtext']]
 		]
