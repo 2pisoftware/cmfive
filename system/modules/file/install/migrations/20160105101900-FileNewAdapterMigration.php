@@ -1,6 +1,6 @@
 <?php
 
-class FileAdapterMigration extends CmfiveMigration {
+class FileNewAdapterMigration extends CmfiveMigration {
 	
 	public function up() {
 		
