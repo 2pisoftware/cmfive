@@ -538,8 +538,8 @@ class Html {
         if ($includeFormTag) {
             $class .= " small-12 columns";
             $form->id($id)->name($id)->setClass($class)->method($method)->action($action)->target($target);
-                
-            if (in_multiarray("file", $data)) {
+        
+            if (in_multiarray("file", $data) || objectPropertyHasValueInMultiArray("\Html\Form\InputField", "type", "file", $data)) {
                 $form->enctype("multipart/form-data");
             }
             

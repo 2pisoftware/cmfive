@@ -150,9 +150,41 @@ class Task extends DbObject {
         return $this->getCanIView();
     }
 
-    // Until we know exactly who can delete, restrict it to admin
+    /**
+	 * The following users can delete a task:
+	 * - Administrators
+	 * - Users with the task_admin role
+	 * - Task group owners
+	 * - Task owners
+	 * 
+	 * @param \User $user
+	 * @return boolean
+	 */
+
     function canDelete(\User $user) {
-        return ($user && $user->is_admin);
+		// User is admin
+		if ($user->is_admin) {
+			return true;
+		}
+		
+		// User has role task_admin
+		if ($user->hasRole("task_admin")) {
+			return true;
+		}
+		
+		// User is taskgroup owner
+		$taskgroup = $this->getTaskgroup();
+		if ($taskgroup->isOwner($user)) {
+			return true;
+		}
+
+		// User is task creator
+		$creator = $this->_modifiable->getCreator();
+		if ($creator->id === $user->id) {
+			return true;
+		}
+		
+        return false;
     }
     
     // get my membership object and check i am better than GUEST of a task group given a task group ID

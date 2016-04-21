@@ -520,6 +520,33 @@ function in_multiarray($value, $array) {
     return false;
 }
 
+/**
+ * This function finds instances of the given $object and returns whether or not
+ * a matching instances property has a certain value when stored in a multi
+ * dimensional array (value matching only)
+ * 
+ * @param string $object
+ * @param string $property
+ * @param mixed $value
+ * @param array $multiarray
+ * @return boolean
+ */
+function objectPropertyHasValueInMultiArray($object, $property, $value, $multiarray = []) {
+	if (!empty($multiarray)) {
+		foreach($multiarray as $array_key => $array_value) {
+			if (is_array($array_value)) {
+				return objectPropertyHasValueInMultiArray($object, $property, $value, $array_value);
+			}
+			
+			if (is_object($array_value) && is_a($array_value, $object, true) && property_exists($array_value, $property) && $array_value->$property === $value) {
+				return true;
+			}
+ 		}
+	}
+	
+	return false;
+}
+
 // Find a value in a multidimension array
 // Modified to only look at the keys, this will always return true in instances like:
 // Look for file in form array, will be true is the values in the select is file (like get all modules)

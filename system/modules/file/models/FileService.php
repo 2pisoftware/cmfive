@@ -284,8 +284,8 @@ class FileService extends DbService {
 		$replace_underscore = array(" ", "&", "+", "$", "?", "|", "%", "@", "#", "(", ")", "{", "}", "[", "]", ",", ";", ":");
 		
 		//Check for posted content
-		if(!empty($_POST[$requestkey])) {
-			$filename = str_replace($replace_underscore, "_", str_replace($replace_empty, "", $_POST['fname']));
+		if(!empty($_POST[$requestkey]) && empty($_FILES[$requestkey])) {
+			$filename = str_replace($replace_underscore, "_", str_replace($replace_empty, "", $_POST[$requestkey]));
 		} else {
 			$filename = str_replace($replace_underscore, "_", str_replace($replace_empty, "", basename($_FILES[$requestkey]['name'])));
 		}

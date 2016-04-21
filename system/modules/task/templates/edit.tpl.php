@@ -1,13 +1,7 @@
 <div class="tabs">
     <div class="tab-head">
         <a href="#details">Task Details</a>
-		<?php if (!empty($task->id)) :
-            /*
-             partial template files changed to incorporate a class for each counting of objects
-            ./system/modules/file/partials/templates/listattachments.tpl.php
-            ./system/modules/timelog/partials/templates/listtimelog.tpl.php
-             */
-        ?>
+		<?php if (!empty($task->id)) : ?>
             <a href="#timelog">Time Log <span id='total_timelogs' class='total_number'></span></a>
             <a href="#comments">Comments <span id='total_comments' class='total_number'></span></a>
             <a href="#attachments">Attachments <span id='total_attachments' class='total_number'></span></a>
