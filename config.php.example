@@ -2,21 +2,21 @@
 
 //======= Override Main Module Company Parameters ============
 
-Config::append('main.application_name', 'Cmfive');
-Config::append('main.company_name', '2pi Software');
-Config::append('main.application_logo', '/system/templates/img/cmfive-logo.png');
-Config::append('main.company_url', 'http://2pisoftware.com');
+Config::set('main.application_name', 'Cmfive');
+Config::set('main.company_name', '2pi Software');
+Config::set('main.application_logo', '/system/templates/img/cmfive-logo.png');
+Config::set('main.company_url', 'http://2pisoftware.com');
 
 // enter a valid email address
-Config::append('main.company_support_email','');
+Config::set('main.company_support_email','');
 
-// append this to true to display a big notice bar at the top of each page
-Config::append('system.test_mode', false);
-Config::append('system.test_mode_message', "You are using a test system");
+// set this to true to display a big notice bar at the top of each page
+Config::set('system.test_mode', false);
+Config::set('system.test_mode_message', "You are using a test system");
 
 //=============== Timezone ===================================
 
-Config::append('system.timezone','Australia/Sydney');
+Config::set('system.timezone','Australia/Sydney');
 
 //========== Database Configuration ==========================
 
@@ -71,7 +71,7 @@ Config::append('system.allow_action', array(
 
 // use the API_KEY to authenticate with username and password
 
-Config::append('system.rest_api_key', "abcdefghijklmnopqrstuvwxyz1234567890");
+Config::set('system.rest_api_key', "abcdefghijklmnopqrstuvwxyz1234567890");
 
 // include class of objects that you want available via REST
 // be aware that only the listed objects will be available via
