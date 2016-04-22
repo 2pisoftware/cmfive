@@ -227,7 +227,7 @@ class Textarea extends \Html\Form\FormElement {
 	 * @param string $required
 	 * @return \Html\Form\Textarea
 	 */
-	public function setRequried($required) {
+	public function setRequired($required) {
 		$this->required = $required;
 		
 		return $this;
