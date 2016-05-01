@@ -99,10 +99,12 @@ class Web {
         $this->_hooks = array();
         
         // if using IIS then value is "off" for non ssl requests
-        if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == "off") {
-        	$this->_webroot = "http://" . $_SERVER['HTTP_HOST'];
+        $sHttps=array_key_exists('HTTPS',$_SERVER) ? $_SERVER['HTTPS'] : '';
+        $sHttpHost=array_key_exists('HTTP_HOST',$_SERVER) ? $_SERVER['HTTP_HOST'] : '';
+        if (empty($sHttps) || $sHttps == "off") {
+        	$this->_webroot = "http://" . $sHttpHost;
         } else {
-        	$this->_webroot = "https://" . $_SERVER['HTTP_HOST'];
+        	$this->_webroot = "https://" . $sHttpHost;
         }
         $this->_actionMethod = null;
 
@@ -111,7 +113,7 @@ class Web {
 		defined("WEBROOT") ||  define("WEBROOT", $this->_webroot);
 		
         // conditions to start the installer
-        $this->_is_installing = strpos($_SERVER['REQUEST_URI'], '/install') === 0 ||
+        $this->_is_installing = (array_key_exists('REQUEST_URI',$_SERVER) && strpos($_SERVER['REQUEST_URI'], '/install') === 0) ||
                                 !file_exists(ROOT_PATH . "/config.php");
 
         $this->loadConfigurationFiles();
@@ -416,7 +418,7 @@ class Web {
         // using <module>_<action>_<type>()
         // or just <action>_<type>()
 
-        $this->_requestMethod = $_SERVER['REQUEST_METHOD'];
+        $this->_requestMethod = array_key_exists('REQUEST_METHOD',$_SERVER) ? $_SERVER['REQUEST_METHOD'] : '';
         $actionmethods[] = $this->_action . '_' . $this->_requestMethod;
         $actionmethods[] = $this->_action . '_ALL';
         $actionmethods[] = 'default_ALL';
@@ -933,7 +935,7 @@ class Web {
      * @param string $array
      * @return string html code
      */
-    function menuButton($path, $title, &$array = null,$id) {
+    function menuButton($path, $title, &$array = null,$id='') {
         $link = $this->Auth->allowed($path, Html::b($this->localUrl($path), $title,null,$id));
         if ($array !== null) {
             $array[] = $link;
