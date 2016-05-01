@@ -51,7 +51,7 @@ class exampleGenericCRUDCest
 		// $I->editRecord($I,$this);//// not flexible enough
 		$I->doEditRecord($I,$this->navSelector,$this->moduleUrl.'edit/','Save',$this->recordLabel.' updated',$this->databaseTable, $this->validDBRecord,$this->updateData);
 		// delete
-		$I->doDeleteRecord($I,$this->navSelector, $this->moduleUrl.'delete/','Object Deleted',  $this->databaseTable,$this->validDBRecord);
+		//$I->doDeleteRecord($I,$this->navSelector, $this->moduleUrl.'delete/','Object Deleted',  $this->databaseTable,$this->validDBRecord);
 		
 	}
 	
