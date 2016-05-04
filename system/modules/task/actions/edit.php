@@ -39,7 +39,7 @@ function edit_GET($w) {
     
     // Create form
     $form = array(
-        (!empty($p["id"]) ? 'Edit task [' . $task->id . ']' : "Create a new task") => array(
+        (!empty($p["id"]) ? 'Edit task [' . $task->id . '] - Created: ' . formatDate($task->_modifiable->getCreatedDate()) : "Create a new task") => array(
             array(
 				!empty($p["id"]) ?
                         array("Task Group", "text", "-task_group_id_text", $taskgroup->title) :
@@ -76,7 +76,7 @@ function edit_GET($w) {
     if (empty($p['id'])) {
     	History::add("New Task");
     } else {
-    	History::add("Task: {$task->title}");
+    	History::add("Task: {$task->title}", null, $task);
     }
     $w->ctx("task", $task);
     $w->ctx("form", Html::multiColForm($form, $w->localUrl("/task/edit/{$task->id}"), "POST", "Save", "edit_form", null, null, "_self", true, Task::$_validation));

@@ -12,7 +12,7 @@ function viewtaskgroup_GET(Web &$w) {
 	$group_details = $w->Task->getTaskGroup($p['id']);
 
 	if (!empty($group_details)) {
-		History::add("Taskgroup: ".$group_details->title);
+		History::add("Taskgroup: ".$group_details->title, null, $group_details);
 	}
 	// if is_active is set to '0', display 'Yes', else display 'No'
 	$isactive = $group_details->is_active == "1" ? "Yes" : "No";

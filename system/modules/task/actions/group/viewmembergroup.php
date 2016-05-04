@@ -14,7 +14,7 @@ function viewmembergroup_GET(Web $w) {
 	// put the group title into the page heading
 	$w->Task->navigation($w, "Task Group - " . $group->title);
 
-	History::add("Task Group: ".$group->title);
+	History::add("Task Group: ".$group->title, null, $group);
 		
 	// set columns headings for display of members
 	$line[] = array("Member","Role","");

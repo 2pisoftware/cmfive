@@ -34,12 +34,27 @@ class Task extends DbObject {
     );
     public static $_db_table = "task";
 
-    // @TODO: add TaskData and TaskComments
+    /**
+	 * Adds task type and task data to the index
+	 * 
+	 * @return string
+	 */
     function addToIndex() {
         $ttype = $this->getTaskTypeObject();
+		$index = [];
         if ($ttype) {
-            return $ttype->addToIndex($this);
+            $index[] = $ttype->addToIndex($this);
         }
+		
+		$data = $this->getTaskData();
+		if (!empty($data)) {
+			foreach($data as $d) {
+//				var_dump($d);
+				$index[] = $d->addToIndex();
+			}
+		}
+//		var_dump($index); die();
+		return implode(' ', $index);
     }
 
     public function __get($name) {
@@ -69,6 +84,15 @@ class Task extends DbObject {
         }
     }
 
+	/**
+	 * Retuns all TaskData associated with this task
+	 * 
+	 * @return array<TaskData>
+	 */
+	function getTaskData() {
+		return $this->getObjects("TaskData", ["task_id" => $this->id]);
+	}
+	
     /**
      * return the value of task data given the task ID and the key/name of the target attribute
      * task data is associated with the additional form fields available to a task type
@@ -314,7 +338,8 @@ class Task extends DbObject {
     // return due date in bold red for display, if it is on or past the due date
     function isTaskLate() {
         if (($this->dt_due == "0000-00-00 00:00:00") || ($this->dt_due == "")) {
-            return "Not given";
+			return "<em>" . formatDate($this->_modifiable->getCreatedDate()) . " (Created)</em>";
+//            return "Not given";
 		}
 		
         if ((!$this->getisTaskClosed()) && (time() > $this->dt_due)) {

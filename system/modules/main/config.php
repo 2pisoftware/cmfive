@@ -10,5 +10,8 @@ Config::set('main', array(
     'company_url' => 'http://github.com/careck/cmfive',
     "dependencies" => array(
         "monolog/monolog" => "1.8.*@dev"
-    )
+    ),
+	'hooks' => [
+		'core_dbobject'
+	]
 ));

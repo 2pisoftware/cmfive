@@ -13,7 +13,7 @@ function edit_GET(Web &$w) {
     if (empty($report)) {
     	History::add("Create Report");
     } else {
-    	History::add("Edit Report: ".$report->title);
+    	History::add("Edit Report: ".$report->title, null, $report);
     }
     
     $w->ctx("report", $report);

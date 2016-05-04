@@ -171,6 +171,7 @@
                 'extra': extras_form
             },
             complete: function(response) {
+//				debugger;
                 if ($.isNumeric(response.responseText)) {
                     window.location.href = "/task/edit/" + response.responseText;
                 } else {
