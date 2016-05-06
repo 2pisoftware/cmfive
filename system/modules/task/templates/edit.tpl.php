@@ -28,6 +28,7 @@
 							//echo $w->Tag->getTagButton($task->id,"Task")."&nbsp;";
 							echo $task->canDelete($w->Auth->user()) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), "Delete", "Are you sure you want to delete this task?" ) : ''; 
 							echo Html::b($task->w->localURL('task/duplicatetask/' . $task->id), "Duplicate Task");
+                            echo Html::b($task->w->localURL('/task/edit/?gid=' . $task->task_group_id), "New Task");
 							echo $w->partial('listTags',['object' => $task], 'tag');
 						}
 					?>
