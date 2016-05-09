@@ -19,11 +19,21 @@ function saveNewTaskgroup_POST(Web $w) {
 	$new_taskgroup = $w->Task->getTaskGroup($new_taskgroup_id);
 	$task = $w->Task->getTask($task_id);
 	
-	if ($old_taskgroup->task_group_type == $new_taskgroup->task_group_type) {
-		$task->task_group_id = $new_taskgroup->id;
-		$task->update();
+	// If moving to taskgroup of same type
+	$task->task_group_id = $new_taskgroup->id;
+	if ($old_taskgroup->task_group_type !== $new_taskgroup->task_group_type) {
+		$new_task_type = $w->request("new_task_type");
+		$new_status = $w->request("new_task_status");
+		$new_priority = $w->request("new_task_priority");
+		$new_assignee = $w->request("new_task_assignee");
 		
-		$w->msg("Taskgroup changed", "/task/edit/" . $task->id);
+		$task->task_type = $new_task_type;
+		$task->status = $new_status;
+		$task->priority = $new_priority;
+		$task->assignee_id = $new_assignee;
 	}
+	
+	$task->update(false, false);
+	$w->msg("Taskgroup changed", "/task/edit/" . $task->id);
 		
 }

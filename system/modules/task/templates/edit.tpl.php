@@ -125,8 +125,8 @@
             // Get/check for extra form fields
             $.getJSON("/task/ajaxGetFieldForm/" + $("#task_type").val() + "/" + $("#task_group_id").val() + "/<?php echo !empty($task->id) ? $task->id : ''; ?>",
                 function(result) {
-                    if (result[0]) {
-                        $("#formfields").html(result[0]);
+                    if (result) {
+                        $("#formfields").html(result);
                         $("#formfields").fadeIn();
                     }
                 }
@@ -172,6 +172,7 @@
                 'extra': extras_form
             },
             complete: function(response) {
+				console.log(response);
 //				debugger;
                 if ($.isNumeric(response.responseText)) {
                     window.location.href = "/task/edit/" + response.responseText;

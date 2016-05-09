@@ -11,6 +11,9 @@ class Autocomplete extends \Html\Element {
 	
 	use \Html\GlobalAttributes;
 	
+	// A prefix for the autocomplete text field
+	public static $_prefix = "acp_";
+	
 	public $minlength = 3;
 	public $name;
 	public $options = [];
@@ -19,7 +22,7 @@ class Autocomplete extends \Html\Element {
 	
 	public static $_excludeFromOutput = [
 		"id", "name", "required", "value", "minlength", "class", "style",
-		"options"
+		"options", "_prefix"
 	];
 	
 	/**
@@ -140,18 +143,20 @@ class Autocomplete extends \Html\Element {
 			}
 		}
 		
+		$prefix = static::$_prefix;
+		
 		return <<<BUFFER
 <input type="text" style="display: none;" id="{$this->id}"  name="{$this->name}" value="{$this->value}" {$attribute_buffer} />
-<input type="text" id="acp_{$this->id}"  name="acp_{$this->name}" value="{$this->value}" class="{$this->class}" style="{$this->style}" {$required} />
+<input type="text" id="{$prefix}{$this->id}"  name="{$prefix}{$this->name}" value="{$this->value}" class="{$this->class}" style="{$this->style}" {$required} />
 <script type='text/javascript'>
 	(function() {
-		$("#acp_{$this->name}").keyup(function(e){
+		$("#{$prefix}{$this->name}").keyup(function(e){
 			if (e.which != 13) { 	
 				$("#{$this->name}").val("");
 			}
 		});
 		
-		$("#acp_{$this->name}").autocomplete({
+		$("#{$prefix}{$this->name}").autocomplete({
 			minLength: {$this->minlength}, 
 			source: {$source},
 			select: function(event,ui) {

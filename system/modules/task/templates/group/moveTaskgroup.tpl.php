@@ -17,7 +17,7 @@
 			]));
 			echo (new \Html\Form\InputField\Hidden([
 				"name" => "new_taskgroup_id",
-				"id" => "new_taskgroup_id"
+				"class" => "new_taskgroup_id"
 			]));
 			echo (new \Html\Form\InputField\Hidden([
 				"name" => "task_id",
@@ -31,7 +31,30 @@
 </div>
 <div id="taskgroup_results" style="display: none;">
 	<hr/>
+	<p>Choosing a different taskgroup type requires additional data to be entered:</p>
+	<div class="row-fluid clearfix">
+		<div class="small-12 columns">
+			<blockquote id="new_taskgroup_type_placeholder">
+			</blockquote>
+		</div>
+	</div>
+		
 	<form action="/task-group/saveNewTaskgroup" method="POST">
+		<?php echo (new \Html\Form\InputField\Hidden([
+				"name" => "old_taskgroup_id",
+				"id" => "old_taskgroup_id",
+				"value" => $old_taskgroup->id
+			]));
+			echo (new \Html\Form\InputField\Hidden([
+				"name" => "new_taskgroup_id",
+				"class" => "new_taskgroup_id"
+			]));
+			echo (new \Html\Form\InputField\Hidden([
+				"name" => "task_id",
+				"id" => "task_id",
+				"value" => $task->id
+			]));
+		?>
 		<div class="row-fluid clearfix">
 			<div class="small-12 medium-6 large-4 columns">
 				<label>Select new Task Type (was <?php echo $task->task_type; ?>)
@@ -83,13 +106,17 @@
 		if (event.target.id == "acp_taskgroup") {
 			$.get("/task-group/ajax_getTaskgroupDetails/" + ui.item.id, function(response) {
 				var res = JSON.parse(response);
-				debugger;
-				if (res.taskgroup_type == old_taskgroup_type) {
-					$("#new_taskgroup_id").val(ui.item.id);
+				if (res.taskgroup_type_name == old_taskgroup_type) {
+					$(".new_taskgroup_id").val(ui.item.id);
 					$("#taskgroup_identical").show();
 				} else {
 					// New taskgroup type, prompt for details
+					$(".new_taskgroup_id").val(ui.item.id);
+					$("#new_taskgroup_type_placeholder").html(res.taskgroup_type + "<cite>" + res.taskgroup_description + "</cite>");
 					$("#new_task_type_placeholder").html(res.task_types);
+					$("#new_status_placeholder").html(res.statuses);
+					$("#new_priority_placeholder").html(res.priorities);
+					$("#new_assignee_placeholder").html(res.assignees);
 					$("#taskgroup_results").show();
 				}
 			});

@@ -65,13 +65,13 @@ function edit_GET($w) {
 				array("Effort", "text", "effort", $task->effort)
 			),
             array(array("Description", "textarea", "description", $task->description)),
-        		        	
+        	!empty($p['id']) ? [["Task Group ID", "hidden", "task_group_id", $task->task_group_id]] : null
         )
     );
 	
-	if (!empty($p['id'])) {
-		$form['Edit task [' . $task->id . ']'][5][] = array("Task Group ID", "hidden", "task_group_id", $task->task_group_id);
-	}
+//	if (!empty($p['id'])) {
+//		$form['Edit task [' . $task->id . ']'][5][] = array("Task Group ID", "hidden", "task_group_id", $task->task_group_id);
+//	}
 
     if (empty($p['id'])) {
     	History::add("New Task");
@@ -79,7 +79,7 @@ function edit_GET($w) {
     	History::add("Task: {$task->title}", null, $task);
     }
     $w->ctx("task", $task);
-    $w->ctx("form", Html::multiColForm($form, $w->localUrl("/task/edit/{$task->id}"), "POST", "Save", "edit_form", null, null, "_self", true, Task::$_validation));
+    $w->ctx("form", Html::multiColForm($form, $w->localUrl("/task/edit/{$task->id}"), "POST", "Save", "edit_form", "prompt", null, "_self", true, Task::$_validation));
    
     //////////////////////////
     // Build time log table //
@@ -200,12 +200,19 @@ function edit_POST($w) {
     $existing_task_data = $w->Task->getTaskData($task->id);
     if (!empty($existing_task_data)) {
         foreach($existing_task_data as $e_task_data) {
+			// Sanity cleaning to remove old task_data values that store both of the
+			// Autocomplete fields
+			if (strpos($e_task_data->data_key, \Html\Form\Autocomplete::$_prefix) === 0) {
+				$e_task_data->delete();
+				continue;
+			}
+			
             foreach($_POST["extra"] as $key => $data) {
                 if ($key == \CSRF::getTokenId()) {
                     unset($_POST["extra"][\CSRF::getTokenID()]);
                     continue;
                 }
-                
+            	
                 if ($e_task_data->data_key == $key) {
                     $e_task_data->value = $data;
                     $e_task_data->update();
@@ -223,11 +230,13 @@ function edit_POST($w) {
     // Insert data that didn't exist above as new task_data objects
     if (!empty($_POST["extra"])) {
         foreach ($_POST["extra"] as $key => $data) {
-            $tdata = new TaskData($w);
-            $tdata->task_id = $task->id;
-            $tdata->data_key = $key;
-            $tdata->value = $data;
-            $tdata->insert();
+			if (strpos($key, \Html\Form\Autocomplete::$_prefix) !== 0) {
+				$tdata = new TaskData($w);
+				$tdata->task_id = $task->id;
+				$tdata->data_key = $key;
+				$tdata->value = $data;
+				$tdata->insert();
+			}
         }
     }
     

@@ -706,8 +706,8 @@ class Html {
 							// For Chrome, Safari, IE8+ and Opera 12+
 							return message;
 						};"
-				. "		$('form :input').unbind('input');"
-				. "		$('form :input').on('input', function() {"
+				. "		$('form.prompt :input').unbind('input');"
+				. "		$('form.prompt :input').on('input', function() {"
 				. "			window.onbeforeunload = confirmOnPageExit;"	
 				. "		});"
 				. "});"

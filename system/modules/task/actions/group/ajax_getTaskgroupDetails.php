@@ -8,7 +8,8 @@ function ajax_getTaskgroupDetails_GET(Web $w) {
 	
 	$taskgroup = $w->Task->getTaskGroup($taskgroup_id);
 	$taskgroup_type = $taskgroup->getTaskGroupTypeObject();
-	
+	$members = $w->Task->getMembersBeAssigned($taskgroup->id);
+			
 	// Normalise taskgroup type fields to be consumed by the Options class
 	$task_type_options_array = [];
 	$task_type_array = $taskgroup_type->getTaskTypeArray();
@@ -18,25 +19,51 @@ function ajax_getTaskgroupDetails_GET(Web $w) {
 		}
 	}
 	
+	
+	$task_status_options_array = [];
+	$task_status_array = $taskgroup_type->getStatusArray();
+	if (!empty($task_status_array)) {
+		foreach($task_status_array as $task_status_key => $task_status_value) {
+			$task_status_options_array[] = ["label" => $task_status_value[0], "value" => $task_status_value[0]];
+		}
+	}
+	
+	$task_priority_options_array = [];
+	$task_priority_array = $taskgroup_type->getTaskPriorityArray();
+	if (!empty($task_priority_array)) {
+		foreach($task_priority_array as $task_priority_value) {
+			$task_priority_options_array[] = ["label" => $task_priority_value, "value" => $task_priority_value];
+		}
+	}
+	
+	$task_assignee_options_array = [];
+	if (!empty($members)) {
+		foreach($members as $member) {
+			$task_assignee_options_array[] = ["label" => $member[0], "value" => $member[1]];
+		}
+	}
+	
 	// Build response data
 	echo json_encode([
-		"taskgroup_type" => $taskgroup->task_group_type,
+		"taskgroup_description" => "Description: " . $taskgroup_type->getTaskGroupTypeDescription(),
+		"taskgroup_type" => "Type: " . $taskgroup_type->getTaskgroupTypeTitle(),
+		"taskgroup_type_name" => $taskgroup->task_group_type,
 		"task_types" => (new Select([
-			"name" => "new_task_type",
-			"id" => "new_task_type"
-		]))->setOptions($task_type_options_array)->__toString(),
+				"name" => "new_task_type",
+				"id" => "new_task_type"
+			]))->setOptions($task_type_options_array)->__toString(),
 		"statuses" => (new Select([
-			"name" => "new_task_type",
-			"id" => "new_task_type"
-		]))->setOptions($taskgroup_type->getStatusArray())->__toString(),
-		"taskgroup_description" => (new Select([
-			"name" => "new_task_type",
-			"id" => "new_task_type"
-		]))->setOptions($taskgroup_type->getTaskGroupTypeDescription())->__toString(),
+				"name" => "new_task_status",
+				"id" => "new_task_status"
+			]))->setOptions($task_status_options_array)->__toString(),
 		"priorities" => (new Select([
-			"name" => "new_task_type",
-			"id" => "new_task_type"
-		]))->setOptions($taskgroup_type->getTaskPriorityArray())->__toString()
+				"name" => "new_task_priority",
+				"id" => "new_task_priority"
+			]))->setOptions($task_priority_options_array)->__toString(),
+		"assignees" => (new Select([
+				"name" => "new_task_assignee",
+				"id" => "new_task_assignee"
+			]))->setOptions($task_assignee_options_array)->__toString(),
 	]);
 	
 }
