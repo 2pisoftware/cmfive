@@ -52,7 +52,7 @@ class TaskGroup extends DbObject {
         
         return $this->isOwner($user);
     }
-    
+	
     // Only owner of taskgroup or admin can delete
     public function canDelete(\User $user) {
         if ($this->Auth->user()->is_admin == 1) {
@@ -61,6 +61,17 @@ class TaskGroup extends DbObject {
         
         return $this->isOwner($user);
     }
+	
+	public function delete($force = false) {
+		$tasks = $this->getTasks();
+		if (!empty($tasks)) {
+			foreach($tasks as $task) {
+				$task->delete($force);
+			}
+		}
+		
+		parent::delete($force);
+	}
     
     // get my member object. compare my role with group role required to view task group
     function getCanIView() {
