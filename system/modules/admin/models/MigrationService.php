@@ -228,7 +228,7 @@ MIGRATION;
 								$migration_object->path = $migration_path;
 								$migration_object->classname = $migration;
 								$migration_object->module = strtolower($module);
-								$migration_object->batch = Migration::getNextBatchNumber();
+								$migration_object->batch = $migration_object->getNextBatchNumber();
 								$migration_object->insert();
 								
 								$runMigrations++;
