@@ -269,9 +269,19 @@
                 </div>
                 <?php endif;?>
                 <?php if (!empty($error) || !empty($msg)) : ?>
-                    <?php $type = !empty($error) ? array("name" => "error", "class" => "warning") : array("name" => "msg", "class" => "info"); ?>
+                    <?php 
+						$type = [];
+						$nameValue='';
+						if (!empty($error)) {
+							$type= array("name" => "error", "class" => "warning");
+							$nameValue=$error;
+						} else {
+							$type=array("name" => "msg", "class" => "info"); 
+							$nameValue=$msg;
+						}
+                    ?>
                     <div data-alert class="alert-box <?php echo $type["class"]; ?>">
-                        <?php echo $$type["name"]; ?>
+                        <?php echo $nameValue; ?>
                         <a href="#" class="close">&times;</a>
                     </div>
                 <?php endif; ?>
