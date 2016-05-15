@@ -27,9 +27,9 @@ function anonymous_allowed(Web $w,$path) {
 	if (is_array(Config::get('system.allow_action'))) {
 		$in_path = in_array($path,Config::get('system.allow_action'));
 	}
-
 	$allowed=false;
-	if (is_array($path)) {
+
+	if (strlen(trim($path))>0) {
 		$path_explode = explode("/", $path);
 		$module = $path_explode[0];
 		// $action = $path_explode[1];
