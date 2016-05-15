@@ -48,9 +48,8 @@ function useradd_POST(Web &$w) {
 	$user->dt_created = time();
 	$user->contact_id = $contact->id;
 	$user->insert();
-	
 	$user->setPassword($_REQUEST['password']);
-
+	$user->update();
 	$w->ctx("user", $user);
 
 	// now saving the roles
