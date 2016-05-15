@@ -140,7 +140,9 @@ class CmFiveTestHelper extends \Codeception\Module
 					// disable confirm
 					$I->executeJS('window.confirm = function(){return true;}');
 					//codecept_debug('username match on DeleTE - '.$deleteButton);
-					$I->click('Delete',$deleteButton);
+					$I->click('Remove',$deleteButton);
+					$I->executeJS('window.confirm = function(){return true;}');
+					$I->click('Delete user');
 					//$I->acceptPopup();
 					$I->see('User '.$username.' deleted');
 					$actionCompleted=true;
@@ -261,6 +263,7 @@ class CmFiveTestHelper extends \Codeception\Module
 					// disable confirm
 					$I->executeJS('window.confirm = function(){return true;}');
 					$I->click('Delete',$button);
+					
 					$I->see('Group is deleted');
 					$I->dontSeeLink($title);
 					$actionCompleted=true;
@@ -393,7 +396,8 @@ class CmFiveTestHelper extends \Codeception\Module
 	 * Create a Task Group
 	 ****************************/
 	public function createTaskGroup($I,$taskGroup,$data) {
-		$I->moveMouseOver('Task');
+		$I->wait(1);
+		$I->moveMouseOver(['css' => '#topnav_task']);
 		$I->click('Task Groups');
 		$I->click('New Task Group');
 		$fields=[];
@@ -411,7 +415,9 @@ class CmFiveTestHelper extends \Codeception\Module
 	}
 
 	public function updateTaskGroup($I,$taskGroup,$data) {
-		$I->moveMouseOver('Task');
+		$I->wait(1);
+		$I->moveMouseOver(['css' => '#topnav_task']);
+		$I->wait(1);
 		$I->click("Task Groups");
 		$actionCompleted=false;	
 		if ($rowNumber=$this->findTableRowMatching($I,1,$taskGroup) > 0)  {
@@ -434,8 +440,11 @@ class CmFiveTestHelper extends \Codeception\Module
 	}
 	
 	public function deleteTaskGroup($I,$taskGroup) {
-		$I->moveMouseOver('Task');
-		$I->click("Task Groups");
+		//$I->wait(1);
+		//$I->moveMouseOver(['css' => '#topnav_task']);
+		//$I->wait(1);
+		//$I->click("Task Groups");
+		$I->amOnPage('/task-group/viewtaskgrouptypes');
 		$actionCompleted=false;	
 		if ($rowNumber=$this->findTableRowMatching($I,1,$taskGroup) > 0)  {
 			$context=".tablesorter tbody tr:nth-child(". $rowNumber .")";
@@ -450,7 +459,9 @@ class CmFiveTestHelper extends \Codeception\Module
 	}
 	
 	public function addMemberToTaskGroup($I,$taskGroup,$userLabel,$role) {
-		$I->moveMouseOver('Task');
+		$I->wait(1);
+		$I->moveMouseOver(['css' => '#topnav_task']);
+		$I->wait(1);
 		$I->click("Task Groups");
 		$actionCompleted=false;	
 		if ($rowNumber=$this->findTableRowMatching($I,1,$taskGroup) > 0)  {
@@ -469,7 +480,9 @@ class CmFiveTestHelper extends \Codeception\Module
 	}
 	
 	public function updateMemberInTaskGroup($I,$taskGroup,$userLabel,$role) {
-		$I->moveMouseOver('Task');
+		$I->wait(1);
+		$I->moveMouseOver(['css' => '#topnav_task']);
+		$I->wait(1);
 		$I->click("Task Groups");
 		$actionCompleted=false;	
 		if ($rowNumber=$this->findTableRowMatching($I,1,$taskGroup) > 0)  {
@@ -486,7 +499,9 @@ class CmFiveTestHelper extends \Codeception\Module
 		$I->assertTrue($actionCompleted);
 	}
 	public function removeMemberFromTaskGroup($I,$taskGroup,$userLabel) {
-		$I->moveMouseOver('Task');
+		$I->wait(1);
+		$I->moveMouseOver(['css' => '#topnav_task']);
+		$I->wait(1);
 		$I->click("Task Groups");
 		$actionCompleted=false;	
 		if ($rowNumber=$this->findTableRowMatching($I,1,$taskGroup) > 0)  {
@@ -514,7 +529,10 @@ class CmFiveTestHelper extends \Codeception\Module
 	 * Create a task
 	 ****************************/
 	public function createTask($I,$taskGroup,$task,$data) {
-		$I->click("Task","section.top-bar-section ul.left");
+		//$I->click("Task","section.top-bar-section ul.left");
+		$I->wait(1);
+		$I->moveMouseOver(['css' => '#topnav_task']);
+		$I->wait(1);
 		$I->click('New Task');
 		$this->fillForm($I,[
 			'autocomplete:task_group_id'=>$taskGroup,
