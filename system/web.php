@@ -100,10 +100,12 @@ class Web {
         $this->_hooks = array();
         
         // if using IIS then value is "off" for non ssl requests
-        if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == "off") {
-        	$this->_webroot = "http://" . $_SERVER['HTTP_HOST'];
+        $sHttps=array_key_exists('HTTPS',$_SERVER) ? $_SERVER['HTTPS'] : '';
+        $sHttpHost=array_key_exists('HTTP_HOST',$_SERVER) ? $_SERVER['HTTP_HOST'] : '';
+        if (empty($sHttps) || $sHttps == "off") {
+        	$this->_webroot = "http://" . $sHttpHost;
         } else {
-        	$this->_webroot = "https://" . $_SERVER['HTTP_HOST'];
+        	$this->_webroot = "https://" . $sHttpHost;
         }
         $this->_actionMethod = null;
 
@@ -445,6 +447,7 @@ class Web {
         $this->_requestMethod = array_key_exists('REQUEST_METHOD',$_SERVER) ? $_SERVER['REQUEST_METHOD'] : '';
         $actionmethods[] = $this->_action . '_' . $this->_requestMethod;
         $actionmethods[] = $this->_action . '_ALL';
+        $actionmethods[] = 'default_ALL';
 
         // change the submodule and action for installation
         if($this->_is_installing) {
