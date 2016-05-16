@@ -251,7 +251,12 @@ function edit_POST($w) {
         $messageObject->setSubject("Invite to: " . $task->title)
             ->setFrom($w->Auth->user()->getContact()->email);
 
-        $messageObject->addPart("Your iCal is attached<br/>View Task at: " . $task->toLink(null, null, $user), "text/html");
+        $messageObject->addPart("Your iCal is attached<br/><br/><a href='http://www.google.com/calendar/event?
+action=TEMPLATE&text={$task->title}
+&dates=" . date("Ymd", strtotime(str_replace('/', '-', $task->dt_due))) . "/" . date("Ymd", strtotime(str_replace('/', '-', $task->dt_due))) .
+"&details=" . htmlentities($task->description) .
+"&trp=false target='_blank' rel='nofollow'>Add to Google calendar</a><br/><br/>View the Task at: " . $task->toLink(null, null, $user), "text/html");
+
         $ics_content = $data;
 		$messageObject->addPart($ics_content, "text/calendar");
 		
