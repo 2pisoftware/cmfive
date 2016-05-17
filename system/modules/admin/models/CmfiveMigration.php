@@ -6,7 +6,7 @@ use \Cmfive\Table as Table;
 use Phinx\Db\Table\Column as Column;
 
 class CmfiveMigration extends Phinx\Migration\AbstractMigration {
-
+	
 	public function Column() {
 		return new Column;
 	}
@@ -71,6 +71,38 @@ class CmfiveMigration extends Phinx\Migration\AbstractMigration {
 			if ($this->table($table)->hasColumn($column)) {
 				$this->table($table)->removeColumn($column);
 			}
+		}
+	}
+	
+	/**
+	 * Helper function to update data for a given table row, an "id" field in
+	 * the $data array is expected otherwise no updates will occur
+	 * 
+	 * @param string $table
+	 * @param array $data
+	 * @return null
+	 */
+	public function updateRowInTable($table, Array $data) {
+		if (empty($data['id']) || empty($data)) {
+			return;
+		}
+		
+		// Validate table
+		if ($this->hasTable($table)) {
+			$update_statement_string = "UPDATE {$table} SET ";
+			foreach($data as $column_name => $column_value) {
+				if ($column_name == "id" || is_int($column_name)) {
+					continue;
+				}
+				
+				$update_statement_string .= " {$column_name}=\"{$column_value}\",";
+			}
+			
+			$update_statement_string = rtrim($update_statement_string, ',');
+			
+			$update_statement_string .= " WHERE id=" . $data['id'];
+			
+			$this->execute($update_statement_string);
 		}
 	}
 }
