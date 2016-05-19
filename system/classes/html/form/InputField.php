@@ -203,7 +203,7 @@ class InputField extends \Html\Form\FormElement {
 	 * @return \Html\Form\InputField this
 	 */
 	public function setChecked($checked) {
-		$this->checked = (bool) $checked;
+		$this->checked = (bool) $checked ? "checked" : null;
 		
 		return $this;
 	}
@@ -222,8 +222,8 @@ class InputField extends \Html\Form\FormElement {
 	 * @return \Html\Form\InputField this
 	 */
 	public function setDisabled($disabled) {
-		$this->disabled = (bool) $disabled;
-		
+		$this->disabled = (bool) $disabled ? "disabled" : null;
+
 		return $this;
 	}
 	
