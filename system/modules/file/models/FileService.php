@@ -136,6 +136,51 @@ class FileService extends DbService {
 	}
 
 	/**
+	 * Get a Gaufrette Filesystem for a given adapter, adapter config and path
+	 * 
+	 * @param string $adapter adapter to load
+	 * @param Array $adapter_config to use
+	 * @param string $path base path to load the filesystem adapter at
+	 * @param Mixed $content content to load into the filesystem (mainly used for the "memory" adapter
+	 * @param Array $options options to give to the filesystem
+	 * @return FileSystem
+	 */
+	function getSpecificFilesystemWithCustomAdapter($adapter = 'local', $adapter_config = null, $path = null, $content = null, $options = []) {
+		$adapter_obj = null;
+		switch ($adapter) {
+			case "local":
+				$adapter_obj = new LocalAdapter($path, true);
+				break;
+			case "memory":
+				$adapter_obj = new InMemoryAdapter(array(basename($path) => $content));
+				break;
+			case "s3":
+				$config_options = $adapter_config['options'];
+				$config_options = array_replace(is_array($config_options) ? $config_options : [], ["directory" => $path], $options);
+				$client = S3Client::factory(["key" => $adapter_config['key'], "secret" => $adapter_config['secret']]);
+				$adapter_obj = new AwsS3($client, $adapter_config['bucket'], is_array($config_options) ? $config_options : []);
+				break;
+			case "dropbox":
+				if (!function_exists("oauth")) {
+					$this->w->Log->setLogger("FILE_SERVICE")->error("The Dropbox API requires the oAuth extension to be installed.");
+					return null;
+				}
+				$app_id = $adapter_config['app_id'];
+				if (!empty($app_id)) {
+					$adapter_obj = new \Gaufrette\Adapter\Dropbox(new Dropbox_API(new Dropbox_OAuth_PHP($app_id, '')));
+				} else {
+					$this->w->Log->setLogger("FILE_SERVICE")->error("Dropbox adapter requested but no app ID has been provided in the config.");
+				}
+				break;
+		}
+
+		if ($adapter_obj !== null) {
+			return new Filesystem($adapter_obj);
+		}
+		return null;
+	}
+	
+	/**
 	 * Register a gaufrette stream wrapper
 	 * 
 	 * @param \Gaufrette\Filesystem
