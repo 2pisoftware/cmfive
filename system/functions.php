@@ -328,7 +328,7 @@ function formatDateTime($date, $format = "d/m/Y h:i a", $usetimezone = true) {
 function formatMoney($format, $number) {
     if (function_exists('money_format')) {
         setlocale(LC_MONETARY, 'en_AU');
-        return money_format($format, $number);
+        return money_format($format, doubleval($number));
     }
 
     $regex = '/%((?:[\^!\-]|\+|\(|\=.)*)([0-9]+)?' .
