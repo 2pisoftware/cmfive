@@ -1,7 +1,7 @@
 <?php
 
 function role_task_admin_allowed(Web $w,$path) {
-    return preg_match("/task(-.*)?\//",$path);
+    return $w->checkUrl($path, "task", "*", "*"); //preg_match("/task(-.*)?\//",$path);
 }
 
 function role_task_user_allowed(Web $w,$path) {
@@ -9,6 +9,7 @@ function role_task_user_allowed(Web $w,$path) {
         $w->checkUrl($path, "task", null, "index") || 
         $w->checkUrl($path, "task", null, "tasklist") ||
         $w->checkUrl($path, "task", null, "edit") ||
+		$w->checkUrl($path, "task", null, "delete") ||
         $w->checkUrl($path, "task", null, "duplicatetask") ||
         $w->checkUrl($path, "task", null, "ajaxGetExtraDetails") ||
         $w->checkUrl($path, "task", null, "ajaxGetFieldForm") || 
