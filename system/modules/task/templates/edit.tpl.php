@@ -28,7 +28,7 @@
 							//echo $w->Tag->getTagButton($task->id,"Task")."&nbsp;";
 							echo $task->canDelete($w->Auth->user()) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), "Delete", "Are you sure you want to delete this task?" ) : ''; 
 							echo Html::b($task->w->localURL('task/duplicatetask/' . $task->id), "Duplicate Task");
-                            echo Html::b($task->w->localURL('/task/edit/?gid=' . $task->task_group_id), "New Task");
+							echo Html::box("/task-group/moveTaskgroup/" . $task->id, "Move to Taskgroup", true, false, null, null, null, null, 'secondary');
 							echo $w->partial('listTags',['object' => $task], 'tag');
 						}
 					?>
@@ -125,8 +125,8 @@
             // Get/check for extra form fields
             $.getJSON("/task/ajaxGetFieldForm/" + $("#task_type").val() + "/" + $("#task_group_id").val() + "/<?php echo !empty($task->id) ? $task->id : ''; ?>",
                 function(result) {
-                    if (result[0]) {
-                        $("#formfields").html(result[0]);
+                    if (result) {
+                        $("#formfields").html(result);
                         $("#formfields").fadeIn();
                     }
                 }
@@ -172,6 +172,7 @@
                 'extra': extras_form
             },
             complete: function(response) {
+				console.log(response);
 //				debugger;
                 if ($.isNumeric(response.responseText)) {
                     window.location.href = "/task/edit/" + response.responseText;

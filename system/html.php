@@ -554,7 +554,7 @@ class Html {
             
             // Print section header
             $buffer .= "<div class='panel'>";
-            $buffer .= "<div class='row-fluid section-header'><h4>{$section}</h4></div>";
+            $buffer .= "<div class='row-fluid section-header'><h4>{$section}<span style='display: none;' class='changed_status right alert radius label'>changed</span></h4></div>";
             
             // Loop through each row
             foreach ($rows as $row) {
@@ -563,6 +563,10 @@ class Html {
                 $fieldCount = count($row);
                 $buffer .= "<ul class='small-block-grid-1 medium-block-grid-{$fieldCount} section-body'>";
                 
+				if (empty($row)) {
+					continue;
+				}
+				
                 foreach($row as $field) {
                     
 					// Check if the row is an object like an InputField
@@ -646,8 +650,8 @@ class Html {
                             $items = !empty($field[4]) ? $field[4] : null;
 
                             $default = !empty($field[5]) ? ($field[5] == "null" ? null : $field[5]) : "-- Select --";
-                            $class = !empty($field[6]) ? $field[6] : null;
-                            $buffer .= Html::select($name, $items, $value, $class, "width: 100%;", $default, $readonly ? ' disabled="disabled" ' : null, $required);
+                            $sl_class = !empty($field[6]) ? $field[6] : null;
+                            $buffer .= Html::select($name, $items, $value, $sl_class, "width: 100%;", $default, $readonly ? ' disabled="disabled" ' : null, $required);
                         break;
                         case "multiSelect":
                             $items = !empty($field[4]) ? $field[4] : null;
@@ -659,14 +663,14 @@ class Html {
                         break;
                         case "checkbox":
                             $defaultValue = !empty($field[4]) ? $field[4] : null;
-                            $class = !empty($field[5]) ? $field[5] : null;
-                            $buffer .= Html::checkbox($name, $value, $defaultValue, $class);
+                            $cb_class = !empty($field[5]) ? $field[5] : null;
+                            $buffer .= Html::checkbox($name, $value, $defaultValue, $cb_class);
                         break;
                         case "radio":
                             $group = !empty($field[4]) ? $field[4] : null;
                             $defaultValue = !empty($field[5]) ? $field[5] : null;
-                            $class = !empty($field[6]) ? $field[6] : null;
-                            $buffer .= Html::radio($name, $group, $value, $defaultValue, $class) . "&nbsp;" . htmlentities($title);
+                            $rd_class = !empty($field[6]) ? $field[6] : null;
+                            $buffer .= Html::radio($name, $group, $value, $defaultValue, $rd_class) . "&nbsp;" . htmlentities($title);
                         break;
                         case "hidden":
                             $buffer .= '<input type="hidden" name="' . $name . '" value="' . htmlspecialchars($value) . '" id="' . $name . '"/>';
@@ -687,7 +691,35 @@ class Html {
         }
         $buffer .= "<script>$(function(){try{\$('.ckeditor').each(function(){CKEDITOR.replace(this)})}catch(err){}});</script>";
         $buffer .= "<script>$(function(){try{\$('.codemirror').each(function(){var editor = CodeMirror.fromTextArea($(this), {lineNumbers: true, mode: 'text/html', matchBrackets: true, viewportMargin: Infinity}); editor.refresh()})}catch(err){}});</script>";
-  
+		
+		// Expermiental
+		if (strpos($class, "prompt") !== FALSE) {
+			$buffer .= "<script>"
+					. "$(function() {"
+					. "		var confirmOnPageExit = function (e) {
+								console.log(e);
+								// If we haven't been passed the event get the window.event
+								e = e || window.event;
+
+								var message = 'You have unsaved changes, are you sure you want to navigate away?';
+
+								// For IE6-8 and Firefox prior to version 4
+								if (e) {
+									e.returnValue = message;
+								}
+
+								// For Chrome, Safari, IE8+ and Opera 12+
+								return message;
+							};"
+					. "		$('form.prompt :input').unbind('input');"
+					. "		$('form.prompt :input').on('input', function() {"
+					. "			window.onbeforeunload = confirmOnPageExit;"
+					. "			$(this).closest('form').find('.section-header h4 > .changed_status').show();"	
+					. "		});"
+					. "});"
+					. "</script>";
+		}
+		
         // Finish shell div tag
         $buffer .= "</div>";
         
