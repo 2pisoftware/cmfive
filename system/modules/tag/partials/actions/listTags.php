@@ -9,12 +9,14 @@ function listTags(\Web $w, $params) {
 	
 	// Load scripts into main template
 	if(!empty($user)) {
-		if($user->hasRole("tag_admin")) {
-			$w->enqueueScript(["uri" => "/system/modules/tag/assets/js/tagButtonAdmin.js", "weight" => 500]);
-		} elseif($user->hasRole("tag_user")) {
+		if ($user->hasAnyRole(["tag_admin", "tag_user"])) {
 			$w->enqueueScript(["uri" => "/system/modules/tag/assets/js/tagButton.js", "weight" => 500]);
+			$w->enqueueStyle(["uri" => "/system/modules/tag/assets/css/tagButton.css", "weight" => 500]);
+			
+			if($user->hasRole("tag_admin")) {
+				$w->enqueueScript(["uri" => "/system/modules/tag/assets/js/tagButtonAdmin.js", "weight" => 499]);
+			}
 		}
-        $w->enqueueStyle(["uri" => "/system/modules/tag/assets/css/tagButton.css", "weight" => 500]);
 	}
 	
 	if (!empty($params['object'])) {
