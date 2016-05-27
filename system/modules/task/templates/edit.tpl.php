@@ -174,6 +174,7 @@
             complete: function(response) {
 				console.log(response);
 //				debugger;
+				window.onbeforeunload = null;
                 if ($.isNumeric(response.responseText)) {
                     window.location.href = "/task/edit/" + response.responseText;
                 } else {
