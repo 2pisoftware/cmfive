@@ -57,7 +57,7 @@ uniTag.filterTagDialog = function (parent_id, term) {
 						// how many hidden tags are there?
 						if (list.hasClass('limited')) {
 							$('.first', list).removeClass('first');
-							var tags = $('.tag_selection.primary:visible', list);
+							var tags = $('.tag_selection.primary', list);
 							var numTags = tags.length - 1;
 							tags.first().addClass('first');
 							$('.limited_count', list).text(" +" + numTags);
