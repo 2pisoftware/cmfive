@@ -14,7 +14,7 @@
 	<?php endif; ?>
 		
 	<?php if (!empty($user)) : ?>
-		<div class="tag_list_dialog" id="tag_list_<?php echo ($object_class ? : '') . ($object_id ? : ''); ?>">
+		<div class="tag_list_dialog" id="tag_list_dialog_<?php echo ($object_class ? : '') . ($object_id ? : ''); ?>">
 			<div class="tag_list_modal">
 				<div class="tag_list_header">
 					Available tags <span class="fi-x hide_tag_list"></span>

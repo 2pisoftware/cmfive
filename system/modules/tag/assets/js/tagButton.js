@@ -11,13 +11,15 @@ var uniTag = {
 	ready: function (reload) {
 		// There can be multiple tag lists on the page, so bind tags for
 		// each individually
+		
+
 		$('.tag_list').each(function (index) {
 			uniTag.bindTags($(this).get()[0].id);
 
 		});
 
 		if (reload) {
-			$('.tag_selection:visible:first').trigger('click');
+			//$('.tag_selection:visible:first').trigger('click');
 		}
 	},
 	/*
@@ -25,7 +27,7 @@ var uniTag = {
 	 * This is a list of all available tags and highlights which ones are already attached
 	 */
 	loadTagDialog: function (tags, parent_id) {
-
+		//console.log("test load dialog");
 		// Clicking tags for current dialog will close the dialog
 		$("#" + parent_id + ' .tag_selection').unbind('click');
 		$("#" + parent_id + ' .tag_selection').bind('click', function (e) {
@@ -65,6 +67,7 @@ var uniTag = {
 		return uniTag.buf;
 	},
 	buildTagDialog: function (parent_id) {
+
 		$('#' + parent_id + ' .tag_list_dialog .tag_list_body').html(uniTag.buf);
 		$('#' + parent_id + ' .tag_list_dialog').show();
 		$('body').bind('click.taglisthide', uniTag.hideTagsOnLoseFocus);
@@ -111,17 +114,21 @@ var uniTag = {
 	 * Adds or removes a tag
 	 */
 	setTag: function (obj, parent_id) {
+		//label refers to the label for the tag within the tag dialog
 		var label = $(obj).find('.label');
 		var list = $(obj).closest('.tag_list'); // $('#'+parent_id)
 		var url = $('#' + parent_id).data('url');
 		var tagId = $(obj).data('id');
 		var tag = $(obj).data('tag');
+		// check to see if the tag is allready selected
 		if (label.hasClass('primary')) {
+			//hide the tag and change class
 			$('#' + parent_id + ' .tag_selection[data-tag="' + tag + '"]').addClass('hidetag');
 			// If there are no more tags then show no tag
 			if ($('#' + parent_id + ' .tag_selection:visible').length == 0) {
 				$('#' + parent_id + ' .no_tags').removeClass('hidetag');
 			}
+
 			label.removeClass('primary').addClass('secondary');
 			$.get(url + '&cmd=removeTag&tagId=' + tagId);
 		} else {
@@ -142,7 +149,7 @@ var uniTag = {
 		// how many hidden tags are there?
 		if (list.hasClass('limited')) {
 			$('.first', list).removeClass('first');
-			var tags = $('.tag_selection.primary:visible', list);
+			var tags = $('.tag_selection.primary', list);
 			var numTags = tags.length - 1;
 			tags.first().addClass('first');
 			$('.limited_count', list).text(" +" + numTags);
