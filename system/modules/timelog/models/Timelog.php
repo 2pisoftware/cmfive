@@ -20,7 +20,7 @@ class Timelog extends DbObject {
         "object_id" => array('required'),
         "dt_start" => array('required'),
 //        "dt_end" => array('required'),
-         "time_type" => array('required')
+        // "time_type" => array('required')
     );    
 
 	public function isRunning() {
