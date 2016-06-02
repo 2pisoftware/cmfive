@@ -62,27 +62,31 @@ var globalFileUpload = {
 	},
 	handleFiles: function(files) {
 		if (files) {
-			var error = true;
+			var error = 0;
+			
 			$.each(files,function(key,file) {
 				var k = globalFileUpload.filesToUpload.push(file);
 				globalFileUpload.filesToUpload[k-1].self_id = k;
 				if(file.size > globalFileUpload.MAXUPLOAD) {
-					globalFileUpload.filesToUpload[k-1].error = true;
-				} else {
-					error = false;
+					alert("File " + file.name + " is too large, 2MB max allowed");
+					globalFileUpload.filesToUpload.splice(k-1, 1);
+					error++;
 				}
 			});
-			if(!error) {
+
+			if(error === 0) {
 				jQuery('.global_file_drop_overlay').show();
 				globalFileUpload.uploadFiles();
 			} else {
+				globalFileUpload.filesToUpload = [];
 				$('.global_file_drop_overlay_loading').hide();
 				$('.global_file_drop_overlay_init').show();
 			}
 		}
 	},
 	uploadFiles: function() {
-		for(i in globalFileUpload.filesToUpload) {
+		var file_upload_count = 0;
+		for(var i in globalFileUpload.filesToUpload) {
 			if(globalFileUpload.filesToUpload[i] != undefined) {
 				var file = globalFileUpload.filesToUpload[i];
 				var parts;
@@ -102,7 +106,7 @@ var globalFileUpload = {
 					fd["file"] = event.target.result;
 					fd[$('#token').prop('name')] = $('#token').val();
 					if(file.error) {
-						globalFileUpload.filesToUpload.splice(reader.key, 1);
+						file_upload_count++;
 						return;
 					}
 					$.ajax({
@@ -126,9 +130,9 @@ var globalFileUpload = {
 						data: fd,
 						dataType: 'json',
 						complete: function(data) {
-							var key = parseInt(data.responseJSON.key);
-							globalFileUpload.filesToUpload.splice(key, 1);
-							if(globalFileUpload.filesToUpload.length === 0) {
+							file_upload_count++;
+							console.log("length", globalFileUpload.filesToUpload.length);
+							if(globalFileUpload.filesToUpload.length === file_upload_count) {
 								jQuery('.global_file_drop_overlay').hide();
 								window.location.reload();
 								jQuery('.global_file_drop_overlay_loading').hide();

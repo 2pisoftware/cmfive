@@ -330,9 +330,9 @@ class FileService extends DbService {
 		
 		//Check for posted content
 		if(!empty($_POST[$requestkey]) && empty($_FILES[$requestkey])) {
-			$filename = str_replace($replace_underscore, "_", str_replace($replace_empty, "", $_POST[$requestkey]));
+			$filename = str_replace($replace_underscore, "_", str_replace($replace_empty, "", $title ? : $_POST['title']));
 		} else {
-			$filename = str_replace($replace_underscore, "_", str_replace($replace_empty, "", basename($_FILES[$requestkey]['name'])));
+			$filename = str_replace($replace_underscore, "_", str_replace($replace_empty, "", $title ? : basename($_FILES[$requestkey]['name'])));
 		}
 
 		$att = new Attachment($this->w);
