@@ -34,6 +34,7 @@ class ExampleService extends DbService {
 		$nav = array();
 		if ($w->Auth->loggedIn()) {
 			$w->menuLink("example/index", "Home", $nav);
+			$w->menuLink("example/dashboard", "Dashboard", $nav);
 		}
 		return $nav;
 	}	

@@ -54,10 +54,10 @@ class RestSearchableService extends DbService {
 				if ($parts['skip']>0) {
 					$skip=" OFFSET ".$parts['skip'];
 				}
-				if ($parts['groupBy']>0) {
+				if (!empty($parts['groupBy'])) {
 					$groupBy=" GROUP BY ".$parts['groupBy'];
 				}
-				if ($parts['orderBy']>0) {
+				if (!empty($parts['orderBy'])) {
 					$orderBy=" ORDER BY ".$parts['orderBy'];
 				}
 			} else {
@@ -106,12 +106,12 @@ class RestSearchableService extends DbService {
 		
 		$groupBy='';
 		if ($query[0]=="GROUPBY") {
-			$limit=$query[1];
+			$groupBy=$query[1];
 			$query=array_slice($query,2);
 		}
 		$orderBy='';
 		if ($query[0]=="ORDERBY") {
-			$limit=$query[1];
+			$orderBy=$query[1];
 			$query=array_slice($query,2);
 		}
 		return ['skip'=>$skip,'limit'=>$limit,'groupBy'=>$groupBy,'orderBy'=>$orderBy,'joins'=>$joins,'fields'=>$fields,'rules'=>$query];

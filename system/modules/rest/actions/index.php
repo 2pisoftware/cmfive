@@ -8,6 +8,7 @@ function index_GET(Web &$w) {
 	$parts=[];
 	// extract that bit of the url relating to the query
 	foreach($p as $pk=>$pv) {
+		if(is_int($pk)) continue;
 		if ($count>0) $parts[]=$pv;
 		$count++;
 	} 

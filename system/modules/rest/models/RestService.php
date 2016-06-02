@@ -109,10 +109,14 @@ class RestService extends RestSearchableService {
 			return $this->errorJson('No access to '.$classname);
 		}
 		
-		if (intval($id)>0) { 
-			$o = $this->getObject($classname, $id);
+		if (intval($id)>=0) {
+			if(intval($id) === 0) {
+				$o = new $classname($this->w);
+			} else {
+				$o = $this->getObject($classname, $id);
+			}
 			if ($o->canEdit($this->w->Auth->user())) {
-				if ($o) {
+				if ($o && intval($id) > 0) {
 					$o->fill($record);
 					$saveResult=$o->update();
 					// validation
@@ -131,7 +135,7 @@ class RestService extends RestSearchableService {
 						return $this->errorJson('No feedback from save.');
 					}
 
-					} else {
+				} else {
 					return $this->_saveNew($classname,$record);
 				}
 			} else {
