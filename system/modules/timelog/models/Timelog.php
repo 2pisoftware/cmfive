@@ -19,8 +19,8 @@ class Timelog extends DbObject {
         "object_class" => array('required'),
         "object_id" => array('required'),
         "dt_start" => array('required'),
-//        "dt_end" => array('÷required'),
-        // "time_type" => array('required') Only required in some cases??!!
+//        "dt_end" => array('required'),
+         "time_type" => array('required')
     );    
 
 	public function isRunning() {
