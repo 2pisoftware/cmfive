@@ -283,7 +283,7 @@ cursor:pointer;
 }
 .cmfive_loading_overlay {
 opacity:0.5;
-background-image:url(images/gears.svg);
+background-image:url(../img/gears.svg);
 background-repeat:no-repeat;
 background-position:center 20px;
 background-color:#ccc;

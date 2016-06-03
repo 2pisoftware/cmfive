@@ -30,6 +30,11 @@ function datalist_ALL(Web $w) {
 					'title' => 'Time Field'
 				),
 			),
+			'buttons' => array(
+				'/example/edit/' => array(
+					'title' => 'Edit'
+				)
+			),
 		)
 	);
 	$w->ctx('datalist', Html::datalist($datalist));

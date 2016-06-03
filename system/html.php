@@ -38,7 +38,13 @@ class Html {
 		$pages = '';
 		foreach($data as $class=>$setup) {
 			$menu .= '<li data-page="cmfive_event_page_'.$class.'" data-type="'.$class.'">'.$setup['title'].'</li>';
-			$pages .= '<div data-type="'.$class.'" data-titlefield=\''.(is_array($setup['filters']['keyword_field']) ? json_encode($setup['filters']['keyword_field']) : $setup['filters']['keyword_field']).'\' id="cmfive_event_page_'.$class.'" style="display:none;" class="cmfive_datalist_event_page">';
+			$buttons = '';
+			if(!empty($setup['buttons'])) {
+				if($setup['buttons']) {
+					$buttons = 'data-buttons=\''.json_encode($setup['buttons']).'\'';
+				}
+			}
+			$pages .= '<div '.$buttons.' data-type="'.$class.'" data-titlefield=\''.(is_array($setup['filters']['keyword_field']) ? json_encode($setup['filters']['keyword_field']) : $setup['filters']['keyword_field']).'\' id="cmfive_event_page_'.$class.'" style="display:none;" class="cmfive_datalist_event_page">';
 			$pages .= '<div class="cmfive_event_filters">';
 			if(!empty($setup['filters']['select'])) {
 				$i = 1;
@@ -63,6 +69,10 @@ class Html {
 			$footer = '<tfoot><tr>';
 			foreach($setup['fields'] as $field=>$conf) {
 				$sortable = '';
+				$editable = true;
+				if(isset($conf['editable'])) {
+					$editable = $conf['editable'];
+				}
 				if(!empty($conf['sortable'])) {
 					if($conf['sortable']) {
 						$sortable = 'data-sorted="false" class="sortable"';
@@ -71,7 +81,7 @@ class Html {
 				if(!empty($conf['width'])) {
 					$cols .= '<col style="width:'.$conf['width'].';" />';
 				}
-				$header  .= '<th '.$sortable.' data-field="'.$field.'">'.$conf['title'].'<span class="sortable-dir"></span></th>';
+				$header  .= '<th '.$sortable.' data-editable="'.$editable.'" data-field="'.$field.'">'.$conf['title'].'<span class="sortable-dir"></span></th>';
 				$footer  .= '<th>'.$conf['title'].'</th>';
 			}
 			$header .= '<th></th></tr></thead>';

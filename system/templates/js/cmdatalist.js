@@ -292,14 +292,20 @@ var cmDatalist = {
 						alert(msg);
 						return false;
 					}
+					var buttons = false;
+					if($('#' + type).data('buttons') != undefined) {
+						buttons = $('#' + type).data('buttons');
+					}
 					//Show loading overlay
 					$('#' + type + ' .cmfive_loading_overlay').css('height', $('#' + type + ' .cmfive_event_page_table').outerHeight() + 'px');
 					var rows = '';
 					var cols = [];
+					var editable = [];
 					//Build list of columns we need to fetch data for
 					$('#' + type + ' table thead th').each(function () {
 						if (this.dataset.field != undefined) {
 							cols.push(this.dataset.field);
+							editable[this.dataset.field] = this.dataset.editable;
 						}
 					});
 					for (var i in data.success) {
@@ -315,10 +321,20 @@ var cmDatalist = {
 								var date = new Date(row[cols[j]] * 1000);
 								rows += '<td data-field="' + cols[j] + '"><input type="hidden" class="datetimepicker dp_input" value="' + moment(date).format('DD/MM/YYYY HH:mm:ss') + '" /><div class="datepicker_trigger">' + moment(date).format('DD/MM/YYYY HH:mm:ss') + '</div></td>';
 							} else {
-								rows += '<td contentEditable="true" data-field="' + cols[j] + '">' + row[cols[j]] + '</td>';
+								if(editable[cols[j]]) {
+									rows += '<td contentEditable="true" data-field="' + cols[j] + '">' + row[cols[j]] + '</td>';
+								} else {
+									rows += '<td data-field="' + cols[j] + '">' + row[cols[j]] + '</td>';
+								}
 							}
 						}
-						rows += '<td><button type="button" onclick="return cmDatalist.deleteRow(this);" class="button round alert">Delete</button></td>';
+						rows += '<td>';
+						if(buttons !== false) {
+							for(var bUrl in buttons) {
+								rows += '<button type="button" href="' + bUrl + row['id'] + '" data-reveal-id="cmfive-modal" data-reveal-ajax="true" class=" button round tiny success">' + buttons[bUrl].title + '</button>';
+							}
+						}
+						rows += ' <button type="button" onclick="return cmDatalist.deleteRow(this);" class="button tiny round alert">Delete</button></td>';
 						rows += '</tr>';
 					}
 					$('#' + type + ' table tbody').html(rows);
