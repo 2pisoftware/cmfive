@@ -1,13 +1,13 @@
-#cmfive_dashboard_header {
+#cmfive_datalist_header {
 position:relative;
 }
-#cmfive_dashboard_events {
+#cmfive_datalist_events {
 position:relative;
 }
 [contenteditable]:hover:not(:focus) {
 outline: 1px dotted #75D975;
 }
-#cmfive_dashboard_header h2 {
+#cmfive_datalist_header h2 {
 color:#043C6B;
 font-weight:normal;
 position:relative;
@@ -203,10 +203,10 @@ border-bottom-left-radius: 5px;
 -moz-border-radius-bottomright: 5px;
 border-bottom-right-radius: 5px;
 }
-#cmfive_dashboard_assignments {
+#cmfive_datalist_assignments {
 margin:25px 0;
 }
-#cmfive_dashboard_assignments table,
+#cmfive_datalist_assignments table,
 .cmfive_event_page_table {
 width:100%;
 border-spacing:0;
@@ -299,7 +299,7 @@ left:0;
 .cmfive_event_filter_tag.tag_color_3 {background-color:#7FB3FF;}
 .cmfive_event_filter_tag.tag_color_4 {background-color:#E0EDFF;}
 .cmfive_event_filter_tag:hover {background-color:#FFFFFF;}
-#cmfive_dashboard_assignments tbody tr td,
+#cmfive_datalist_assignments tbody tr td,
 .cmfive_event_page_table tbody tr td {
 border-bottom:1px solid #646464;
 font-size:1.1em;
@@ -314,20 +314,20 @@ background-color:#FFFFFF;
 .cmfive_event_page_table tbody tr:last-child td {
 border-bottom:0;
 }
-#cmfive_dashboard_show_more {
+#cmfive_datalist_show_more {
 cursor:pointer;
 color:#77AA55;
 font-size:1.1em;
 margin:10px 0;
 text-decoration:underline;
 }
-#cmfive_dashboard_assignments tbody tr td .edit_button button {
+#cmfive_datalist_assignments tbody tr td .edit_button button {
 background-color:transparent;
 color:#8F8F8F;
 border:1px solid #8F8F8F;
 border-radius:5px;
 }
-#cmfive_dashboard_assignments tbody tr td .edit_button button:hover {
+#cmfive_datalist_assignments tbody tr td .edit_button button:hover {
 border-top-color:#93bed9;
 border-left-color:#93bed9;
 border-bottom-color:#799cb3;
@@ -390,11 +390,11 @@ border-radius:5px;
 top:20px;
 left:0;
 }
-#cmfive_dashboard_event_tabs {
+#cmfive_datalist_event_tabs {
 margin-top:10px;
 }
 #cmfive_record_new_options ul,
-#cmfive_dashboard_event_tabs ul {
+#cmfive_datalist_event_tabs ul {
 list-style:none;
 display:inline;
 }
@@ -407,7 +407,7 @@ padding:5px;
 margin:5px 10px;
 border-bottom:1px solid #646464;
 }
-#cmfive_dashboard_event_tabs ul li {
+#cmfive_datalist_event_tabs ul li {
 z-index:2;
 display:block;
 font-size:1.2em;
@@ -433,14 +433,14 @@ border-bottom:0;
 -ms-user-select: none;
 user-select: none;
 }
-#cmfive_dashboard_event_tabs ul li.moving {
+#cmfive_datalist_event_tabs ul li.moving {
 position:relative;
 z-index:5;
 }
-#cmfive_dashboard_event_tabs ul li:last-child {
+#cmfive_datalist_event_tabs ul li:last-child {
 border-right:1px solid #ccc;
 }
-#cmfive_dashboard_event_tabs ul li.enabled {
+#cmfive_datalist_event_tabs ul li.enabled {
 position:relative;
 border-right:1px solid #ccc;
 top:1px;
@@ -455,7 +455,7 @@ border:0;
 color:#ccc;
 cursor:not-allowed;
 }
-.cmfive_dashboard_event_page {
+.cmfive_datalist_event_page {
 border-top:1px solid #6A6A6A;
 min-height:500px;
 position:relative;

@@ -5,9 +5,9 @@ require_once "classes/html/form.php";
 
 class Html {
 	/**
-     * Creates a dashboard from an array like
-     * (
-     *   "ModelClassName" => (
+	 * Creates a data list from an array like
+	 * (
+	 *   "ModelClassName" => (
 	 *      "title" => "Tab title",
 	 *      "filters" => (
 	 *         "keyword_field" => "database_field",//What database field the keyword search filters the results by
@@ -26,19 +26,19 @@ class Html {
 	 *         ),
 	 *         ...
 	 *      ),
-     *   ),
+	 *   ),
 	 * ),
 	 * ...
-     *
-     * @param array $data array that defines the dashboard
-     *
-     */
-	public static function dashboard($data) {
-		$menu = '<div id="cmfive_dashboard_event_tabs"><ul>';
+	 *
+	 * @param array $data array that defines the data list
+	 *
+	 */
+	public static function dataList($data) {
+		$menu = '<div id="cmfive_datalist_event_tabs"><ul>';
 		$pages = '';
 		foreach($data as $class=>$setup) {
 			$menu .= '<li data-page="cmfive_event_page_'.$class.'" data-type="'.$class.'">'.$setup['title'].'</li>';
-			$pages .= '<div data-type="'.$class.'" data-titlefield="'.$setup['filters']['keyword_field'].'" id="cmfive_event_page_'.$class.'" style="display:none;" class="cmfive_dashboard_event_page">';
+			$pages .= '<div data-type="'.$class.'" data-titlefield=\''.(is_array($setup['filters']['keyword_field']) ? json_encode($setup['filters']['keyword_field']) : $setup['filters']['keyword_field']).'\' id="cmfive_event_page_'.$class.'" style="display:none;" class="cmfive_datalist_event_page">';
 			$pages .= '<div class="cmfive_event_filters">';
 			if(!empty($setup['filters']['select'])) {
 				$i = 1;
@@ -62,18 +62,16 @@ class Html {
 			$header = '<thead><tr>';
 			$footer = '<tfoot><tr>';
 			foreach($setup['fields'] as $field=>$conf) {
-				$sortable = false;
+				$sortable = '';
 				if(!empty($conf['sortable'])) {
-					$sortable = (bool)$conf['sortable'];
+					if($conf['sortable']) {
+						$sortable = 'data-sorted="false" class="sortable"';
+					}
 				}
 				if(!empty($conf['width'])) {
 					$cols .= '<col style="width:'.$conf['width'].';" />';
 				}
-				if($sortable) {
-					$header  .= '<th data-sorted="false" class="sortable" data-field="'.$field.'">'.$conf['title'].'<span class="sortable-dir"></span></th>';
-				} else {
-					$header  .= '<th data-field="'.$field.'">'.$conf['title'].'</th>';
-				}
+				$header  .= '<th '.$sortable.' data-field="'.$field.'">'.$conf['title'].'<span class="sortable-dir"></span></th>';
 				$footer  .= '<th>'.$conf['title'].'</th>';
 			}
 			$header .= '<th></th></tr></thead>';
@@ -87,10 +85,10 @@ class Html {
 			$pages .= '</div>';
 		}
 		$menu .= '</ul><div class="clear"></div></div>';
-		$buffer = '<div id="cmfive_dashboard_events">';
+		$buffer = '<div id="cmfive_datalist_events">';
 		$buffer .= $menu;
 		$buffer .= $pages;
-		$buffer .= '</div><script src="/system/templates/js/cmdashboard.js"></script>';
+		$buffer .= '</div><script src="/system/templates/js/cmdatalist.js"></script>';
 		return $buffer;
 	}
     /**
@@ -529,13 +527,13 @@ class Html {
 
     public static function datetimePicker($name, $value = null, $size = null, $required = null) {
         $buf = '<input class="date_picker" type="text" name="' . $name . '" value="' . $value . '" size="' . $size . '" id="' . $name . '" ' . $required . ' />';
-        $buf.= "<script>$('#$name').datetimepicker({ampm: true, dateFormat: 'dd/mm/yy', changeMonth: true, changeYear: true});$('#$name').keyup( function(event) { $(this).val('');}); </script>";
+        $buf.= "<script>$('#$name').datetimepicker({ampm: false, timeFormat: 'hh:mm:ss', dateFormat: 'dd/mm/yy', changeMonth: true, changeYear: true});$('#$name').keyup( function(event) { $(this).val('');}); </script>";
         return $buf;
     }
 
     public static function timePicker($name, $value = null, $size = null, $required = null) {
         $buf = '<input class="date_picker" type="text" name="' . $name . '" value="' . $value . '" size="' . $size . '" id="' . $name . '" ' . $required . ' />';
-        $buf.= "<script>$('#$name').timepicker({ampm: true, dateFormat: 'dd/mm/yy'});$('#$name').keyup( function(event) { $(this).val('');}); </script>";
+        $buf.= "<script>$('#$name').timepicker({ampm: false, timeFormat: 'hh:mm:ss', dateFormat: 'dd/mm/yy'});$('#$name').keyup( function(event) { $(this).val('');}); </script>";
         return $buf;
     }
 

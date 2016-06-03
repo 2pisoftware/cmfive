@@ -69,7 +69,7 @@ class RestSearchableService extends DbService {
 			$o=new $class($this->w);
 			$columns=$o->getDbTableColumnNames();
 			foreach ($columns as $a =>$column) { 
-				if (startsWith($column,'dt_') || startsWith($column,'d_') ||startsWith($column,'t_')) {
+				if (startsWith($column,'dt_') || startsWith($column,'d_')) {
 					$columns[$a]='unix_timestamp('.$column.') '.$column;
 				}
 			}
