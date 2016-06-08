@@ -553,7 +553,7 @@ class Html {
         foreach ($data as $section => $rows) {
             
             // Print section header
-            $buffer .= "<div class='panel'>";
+            $buffer .= "<div class='panel clearfix'>";
             $buffer .= "<div class='row-fluid clearfix section-header'><h4>{$section}<span style='display: none;' class='changed_status right alert radius label'>changed</span></h4></div>";
             
             // Loop through each row
