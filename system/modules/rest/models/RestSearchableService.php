@@ -35,14 +35,27 @@ class RestSearchableService extends DbService {
 			$orderBy='';
 			$parameters=[];
 			$o=new $class($this->w);
+			$t = $o->getDbTableName();
 				
 			if (is_array($restQuery) &&  count($restQuery)>0)  {
 				$parts=$this->extractPartsFromRestQuery($restQuery);
 				if (!$allowDeleted) {
 					$deletedCondition=array('AND','is_deleted___equal','0');
 					$parts['rules']=array_merge($deletedCondition,$parts['rules']);
-				} 
-				$parts['rules']=$this->generateSearchQueryFromRestUrl($parts['rules']);
+				}
+				
+				$joins = [];
+				$joinsSelect = [];
+				if(!empty($parts['joins'])) {
+					foreach($parts['joins'] as $join) {
+						if(!empty($o->{'_rest_joins_'.$join})) {
+							$joins[] = $o->{'_rest_joins_'.$join}['join'];
+							$joinsSelect[] = $o->{'_rest_joins_'.$join}['select'];
+						}
+					}
+				}
+				
+				$parts['rules']=$this->generateSearchQueryFromRestUrl($parts['rules'], $t);
 				
 				$parts['logic']='AND';
 				$where=$this->generateSQLWhere($parts);
@@ -55,14 +68,14 @@ class RestSearchableService extends DbService {
 					$skip=" OFFSET ".$parts['skip'];
 				}
 				if (!empty($parts['groupBy'])) {
-					$groupBy=" GROUP BY ".$parts['groupBy'];
+					$groupBy=" GROUP BY $t.".$parts['groupBy'];
 				}
 				if (!empty($parts['orderBy'])) {
-					$orderBy=" ORDER BY ".$parts['orderBy'];
+					$orderBy=" ORDER BY $t.".$parts['orderBy'];
 				}
 			} else {
 				if (!$allowDeleted) {
-					$whereString=' WHERE is_deleted=0';
+					$whereString=' WHERE '.$t.'.is_deleted=0';
 				}
 			}
 			$objects=[];
@@ -70,10 +83,15 @@ class RestSearchableService extends DbService {
 			$columns=$o->getDbTableColumnNames();
 			foreach ($columns as $a =>$column) { 
 				if (startsWith($column,'dt_') || startsWith($column,'d_')) {
-					$columns[$a]='unix_timestamp('.$column.') '.$column;
+					$columns[$a]='unix_timestamp('.$t.'.'.$column.') '.$column;
+				} else {
+					$columns[$a] = $t.'.'.$columns[$a];
 				}
 			}
-			$sql='select '.implode(",",$columns).' from '.$o->getDbTableName().' '.$whereString.$groupBy.$orderBy.$limit.$skip;
+			if(!empty($joinsSelect)) {
+				$columns = array_merge($columns, $joinsSelect);
+			}
+			$sql='select '.implode(",",$columns).' from '.$o->getDbTableName().' '.implode(' ', $joins).' '.$whereString.$groupBy.$orderBy.$limit.$skip;
 			$statement=$this->_db->prepare($sql); 
 			$statement->execute($parameters);
 			foreach ($statement->fetchAll() as $k =>$rowValue) {
@@ -104,6 +122,11 @@ class RestSearchableService extends DbService {
 		$joins=[];
 		$fields=[];
 		
+		while ($query[0]=="JOINS") {
+			$joins[] = $query[1];
+			$query=array_slice($query,2);
+		}
+		
 		$groupBy='';
 		if ($query[0]=="GROUPBY") {
 			$groupBy=$query[1];
@@ -118,14 +141,14 @@ class RestSearchableService extends DbService {
 	}
 
 	// convert REST url into query object containing nested rules 
-	function generateSearchQueryFromRestUrl(&$searchConfig) {
+	function generateSearchQueryFromRestUrl(&$searchConfig, $table='') {
 		$rules=[];
 		// READ TOKENS
 		while (count($searchConfig)>0) {
 			if ($searchConfig[0]=="AND" || $searchConfig[0]=="OR") {
 				$logic=$searchConfig[0];
 				$searchConfig=array_slice($searchConfig,1);
-				$children=$this->generateSearchQueryFromRestUrl($searchConfig);
+				$children=$this->generateSearchQueryFromRestUrl($searchConfig, $table);
 				$rules[]=['rules'=>$children,'logic'=>$logic];
 			} else if ($searchConfig[0]=="END") {
 				$searchConfig=array_slice($searchConfig,1);
@@ -134,7 +157,7 @@ class RestSearchableService extends DbService {
 				$ruleParts=array_slice($searchConfig,0,2);
 				$searchConfig=array_slice($searchConfig,2);
 				if ($ruleParts[0] && count($ruleParts[0])>0) {
-					$theRule=$this->generateSearchQueryRule($ruleParts);
+					$theRule=$this->generateSearchQueryRule($ruleParts, $table);
 					$rules[]=$theRule;
 				}
 			};
@@ -147,9 +170,10 @@ class RestSearchableService extends DbService {
 		else return false;
 	}
 	
-	function generateSearchQueryRule($ruleConfig) {
+	function generateSearchQueryRule($ruleConfig, $table='') {
 		// now we expect pairs
 		$filter='';
+		if(!empty($table)) $table .= '.';
 		$queryPart=new RestQueryPart();
 		$queryPart->filter='';
 		$queryPart->parameters=[];
@@ -158,7 +182,9 @@ class RestSearchableService extends DbService {
 		// query with with timestamps
 		if (startsWith($keyParts[0],'dt_') || startsWith($keyParts[0],'d_')) {
 			//$valueParts=date("Y-m-d H:i:s",$valueParts);
-			$keyParts[0]='unix_timestamp('.$keyParts[0].')';
+			$keyParts[0]='unix_timestamp('.$table.$keyParts[0].')';
+		} else {
+			$keyParts[0] = $table.$keyParts[0];
 		}
 		
 		if (count($keyParts)==2) {
