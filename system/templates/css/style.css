@@ -630,3 +630,16 @@ a > div#active_log_time {
     padding: 1px 4px;
 }
 
+/* Styles to force tables to horizontally scroll */
+div.table-responsive {
+	margin: 10px 0px;
+	overflow-x: auto;
+}
+
+div.table-responsive > p {
+	margin-bottom: 0px;
+}
+
+div.table-responsive > table > thead th, div.table-responsive > table > tbody td {
+	white-space: nowrap;
+}

@@ -966,12 +966,14 @@ class Html {
     public static function pagination($currentpage, $numpages, $pagesize, $totalresults, $baseurl, $pageparam = "p", $pagesizeparam = "ps", $totalresultsparam = "tr") {
         // See functions.php for implementation of isNumber
         // Prepare buffer
-        $buf = "<ul class='pagination'>";
+        $buf = '';
         if (isNumber($currentpage) && isNumber($numpages) && isNumber($pagesize) && isNumber($totalresults)) {
+
             // Check that we're within range
             if ($currentpage > 0 && $currentpage <= $numpages && $numpages > 1) {
-
-                // Build pagination links
+				$buf = "<ul class='pagination'>";
+                
+				// Build pagination links
                 for ($page = 1; $page <= $numpages; $page++) {
                     // Check if the current page
                     if ($currentpage == $page) {
@@ -980,17 +982,102 @@ class Html {
 						$buf .= "<li>";
 					}
 					
-					$buf .= "<a href='{$baseurl}";
-					$buf .= (strpos($baseurl, "?") == 0 ? "?" : "&");
-					$buf .= "{$pageparam}={$page}&{$pagesizeparam}={$pagesize}&{$totalresultsparam}={$totalresults}'>" . $page . "</a>";
-
-                    $buf .= "</li>";
+					$url_parsed = parse_url($baseurl);
+					
+					$url_string = $url_parsed['path'];
+					$url_string .= (empty($url_parsed['query']) ? '?' : '?' . $url_parsed['query'] . '&') . $pageparam . '=' . $page . '&' . $pagesizeparam . '=' . $pagesize . '&' . $totalresultsparam . '=' . $totalresults;
+					$url_string .= (!empty($url_parsed['fragment']) ? '#' . $url_parsed['fragment'] : '');
+					
+					$buf .= '<a href=\'' . $url_string . '\'>' . $page . '</a></li>';
                 }
+				
+				$buf .= "</ul>";
             }
         }
-        $buf .= "</ul>";
+        
         return $buf;
     }
+	
+	/**
+	 * This function creates a DataTables table, ID to identify the table, 
+	 * an array of headers and the source data url are required
+	 * 
+	 * If a table column is to be sortable, you must provide each header element
+	 * in the following format:
+	 *		[0 => "<sort column>", 1 => "<title>"]
+	 * 
+	 * @param Array $header
+	 * @param Array $data
+	 * @param int $page
+	 * @param int $page_size
+	 * @param int $total_results
+	 * @param string $base_url
+	 * @param string|optional $sort
+	 * @param string|optional $sort_direction
+	 * @param string|optional $page_query_param
+	 * @param string|optional $pagesize_query_param
+	 * @param string|optional $total_results_query_param
+	 * @param string|optional $sort_query_param
+	 */
+	public static function paginatedTable($header, $data, $page, $page_size, $total_results, $base_url, 
+			$sort = null, $sort_direction = 'asc', $page_query_param = "page", $pagesize_query_param = "page_size", 
+			$total_results_query_param = "total_results", $sort_query_param = "sort", $sort_direction_param = "sort_direction") {
+		$url_parsed = parse_url($base_url);			
+		$url_string = $url_parsed['path'];
+		$url_string .= (empty($url_parsed['query']) ? "?" : '?' . $url_parsed['query'] . '&') . $sort_query_param . '=' . $sort . '&' . $sort_direction_param . '=' . $sort_direction; // . $page_query_param . '=' . $page . '&' . $pagesize_query_param . '=' . $page_size . '&' . $total_results_query_param . '=' . $total_results . '&'
+		$url_string .= (!empty($url_parsed['fragment']) ? '#' . $url_parsed['fragment'] : '');
+
+		// Generate the table
+		$count_items = count($data);
+		$starting_item = (($page - 1) * $page_size) + 1;
+		$buffer = "<div class='row-fluid clearfix table-responsive'>"
+				.'<p>Showing ' . $starting_item . ' - ' . ($starting_item + $count_items - 1) . ' of ' . $total_results . '</p>'
+				. "<table class='small-12'>";
+		if (!empty($header) && is_array($header)) {
+			
+			// Print table header
+			$buffer .= "<thead><tr>";
+			foreach($header as $title) {
+				// Build optional sort url
+				$sort_string = '';
+				if (is_array($title)) {
+					$sort_direction_key = 'asc';
+					if ($title[0] === $sort) {
+						if ($sort_direction === 'asc') {
+							$sort_direction_key = 'desc';
+						}
+					}
+					$sort_direction_query = "{$sort_query_param}={$title[0]}&{$sort_direction_param}={$sort_direction_key}";
+
+					$sort_string = $url_parsed['path'] . (empty($url_parsed['query']) ? '?' : '?' . $url_parsed['query'] . '&') . $sort_direction_query . (!empty($url_parsed['fragment']) ? '#' . $url_parsed['fragment'] : '');
+				}
+				$buffer .= '<th>' . (is_array($title) ? '<a href="' . $sort_string . '">' . $title[1] . '</a>' : $title) . '</th>';
+			}
+			$buffer .= "</tr></thead>";
+			
+//			$buffer .= "<tfoot><tr>";
+//			foreach($header as $title) {
+//				$buffer .= '<th>' . (is_array($title) ? $title[1] : $title) . '</th>';
+//			}
+//			$buffer .= "</tr></tfoot>";
+		}
+		
+		// Print table body
+		if (!empty($data) && is_array($data)) {
+			$buffer .= "<tbody>";
+			foreach($data as $key => $row) {
+				$buffer .= '<tr data-id="' . $key . '">';
+                foreach($row as $column) {
+					$buffer .= "<td>{$column}</td>";
+                }
+                $buffer .= "</tr>";
+            }
+			$buffer .= "</tbody>";
+		}
+		$buffer .= "</table></div>";
+		$buffer .= '<div class="pagination-centered">' . Html::pagination($page, ceil($total_results / $page_size), $page_size, $total_results, $url_string, $page_query_param, $pagesize_query_param, $total_results_query_param) . '</div>';
+		return $buffer;
+	}
 
     /**
      *  Filter function returns formatted form for declaring filters. Data is the same
