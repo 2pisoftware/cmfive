@@ -5,12 +5,9 @@ var cmDatalist = {
 	DELETED_RECORDS : [],
 	//Last request, can be cancelled if a newer request comes in before it's completed
 	globXhr : null,
-	//Order of records to load
-	orderBy : null,
 
-	//Init function
-	ready : function () {
-		//Get and store API token
+	//Get and store API token
+	fetchAPIToken: function() {
 		if (!localStorage.getItem('api_token') || localStorage.getItem('api_token') == 'null') {
 			$.ajax({
 				url : '/rest/token',
@@ -18,12 +15,33 @@ var cmDatalist = {
 				success : function (d) {
 					cmDatalist.API_TOKEN = d.success;
 					localStorage.setItem('api_token', cmDatalist.API_TOKEN);
+					cmDatalist.ready();
 				}
 			});
 		} else {
-			cmDatalist.API_TOKEN = localStorage.getItem('api_token');
+			$.ajax({
+				url : '/rest/index?token=' + localStorage.getItem('api_token'),
+				dataType : 'json',
+				success : function (d) {
+					if(d.error && d.error == 'No session associated with this token') {
+						localStorage.removeItem('api_token');
+						cmDatalist.fetchAPIToken();
+					} else {
+						cmDatalist.API_TOKEN = localStorage.getItem('api_token');
+						cmDatalist.ready();
+					}
+				}
+			});
 		}
-
+	},
+	
+	init: function() {
+		cmDatalist.fetchAPIToken();
+	},
+	
+	//Ready function
+	ready : function () {
+		
 		//Show last tab if found
 		if (!localStorage.getItem('show_tab')) {
 			cmDatalist.show_tab = $('#cmfive_datalist_event_tabs li:first').data('type');
@@ -64,17 +82,21 @@ var cmDatalist = {
 		//Bind sortable fields
 		$('table.cmfive_event_page_table thead tr th.sortable').click(function () {
 			var $this = $(this);
+			var $event_page = $('.cmfive_datalist_event_page:visible');
+			var orderBy = $event_page.data('orderBy');
+			if(orderBy == undefined) orderBy = '';
 			$('table.cmfive_event_page_table thead .sortable-dir').removeClass('fi-arrow-down').removeClass('fi-arrow-up');
-			if ($this.data('sorted') == false || cmDatalist.orderBy.match($this.data('field')) != $this.data('field') || $this.data('sorted') == 'up') {
+			if ($this.data('sorted') == false || orderBy.match($this.data('field')) != $this.data('field') || $this.data('sorted') == 'up') {
 				$this.data('sorted', 'down');
 				$this.find('.sortable-dir').addClass('fi-arrow-down');
-				cmDatalist.orderBy = $this.data('field') + ' DESC';
+				orderBy = $this.data('field') + ' DESC';
 			} else {
 				$this.data('sorted', 'up');
 				$this.find('.sortable-dir').addClass('fi-arrow-up');
-				cmDatalist.orderBy = $this.data('field') + ' ASC';
+				orderBy = $this.data('field') + ' ASC';
 			}
-			cmDatalist.updateFilter($('.cmfive_datalist_event_page:visible').attr('id'), $('.cmfive_event_filters:visible').data('tag'));
+			 $event_page.data('orderBy', orderBy);
+			cmDatalist.updateFilter($event_page.attr('id'), $('.cmfive_event_filters:visible').data('tag'));
 		});
 
 		//Catch triggered changes
@@ -250,6 +272,7 @@ var cmDatalist = {
 		}
 		var filter = '';
 		var addDescription = '';
+		var filterGroup = {};
 		for (var i in tags) {
 			if (tags.hasOwnProperty(i)) {
 				if (i == 'description') {
@@ -264,16 +287,29 @@ var cmDatalist = {
 						addDescription = '/AND/' + titleField + '___contains/' + encodeURI(tags[i]);
 					}
 				} else {
-					filter += '/OR/' + encodeURIComponent(tags[i]) + '___equal/' + encodeURIComponent(i);
+					if(filterGroup[tags[i]] == undefined) filterGroup[tags[i]] = [];
+					filterGroup[tags[i]].push(encodeURIComponent(tags[i]) + '___equal/' + encodeURIComponent(i));
 				}
 			}
 		}
-		filter += addDescription;
-		var orderBy = '';
-		if (cmDatalist.orderBy !== null) {
-			orderBy = '/ORDERBY/' + cmDatalist.orderBy;
+		if(filterGroup != {}) {
+			var filterArray = [];
+			for(i in filterGroup) {
+				filterArray.push(filterGroup[i].join('/OR/'));
+			}
+			filter += '/OR/' + filterArray.join('/AND/');
 		}
-		var aUrl = '/rest/index/' + $('#' + type).data('type') + '/LIMIT/500' + orderBy + filter + '?token=' + cmDatalist.API_TOKEN;
+		filter += addDescription;
+		var joins = '';
+		if($('#' + type).data('joins') != undefined) {
+			joins = '/JOINS/' + $('#' + type).data('joins').join('/JOINS/');
+		}
+		
+		var orderBy = '';
+		if ( $('#' + type).data('orderBy') != undefined ) {
+			orderBy = '/ORDERBY/' +  $('#' + type).data('orderBy');
+		}
+		var aUrl = '/rest/index/' + $('#' + type).data('type') + '/LIMIT/500' + joins + orderBy + filter + '?token=' + cmDatalist.API_TOKEN;
 		$('#' + type + ' .cmfive_loading_overlay').show();
 		$('#' + type + ' .cmfive_loading_overlay').css('top', $('#' + type + ' .cmfive_event_filters').outerHeight() + 'px');
 		$('#' + type + ' .cmfive_loading_overlay').css('min-height', (500 - $('#' + type + ' .cmfive_event_filters').outerHeight()) + 'px');
@@ -284,7 +320,9 @@ var cmDatalist = {
 				success : function (data) {
 					if (data.error) {
 						var msg = '';
-						if (data.error.match('No access')) {
+						if(data.error.errorInfo != undefined) {
+							msg = 'Error loading content, please try again later';
+						} else if (data.error.match('No access')) {
 							msg = data.error + '\n' + 'You need to add the above module to system.rest_allow in the config.'
 						} else {
 							msg = data.error;
@@ -416,7 +454,7 @@ var cmDatalist = {
 			if (apdObj.find('.cmfive_event_filter_tag[data-tag="' + val + '"]').length > 0) {
 				apdObj.find('.cmfive_event_filter_tag[data-tag="' + val + '"]').show();
 			} else {
-				apdObj.append('<div class="cmfive_event_filter_tag ' + color + '" data-tag="' + val + '">' + title + '<span class="filter_tag_close"></span></div>');
+				apdObj.append('<div class="cmfive_event_filter_tag ' + color + '" data-tag="' + val + '">' + title + '<span class="filter_tag_close">&times;</span></div>');
 			}
 			cmDatalist.updateFilter(parent.closest('.cmfive_datalist_event_page')[0].id, tags);
 		}
@@ -424,5 +462,5 @@ var cmDatalist = {
 }
 
 $(function () {
-	cmDatalist.ready();
+	cmDatalist.init();
 });

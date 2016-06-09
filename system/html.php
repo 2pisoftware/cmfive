@@ -44,7 +44,15 @@ class Html {
 					$buttons = 'data-buttons=\''.json_encode($setup['buttons']).'\'';
 				}
 			}
-			$pages .= '<div '.$buttons.' data-type="'.$class.'" data-titlefield=\''.(is_array($setup['filters']['keyword_field']) ? json_encode($setup['filters']['keyword_field']) : $setup['filters']['keyword_field']).'\' id="cmfive_event_page_'.$class.'" style="display:none;" class="cmfive_datalist_event_page">';
+			$joins = '';
+			if(!empty($setup['joins'])) {
+				$joins = 'data-joins=\''.json_encode($setup['joins']).'\'';
+			}
+			$titlefield = '';
+			if(!empty($setup['filters']['keyword_field'])) {
+				$titlefield = 'data-titlefield=\''.(is_array($setup['filters']['keyword_field']) ? json_encode($setup['filters']['keyword_field']) : $setup['filters']['keyword_field']).'\'';
+			}
+			$pages .= '<div '.$buttons.' data-type="'.$class.'" '.$joins.' '.$titlefield.' id="cmfive_event_page_'.$class.'" style="display:none;" class="cmfive_datalist_event_page">';
 			$pages .= '<div class="cmfive_event_filters">';
 			if(!empty($setup['filters']['select'])) {
 				$i = 1;
@@ -62,7 +70,11 @@ class Html {
 					$i++;
 				}
 			}
-			$pages .= '<div class="cmfive_event_filter"><div class="cmfive_event_keyword">Keyword Search: <input value="" type="text" title="Press enter to filter results" /> <button type="button" class="show-for-touch button round tiny">Search</button></div><div class="cmfive_event_filter_actions"><ul class="button-group radius"><li><button data-action="reset" class="small button" disabled="disabled">Reset</button></li><li><button data-action="undo" class="small button" disabled="disabled">Undo</button></li><li><button data-action="new" class="small button success">New</button></li></ul></div></div>';
+			$pages .= '<div class="cmfive_event_filter">';
+			if(!empty($titlefield)) {
+				$pages .= '<div class="cmfive_event_keyword">Keyword Search: <input value="" type="text" title="Press enter to filter results" /> <button type="button" class="show-for-touch button round tiny">Search</button></div>';
+			}
+			$pages .= '<div class="cmfive_event_filter_actions"><ul class="button-group radius"><li><button data-action="reset" class="small button" disabled="disabled">Reset</button></li><li><button data-action="undo" class="small button" disabled="disabled">Undo</button></li><li><button data-action="new" class="small button success">New</button></li></ul></div></div>';
 			$pages .= '</div><div class="cmfive_loading_overlay" style="display:none;"></div>';
 			$cols = '';
 			$header = '<thead><tr>';

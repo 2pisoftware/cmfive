@@ -2304,7 +2304,6 @@ meta.foundation-mq-topbar {
   .button-group:after {
     clear: both; }
   .button-group > li {
-    margin: 0 -2px;
     display: inline-block; }
     .button-group > li > button, .button-group > li .button {
       border-left: 1px solid;
@@ -2358,7 +2357,6 @@ meta.foundation-mq-topbar {
         .button-group.stack-for-small > li:first-child button, .button-group.stack-for-small > li:first-child .button {
           border-top: 0; } }
   .button-group.radius > * {
-    margin: 0 -2px;
     display: inline-block; }
     .button-group.radius > * > button, .button-group.radius > * .button {
       border-left: 1px solid;
