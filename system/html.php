@@ -1039,19 +1039,20 @@ class Html {
 			$buffer .= "<thead><tr>";
 			foreach($header as $title) {
 				// Build optional sort url
-				$sort_string = '';
+				$sort_asc_string = '';
+				$sort_desc_string = '';
 				if (is_array($title)) {
-					$sort_direction_key = 'asc';
-					if ($title[0] === $sort) {
-						if ($sort_direction === 'asc') {
-							$sort_direction_key = 'desc';
-						}
-					}
-					$sort_direction_query = "{$sort_query_param}={$title[0]}&{$sort_direction_param}={$sort_direction_key}";
+					$sort_direction_asc_query = "{$sort_query_param}={$title[0]}&{$sort_direction_param}=asc";
+					$sort_direction_desc_query = "{$sort_query_param}={$title[0]}&{$sort_direction_param}=desc";
 
-					$sort_string = $url_parsed['path'] . (empty($url_parsed['query']) ? '?' : '?' . $url_parsed['query'] . '&') . $sort_direction_query . (!empty($url_parsed['fragment']) ? '#' . $url_parsed['fragment'] : '');
+					$sort_asc_string = $url_parsed['path'] . (empty($url_parsed['query']) ? '?' : '?' . $url_parsed['query'] . '&') . $sort_direction_asc_query . (!empty($url_parsed['fragment']) ? '#' . $url_parsed['fragment'] : '');
+					$sort_desc_string = $url_parsed['path'] . (empty($url_parsed['query']) ? '?' : '?' . $url_parsed['query'] . '&') . $sort_direction_desc_query . (!empty($url_parsed['fragment']) ? '#' . $url_parsed['fragment'] : '');
 				}
-				$buffer .= '<th>' . (is_array($title) ? '<a href="' . $sort_string . '">' . $title[1] . '</a>' : $title) . '</th>';
+				$buffer .= '<th' . (is_array($title) && $title[0] === $sort ? ' class="sorted_column"' : '') . '>' . (is_array($title) ? '<a href="' . ($sort_direction === 'asc' ? $sort_desc_string : $sort_asc_string) . '">' . $title[1] . '</a>' : $title)
+						. (is_array($title) ? '<div class="right">'
+							. ($title[0] !== $sort || ($title[0] === $sort && $sort_direction !== 'asc') ? '<a class="sort-ascending" href="' . $sort_asc_string . '"><i class="fi-play sort-icons "></i></a>' : '')
+							. ($title[0] !== $sort || ($title[0] === $sort && $sort_direction !== 'desc') ? '<a class="sort-descending" href="' . $sort_desc_string . '"><i class="fi-play sort-icons"></i></a>' : '')
+						. '</div></th>' : '');
 			}
 			$buffer .= "</tr></thead>";
 			

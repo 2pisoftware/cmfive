@@ -1696,12 +1696,24 @@ class Web {
      * get/put a session value
      */
     function session($key, $value = null) {
-        if ($value == null) {
-            return !empty($_SESSION[$key]) ? $_SESSION[$key] : null;
-        } else {
-            $_SESSION[$key] = $value;
-        }
+		if ($value !== null) {
+			$_SESSION[$key] = $value;
+		}
+        
+		return array_key_exists($key, $_SESSION) ? $_SESSION[$key] : null;
     }
+	
+	/**
+	 * This function will retrieve data from session, but will also try to 
+	 * update the value from the request function first, if both are null then
+	 * it will assign $default to the session $key
+	 * 
+	 * @param string $key
+	 * @param mixed $default
+	 */
+	function sessionOrRequest($key, $default = null) {
+		return $this->session($key, $this->request($key, !is_null($this->session($key)) ? $this->session($key) : $default));
+	}
 
     function sessionUnset($key) {
         unset($_SESSION[$key]);
