@@ -1022,17 +1022,35 @@ class Html {
 	public static function paginatedTable($header, $data, $page, $page_size, $total_results, $base_url, 
 			$sort = null, $sort_direction = 'asc', $page_query_param = "page", $pagesize_query_param = "page_size", 
 			$total_results_query_param = "total_results", $sort_query_param = "sort", $sort_direction_param = "sort_direction") {
+		
+		// Build URL for pagination
 		$url_parsed = parse_url($base_url);			
 		$url_string = $url_parsed['path'];
 		$url_string .= (empty($url_parsed['query']) ? "?" : '?' . $url_parsed['query'] . '&') . $sort_query_param . '=' . $sort . '&' . $sort_direction_param . '=' . $sort_direction; // . $page_query_param . '=' . $page . '&' . $pagesize_query_param . '=' . $page_size . '&' . $total_results_query_param . '=' . $total_results . '&'
 		$url_string .= (!empty($url_parsed['fragment']) ? '#' . $url_parsed['fragment'] : '');
 
 		// Generate the table
+		$num_results = ceil($total_results / $page_size);
 		$count_items = count($data);
 		$starting_item = (($page - 1) * $page_size) + 1;
-		$buffer = "<div class='row-fluid clearfix table-responsive'>"
-				.'<p>Showing ' . $starting_item . ' - ' . ($starting_item + $count_items - 1) . ' of ' . $total_results . '</p>'
-				. "<table class='small-12'>";
+		$buffer = '<div class="row-fluid clearfix">'
+					. '<div class="small-12 medium-6 small-text-center medium-text-left columns" style="margin-top: 5px;">Showing ' . $starting_item . ' - ' . ($starting_item + $count_items - 1) . ' of ' . $total_results . '</div>'
+					. '<div class="small-12 medium-6 columns">';
+		if ($num_results > 0) {
+			$buffer .= '<div class="row-fluid clearfix"><span class="small-3 medium-6 columns small-text-center medium-text-right" style="margin-top: 5px;">Page:</span><select onchange="location = this.value;" class="small-9 medium-6 columns right">';
+			// Build URL for dropdown pagination
+			$dropdown_url_string = $url_parsed['path'];
+			$dropdown_url_string .= (empty($url_parsed['query']) ? "?" : '?' . $url_parsed['query'] . '&') . $sort_query_param . '=' . $sort . '&' . $sort_direction_param . '=' . $sort_direction; // . $page_query_param . '=' . $page . '&' . $pagesize_query_param . '=' . $page_size . '&' . $total_results_query_param . '=' . $total_results . '&'
+			
+			for($i = 1; $i <= $num_results; $i++) {
+				$buffer .= '<option' . ($i == $page ? ' selected="selected"' : '') . ' value="' . $dropdown_url_string . '&' . $page_query_param . '=' . $i . (!empty($url_parsed['fragment']) ? '#' . $url_parsed['fragment'] : '') . '">' . $i . '</option>';
+			}
+			$buffer .= '</select></div>';
+		}
+		$buffer .= "</div></div>"
+				. "<div data-alert class='show-for-small alert-box'>This is a responsive table, pan left to right to view data.</div>"
+				. "<div class='row-fluid clearfix table-responsive'>"
+					. "<table class='small-12'>";
 		if (!empty($header) && is_array($header)) {
 			
 			// Print table header
@@ -1048,7 +1066,7 @@ class Html {
 					$sort_asc_string = $url_parsed['path'] . (empty($url_parsed['query']) ? '?' : '?' . $url_parsed['query'] . '&') . $sort_direction_asc_query . (!empty($url_parsed['fragment']) ? '#' . $url_parsed['fragment'] : '');
 					$sort_desc_string = $url_parsed['path'] . (empty($url_parsed['query']) ? '?' : '?' . $url_parsed['query'] . '&') . $sort_direction_desc_query . (!empty($url_parsed['fragment']) ? '#' . $url_parsed['fragment'] : '');
 				}
-				$buffer .= '<th' . (is_array($title) && $title[0] === $sort ? ' class="sorted_column"' : '') . '>' . (is_array($title) ? '<a href="' . ($sort_direction === 'asc' ? $sort_desc_string : $sort_asc_string) . '">' . $title[1] . '</a>' : $title)
+				$buffer .= '<th' . (is_array($title) && $title[0] === $sort ? ' class="sorted_column"' : '') . '>' . (is_array($title) ? '<a href="' . ($title[0] === $sort && $sort_direction === 'asc' ? $sort_desc_string : $sort_asc_string) . '">' . $title[1] . '</a>' : $title)
 						. (is_array($title) ? '<div class="right">'
 							. ($title[0] !== $sort || ($title[0] === $sort && $sort_direction !== 'asc') ? '<a class="sort-ascending" href="' . $sort_asc_string . '"><i class="fi-play sort-icons "></i></a>' : '')
 							. ($title[0] !== $sort || ($title[0] === $sort && $sort_direction !== 'desc') ? '<a class="sort-descending" href="' . $sort_desc_string . '"><i class="fi-play sort-icons"></i></a>' : '')
@@ -1076,7 +1094,7 @@ class Html {
 			$buffer .= "</tbody>";
 		}
 		$buffer .= "</table></div>";
-		$buffer .= '<div class="pagination-centered">' . Html::pagination($page, ceil($total_results / $page_size), $page_size, $total_results, $url_string, $page_query_param, $pagesize_query_param, $total_results_query_param) . '</div>';
+		$buffer .= '<div class="pagination-centered">' . Html::pagination($page, $num_results, $page_size, $total_results, $url_string, $page_query_param, $pagesize_query_param, $total_results_query_param) . '</div>';
 		return $buffer;
 	}
 
