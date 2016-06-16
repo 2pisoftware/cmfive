@@ -851,7 +851,7 @@ class TaskService extends DbService {
             $w->menuLink("task/edit", "New Task", $nav);
 //          $w->menuLink("task/index", "Task Dashboard", $nav);
             $w->menuLink("task/tasklist", "Task List", $nav);
-            $w->menuLink("task/tasklist#notifications", "Notifications", $nav);
+            $w->menuLink("task/notifications", "Notifications", $nav);
             $w->menuLink("task/taskweek", "Activity", $nav);
             $w->menuLink("task-group/viewtaskgrouptypes", "Task Groups", $nav);
         }

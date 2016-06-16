@@ -6,17 +6,17 @@ function tasklist_ALL(Web $w) {
     $reset = $w->request("reset");
     if (empty($reset)) {
         // Get filter values
-        $assignee_id = $w->request("assignee_id");
-        $creator_id = $w->request("creator_id");
+        $assignee_id = $w->sessionOrRequest("task__assignee-id");
+        $creator_id = $w->sessionOrRequest("task__creator-id");
 
-        $task_group_id = $w->request("task_group_id");
-        $task_type = $w->request('task_type');
-        $task_priority = $w->request('task_priority');
-        $task_status = $w->request('task_status');
-        $is_closed = $w->request("is_closed");
-        $dt_from = $w->request('dt_from');
-        $dt_to = $w->request('dt_to');
-		$filter_urgent = $w->request('filter_urgent');
+        $task_group_id = $w->sessionOrRequest("task__task-group-id");
+        $task_type = $w->sessionOrRequest('task__type');
+        $task_priority = $w->sessionOrRequest('task__priority');
+        $task_status = $w->sessionOrRequest('task__status');
+        $is_closed = $w->sessionOrRequest("task__is-closed");
+        $dt_from = $w->sessionOrRequest('task__dt-from');
+        $dt_to = $w->sessionOrRequest('task__dt-to');
+		$filter_urgent = $w->sessionOrRequest('task__filter-urgent');
     }
     
     // Make the query manually
@@ -94,13 +94,13 @@ function tasklist_ALL(Web $w) {
     $filter_assignees = $taskgroup_data["members"];
     array_unshift($filter_assignees,array("Unassigned","unassigned"));
     $filter_data = array(
-        array("Assignee", "select", "assignee_id", !empty($assignee_id) ? $assignee_id : null, $filter_assignees),
-        array("Creator", "select", "creator_id", !empty($creator_id) ? $creator_id : null, $taskgroup_data["members"]),
-        array("Task Group", "select", "task_group_id", !empty($task_group_id) ? $task_group_id : null, $taskgroup_data["taskgroups"]),
-        array("Task Type", "select", "task_type", !empty($task_type) ? $task_type : null, $taskgroup_data["types"]),
-        array("Task Priority", "select", "task_priority", !empty($task_priority) ? $task_priority : null, $taskgroup_data["priorities"]),
-        array("Task Status", "select", "task_status", !empty($task_status) ? $task_status : null, $taskgroup_data["statuses"]),
-        array("Closed", "checkbox", "is_closed", !empty($is_closed) ? $is_closed : null)
+        array("Assignee", "select", "task__assignee-id", !empty($assignee_id) ? $assignee_id : null, $filter_assignees),
+        array("Creator", "select", "task__creator-id", !empty($creator_id) ? $creator_id : null, $taskgroup_data["members"]),
+        array("Task Group", "select", "task__task-group-id", !empty($task_group_id) ? $task_group_id : null, $taskgroup_data["taskgroups"]),
+        array("Task Type", "select", "task__type", !empty($task_type) ? $task_type : null, $taskgroup_data["types"]),
+        array("Task Priority", "select", "task__priority", !empty($task_priority) ? $task_priority : null, $taskgroup_data["priorities"]),
+        array("Task Status", "select", "task__status", !empty($task_status) ? $task_status : null, $taskgroup_data["statuses"]),
+        array("Closed", "checkbox", "task__is-closed", !empty($is_closed) ? $is_closed : null)
     );
     
     $w->ctx("filter_data", $filter_data);
@@ -108,48 +108,5 @@ function tasklist_ALL(Web $w) {
     
     // tab: notifications
     // list groups and notification based on my role and permissions
-    $line = array(array("Task Group", "Your Role", "Creator", "Assignee", "All Others", ""));
-    $user_taskgroup_members = $w->Task->getMemberGroups($w->Auth->user()->id);
-    if ($user_taskgroup_members) {
-        usort($user_taskgroup_members, array("TaskService", "sortbyRole"));
-
-        foreach ($user_taskgroup_members as $member) {
-            $taskgroup = $member->getTaskGroup();
-            $value_array = array();
-            $notify = $w->Task->getTaskGroupUserNotify($w->Auth->user()->id, $member->task_group_id);
-            if ($notify) {
-                foreach ($notify as $n) {
-                    $value = ($n->value == "0") ? "No" : "Yes";
-                    $value_array[$n->role][$n->type] = $value;
-                }
-            } else {
-                $notify = $w->Task->getTaskGroupNotify($member->task_group_id);
-                if ($notify) {
-                    foreach ($notify as $n) {
-                        $value = ($n->value == "0") ? "No" : "Yes";
-                        $value_array[$n->role][$n->type] = $value;
-                    }
-                }
-            }
-
-            if ($taskgroup->getCanIView()) {
-                $title = $w->Task->getTaskGroupTitleById($member->task_group_id);
-                $role = strtolower($member->role);
-
-                $line[] = array(
-                    $title,
-                    ucfirst($role),
-                    @$value_array[$role]["creator"],
-                    @$value_array[$role]["assignee"],
-                    @$value_array[$role]["other"],
-                    Html::box(WEBROOT . "/task/updateusergroupnotify/" . $member->task_group_id, " Edit ", true)
-                );
-            }
-            unset($value_array);
-        }
-        
-
-        // display list
-        $w->ctx("notify", Html::table($line, null, "tablesorter", true));
-    }
+    
 }
