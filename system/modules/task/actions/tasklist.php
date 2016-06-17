@@ -2,6 +2,8 @@
 
 function tasklist_ALL(Web $w) {
 	History::add("List Tasks");
+	$w->ctx("title", "Task List");
+	
     // Look for reset
     $reset = $w->request("reset");
     if (empty($reset)) {
