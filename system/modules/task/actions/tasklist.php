@@ -22,11 +22,11 @@ function tasklist_ALL(Web $w) {
     }
     
     // Make the query manually
-    $query_object = $w->db->get("task")->leftJoin("task_group");
+    $query_object = $w->db->get("task")->leftJoin("task_group")->where("task_group.is_deleted", 0);
     
     // We can now make ID queries directly to the task_group table because of left join
     if (!empty($task_group_id)) {
-        $query_object->where("task_group.id", $task_group_id);
+        $query_object->where("task.task_group_id", $task_group_id);
     }
     
     // Repeat above for everything else
@@ -73,14 +73,14 @@ function tasklist_ALL(Web $w) {
     }
     
     // Standard wheres
-    $query_object->where("task.is_deleted", array(0, null))->where("task_group.is_active", 1)->where("task_group.is_deleted", 0);
-    
-    // Fetch dataset and get model objects for them
+    $query_object->where("task.is_deleted", array(0, null)); //->where("task_group.is_active", 1)->where("task_group.is_deleted", 0);
+
+	// Fetch dataset and get model objects for them
     $tasks_result_set = $query_object->fetch_all();
     $task_objects = $w->Task->getObjectsFromRows("Task", $tasks_result_set);
     
 	// Filter in or out closed tasks based on given is_closed filter parameter
-	if (!empty($task_objects)) {
+	if (!empty($task_objects) && empty($reset)) {
 		$task_objects = array_filter($task_objects, function($task) use ($is_closed, $filter_urgent) {
 			if (!is_null($filter_urgent)) {
 				return $task->isUrgent();

@@ -6,26 +6,79 @@ class TaskService extends DbService {
 
     public function getTaskGroupDetailsForUser() {
         $user_id = $this->w->Auth->user()->id;
-        $taskgroups = $this->getTaskGroupsForMember($user_id);
-        
-        $taskgroup_details = array("taskgroups" => array(), "statuses" => array(), "priorities" => array(), "members" => array(), "types" => array());
-        if (!empty($taskgroups)) {
-            foreach($taskgroups as $taskgroup) {
-                $taskgroup_details["taskgroups"][] = $taskgroup;
-                $taskgroup_details["statuses"] = array_merge($taskgroup_details["statuses"], $taskgroup->getStatus());
-                $taskgroup_details["priorities"] = array_merge($taskgroup_details["priorities"], $taskgroup->getPriority());
-                $taskgroup_details["members"] = array_merge($taskgroup_details["members"], $this->getMembersInGroup($taskgroup->id));
-                $task_type_array = $taskgroup->getTaskGroupTypeObject()->getTaskTypeArray();
-                
-                $taskgroup_details["types"][key($task_type_array)] = array($task_type_array[key($task_type_array)], key($task_type_array));
-            }
-        }
-        
-        // Flatten arrays
-        $taskgroup_details["statuses"] = array_unique($this->flattenTaskGroupArray($taskgroup_details["statuses"]));
-        $taskgroup_details["priorities"] = array_unique($this->flattenTaskGroupArray($taskgroup_details["priorities"]));
-//        $taskgroup_details["types"] = array_unique($taskgroup_details["types"]);
-        $taskgroup_details["members"] = array_unique_multidimensional($taskgroup_details["members"]);
+		
+		// Replacing functionality in favour of speed
+		$member_of_task_groups = $this->_db->get("task_group_member")
+                ->leftJoin("task_group on task_group.id = task_group_member.task_group_id")->select()->select("DISTINCT task_group.id")
+                ->where("task_group_member.user_id", $user_id)->and("task_group_member.is_active", 1)
+                ->and("task_group.is_active", 1)->and("task_group.is_deleted", 0)->fetchAll();
+		
+		$member_ids = [];
+		if (!empty($member_of_task_groups)) {
+			foreach ($member_of_task_groups as $member_of_task_group) {
+				$member_ids[]  = $member_of_task_group["id"];
+			}
+		}
+		
+		$taskgroup_statuses = $this->w->db->get("task")->select()->select("DISTINCT status")->where("task.task_group_id", $member_ids)->where("task.is_deleted", 0)->fetchAll();
+		$statuses = [];
+		
+		if (!empty($taskgroup_statuses)) {
+			foreach($taskgroup_statuses as $taskgroup_status) {
+				$statuses[] = $taskgroup_status['status'];
+			}
+		}
+		
+		$taskgroup_priorities = $this->w->db->get("task")->select()->select("DISTINCT priority")->where("task.task_group_id", $member_ids)->where("task.is_deleted", 0)->fetchAll();
+		$priorities = [];
+		
+		if (!empty($taskgroup_priorities)) {
+			foreach($taskgroup_priorities as $taskgroup_priority) {
+				$priorities[] = $taskgroup_priority['priority'];
+			}
+		}
+		
+		$taskgroup_tasktypes = $this->w->db->get("task")->select()->select("DISTINCT task_type")->where("task.task_group_id", $member_ids)->where("task.is_deleted", 0)->fetchAll();
+		$tasktypes = [];
+		
+		if (!empty($taskgroup_tasktypes)) {
+			foreach($taskgroup_tasktypes as $taskgroup_tasktype) {
+				$tasktypes[] = $taskgroup_tasktype['task_type'];
+			}
+		}
+		
+		$members = $this->w->db->get("task_group_member")->select()->select("DISTINCT task_group_member.user_id")
+				->where("task_group_member.task_group_id", $member_ids)->fetchAll();
+		$flat_members = [];
+		if (!empty($members)) {
+			foreach($members as $member) {
+				$flat_members[] = $member['user_id'];
+			}
+		}
+		
+		$taskgroup_members = $this->w->Task->getObjects("User", ["id" => $flat_members]);
+		
+		$taskgroup_details = ["statuses" => $statuses, "priorities" => $priorities, "members" => $taskgroup_members, "types" => $tasktypes];
+//        $taskgroups = $this->getTaskGroupsForMember($user_id);
+//        
+//        $taskgroup_details = array("taskgroups" => array(), "statuses" => array(), "priorities" => array(), "members" => array(), "types" => array());
+//        if (!empty($taskgroups)) {
+//            foreach($taskgroups as $taskgroup) {
+//                $taskgroup_details["taskgroups"][] = $taskgroup;
+//                $taskgroup_details["statuses"] = array_merge($taskgroup_details["statuses"], $taskgroup->getStatus());
+//                $taskgroup_details["priorities"] = array_merge($taskgroup_details["priorities"], $taskgroup->getPriority());
+//                $taskgroup_details["members"] = array_merge($taskgroup_details["members"], $this->getMembersInGroup($taskgroup->id));
+//                $task_type_array = $taskgroup->getTaskGroupTypeObject()->getTaskTypeArray();
+//                
+//                $taskgroup_details["types"][key($task_type_array)] = array($task_type_array[key($task_type_array)], key($task_type_array));
+//            }
+//        }
+//        
+//        // Flatten arrays
+//        $taskgroup_details["statuses"] = array_unique($this->flattenTaskGroupArray($taskgroup_details["statuses"]));
+//        $taskgroup_details["priorities"] = array_unique($this->flattenTaskGroupArray($taskgroup_details["priorities"]));
+////        $taskgroup_details["types"] = array_unique($taskgroup_details["types"]);
+//        $taskgroup_details["members"] = array_unique_multidimensional($taskgroup_details["members"]);
         
         return $taskgroup_details;
     }
