@@ -96,7 +96,14 @@ function tasklist_ALL(Web $w) {
     $filter_data = array(
         array("Assignee", "select", "task__assignee-id", !empty($assignee_id) ? $assignee_id : null, $filter_assignees),
         array("Creator", "select", "task__creator-id", !empty($creator_id) ? $creator_id : null, $taskgroup_data["members"]),
-        array("Task Group", "select", "task__task-group-id", !empty($task_group_id) ? $task_group_id : null, $taskgroup_data["taskgroups"]),
+        (new \Html\Form\Autocomplete([
+			"label"		=> "Task Group",
+			"name"		=> "task__task-group-id",
+			"id"		=> "task__task-group-id",
+			"source"	=> $w->localUrl("/task-group/ajaxAutocompleteTaskgroups"),
+			"value"		=> !empty($task_group_id) ? $task_group_id : null,
+			"minlength" => 2
+		])), // array("Task Group", "select", "task__task-group-id", !empty($task_group_id) ? $task_group_id : null, $taskgroup_data["taskgroups"]),
         array("Task Type", "select", "task__type", !empty($task_type) ? $task_type : null, $taskgroup_data["types"]),
         array("Task Priority", "select", "task__priority", !empty($task_priority) ? $task_priority : null, $taskgroup_data["priorities"]),
         array("Task Status", "select", "task__status", !empty($task_status) ? $task_status : null, $taskgroup_data["statuses"]),
@@ -104,9 +111,4 @@ function tasklist_ALL(Web $w) {
     );
     
     $w->ctx("filter_data", $filter_data);
-    
-    
-    // tab: notifications
-    // list groups and notification based on my role and permissions
-    
 }
