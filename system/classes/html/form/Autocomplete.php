@@ -23,7 +23,7 @@ class Autocomplete extends \Html\Form\FormElement {
 	
 	public static $_excludeFromOutput = [
 		"id", "name", "required", "value", "minlength", "class", "style",
-		"options", "_prefix", "label", "source"
+		"options", "_prefix", "label", "source", "title"
 	];
 	
 	/**
@@ -132,6 +132,19 @@ class Autocomplete extends \Html\Form\FormElement {
 	}
 	
 	/**
+	 * Sets the default display title (i.e. what is displayed in the textfield)
+	 * for the autocomplete
+	 * 
+	 * @param string $title
+	 * @return \Html\Form\Autocomplete this
+	 */
+	public function setTitle($title) {
+		$this->title = $title;
+		
+		return $this;
+	}
+	
+	/**
 	 * Sets the default value for the autocomplete
 	 * 
 	 * @param string $value
@@ -163,10 +176,12 @@ class Autocomplete extends \Html\Form\FormElement {
 		
 		$prefix = static::$_prefix;
 		
+		$displayValue = !empty($this->title) ? $this->title : $this->value;
+		
 		return <<<BUFFER
 <input type="text" style="display: none;" id="{$this->id}"  name="{$this->name}" value="{$this->value}" {$attribute_buffer} />
 <div class='acp_container'>
-	<input type="text" id="{$prefix}{$this->id}"  name="{$prefix}{$this->name}" value="{$this->value}" class="{$this->class}" style="{$this->style}" {$required} />
+	<input type="text" id="{$prefix}{$this->id}"  name="{$prefix}{$this->name}" value="{$displayValue}" class="{$this->class}" style="{$this->style}" {$required} />
 	<div class="circle"></div>
 	<img class="center_image" width="40px" height="40px" src="/system/templates/img/cmfive_V_logo.png" />
 </div>

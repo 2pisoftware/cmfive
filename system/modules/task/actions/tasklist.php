@@ -21,12 +21,18 @@ function tasklist_ALL(Web $w) {
 		$filter_urgent = $w->sessionOrRequest('task__filter-urgent');
     }
     
+	// First get the taskgroup
+	$taskgroup = null;
+    if (!empty($task_group_id)) {
+		$taskgroup = $w->Task->getTaskGroup($task_group_id);
+	}
+	
     // Make the query manually
     $query_object = $w->db->get("task")->leftJoin("task_group")->where("task_group.is_deleted", 0);
     
     // We can now make ID queries directly to the task_group table because of left join
-    if (!empty($task_group_id)) {
-        $query_object->where("task.task_group_id", $task_group_id);
+	if (!empty($task_group_id)) {
+	    $query_object->where("task.task_group_id", $task_group_id);
     }
     
     // Repeat above for everything else
@@ -106,8 +112,9 @@ function tasklist_ALL(Web $w) {
 			"name"		=> "task__task-group-id",
 			"id"		=> "task__task-group-id",
 			"source"	=> $w->localUrl("/task-group/ajaxAutocompleteTaskgroups"),
-			"value"		=> !empty($task_group_id) ? $task_group_id : null,
-			"minlength" => 2
+			"value"		=> !empty($task_group_id) ? $taskgroup->getSelectOptionValue() : null,
+			"minlength" => 2,
+			"title"		=> !empty($task_group_id) ? $taskgroup->getSelectOptionTitle() : null
 		])), // array("Task Group", "select", "task__task-group-id", !empty($task_group_id) ? $task_group_id : null, $taskgroup_data["taskgroups"]),
         array("Task Type", "select", "task__type", !empty($task_type) ? $task_type : null, $taskgroup_data["types"]),
         array("Task Priority", "select", "task__priority", !empty($task_priority) ? $task_priority : null, $taskgroup_data["priorities"]),
