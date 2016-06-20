@@ -15,7 +15,7 @@ function tasklist_ALL(Web $w) {
         $task_type = $w->sessionOrRequest('task__type');
         $task_priority = $w->sessionOrRequest('task__priority');
         $task_status = $w->sessionOrRequest('task__status');
-        $is_closed = $w->sessionOrRequest("task__is-closed");
+        $is_closed = $w->sessionOrRequest("task__is-closed", 0);
         $dt_from = $w->sessionOrRequest('task__dt-from');
         $dt_to = $w->sessionOrRequest('task__dt-to');
 		$filter_urgent = $w->sessionOrRequest('task__filter-urgent');
@@ -85,7 +85,10 @@ function tasklist_ALL(Web $w) {
 			if (!is_null($filter_urgent)) {
 				return $task->isUrgent();
 			}
-			return (is_null($is_closed) || $is_closed == 0) ? !$task->getisTaskClosed() : $task->getisTaskClosed();
+			if (is_null($is_closed) || $is_closed === '') {
+				return true;
+			}
+			return ($is_closed == 0 ? !$task->getisTaskClosed() : $task->getisTaskClosed());
 		});
 	}
 	
@@ -109,7 +112,15 @@ function tasklist_ALL(Web $w) {
         array("Task Type", "select", "task__type", !empty($task_type) ? $task_type : null, $taskgroup_data["types"]),
         array("Task Priority", "select", "task__priority", !empty($task_priority) ? $task_priority : null, $taskgroup_data["priorities"]),
         array("Task Status", "select", "task__status", !empty($task_status) ? $task_status : null, $taskgroup_data["statuses"]),
-        array("Closed", "checkbox", "task__is-closed", !empty($is_closed) ? $is_closed : null)
+        (new \Html\Form\Select([
+			"label"		=> "Closed",
+			"name"		=> "task__is-closed",
+			"id"		=> "task__is_closed"
+		]))->setOptions([
+			["label" => "No", "value" => '0'],
+			["label" => "Yes", "value" => '1'],
+			["label" => "Both", "value" => '']
+		])->setSelectedOption($is_closed) //array("Closed", "checkbox", "task__is-closed", !empty($is_closed) ? $is_closed : null)
     );
     
     $w->ctx("filter_data", $filter_data);
