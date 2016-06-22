@@ -140,6 +140,10 @@ class Task extends DbObject {
             return true;
         }
 
+		if ($loggedin_user->hasRole("task_admin")) {
+			return true;
+		}
+		
         $me = $this->Task->getMemberGroupById($this->task_group_id, $loggedin_user->id);
 
         if (empty($me)) {
