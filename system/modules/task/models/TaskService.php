@@ -20,7 +20,8 @@ class TaskService extends DbService {
 			}
 		}
 		
-		$taskgroup_statuses = $this->w->db->get("task")->select()->select("DISTINCT status")->where("task.task_group_id", $member_ids)->where("task.is_deleted", 0)->fetchAll();
+	
+		$taskgroup_statuses = $this->w->db->get("task")->select()->select("DISTINCT status")->where("task.is_deleted", 0)->fetchAll();
 		$statuses = [];
 		
 		if (!empty($taskgroup_statuses)) {
@@ -29,7 +30,7 @@ class TaskService extends DbService {
 			}
 		}
 		
-		$taskgroup_priorities = $this->w->db->get("task")->select()->select("DISTINCT priority")->where("task.task_group_id", $member_ids)->where("task.is_deleted", 0)->fetchAll();
+		$taskgroup_priorities = $this->w->db->get("task")->select()->select("DISTINCT priority")->where("task.is_deleted", 0)->fetchAll();
 		$priorities = [];
 		
 		if (!empty($taskgroup_priorities)) {
@@ -38,7 +39,7 @@ class TaskService extends DbService {
 			}
 		}
 		
-		$taskgroup_tasktypes = $this->w->db->get("task")->select()->select("DISTINCT task_type")->where("task.task_group_id", $member_ids)->where("task.is_deleted", 0)->fetchAll();
+		$taskgroup_tasktypes = $this->w->db->get("task")->select()->select("DISTINCT task_type")->where("task.is_deleted", 0)->fetchAll();
 		$tasktypes = [];
 		
 		if (!empty($taskgroup_tasktypes)) {
@@ -47,8 +48,7 @@ class TaskService extends DbService {
 			}
 		}
 		
-		$members = $this->w->db->get("task_group_member")->select()->select("DISTINCT task_group_member.user_id")
-				->where("task_group_member.task_group_id", $member_ids)->fetchAll();
+		$members = $this->w->db->get("task_group_member")->select()->select("DISTINCT task_group_member.user_id")->fetchAll();
 		$flat_members = [];
 		if (!empty($members)) {
 			foreach($members as $member) {

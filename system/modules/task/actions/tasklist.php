@@ -6,6 +6,7 @@ function tasklist_ALL(Web $w) {
 	
     // Look for reset
     $reset = $w->request("reset");
+	$is_closed = 0;
     if (empty($reset)) {
         // Get filter values
         $assignee_id = $w->sessionOrRequest("task__assignee-id");

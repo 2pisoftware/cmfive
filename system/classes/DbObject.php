@@ -982,7 +982,6 @@ class DbObject extends DbService {
         if (property_exists($this, $prop_string)) {
             $prop_detail = new ReflectionProperty($this, $prop_string);
             if ($prop_detail->isStatic()) {
-                // Is this to "hacky"? No, it's cool!
                 return $this::$$prop_string;
             } else {
                 return $this->$prop_string;
