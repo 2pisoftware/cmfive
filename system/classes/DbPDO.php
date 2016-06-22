@@ -281,7 +281,7 @@ class DbPDO extends PDO {
 	 * @return \DbPDO
 	 */
 	public function paginate($page = null, $page_size = null) {
-		if ($this->query && !is_null($page) && !is_null($page_size)) {
+		if ($this->query && !is_null($page) && !is_null($page_size) && is_numeric($page) && is_numeric($page_size)) {
 			$this->query = $this->query->offset(($page - 1) * $page_size)->limit($page_size);
 		}
 		return $this;
