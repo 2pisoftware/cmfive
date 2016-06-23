@@ -123,8 +123,18 @@ class DbPDO extends PDO {
                 // Resets the where part of the statement
                 $this->query = $this->query->where(null);
             } else {
-                if (is_array($column) || is_null($equals)){
+                if (is_array($column)){
                     $this->query = $this->query->where($column);
+				} else if (is_null($equals)) {
+					switch(func_num_args()) {
+						case 2:
+							$this->query = $this->query->where($column, null);
+							break;
+						case 1:
+						default:
+							$this->query = $this->query->where($column);
+							break;
+					}					
                 } else {
                     $this->query = $this->query->where($column, $equals);
                 }
@@ -279,7 +289,7 @@ class DbPDO extends PDO {
 	 * @return \DbPDO
 	 */
 	public function paginate($page = null, $page_size = null) {
-		if ($this->query && !is_null($page) && !is_null($page_size)) {
+		if ($this->query && !is_null($page) && !is_null($page_size) && is_numeric($page) && is_numeric($page_size)) {
 			$this->query = $this->query->offset(($page - 1) * $page_size)->limit($page_size);
 		}
 		return $this;
