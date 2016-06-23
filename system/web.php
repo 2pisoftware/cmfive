@@ -1681,7 +1681,7 @@ class Web {
 		
         // There was a massive bug here, using == over === is BAD as $x == null
         // will be true for 0, "", null, false, etc. keep this in mind
-        if ($value === null) {
+        if ($value === null && func_num_args() === 1) {
             return !empty($this->_context[$key]) ? $this->_context[$key] : null;
         } else {
             if ($append) {
