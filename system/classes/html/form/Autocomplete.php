@@ -210,6 +210,10 @@ class Autocomplete extends \Html\Form\FormElement {
 			open: function(){
 				$('#{$prefix}{$this->id} ~ .center_image').hide();
 				$('#{$prefix}{$this->id} ~ .circle').hide();
+			},
+			response: function(){
+				$('#{$prefix}{$this->id} ~ .center_image').hide();
+				$('#{$prefix}{$this->id} ~ .circle').hide();
 			}
 		});
 	});
