@@ -1030,7 +1030,10 @@ class Html {
 		$url_string .= (!empty($url_parsed['fragment']) ? '#' . $url_parsed['fragment'] : '');
 
 		// Generate the table
-		$num_results = ceil($total_results / $page_size);
+		$num_results = $total_results;
+		if ($page_size > 0) {
+			$num_results = ceil($total_results / $page_size);
+		}
 		$count_items = count($data);
 		$starting_item = (($page - 1) * $page_size) + 1;
 		$buffer = '<div class="row-fluid clearfix">'
