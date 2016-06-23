@@ -126,7 +126,15 @@ class DbPDO extends PDO {
                 if (is_array($column)){
                     $this->query = $this->query->where($column);
 				} else if (is_null($equals)) {
-					$this->query = $this->query->where($column, null);
+					switch(func_num_args()) {
+						case 2:
+							$this->query = $this->query->where($column, null);
+							break;
+						case 1:
+						default:
+							$this->query = $this->query->where($column);
+							break;
+					}					
                 } else {
                     $this->query = $this->query->where($column, $equals);
                 }
