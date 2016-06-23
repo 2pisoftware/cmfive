@@ -680,11 +680,12 @@ div.table-responsive > p {
 }
 
 div.table-responsive > table > thead th, div.table-responsive > table > tbody td {
+	min-width: 150px;
 	white-space: nowrap;
 }
 
 /* From: http://stackoverflow.com/questions/248011/how-do-i-wrap-text-in-a-pre-tag */
-td > pre.break-pre, div.table-responsive > table > thead th, div.table-responsive > table > tbody td > pre.break-pre {
+td > pre.break-pre, div.table-responsive > table > tbody td > pre.break-pre {
 	white-space: pre-wrap;       /* Since CSS 2.1 */
     white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
     white-space: -pre-wrap;      /* Opera 4-6 */
