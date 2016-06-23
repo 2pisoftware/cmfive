@@ -21,7 +21,8 @@ class TaskService extends DbService {
 		}
 		
 	
-		$taskgroup_statuses = $this->w->db->get("task")->select()->select("DISTINCT status")->where("task.is_deleted", 0)->fetchAll();
+		$taskgroup_statuses = $this->w->db->get("task")->select()->select("DISTINCT status")
+				->where("task.is_deleted", 0)->order_by("status ASC")->fetchAll();
 		$statuses = [];
 		
 		if (!empty($taskgroup_statuses)) {
@@ -30,7 +31,8 @@ class TaskService extends DbService {
 			}
 		}
 		
-		$taskgroup_priorities = $this->w->db->get("task")->select()->select("DISTINCT priority")->where("task.is_deleted", 0)->fetchAll();
+		$taskgroup_priorities = $this->w->db->get("task")->select()->select("DISTINCT priority")
+				->where("task.is_deleted", 0)->order_by("priority ASC")->fetchAll();
 		$priorities = [];
 		
 		if (!empty($taskgroup_priorities)) {
@@ -39,7 +41,8 @@ class TaskService extends DbService {
 			}
 		}
 		
-		$taskgroup_tasktypes = $this->w->db->get("task")->select()->select("DISTINCT task_type")->where("task.is_deleted", 0)->fetchAll();
+		$taskgroup_tasktypes = $this->w->db->get("task")->select()->select("DISTINCT task_type")
+				->where("task.is_deleted", 0)->order_by("task_type ASC")->fetchAll();
 		$tasktypes = [];
 		
 		if (!empty($taskgroup_tasktypes)) {
@@ -48,7 +51,8 @@ class TaskService extends DbService {
 			}
 		}
 		
-		$members = $this->w->db->get("task_group_member")->select()->select("DISTINCT task_group_member.user_id")->fetchAll();
+		$members = $this->w->db->get("task_group_member")->select()->select("DISTINCT task_group_member.user_id")->fetchAll(); // ->leftJoin("user on user.id = task_group_member.user_id")->leftJoin("contact on contact.id = user.contact_id")
+//				->order_by("contact.firstname ASC")
 		$flat_members = [];
 		if (!empty($members)) {
 			foreach($members as $member) {
@@ -57,6 +61,10 @@ class TaskService extends DbService {
 		}
 		
 		$taskgroup_members = $this->w->Task->getObjects("User", ["id" => $flat_members]);
+		
+		uasort($taskgroup_members, function($a, $b) {
+			return strcmp($a->getFullName(), $b->getFullName());
+		});
 		
 		$taskgroup_details = ["statuses" => $statuses, "priorities" => $priorities, "members" => $taskgroup_members, "types" => $tasktypes];
 //        $taskgroups = $this->getTaskGroupsForMember($user_id);
