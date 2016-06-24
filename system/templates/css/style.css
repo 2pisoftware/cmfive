@@ -320,8 +320,9 @@ button.button {
 }
 
 .section-body {
-    padding: 0px 10px;
-    display: inline;
+    /*padding: 0px 10px;
+    display: inline;*/
+    margin: 20px 0px;
 }
 
 .section-body ul {
