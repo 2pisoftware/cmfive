@@ -114,7 +114,7 @@ class Web {
 		defined("WEBROOT") ||  define("WEBROOT", $this->_webroot);
 		
         // conditions to start the installer
-        $this->_is_installing = array_key_exists('REQUEST_URI',$_SERVER) && strpos($_SERVER['REQUEST_URI'], '/install') === 0 ||!file_exists(ROOT_PATH . "/config.php");
+        $this->_is_installing = (array_key_exists('REQUEST_URI',$_SERVER) && strpos($_SERVER['REQUEST_URI'], '/install') === 0) ||!file_exists(ROOT_PATH . "/config.php");
 
         $this->loadConfigurationFiles();
          
@@ -195,7 +195,8 @@ class Web {
      * http://www.phpaddiction.com/tags/axial/url-routing-with-php-part-one/
      */
     public function _getCommandPath($url = null) {    	
-        $uri = explode('?', empty($url) ? $_SERVER['REQUEST_URI'] : $url); // get rid of parameters
+		$requestUri = !empty($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+        $uri = explode('?', empty($url) ? $requestUri : $url); // get rid of parameters
         $uri = $uri[0];
         // get rid of trailing slashes
         if (substr($uri, -1) == "/") {
