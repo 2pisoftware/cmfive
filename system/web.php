@@ -195,7 +195,7 @@ class Web {
      * http://www.phpaddiction.com/tags/axial/url-routing-with-php-part-one/
      */
     public function _getCommandPath($url = null) {    	
-		$requestUri = !empty($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+		$requestUri = array_key_exists('REQUEST_URI'$_SERVER) ? $_SERVER['REQUEST_URI'] : '';
         $uri = explode('?', empty($url) ? $requestUri : $url); // get rid of parameters
         $uri = $uri[0];
         // get rid of trailing slashes
@@ -203,7 +203,8 @@ class Web {
             $uri = substr($uri, 0, -1);
         }
         $requestURI = explode('/', $uri);
-        $scriptName = explode('/', $_SERVER['SCRIPT_NAME']);
+        $scriptName=array_key_exists('SCRIPT_NAME'$_SERVER) ? $_SERVER['SCRIPT_NAME'] : '';
+        $scriptName = explode('/', $scriptName);
         
         for ($i = 0; $i < sizeof($scriptName); $i++) {
             // Checking is these vars are set makes the logout function not work
