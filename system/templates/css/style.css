@@ -53,7 +53,7 @@ ul.accordion {
 .multicolform .panel {
     position:relative;
     display: block;
-    padding: 10px;
+    padding: 10px 10px 25px 10px;
 }
 
 .multicolform .panel table {
