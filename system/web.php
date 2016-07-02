@@ -195,7 +195,7 @@ class Web {
      * http://www.phpaddiction.com/tags/axial/url-routing-with-php-part-one/
      */
     public function _getCommandPath($url = null) {    	
-		$requestUri = array_key_exists('REQUEST_URI'$_SERVER) ? $_SERVER['REQUEST_URI'] : '';
+		$requestUri = array_key_exists('REQUEST_URI',$_SERVER) ? $_SERVER['REQUEST_URI'] : '';
         $uri = explode('?', empty($url) ? $requestUri : $url); // get rid of parameters
         $uri = $uri[0];
         // get rid of trailing slashes
