@@ -203,7 +203,7 @@ class Web {
             $uri = substr($uri, 0, -1);
         }
         $requestURI = explode('/', $uri);
-        $scriptName=array_key_exists('SCRIPT_NAME'$_SERVER) ? $_SERVER['SCRIPT_NAME'] : '';
+        $scriptName=array_key_exists('SCRIPT_NAME',$_SERVER) ? $_SERVER['SCRIPT_NAME'] : '';
         $scriptName = explode('/', $scriptName);
         
         for ($i = 0; $i < sizeof($scriptName); $i++) {
