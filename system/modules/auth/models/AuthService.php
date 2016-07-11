@@ -56,7 +56,7 @@ class AuthService extends DbService {
     }
 
     function getUserForLogin($login) {
-        $user = $this->db->get("user")->where("login", $login)->fetch_row();
+        $user = $this->db->get("user")->where("login", $login)->and("is_deleted", 0)->fetch_row();
 		return $this->getObjectFromRow("User", $user);
     }
 
