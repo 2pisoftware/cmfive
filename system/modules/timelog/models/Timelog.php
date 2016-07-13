@@ -42,6 +42,13 @@ class Timelog extends DbObject {
 		return null;
 	}
 	
+	public function getTimeEnd() {
+		if (!empty($this->dt_end)) {
+			return date('H:i', $this->dt_end);
+		}
+		return null;
+	}
+	
 	public function getHoursWorked() {
 		if (!empty($this->dt_end)) {
 			$date_time_diff = $this->dt_end - $this->dt_start;
