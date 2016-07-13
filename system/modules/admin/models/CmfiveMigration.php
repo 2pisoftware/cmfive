@@ -7,6 +7,13 @@ use Phinx\Db\Table\Column as Column;
 
 class CmfiveMigration extends Phinx\Migration\AbstractMigration {
 	
+	public $w;
+	
+	public function setWeb($w) {
+		$this->w = $w;
+		return $this;
+	}
+	
 	public function Column() {
 		return new Column;
 	}
