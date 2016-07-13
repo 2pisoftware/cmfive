@@ -82,7 +82,7 @@ class Timelog extends DbObject {
 	}
 
     public function getDuration() {
-        if (!empty($this->dt_start) and !empty($this->dt_end)) {
+        if (!empty($this->dt_start) && !empty($this->dt_end)) {
             return ($this->dt_end - $this->dt_start);
         }
     }
