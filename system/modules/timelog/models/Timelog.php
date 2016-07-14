@@ -18,9 +18,7 @@ class Timelog extends DbObject {
     public static $_validation = array(
         "object_class" => array('required'),
         "object_id" => array('required'),
-        "dt_start" => array('required'),
-//        "dt_end" => array('required'),
-        // "time_type" => array('required')
+        "dt_start" => array('required')
     );    
 
 	public function isRunning() {

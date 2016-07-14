@@ -49,7 +49,7 @@
         $w->outputScripts();
         ?>
         <script type="text/javascript">
-            var $ = jQuery;
+            var $ = $ || jQuery;
             $(document).ready(function() {
 				
 				// Focus first field
@@ -108,6 +108,16 @@
 				if(jQuery('.enable_drop_attachments').length !== 0) {
 					globalFileUpload.init();
 				}
+				
+				// Look for cmfive__count-* classes and count the instances of *
+				$("span[class^='cmfive__count-'], span[class*=' cmfive__count-']").each(function(index, element) {
+					var classList = this.className.split(/\s+/);
+					for(var i in classList) {
+						if (classList[i].indexOf('cmfive__count-') > -1) {
+							$(this).text($('.' + classList[i].substring(classList[i].indexOf('-') + 1)).length);
+						}
+					}
+				});
             });
 
             // Try and prevent multiple form submissions

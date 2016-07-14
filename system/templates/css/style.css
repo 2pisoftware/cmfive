@@ -715,3 +715,7 @@ th.sorted_column {
     -webkit-transform: rotateZ(90deg);
     transform: rotateZ(90deg);
 }
+
+.cmfive__tab-label {
+	top: -2px;
+}
