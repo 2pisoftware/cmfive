@@ -166,7 +166,7 @@ class Autocomplete extends \Html\Form\FormElement {
 		// Get necessary fields for HTML
 		$required = !is_null($this->required) ? 'required="required"' : '';
 		$source = !empty($this->source) ? '"' . $this->source . '"' : json_encode($this->options);
-			
+		$using_source = !empty($this->source) ? 'true' : 'false';
 		$attribute_buffer = '';
 		foreach(get_object_vars($this) as $field => $value) {
 			if (!is_null($value) && !in_array($field, static::$_excludeFromOutput)) {
@@ -181,37 +181,38 @@ class Autocomplete extends \Html\Form\FormElement {
 		return <<<BUFFER
 <input type="text" style="display: none;" id="{$this->id}"  name="{$this->name}" value="{$this->value}" {$attribute_buffer} />
 <div class='acp_container'>
-	<input type="text" id="{$prefix}{$this->id}"  name="{$prefix}{$this->name}" value="{$displayValue}" class="{$this->class}" style="{$this->style}" {$required} />
+	<input type="text" id="{$prefix}{$this->id}" name="{$prefix}{$this->name}" value="{$displayValue}" class="{$this->class}" style="{$this->style}" {$required} />
 	<div class="circle"></div>
 	<img class="center_image" width="40px" height="40px" src="/system/templates/img/cmfive_V_logo.png" />
 </div>
 <script type='text/javascript'>
 	$(document).ready(function() {
-		$("#{$prefix}{$this->name}").keyup(function(e){
+		$("#{$prefix}{$this->id}").keyup(function(e){
 			if (e.which != 13) { 	
-				$("#{$this->name}").val("");
+				$("#{$this->id}").val("");
 			}
 		});
 		
-		$("#{$prefix}{$this->name}").autocomplete({
+		var using_source = {$using_source};
+		$("#{$prefix}{$this->id}").autocomplete({
 			minLength: {$this->minlength}, 
 			source: {$source},
 			select: function(event,ui) {
 				event.preventDefault();
-				$("#{$this->name}").val(ui.item.value);
-				$("#{$prefix}{$this->name}").val(ui.item.label);
+				$("#{$this->id}").val(using_source ? ui.item.value : ui.item.id);
+				$("#{$prefix}{$this->id}").val(ui.item.label);
 				selectAutocompleteCallback(event, ui);
 			},
-			search: function(){
+			search: function() {
 				$('#{$prefix}{$this->id} ~ .center_image').show();
 				$('#{$prefix}{$this->id} ~ .circle').show();
 				$('.ui-autocomplete').hide();
 			},
-			open: function(){
+			open: function() {
 				$('#{$prefix}{$this->id} ~ .center_image').hide();
 				$('#{$prefix}{$this->id} ~ .circle').hide();
 			},
-			response: function(){
+			response: function() {
 				$('#{$prefix}{$this->id} ~ .center_image').hide();
 				$('#{$prefix}{$this->id} ~ .circle').hide();
 			}

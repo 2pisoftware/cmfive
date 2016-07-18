@@ -11,8 +11,8 @@
 						<?php if ($w->Auth->user()->is_admin) {
 							echo (new \Html\Form\Autocomplete([
 								"id|name"	=> "user_id",
-								"title"		=> empty($timelog->id) ? $w->Auth->user()->getFullName() : $w->Auth->getUser($timelog->user_id)->getFullName(),
-								"value"		=> empty($timelog->id) ? $w->Auth->user()->id : $timelog->user_id
+								"title"		=> empty($timelog->id) ? $w->Auth->user()->getFullName() : (!empty($timelog->user_id) ? $w->Auth->getUser($timelog->user_id)->getFullName() : null),
+								"value"		=> empty($timelog->id) ? $w->Auth->user()->id : (!empty($timelog->user_id) ? $timelog->user_id : null)
 							]))->setOptions($w->Auth->getUsers());
 						} else {
 							echo (new \Html\Form\InputField\Hidden([

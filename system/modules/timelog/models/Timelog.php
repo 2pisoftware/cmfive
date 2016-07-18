@@ -154,6 +154,8 @@ class Timelog extends DbObject {
 	public function update($force_null_values = false, $force_validation = true) {
 		if ($this->w->Auth->user()->is_admin) {
 			$this->user_id = !empty($_POST['user_id']) ? intval($_POST['user_id']) : $this->w->Auth->user()->id;
+		} else {
+			$this->user_id = $this->w->Auth->user()->id;
 		}
 		
 		parent::update($force_null_values, $force_validation);
