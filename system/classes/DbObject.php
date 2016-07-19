@@ -280,7 +280,7 @@ class DbObject extends DbService {
             if (!empty($v)) {
                 return $this->d2Time($v);
             }
-        }
+        } 
         return $v;
     }
     
@@ -1151,7 +1151,7 @@ class DbObject extends DbService {
             } else
                 return null;
         } else if (strpos($k, "t_") === 0) {
-            if (!empty($v)) {
+            if (!empty($v) && is_int($v)) {
                 return $this->time2T($v);
             } else
                 return null;

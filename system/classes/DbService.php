@@ -88,8 +88,8 @@ class DbService {
         return strtotime(str_replace("/", "-", $d));
     }
 
-    function t2Time($d) {
-        return strtotime(str_replace("/", "-", $d));
+    function t2Time($t) {
+        return strtotime(str_replace("/", "-", $t));
     }
 
     /**
