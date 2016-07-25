@@ -358,6 +358,46 @@ button.button + button {
     margin-left: 5px !important;
 }
 
+div.acp_container {
+	position: relative;
+}
+
+div.acp_container input {
+	position: relative;
+	z-index: 10;
+}
+
+div.acp_container > div.circle {
+	display: none;
+    background-color: rgba(0,0,0,0);
+    border: 5px solid rgba(0,183,229,0.9);
+    opacity: .9;
+    border-radius: 50px;
+    width: 45px;
+    height: 45px;
+    margin: auto;
+    position: absolute;
+    top: -3px; right: -3px;
+    -moz-animation: circlePulse 2s infinite linear;
+    -webkit-animation: circlePulse 2s infinite linear;
+	animation: circlePulse 2s infinite linear;
+	z-index: 10000;
+}
+
+div.acp_container > img.center_image {
+	display: none;
+	background-color: rgba(0,0,0,0);
+    width: 30px;
+    height: 30px;
+    margin: auto;
+    position: absolute;
+    top: 4px; right: 4px;
+    -moz-animation: bounceImage 2s infinite linear;
+    -webkit-animation: bounceImage 2s infinite linear;
+	animation: bounceImage 2s linear infinite;
+	z-index: 100;
+}
+
 /* Loading Indicator - from: http://www.alessioatzeni.com/blog/css3-loading-animation-loop/ */
 .loading_overlay, .global_file_drop_overlay {
     position: fixed;
@@ -407,7 +447,6 @@ button.button + button {
     background-color: rgba(0,0,0,0);
     width: 100px;
     height: 100px;
-    position: relative;
     margin: auto;
     position: absolute;
     top: 0; left: 0; bottom: 0; right: 0;
@@ -642,11 +681,12 @@ div.table-responsive > p {
 }
 
 div.table-responsive > table > thead th, div.table-responsive > table > tbody td {
+	min-width: 150px;
 	white-space: nowrap;
 }
 
 /* From: http://stackoverflow.com/questions/248011/how-do-i-wrap-text-in-a-pre-tag */
-td > pre.break-pre, div.table-responsive > table > thead th, div.table-responsive > table > tbody td > pre.break-pre {
+td > pre.break-pre, div.table-responsive > table > tbody td > pre.break-pre {
 	white-space: pre-wrap;       /* Since CSS 2.1 */
     white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
     white-space: -pre-wrap;      /* Opera 4-6 */
@@ -675,4 +715,8 @@ th.sorted_column {
 	-ms-transform: rotateZ(90deg);
     -webkit-transform: rotateZ(90deg);
     transform: rotateZ(90deg);
+}
+
+.cmfive__tab-label {
+	top: -2px;
 }

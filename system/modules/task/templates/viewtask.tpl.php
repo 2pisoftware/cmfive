@@ -8,9 +8,9 @@
      */
 ?>
         <a href="#details">Task Details</a>
-        <a href="#timelog">Time Log <span id='total_timelogs' class='total_number'></span></a>
-        <a href="#comments">Comments <span id='total_comments' class='total_number'></span></a>
-        <a href="#documents">Documents <span id='total_attachments' class='total_number'></span></a>
+        <a href="#timelog">Time Log <span id='total_timelogs' class='label secondary round cmfive__tab-label'></span></a>
+        <a href="#comments">Comments <span id='total_comments' class='label secondary round cmfive__tab-label'></span></a>
+        <a href="#documents">Documents <span id='total_attachments' class='label secondary round cmfive__tab-label'></span></a>
        	<?php if ($task->getCanINotify()):?><a href="#notification">Notifications</a><?php endif;?>
     </div>	
 	

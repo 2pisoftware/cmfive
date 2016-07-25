@@ -1034,6 +1034,7 @@ class Html {
 		if ($page_size > 0) {
 			$num_results = ceil($total_results / $page_size);
 		}
+		
 		$count_items = count($data);
 		$starting_item = (($page - 1) * $page_size) + 1;
 		$buffer = '<div class="row-fluid clearfix">'
@@ -1119,8 +1120,9 @@ class Html {
      */
     public static function filter($legend, $data, $action = null, $method = "POST", $submitTitle = "Filter", $id = null, $class = null, $validation = null) {
         // This will pretty much be a redesigned Html::form layout
-        if (empty($data))
+        if (empty($data)) {
             return;
+		}
 
         $form = new \Html\form();
         // If form tag is needed print it
@@ -1133,18 +1135,25 @@ class Html {
         $hidden = "";
         $buffer .= "<fieldset style=\"padding: 0; padding-top: 10px; padding-left: 10px;\">\n";
         $buffer .= "<legend>" . $legend . "</legend>\n";
-        // $buffer .= "<div class=\"row-fluid\">\n";
         $buffer .= "<ul id='filter-grid' class='small-block-grid-1 medium-block-grid-3 large-block-grid-4'>";
         
         $should_autosubmit = false;
-        if (count($data) === 1 && $data[0][1] === "select") {
+        if (count($data) === 1 && is_array($data[0]) && $data[0][1] === "select") {
             $should_autosubmit = true;
         }
         
         // Loop through data
         foreach ($data as $row) {
-
-//            $buffer .= "<div class=\"small-12 medium-3 left\"><div class=\"row\">";
+			// Check if the row is an object like an InputField
+			if (!is_array($row) && is_object($row)) {
+				if ((property_exists($row, "type") && $row->type !== "hidden") || !property_exists($row, "type")) {
+					$buffer .= '<li><label class=\'small-12 columns\'>' . $row->label . '<div>' . $row->__toString() . '</div></label></li>';
+				} else {
+					$buffer .= $row->__toString();
+				}
+				continue;
+			}
+			
             $buffer .= "<li>";
             
             // Get row parameters
@@ -1174,13 +1183,11 @@ class Html {
                 if ($type == "checkbox") {
                     $mediumCols = 6;
                 }
-                $buffer .= "<div class='small-12 columns'><label>{$title}"; // medium-" . (12 - $mediumCols) . " 
-//                $buffer .= "<div class='small-12 medium-{$mediumCols} columns'>";
+                $buffer .= "<div class='small-12 columns'><label>{$title}"; 
             } else {
                 $buffer .= "<div class='small-12'>";
             }
 
-//            $buffer .= "<div class=\"small-12 medium-10 columns\">";
             $size = !empty($row[4]) ? $row[4] : null;
 
             // Get the input that we need

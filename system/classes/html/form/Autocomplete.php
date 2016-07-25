@@ -7,7 +7,7 @@
  * 
  * @author Adam Buckley <adam@2pisoftware.com>
  */
-class Autocomplete extends \Html\Element {
+class Autocomplete extends \Html\Form\FormElement {
 	
 	use \Html\GlobalAttributes;
 	
@@ -18,11 +18,12 @@ class Autocomplete extends \Html\Element {
 	public $name;
 	public $options = [];
 	public $required;
+	public $source;
 	public $value;
 	
 	public static $_excludeFromOutput = [
 		"id", "name", "required", "value", "minlength", "class", "style",
-		"options", "_prefix"
+		"options", "_prefix", "label", "source", "title"
 	];
 	
 	/**
@@ -114,6 +115,36 @@ class Autocomplete extends \Html\Element {
 	}
 	
 	/**
+	 * Sets the source string, this should be a url that will be used to
+	 * talk via ajax to the backend. The specified datasource is required to
+	 * return data in the format supported, specified here: 
+	 * <http://api.jqueryui.com/autocomplete/#option-source>
+	 * 
+	 * NB: Setting the source will override any options given
+	 * 
+	 * @param string $source
+	 * @return \Html\Form\Autocomplete this
+	 */
+	public function setSource($source) {
+		$this->source = $source;
+		
+		return $this;
+	}
+	
+	/**
+	 * Sets the default display title (i.e. what is displayed in the textfield)
+	 * for the autocomplete
+	 * 
+	 * @param string $title
+	 * @return \Html\Form\Autocomplete this
+	 */
+	public function setTitle($title) {
+		$this->title = $title;
+		
+		return $this;
+	}
+	
+	/**
 	 * Sets the default value for the autocomplete
 	 * 
 	 * @param string $value
@@ -134,8 +165,8 @@ class Autocomplete extends \Html\Element {
 		
 		// Get necessary fields for HTML
 		$required = !is_null($this->required) ? 'required="required"' : '';
-		$source = json_encode($this->options);
-			
+		$source = !empty($this->source) ? '"' . $this->source . '"' : json_encode($this->options);
+		$using_source = !empty($this->source) ? 'true' : 'false';
 		$attribute_buffer = '';
 		foreach(get_object_vars($this) as $field => $value) {
 			if (!is_null($value) && !in_array($field, static::$_excludeFromOutput)) {
@@ -145,26 +176,48 @@ class Autocomplete extends \Html\Element {
 		
 		$prefix = static::$_prefix;
 		
+		$displayValue = !empty($this->title) ? $this->title : $this->value;
+		
 		return <<<BUFFER
 <input type="text" style="display: none;" id="{$this->id}"  name="{$this->name}" value="{$this->value}" {$attribute_buffer} />
-<input type="text" id="{$prefix}{$this->id}"  name="{$prefix}{$this->name}" value="{$this->value}" class="{$this->class}" style="{$this->style}" {$required} />
+<div class='acp_container'>
+	<input type="text" id="{$prefix}{$this->id}" name="{$prefix}{$this->name}" value="{$displayValue}" class="{$this->class}" style="{$this->style}" {$required} />
+	<div class="circle"></div>
+	<img class="center_image" width="40px" height="40px" src="/system/templates/img/cmfive_V_logo.png" />
+</div>
 <script type='text/javascript'>
-	(function() {
-		$("#{$prefix}{$this->name}").keyup(function(e){
+	$(document).ready(function() {
+		$("#{$prefix}{$this->id}").keyup(function(e){
 			if (e.which != 13) { 	
-				$("#{$this->name}").val("");
+				$("#{$this->id}").val("");
 			}
 		});
 		
-		$("#{$prefix}{$this->name}").autocomplete({
+		var using_source = {$using_source};
+		$("#{$prefix}{$this->id}").autocomplete({
 			minLength: {$this->minlength}, 
 			source: {$source},
 			select: function(event,ui) {
-				$("#{$this->name}").val(ui.item.id);
+				event.preventDefault();
+				$("#{$this->id}").val(using_source ? ui.item.value : ui.item.id);
+				$("#{$prefix}{$this->id}").val(ui.item.label);
 				selectAutocompleteCallback(event, ui);
+			},
+			search: function() {
+				$('#{$prefix}{$this->id} ~ .center_image').show();
+				$('#{$prefix}{$this->id} ~ .circle').show();
+				$('.ui-autocomplete').hide();
+			},
+			open: function() {
+				$('#{$prefix}{$this->id} ~ .center_image').hide();
+				$('#{$prefix}{$this->id} ~ .circle').hide();
+			},
+			response: function() {
+				$('#{$prefix}{$this->id} ~ .center_image').hide();
+				$('#{$prefix}{$this->id} ~ .circle').hide();
 			}
 		});
-	})();
+	});
 </script>
 BUFFER;
 	}

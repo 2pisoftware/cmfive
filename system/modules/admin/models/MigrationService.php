@@ -219,7 +219,7 @@ MIGRATION;
 								$this->w->Log->setLogger("MIGRATION")->info("Running migration: " . $migration);
 
 								// Run migration UP
-								$migration_class = new $migration(1);
+								$migration_class = (new $migration(1))->setWeb($this->w);
 								$migration_class->setAdapter($mysql_adapter);
 								$migration_class->up();
 

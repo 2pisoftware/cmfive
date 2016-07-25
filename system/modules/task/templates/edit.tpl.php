@@ -2,9 +2,9 @@
     <div class="tab-head">
         <a href="#details">Task Details</a>
 		<?php if (!empty($task->id)) : ?>
-            <a href="#timelog">Time Log <span id='total_timelogs' class='total_number'></span></a>
-            <a href="#comments">Comments <span id='total_comments' class='total_number'></span></a>
-            <a href="#attachments">Attachments <span id='total_attachments' class='total_number'></span></a>
+            <a href="#timelog">Time Log <span class='label secondary round cmfive__tab-label cmfive__count-timelog'></span></a>
+            <a href="#comments">Comments <span class='label secondary round cmfive__tab-label cmfive__count-comment_section'></span></a>
+            <a href="#attachments">Attachments <span class='label secondary round cmfive__tab-label cmfive__count-attachment'></span></a>
 
             <?php if ($task->getCanINotify()):?><a href="#notification">Notifications</a><?php endif;?>
 			<?php 
@@ -30,6 +30,13 @@
 							echo Html::b($task->w->localURL('task/duplicatetask/' . $task->id), "Duplicate Task");
 							echo Html::b($task->w->localURL('/task/edit/?gid=' . $task->task_group_id), "New Task");
 							echo Html::box("/task-group/moveTaskgroup/" . $task->id, "Move to Taskgroup", true, false, null, null, null, null, 'secondary');
+							
+							// Extra buttons for task
+							$buttons = $w->callHook("task", "extra_buttons", $task);
+							if (!empty($buttons)) {
+								echo implode('', $buttons);
+							}
+							
 							echo $w->partial('listTags',['object' => $task], 'tag');
 						}
 					?>
@@ -81,10 +88,6 @@
 
     $(document).ready(function() {
         bindTypeChangeEvent();
-		
-		$('#total_timelogs').text($('.timelog').length);
-        $('#total_comments').text($('.comment_section').length);
-        $('#total_attachments').text($('.attachment').length);
 
         getTaskGroupData(<?php echo !empty($task->task_group_id) ? $task->task_group_id : $w->request('gid'); ?>);
         $("#task_type").trigger("change");

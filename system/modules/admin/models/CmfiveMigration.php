@@ -7,6 +7,13 @@ use Phinx\Db\Table\Column as Column;
 
 class CmfiveMigration extends Phinx\Migration\AbstractMigration {
 	
+	public $w;
+	
+	public function setWeb($w) {
+		$this->w = $w;
+		return $this;
+	}
+	
 	public function Column() {
 		return new Column;
 	}
@@ -54,6 +61,23 @@ class CmfiveMigration extends Phinx\Migration\AbstractMigration {
 		if ($this->hasTable($table)) {
 			if (!$this->table($table)->hasColumn($column)) {
 				$this->table($table)->addColumn($column, $datatype, $options)->save();
+			}
+		}
+	}
+	
+	/**
+	 * Renames a column within a table
+	 * 
+	 * @param string $table
+	 * @param string $column
+	 * @param string $datatype
+	 * @param Array $options
+	 * @return null
+	 */
+	public function renameColumnInTable($table, $old_column, $new_column) {
+		if ($this->hasTable($table)) {
+			if ($this->table($table)->hasColumn($old_column)) {
+				$this->table($table)->renameColumn($old_column, $new_column)->save();
 			}
 		}
 	}

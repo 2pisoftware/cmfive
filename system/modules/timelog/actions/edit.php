@@ -1,16 +1,12 @@
 <?php
 
-use \Html\Form\InputField as InputField;
-use \Html\Form\InputField\Number as Number;
-use \Html\Form\Textarea as Textarea;
-
 function edit_GET(Web $w) {
 	
 	$p = $w->pathMatch("id");
 	
 	$timelog = !empty($p['id']) ? $w->Timelog->getTimelog($p['id']) : new Timelog($w);
-	 
-	$redirect = $w->request("redirect", '');
+	$w->ctx("timelog", $timelog);
+	$w->ctx('redirect', $w->request("redirect", ''));
 	
 	$indexes = $w->search->getIndexes();
     $select_indexes = [];
@@ -19,11 +15,12 @@ function edit_GET(Web $w) {
             $select_indexes[] = array($friendly_name, $search_name);
         }
     }
-	
-	$comment = $timelog->getComment();
-	
-	$tracking_class = $w->request("class");
+	$w->ctx("select_indexes", $select_indexes);
+
 	$tracking_id = $w->request("id");
+	$tracking_class = $w->request("class");
+	$w->ctx("tracking_id", $tracking_id);
+	$w->ctx("tracking_class", $tracking_class);
 	
 	// If timelog.object_id is required then we must require the search field
 	$validation = Timelog::$_validation;
@@ -33,43 +30,14 @@ function edit_GET(Web $w) {
 		} 
 	}
 	
-	$form = [
-		'Timelog' => [
-			[
-				["Assigned user", $w->Auth->user()->is_admin ? "autocomplete" : "hidden", "user_id", empty($timelog->id) ? $w->Auth->user()->id : $timelog->user_id, $w->Auth->getUsers()]
-			],
-			[
-				["Module", "select", "object_class", $timelog->object_class ? : $tracking_class, $select_indexes],
-				["Search", "autocomplete", "search", !empty($timelog->object_id) ? $timelog->object_id : $tracking_id, (!empty($timelog->object_class) || !empty($tracking_class) ? $w->Timelog->getObjects($timelog->object_class ? : $tracking_class) : '')]
-			],
-            [
-				(new InputField(["label" => "Object ID", "type" => "hidden", "name" => "object_id", "id" => "object_id", "value" => $timelog->object_id ? : $tracking_id]))
-				//["object id", 'hidden', "object_id", $timelog->object_id ? : $tracking_id],
-			],
-			[
-				['Date', 'date', 'date_start', $timelog->getDateStart()],
-			],
-			[
-				(new InputField())->setLabel("Time Started")->setName("time_start")->setValue($timelog->getTimeStart())
-							->setPattern("^(0?[0-9]|1[0-9]|2[0-3]):[0-5][0-9](\s+)?(AM|PM|am|pm)?$")
-							->setPlaceholder("e.g. 11:30, 11:30am, 23:30, 11:30pm")
-							->setRequired("true"),
-				!$timelog->isRunning() ? (new Number())->setLabel("Hours Worked")->setName("hours_worked")->setValue($timelog->getHoursWorked())
-							->setMin(0)->setMax(23)->setStep(1)->setPlaceHolder("0-23")->setRequired("true") : null,
-				!$timelog->isRunning() ? (new Number())->setLabel("Minutes Worked")->setName("minutes_worked")->setValue($timelog->getMinutesWorked())
-							->setMin(0)->setMax(59)->setStep(1)->setPlaceHolder("0-59") : null,
-			],
-			[(new Textarea())->setLabel("Description")->setName("description")->setValue(!empty($comment) ? $comment->comment : null)->setRows(8)]
-		]
-	];
-	
 	$object = $w->Timelog->getObject($timelog->object_class ? : $tracking_class, $timelog->object_id ? : $tracking_id);
-	
+	$w->ctx("object", $object);
 	// Hook relies on knowing the timelogs time_type record, but also the object, so we give the time_type to object
 	if (!empty($object->id) && !empty($timelog->id)) {
 		$object->time_type = $timelog->time_type;
 	}
 	
+	$form = [];
 	if (!empty($object)) {
 		$additional_form_fields = $w->callHook("timelog", "type_options_for_" . get_class($object), $object);
 		if (!empty($additional_form_fields[0])) {
@@ -79,23 +47,22 @@ function edit_GET(Web $w) {
 			}
 		}
 	}
-	
-	$w->ctx("form", Html::multiColForm($form, "/timelog/edit/" . $timelog->id . (!empty($redirect) ? "?redirect=$redirect" : ''), "POST", "Save", "timelog_edit_form", null, null, "_self", true, $validation));
+	$w->ctx("form", $form);
 }
 
 function edit_POST(Web $w) {
+//	var_dump($_POST); die();
 	$p = $w->pathMatch("id");
-	
 	$redirect = $w->request("redirect", '');
 	
 	$timelog = !empty($p['id']) ? $w->Timelog->getTimelog($p['id']) : new Timelog($w);
 	
-// Get and save timelog
+	// Get and save timelog
 	if (empty($_POST['object_class']) || empty($_POST['object_id'])) {
 		$w->error('Missing data', $redirect ? : '/timelog');
 	}
 	
-	if (!array_key_exists("date_start", $_POST) || !array_key_exists("time_start", $_POST) || (!$timelog->isRunning() && !array_key_exists("hours_worked", $_POST))) {
+	if (!array_key_exists("date_start", $_POST) || !array_key_exists("time_start", $_POST) || (!$timelog->isRunning() && (!array_key_exists("time_end", $_POST) && !array_key_exists("hours_worked", $_POST)))) {
 		$w->error('Missing data', $redirect ? : '/timelog');
 	}
 	
@@ -108,18 +75,29 @@ function edit_POST(Web $w) {
 		$w->error('Invalid start date or time', $redirect ? : '/timelog');
 	} 
 	
-	
 	$timelog->object_class = $_POST['object_class'];
 	$timelog->object_id = $_POST['object_id'];
 	$timelog->time_type = !empty($_POST['time_type']) ? $_POST['time_type'] : null;
 	
 	$timelog->dt_start = $time_object->format('Y-m-d H:i:s');
 	
-	if (!empty($_POST['hours_worked']) || !empty($_POST['minutes_worked'])) {
-		$time_object->add(new DateInterval("PT" . intval($_POST['hours_worked']) . "H" . (!empty($_POST['minutes_worked']) ? intval($_POST['minutes_worked']) : 0) . "M0S"));
-		$timelog->dt_end = $time_object->format('Y-m-d H:i:s');
+	if ($_POST['select_end_method'] === "time") {
+		$end_time_object = null;
+		try {
+			$end_time_object = new DateTime(str_replace('/', '-', $_POST['date_start']) . ' ' . $_POST['time_end']);
+			$timelog->dt_end = $end_time_object->format('Y-m-d H:i:s');
+		} catch (Exception $e) {
+			$w->Log->setLogger("TIMELOG")->error($e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
+			$w->error('Invalid start date or time', $redirect ? : '/timelog');
+		} 
+	} else {
+		if (!empty($_POST['hours_worked']) || !empty($_POST['minutes_worked'])) {
+			$time_object->add(new DateInterval("PT" . intval($_POST['hours_worked']) . "H" . (!empty($_POST['minutes_worked']) ? intval($_POST['minutes_worked']) : 0) . "M0S"));
+			$timelog->dt_end = $time_object->format('Y-m-d H:i:s');
+		}
 	}
 	
+	// Timelog user_id handled in insert/update
 	$timelog->insertOrUpdate();
 	
 	// Save comment

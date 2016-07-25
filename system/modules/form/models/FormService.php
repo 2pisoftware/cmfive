@@ -98,6 +98,19 @@ class FormService extends DbService {
 	}
 	
 	/**
+	 * Counts the number of form instances attached to an object
+	 * 
+	 * @param Form $form
+	 * @param DbObject $object
+	 * return int
+	 */
+	public function countFormInstancesForFormAndObject($form, $object) {
+		return $this->w->db->get('form_instance')->where("form_id", $form->id)
+					->where("object_class", get_class($object))->where("object_id", $object->id)
+					->where("is_deleted", 0)->count();
+	}
+	
+	/**
 	 * Load a form field by form and field name
 	 * 
 	 * @return FormField

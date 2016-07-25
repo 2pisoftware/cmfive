@@ -3,7 +3,7 @@
 class CommentService extends DbService {
     
     public function getCommentsForTable($table = null, $object_id = null){
-        $where = array("is_deleted" => 0);
+        $where = array("is_deleted = NULL OR is_deleted = ?" => 0);
         if (!empty($table)){
             if (is_a($table, "DbObject")){
                 // This way is probably better cause you dont hard code the table name in anywhere
@@ -36,14 +36,13 @@ class CommentService extends DbService {
         $comment->obj_table = $object->getDbTableName();
         $comment->obj_id = $object->id;
         $comment->comment = strip_tags($message);
+		$comment->is_deleted = 0;
         $comment->insert();
     }
     
     public function renderComment($text) {
     	require_once 'creole/creole.php';
-    	$creole = new creole();
-    	$options = null;
-    	return $creole->parse(strip_tags($text));
+    	return (new creole())->parse(strip_tags($text));
     }
     
 }

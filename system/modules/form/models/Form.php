@@ -88,6 +88,10 @@ class Form extends DbObject {
 		return $this->w->Form->getFormInstancesForFormAndObject($this, $object);
 	}
 	
+	public function countFormInstancesForObject($object) {
+		return $this->w->Form->countFormInstancesForFormAndObject($this, $object);
+	}
+	
 	/**
 	 * Generate label to show this record in select inputs
 	 * @return string
