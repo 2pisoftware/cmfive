@@ -75,7 +75,8 @@
 									"value"		=> "time",
 									"class"		=> "right",
 									"style"		=> "margin-top: 20px;",
-									"checked"	=> "true"
+									"checked"	=> "true",
+									"tabindex"	=> -1
 								])); ?>
 							</div>
 							<div class="small-10 medium-11 columns">
@@ -98,7 +99,8 @@
 									"name"		=> "select_end_method",
 									"value"		=> "hours",
 									"class"		=> "right",
-									"style"		=> "margin-top: 20px;"
+									"style"		=> "margin-top: 20px;",
+									"tabindex"	=> -1
 								])); ?>
 							</div>
 							<div class="small-10 medium-11 columns">
