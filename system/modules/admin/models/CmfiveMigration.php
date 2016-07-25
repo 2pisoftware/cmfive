@@ -66,6 +66,23 @@ class CmfiveMigration extends Phinx\Migration\AbstractMigration {
 	}
 	
 	/**
+	 * Renames a column within a table
+	 * 
+	 * @param string $table
+	 * @param string $column
+	 * @param string $datatype
+	 * @param Array $options
+	 * @return null
+	 */
+	public function renameColumnInTable($table, $old_column, $new_column) {
+		if ($this->hasTable($table)) {
+			if ($this->table($table)->hasColumn($old_column)) {
+				$this->table($table)->renameColumn($old_column, $new_column)->save();
+			}
+		}
+	}
+	
+	/**
 	 * Removes a column from a table. Takes care of checking for table/column
 	 * existance
 	 * 
