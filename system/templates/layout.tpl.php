@@ -245,7 +245,11 @@
 												$hook_navigation_items = $w->callHook($module, "extra_navigation_items", $module_navigation);
 												if (!empty($hook_navigation_items)) {
 													foreach($hook_navigation_items as $hook_navigation_item) {
-														$module_navigation[] = $hook_navigation_item[0];
+														if (is_array($hook_navigation_item)) {
+															$module_navigation = array_merge($module_navigation, $hook_navigation_item);
+														} else {
+															$module_navigation[] = $hook_navigation_item;
+														}
 													}
 												}
 												echo Html::ul($module_navigation, null, "dropdown"); ?>
