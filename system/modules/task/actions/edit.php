@@ -244,7 +244,7 @@ function edit_POST($w) {
 	if (empty($p['id']) && Config::get('task.ical.send') == true) {		
         $data = $task->getIcal();
         $user = $w->Auth->getUser($task->assignee_id);
-        $contact = $user->getContact();
+        $contact = !empty($user->id) ? $user->getContact() : $w->Auth->user()->getContact();
 
         $messageObject = Swift_Message::newInstance();
 		$messageObject->setTo(array($contact->email));

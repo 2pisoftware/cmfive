@@ -1035,6 +1035,10 @@ class Html {
 			$num_results = ceil($total_results / $page_size);
 		}
 		
+		if ($total_results == 0) {
+			return '<div class="row-fluid clearfix"><div class="small-12 medium-6 small-text-center medium-text-left columns" style="margin: 5px 0px;">No results found</div></div>';
+		}
+		
 		$count_items = count($data);
 		$starting_item = (($page - 1) * $page_size) + 1;
 		$buffer = '<div class="row-fluid clearfix">'

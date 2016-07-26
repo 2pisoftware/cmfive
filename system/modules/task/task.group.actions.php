@@ -167,7 +167,7 @@ function deletetaskgroup_POST(Web &$w) {
     // Delete and return
     $taskgroup->delete();
 
-    $w->msg("Task Group " . $group_details->title . " deleted.","/task-group/viewtaskgrouptypes");
+    $w->msg("Task Group " . $taskgroup->title . " deleted.","/task-group/viewtaskgrouptypes");
 }
 
 ////////////////////////////////////////////////////
