@@ -295,7 +295,29 @@ class FileService extends DbService {
 		}
 		return null;
 	}
-
+	
+	/**
+	 * Counts attachments for a given object/table and id
+	 * 
+	 * @param Mixed $objectOrTable
+	 * @param int (option) $id
+	 * @return int
+	 */
+	function countAttachments($objectOrTable, $id = null) {
+		if (is_scalar($objectOrTable)) {
+			$table = $objectOrTable;
+		} elseif (is_a($objectOrTable, "DbObject")) {
+			$table = $objectOrTable->getDbTableName();
+			$id = $objectOrTable->id;
+		}
+		
+		if ($table && $id) {
+			return $this->_db->get("attachment")->where("parent_table", $table)->and("parent_id", $id)->and("is_deleted", 0)->count();
+		}
+		
+		return 0;
+	}
+	
 	/**
 	 * Load a single attachment
 	 * 

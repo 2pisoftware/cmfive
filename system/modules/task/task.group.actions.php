@@ -125,28 +125,36 @@ function updatetaskgroup_POST(Web &$w) {
 }
 
 function deletetaskgroup_GET(Web &$w) {
+	$w->setLayout(null);
+	
 	$p = $w->pathMatch("id");
+	
 	// get details of task group to be deleted
-	$group_details = $w->Task->getTaskGroup($p['id']);
+	$taskgroup = $w->Task->getTaskGroup($p['id']);
 
 	// if is_active is set to '0', display 'Yes', else display 'No'
-	$isactive = $group_details->is_active == "1" ? "Yes" : "No";
+	$isactive = $taskgroup->is_active == "1" ? "Yes" : "No";
 
+	if (count($taskgroup->getTasks()) !== 0) {
+		$w->out("<div class='row-fluid panel'>To be able to delete a task group, please ensure there are no active tasks</div>");
+		return;
+	}
+	
 	// build static form displaying group details for confirmation of delete
 	$f = Html::form(array(
-	array("Task Group Details","section"),
-	array("Task Group Type","static", "task_group_type",$group_details->getTypeTitle()),
-	array("Title","static", "title",$group_details->title),
-	array("Who Can Assign","static", "can_assign",$group_details->can_assign),
-	array("Who Can View","static", "can_view",$group_details->can_view),
-	array("Who Can Create","static", "can_create",$group_details->can_create),
-	array("Is Active","static", "is_active", $isactive),
-	array("Description","static", "description",$group_details->description),
-	array("Default Assignee","static", "default_assignee_id",$w->Task->getUserById($group_details->default_assignee_id)),
-	),$w->localUrl("/task-group/deletetaskgroup/".$group_details->id),"POST"," Delete ");
+		array("Task Group Details","section"),
+		array("Task Group Type","static", "task_group_type",$taskgroup->getTypeTitle()),
+		array("Title","static", "title",$taskgroup->title),
+		array("Who Can Assign","static", "can_assign",$taskgroup->can_assign),
+		array("Who Can View","static", "can_view",$taskgroup->can_view),
+		array("Who Can Create","static", "can_create",$taskgroup->can_create),
+		array("Is Active","static", "is_active", $isactive),
+		array("Description","static", "description",$taskgroup->description),
+		array("Default Assignee","static", "default_assignee_id",$w->Task->getUserById($taskgroup->default_assignee_id)),
+	), $w->localUrl("/task-group/deletetaskgroup/".$taskgroup->id),"POST","Delete");
 
 	// display form
-	$w->setLayout(null);
+	
 	$w->ctx("viewgroup",$f);
 }
 

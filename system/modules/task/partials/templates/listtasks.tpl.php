@@ -1,5 +1,5 @@
 <?php 
-echo Html::filter("Filter Tasks", $filter_data, '/' . $redirect, "GET", "Filter", "task_list");
+echo (empty($hide_filter) || $hide_filter !== true) ? Html::filter("Filter Tasks", $filter_data, '/' . $redirect, "GET", "Filter", "task_list") : '';
 
 if (!empty($tasks)) {
     $table_header = array("Title", "Created By", "Assigned To", "Group", "Type", "Priority", "Status", "Due");

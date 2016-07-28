@@ -699,3 +699,38 @@ function cast($destination, $sourceObject) {
     }
     return $destination;
 }
+
+/**
+ * Deletes string between $beginning and $end inclusive from $string
+ * 
+ * From: http://stackoverflow.com/questions/13031250/php-function-to-delete-all-between-certain-characters-in-string
+ * 
+ * Adapted to do multiple passes over the same string to remove more than once
+ * instance of $beginning and $end.
+ * 
+ * @param string $beginning
+ * @param string $end
+ * @param string $string
+ * @return string
+ */
+function delete_all_between($beginning, $end, $string, $remove_every_instance = false) {
+	$beginningPos = strpos($string, $beginning);
+	$endPos = strpos($string, $end);
+
+	if ($beginningPos === false || $endPos === false) {
+		return $string;
+	}
+	
+	if (!$remove_every_instance) {
+		return trim(str_replace(substr($string, $beginningPos, ($endPos + strlen($end)) - $beginningPos), '', $string));
+	} else {
+		$loopSafeguard = 1;
+		while(($beginningPos !== FALSE && $endPos !== FALSE) || $loopSafeguard-- > 0) {
+			$string = trim(str_replace(substr($string, $beginningPos, ($endPos + strlen($end)) - $beginningPos), '', $string));
+			$beginningPos = strpos($string, $beginning);
+			$endPos = strpos($string, $end);
+		}
+		
+		return $string;
+	}
+}

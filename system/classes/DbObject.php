@@ -440,6 +440,19 @@ class DbObject extends DbService {
 		return !is_null($this->id) && intval($this->id) > 0;
 	}
 	
+	/**
+	 * Checks whether or not a given property has changed. It does this by
+	 * looking for the $prop value in the __old array and comparing it against
+	 * the active property.
+	 * 
+	 * @param string $prop
+	 * @return boolean
+	 */
+	public function propertyHasChanged($prop) {
+		return property_exists($this, '__old') && property_exists($this, $prop) && 
+				array_key_exists($prop, $this->__old) && $this->__old[$prop] != $this->$prop;
+	}
+	
     /**
      * Utility function to decide
      * whether to insert or update
