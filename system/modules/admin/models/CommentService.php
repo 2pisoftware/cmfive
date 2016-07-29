@@ -26,6 +26,24 @@ class CommentService extends DbService {
         return null;
     }
     
+	/**
+	 * Counts the number of comments created by a user for a given object
+	 * 
+	 * @param DbObject $object
+	 * @param User $user
+	 * @return int
+	 */
+	public function countCommentsForObjectByUser($object, $user) {
+		if (empty($object) || empty($user) || !is_a($object, "DbObject")) {
+			return 0;
+		}
+		
+		return $this->w->db->get("comment")->where("obj_table", $object->getDbTableName())
+				->where("obj_id", $object->id)
+				->where("creator_id", $user->id)
+				->where("is_system", 0)->count();
+	}
+	
     /**
      * An easy way to save a comment against an object
      * @param <DbObject> $object

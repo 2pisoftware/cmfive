@@ -319,6 +319,22 @@ class FileService extends DbService {
 	}
 	
 	/**
+	 * Counts attachments for a given object/table and id
+	 * 
+	 * @param Mixed $objectOrTable
+	 * @param int (option) $id
+	 * @return int
+	 */
+	function countAttachmentsForUser($object, $user) {
+		if (empty($object) || empty($user) || !is_a($object, "DbObject")) {
+			return 0;
+		}
+		
+		return $this->_db->get("attachment")->where('creator_id', $user->id)
+				->and("parent_table", $object->getDbTableName())->and("parent_id", $object->id)->and("is_deleted", 0)->count();
+	}
+	
+	/**
 	 * Load a single attachment
 	 * 
 	 * @param Mixed $id attachment ID

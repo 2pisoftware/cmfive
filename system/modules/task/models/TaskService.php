@@ -590,10 +590,13 @@ class TaskService extends DbService {
 
     // return an array for display of all members in a given task group, by task group ID
     function getMembersInGroup($id) {
+		$line = [];
         $members = $this->getObjects("TaskGroupMember", array("task_group_id" => $id, "is_active" => 1));
-        foreach ($members as $member) {
-            $line[] = array($this->getUserById($member->user_id), $member->user_id);
-        }
+		if (!empty($members)) {
+			foreach ($members as $member) {
+				$line[] = array($this->getUserById($member->user_id), $member->user_id);
+			}
+		}
         return $line;
     }
 
@@ -665,10 +668,8 @@ class TaskService extends DbService {
     }
 
     function removeMemberFromTaskGroup($taskgroup_id, $user_id) {
-    	$this->Log->debug("before delete Taskgroupmember(".$taskgroup_id."), user({$user_id})");
     	$tgm = $this->getObject("TaskGroupMember", array("task_group_id"=>$taskgroup_id, "user_id"=>$user_id));
     	if (!empty($tgm)) {
-    		$this->Log->debug("delete Taskgroupmember(".$tgm->id."), user({$user_id})");
     		$tgm->delete();
     	}
     }
@@ -801,6 +802,9 @@ class TaskService extends DbService {
         $owners = $this->getTaskGroupOwners($task->task_group_id);
 
         // us is everyone
+		if (empty($owners) || !is_array($owners)) {
+			$owners = [];
+		}
         $us = (object) array_merge($me, $creator, $owners);
 
         if (empty($us)) {

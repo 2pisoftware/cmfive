@@ -67,6 +67,16 @@ class TimelogService extends DbService {
 		}
 	}
 	
+	public function countTimelogsForUserAndObject($user, $object) {
+		if (!empty($user) && !empty($object) && is_a($object, 'DbObject')) {
+			return $this->w->db->get('timelog')->where('user_id', $user->id)
+					->where("object_class", get_class($object))
+					->where("object_id", $object->id)
+					->where('is_deleted', 0)->count();
+		}
+		return 0;
+	}
+	
 	/**
 	 * Returns all non deleted timelogs
 	 * 
