@@ -59,7 +59,7 @@ class Timelog extends DbObject {
 		if (!empty($this->dt_end)) {
 			$date_time_diff = $this->dt_end - $this->dt_start;
 			$date_time_diff -= intval($date_time_diff / 3600) * 3600;
-			return $date_time_diff / 60;
+			return round($date_time_diff / 60);
 		}
 		return null;
 	}
