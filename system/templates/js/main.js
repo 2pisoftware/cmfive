@@ -264,3 +264,31 @@ function compareDates(from_date, to_date) {
     ndStr = (Date.parse(ndStr) / 86400000);//from milliseconds to days, divide by 86400000
     return ndStr - oStr;
 }
+
+/**
+ * Parses a given time into a date object
+ * 
+ * From: http://stackoverflow.com/a/2188651
+ * 
+ * @param {string} timeString
+ * @returns {Date|parseTime.d}
+ */
+function parseTime(timeString) {    
+    if (timeString == '') return null;
+
+    var time = timeString.match(/(\d+)(:(\d\d))?\s*(p?)/i); 
+    if (time == null) return null;
+
+    var hours = parseInt(time[1],10);    
+    if (hours == 12 && !time[4]) {
+          hours = 0;
+    }
+    else {
+        hours += (hours < 12 && time[4])? 12 : 0;
+    }   
+    var d = new Date();             
+    d.setHours(hours);
+    d.setMinutes(parseInt(time[3],10) || 0);
+    d.setSeconds(0, 0);  
+    return d;
+}

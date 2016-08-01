@@ -82,7 +82,6 @@ function edit_POST(Web $w) {
 	$timelog->dt_start = $time_object->format('Y-m-d H:i:s');
 	
 	if ($_POST['select_end_method'] === "time") {
-		$end_time_object = null;
 		try {
 			$end_time_object = new DateTime(str_replace('/', '-', $_POST['date_start']) . ' ' . $_POST['time_end']);
 			$timelog->dt_end = $end_time_object->format('Y-m-d H:i:s');

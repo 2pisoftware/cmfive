@@ -89,6 +89,7 @@
 										"required"		=> "true"
 									])); ?>
 								</label>
+								<small id="timelog__end-time-error" class="error" style="display: none;">End time must be after the start time</small>
 							</div>
 						</div>
 					</li>
@@ -176,6 +177,9 @@
 	// Input values are module, search and description
 	$(document).ready(function () {
 		$("input[type=radio][name=select_end_method]").change(function() {
+			$("#timelog__end-time-error").hide();
+			$("#timelog__end-time-error").parent().removeClass('error');
+			
 			if (this.value === "time") {
 				$("#time_end").removeAttr("disabled");
 				
@@ -216,6 +220,7 @@
 
 		// If there is already a value in #object_class, that is, we are 
 		// editing, then set the searchURL
+		var searchUrl = '';
 		if ($("#object_class").val !== '') {
 			searchUrl = searchBaseUrl + "?index=" + $(this).val();
 		}
@@ -257,6 +262,25 @@
 
 			},
 			minLength: 3
+		});
+
+		$("#time_end").on('keyup', function() {
+			$("#timelog__end-time-error").hide();
+			$("#timelog__end-time-error").parent().removeClass('error');
+		});
+
+		$("#timelog_edit_form").on('submit', function() {
+			// Validate start/finish times
+			var startDate = parseTime($("#time_start").val());
+			var endDate = parseTime($("#time_end").val());
+			
+			if ($("input[name='select_end_method']").val() === 'time') {
+				if (endDate <= startDate) {
+					$("#timelog__end-time-error").show();
+					$("#timelog__end-time-error").parent().addClass('error');
+					return false;
+				}
+			}
 		});
 
 		$("#timelogForm").on("submit", function () {
