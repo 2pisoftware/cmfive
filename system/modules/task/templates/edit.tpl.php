@@ -1,3 +1,12 @@
+<?php if (!empty($task->id)) : ?>
+	<div class="row-fluid clearfix panel">
+		<h3>Task [<?php echo $task->id; ?>]: <?php echo $task->title; ?></h3>
+		<blockquote>
+			Created: <?php echo formatDate($task->_modifiable->getCreatedDate()); ?><br/>
+			Taskgroup: <?php echo $task->getTaskGroupTypeTitle(); ?>
+		</blockquote>
+	</div>
+<?php endif; ?>
 <div class="tabs">
     <div class="tab-head">
         <a href="#details">Task Details</a>
@@ -177,6 +186,7 @@
             },
             complete: function(response) {
 				console.log(response);
+				console.log(response.responseText);
 //				debugger;
 				window.onbeforeunload = null;
                 if ($.isNumeric(response.responseText)) {

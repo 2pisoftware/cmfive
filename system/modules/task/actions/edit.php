@@ -10,7 +10,7 @@ function edit_GET($w) {
     if (!empty($task->id) && !$task->canView($w->Auth->user())) {
         $w->error("You do not have permission to edit this Task", "/task/tasklist");
     }
-    
+	
     // Get a list of the taskgroups and filter by what can be used
     $taskgroups = array_filter($w->Task->getTaskGroups(), function($taskgroup){
         return $taskgroup->getCanICreate();
@@ -39,7 +39,7 @@ function edit_GET($w) {
     
     // Create form
     $form = array(
-        (!empty($p["id"]) ? 'Edit task [' . $task->id . '] - Created: ' . formatDate($task->_modifiable->getCreatedDate()) : "Create a new task") => array(
+        (!empty($p["id"]) ? 'Edit task' : "Create a new task") => array(
             array(
 				!empty($p["id"]) ?
                         array("Task Group", "text", "-task_group_id_text", $taskgroup->title) :
@@ -85,47 +85,47 @@ function edit_GET($w) {
     // Build time log table //
     //////////////////////////
 
-    $timelog = $task->getTimeLog();
-    $total_seconds = 0;
-    
-    $table_header = array("Assignee", "Start", "Period (hours)", "Comment","Actions");
-    $table_data = array();
-    if (!empty($timelog)) {
-        // for each entry display, calculate period and display total time on task
-        foreach ($timelog as $log) {
-            // get time difference, start to end
-            $seconds = $log->dt_end - $log->dt_start;
-            $period = $w->Task->getFormatPeriod($seconds);
-			$comment = $w->Comment->getComment($log->comment_id);
-			$comment = !empty($comment) ? $comment->comment : "";
-            $table_row = array(
-                $w->Task->getUserById($log->user_id),
-                formatDateTime($log->dt_start),
-                $period,
-            	!empty($comment) ? $w->Comment->renderComment($comment) : "",
-            );
-            
-            // Build list of buttons
-            $buttons = '';
-            if ($log->is_suspect == "0") {
-                $total_seconds += $seconds;
-                $buttons .= Html::box($w->localUrl("/task/addtime/".$task->id."/".$log->id)," Edit ",true);
-            }
-
-            if ($w->Task->getIsOwner($task->task_group_id, $w->Auth->user()->id)) {
-                $buttons .= Html::b($w->localUrl("/task/suspecttime/".$task->id."/".$log->id), ((empty($log->is_suspect) || $log->is_suspect == "0") ? "Review" : "Accept"));
-            }
-            
-            $buttons .= Html::b($w->localUrl("/task/deletetime/".$task->id."/".$log->id), "Delete", "Are you sure you wish to DELETE this Time Log Entry?");
-            
-            $table_row[] = $buttons;
-            
-            $table_data[] = $table_row;
-        }
-        $table_data[] = array("<b>Total</b>", "","<b>".$w->Task->getFormatPeriod($total_seconds)."</b>","","");
-    }
-    // display the task time log
-    $w->ctx("timelog",Html::table($table_data, null, "tablesorter", $table_header));
+//    $timelog = $task->getTimeLog();
+//    $total_seconds = 0;
+//    
+//    $table_header = array("Assignee", "Start", "Period (hours)", "Comment","Actions");
+//    $table_data = array();
+//    if (!empty($timelog)) {
+//        // for each entry display, calculate period and display total time on task
+//        foreach ($timelog as $log) {
+//            // get time difference, start to end
+//            $seconds = $log->dt_end - $log->dt_start;
+//            $period = $w->Task->getFormatPeriod($seconds);
+//			$comment = $w->Comment->getComment($log->comment_id);
+//			$comment = !empty($comment) ? $comment->comment : "";
+//            $table_row = array(
+//                $w->Task->getUserById($log->user_id),
+//                formatDateTime($log->dt_start),
+//                $period,
+//            	!empty($comment) ? $w->Comment->renderComment($comment) : "",
+//            );
+//            
+//            // Build list of buttons
+//            $buttons = '';
+//            if ($log->is_suspect == "0") {
+//                $total_seconds += $seconds;
+//                $buttons .= Html::box($w->localUrl("/task/addtime/".$task->id."/".$log->id)," Edit ",true);
+//            }
+//
+//            if ($w->Task->getIsOwner($task->task_group_id, $w->Auth->user()->id)) {
+//                $buttons .= Html::b($w->localUrl("/task/suspecttime/".$task->id."/".$log->id), ((empty($log->is_suspect) || $log->is_suspect == "0") ? "Review" : "Accept"));
+//            }
+//            
+//            $buttons .= Html::b($w->localUrl("/task/deletetime/".$task->id."/".$log->id), "Delete", "Are you sure you wish to DELETE this Time Log Entry?");
+//            
+//            $table_row[] = $buttons;
+//            
+//            $table_data[] = $table_row;
+//        }
+//        $table_data[] = array("<b>Total</b>", "","<b>".$w->Task->getFormatPeriod($total_seconds)."</b>","","");
+//    }
+//    // display the task time log
+//    $w->ctx("timelog",Html::table($table_data, null, "tablesorter", $table_header));
     
     ///////////////////
     // Notifications //
