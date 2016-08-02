@@ -1095,7 +1095,11 @@ class Html {
 			foreach($data as $key => $row) {
 				$buffer .= '<tr data-id="' . $key . '">';
                 foreach($row as $column) {
-					$buffer .= "<td>{$column}</td>";
+					if (is_array($column)) {
+						$buffer .= '<td class="' . $column[1] . '">' . $column[0] . '</td>';
+					} else {
+						$buffer .= "<td>{$column}</td>";
+					}
                 }
                 $buffer .= "</tr>";
             }
