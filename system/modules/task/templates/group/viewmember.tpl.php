@@ -1,5 +1,1 @@
-<?php
-
-echo $viewmember;
-
-?>
+<?php echo $viewmember;

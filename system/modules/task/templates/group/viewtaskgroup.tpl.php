@@ -1,7 +1,1 @@
-<?php
-
-echo $viewgroup;
-
-?>
-
-
+<?php echo $viewgroup;

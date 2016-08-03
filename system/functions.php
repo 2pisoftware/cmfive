@@ -75,24 +75,14 @@ function isNumber($var) {
 
 function defaultVal($val, $default = null, $forceNull = false) {
     // Experiment to see if we can easily remove the strict standards
-    // errors with a small function      
-    if (empty($default)) {
-        if (empty($val)) {
-            return null;
-        } else {
-            return $val;
-        }
-    } else if (empty($val)) {
+    // errors with a small function
+    if (isset($default) && is_null($default)) {
+        return $val;
+    } else if (is_null($val)) {
         return $default;
     }
 
-    // The above more of less emulates below but using empty we can test
-    // for isset, which below doesn't and is the cause of most of the strict
-    // standards errors
-    if ($forceNull) {
-        return $val === null ? $default : $val;
-    }
-    return $val ? $val : $default;
+	return $val;
 }
 
 /**
@@ -724,8 +714,7 @@ function delete_all_between($beginning, $end, $string, $remove_every_instance = 
 	if (!$remove_every_instance) {
 		return trim(str_replace(substr($string, $beginningPos, ($endPos + strlen($end)) - $beginningPos), '', $string));
 	} else {
-		$loopSafeguard = 1;
-		while(($beginningPos !== FALSE && $endPos !== FALSE) || $loopSafeguard-- > 0) {
+		while(($beginningPos !== FALSE && $endPos !== FALSE)) {
 			$string = trim(str_replace(substr($string, $beginningPos, ($endPos + strlen($end)) - $beginningPos), '', $string));
 			$beginningPos = strpos($string, $beginning);
 			$endPos = strpos($string, $end);
