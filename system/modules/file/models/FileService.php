@@ -265,11 +265,12 @@ class FileService extends DbService {
 	 */	
 	function getAttachmentsFileList($objectOrTable, $id = null) {
 		$attachments = $this->getAttachments($objectOrTable, $id);
+                
 		if (!empty($attachments)) {
 			$pluck = array();
-			array_reduce($attachments, function(&$pluck, $attachment) {
-				$pluck[] = $attachment->fullpath;
-			});
+			foreach ($attachments as $attachment) {
+                            $pluck[] = $attachment->getFilePath() . "/" . $attachment->filename;
+			}
 			return $pluck;
 		}
 		return array();
