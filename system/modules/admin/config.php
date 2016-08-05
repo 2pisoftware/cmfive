@@ -29,5 +29,8 @@ Config::set('admin', array(
 		"mandrill/mandrill" => "1.0.*",
 		"robmorgan/phinx" => "^0.4.6",
 		"sendgrid/sendgrid" => "~4.0"
+    ),
+    "bulkemail"=> array(
+        "number_per_cron" => 5
     )
 ));
