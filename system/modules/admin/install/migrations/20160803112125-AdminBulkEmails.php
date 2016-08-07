@@ -49,12 +49,21 @@ class AdminBulkEmails extends CmfiveMigration {
                                 ->addCmfiveParameters()
                                 ->create();
                 }
+                
+                /**
+		 * Add is_public to attechments
+		 */
+		if ($this->hasTable('attachment') && !$this->table("attachment")->hasColumn("is_public")) {
+                    $this->table("attachment")->addBooleanColumn("is_public")->save();
+                }
+                
 	}
 
 	public function down() {
 		// DOWN
             $this->hasTable('mail_queue') ? $this->dropTable('mail_queue') : null;
             $this->hasTable('mail_batch') ? $this->dropTable('mail_batch') : null;
+            $this->hasTable('attachment') && $this->table("attachment")->hasColumn("is_public") ? $this->table('attachment')->removeColumn('is_public') : null;
 	}
 
 }

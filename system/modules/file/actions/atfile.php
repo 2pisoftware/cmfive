@@ -5,7 +5,11 @@ function atfile_GET(Web &$w) {
 	
 	$attachment = $w->File->getAttachment($id);
 	if (!empty($attachment) && $attachment->exists()) {
-		$attachment->displayContent();
+            //check if no user logged in, is attachment public
+            if (!$w->auth->loggedIn() && !$attachment->is_public) {
+                return;
+            }
+            $attachment->displayContent();
 	} else {
 		$w->header("HTTP/1.1 404 Not Found");
 		$w->notFoundPage();
