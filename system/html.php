@@ -53,7 +53,7 @@ class Html {
                     if (!is_array($column)) {
                         $buffer .= "<td>{$column}</td>";
                     } else {
-                        $buffer .= "<td " . ($column[1] === true ? "class='show-for-medium-up'" : "") . ">{$column[0]}</td>";
+                        $buffer .= "<td class='" . ($column[1] === true ? "show-for-medium-up" : (is_scalar($column[1]) ? $column[1] : '')) . "'>{$column[0]}</td>";
                     }
                 }
                 $buffer .= "</tr>";
