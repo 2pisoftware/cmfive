@@ -274,7 +274,7 @@
 			var startDate = parseTime($("#time_start").val());
 			var endDate = parseTime($("#time_end").val());
 			
-			if ($("input[name='select_end_method']").val() === 'time') {
+			if ($("input[name='select_end_method']:checked").val() === 'time') {
 				if (endDate <= startDate) {
 					$("#timelog__end-time-error").show();
 					$("#timelog__end-time-error").parent().addClass('error');
