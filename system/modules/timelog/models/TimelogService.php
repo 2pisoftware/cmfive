@@ -72,7 +72,7 @@ class TimelogService extends DbService {
 			return $this->w->db->get('timelog')->where('user_id', $user->id)
 					->where("object_class", get_class($object))
 					->where("object_id", $object->id)
-					->where('is_deleted', 0)->count();
+					->where('is_deleted', 0)->orderBy('dt_start ASC')->count();
 		}
 		return 0;
 	}

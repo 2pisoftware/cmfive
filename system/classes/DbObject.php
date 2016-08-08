@@ -290,7 +290,7 @@ class DbObject extends DbService {
         }
         // build cache of filtered object vars
         self::$_object_vars[$this->_class] = array();
-        foreach(get_object_vars($this) as $k=>$v) {
+        foreach(get_object_vars($this) as $k => $v) {
             // ignore volatile vars and web
             if('_' !== $k{0} && 'w' !== $k) {
                 self::$_object_vars[$this->_class][] = $k;
