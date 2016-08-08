@@ -63,7 +63,7 @@ class TimelogService extends DbService {
 	
 	public function getTimelogsForObjectByClassAndId($object_class, $object_id) {
 		if (!empty($object_class) || !empty($object_id)) {
-			return $this->getObjects("Timelog", ["object_class" => $object_class, "object_id" => $object_id, "is_deleted" => 0]);
+			return $this->getObjects("Timelog", ["object_class" => $object_class, "object_id" => $object_id, "is_deleted" => 0], false, true, "dt_start ASC");
 		}
 	}
 	
@@ -72,7 +72,7 @@ class TimelogService extends DbService {
 			return $this->w->db->get('timelog')->where('user_id', $user->id)
 					->where("object_class", get_class($object))
 					->where("object_id", $object->id)
-					->where('is_deleted', 0)->orderBy('dt_start ASC')->count();
+					->where('is_deleted', 0)->count();
 		}
 		return 0;
 	}
