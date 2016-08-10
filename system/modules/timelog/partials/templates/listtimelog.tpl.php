@@ -4,7 +4,7 @@
 </h4>
 
 <?php if (!empty($timelogs)) : ?>
-	<table class='small-12'>
+	<table class='tablesorter small-12'>
 		<thead><tr><th width="10%">Name</th><th width="15%">From</th><th width="15%">To</th><th width="5%">Duration</th><th width="10%">Time type</th><th width="25%">Description</th><th width="20%">Actions</th></tr></thead>
 		<tbody>
 			<?php foreach($timelogs as $timelog) : ?>
