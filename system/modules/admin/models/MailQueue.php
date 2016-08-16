@@ -38,6 +38,7 @@ class MailQueue extends DbObject {
         if (empty($from_contact)) {
             throw new Exception('No contact found for sender id');
         }      
+        $attachments = $this->w->File->getAttachmentsFileList('mail_batch', $this->batch_id);
         $data_array = [];
         $data_array['contact'] = $to_contact->toArray();
         $data_array['sender'] = $from_contact->toArray();
@@ -56,7 +57,7 @@ class MailQueue extends DbObject {
             $message, 
             null, 
             null, 
-            null
+            $attachments
         );
     }
 }
