@@ -44,7 +44,7 @@ class AdminBulkEmails extends CmfiveMigration {
                                 ->addBooleanColumn('is_billing_contact')
                                 ->addBooleanColumn('is_self')
                                 ->addIntegerColumn('template_id')
-                                ->addStringColumn('message')
+                                ->addColumn('message', 'text', ['limit' => 4294967295, 'null' => true])
                                 ->addStringColumn('extra_data')
                                 ->addCmfiveParameters()
                                 ->create();
