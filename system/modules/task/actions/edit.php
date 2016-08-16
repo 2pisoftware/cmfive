@@ -1,5 +1,11 @@
 <?php
 
+//load form elements for required feilds
+use \Html\Form\InputField as InputField;
+use \Html\Form\Select as Select;
+use \Html\Form\Autocomplete as Autocomplete;
+
+
 function edit_GET($w) {
     $p = $w->pathMatch("id");
     $task = (!empty($p["id"]) ? $w->Task->getTask($p["id"]) : new Task($w));
@@ -41,13 +47,28 @@ function edit_GET($w) {
     $form = array(
         (!empty($p["id"]) ? 'Edit task' : "Create a new task") => array(
             array(
-				!empty($p["id"]) ?
-                        array("Task Group", "text", "-task_group_id_text", $taskgroup->title) :
-                        array("Task Group", "autocomplete", "task_group_id", !empty($task->task_group_id) ? $task->task_group_id : $taskgroup_id, $taskgroups),
-                !empty($p["id"]) ?
-                        array("Task Type", "select", "-task_type", $task->task_type, $tasktypes) :
-                        //array("Task Type", "select", "task_type", $task->task_type, $tasktypes)
-                        array("Task Type", "select", "task_type", (sizeof($tasktypes) === 1) ? $tasktypes[0] : null, $tasktypes)
+                (new Autocomplete())
+                    ->setLabel("Task Group <small>Required</small>")
+                    ->setName(!empty($p["id"]) ? "task_group_id_text" : "task_group_id")
+                    ->setReadOnly(!empty($p["id"]) ? 'true' : null)
+                    ->setOptions($taskgroups)
+                    ->setValue(!empty($task->task_group_id) ? $w->task->getTaskgroup($task->task_group_id)->getSelectOptionTitle() : $taskgroup_id)
+                    ->setRequired('required'),
+//				!empty($p["id"]) ?
+//                        array("Task Group", "text", "-task_group_id_text", $taskgroup->title) :
+//                        array("Task Group", "autocomplete", "task_group_id", !empty($task->task_group_id) ? $task->task_group_id : $taskgroup_id, $taskgroups),
+                (new Select())
+                    ->setLabel("Task Type <small>Required</small>")
+                    ->setName(!empty($p["id"]) ? "-task_type" : "task_type")
+                    ->setId(!empty($p["id"]) ? "-task_type" : "task_type")
+                    ->setDisabled(!empty($p["id"]) ? "true" : null)
+                    ->setOptions($tasktypes)
+                    ->setSelectedOption(!empty($p["id"]) ? $task->task_type : sizeof($tasktypes) === 1 ? $tasktypes[0] : null)
+                    ->setRequired('required')
+//                !empty($p["id"]) ?
+//                        array("Task Type", "select", "-task_type", $task->task_type, $tasktypes) :
+//                        //array("Task Type", "select", "task_type", $task->task_type, $tasktypes)
+//                        array("Task Type", "select", "task_type", (sizeof($tasktypes) === 1) ? $tasktypes[0] : null, $tasktypes)
             ),
             array(
                 array("Task Title", "text", "title", $task->title),
@@ -200,7 +221,6 @@ function edit_POST($w) {
     $existing_task_data = $w->Task->getTaskData($task->id);
     if (!empty($existing_task_data)) {
         foreach($existing_task_data as $e_task_data) {
-			// Sanity cleaning to remove old task_data values that store both of the
 			// Autocomplete fields
 			if (strpos($e_task_data->data_key, \Html\Form\Autocomplete::$_prefix) === 0) {
 				$e_task_data->delete();
