@@ -1429,4 +1429,15 @@ UPLOAD;
         return $buffer;
     }
     
+	/**
+	 * Returns embed iframe for displaying pdfs and other documents in the browser
+	 * 
+	 * @param string $link
+	 * @param string $width
+	 * @param string $height
+	 * @return string
+	 */
+	public static function embedDocument($link, $width = '1024', $height = '724') {
+		return "<iframe src='/system/templates/js/viewerjs-0.5.8/ViewerJS/#../../../../..{$link}' width='{$width}' height='{$height}' allowfullscreen webkitallowfullscreen></iframe>";
+	}
 }

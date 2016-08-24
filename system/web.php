@@ -74,7 +74,8 @@ class Web {
     public $db;
     public $_isFrontend = false;
     public $_is_installing = false;
-    
+    public $_is_head_request = false;
+	
     private $_classdirectory; // used by the class auto loader
 
     public $_scripts = array();
@@ -445,6 +446,12 @@ class Web {
         // or just <action>_<type>()
 
         $this->_requestMethod = array_key_exists('REQUEST_METHOD',$_SERVER) ? $_SERVER['REQUEST_METHOD'] : '';
+		
+		if ($this->_requestMethod === "HEAD") {
+			$this->_is_head_request = true;
+			$this->_requestMethod = "GET";
+		}
+		
         $actionmethods[] = $this->_action . '_' . $this->_requestMethod;
         $actionmethods[] = $this->_action . '_ALL';
         $actionmethods[] = 'default_ALL';
@@ -535,6 +542,12 @@ class Web {
                     $this->header($key . ': ' . $val);
                 }
             }
+			
+			// If a HEAD request was sent, no body is required but it behaves like a GET
+			if ($this->_is_head_request === true) {
+				return;
+			}
+			
             $body = null;
             // evaluate template only when buffer is empty
             if (sizeof($this->_buffer) == 0) {
@@ -552,7 +565,8 @@ class Web {
             } else {
                 $this->_buffer = $body;
             }
-            echo $this->_buffer;
+			
+			echo $this->_buffer;
         } else {
             $this->notFoundPage();
         }
@@ -1768,7 +1782,10 @@ class Web {
     }
     
     /**
-     *  Allow stubbing of global header function for unit tets
+     * Wrapper for PHP header function
+	 * 
+	 * @param string $string
+	 * @return null
      */
     function header($string) {
 		header($string);
@@ -1888,6 +1905,7 @@ class Web {
 	 */
     function checkUrl($url,$module,$submodule,$action) {
     	$p=$this->parseUrl($url);
+		
     	if (empty($p) || empty($module)) {
     		return false;
     	}
