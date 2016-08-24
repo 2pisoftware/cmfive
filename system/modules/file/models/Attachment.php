@@ -119,7 +119,7 @@ class Attachment extends DbObject {
 
 	public function getDocumentEmbedHtml($width = '1024', $height = '724') {
 		if ($this->isDocument() && $this->adapter == 'local') {
-			return Html::embedDocument('/uploads/' . $this->fullpath, $width, $height);
+			return Html::embedDocument($this->getViewUrl(), $width, $height);
 		}
 		return Html::a($this->getViewUrl(), $this->title);
 	}
