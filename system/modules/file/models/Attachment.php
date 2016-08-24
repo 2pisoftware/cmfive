@@ -91,9 +91,8 @@ class Attachment extends DbObject {
     function getThumbnailUrl() {
         if ($this->isImage()) {
             return WEBROOT . "/file/atthumb/" . $this->id;
-        } else {
-            return WEBROOT . "/img/document.jpg";
         }
+		return null; // WEBROOT . "/img/document.jpg";
     }
 
     /**
@@ -118,6 +117,24 @@ class Attachment extends DbObject {
         }
     }
 
+	public function getDocumentEmbedHtml($width = '1024', $height = '724') {
+		if ($this->isDocument() && $this->adapter == 'local') {
+			return Html::embedDocument('/uploads/' . $this->fullpath, $width, $height);
+		}
+		return Html::a($this->getViewUrl(), $this->title);
+	}
+	
+	/**
+	 * Returns whether or not this attachment has a document mimetype
+	 * 
+	 * @return bool
+	 */
+	public function isDocument() {
+		$document_mimetypes = ['application/pdf', 'application/msword', 'application/msword', 'application/rtf', 'application/vnd.ms-excel', 'application/vnd.ms-excel',
+        	'application/vnd.ms-powerpoint', 'application/vnd.ms-powerpoint', 'application/vnd.oasis.opendocument.text', 'application/vnd.oasis.opendocument.spreadsheet'];
+		return in_array($this->mimetype, $document_mimetypes);
+	}
+	
 	/**********
 	 * Gaufrette helper functions
 	 **********/

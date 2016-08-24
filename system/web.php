@@ -1888,6 +1888,7 @@ class Web {
 	 */
     function checkUrl($url,$module,$submodule,$action) {
     	$p=$this->parseUrl($url);
+		
     	if (empty($p) || empty($module)) {
     		return false;
     	}
