@@ -200,7 +200,6 @@ function edit_POST($w) {
     $existing_task_data = $w->Task->getTaskData($task->id);
     if (!empty($existing_task_data)) {
         foreach($existing_task_data as $e_task_data) {
-			// Sanity cleaning to remove old task_data values that store both of the
 			// Autocomplete fields
 			if (strpos($e_task_data->data_key, \Html\Form\Autocomplete::$_prefix) === 0) {
 				$e_task_data->delete();
