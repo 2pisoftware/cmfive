@@ -2,7 +2,7 @@
 	<div class="row-fluid clearfix panel">
 		<h3>Task [<?php echo $task->id; ?>]: <?php echo $task->title; ?></h3>
 		<blockquote>
-			Created: <?php echo formatDate($task->_modifiable->getCreatedDate()); ?><br/>
+			Created: <?php echo formatDate($task->_modifiable->getCreatedDate()) . (!empty($task->_modifiable->getCreator()) ? ' by <strong>' . @$task->_modifiable->getCreator()->getFullName() . '</strong>' : ''); ?><br/>
 			Taskgroup: <?php echo $task->getTaskGroupTypeTitle(); ?>
 		</blockquote>
 	</div>
