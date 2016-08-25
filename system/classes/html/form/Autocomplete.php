@@ -20,6 +20,7 @@ class Autocomplete extends \Html\Form\FormElement {
 	public $required;
 	public $source;
 	public $value;
+        public $readonly;
 	
 	public static $_excludeFromOutput = [
 		"id", "name", "required", "value", "minlength", "class", "style",
@@ -113,6 +114,18 @@ class Autocomplete extends \Html\Form\FormElement {
 		
 		return $this;
 	}
+        
+        /**
+         * Sets the boolean readonly attribute
+         * 
+         * @param string $readonly 'true' for readonly fields
+         * @return \Html\Form\Autocomplete this
+         */
+        public function setReadOnly($readonly) {
+		$this->readonly = $readonly;
+		
+		return $this;
+	}
 	
 	/**
 	 * Sets the source string, this should be a url that will be used to
@@ -164,6 +177,7 @@ class Autocomplete extends \Html\Form\FormElement {
 	public function __toString() {
 		
 		// Get necessary fields for HTML
+                $readonly = !is_null($this->readonly) ? 'readonly="true"' : '';
 		$required = !is_null($this->required) ? 'required="required"' : '';
 		$source = !empty($this->source) ? '"' . $this->source . '"' : json_encode($this->options);
 		$using_source = !empty($this->source) ? 'true' : 'false';
@@ -181,7 +195,7 @@ class Autocomplete extends \Html\Form\FormElement {
 		return <<<BUFFER
 <input type="text" style="display: none;" id="{$this->id}"  name="{$this->name}" value="{$this->value}" {$attribute_buffer} />
 <div class='acp_container'>
-	<input type="text" id="{$prefix}{$this->id}" name="{$prefix}{$this->name}" value="{$displayValue}" class="{$this->class}" style="{$this->style}" {$required} />
+	<input type="text" id="{$prefix}{$this->id}" name="{$prefix}{$this->name}" value="{$displayValue}" class="{$this->class}" style="{$this->style}" {$required} {$readonly} />
 	<div class="circle"></div>
 	<img class="center_image" width="40px" height="40px" src="/system/templates/img/cmfive_V_logo.png" />
 </div>
