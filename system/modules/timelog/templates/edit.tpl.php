@@ -38,7 +38,8 @@
 						<?php echo (new \Html\Form\Autocomplete([
 							"id|name"		=> "search",
 							"title"			=> !empty($object) ? $object->getSelectOptionTitle() : null,
-							"value"			=> !empty($timelog->object_id) ? $timelog->object_id : $tracking_id
+							"value"			=> !empty($timelog->object_id) ? $timelog->object_id : $tracking_id,
+							"required"		=> "true"
 						]))->setOptions(!empty($timelog->object_class) || !empty($tracking_class) ? $w->Timelog->getObjects($timelog->object_class ? : $tracking_class) : ''); ?>
 					</label>
 				</li>
@@ -49,7 +50,8 @@
 					<label class="small-12 columns">Date
 						<?php echo (new \Html\Form\InputField\Date([
 							"id|name"		=> "date_start",
-							"value"			=> $timelog->getDateStart()
+							"value"			=> $timelog->getDateStart(),
+							"required"		=> "true"
 						])); ?>
 					</label>
 				</li>
@@ -59,7 +61,7 @@
 							"id|name"		=> "time_start",
 							"value"			=> $timelog->getTimeStart(),
 							"pattern"		=> "^(0?[0-9]|1[0-9]|2[0-3]):[0-5][0-9](\s+)?(AM|PM|am|pm)?$",
-							"placeholder"	=> "e.g. 11:30, 11:30am, 23:30, 11:30pm",
+							"placeholder"	=> "12hr format: 11:30pm or 24hr format: 23:30",
 							"required"		=> "true"
 						])); ?>
 					</label>
@@ -85,7 +87,7 @@
 										"id|name"		=> "time_end",
 										"value"			=> $timelog->getTimeEnd(),
 										"pattern"		=> "^(0?[0-9]|1[0-9]|2[0-3]):[0-5][0-9](\s+)?(AM|PM|am|pm)?$",
-										"placeholder"	=> "e.g. 11:30, 11:30am, 23:30, 11:30pm",
+										"placeholder"	=> "12hr format: 11:30pm or 24hr format: 23:30",
 										"required"		=> "true"
 									])); ?>
 								</label>
@@ -115,7 +117,6 @@
 												"max"			=> 23,
 												"step"			=> 1,
 												"placeholder"	=> "Hours: 0-23",
-												"required"		=> "true",
 												"disabled"		=> "true"
 											])); ?>
 										</div>
@@ -130,6 +131,7 @@
 												"disabled"		=> "true"
 											])); ?>
 										</div>
+										<small id="timelog__hours-mins-error" class="error" style="display: none;">Either hours or minutes must be set</small>
 									</div>
 								</label>
 							</div>
@@ -187,13 +189,17 @@
 				$("#minutes_worked").attr("disabled", "disabled");
 				
 				$("#hours_worked").val("");
-				$("#minutes_worked").val("")
+				$("#minutes_worked").val("");
+				
+				$("#time_end").focus();
 			} else if (this.value === "hours") {
 				$("#hours_worked").removeAttr("disabled");
 				$("#minutes_worked").removeAttr("disabled");
 				
 				$("#time_end").attr("disabled", "disabled");
 				$("#time_end").val("");
+				
+				$("#hours_worked").focus();
 			}
 		});
 		
@@ -268,16 +274,35 @@
 			$("#timelog__end-time-error").hide();
 			$("#timelog__end-time-error").parent().removeClass('error');
 		});
-
+		
+		$("#hours_worked").on('keyup', function() {
+			$("#timelog__hours-mins-error").hide();
+			$("#timelog__hours-mins-error").parent().removeClass('error');
+		});
+		
+		$("#minutes_worked").on('keyup', function() {
+			$("#timelog__hours-mins-error").hide();
+			$("#timelog__hours-mins-error").parent().removeClass('error');
+		});
+				
 		$("#timelog_edit_form").on('submit', function() {
 			// Validate start/finish times
-			var startDate = parseTime($("#time_start").val());
-			var endDate = parseTime($("#time_end").val());
-			
 			if ($("input[name='select_end_method']:checked").val() === 'time') {
+				var startDate = parseTime($("#time_start").val());
+				var endDate = parseTime($("#time_end").val());
+			
 				if (endDate <= startDate) {
 					$("#timelog__end-time-error").show();
 					$("#timelog__end-time-error").parent().addClass('error');
+					return false;
+				}
+			} else {
+				var hours_worked = $("#hours_worked").val();
+				var minutes_worked = $("#minutes_worked").val();
+				
+				if ((!hours_worked && !minutes_worked) || (hours_worked <= 0 && minutes_worked <= 0)) {
+					$("#timelog__hours-mins-error").show();
+					$("#timelog__hours-mins-error").parent().addClass('error');
 					return false;
 				}
 			}

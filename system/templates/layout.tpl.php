@@ -6,7 +6,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="shortcut icon" href="/system/templates/img/favicon.ico" type="image/x-icon"/>
         <title><?php echo ucfirst($w->currentModule()); ?><?php echo!empty($title) ? ' - ' . $title : ''; ?></title>
-<!--        <link rel="icon" href="<?php // echo WEBROOT; ?>/templates/img/favicon.png" type="image/png"/>-->
 
         <?php
         $w->enqueueStyle(array("name" => "normalize.css", "uri" => "/system/templates/js/foundation-5.5.0/css/normalize.css", "weight" => 1010));
