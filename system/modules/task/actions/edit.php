@@ -57,10 +57,9 @@ function edit_GET($w) {
 //				!empty($p["id"]) ?
 //                        array("Task Group", "text", "-task_group_id_text", $taskgroup->title) :
 //                        array("Task Group", "autocomplete", "task_group_id", !empty($task->task_group_id) ? $task->task_group_id : $taskgroup_id, $taskgroups),
-                (new Select())
-                    ->setLabel("Task Type <small>Required</small>")
-                    ->setName(!empty($p["id"]) ? "-task_type" : "task_type")
-                    ->setId(!empty($p["id"]) ? "-task_type" : "task_type")
+                (new Select([
+					"id|name" => "task_type"
+				]))->setLabel("Task Type <small>Required</small>")
                     ->setDisabled(!empty($p["id"]) ? "true" : null)
                     ->setOptions($tasktypes)
                     ->setSelectedOption(!empty($p["id"]) ? $task->task_type : sizeof($tasktypes) === 1 ? $tasktypes[0] : null)
