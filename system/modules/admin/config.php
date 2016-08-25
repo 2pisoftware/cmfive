@@ -31,6 +31,8 @@ Config::set('admin', array(
 		"sendgrid/sendgrid" => "~4.0"
     ),
     "bulkemail"=> array(
-        "number_per_cron" => 5
+        "number_per_cron" => 5,
+        //set user to authenticate attachments for emails
+        "auth_user" => null
     )
 ));

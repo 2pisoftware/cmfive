@@ -7,6 +7,8 @@
  */ 
 
 function sendbulkemail_ALL (Web $w) {
+    //force authentication for getting attachments
+    $w->auth->forceLogin(Config::get('admin.bulkemail.auth_user'));
     //get current batch id
     $batch_id = $w->mail->getCurrentBatchId();
     
