@@ -56,9 +56,9 @@
         <br/><br/>
         <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
         <?php foreach ($attachments as $attachment) : ?>
-            <?php if ($attachment->isImage()) : ?>
+            <?php if ($attachment->isImage() || $attachment->isDocument()) : ?>
 				<li>
-					<div class="image-container attachment">
+					<div class="image-container attachment text-center">
 						<div class="image-container-overlay">
 							<div class="row-fluid">
 								<button href="#" data-reveal-id="attachment_modal_<?php echo $attachment->id; ?>" class="button expand">View</button>
@@ -70,7 +70,11 @@
 								<?php echo Html::b("/file/delete/" . $attachment->id . "?redirect_url=" . urlencode($redirect), "Delete", "Are you sure you want to delete this attachment?", null, false, "expand alert ");?>
 							</div>
 						</div>
-						<img class="image-cropped" data-caption="<?php echo $attachment->title; ?>" src="<?php echo $attachment->getThumbnailUrl(); ?>">
+						<?php if ($attachment->isImage()) : ?>
+							<img class="image-cropped" data-caption="<?php echo $attachment->title; ?>" src="<?php echo $attachment->getThumbnailUrl(); ?>">
+						<?php else: ?>
+							<i class="fi-page-<?php echo $attachment->mimetype == 'application/pdf' ? "pdf" : "doc"; ?>" style="font-size: 90pt;"></i>
+						<?php endif; ?>
 					</div>
 					
 					<a href="#" data-reveal-id="attachment_modal_<?php echo $attachment->id; ?>">
@@ -81,15 +85,26 @@
 							<?php echo strip_tags($attachment->description); ?>
 						</div>
 					</a>
-					<div id="attachment_modal_<?php echo $attachment->id; ?>" class="reveal-modal" data-reveal role="dialog">
+					<div id="attachment_modal_<?php echo $attachment->id; ?>" class="reveal-modal file__pdf-modal" data-reveal role="dialog">
 						<div class="row-fluid panel" style="text-align: center;">
-							<img src="/file/atfile/<?php echo $attachment->id; ?>" alt="<?php echo $attachment->title; ?>" />
+							<?php if ($attachment->isDocument()) :
+								echo $attachment->getDocumentEmbedHtml();
+							else: ?>
+								<img src="/file/atfile/<?php echo $attachment->id; ?>" alt="<?php echo $attachment->title; ?>" />
+							<?php endif; ?>
 						</div>
 						
 						<h2 id="firstModalTitle" style="font-weight: lighter; text-align: center; border-bottom: 1px solid #777;"><?php echo $attachment->title; ?></h2>
 						<p style="text-align: center;"><?php echo $attachment->description; ?></p>
 						
-						<a href="/file/atfile/<?php echo $attachment->id; ?>" target="_blank" class="button expand secondary" onclick="$('#attachment_modal_<?php echo $attachment->id; ?>').foundation('reveal', 'close');">Open in new tab/window</a>
+						<div class='row'>
+							<div class='small-6 columns'>
+								<a href="/file/atfile/<?php echo $attachment->id; ?>" target="_blank" class="button expand" onclick="$('#attachment_modal_<?php echo $attachment->id; ?>').foundation('reveal', 'close');">Open in new tab/window</a>
+							</div>
+							<div class='small-6 columns'>
+								<a class="button expand secondary" onclick="$('#attachment_modal_<?php echo $attachment->id; ?>').foundation('reveal', 'close');" aria-label="Close">Close</a>
+							</div>
+						</div>
 						
 						<a class="close-reveal-modal" aria-label="Close">&#215;</a>
 					</div>
