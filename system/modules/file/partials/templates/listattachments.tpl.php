@@ -97,7 +97,7 @@
 						<h2 id="firstModalTitle" style="font-weight: lighter; text-align: center; border-bottom: 1px solid #777;"><?php echo $attachment->title; ?></h2>
 						<p style="text-align: center;"><?php echo $attachment->description; ?></p>
 						
-						<div class='row'>
+						<div class='row-fluid'>
 							<div class='small-6 columns'>
 								<a href="/file/atfile/<?php echo $attachment->id; ?>" target="_blank" class="button expand" onclick="$('#attachment_modal_<?php echo $attachment->id; ?>').foundation('reveal', 'close');">Open in new tab/window</a>
 							</div>
