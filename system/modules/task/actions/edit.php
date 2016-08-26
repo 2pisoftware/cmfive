@@ -52,7 +52,8 @@ function edit_GET($w) {
                     ->setName(!empty($p["id"]) ? "task_group_id_text" : "task_group_id")
                     ->setReadOnly(!empty($p["id"]) ? 'true' : null)
                     ->setOptions($taskgroups)
-                    ->setValue(!empty($task->task_group_id) ? $w->task->getTaskgroup($task->task_group_id)->getSelectOptionTitle() : $taskgroup_id)
+                    ->setValue($taskgroup->id)
+                    ->setTitle($taskgroup->getSelectOptionTitle())
                     ->setRequired('required'),
 //				!empty($p["id"]) ?
 //                        array("Task Group", "text", "-task_group_id_text", $taskgroup->title) :
