@@ -11,6 +11,12 @@ function duplicatetask_GET(Web $w) {
     $new_task = $old_task->copy(false);
     $new_task->title = $old_task->title . " -Copy";
     $new_task->insert();
+	
+	$object_modification = new ObjectModification($w);
+	$object_modification->table_name = 'task';
+	$object_modification->object_id = $new_task->id;
+	$object_modification->insert();
+	
     //copy the task data
     $old_task_data = $w->task->getTaskData($old_task_id);
     if(!empty($old_task_data[0])) {
@@ -34,9 +40,13 @@ function duplicatetask_GET(Web $w) {
     $old_task_comments = $w->comment->getCommentsForTable("task", $old_task_id);
     if(!empty($old_task_comments)) {
         foreach ($old_task_comments as $old_comment) {
-            $new_comment = $old_comment->copy(false);
-            $new_comment->obj_id = $new_task->id;
-            $new_comment->insert();
+			if ($old_comment->is_system == 0) {
+				$new_comment = $old_comment->copy(false);
+				$new_comment->obj_id = $new_task->id;
+				$new_comment->insert();
+				$new_comment->creator_id = $old_comment->creator_id;
+				$new_comment->update();
+			}
         }
     }
     //copy the task attachments

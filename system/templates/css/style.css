@@ -720,3 +720,7 @@ th.sorted_column {
 .cmfive__tab-label {
 	top: -2px;
 }
+
+.file__pdf-modal {
+	max-width: 100%;
+}

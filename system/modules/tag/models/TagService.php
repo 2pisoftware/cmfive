@@ -12,6 +12,14 @@ class TagService extends DbService {
 			return $object;
 		}
 	}
+        public function getTagsByObjClass($obj_class, $tag = null) {
+            if (!empty($tag)) {
+                return $this->getObjects('Tag',["is_deleted"=> 0, "obj_class"=> $obj_class, "tag"=>$tag]);
+            } else {
+                return $this->getObjects('Tag',["is_deleted"=> 0, "obj_class"=> $obj_class]);
+            }
+            
+        }
 	public function removeTag($object_id, $obj_class, $tagText) {
 		//No id needed as the other fields act as our unique identifiers
 		if( !empty($object_id) && !empty($obj_class) ) {

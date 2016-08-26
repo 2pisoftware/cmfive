@@ -56,14 +56,14 @@ function edit_POST(Web $w) {
 	$redirect = $w->request("redirect", '');
 	
 	$timelog = !empty($p['id']) ? $w->Timelog->getTimelog($p['id']) : new Timelog($w);
-	
+
 	// Get and save timelog
 	if (empty($_POST['object_class']) || empty($_POST['object_id'])) {
-		$w->error('Missing data', $redirect ? : '/timelog');
+		$w->error('Missing module or search data', $redirect ? : '/timelog');
 	}
 	
 	if (!array_key_exists("date_start", $_POST) || !array_key_exists("time_start", $_POST) || (!$timelog->isRunning() && (!array_key_exists("time_end", $_POST) && !array_key_exists("hours_worked", $_POST)))) {
-		$w->error('Missing data', $redirect ? : '/timelog');
+		$w->error('Missing date/time data', $redirect ? : '/timelog');
 	}
 	
 	// Get start and end date/time

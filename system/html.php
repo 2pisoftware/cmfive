@@ -153,9 +153,9 @@ class Html {
         return $a->__toString();
     }
 
-    public static function b($href, $title, $confirm = null, $id = null, $newtab = false, $class = null, $type = null) {
+    public static function b($href, $title, $confirm = null, $id = null, $newtab = false, $class = null, $type = null,$name = null) {
         $button = new \Html\button();
-        $button->href($href)->text($title)->confirm($confirm)->id($id)->setClass($class)->newtab($newtab)->type($type);
+        $button->href($href)->text($title)->confirm($confirm)->id($id)->setClass($class)->newtab($newtab)->type($type)->name($name);
         return $button->__toString();
     }
     /**
@@ -1429,4 +1429,15 @@ UPLOAD;
         return $buffer;
     }
     
+	/**
+	 * Returns embed iframe for displaying pdfs and other documents in the browser
+	 * 
+	 * @param string $link
+	 * @param string $width
+	 * @param string $height
+	 * @return string
+	 */
+	public static function embedDocument($link, $width = '1024', $height = '724', $zoom = 'page-width') {
+		return "<iframe src='/system/templates/js/viewerjs-0.5.8/ViewerJS/index.html?zoom={$zoom}#../../../../..{$link}' width='{$width}' height='{$height}' allowfullscreen webkitallowfullscreen></iframe>";
+	}
 }
