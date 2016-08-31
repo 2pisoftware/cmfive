@@ -144,7 +144,12 @@ function task_core_dbobject_after_insert_Task(Web $w, $object) {
 				// Add message to inbox (needed?) but dont send an email
 				$w->Inbox->addMessage($subject, $message, $user, null, null, false);
 			}
-		}
+			
+			// Add message to inbox (needed?) but dont send an email
+            if (Config::get('inbox.active') === true) {            
+                $w->Inbox->addMessage($subject, $message, $user, null, null, false);
+            }
+        }
     }
 }
 
