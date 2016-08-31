@@ -129,6 +129,38 @@ class CmfiveMigration extends Phinx\Migration\AbstractMigration {
 			$this->execute($update_statement_string);
 		}
 	}
+	
+	/**
+	 * Checks if the table and column exists and applies an index to that given 
+	 * column if it does.
+	 * 
+	 * @param string $table
+	 * @param string $column
+	 * @return null
+	 */
+	public function addIndexToTable($table, $column) {
+		if ($this->hasTable($table)) {
+			if ($this->table($table)->hasColumn($column)) {
+				$this->table($table)->addIndex($column)->update();
+			}
+		}
+	}
+	
+	/**
+	 * Checks if the table and column exists and removes an index from that 
+	 * given column if it does.
+	 * 
+	 * @param string $table
+	 * @param string $column
+	 * @return null
+	 */
+	public function removeIndexFromTable($table, $column) {
+		if ($this->hasTable($table)) {
+			if ($this->table($table)->hasColumn($column)) {
+				$this->table($table)->removeIndex($column)->update();
+			}
+		}
+	}
 }
 
 class MigrationException extends Exception {
