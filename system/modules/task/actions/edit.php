@@ -83,7 +83,8 @@ function edit_GET($w) {
             ),
 			array(
 				array("Estimated hours", "text", "estimate_hours", $task->estimate_hours),
-				array("Effort", "text", "effort", $task->effort)
+				array("Effort", "text", "effort", $task->effort),
+                            (new InputField())->setName('rate')->setLabel('Rate')->setValue($task->rate)->setPattern('^\d+(?:\.\d{1,2})?$')
 			),
             array(array("Description", "textarea", "description", $task->description)),
         	!empty($p['id']) ? [["Task Group ID", "hidden", "task_group_id", $task->task_group_id]] : null
@@ -206,12 +207,13 @@ function edit_POST($w) {
     }
     
     $task->fill($_POST['edit']);
+    $task->rate = abs($task->rate) == 0 ? NULL : $task->rate;
     $task->assignee_id = intval($_POST['edit']['assignee_id']);
     if (empty($task->dt_due)) {
         $task->dt_due = $w->Task->getNextMonth();
     }
     
-    $task->insertOrUpdate();
+    $task->insertOrUpdate(true);
     
     // Tell the template what the task id is (this post action is being called via ajax)
     $w->setLayout(null);
