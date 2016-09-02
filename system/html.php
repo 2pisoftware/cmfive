@@ -560,7 +560,7 @@ class Html {
             foreach ($rows as $row) {
                 
                 // Print each field
-                $fieldCount = count($row);
+                $fieldCount = count(array_filter($row));
                 $buffer .= "<ul class='small-block-grid-1 medium-block-grid-{$fieldCount} section-body'>";
                 
 				if (empty($row)) {
@@ -568,7 +568,7 @@ class Html {
 				}
 				
                 foreach($row as $field) {
-                    
+                   
 					// Check if the row is an object like an InputField
 					if (!is_array($field) && is_object($field)) {
 						if ((property_exists($field, "type") && $field->type !== "hidden") || !property_exists($field, "type")) {

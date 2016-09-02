@@ -160,6 +160,19 @@ class Task extends DbObject {
         $group = $this->Task->getTaskGroup($this->task_group_id);
         return $this->Task->getMyPerms($me->role, $group->can_view);
     }
+    
+    /**
+     * used to hide the rate field
+     * @return boolean 
+     */
+    function canISetRate() {
+        $user = $this->w->auth->User();
+        $taskgroup = $this->getTaskGroup();
+        if ($user->is_admin == 1 || $taskgroup->isOwner($user)) {
+            return true;
+        }
+        return false;
+    }
 
     /**
      * Used by the search interface
