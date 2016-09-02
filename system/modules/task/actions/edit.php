@@ -84,13 +84,13 @@ function edit_GET($w) {
 			array(
 				array("Estimated hours", "text", "estimate_hours", $task->estimate_hours),
 				array("Effort", "text", "effort", $task->effort),
-                            (new InputField())->setName('rate')->setLabel('Rate ($)')->setValue($task->rate)->setPattern('^\d+(?:\.\d{1,2})?$')->setPlaceholder('0.00')
+                            ($task->canISetRate() ? (new InputField())->setName('rate')->setLabel('Rate ($)')->setValue($task->rate)->setPattern('^\d+(?:\.\d{1,2})?$')->setPlaceholder('0.00') : null)
 			),
             array(array("Description", "textarea", "description", $task->description)),
         	!empty($p['id']) ? [["Task Group ID", "hidden", "task_group_id", $task->task_group_id]] : null
         )
     );
-	
+    
 //	if (!empty($p['id'])) {
 //		$form['Edit task [' . $task->id . ']'][5][] = array("Task Group ID", "hidden", "task_group_id", $task->task_group_id);
 //	}
