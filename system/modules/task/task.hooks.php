@@ -40,6 +40,16 @@ function task_timelog_type_options_for_Task(Web $w, $object) {
 /**
  * Hook to notify relevant people when a task has been created
  * 
+ * Task template email parameters:
+ * message
+ *		status = "A new task has been created"
+ *		action_url = "http://github.com/2pisoftware/cmfive"
+ *		footer = "Task description"
+ * fields[]
+ *		key
+ *		value
+ *	
+ * 
  * @param Web $w
  * @param Task $object
  */
@@ -57,28 +67,82 @@ function task_core_dbobject_after_insert_Task(Web $w, $object) {
 		$subject = $event_title . "[" . $object->id . "]: " . $object->title;
         $logged_in_user = $w->Auth->user();
 		
-        foreach ($users_to_notify as $user) {
-            $message = "<b>" . $event_title . " [" . $object->id . "]</b><br/>\n";
-            $message .= "<p>A new task has been created</p>";
-            
-			$message .= "<p><b>Subject:</b> " . $object->title . "</p>";
-			$message .= "<p><b>Body:</b>" . $object->description . "</p>";
+		// Get template
+		$template = $w->Template->findTemplate("task", "notification_email");
+		if (!empty($template->id)) {
+			$message_struct = [];
+			$message_struct['status']		= "[{$object->id}] A new task has been created";
+			$message_struct['footer']		= $object->description;
+			$message_struct['action_url']	= $w->localUrl('/task/edit/' . $object->id);
 			
-			// Get additional details
-			$message .= $w->Task->getNotificationAdditionalDetails($object);
-			
-            $user_object = $w->Auth->getUser($user);
-            $message .= "<br/><p>Access the task here: " . $object->toLink(null, null, $user_object) . "</p>";
-            $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
+			$message_struct['fields'] = [
+				"Assigned to"	=> !empty($object->assignee_id) ? $object->getAssignee()->getFullName() : '',
+				"Type"			=> $object->getTypeTitle(),
+				"Title"			=> $object->title,
+				"Due"			=> !empty($object->dt_due) ? date('d-m-Y', strtotime(str_replace('/', '-', $object->dt_due))) : '',
+				"Status"		=> $object->status,
+				"Priority"		=> $object->isUrgent() ? "<b style='color: orange;'>{$object->priority}</b>" : $object->priority
+			];
 
-			$attachments = $w->File->getAttachmentsFileList($object);
+			foreach ($users_to_notify as $user) {
+				// Get additional details
+				$additional_details = $w->Task->getNotificationAdditionalDetails($object);
+				if (!empty($additional_details)) {
+					$message_struct['footer'] .= $additional_details;
+				}
+
+				$user_object = $w->Auth->getUser($user);
+				if (!empty($object->assignee_id)) {
+					if ($user_object->id == $object->assignee_id) {
+						$message_struct['fields']["Assigned to"] = "You (" . $object->getAssignee()->getFullName() . ")";
+					} else {
+						$message_struct['fields']["Assigned to"] = !empty($object->assignee_id) ? $object->getAssignee()->getFullName() : '';
+					}
+				} else {
+					$message_struct['fields']["Assigned to"] = "No one";
+				}
+
+				$attachments = $w->File->getAttachmentsFileList($object);
+				$message = $w->Template->render($template, $message_struct);
+				if (!$logged_in_user || $logged_in_user->id !== $user_object->id) {
+					$w->Mail->sendMail(
+						$user_object->getContact()->email, 
+						!empty($logged_in_user->id) ? $logged_in_user->getContact()->email : Config::get('main.company_support_email'),
+						$subject, $message, null, null, $attachments
+					);
+				}
+
+				// Add message to inbox (needed?) but dont send an email
+				$w->Inbox->addMessage($subject, $message, $user, null, null, false);
+			}
+		} else {
+			// Fallback to old style
+			$w->Log->error("Task notification email template not found (Category: 'notificiation_email')");
+			foreach ($users_to_notify as $user) {
+				$message = "<b>" . $event_title . " [" . $object->id . "]</b><br/>\n";
+				$message .= "<p>A new task has been created</p>";
+
+				$message .= "<p><b>Subject:</b> " . $object->title . "</p>";
+				$message .= "<p><b>Body:</b>" . $object->description . "</p>";
+
+				// Get additional details
+				$message .= $w->Task->getNotificationAdditionalDetails($object);
+
+				$user_object = $w->Auth->getUser($user);
+				$message .= "<br/><p>Access the task here: " . $object->toLink(null, null, $user_object) . "</p>";
+				$message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
+							$attachments = $w->File->getAttachmentsFileList($object);
 			
-			if (!$logged_in_user || $logged_in_user->id !== $user_object->id) {
-				$w->Mail->sendMail(
-					$user_object->getContact()->email, 
-					!empty($logged_in_user->id) ? $logged_in_user->getContact()->email : Config::get('main.company_support_email'),
-					$subject, $message, null, null, $attachments
-				);
+				if (!$logged_in_user || $logged_in_user->id !== $user_object->id) {
+					$w->Mail->sendMail(
+						$user_object->getContact()->email, 
+						!empty($logged_in_user->id) ? $logged_in_user->getContact()->email : Config::get('main.company_support_email'),
+						$subject, $message, null, null, $attachments
+					);
+				}
+				
+				// Add message to inbox (needed?) but dont send an email
+				$w->Inbox->addMessage($subject, $message, $user, null, null, false);
 			}
 			
 			// Add message to inbox (needed?) but dont send an email

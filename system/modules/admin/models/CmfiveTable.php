@@ -28,6 +28,7 @@ class Table extends \Phinx\Db\Table {
 		// is_deleted
 		if (!in_array("is_deleted", $exclude)) {
 			$this->addBooleanColumn("is_deleted", false, 0);
+			$this->addIndex('is_deleted');
 		}
 
 		return $this;
