@@ -60,9 +60,7 @@ class MailService extends DbService {
      * @return string current email batch id
      */
     public function getCurrentBatchId () {
-        return $this->_db->sql('SELECT id FROM mail_batch WHERE dt_created = '
-                . '(SELECT MIN(dt_created) FROM mail_batch WHERE is_deleted = 0 AND status = "Active") '
-                . 'AND is_deleted = 0 '
+        return $this->_db->sql('SELECT id FROM mail_batch WHERE is_deleted = 0 '
                 . 'AND status = "Active" LIMIT 1')->fetch_row();
     }
     

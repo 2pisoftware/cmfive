@@ -34,7 +34,8 @@ class MailQueue extends DbObject {
         if (empty($to_contact)) {
             throw new Exception('No contact found for reciever id.');
         }       
-        $from_contact = $this->w->auth->user($batch->user_to_notify)->getContact();
+        $from_contact = $this->w->auth->getUser($batch->user_to_notify)->getContact();
+//        $this->w->Log->debug(" bulk email from contact: " . var_dump($from_contact) . ' ' . print_r($from_contact));
         if (empty($from_contact)) {
             throw new Exception('No contact found for sender id');
         }      
