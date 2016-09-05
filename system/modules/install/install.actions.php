@@ -70,8 +70,8 @@ function index_ALL(Web $w) {
         if(isset($nextInstallStep))
         {
             $nextInstallStep->clearInstallErrors(); // has to be cleared before partial templates are displayed
-            $form_action = DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR .
-                            $next_step . DIRECTORY_SEPARATOR . $nextInstallStep->getStepName();
+            $form_action = DS . 'install' . DS .
+                            $next_step . DS . $nextInstallStep->getStepName();
         
             if(empty($form_action))
             {
