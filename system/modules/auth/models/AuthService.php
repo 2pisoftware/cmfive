@@ -4,7 +4,6 @@ class AuthService extends DbService {
 
     public $_roles;
     public $_roles_loaded = false;
-    public $_user = null;
     public $_rest_user = null;
 	private static $_cache = array();
 
@@ -42,10 +41,6 @@ class AuthService extends DbService {
         $user->updateLastLogin();
         $this->w->session('user_id', $user->id);
     }
-    
-    function loginLocalUser() {
-        
-    }
 
     function __init() {
         $this->_loadRoles();
@@ -68,16 +63,24 @@ class AuthService extends DbService {
         $this->_rest_user = $user;
     }
 
+    /**
+     * Return the logged in user based on the session variable user_id.
+     * 
+     * If a user has been set from a REST service, then that user will
+     * be returned.
+     * 
+     * @return User|NULL
+     */
     function user() {
         // special case where RestService handles authentication
         if ($this->_rest_user) {
             return $this->_rest_user;
         }
         // normal session based authentication
-        if (!$this->_user && $this->loggedIn()) {
-            $this->_user = $this->getObject("User", $this->w->session('user_id'));
+        if ($this->loggedIn()) {
+            return $this->getObject("User", $this->w->session('user_id'));
         }
-        return $this->_user;
+        return null;
     }
 
     /**
