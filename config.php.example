@@ -81,3 +81,8 @@ Config::append('system.rest_allow',array(
     "User",
     "Contact"
 ));
+
+if (file_exists("config.override.php")) {
+    include ("config.override.php");
+}
+
