@@ -360,6 +360,7 @@ MIGRATION;
 	public function installInitialMigration() {
 		$migration = "AdminInitialMigration";
 		$filename = "20151030134124-AdminInitialMigration.php";
+		
 		$directory = SYSTEM_MODULE_DIRECTORY . DS . "admin" . DS . MIGRATION_DIRECTORY;
 		
 		$mysql_adapter = new \Phinx\Db\Adapter\MysqlAdapter([
@@ -387,6 +388,7 @@ MIGRATION;
 				$migration_object->path = $directory . DS . $filename;
 				$migration_object->classname = $migration;
 				$migration_object->module = "admin";
+				$migration_object->batch = 1;
 				$migration_object->dt_created = time();
 				$migration_object->creator_id = 1;
 				$migration_object->insert();

@@ -47,8 +47,8 @@
                                 foreach($steps as $i => $title)
                                 {
                                     echo "                            <li" . ($step >= intval($i) ? " class='complete'" : "") . ">\n" .
-                                         "                                <a href='" . DIRECTORY_SEPARATOR .
-                                         "install" . DIRECTORY_SEPARATOR .  $i . DIRECTORY_SEPARATOR . $title . "'>" .
+                                         "                                <a href='" . DS .
+                                         "install" . DS .  $i . DS . $title . "'>" .
                                                 $i . ". " . ucwords(str_replace('-', ' ', $title)) .
                                          "</a>\n" .
                                          "                            </li>\n";

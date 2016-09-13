@@ -218,9 +218,9 @@ class InstallService
     
     function findSteps()
     {
-        $install_dir = SYSTEM_PATH . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR;
-        $actions_dir = $install_dir . DIRECTORY_SEPARATOR . "actions" . DIRECTORY_SEPARATOR;
-        $template_dir = $install_dir . DIRECTORY_SEPARATOR . "templates";
+        $install_dir = SYSTEM_PATH . DS . 'modules' . DS . 'install' . DS;
+        $actions_dir = $install_dir . DS . "actions" . DS;
+        $template_dir = $install_dir . DS . "templates";
         
         // dynamically generate the steps, in order, based on which php template files exist
         $steps = array();
