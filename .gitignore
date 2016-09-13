@@ -13,3 +13,6 @@ cache/
 phpMyAdmin/
 modules/webdav
 modules/wiki
+storage
+config.override.php
+
