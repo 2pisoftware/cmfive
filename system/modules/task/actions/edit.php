@@ -100,6 +100,8 @@ function edit_GET($w) {
     } else {
     	History::add("Task: {$task->title}", null, $task);
     }
+    
+    
     $w->ctx("task", $task);
     $w->ctx("form", Html::multiColForm($form, $w->localUrl("/task/edit/{$task->id}"), "POST", "Save", "edit_form", "prompt", null, "_self", true, Task::$_validation));
    
