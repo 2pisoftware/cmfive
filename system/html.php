@@ -560,7 +560,7 @@ class Html {
             foreach ($rows as $row) {
                 
                 // Print each field
-                $fieldCount = !empty($row) ? count(array_filter($row)) : 1;
+                $fieldCount = count($row);
                 $buffer .= "<ul class='small-block-grid-1 medium-block-grid-{$fieldCount} section-body'>";
                 
 				if (empty($row)) {
