@@ -168,8 +168,10 @@ class Task extends DbObject {
     function canISetRate() {
         $user = $this->w->auth->User();
         $taskgroup = $this->getTaskGroup();
-        if ($user->is_admin == 1 || $taskgroup->isOwner($user)) {
-            return true;
+        if (!empty($taskgroup) && !empty($user)) {
+            if ($user->is_admin == 1 || $taskgroup->isOwner($user)) {
+                return true;
+            }
         }
         return false;
     }
