@@ -26,6 +26,7 @@ class Task extends DbObject {
     public $is_deleted;  // is_deleted flag
     public $_modifiable;  // Modifiable Aspect
     public $_searchable;
+    public $rate; //rate used for calculating invoice values
     public static $_validation = array(
         "title" => array('required'),
         "task_group_id" => array('required'),
@@ -158,6 +159,21 @@ class Task extends DbObject {
 
         $group = $this->Task->getTaskGroup($this->task_group_id);
         return $this->Task->getMyPerms($me->role, $group->can_view);
+    }
+    
+    /**
+     * used to hide the rate field
+     * @return boolean 
+     */
+    function canISetRate() {
+        $user = $this->w->auth->User();
+        $taskgroup = $this->getTaskGroup();
+        if (!empty($taskgroup) && !empty($user)) {
+            if ($user->is_admin == 1 || $taskgroup->isOwner($user)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
