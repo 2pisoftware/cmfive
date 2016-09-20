@@ -74,7 +74,8 @@ class Web {
     public $db;
     public $_isFrontend = false;
     public $_is_installing = false;
-    
+    public $_is_head_request = false;
+	
     private $_classdirectory; // used by the class auto loader
 
     public $_scripts = array();
@@ -447,6 +448,12 @@ class Web {
         // or just <action>_<type>()
 
         $this->_requestMethod = array_key_exists('REQUEST_METHOD',$_SERVER) ? $_SERVER['REQUEST_METHOD'] : '';
+		
+		if ($this->_requestMethod === "HEAD") {
+			$this->_is_head_request = true;
+			$this->_requestMethod = "GET";
+		}
+		
         $actionmethods[] = $this->_action . '_' . $this->_requestMethod;
         $actionmethods[] = $this->_action . '_ALL';
         $actionmethods[] = 'default_ALL';
@@ -537,6 +544,12 @@ class Web {
                     $this->header($key . ': ' . $val);
                 }
             }
+			
+			// If a HEAD request was sent, no body is required but it behaves like a GET
+			if ($this->_is_head_request === true) {
+				return;
+			}
+			
             $body = null;
             // evaluate template only when buffer is empty
             if (sizeof($this->_buffer) == 0) {
@@ -554,7 +567,8 @@ class Web {
             } else {
                 $this->_buffer = $body;
             }
-            echo $this->_buffer;
+			
+			echo $this->_buffer;
         } else {
             $this->notFoundPage();
         }
@@ -1683,7 +1697,7 @@ class Web {
 		
         // There was a massive bug here, using == over === is BAD as $x == null
         // will be true for 0, "", null, false, etc. keep this in mind
-        if ($value === null) {
+        if ($value === null && func_num_args() === 1) {
             return !empty($this->_context[$key]) ? $this->_context[$key] : null;
         } else {
             if ($append) {
@@ -1698,12 +1712,24 @@ class Web {
      * get/put a session value
      */
     function session($key, $value = null) {
-        if ($value == null) {
-            return !empty($_SESSION[$key]) ? $_SESSION[$key] : null;
-        } else {
-            $_SESSION[$key] = $value;
-        }
+		if ($value !== null) {
+			$_SESSION[$key] = $value;
+		}
+        
+		return array_key_exists($key, $_SESSION) ? $_SESSION[$key] : null;
     }
+	
+	/**
+	 * This function will retrieve data from session, but will also try to 
+	 * update the value from the request function first, if both are null then
+	 * it will assign $default to the session $key
+	 * 
+	 * @param string $key
+	 * @param mixed $default
+	 */
+	function sessionOrRequest($key, $default = null) {
+		return $this->session($key, $this->request($key, !is_null($this->session($key)) ? $this->session($key) : $default));
+	}
 
     function sessionUnset($key) {
         unset($_SESSION[$key]);
@@ -1758,7 +1784,10 @@ class Web {
     }
     
     /**
-     *  Allow stubbing of global header function for unit tets
+     * Wrapper for PHP header function
+	 * 
+	 * @param string $string
+	 * @return null
      */
     function header($string) {
 		header($string);
@@ -1878,6 +1907,7 @@ class Web {
 	 */
     function checkUrl($url,$module,$submodule,$action) {
     	$p=$this->parseUrl($url);
+		
     	if (empty($p) || empty($module)) {
     		return false;
     	}

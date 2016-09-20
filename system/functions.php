@@ -75,24 +75,14 @@ function isNumber($var) {
 
 function defaultVal($val, $default = null, $forceNull = false) {
     // Experiment to see if we can easily remove the strict standards
-    // errors with a small function      
-    if (empty($default)) {
-        if (empty($val)) {
-            return null;
-        } else {
-            return $val;
-        }
-    } else if (empty($val)) {
+    // errors with a small function
+    if (isset($default) && is_null($default)) {
+        return $val;
+    } else if (is_null($val)) {
         return $default;
     }
 
-    // The above more of less emulates below but using empty we can test
-    // for isset, which below doesn't and is the cause of most of the strict
-    // standards errors
-    if ($forceNull) {
-        return $val === null ? $default : $val;
-    }
-    return $val ? $val : $default;
+	return $val;
 }
 
 /**
@@ -698,4 +688,38 @@ function cast($destination, $sourceObject) {
         }
     }
     return $destination;
+}
+
+/**
+ * Deletes string between $beginning and $end inclusive from $string
+ * 
+ * From: http://stackoverflow.com/questions/13031250/php-function-to-delete-all-between-certain-characters-in-string
+ * 
+ * Adapted to do multiple passes over the same string to remove more than once
+ * instance of $beginning and $end.
+ * 
+ * @param string $beginning
+ * @param string $end
+ * @param string $string
+ * @return string
+ */
+function delete_all_between($beginning, $end, $string, $remove_every_instance = false) {
+	$beginningPos = strpos($string, $beginning);
+	$endPos = strpos($string, $end);
+
+	if ($beginningPos === false || $endPos === false) {
+		return $string;
+	}
+	
+	if (!$remove_every_instance) {
+		return trim(str_replace(substr($string, $beginningPos, ($endPos + strlen($end)) - $beginningPos), '', $string));
+	} else {
+		while(($beginningPos !== FALSE && $endPos !== FALSE)) {
+			$string = trim(str_replace(substr($string, $beginningPos, ($endPos + strlen($end)) - $beginningPos), '', $string));
+			$beginningPos = strpos($string, $beginning);
+			$endPos = strpos($string, $end);
+		}
+		
+		return $string;
+	}
 }

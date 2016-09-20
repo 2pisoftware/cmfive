@@ -265,11 +265,12 @@ class FileService extends DbService {
 	 */	
 	function getAttachmentsFileList($objectOrTable, $id = null) {
 		$attachments = $this->getAttachments($objectOrTable, $id);
+                
 		if (!empty($attachments)) {
 			$pluck = array();
-			array_reduce($attachments, function(&$pluck, $attachment) {
-				$pluck[] = $attachment->fullpath;
-			});
+			foreach ($attachments as $attachment) {
+                            $pluck[] = $attachment->getFilePath() . "/" . $attachment->filename;
+			}
 			return $pluck;
 		}
 		return array();
@@ -295,7 +296,45 @@ class FileService extends DbService {
 		}
 		return null;
 	}
-
+	
+	/**
+	 * Counts attachments for a given object/table and id
+	 * 
+	 * @param Mixed $objectOrTable
+	 * @param int (option) $id
+	 * @return int
+	 */
+	function countAttachments($objectOrTable, $id = null) {
+		if (is_scalar($objectOrTable)) {
+			$table = $objectOrTable;
+		} elseif (is_a($objectOrTable, "DbObject")) {
+			$table = $objectOrTable->getDbTableName();
+			$id = $objectOrTable->id;
+		}
+		
+		if ($table && $id) {
+			return $this->_db->get("attachment")->where("parent_table", $table)->and("parent_id", $id)->and("is_deleted", 0)->count();
+		}
+		
+		return 0;
+	}
+	
+	/**
+	 * Counts attachments for a given object/table and id
+	 * 
+	 * @param Mixed $objectOrTable
+	 * @param int (option) $id
+	 * @return int
+	 */
+	function countAttachmentsForUser($object, $user) {
+		if (empty($object) || empty($user) || !is_a($object, "DbObject")) {
+			return 0;
+		}
+		
+		return $this->_db->get("attachment")->where('creator_id', $user->id)
+				->and("parent_table", $object->getDbTableName())->and("parent_id", $object->id)->and("is_deleted", 0)->count();
+	}
+	
 	/**
 	 * Load a single attachment
 	 * 

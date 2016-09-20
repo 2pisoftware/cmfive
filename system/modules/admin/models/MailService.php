@@ -55,5 +55,48 @@ class MailService extends DbService {
 		}
 		
     }
-
+    
+    /**
+     * @return string current email batch id
+     */
+    public function getCurrentBatchId () {
+        return $this->_db->sql('SELECT id FROM mail_batch WHERE is_deleted = 0 '
+                . 'AND status = "Active" LIMIT 1')->fetch_row();
+    }
+    
+    /**
+     * 
+     * @return object MailBatch
+     */
+    public function getBatchForId($batch_id) {
+        return $this->getObject('MailBatch', $batch_id);
+    }
+    
+    /**
+     * 
+     * @return array emailbatch
+     */
+    public function getAllEmailBatches () {
+        return $this->getObjects('MailBatch', ['is_deleted'=>0]);
+    }
+    
+    /**
+     * 
+     * @param Integer $batch_id
+     * @param Integer $number number of queued emails to return 
+     * @return array of EmailQueue ids
+     */
+    public function getNextEmailsForBatch($batch_id, $number) {
+        return $this->_db->sql('SELECT id FROM mail_queue WHERE batch_id = ' . $batch_id . ' AND is_deleted = 0 ORDER BY dt_created LIMIT ' . $number)->fetch_all();
+    
+    }
+    
+    /**
+     * 
+     * @param Integer $email_id 
+     * @return obj MailQueue
+     */
+    public function getQueueObjForId($email_id) {
+        return $this->getObject('MailQueue', $email_id);
+    }
 }

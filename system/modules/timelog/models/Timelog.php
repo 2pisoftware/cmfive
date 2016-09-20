@@ -18,9 +18,7 @@ class Timelog extends DbObject {
     public static $_validation = array(
         "object_class" => array('required'),
         "object_id" => array('required'),
-        "dt_start" => array('required'),
-//        "dt_end" => array('÷required'),
-        // "time_type" => array('required') Only required in some cases??!!
+        "dt_start" => array('required')
     );    
 
 	public function isRunning() {
@@ -42,6 +40,13 @@ class Timelog extends DbObject {
 		return null;
 	}
 	
+	public function getTimeEnd() {
+		if (!empty($this->dt_end)) {
+			return date('H:i', $this->dt_end);
+		}
+		return null;
+	}
+	
 	public function getHoursWorked() {
 		if (!empty($this->dt_end)) {
 			$date_time_diff = $this->dt_end - $this->dt_start;
@@ -54,7 +59,7 @@ class Timelog extends DbObject {
 		if (!empty($this->dt_end)) {
 			$date_time_diff = $this->dt_end - $this->dt_start;
 			$date_time_diff -= intval($date_time_diff / 3600) * 3600;
-			return $date_time_diff / 60;
+			return round($date_time_diff / 60);
 		}
 		return null;
 	}
@@ -75,7 +80,7 @@ class Timelog extends DbObject {
 	}
 
     public function getDuration() {
-        if (!empty($this->dt_start) and !empty($this->dt_end)) {
+        if (!empty($this->dt_start) && !empty($this->dt_end)) {
             return ($this->dt_end - $this->dt_start);
         }
     }
@@ -149,6 +154,8 @@ class Timelog extends DbObject {
 	public function update($force_null_values = false, $force_validation = true) {
 		if ($this->w->Auth->user()->is_admin) {
 			$this->user_id = !empty($_POST['user_id']) ? intval($_POST['user_id']) : $this->w->Auth->user()->id;
+		} else {
+			$this->user_id = $this->w->Auth->user()->id;
 		}
 		
 		parent::update($force_null_values, $force_validation);

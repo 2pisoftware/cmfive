@@ -6,12 +6,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="shortcut icon" href="/system/templates/img/favicon.ico" type="image/x-icon"/>
         <title><?php echo ucfirst($w->currentModule()); ?><?php echo!empty($title) ? ' - ' . $title : ''; ?></title>
-<!--        <link rel="icon" href="<?php // echo WEBROOT; ?>/templates/img/favicon.png" type="image/png"/>-->
 
         <?php
         $w->enqueueStyle(array("name" => "normalize.css", "uri" => "/system/templates/js/foundation-5.5.0/css/normalize.css", "weight" => 1010));
         $w->enqueueStyle(array("name" => "foundation.css", "uri" => "/system/templates/js/foundation-5.5.0/css/foundation.css", "weight" => 1005));
         $w->enqueueStyle(array("name" => "style.css", "uri" => "/system/templates/css/style.css", "weight" => 1000));
+		$w->enqueueStyle(array("name" => "print.css", "uri" => "/system/templates/css/print.css", "weight" => 995));
         $w->enqueueStyle(array("name" => "tablesorter.css", "uri" => "/system/templates/css/tablesorter.css", "weight" => 990));
         $w->enqueueStyle(array("name" => "datePicker.css", "uri" => "/system/templates/css/datePicker.css", "weight" => 980));
         $w->enqueueStyle(array("name" => "jquery-ui-1.8.13.custom.css", "uri" => "/system/templates/js/jquery-ui-new/css/custom-theme/jquery-ui-1.8.13.custom.css", "weight" => 970));
@@ -49,7 +49,7 @@
         $w->outputScripts();
         ?>
         <script type="text/javascript">
-            var $ = jQuery;
+            var $ = $ || jQuery;
             $(document).ready(function() {
 				
 				// Focus first field
@@ -108,6 +108,16 @@
 				if(jQuery('.enable_drop_attachments').length !== 0) {
 					globalFileUpload.init();
 				}
+				
+				// Look for cmfive__count-* classes and count the instances of *
+				$("span[class^='cmfive__count-'], span[class*=' cmfive__count-']").each(function(index, element) {
+					var classList = this.className.split(/\s+/);
+					for(var i in classList) {
+						if (classList[i].indexOf('cmfive__count-') > -1) {
+							$(this).text($('.' + classList[i].substring(classList[i].indexOf('-') + 1)).length);
+						}
+					}
+				});
             });
 
             // Try and prevent multiple form submissions
@@ -235,7 +245,11 @@
 												$hook_navigation_items = $w->callHook($module, "extra_navigation_items", $module_navigation);
 												if (!empty($hook_navigation_items)) {
 													foreach($hook_navigation_items as $hook_navigation_item) {
-														$module_navigation[] = $hook_navigation_item[0];
+														if (is_array($hook_navigation_item)) {
+															$module_navigation = array_merge($module_navigation, $hook_navigation_item);
+														} else {
+															$module_navigation[] = $hook_navigation_item;
+														}
 													}
 												}
 												echo Html::ul($module_navigation, null, "dropdown"); ?>

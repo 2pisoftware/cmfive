@@ -16,8 +16,11 @@ abstract class Element {
 	public function __construct($fields = []) {
 		if (!is_null($fields) && is_array($fields) && count($fields) > 0) {
 			foreach($fields as $key => $value) {
-				if (property_exists($this, $key)) {
-					$this->{$key} = $value;
+				$keys = explode('|', $key);
+				foreach($keys as $field_key) {
+					if (property_exists($this, $field_key)) {
+						$this->{$field_key} = $value;
+					}
 				}
 			}
 		}

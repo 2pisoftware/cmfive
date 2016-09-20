@@ -27,10 +27,46 @@ class Select extends \Html\Form\FormElement {
 		"options"
 	];
 	
+	/**
+	 * The options for this select class is a special case, but we want to 
+	 * invoke the setOptions function to convert them so that the output will
+	 * still work.
+	 * 
+	 * @param array $fields
+	 */
+	public function __construct($fields = array()) {
+		// Check for options being set
+		if (array_key_exists('options', $fields)) {
+			$this->setOptions($fields['options']);
+			unset($fields['options']);
+		}
+		
+		// Check for given selected option
+		if (array_key_exists('selected_option', $fields)) {
+			$this->setSelectedOption($fields['selected_option']);
+			unset($fields['selected_option']);
+		}
+		
+		parent::__construct($fields);
+	}
+	
 	// Cmfive setters
 	
 	/**
-	 * This helper function is designed
+	 * This helper function is designed to add \Html\Form\Option objects to
+	 * a local array to be printed via __toString(). 
+	 * 
+	 * You can give a list of objects in multiple ways:
+	 * 1. An array of \Html\Form\Option objects
+	 * 2. An array of DbObjects
+	 * 3. An array with (at least) "label" and "value" keys
+	 * 4. The old select style, an indexed array with key 0 as the label, and 
+	 *		key 1 as the option value
+	 * 5. A string, this will be used for both the option value and label so
+	 *		use caution!
+	 * 
+	 * If the given option doesn't match one of the above use cases then it 
+	 * will be ignored.
 	 * 
 	 * @param Array $options
 	 * @return \Html\Form\Select this
@@ -38,7 +74,26 @@ class Select extends \Html\Form\FormElement {
 	public function setOptions($options = []) {
 		if (!is_null($options) && is_array($options) && count($options) > 0) {
 			foreach($options as $option) {
-				array_push($this->options, new Option($option));
+				// Check for \Html\Form\Option
+				if (is_a($option, "\Html\Form\Option")) {
+					array_push($this->options, $option);
+				} else if (is_a($option, "DbObject")) {
+					// Check for DbObject
+					array_push($this->options, new Option(["value" => $option->getSelectOptionValue(), "label" => $option->getSelectOptionTitle()]));
+				} else if (count($option) >= 2) {
+					// Check for standard Option format
+					if (array_key_exists("label", $option) && array_key_exists("value", $option)) {
+						array_push($this->options, new Option($option));
+					} else if (count($option) == 2) {
+						// Check for old (bad) style
+						array_push($this->options, new Option(["value" => $option[1], "label" => $option[0]]));
+					}
+				} else if (is_scalar ($option)) {
+					// Check for string option
+					array_push($this->options, new Option(["label" => $option, "value" => $option]));
+				} else {
+					// Doesn't match a required format, is ignored
+				}
 			}
 		}
 		
@@ -171,4 +226,23 @@ class Select extends \Html\Form\FormElement {
 		return $this;
 	}
 	
+	/**
+	 * This function is a custom Cmfive helper function designed to alter the
+	 * Options selected marker based on the given $option_value.
+	 * 
+	 * @param string $option_value
+	 * @return \Html\Form\Select $this
+	 */
+	public function setSelectedOption($option_value = null) {
+		if (!empty($this->options) && !is_null($option_value)) {
+			foreach($this->options as &$option) {
+				if ($option->value === $option_value) {
+					$option->setSelected("selected");
+					break;
+				}
+			}
+		}
+		
+		return $this;
+	}
 }

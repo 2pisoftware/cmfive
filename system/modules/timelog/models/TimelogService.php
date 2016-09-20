@@ -47,10 +47,34 @@ class TimelogService extends DbService {
 		}
 	}
 	
+	/**
+	 * Returns number of timelogs for a given object
+	 * 
+	 * @param DbObject $object
+	 * @return int
+	 */
+	public function countTimelogsForObject($object) {
+		if (!empty($object->id)) {
+			return $this->w->db->get('timelog')->where("object_class", get_class($object))->where("object_id", $object->id)
+						->where('is_deleted', 0)->count();
+		}
+		return 0;
+	}
+	
 	public function getTimelogsForObjectByClassAndId($object_class, $object_id) {
 		if (!empty($object_class) || !empty($object_id)) {
-			return $this->getObjects("Timelog", ["object_class" => $object_class, "object_id" => $object_id, "is_deleted" => 0]);
+			return $this->getObjects("Timelog", ["object_class" => $object_class, "object_id" => $object_id, "is_deleted" => 0], false, true, "dt_start ASC");
 		}
+	}
+	
+	public function countTimelogsForUserAndObject($user, $object) {
+		if (!empty($user) && !empty($object) && is_a($object, 'DbObject')) {
+			return $this->w->db->get('timelog')->where('user_id', $user->id)
+					->where("object_class", get_class($object))
+					->where("object_id", $object->id)
+					->where('is_deleted', 0)->count();
+		}
+		return 0;
 	}
 	
 	/**

@@ -21,7 +21,7 @@ class ConfigService extends DbService {
 		if (file_exists($template_path)) {
 			$dir = dirname($template_path);
 			$loader = new Twig_Loader_Filesystem($dir);
-			$template = str_replace($dir . DIRECTORY_SEPARATOR, "", $template_path);
+			$template = str_replace($dir . DS, "", $template_path);
 		} else {
 			$loader = new Twig_Loader_String();
 			$template = $template_path;

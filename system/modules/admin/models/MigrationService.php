@@ -8,6 +8,7 @@ defined('SYSTEM_MODULE_DIRECTORY') || define('SYSTEM_MODULE_DIRECTORY', 'system'
 class MigrationService extends DbService {
 	
 	public static $_installed = []; 
+	public static $_NEXT_BATCH;
 	
 	public function getAvailableMigrations($module_name) {
 		$_this = $this;
@@ -219,7 +220,7 @@ MIGRATION;
 								$this->w->Log->setLogger("MIGRATION")->info("Running migration: " . $migration);
 
 								// Run migration UP
-								$migration_class = new $migration(1);
+								$migration_class = (new $migration(1))->setWeb($this->w);
 								$migration_class->setAdapter($mysql_adapter);
 								$migration_class->up();
 
@@ -228,7 +229,7 @@ MIGRATION;
 								$migration_object->path = $migration_path;
 								$migration_object->classname = $migration;
 								$migration_object->module = strtolower($module);
-								$migration_object->batch = $migration_object->getNextBatchNumber();
+								$migration_object->batch = $this->getNextBatchNumber();
 								$migration_object->insert();
 								
 								$runMigrations++;
@@ -249,6 +250,15 @@ MIGRATION;
 		} else {
 			return "No migrations to run!";
 		}
+	}
+	
+	public function getNextBatchNumber() {
+		if (empty($this->_NEXT_BATCH)) {
+			$current_no = $this->w->db->get("migration")->select()->select("batch")->orderBy("batch DESC")->limit("1")->fetch_element("batch");
+			$this->_NEXT_BATCH = !empty($current_no) ? $current_no + 1 : 1;
+		}
+		
+		return $this->_NEXT_BATCH;
 	}
 	
 	/**
@@ -333,7 +343,7 @@ MIGRATION;
 	public function batchRollback() {
 		
 		// Get latest batch
-		$batch_no = (new Migration($this->w))->getNextBatchNumber() - 1;
+		$batch_no = ($this->getNextBatchNumber() - 1);
 		
 		$migrations = $this->getObjects("Migration", ["batch" => $batch_no]);
 		$migrations_rolled_back = 0;
@@ -350,6 +360,7 @@ MIGRATION;
 	public function installInitialMigration() {
 		$migration = "AdminInitialMigration";
 		$filename = "20151030134124-AdminInitialMigration.php";
+		
 		$directory = SYSTEM_MODULE_DIRECTORY . DS . "admin" . DS . MIGRATION_DIRECTORY;
 		
 		$mysql_adapter = new \Phinx\Db\Adapter\MysqlAdapter([
@@ -377,6 +388,7 @@ MIGRATION;
 				$migration_object->path = $directory . DS . $filename;
 				$migration_object->classname = $migration;
 				$migration_object->module = "admin";
+				$migration_object->batch = 1;
 				$migration_object->dt_created = time();
 				$migration_object->creator_id = 1;
 				$migration_object->insert();

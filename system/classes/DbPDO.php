@@ -123,8 +123,18 @@ class DbPDO extends PDO {
                 // Resets the where part of the statement
                 $this->query = $this->query->where(null);
             } else {
-                if (is_array($column) || is_null($equals)){
+                if (is_array($column)){
                     $this->query = $this->query->where($column);
+				} else if (is_null($equals)) {
+					switch(func_num_args()) {
+						case 2:
+							$this->query = $this->query->where($column, null);
+							break;
+						case 1:
+						default:
+							$this->query = $this->query->where($column);
+							break;
+					}					
                 } else {
                     $this->query = $this->query->where($column, $equals);
                 }
@@ -266,6 +276,38 @@ class DbPDO extends PDO {
         $this->query = $this->fpdo->deleteFrom($table_name);
         return $this;
     }
+	
+	/**
+	 * Helper functions to help with sorting and pagination
+	 */
+	
+	/**
+	 * Paginates data, pages are expected to start at 1
+	 * 
+	 * @param int $page
+	 * @param int $page_size
+	 * @return \DbPDO
+	 */
+	public function paginate($page = null, $page_size = null) {
+		if ($this->query && !is_null($page) && !is_null($page_size) && is_numeric($page) && is_numeric($page_size)) {
+			$this->query = $this->query->offset(($page - 1) * $page_size)->limit($page_size);
+		}
+		return $this;
+	}
+	
+	/**
+	 * Sorts data
+	 * 
+	 * @param string $sort_field
+	 * @param string $sort_direction
+	 * @return \DbPDO
+	 */
+	public function sort($sort_field = null, $sort_direction = null) {
+		if (!is_null($this->query) && !is_null($sort_field) && !is_null($sort_direction) && in_array(strtolower($sort_direction), ['asc', 'desc'])) {
+			$this->query = $this->query->orderBy($sort_field . ' ' . $sort_direction);
+		}
+		return $this;
+	}
     
     /**
      * Magic method call so we can use reserved words in this class

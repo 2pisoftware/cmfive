@@ -1,5 +1,11 @@
 <?php
 
+//load form elements for required feilds
+use \Html\Form\InputField as InputField;
+use \Html\Form\Select as Select;
+use \Html\Form\Autocomplete as Autocomplete;
+
+
 function edit_GET($w) {
     $p = $w->pathMatch("id");
     $task = (!empty($p["id"]) ? $w->Task->getTask($p["id"]) : new Task($w));
@@ -10,7 +16,7 @@ function edit_GET($w) {
     if (!empty($task->id) && !$task->canView($w->Auth->user())) {
         $w->error("You do not have permission to edit this Task", "/task/tasklist");
     }
-    
+	
     // Get a list of the taskgroups and filter by what can be used
     $taskgroups = array_filter($w->Task->getTaskGroups(), function($taskgroup){
         return $taskgroup->getCanICreate();
@@ -39,15 +45,30 @@ function edit_GET($w) {
     
     // Create form
     $form = array(
-        (!empty($p["id"]) ? 'Edit task [' . $task->id . '] - Created: ' . formatDate($task->_modifiable->getCreatedDate()) : "Create a new task") => array(
+        (!empty($p["id"]) ? 'Edit task' : "Create a new task") => array(
             array(
-				!empty($p["id"]) ?
-                        array("Task Group", "text", "-task_group_id_text", $taskgroup->title) :
-                        array("Task Group", "autocomplete", "task_group_id", !empty($task->task_group_id) ? $task->task_group_id : $taskgroup_id, $taskgroups),
-                !empty($p["id"]) ?
-                        array("Task Type", "select", "-task_type", $task->task_type, $tasktypes) :
-                        //array("Task Type", "select", "task_type", $task->task_type, $tasktypes)
-                        array("Task Type", "select", "task_type", (sizeof($tasktypes) === 1) ? $tasktypes[0] : null, $tasktypes)
+                (new Autocomplete())
+                    ->setLabel("Task Group <small>Required</small>")
+                    ->setName(!empty($p["id"]) ? "task_group_id_text" : "task_group_id")
+                    ->setReadOnly(!empty($p["id"]) ? 'true' : null)
+                    ->setOptions($taskgroups)
+                    ->setValue(!empty($taskgroup) ? $taskgroup->id : null)
+                    ->setTitle(!empty($taskgroup) ? $taskgroup->getSelectOptionTitle(): null)
+                    ->setRequired('required'),
+//				!empty($p["id"]) ?
+//                        array("Task Group", "text", "-task_group_id_text", $taskgroup->title) :
+//                        array("Task Group", "autocomplete", "task_group_id", !empty($task->task_group_id) ? $task->task_group_id : $taskgroup_id, $taskgroups),
+                (new Select([
+					"id|name" => "task_type"
+				]))->setLabel("Task Type <small>Required</small>")
+                    ->setDisabled(!empty($p["id"]) ? "true" : null)
+                    ->setOptions($tasktypes)
+                    ->setSelectedOption(!empty($p["id"]) ? $task->task_type : sizeof($tasktypes) === 1 ? $tasktypes[0] : null)
+                    ->setRequired('required')
+//                !empty($p["id"]) ?
+//                        array("Task Type", "select", "-task_type", $task->task_type, $tasktypes) :
+//                        //array("Task Type", "select", "task_type", $task->task_type, $tasktypes)
+//                        array("Task Type", "select", "task_type", (sizeof($tasktypes) === 1) ? $tasktypes[0] : null, $tasktypes)
             ),
             array(
                 array("Task Title", "text", "title", $task->title),
@@ -62,13 +83,13 @@ function edit_GET($w) {
             ),
 			array(
 				array("Estimated hours", "text", "estimate_hours", $task->estimate_hours),
-				array("Effort", "text", "effort", $task->effort)
+				array("Effort", "text", "effort", $task->effort),
 			),
             array(array("Description", "textarea", "description", $task->description)),
         	!empty($p['id']) ? [["Task Group ID", "hidden", "task_group_id", $task->task_group_id]] : null
         )
     );
-	
+    
 //	if (!empty($p['id'])) {
 //		$form['Edit task [' . $task->id . ']'][5][] = array("Task Group ID", "hidden", "task_group_id", $task->task_group_id);
 //	}
@@ -78,6 +99,12 @@ function edit_GET($w) {
     } else {
     	History::add("Task: {$task->title}", null, $task);
     }
+    
+    //add task rate
+    if (!empty($task->id) && $task->canISetRate()) {
+        $form['Edit task'][3][] = (new InputField())->setName('rate')->setLabel('Rate ($)')->setValue($task->rate)->setPattern('^\d+(?:\.\d{1,2})?$')->setPlaceholder('0.00');
+    }
+    
     $w->ctx("task", $task);
     $w->ctx("form", Html::multiColForm($form, $w->localUrl("/task/edit/{$task->id}"), "POST", "Save", "edit_form", "prompt", null, "_self", true, Task::$_validation));
    
@@ -85,47 +112,47 @@ function edit_GET($w) {
     // Build time log table //
     //////////////////////////
 
-    $timelog = $task->getTimeLog();
-    $total_seconds = 0;
-    
-    $table_header = array("Assignee", "Start", "Period (hours)", "Comment","Actions");
-    $table_data = array();
-    if (!empty($timelog)) {
-        // for each entry display, calculate period and display total time on task
-        foreach ($timelog as $log) {
-            // get time difference, start to end
-            $seconds = $log->dt_end - $log->dt_start;
-            $period = $w->Task->getFormatPeriod($seconds);
-			$comment = $w->Comment->getComment($log->comment_id);
-			$comment = !empty($comment) ? $comment->comment : "";
-            $table_row = array(
-                $w->Task->getUserById($log->user_id),
-                formatDateTime($log->dt_start),
-                $period,
-            	!empty($comment) ? $w->Comment->renderComment($comment) : "",
-            );
-            
-            // Build list of buttons
-            $buttons = '';
-            if ($log->is_suspect == "0") {
-                $total_seconds += $seconds;
-                $buttons .= Html::box($w->localUrl("/task/addtime/".$task->id."/".$log->id)," Edit ",true);
-            }
-
-            if ($w->Task->getIsOwner($task->task_group_id, $w->Auth->user()->id)) {
-                $buttons .= Html::b($w->localUrl("/task/suspecttime/".$task->id."/".$log->id), ((empty($log->is_suspect) || $log->is_suspect == "0") ? "Review" : "Accept"));
-            }
-            
-            $buttons .= Html::b($w->localUrl("/task/deletetime/".$task->id."/".$log->id), "Delete", "Are you sure you wish to DELETE this Time Log Entry?");
-            
-            $table_row[] = $buttons;
-            
-            $table_data[] = $table_row;
-        }
-        $table_data[] = array("<b>Total</b>", "","<b>".$w->Task->getFormatPeriod($total_seconds)."</b>","","");
-    }
-    // display the task time log
-    $w->ctx("timelog",Html::table($table_data, null, "tablesorter", $table_header));
+//    $timelog = $task->getTimeLog();
+//    $total_seconds = 0;
+//    
+//    $table_header = array("Assignee", "Start", "Period (hours)", "Comment","Actions");
+//    $table_data = array();
+//    if (!empty($timelog)) {
+//        // for each entry display, calculate period and display total time on task
+//        foreach ($timelog as $log) {
+//            // get time difference, start to end
+//            $seconds = $log->dt_end - $log->dt_start;
+//            $period = $w->Task->getFormatPeriod($seconds);
+//			$comment = $w->Comment->getComment($log->comment_id);
+//			$comment = !empty($comment) ? $comment->comment : "";
+//            $table_row = array(
+//                $w->Task->getUserById($log->user_id),
+//                formatDateTime($log->dt_start),
+//                $period,
+//            	!empty($comment) ? $w->Comment->renderComment($comment) : "",
+//            );
+//            
+//            // Build list of buttons
+//            $buttons = '';
+//            if ($log->is_suspect == "0") {
+//                $total_seconds += $seconds;
+//                $buttons .= Html::box($w->localUrl("/task/addtime/".$task->id."/".$log->id)," Edit ",true);
+//            }
+//
+//            if ($w->Task->getIsOwner($task->task_group_id, $w->Auth->user()->id)) {
+//                $buttons .= Html::b($w->localUrl("/task/suspecttime/".$task->id."/".$log->id), ((empty($log->is_suspect) || $log->is_suspect == "0") ? "Review" : "Accept"));
+//            }
+//            
+//            $buttons .= Html::b($w->localUrl("/task/deletetime/".$task->id."/".$log->id), "Delete", "Are you sure you wish to DELETE this Time Log Entry?");
+//            
+//            $table_row[] = $buttons;
+//            
+//            $table_data[] = $table_row;
+//        }
+//        $table_data[] = array("<b>Total</b>", "","<b>".$w->Task->getFormatPeriod($total_seconds)."</b>","","");
+//    }
+//    // display the task time log
+//    $w->ctx("timelog",Html::table($table_data, null, "tablesorter", $table_header));
     
     ///////////////////
     // Notifications //
@@ -185,12 +212,13 @@ function edit_POST($w) {
     }
     
     $task->fill($_POST['edit']);
+    $task->rate = $task->rate == 0 ? NULL : $task->rate;
     $task->assignee_id = intval($_POST['edit']['assignee_id']);
     if (empty($task->dt_due)) {
         $task->dt_due = $w->Task->getNextMonth();
     }
     
-    $task->insertOrUpdate();
+    $task->insertOrUpdate(true);
     
     // Tell the template what the task id is (this post action is being called via ajax)
     $w->setLayout(null);
@@ -200,7 +228,6 @@ function edit_POST($w) {
     $existing_task_data = $w->Task->getTaskData($task->id);
     if (!empty($existing_task_data)) {
         foreach($existing_task_data as $e_task_data) {
-			// Sanity cleaning to remove old task_data values that store both of the
 			// Autocomplete fields
 			if (strpos($e_task_data->data_key, \Html\Form\Autocomplete::$_prefix) === 0) {
 				$e_task_data->delete();
@@ -244,7 +271,7 @@ function edit_POST($w) {
 	if (empty($p['id']) && Config::get('task.ical.send') == true) {		
         $data = $task->getIcal();
         $user = $w->Auth->getUser($task->assignee_id);
-        $contact = $user->getContact();
+        $contact = !empty($user->id) ? $user->getContact() : $w->Auth->user()->getContact();
 
         $messageObject = Swift_Message::newInstance();
 		$messageObject->setTo(array($contact->email));

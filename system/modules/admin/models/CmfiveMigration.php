@@ -7,6 +7,13 @@ use Phinx\Db\Table\Column as Column;
 
 class CmfiveMigration extends Phinx\Migration\AbstractMigration {
 	
+	public $w;
+	
+	public function setWeb($w) {
+		$this->w = $w;
+		return $this;
+	}
+	
 	public function Column() {
 		return new Column;
 	}
@@ -59,6 +66,23 @@ class CmfiveMigration extends Phinx\Migration\AbstractMigration {
 	}
 	
 	/**
+	 * Renames a column within a table
+	 * 
+	 * @param string $table
+	 * @param string $column
+	 * @param string $datatype
+	 * @param Array $options
+	 * @return null
+	 */
+	public function renameColumnInTable($table, $old_column, $new_column) {
+		if ($this->hasTable($table)) {
+			if ($this->table($table)->hasColumn($old_column)) {
+				$this->table($table)->renameColumn($old_column, $new_column)->save();
+			}
+		}
+	}
+	
+	/**
 	 * Removes a column from a table. Takes care of checking for table/column
 	 * existance
 	 * 
@@ -103,6 +127,38 @@ class CmfiveMigration extends Phinx\Migration\AbstractMigration {
 			$update_statement_string .= " WHERE id=" . $data['id'];
 			
 			$this->execute($update_statement_string);
+		}
+	}
+	
+	/**
+	 * Checks if the table and column exists and applies an index to that given 
+	 * column if it does.
+	 * 
+	 * @param string $table
+	 * @param string $column
+	 * @return null
+	 */
+	public function addIndexToTable($table, $column) {
+		if ($this->hasTable($table)) {
+			if ($this->table($table)->hasColumn($column)) {
+				$this->table($table)->addIndex($column)->update();
+			}
+		}
+	}
+	
+	/**
+	 * Checks if the table and column exists and removes an index from that 
+	 * given column if it does.
+	 * 
+	 * @param string $table
+	 * @param string $column
+	 * @return null
+	 */
+	public function removeIndexFromTable($table, $column) {
+		if ($this->hasTable($table)) {
+			if ($this->table($table)->hasColumn($column)) {
+				$this->table($table)->removeIndex($column)->update();
+			}
 		}
 	}
 }

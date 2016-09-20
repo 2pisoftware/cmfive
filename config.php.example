@@ -81,3 +81,14 @@ Config::append('system.rest_allow',array(
     "User",
     "Contact"
 ));
+
+// Allow for docker deployment changes to added via file
+if (file_exists("config.docker.php")) {
+    include ("config.docker.php");
+}
+
+// Allow individual deployments to add config changes via a file
+if (file_exists("config.override.php")) {
+    include ("config.override.php");
+}
+

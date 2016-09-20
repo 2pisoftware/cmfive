@@ -53,7 +53,7 @@ class Html {
                     if (!is_array($column)) {
                         $buffer .= "<td>{$column}</td>";
                     } else {
-                        $buffer .= "<td " . ($column[1] === true ? "class='show-for-medium-up'" : "") . ">{$column[0]}</td>";
+                        $buffer .= "<td class='" . ($column[1] === true ? "show-for-medium-up" : (is_scalar($column[1]) ? $column[1] : '')) . "'>{$column[0]}</td>";
                     }
                 }
                 $buffer .= "</tr>";
@@ -153,9 +153,9 @@ class Html {
         return $a->__toString();
     }
 
-    public static function b($href, $title, $confirm = null, $id = null, $newtab = false, $class = null, $type = null) {
+    public static function b($href, $title, $confirm = null, $id = null, $newtab = false, $class = null, $type = null,$name = null) {
         $button = new \Html\button();
-        $button->href($href)->text($title)->confirm($confirm)->id($id)->setClass($class)->newtab($newtab)->type($type);
+        $button->href($href)->text($title)->confirm($confirm)->id($id)->setClass($class)->newtab($newtab)->type($type)->name($name);
         return $button->__toString();
     }
     /**
@@ -547,14 +547,14 @@ class Html {
         }
         
         // Set up shell layout
-        $buffer .= "<div class='row-fluid small-12 multicolform'>";
+        $buffer .= "<div class='row-fluid clearfix small-12 multicolform'>";
         
         // Print internals
         foreach ($data as $section => $rows) {
             
             // Print section header
-            $buffer .= "<div class='panel'>";
-            $buffer .= "<div class='row-fluid section-header'><h4>{$section}<span style='display: none;' class='changed_status right alert radius label'>changed</span></h4></div>";
+            $buffer .= "<div class='panel clearfix'>";
+            $buffer .= "<div class='row-fluid clearfix section-header'><h4>{$section}<span style='display: none;' class='changed_status right alert radius label'>changed</span></h4></div>";
             
             // Loop through each row
             foreach ($rows as $row) {
@@ -568,7 +568,7 @@ class Html {
 				}
 				
                 foreach($row as $field) {
-                    
+                   
 					// Check if the row is an object like an InputField
 					if (!is_array($field) && is_object($field)) {
 						if ((property_exists($field, "type") && $field->type !== "hidden") || !property_exists($field, "type")) {
@@ -966,12 +966,14 @@ class Html {
     public static function pagination($currentpage, $numpages, $pagesize, $totalresults, $baseurl, $pageparam = "p", $pagesizeparam = "ps", $totalresultsparam = "tr") {
         // See functions.php for implementation of isNumber
         // Prepare buffer
-        $buf = "<ul class='pagination'>";
+        $buf = '';
         if (isNumber($currentpage) && isNumber($numpages) && isNumber($pagesize) && isNumber($totalresults)) {
+
             // Check that we're within range
             if ($currentpage > 0 && $currentpage <= $numpages && $numpages > 1) {
-
-                // Build pagination links
+				$buf = "<ul class='pagination'>";
+                
+				// Build pagination links
                 for ($page = 1; $page <= $numpages; $page++) {
                     // Check if the current page
                     if ($currentpage == $page) {
@@ -980,17 +982,133 @@ class Html {
 						$buf .= "<li>";
 					}
 					
-					$buf .= "<a href='{$baseurl}";
-					$buf .= (strpos($baseurl, "?") == 0 ? "?" : "&");
-					$buf .= "{$pageparam}={$page}&{$pagesizeparam}={$pagesize}&{$totalresultsparam}={$totalresults}'>" . $page . "</a>";
-
-                    $buf .= "</li>";
+					$url_parsed = parse_url($baseurl);
+					
+					$url_string = $url_parsed['path'];
+					$url_string .= (empty($url_parsed['query']) ? '?' : '?' . $url_parsed['query'] . '&') . $pageparam . '=' . $page . '&' . $pagesizeparam . '=' . $pagesize . '&' . $totalresultsparam . '=' . $totalresults;
+					$url_string .= (!empty($url_parsed['fragment']) ? '#' . $url_parsed['fragment'] : '');
+					
+					$buf .= '<a href=\'' . $url_string . '\'>' . $page . '</a></li>';
                 }
+				
+				$buf .= "</ul>";
             }
         }
-        $buf .= "</ul>";
+        
         return $buf;
     }
+	
+	/**
+	 * This function creates a DataTables table, ID to identify the table, 
+	 * an array of headers and the source data url are required
+	 * 
+	 * If a table column is to be sortable, you must provide each header element
+	 * in the following format:
+	 *		[0 => "<sort column>", 1 => "<title>"]
+	 * 
+	 * @param Array $header
+	 * @param Array $data
+	 * @param int $page
+	 * @param int $page_size
+	 * @param int $total_results
+	 * @param string $base_url
+	 * @param string|optional $sort
+	 * @param string|optional $sort_direction
+	 * @param string|optional $page_query_param
+	 * @param string|optional $pagesize_query_param
+	 * @param string|optional $total_results_query_param
+	 * @param string|optional $sort_query_param
+	 */
+	public static function paginatedTable($header, $data, $page, $page_size, $total_results, $base_url, 
+			$sort = null, $sort_direction = 'asc', $page_query_param = "page", $pagesize_query_param = "page_size", 
+			$total_results_query_param = "total_results", $sort_query_param = "sort", $sort_direction_param = "sort_direction") {
+		
+		// Build URL for pagination
+		$url_parsed = parse_url($base_url);			
+		$url_string = $url_parsed['path'];
+		$url_string .= (empty($url_parsed['query']) ? "?" : '?' . $url_parsed['query'] . '&') . $sort_query_param . '=' . $sort . '&' . $sort_direction_param . '=' . $sort_direction; // . $page_query_param . '=' . $page . '&' . $pagesize_query_param . '=' . $page_size . '&' . $total_results_query_param . '=' . $total_results . '&'
+		$url_string .= (!empty($url_parsed['fragment']) ? '#' . $url_parsed['fragment'] : '');
+
+		// Generate the table
+		$num_results = $total_results;
+		if ($page_size > 0) {
+			$num_results = ceil($total_results / $page_size);
+		}
+		
+		if ($total_results == 0) {
+			return '<div class="row-fluid clearfix"><div class="small-12 medium-6 small-text-center medium-text-left columns" style="margin: 5px 0px;">No results found</div></div>';
+		}
+		
+		$count_items = count($data);
+		$starting_item = (($page - 1) * $page_size) + 1;
+		$buffer = '<div class="row-fluid clearfix">'
+					. '<div class="small-12 medium-6 small-text-center medium-text-left columns" style="margin-top: 5px;">Showing ' . $starting_item . ' - ' . ($starting_item + $count_items - 1) . ' of ' . $total_results . '</div>'
+					. '<div class="small-12 medium-6 columns">';
+		if ($num_results > 0) {
+			$buffer .= '<div class="row-fluid clearfix"><span class="small-3 medium-6 columns small-text-center medium-text-right" style="margin-top: 5px;">Page:</span><select onchange="location = this.value;" class="small-9 medium-6 columns right">';
+			// Build URL for dropdown pagination
+			$dropdown_url_string = $url_parsed['path'];
+			$dropdown_url_string .= (empty($url_parsed['query']) ? "?" : '?' . $url_parsed['query'] . '&') . $sort_query_param . '=' . $sort . '&' . $sort_direction_param . '=' . $sort_direction; // . $page_query_param . '=' . $page . '&' . $pagesize_query_param . '=' . $page_size . '&' . $total_results_query_param . '=' . $total_results . '&'
+			
+			for($i = 1; $i <= $num_results; $i++) {
+				$buffer .= '<option' . ($i == $page ? ' selected="selected"' : '') . ' value="' . $dropdown_url_string . '&' . $page_query_param . '=' . $i . (!empty($url_parsed['fragment']) ? '#' . $url_parsed['fragment'] : '') . '">' . $i . '</option>';
+			}
+			$buffer .= '</select></div>';
+		}
+		$buffer .= "</div></div>"
+				. "<div data-alert class='show-for-small alert-box'>This is a responsive table, pan left to right to view data.</div>"
+				. "<div class='row-fluid clearfix table-responsive'>"
+					. "<table class='small-12'>";
+		if (!empty($header) && is_array($header)) {
+			
+			// Print table header
+			$buffer .= "<thead><tr>";
+			foreach($header as $title) {
+				// Build optional sort url
+				$sort_asc_string = '';
+				$sort_desc_string = '';
+				if (is_array($title)) {
+					$sort_direction_asc_query = "{$sort_query_param}={$title[0]}&{$sort_direction_param}=asc";
+					$sort_direction_desc_query = "{$sort_query_param}={$title[0]}&{$sort_direction_param}=desc";
+
+					$sort_asc_string = $url_parsed['path'] . (empty($url_parsed['query']) ? '?' : '?' . $url_parsed['query'] . '&') . $sort_direction_asc_query . (!empty($url_parsed['fragment']) ? '#' . $url_parsed['fragment'] : '');
+					$sort_desc_string = $url_parsed['path'] . (empty($url_parsed['query']) ? '?' : '?' . $url_parsed['query'] . '&') . $sort_direction_desc_query . (!empty($url_parsed['fragment']) ? '#' . $url_parsed['fragment'] : '');
+				}
+				$buffer .= '<th' . (is_array($title) && $title[0] === $sort ? ' class="sorted_column"' : '') . '>' . (is_array($title) ? '<a href="' . ($title[0] === $sort && $sort_direction === 'asc' ? $sort_desc_string : $sort_asc_string) . '">' . $title[1] . '</a>' : $title)
+						. (is_array($title) ? '<div class="right">'
+							. ($title[0] !== $sort || ($title[0] === $sort && $sort_direction !== 'asc') ? '<a class="sort-ascending" href="' . $sort_asc_string . '"><i class="fi-play sort-icons "></i></a>' : '')
+							. ($title[0] !== $sort || ($title[0] === $sort && $sort_direction !== 'desc') ? '<a class="sort-descending" href="' . $sort_desc_string . '"><i class="fi-play sort-icons"></i></a>' : '')
+						. '</div></th>' : '');
+			}
+			$buffer .= "</tr></thead>";
+			
+//			$buffer .= "<tfoot><tr>";
+//			foreach($header as $title) {
+//				$buffer .= '<th>' . (is_array($title) ? $title[1] : $title) . '</th>';
+//			}
+//			$buffer .= "</tr></tfoot>";
+		}
+		
+		// Print table body
+		if (!empty($data) && is_array($data)) {
+			$buffer .= "<tbody>";
+			foreach($data as $key => $row) {
+				$buffer .= '<tr data-id="' . $key . '">';
+                foreach($row as $column) {
+					if (is_array($column)) {
+						$buffer .= '<td class="' . $column[1] . '">' . $column[0] . '</td>';
+					} else {
+						$buffer .= "<td>{$column}</td>";
+					}
+                }
+                $buffer .= "</tr>";
+            }
+			$buffer .= "</tbody>";
+		}
+		$buffer .= "</table></div>";
+		$buffer .= '<div class="pagination-centered">' . Html::pagination($page, $num_results, $page_size, $total_results, $url_string, $page_query_param, $pagesize_query_param, $total_results_query_param) . '</div>';
+		return $buffer;
+	}
 
     /**
      *  Filter function returns formatted form for declaring filters. Data is the same
@@ -1010,8 +1128,9 @@ class Html {
      */
     public static function filter($legend, $data, $action = null, $method = "POST", $submitTitle = "Filter", $id = null, $class = null, $validation = null) {
         // This will pretty much be a redesigned Html::form layout
-        if (empty($data))
+        if (empty($data)) {
             return;
+		}
 
         $form = new \Html\form();
         // If form tag is needed print it
@@ -1024,18 +1143,25 @@ class Html {
         $hidden = "";
         $buffer .= "<fieldset style=\"padding: 0; padding-top: 10px; padding-left: 10px;\">\n";
         $buffer .= "<legend>" . $legend . "</legend>\n";
-        // $buffer .= "<div class=\"row-fluid\">\n";
         $buffer .= "<ul id='filter-grid' class='small-block-grid-1 medium-block-grid-3 large-block-grid-4'>";
         
         $should_autosubmit = false;
-        if (count($data) === 1 && $data[0][1] === "select") {
+        if (count($data) === 1 && is_array($data[0]) && $data[0][1] === "select") {
             $should_autosubmit = true;
         }
         
         // Loop through data
         foreach ($data as $row) {
-
-//            $buffer .= "<div class=\"small-12 medium-3 left\"><div class=\"row\">";
+			// Check if the row is an object like an InputField
+			if (!is_array($row) && is_object($row)) {
+				if ((property_exists($row, "type") && $row->type !== "hidden") || !property_exists($row, "type")) {
+					$buffer .= '<li><label class=\'small-12 columns\'>' . $row->label . '<div>' . $row->__toString() . '</div></label></li>';
+				} else {
+					$buffer .= $row->__toString();
+				}
+				continue;
+			}
+			
             $buffer .= "<li>";
             
             // Get row parameters
@@ -1065,13 +1191,11 @@ class Html {
                 if ($type == "checkbox") {
                     $mediumCols = 6;
                 }
-                $buffer .= "<div class='small-12 columns'><label>{$title}"; // medium-" . (12 - $mediumCols) . " 
-//                $buffer .= "<div class='small-12 medium-{$mediumCols} columns'>";
+                $buffer .= "<div class='small-12 columns'><label>{$title}"; 
             } else {
                 $buffer .= "<div class='small-12'>";
             }
 
-//            $buffer .= "<div class=\"small-12 medium-10 columns\">";
             $size = !empty($row[4]) ? $row[4] : null;
 
             // Get the input that we need
@@ -1305,4 +1429,15 @@ UPLOAD;
         return $buffer;
     }
     
+	/**
+	 * Returns embed iframe for displaying pdfs and other documents in the browser
+	 * 
+	 * @param string $link
+	 * @param string $width
+	 * @param string $height
+	 * @return string
+	 */
+	public static function embedDocument($link, $width = '1024', $height = '724', $zoom = 'page-width') {
+		return "<iframe src='/system/templates/js/viewerjs-0.5.8/ViewerJS/index.html?zoom={$zoom}#../../../../..{$link}' width='{$width}' height='{$height}' allowfullscreen webkitallowfullscreen></iframe>";
+	}
 }

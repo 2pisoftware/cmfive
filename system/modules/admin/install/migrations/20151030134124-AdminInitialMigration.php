@@ -21,6 +21,7 @@ class AdminInitialMigration extends CmfiveMigration {
 					->addColumn('path', 'string', ['limit' => 1024])
 					->addColumn('classname', 'string', ['limit' => 1024])
 					->addColumn('module', 'string', ['limit' => 1024])
+					->addColumn("batch", "integer")
 					->addCmfiveParameters(['dt_modified', 'modifier_id', 'is_deleted'])
 					->create();
 		}

@@ -87,8 +87,10 @@
                         $("#start_timer").hide();
                         $("#stop_timer").fadeIn();
                         
-                        $('#stop_timer span[data-tooltip]').attr('title', object_data.object + ': ' + object_data.title);
-                        $(document).foundation('tooltip');
+                        var selector = $('#stop_timer span[data-tooltip]').attr('data-selector');
+                        $('#' + selector).html(object_data.object + ': ' + object_data.title);
+                        
+                        $(document).foundation('tooltip', 'reflow');
 						
 						$("#timelog_description").val("");
 						$('#timerModal').foundation('reveal', 'close');
@@ -117,6 +119,8 @@
                 success: function(data) {
                     jQuery("#stop_timer").hide();
                     jQuery("#start_timer").fadeIn();
+                    
+                    $(document).foundation('tooltip', 'reflow');
                 }
             });
         });

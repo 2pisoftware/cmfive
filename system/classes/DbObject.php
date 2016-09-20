@@ -280,7 +280,7 @@ class DbObject extends DbService {
             if (!empty($v)) {
                 return $this->d2Time($v);
             }
-        }
+        } 
         return $v;
     }
     
@@ -290,7 +290,7 @@ class DbObject extends DbService {
         }
         // build cache of filtered object vars
         self::$_object_vars[$this->_class] = array();
-        foreach(get_object_vars($this) as $k=>$v) {
+        foreach(get_object_vars($this) as $k => $v) {
             // ignore volatile vars and web
             if('_' !== $k{0} && 'w' !== $k) {
                 self::$_object_vars[$this->_class][] = $k;
@@ -438,6 +438,19 @@ class DbObject extends DbService {
 	 */
 	public function exists() {
 		return !is_null($this->id) && intval($this->id) > 0;
+	}
+	
+	/**
+	 * Checks whether or not a given property has changed. It does this by
+	 * looking for the $prop value in the __old array and comparing it against
+	 * the active property.
+	 * 
+	 * @param string $prop
+	 * @return boolean
+	 */
+	public function propertyHasChanged($prop) {
+		return property_exists($this, '__old') && property_exists($this, $prop) && 
+				array_key_exists($prop, $this->__old) && $this->__old[$prop] != $this->$prop;
 	}
 	
     /**
@@ -982,13 +995,12 @@ class DbObject extends DbService {
         if (property_exists($this, $prop_string)) {
             $prop_detail = new ReflectionProperty($this, $prop_string);
             if ($prop_detail->isStatic()) {
-                // Is this to "hacky"? No, it's cool!
                 return $this::$$prop_string;
             } else {
                 return $this->$prop_string;
             }
         } else if (property_exists($this, $prop_lookup) && $this->$prop_lookup) {
-            return $this->getObjects("Lookup", array("type" => $this->$prop_lookup));
+            return $this->getObjects("Lookup", array("type" => $this->$prop_lookup, "is_deleted" => 0));
         } else if (property_exists($this, $prop_class) && $this->$prop_class) {
             if (property_exists($this, $prop_filter) && $this->$prop_filter) {
                 return $this->getObjects($this->$prop_class, $this->$prop_filter, true);
@@ -1151,7 +1163,7 @@ class DbObject extends DbService {
             } else
                 return null;
         } else if (strpos($k, "t_") === 0) {
-            if (!empty($v)) {
+            if (!empty($v) && is_int($v)) {
                 return $this->time2T($v);
             } else
                 return null;

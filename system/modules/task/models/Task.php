@@ -26,6 +26,7 @@ class Task extends DbObject {
     public $is_deleted;  // is_deleted flag
     public $_modifiable;  // Modifiable Aspect
     public $_searchable;
+    public $rate; //rate used for calculating invoice values
     public static $_validation = array(
         "title" => array('required'),
         "task_group_id" => array('required'),
@@ -49,11 +50,9 @@ class Task extends DbObject {
 		$data = $this->getTaskData();
 		if (!empty($data)) {
 			foreach($data as $d) {
-//				var_dump($d);
 				$index[] = $d->addToIndex();
 			}
 		}
-//		var_dump($index); die();
 		return implode(' ', $index);
     }
 
@@ -140,6 +139,10 @@ class Task extends DbObject {
             return true;
         }
 
+		if ($loggedin_user->hasRole("task_admin")) {
+			return true;
+		}
+		
         $me = $this->Task->getMemberGroupById($this->task_group_id, $loggedin_user->id);
 
         if (empty($me)) {
@@ -156,6 +159,21 @@ class Task extends DbObject {
 
         $group = $this->Task->getTaskGroup($this->task_group_id);
         return $this->Task->getMyPerms($me->role, $group->can_view);
+    }
+    
+    /**
+     * used to hide the rate field
+     * @return boolean 
+     */
+    function canISetRate() {
+        $user = $this->w->auth->User();
+        $taskgroup = $this->getTaskGroup();
+        if (!empty($taskgroup) && !empty($user)) {
+            if ($user->is_admin == 1 || $taskgroup->isOwner($user)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -394,7 +412,7 @@ class Task extends DbObject {
     }
 	
     function getAssignee() {
-        if ($this->assignee_id) {
+        if (!empty($this->assignee_id)) {
             return $this->getObject("User", $this->assignee_id);
         }
     }
@@ -603,6 +621,14 @@ class Task extends DbObject {
 		$task_creator = $this->getCreator();
 		$task_assignee = $this->getAssignee();
 		
+		$assignee_name = '';
+		$mailto_email = '';
+		if (!empty($task_assignee)) {
+			$assignee_name = $task_assignee->getFullName();
+			$mailto_email = $task_assignee->getContact()->email;
+		} else {
+			$mailto_email = $task_creator->getContact()->email;
+		}
         // Borrowed from here http://stackoverflow.com/questions/1463480/how-can-i-use-php-to-dynamically-publish-an-ical-file-to-be-read-by-google-calen
         $ical = "BEGIN:VCALENDAR
 VERSION:2.0
@@ -616,7 +642,7 @@ DTSTAMP:" . gmdate('Ymd').'T'. gmdate('His') . "Z
 ORGANIZER;CN=" . $task_creator->getFullName() . ":mailto:" . $task_creator->getContact()->email . "
 UID:" . md5(uniqid(mt_rand(), true)) . "@2pisoftware.com
 ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
-  TRUE;CN=" . $task_assignee->getFullName() . ";X-NUM-GUESTS=0:mailto:" . $task_assignee->getContact()->email . "
+  TRUE;CN=" . $assignee_name . ";X-NUM-GUESTS=0:mailto:" . $mailto_email . "
 SUMMARY:" . $this->title . "
 DESCRIPTION:" . htmlentities($this->description) . "
 SEQUENCE:0

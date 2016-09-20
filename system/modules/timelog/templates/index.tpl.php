@@ -10,7 +10,7 @@
                             <td><?php echo formatDate($time_entry->dt_start, "H:i:s"); ?></td>
                             <td><?php echo formatDate($time_entry->dt_end, "H:i:s"); ?></td>
                             <td><?php echo ($time_entry->getLinkedObject() ? get_class($time_entry->getLinkedObject()) . ": " . $time_entry->getLinkedObject()->toLink() : ''); ?></td>
-                            <td><pre style="font-family: sans-serif;"><?php echo $time_entry->getComment()->comment; ?></td>
+                            <td><pre class="break-pre" style="font-family: sans-serif;"><?php echo $time_entry->getComment()->comment; ?></pre></td>
                             <td>
                                 <?php echo $time_entry->object_class == "Task" ? Html::b('/task/edit/' . $time_entry->object_id . "#timelog", "View Time Log") : ""; ?>
 								<?php echo Html::box('/timelog/edit/' . $time_entry->id, 'Edit', true); ?>
