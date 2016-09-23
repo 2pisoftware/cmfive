@@ -1,0 +1,9 @@
+[[title|Migration]]
+
+<p><b>Warning!</b> Running migrations can cause loss of data. Please use only as directed by 
+2piSoftware staff.</p> 
+
+<p>Migrations update the structure of the underlying system database. When system 
+updates occur there may be necessary database changes. These changes will be conducted 
+by 2piSoftware maintenance staff. The migrations module provides tools for maintaining 
+the state of the database for these changes.</p>

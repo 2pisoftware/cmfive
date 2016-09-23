@@ -192,7 +192,9 @@ function task_core_dbobject_after_update_Task(Web $w, $object) {
             $message .= $object->toLink(null, null, $user_object);
             $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
 
-            $w->Inbox->addMessage($subject, $message, $user);
+            if (Config::get('inbox.active') === true) {
+                $w->Inbox->addMessage($subject, $message, $user);
+            }
         }
     }
 }

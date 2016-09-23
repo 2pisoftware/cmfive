@@ -222,7 +222,7 @@ class Task extends DbObject {
 
 		// User is task creator
 		$creator = $this->_modifiable->getCreator();
-		if ($creator->id === $user->id) {
+		if (!empty($creator) && $creator->id === $user->id) {
 			return true;
 		}
 		
