@@ -1,6 +1,12 @@
 <?php
 
 define('CACHE_PATH', 'cache');
+use Gaufrette\Filesystem;
+use Gaufrette\File as File;
+use Gaufrette\Adapter\Local as LocalAdapter;
+use Gaufrette\Adapter\InMemory as InMemoryAdapter;
+use Gaufrette\Adapter\AwsS3 as AwsS3;
+use Aws\S3\S3Client as S3Client;
 
 class Attachment extends DbObject {
 
@@ -18,6 +24,7 @@ class Attachment extends DbObject {
     public $type_code; // this is a type of attachment, eg. Receipt of Deposit, PO Variation, Sitephoto, etc.
 
 	public $adapter;
+        
     
 	/**
 	 * DbObject::insert() override to set the mimetype, path and to call the
@@ -257,6 +264,69 @@ class Attachment extends DbObject {
 		}
 		return false;
 	}
+        
+        /**
+         * replaces an attachments file with a new one
+         */
+        public function updateAttachment ($requestkey,$title = null, $description = null, $type_code = null) {
+            //Check for posted content
+		if(!empty($_POST[$requestkey]) && empty($_FILES[$requestkey])) {
+			$filename = str_replace($replace_underscore, "_", str_replace($replace_empty, "", $_POST[$requestkey]));
+		} else {
+			$filename = str_replace($replace_underscore, "_", str_replace($replace_empty, "", basename($_FILES[$requestkey]['name'])));
+		}
+                
+                $this->filename = $filename;
+                
+                $filesystemPath = "attachments/" . $this ->parent_table . '/' . date('Y/m/d') . '/' . $this->id . '/';
+		$filesystem = $this->w->file->getFilesystem($this->w->file->getFilePath($filesystemPath));
+		if (empty($filesystem)) {
+			$this->w->Log->setLogger("FILE_SERVICE")->error("Cannot save file, no filesystem returned");
+			return null;
+		}
+                
+                $file = new File($filename, $filesystem);
+		
+		$this->adapter = $this->w->file->getActiveAdapter();
+		$this->fullpath = str_replace(FILE_ROOT, "", $filesystemPath . $filename);
+		
+		//Check for posted content
+		if(!empty($_POST[$requestkey])) {
+			preg_match('%data:(.*);base%', substr($_POST[$requestkey], 0, 25), $mime);
+			$data = substr($_POST[$requestkey], strpos($_POST[$requestkey], ",") + 1);
+			$mime_type = $mime[1];
+			$content = base64_decode($data);
+		} else {
+			$content = file_get_contents($_FILES[$requestkey]['tmp_name']);
+			
+			switch($this->adapter) {
+				case "local":
+					$mime_type = $this->w->getMimetype(FILE_ROOT . $att->fullpath);
+				default:
+					$mime_type = $this->w->getMimetypeFromString($content);
+			}
+		}
+		$file->setContent($content, ['contentType' => $mime_type]);
+		
+		$this->mimetype = $mime_type;		
+		$this->update();
+                
+                // Generate thumbnail and cache
+                require_once 'phpthumb/ThumbLib.inc.php';
+                $width = $this->w->request("w",  FileService::$_thumb_width);
+                $height = $this->w->request("h", FileService::$_thumb_height);
+                $thumb = PhpThumbFactory::create($this->getContent(), [], true);
+                $thumb->adaptiveResize($width, $height);
+
+                // Create cached folder
+                if (!is_dir(dirname($this->getThumbnailCachePath()))) {
+                        mkdir(dirname($this->getThumbnailCachePath()), 0755, true);
+                }
+
+                // Write thumbnail to cache
+                file_put_contents($this->getThumbnailCachePath(), $thumb->getImageAsString());
+
+        }
 	
 	/**
 	 * Automagic label
