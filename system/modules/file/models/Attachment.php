@@ -278,7 +278,7 @@ class Attachment extends DbObject {
                 
                 $this->filename = $filename;
                 
-                $filesystemPath = "attachments/" . $this ->parent_table . '/' . date('Y/m/d') . '/' . $this->id . '/';
+                $filesystemPath = "attachments/" . $this ->parent_table . '/' . date('Y/m/d') . '/' . $this->parent_id . '/';
 		$filesystem = $this->w->file->getFilesystem($this->w->file->getFilePath($filesystemPath));
 		if (empty($filesystem)) {
 			$this->w->Log->setLogger("FILE_SERVICE")->error("Cannot save file, no filesystem returned");
