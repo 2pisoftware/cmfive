@@ -9,5 +9,5 @@ parent group for which they are a member.</p>
     <li><b>New Group</b> - Creates a new User Group</li>
     <li><b>More Info</b> - Manage the User Group</li>
     <li><b>Delete</b> - Deleting User Groups can effect the permission settings 
-for users. Be mindful that users may loose permissions when deleting User Groups</li>
+for users. Be mindful that users may lose permissions when deleting User Groups</li>
 </ul>
