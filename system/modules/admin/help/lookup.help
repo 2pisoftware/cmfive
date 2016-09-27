@@ -35,6 +35,6 @@ most cases, when selecting a name or text the Title will be a duplicate of the C
 <h4>Example</h4>
 <p>A simple example of the Lookup functionality can be found on the [[help|admin/useredit|user edit]] form.
 To add a new option to the contact details title select field create a new lookup 
-item with Type = 'title'. Insert 'Supreme Leader' into both the Code and Title fields. 
-When editing a user's details 'Supreme Leader' will be an avaliable option.</p>
+item with Type = 'title'. Insert 'The Honorable' into both the Code and Title fields. 
+When editing a user's details 'The Honorable' will be an avaliable option.</p>
  
