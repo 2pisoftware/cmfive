@@ -268,7 +268,7 @@ class Attachment extends DbObject {
         /**
          * replaces an attachments file with a new one
          */
-        public function updateAttachment ($requestkey,$title = null, $description = null, $type_code = null) {
+        public function updateAttachment ($requestkey) {
             //Check for posted content
 		if(!empty($_POST[$requestkey]) && empty($_FILES[$requestkey])) {
 			$filename = str_replace($replace_underscore, "_", str_replace($replace_empty, "", $_POST[$requestkey]));
