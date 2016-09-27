@@ -9,7 +9,8 @@ to a [[help|task/group/viewtaskgrouptypes|Task Group]] they will not be able to
 view any tasks.</p>
 <p>Permissions are included on a module basis. Several core permissions will be 
 explained below to provide examples. If the permission you are interested in is 
-not explained below, this information can be retrieved from the 2piSoftware help desk.</p>
+not explained below, this information can be retrieved from help screen for a module
+or specific action.</p>
 <ul>
     <li><b>Admin</b>
         <ul>
