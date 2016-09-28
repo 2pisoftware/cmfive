@@ -130,6 +130,27 @@ class TimelogService extends DbService {
         // Check if tracking object set or existing timelog is running
         return ($this->w->Auth->user()->hasRole("timelog_user") && ($this->hasTrackingObject() || $this->hasActiveLog()));
     }
+    
+    /**
+     * returns a list of objects to which you can attach timelogs
+     * @return type array
+     */
+    public function getLoggableObjects() {
+        //get a list of all active modules
+        $objects = [];
+        $modules = Config::keys();
+        foreach ($modules as $key => $module) {
+            $conf = Config::get($module);
+            //check module config for timelog enabled objects
+            if (array_key_exists("timelog", $conf) && !empty($conf['timelog'])) {
+                foreach ($conf['timelog'] as $value) {
+                    $objects[$value] = $value;
+                }
+            }
+            
+        }
+        return $objects;
+    }
 
     public function navigation(Web $w, $title = null, $nav = null) {
         if ($title) {
