@@ -12,16 +12,17 @@ specific, module titles must match correctly for the template to work</li>
             <li>Category - Usually describes the purpose of the template. This field 
 is also context sensitive and needs to match specified values for the template to work</li>
         </ul>
-    <li><b>Description</b> - Used for storying notes and usefull information about the template</li>
+    <li><b>Description</b> - Used for storing notes and useful information about the template</li>
 </ul>
 
 <h4>Template</h4>
-<p>Templates are written in HTML with the Twig formating language. Variables are passed to 
+<p>Templates are written in HTML with the <a href="http://twig.sensiolabs.org/" target="_blank">Twig formatting 
+language</a>. Variables are passed to 
 placeholders enclosed by {{double curly brackets}}.</p>
 <ul>
     <li><b>Template Title</b> - Templates are split into two sections, the title and the body.
-The template title a smaller field and is not used for single page templates, eg. templates that
-product PDF's. For email templates the contents of the title section is used to 
+The template title is a smaller field and is not used for single page templates, eg. templates that
+produce PDFs. For email templates the contents of the title section is used to 
 fill out the subject line of the email</li>
     <li><b>Template Body</b> - The template body is the main section of the template.</li>
 </ul>
@@ -35,7 +36,7 @@ in the template.<br>
 }</p>
 
 <h4>Test Output</h4>
-<p>Test output will preview the template with the data provided under the Test Data tab.</p>
+<p>Test output will show a preview of the template with the data provided under the Test Data tab.</p>
 
 <h4>Manual</h4>
 <p>A detailed description of how to write templates.</p>
