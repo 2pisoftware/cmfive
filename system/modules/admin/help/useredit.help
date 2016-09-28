@@ -5,7 +5,8 @@
     <li><b>Login</b> - The user's login/username</li>
     <li><b>Admin</b> - Select to make user a system administrator</li>
     <li><b>Active</b> - A user must be "Active" in order to use the system. A user's access can be denied by switching this off</li>
-    <li><b>Password / Repeat Password</b> - set the user's password. Both fields must match.</li>
+    <li><b>Password / Repeat Password</b> - set the user's password. Both fields must match. If editing an existing user, and 
+    both fields are empty then the current password will not be changed.</li>
 </ul>
 
 <h4>Contact Details</h4>
@@ -16,4 +17,4 @@
 </ul>
 
 <h4>User Groups</h4>
-<p>Lists links to all [[help|admin/groups|User Groups]] for which the user is a member.</p>
+<p>Lists links to all [[help|admin/groups|User Groups]] of which the user is a member.</p>
