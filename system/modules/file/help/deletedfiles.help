@@ -9,5 +9,5 @@ the path is provided to enable retrieval if required</li>
     <li><b>View</b> - Opens the file in the browser</li>
     <li><b>Restore File</b> - Restores the file making it accessible from the original 
 object it was attached to</li>
-    <li><b>Permanently Delete</b> - Removes file indefinitely</li>
+    <li><b>Permanently Delete</b> - Removes the file from the filesystem so that it can not be retrieved again.</li>
 </ul>
