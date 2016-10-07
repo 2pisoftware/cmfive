@@ -12,25 +12,38 @@ function listcomments(\Web $w, $params) {
     //add checkboxes to the form for each notification recipient    
     $recipients_form_html = '';
     if (!empty($get_recipients)) {
-        
+        $unique_recipients = [];
         foreach($get_recipients as $recipients) {
-            $recipients_form_html .= '<h4>Notifications</h4>';
-            $recipients_form_html .= '<input type="hidden" name="is_notifications" value="1" id="is_notifications">';
-            $recipients_form_html .= '<div id="notifications_list">';
             foreach ($recipients as $user_id => $is_notify) {
+                if($is_notify && !array_key_exists($user_id, $unique_recipients)){
+                    $unique_recipients[$user_id] = $is_notify;
+                }
+            }
+        }
+        $recipients_form_html .= '<h4>Notifications</h4>';
+        $recipients_form_html .= '<input type="hidden" name="is_notifications" value="1" id="is_notifications">';
+        $recipients_form_html .= '<div id="notifications_list">';
+        $parts = array_chunk($unique_recipients, 4, true);
+        foreach ($parts as $key=>$row) {
+            
+            $recipients_form_html .= '<ul class="small-block-grid-1 medium-block-grid-' . count($row) . ' section-body">';
+            foreach ($row as $user_id => $is_notify) {
                 $user = $w->Auth->getUser($user_id);
                 if (!empty($user)) {
-                    $recipients_form_html .= '<label class="small-12 columns">';
+                    $recipients_form_html .= '<li><label class="small-12 columns">';
                     $recipients_form_html .= $user->getFullName(); 
                     $recipients_form_html .= ' <input type="checkbox" name="recipient_' . $user->id;
                     $recipients_form_html .= '" value="1" checked="checked" id="recipient_' . $user_id;
-                    $recipients_form_html .= '" class=""></label>';
-
-
+                    $recipients_form_html .= '" class=""></label></li>';                    
                 }
             }
-            $recipients_form_html .= '</div>';
+            $recipients_form_html .= '</ul>';
         }
+        $recipients_form_html .= '</div>';
+        
+        
+        
+        
         
     }
     $w->ctx('recipients_html', $recipients_form_html);

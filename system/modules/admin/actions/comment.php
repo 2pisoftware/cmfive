@@ -42,35 +42,56 @@ EOF;
     //call hook for notification select
     $get_recipients = $w->callHook('comment', 'get_notification_recipients_' . $top_table_name,['object_id'=>$top_id]);
     
-    $form = array(
-        array("Comment","section"),
-        array("", "textarea", "comment", $comment->comment, 100, 15, false),
-    	array("Help","section"),
-    	array("", "textarea", "-help",$help, 100, 5, false),
-        array("", "hidden", "redirect_url", $w->request("redirect_url"))
-        
-    );
+    $form = [
+        'Comment'=> [
+            [
+                array("", "textarea", "comment", $comment->comment, 100, 15, false)
+            ]
+        ],
+        'Help'=> [
+            [
+                array("", "textarea", "-help",$help, 100, 5, false)
+            ],
+            [
+                array("", "hidden", "redirect_url", $w->request("redirect_url"))
+            ]
+        ]
+    ];
+    
     //add checkboxes to the form for each notification recipient    
     if (!empty($get_recipients)) {
+        $unique_recipients = [];
         foreach($get_recipients as $recipients) {
-            $form[] = array("Notifications","section");
-            $form[] = array("", "hidden", "is_notifications", 1);
             foreach ($recipients as $user_id => $is_notify) {
+                if($is_notify && !array_key_exists($user_id, $unique_recipients)){
+                    $unique_recipients[$user_id] = $is_notify;
+                }
+            }
+        }
+        
+        $form["Notifications"] = [
+            [
+                array("", "hidden", "is_notifications", 1)
+            ]
+        ];
+        $parts = array_chunk($unique_recipients, 4, true);
+        
+        foreach ($parts as $key=>$row) {
+            
+            $form['Notifications'][$key+1] = [];
+            foreach ($row as $user_id => $is_notify) {
                 $user = $w->Auth->getUser($user_id);
                 if (!empty($user)) {
-                    $form[] = array($user->getFullName() . '    ', 'checkbox', 'recipient_' . $user->id, $is_notify);
-
-
+                    $form['Notifications'][$key+1][] = array($user->getFullName() . '    ', 'checkbox', 'recipient_' . $user->id, $is_notify);
                 }
             }
         }
     }
     
-    
     // return the comment for display and edit
     $w->setLayout(null);
     
-    $w->out(Html::form($form, $w->localUrl("/admin/comment/{$comment_id}/{$p["tablename"]}/{$p["object_id"]}"), "POST", "Save"));
+    $w->out(Html::MultiColForm($form, $w->localUrl("/admin/comment/{$comment_id}/{$p["tablename"]}/{$p["object_id"]}"), "POST", "Save"));
     $w->out('<script>$("form").submit(function(event) {toggleModalLoading();});</script>');
     
     

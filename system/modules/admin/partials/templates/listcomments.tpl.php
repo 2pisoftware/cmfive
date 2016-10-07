@@ -87,10 +87,10 @@
                 var notification_users = [];
                 if ($('#is_notifications').length != 0) {
                     notification_users.push('parentObject_' + '<?php echo $object->getDbTableName(); ?>' + '_' + '<?php echo $object->id; ?>');
-                    $('#notifications_list').children().each(function () {                        
-                        var notification_user_input = $('input', this);                        
-                        if (notification_user_input.is(':checked')) {
-                            notification_users.push(notification_user_input.attr('name'));
+                    $('#notifications_list > ul > li > label').each(function () {                        
+                        var notification = $('input', this);                     
+                        if (notification.is(':checked')) {
+                            notification_users.push(notification.attr('name'));
                         }                                                                       
                     });
                 }
