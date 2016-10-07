@@ -17,6 +17,7 @@ function ajaxSaveComment_POST(Web $w) {
         $obj_id = '';
         $recipients = [];        
         foreach($list as $key) {
+            //keys of interest are either 'recipient_{user_id}' or 'parentObject_{classOrTableName}_{object_id}' 
             $exp_key = explode('_',$key);
             if ($exp_key[0] == 'recipient') {
                 $recipients[] = $exp_key[1];
