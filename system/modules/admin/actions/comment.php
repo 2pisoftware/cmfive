@@ -32,7 +32,7 @@ Horizontal Line:
 EOF;
     
     //call hook for notification select
-    $results = $w->callHook('comment', 'get_notification_recipients_' . $p['tablename'],['object_id'=>$p['object_id']]);
+    $get_recipients = $w->callHook('comment', 'get_notification_recipients_' . $p['tablename'],['object_id'=>$p['object_id']]);
     
     $form = array(
         array("Comment","section"),
@@ -42,10 +42,9 @@ EOF;
         array("", "hidden", "redirect_url", $w->request("redirect_url"))
         
     );
-    //add checkboxes to the form for each notification recipient
-    var_dump($results);
-    if (!empty($results)) {
-        foreach($results as $recipients) {
+    //add checkboxes to the form for each notification recipient    
+    if (!empty($get_recipients)) {
+        foreach($get_recipients as $recipients) {
             $form[] = array("Notifications","section");
             $form[] = array("", "hidden", "is_notifications", 1);
             foreach ($recipients as $user_id => $is_notify) {
@@ -69,9 +68,11 @@ function comment_POST(Web $w){
     $p = $w->pathMatch("comment_id", "tablename","object_id");
     $comment_id = intval($p["comment_id"]);
     
-    $comment = ($comment_id > 0 ? $w->Comment->getComment($comment_id) : new Comment($w));
+    $comment = $w->Comment->getComment($comment_id);
+    $is_new = false;
     if ($comment === null){
         $comment = new Comment($w);
+        $is_new = true;
     }
     
     $comment->obj_table = $p["tablename"];
@@ -88,7 +89,7 @@ function comment_POST(Web $w){
                 $recipients[] = $exp_key[1];
             }            
         }        
-        $results = $w->callHook('comment', 'send_notification_recipients_' . $p['tablename'],['object_id'=>$p['object_id'], 'recipients'=>$recipients, 'commentor_id'=>$w->auth->loggedIn(),'comment'=>$comment]);
+        $results = $w->callHook('comment', 'send_notification_recipients_' . $p['tablename'],['object_id'=>$p['object_id'], 'recipients'=>$recipients, 'commentor_id'=>$w->auth->loggedIn(),'comment'=>$comment, 'is_new'=>$is_new]);
     
         
     }

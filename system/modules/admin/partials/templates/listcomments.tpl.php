@@ -65,6 +65,7 @@
                                 id: 'textarea_comment',
                                 palceholder: 'Enter your reply...'
                             }))
+                            .append('<?php echo $recipients_html; ?>')
                             .append($('<button>Reply</button>').attr({
                                 type: 'submit'
                             }).addClass('button tiny'))
@@ -81,16 +82,31 @@
             $("#textarea_comment").focus();
 
             $('#comment_reply_form').submit(function() {
+                toggleModalLoading();
+                //generate list of users to notify
+                var notification_users = [];
+                if ($('#is_notifications').length != 0) {
+                    notification_users.push('parentObject_' + '<?php echo $object->getDbTableName(); ?>' + '_' + '<?php echo $object->id; ?>');
+                    $('#notifications_list').children().each(function () {                        
+                        var notification_user_input = $('input', this);                        
+                        if (notification_user_input.is(':checked')) {
+                            notification_users.push(notification_user_input.attr('name'));
+                        }                                                                       
+                    });
+                }
+                
                 $.ajax({
                     url  : '/admin/ajaxSaveComment/' + comment_id,
                     type : 'POST',
                     data : {
                         'redirect': '<?php echo $redirect; ?>',
                         'comment': $('#textarea_comment').val(),
+                        'notification_recipients': notification_users,
                         '<?php echo \CSRF::getTokenID(); ?>': '<?php echo \CSRF::getTokenValue(); ?>'
                     },
                     complete: function(comment_response) {
-                        toggleModalLoading();
+                        //alert(comment_response.responseText);
+                        
                         window.location.reload();
                         
 //                        cancelReply(replyForm);
