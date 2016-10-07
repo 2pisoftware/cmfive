@@ -40,7 +40,10 @@ function edit_POST(Web $w) {
 	if (empty($attachment->id)) {
 		$w->error("Attachment not found", $redirect_url);
 	}
-	$attachment->updateAttachment("file");
+        
+        if ($_FILES['file']['size'] > 0) {
+            $attachment->updateAttachment("file");
+        }
 	$attachment->title = $_POST['title'];
 	$attachment->description = $_POST['description'];
 	$attachment->update();
