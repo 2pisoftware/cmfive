@@ -17,7 +17,7 @@
 						</div>
 						<button href="#" data-reveal-id="attachment_modal_<?php echo $deleted_file->id; ?>" class="button">View</button>
 						<?php echo Html::b("/file-attachment/restore/" . $deleted_file->id . "?redirect_url=" . urlencode("/file/deletedfiles"), "Restore file", "Are you sure you want to restore this file?"); ?>
-						<?php echo Html::b("/file-attachment/delete/" . $deleted_file->id . "?redirect_url=" . urlencode("/file/deletedfiles"), "Perminantly Delete", "Are you sure you want to delete this file?"); ?>
+						<?php echo Html::b("/file-attachment/delete/" . $deleted_file->id . "?redirect_url=" . urlencode("/file/deletedfiles"), "Permanently Delete", "Are you sure you want to delete this file?"); ?>
 					</td>
 				</tr>
 			<?php endforeach; ?>

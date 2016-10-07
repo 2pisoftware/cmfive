@@ -52,8 +52,8 @@ function lookup_ALL(Web &$w) {
 	array("Create a New Entry","section"),
 	array("Type","select","type", null,$types),
 	array("or Add New Type","text","ntype"),
-	array("Key","text","code"),
-	array("Value","text","title"),
+	array("Code","text","code"),
+	array("Title","text","title"),
 	),$w->localUrl("/admin/newlookup/"),"POST"," Save ");
 	 
 	$w->ctx("newitem",$f);
