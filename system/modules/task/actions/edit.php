@@ -10,6 +10,10 @@ function edit_GET($w) {
     $p = $w->pathMatch("id");
     $task = (!empty($p["id"]) ? $w->Task->getTask($p["id"]) : new Task($w));
     
+    if ($task->is_deleted == 1) {
+        $w->error('You have attempted to view a deleted task.');
+    }
+    
     // Register for timelog
     $w->Timelog->registerTrackingObject($task);
     
