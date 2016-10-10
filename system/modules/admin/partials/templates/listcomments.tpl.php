@@ -1,5 +1,9 @@
 <?php
+
+
     use Carbon\Carbon;
+
+if ($w->auth->hasRole('comment')) {
     
     // Shows standard comment box, url is in the form:
     // /admin/comment/[COMMENT_ID]/[TABLE_NAME]/[OBJECT_ID]?redirect_url=[REDIRECT_URL]
@@ -165,4 +169,9 @@
        }
 
     </script>
-<?php endif;
+    <?php endif;
+} else {
+    ?>
+    <div class="warning"><p>'Comment' permissions are required. See your system administrator.</p></div>
+    <?php
+}
