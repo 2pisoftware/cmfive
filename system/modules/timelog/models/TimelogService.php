@@ -138,17 +138,22 @@ class TimelogService extends DbService {
     public function getLoggableObjects() {
         //get a list of all active modules
         $objects = [];
-        $modules = Config::keys();
-        foreach ($modules as $key => $module) {
-            $conf = Config::get($module);
-            //check module config for timelog enabled objects
-            if (array_key_exists("timelog", $conf) && !empty($conf['timelog'])) {
-                foreach ($conf['timelog'] as $value) {
-                    $objects[$value] = $value;
-                }
-            }
-            
-        }
+        $modules = array_filter(Config::keys() ? : [], function($config) {
+			return Config::get("$module.active") === true;
+		});
+	
+		if (!empty($modules) {
+			foreach ($modules as $key => $module) {
+				$timelog = Config::get("$module.timelog");
+				//check module config for timelog enabled objects
+				if ($timelog !== null && is_array($timelog)) {
+					foreach ($timelog as $value) {
+						$objects[$value] = $value;
+					}
+				}
+
+			}
+		}
         return $objects;
     }
 
