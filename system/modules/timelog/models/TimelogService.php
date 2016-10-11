@@ -142,7 +142,7 @@ class TimelogService extends DbService {
 			return Config::get("$module.active") === true;
 		});
 	
-		if (!empty($modules) {
+		if (!empty($modules)) {
 			foreach ($modules as $key => $module) {
 				$timelog = Config::get("$module.timelog");
 				//check module config for timelog enabled objects
