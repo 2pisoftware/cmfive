@@ -12,11 +12,15 @@
     </div>
 	
     <div id="timerModal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
-		<div class="row">
+		<div class="row-fluid clearfix panel">
+                        <?php echo $active_object_description; ?>
+                </div>
+                <div class="row">
 			<div class="large-12 columns">
 				<h2>Start timer</h2>
 			</div>
 		</div>
+                
 		<div class="row">
 			<div class="large-12 columns">
 				<label>Enter Description
@@ -25,6 +29,20 @@
 			</div>
 		</div>
 		<br/>
+                <div class="row">
+			<div class="large-12 columns">
+				<label>Enter Start Time (Optional - Defaults to 'now')
+					<?php echo(new \Html\Form\InputField([
+                                                "id|name"		=> "start_time",
+                                                "value"			=> !empty($active_log) ? $active_log->getTimeStart() : null,
+                                                "pattern"		=> "^(0?[0-9]|1[0-9]|2[0-3]):[0-5][0-9](\s+)?(AM|PM|am|pm)?$",
+                                                "placeholder"	=> "12hr format: 11:30pm or 24hr format: 23:30",
+                                                "required"		=> "true"
+                                        ])); ?>
+				</label>
+			</div>
+		</div>
+                <br/>
 		<div class="row">
 			<div class="large-12 columns">
 				<button class="button" onclick="saveTimer();">Start</button>
@@ -71,6 +89,29 @@
 
         // Start timer function
         function saveTimer() {
+            if ($("#start_time").val() != "") {
+                var regx = new RegExp("^(0?[0-9]|1[0-9]|2[0-3]):[0-5][0-9](\s+)?(AM|PM|am|pm)?$");
+                if (regx.test($("#start_time").val())) {
+                    //check that time is not in the future
+                    var raw_time = $("#start_time").val();
+                    raw_time = $.trim(raw_time);
+                    var raw_time_length = raw_time.length;
+                    var input_time;
+                    if ($.inArray($.trim(raw_time).slice(-2),['am','pm','AM','PM']) != -1) {
+                        var raw_time_string = raw_time.substring(0,raw_time_length - 2) + ' ' + raw_time.substring(raw_time_length - 2, raw_time_length);
+                        input_time = Date.parse(($.datepicker.formatDate("yy/m/d", (new Date()))) + ' ' + raw_time_string);
+                    } else {
+                        input_time = Date.parse(($.datepicker.formatDate("yy/m/d", (new Date()))) + ' ' + raw_time);
+                    }
+                    if (input_time > (new Date()).getTime()) {
+                        alert('cannot set start time in future');
+                        return;
+                    }
+                } else {
+                    alert("Incorrect Time Format. Please use: 12hr format: 11:30pm or 24hr format: 23:30");
+                    return;
+                }
+            }
             var _object = JSON.parse(<?php echo $w->Timelog->hasTrackingObject() ? json_encode($w->Timelog->getJSTrackingObject()) : ''; ?>);
             if (_object.class && _object.id) {
                 jQuery.ajax("/timelog/ajaxStart/" + _object.class + "/" + _object.id, {
@@ -82,11 +123,11 @@
                     success: function(data) {
                         var object_data = JSON.parse(data);
                         
-                        start_time = (new Date().getTime() / 1000);
+                        start_time = object_data.start_time ? object_data.start_time : (new Date().getTime() / 1000);
                         timer = countTime();
                         $("#start_timer").hide();
                         $("#stop_timer").fadeIn();
-                        
+                        $("#start_time").val("");
                         var selector = $('#stop_timer span[data-tooltip]').attr('data-selector');
                         $('#' + selector).html(object_data.object + ': ' + object_data.title);
                         
