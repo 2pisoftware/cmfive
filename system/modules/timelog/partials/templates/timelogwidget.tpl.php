@@ -104,7 +104,7 @@
                         input_time = Date.parse(($.datepicker.formatDate("yy/m/d", (new Date()))) + ' ' + raw_time);
                     }
                     if (input_time > (new Date()).getTime()) {
-                        alert('cannot set start time in future');
+                        alert('You cannot set the start time in future');
                         return;
                     }
                 } else {
