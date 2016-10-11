@@ -138,7 +138,7 @@ class TimelogService extends DbService {
     public function getLoggableObjects() {
         //get a list of all active modules
         $objects = [];
-        $modules = array_filter(Config::keys() ? : [], function($config) {
+        $modules = array_filter(Config::keys() ? : [], function($module) {
 			return Config::get("$module.active") === true;
 		});
 	
