@@ -63,7 +63,7 @@
                             }))
                             .append($('<textarea></textarea>').attr({
                                 id: 'textarea_comment',
-                                palceholder: 'Enter your reply...'
+                                placeholder: 'Enter your reply...'
                             }))
                             .append('<?php echo $recipients_html; ?>')
                             .append($('<button>Reply</button>').attr({
