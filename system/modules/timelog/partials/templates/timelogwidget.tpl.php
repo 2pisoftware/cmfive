@@ -13,9 +13,16 @@
 	
     <div id="timerModal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
         <form onsubmit="saveTimer()">
+            <?php if (!empty($tracked_object)): ?>
                 <div class="row-fluid clearfix panel">
-                        <?php echo $active_object_description; ?>
+                    <h3>
+                        <?php echo $tracked_object->getDbTableName() . " [" . $tracked_object->id . "]"; ?>
+                    </h3>
+                    <p>
+                        <?php echo !empty($tracked_object) ? $tracked_object->printSearchTitle() : ''; ?>
+                    </p>  
                 </div>
+            <?php endif; ?>
                 <div class="row">
 			<div class="large-12 columns">
 				<h2>Start timer</h2>
@@ -91,12 +98,8 @@
 
         // Start timer function
         function saveTimer() {
-            if ($("#start_time").val() != "") {
-                console.log('pass');
-                console.log($("#start_time").val());
-                var startDate = parseTime($("#start_time").val());
-                console.log(startDate);
-                console.log((new Date()));
+            if ($("#start_time").val() != "") {                
+                var startDate = parseTime($("#start_time").val());                
                 if ((new Date()) <= startDate) {                    
                         alert('You cannot set the start time in future');
                     return;
@@ -113,7 +116,7 @@
                     success: function(data) {
                         var object_data = JSON.parse(data);
                         
-                        start_time = object_data.start_time ? object_data.start_time : (new Date().getTime() / 1000);
+                        start_time = (object_data.hasOwnProperty('start_time') && object_data.start_time !== null) ? object_data.start_time : (new Date().getTime() / 1000);
                         timer = countTime();
                         $("#start_timer").hide();
                         $("#stop_timer").fadeIn();
