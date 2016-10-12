@@ -8,13 +8,14 @@ function edit_GET(Web $w) {
 	$w->ctx("timelog", $timelog);
 	$w->ctx('redirect', $w->request("redirect", ''));
 	
-	$indexes = $w->search->getIndexes();
-    $select_indexes = [];
-    if (!empty($indexes)) {
-        foreach($indexes as $friendly_name => $search_name) {
-            $select_indexes[] = array($friendly_name, $search_name);
+        $indexes = $w->timelog->getLoggableObjects();
+        $select_indexes = [];
+        if (!empty($indexes)) {
+            foreach($indexes as $friendly_name => $search_name) {
+                
+                $select_indexes[] = array($friendly_name, $search_name);
+            }
         }
-    }
 	$w->ctx("select_indexes", $select_indexes);
 
 	$tracking_id = $w->request("id");

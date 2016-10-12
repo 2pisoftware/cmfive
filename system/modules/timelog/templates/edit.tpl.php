@@ -28,19 +28,28 @@
 					<label class="small-12 columns">Module
 						<?php echo (new \Html\Form\Select([
 							"id|name"			=> "object_class",
-							"selected_option"	=> $timelog->object_class ? : $tracking_class,
+							"selected_option"	=> $timelog->object_class ? : $tracking_class ?: key(reset($select_indexes)),
 							"options"			=> $select_indexes
 						])); ?>
 					</label>
 				</li>
 				<li>
 					<label class="small-12 columns">Search
-						<?php echo (new \Html\Form\Autocomplete([
+						<?php 
+						$usable_class = !empty($timelog->object_class) ? $timelog->object_class : (!empty($tracking_class) ? $tracking_class : (key(reset($select_indexes))));
+						$where_clause = [];
+						if (!empty($usable_class)) {
+							if (in_array('is_deleted', (new $usable_class($w))->getDbTableColumnNames())) {
+								$where['is_deleted'] = 0;
+							}
+						}
+						
+						echo (new \Html\Form\Autocomplete([
 							"id|name"		=> "search",
 							"title"			=> !empty($object) ? $object->getSelectOptionTitle() : null,
 							"value"			=> !empty($timelog->object_id) ? $timelog->object_id : $tracking_id,
 							"required"		=> "true"
-						]))->setOptions(!empty($timelog->object_class) || !empty($tracking_class) ? $w->Timelog->getObjects($timelog->object_class ? : $tracking_class) : ''); ?>
+						]))->setOptions(!empty($usable_class) ? $w->Timelog->getObjects($usable_class, $where) : ''); ?>
 					</label>
 				</li>
 				<?php echo (new \Html\Form\InputField(["type" => "hidden", "id|name" => "object_id", "value" => $timelog->object_id ? : $tracking_id])); ?>
@@ -228,9 +237,11 @@
 		// editing, then set the searchURL
 		var searchUrl = '';
 		if ($("#object_class").val !== '') {
-			searchUrl = searchBaseUrl + "?index=" + $(this).val();
+                    $("#acp_search").removeAttr("readonly");
+                    searchUrl = searchBaseUrl + "?index=" + $("#object_class").val();
 		}
 		$("#object_class").change(function () {
+                    console.log('object class changed');
 			$("#acp_search").val('');
 			$("#timelog_edit_form .panel + .panel").remove();
 			if ($(this).val() !== "") {
