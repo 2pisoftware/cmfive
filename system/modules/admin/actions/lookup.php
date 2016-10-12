@@ -18,7 +18,6 @@ function lookup_ALL(Web &$w) {
             if ($w->request("type") !== null) {
                 unset($_REQUEST["type"]);
             }
-            var_dump($_REQUEST);
         }
        
 	$lookup = $w->Admin->getAllLookup($where);
