@@ -34,7 +34,7 @@ EOF;
     //setup for comment notifications
     $top_table_name = $p['tablename'];
     $top_id = $p['object_id'];
-    if ($table_name == 'comment') {
+    if ($top_table_name == 'comment') {
         $topObject = $w->Comment->getComment($p['object_id'])->getParentObject();
         $top_table_name = $topObject->getDbTableName();
         $top_id = $topObject->id;
