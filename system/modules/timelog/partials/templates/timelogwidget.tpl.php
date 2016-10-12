@@ -46,7 +46,7 @@
 		<div class="row">
 			<div class="large-12 columns">
 				<button class="button">Save</button>
-				<button class="button secondary right" onclick="$('#timerModal').foundation('reveal', 'close');">Close</button>
+				<button class="button secondary right" type="button" onclick="$('#timerModal').foundation('reveal', 'close');">Close</button>
 			</div>
 		</div>
         </form>
