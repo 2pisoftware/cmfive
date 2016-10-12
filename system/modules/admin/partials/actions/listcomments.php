@@ -20,9 +20,7 @@ function listcomments(\Web $w, $params) {
                 }
             }
         }
-        $recipients_form_html .= '<h4>Notifications</h4>';
-        $recipients_form_html .= '<input type="hidden" name="is_notifications" value="1" id="is_notifications">';
-        $recipients_form_html .= '<div id="notifications_list">';
+        $recipients_form_html .= '<h4>Notifications</h4><input type="hidden" name="is_notifications" value="1" id="is_notifications"><div id="notifications_list">';
         $parts = array_chunk($unique_recipients, 4, true);
         foreach ($parts as $key=>$row) {
             
@@ -30,21 +28,12 @@ function listcomments(\Web $w, $params) {
             foreach ($row as $user_id => $is_notify) {
                 $user = $w->Auth->getUser($user_id);
                 if (!empty($user)) {
-                    $recipients_form_html .= '<li><label class="small-12 columns">';
-                    $recipients_form_html .= $user->getFullName(); 
-                    $recipients_form_html .= ' <input type="checkbox" name="recipient_' . $user->id;
-                    $recipients_form_html .= '" value="1" checked="checked" id="recipient_' . $user_id;
-                    $recipients_form_html .= '" class=""></label></li>';                    
+                    $recipients_form_html .= '<li><label class="small-12 columns">' . $user->getFullName() . ' <input type="checkbox" name="recipient_' . $user->id . '" value="1" checked="checked" id="recipient_' . $user_id . '" class=""></label></li>';                    
                 }
             }
             $recipients_form_html .= '</ul>';
         }
-        $recipients_form_html .= '</div>';
-        
-        
-        
-        
-        
+        $recipients_form_html .= '</div>';        
     }
     $w->ctx('recipients_html', $recipients_form_html);
     
