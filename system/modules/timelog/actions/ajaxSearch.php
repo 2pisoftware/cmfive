@@ -6,7 +6,6 @@ function ajaxSearch_GET(Web $w) {
     $result_objects = [];
 
     // Flatten results
-//    var_dump($results[0]);
     if (!empty($results[0])) {
         foreach($results[0] as $result) {
             if (empty($result_ids[$result['class_name']])) {
@@ -20,7 +19,12 @@ function ajaxSearch_GET(Web $w) {
         foreach($result_ids as $class => $ids) {
             if (class_exists($class)) {
                 $inst_class = new $class($w);
-                $query = $w->db->get($inst_class->getDbTableName())->where('id', $ids)->fetch_all();
+				$where = ['ids' => $ids];
+				if (in_array('is_deleted', $inst_class->getDbColumnNames())) {
+					$where['is_deleted'] = 0;
+				}
+				
+                $query = $w->db->get($inst_class->getDbTableName())->where($where)->fetch_all();
                 if (!empty($query)) {
                     $query_objects = $inst_class->getObjectsFromRows($class, $query);
                     foreach($query_objects as $query_object) {

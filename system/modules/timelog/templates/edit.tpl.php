@@ -35,12 +35,21 @@
 				</li>
 				<li>
 					<label class="small-12 columns">Search
-						<?php echo (new \Html\Form\Autocomplete([
+						<?php 
+						$usable_class = !empty($timelog->object_class) ? $timelog->object_class : (!empty($tracking_class) ? $tracking_class : (key(reset($select_indexes))));
+						$where_clause = [];
+						if (!empty($usable_class)) {
+							if (in_array('is_deleted', (new $usable_class($w))->getDbColumnNames())) {
+								$where['is_deleted'] = 0;
+							}
+						}
+						
+						echo (new \Html\Form\Autocomplete([
 							"id|name"		=> "search",
 							"title"			=> !empty($object) ? $object->getSelectOptionTitle() : null,
 							"value"			=> !empty($timelog->object_id) ? $timelog->object_id : $tracking_id,
 							"required"		=> "true"
-						]))->setOptions(!empty($timelog->object_class) || !empty($tracking_class) ? $w->Timelog->getObjects($timelog->object_class ? : $tracking_class) : $w->Timelog->getObjects(key(reset($select_indexes)))); ?>
+						]))->setOptions(!empty($usable_class) ? $w->Timelog->getObjects($usable_class, $where) : ''); ?>
 					</label>
 				</li>
 				<?php echo (new \Html\Form\InputField(["type" => "hidden", "id|name" => "object_id", "value" => $timelog->object_id ? : $tracking_id])); ?>
