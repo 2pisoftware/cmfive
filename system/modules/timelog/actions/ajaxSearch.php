@@ -18,9 +18,11 @@ function ajaxSearch_GET(Web $w) {
         // Fetch all objects
         foreach($result_ids as $class => $ids) {
             if (class_exists($class)) {
+				/* @var $inst_class DbObject */
                 $inst_class = new $class($w);
-				$where = ['ids' => $ids];
-				if (in_array('is_deleted', $inst_class->getDbColumnNames())) {
+				
+				$where = ['id' => $ids];
+				if (in_array('is_deleted', $inst_class->getDbTableColumnNames())) {
 					$where['is_deleted'] = 0;
 				}
 				

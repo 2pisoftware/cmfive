@@ -39,7 +39,7 @@
 						$usable_class = !empty($timelog->object_class) ? $timelog->object_class : (!empty($tracking_class) ? $tracking_class : (key(reset($select_indexes))));
 						$where_clause = [];
 						if (!empty($usable_class)) {
-							if (in_array('is_deleted', (new $usable_class($w))->getDbColumnNames())) {
+							if (in_array('is_deleted', (new $usable_class($w))->getDbTableColumnNames())) {
 								$where['is_deleted'] = 0;
 							}
 						}
