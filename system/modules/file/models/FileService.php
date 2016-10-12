@@ -362,7 +362,7 @@ class FileService extends DbService {
 	function uploadAttachment($requestkey, $parentObject, $title = null, $description = null, $type_code = null) {
             
                 if (empty($_POST[$requestkey]) && (empty($_FILES[$requestkey]) || $_FILES[$requestkey]['size'] <= 0)) {
-                    $this->w->error("No file found for attachment.");
+                    return false;
                 }
             
             
