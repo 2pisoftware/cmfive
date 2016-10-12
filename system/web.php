@@ -355,9 +355,9 @@ class Web {
         date_default_timezone_set($timezone);
 		
         //check config for 'gc_maxlifetime' for the session
-        $gc_maxlifetime = Config::get('system.gc_maxlifetime')[0];
-        //Checks include is greater than 1 day (86400 sec) is less than 1 month (2628000 sec)         
-        if (!empty($gc_maxlifetime) && is_numeric($gc_maxlifetime) && $gc_maxlifetime > 86400 && $gc_maxlifetime < 2628000) {
+        $gc_maxlifetime = Config::get('system.gc_maxlifetime');
+        //Checks include is greater than 1 hour (3600 sec) is less than 1 month (2628000 sec)         
+        if (!empty($gc_maxlifetime) && is_numeric($gc_maxlifetime) && $gc_maxlifetime > 3600 && $gc_maxlifetime < 2628000) {
             ini_set('session.gc_maxlifetime', $gc_maxlifetime);            
         }
         

@@ -49,7 +49,7 @@ Config::set('email.transports', array(
 	'sendmail' => 'SwiftMailerTransport'
 ));
 
-Config::set('system.gc_maxlifetime', 21600);
+Config::append('system', ['gc_maxlifetime'=>21600]);
 
 // For SendGrid API integration (also used for Mandrill integration)
 // Config::append('email.api.credentials.key', '<your key>');
