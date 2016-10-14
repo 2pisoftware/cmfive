@@ -15,8 +15,12 @@ function listcomments(\Web $w, $params) {
         $unique_recipients = [];
         foreach($get_recipients as $recipients) {
             foreach ($recipients as $user_id => $is_notify) {
-                if($is_notify && !array_key_exists($user_id, $unique_recipients)){
+                if(!array_key_exists($user_id, $unique_recipients)){
                     $unique_recipients[$user_id] = $is_notify;
+                } else {
+                    if ($is_notify != $unique_recipients[$user_id]) {
+                        $unique_recipients[$user_id] = 1;
+                    }
                 }
             }
         }
@@ -28,7 +32,13 @@ function listcomments(\Web $w, $params) {
             foreach ($row as $user_id => $is_notify) {
                 $user = $w->Auth->getUser($user_id);
                 if (!empty($user)) {
-                    $recipients_form_html .= '<li><label class="small-12 columns">' . $user->getFullName() . ' <input type="checkbox" name="recipient_' . $user->id . '" value="1" checked="checked" id="recipient_' . $user_id . '" class=""></label></li>';                    
+                    if ($user->id == $w->auth->loggedIn()) {
+                        $recipients_form_html .= '<li><label class="small-12 columns">' . $user->getFullName() . ' <input type="checkbox" name="recipient_' . $user->id . '" value="1" id="recipient_' . $user_id . '" class=""></label></li>';                    
+                    } else {
+                        $recipients_form_html .= '<li><label class="small-12 columns">' . $user->getFullName() . ' <input type="checkbox" name="recipient_' . $user->id . '" value="1" ';
+                        $recipients_form_html .= $is_notify == 1 ? 'checked="checked"' : ''; 
+                        $recipients_form_html .= 'id="recipient_' . $user_id . '" class=""></label></li>';                    
+                    }
                 }
             }
             $recipients_form_html .= '</ul>';
