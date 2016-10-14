@@ -39,8 +39,6 @@ EOF;
         $top_table_name = $topObject->getDbTableName();
         $top_id = $topObject->id;
     }
-    //call hook for notification select
-    $get_recipients = $w->callHook('comment', 'get_notification_recipients_' . $top_table_name,['object_id'=>$top_id]);
     
     $form = [
         'Comment'=> [
@@ -58,13 +56,20 @@ EOF;
         ]
     ];
     
-    //add checkboxes to the form for each notification recipient    
+    
+    //call hook for notification select
+    $get_recipients = $w->callHook('comment', 'get_notification_recipients_' . $top_table_name,['object_id'=>$top_id]);
+    //add checkboxes to the form for each notification recipient 
     if (!empty($get_recipients)) {
         $unique_recipients = [];
         foreach($get_recipients as $recipients) {
             foreach ($recipients as $user_id => $is_notify) {
-                if($is_notify && !array_key_exists($user_id, $unique_recipients)){
+                if(!array_key_exists($user_id, $unique_recipients)){
                     $unique_recipients[$user_id] = $is_notify;
+                } else {
+                    if ($is_notify != $unique_recipients[$user_id]) {
+                        $unique_recipients[$user_id] = 1;
+                    }
                 }
             }
         }
@@ -77,12 +82,16 @@ EOF;
         $parts = array_chunk($unique_recipients, 4, true);
         
         foreach ($parts as $key=>$row) {
-            
             $form['Notifications'][$key+1] = [];
             foreach ($row as $user_id => $is_notify) {
                 $user = $w->Auth->getUser($user_id);
                 if (!empty($user)) {
-                    $form['Notifications'][$key+1][] = array($user->getFullName() . '    ', 'checkbox', 'recipient_' . $user->id, $is_notify);
+                    if ($user->id == $w->auth->loggedIn()) {
+                        $form['Notifications'][$key+1][] = array($user->getFullName() . '    ', 'checkbox', 'recipient_' . $user->id, 0);
+                    } else {
+                        $form['Notifications'][$key+1][] = array($user->getFullName() . '    ', 'checkbox', 'recipient_' . $user->id, $is_notify);
+                    }
+                    
                 }
             }
         }
@@ -116,7 +125,7 @@ function comment_POST(Web $w){
     //handle notifications
     $top_table_name = $p['tablename'];
     $top_id = $p['object_id'];
-    if ($table_name == 'comment') {
+    if ($top_table_name == 'comment') {
         $topObject = $w->Comment->getComment($p['object_id'])->getParentObject();
         $top_table_name = $topObject->getDbTableName();
         $top_id = $topObject->id;

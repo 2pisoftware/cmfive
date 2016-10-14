@@ -27,7 +27,6 @@ function listcomments(\Web $w, $params) {
         $recipients_form_html .= '<h4>Notifications</h4><input type="hidden" name="is_notifications" value="1" id="is_notifications"><div id="notifications_list">';
         $parts = array_chunk($unique_recipients, 4, true);
         foreach ($parts as $key=>$row) {
-            
             $recipients_form_html .= '<ul class="small-block-grid-1 medium-block-grid-' . count($row) . ' section-body">';
             foreach ($row as $user_id => $is_notify) {
                 $user = $w->Auth->getUser($user_id);
@@ -46,7 +45,5 @@ function listcomments(\Web $w, $params) {
         $recipients_form_html .= '</div>';        
     }
     $w->ctx('recipients_html', $recipients_form_html);
-    
-    //$w->ctx('recipients', json_encode($w->callHook('comment', 'get_notification_recipients_' . $object->getDbTableName(),['object_id'=>$object->id])));
 }
 

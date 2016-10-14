@@ -412,8 +412,9 @@ function task_comment_get_notification_recipients_task(Web $w, $params) {
         if (!empty($members)) {
             foreach($members as $member) {
                 //check if member is active
-                if ($member->is_active == 1) {
-                    $results[$member->user_id] = 1;
+                if (!empty($member)) {
+                    $results[$member[1]] = 1;
+
                 }
             }
         }
@@ -438,40 +439,30 @@ function task_comment_send_notification_recipients_task(Web $w, $params) {
         $commentor = $w->auth->getUser($params['commentor_id']);
         if (!empty($commentor)) {
             foreach($params['recipients'] as $key=>$user_id) {
-                if ($commentor->id !== $user_id) {
-                    $user = $w->auth->getUser($user_id);
-                    
-                    if (!empty($user)) {
-                        //$booking = $w->booking->getBookingForId($params['object_id']);
-                        $task = $w->task->getTask($params['object_id']);
-                        if (!empty($task)) {
-                            // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
-                            if ($params['is_new'] == true) {
-                                $subject = (!empty($comment_user->id) ? $comment_user->getFullName() : 'Someone') . ' has commented on a task that you\'re apart of ('.$task->title.')';
-                            } else {
-                                $subject = (!empty($comment_user->id) ? $comment_user->getFullName() : 'Someone') . ' has edited commented on a task that you\'re apart of ('.$task->title.')';
-                            }
-                                
-                            
-                            $message = $task->toLink(null, null, $user_object);
-                            $message .= $w->partial("displaycomment", array("object" => $object, "displayOnly" => true, 'redirect' => '/inbox'), "admin");
-
-                            // Get additional details
-                            $message .= $w->Task->getNotificationAdditionalDetails($task);
-
-                            $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
-
-                            $w->Mail->sendMail($user->getContact()->email, $commentor->getContact()->email, $subject, $message);
-                            
+                $user = $w->auth->getUser($user_id);
+                if (!empty($user)) {
+                    //$booking = $w->booking->getBookingForId($params['object_id']);
+                    $task = $w->task->getTask($params['object_id']);
+                    if (!empty($task)) {
+                        // prepare our message, add heading, add URL to task, add notification advice in messgae footer 
+                        if ($params['is_new'] == true) {
+                            $subject = (!empty($commentor->id) ? $commentor->getFullName() : 'Someone') . ' has commented on a task that you\'re apart of ('.$task->title.')';
                         } else {
-                            //no booking
-                            $w->log->error("Task: No task found for comment notifications");
+                            $subject = (!empty($commentor->id) ? $commentor->getFullName() : 'Someone') . ' has edited commented on a task that you\'re apart of ('.$task->title.')';
                         }
+                        $message = $task->toLink(null, null, $user_object);
+                        $message .= $w->partial("displaycomment", array("object" => $params['comment'], "displayOnly" => true, 'redirect' => '/inbox'), "admin");
+                        // Get additional details
+                        $message .= $w->Task->getNotificationAdditionalDetails($task);
+                        $message .= "<br/><br/><b>Note</b>: Go to " . Html::a(WEBROOT . "/task/tasklist#notifications", "Task > Task List > Notifications") . ", to edit the types of notifications you will receive.";
+                        $w->Mail->sendMail($user->getContact()->email, $commentor->getContact()->email, $subject, $message);
                     } else {
-                        //no user for recipient
-                        $w->log->error("Task: No user found for recipient in comment notifications");
+                        //no task
+                        $w->log->error("Task: No task found for comment notifications");
                     }
-                    
+                } else {
+                    //no user for recipient
+                    $w->log->error("Task: No user found for recipient in comment notifications");
                 }
             }
         } else {
@@ -482,5 +473,4 @@ function task_comment_send_notification_recipients_task(Web $w, $params) {
         //no recipients
         $w->log->error("Task: No recipients found for comment notifications");
     }
-    
 }
