@@ -35,14 +35,14 @@
 							$tasktypeobject = $task->getTaskTypeObject();
 							echo !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null; 
 							//echo $w->Tag->getTagButton($task->id,"Task")."&nbsp;";
-							echo $task->canDelete($w->Auth->user()) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), "Delete", "Are you sure you want to delete this task?" ) : ''; 
+							echo $task->canDelete($w->Auth->user()) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), "Delete", "Are you sure you want to delete this task?", null, false, 'warning') : ''; 
 							echo Html::b($task->w->localURL('task/duplicatetask/' . $task->id), "Duplicate Task");
 							echo Html::b($task->w->localURL('/task/edit/?gid=' . $task->task_group_id), "New Task");
 							echo Html::box("/task-group/moveTaskgroup/" . $task->id, "Move to Taskgroup", true, false, null, null, null, null, 'secondary');
 							
 							// Extra buttons for task
 							$buttons = $w->callHook("task", "extra_buttons", $task);
-							if (!empty($buttons)) {
+							if (!empty($buttons) && is_array($buttons)) {
 								echo implode('', $buttons);
 							}
 							
@@ -208,9 +208,6 @@
                 'extra': extras_form
             },
             complete: function(response) {
-				console.log(response);
-				console.log(response.responseText);
-//				debugger;
 				window.onbeforeunload = null;
                 if ($.isNumeric(response.responseText)) {
                     window.location.href = "/task/edit/" + response.responseText;

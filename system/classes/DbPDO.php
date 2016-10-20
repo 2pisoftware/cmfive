@@ -448,7 +448,7 @@ class DbPDO extends PDO {
 	/**
 	 * A self healing function when a table doesn't exist
 	 * This class will check the Config definition for a module and try and load
-	 * it's install SQL file
+	 * its install SQL file
 	 */
 	public function install($table) {
 		if (!class_exists("Config")) {
