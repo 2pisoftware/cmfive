@@ -35,14 +35,14 @@
 							$tasktypeobject = $task->getTaskTypeObject();
 							echo !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null; 
 							//echo $w->Tag->getTagButton($task->id,"Task")."&nbsp;";
-							echo $task->canDelete($w->Auth->user()) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), "Delete", "Are you sure you want to delete this task?" ) : ''; 
+							echo $task->canDelete($w->Auth->user()) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), "Delete", "Are you sure you want to delete this task?", null, false, 'warning') : ''; 
 							echo Html::b($task->w->localURL('task/duplicatetask/' . $task->id), "Duplicate Task");
 							echo Html::b($task->w->localURL('/task/edit/?gid=' . $task->task_group_id), "New Task");
 							echo Html::box("/task-group/moveTaskgroup/" . $task->id, "Move to Taskgroup", true, false, null, null, null, null, 'secondary');
 							
 							// Extra buttons for task
 							$buttons = $w->callHook("task", "extra_buttons", $task);
-							if (!empty($buttons)) {
+							if (!empty($buttons) && is_array($buttons)) {
 								echo implode('', $buttons);
 							}
 							
@@ -54,7 +54,30 @@
                     <div class="small-12 large-9">
                         <?php echo $form; ?>
                     </div>
-                    <div class="small-12 large-3 right">
+
+                    <div class="small-12 large-3 right" style="margin-top: 16px;">
+						<!--<h4 class="subheader text-center">Additional details</h4>-->
+						<?php
+							// Call hook and filter out empty/false values
+							if (!empty($task->id)) {
+								$additional_details = $w->callHook('task', 'additional_details', $task);
+								if (!is_null($additional_details) && is_array($additional_details)) {
+									$additional_details = array_values(array_filter($additional_details ? : []));
+									if (count($additional_details) > 0) : ?>
+										<div class="row-fluid clearfix panel">
+											<table class="small-12 columns">
+												<tbody>
+													<tr><td class="section" colspan="2">Additional Details</td></tr>
+													<?php foreach($additional_details as $additional_detail) : ?>
+														<tr><td><?php echo $additional_detail[0]; ?></td><td><?php echo $additional_detail[1]; ?></td></tr>
+													<?php endforeach; ?>
+												</tbody>
+											</table>
+										</div>
+									<?php endif;
+								}
+							}
+						?>
                         <div class="small-12 panel" id="tasktext" style="display: none;"></div>
                         <div class="small-12 panel clearfix" id="formfields" style="display: none;"></div>
                         <div class="small-12 panel clearfix" id="formdetails" style="display: none;"></div>
@@ -185,9 +208,6 @@
                 'extra': extras_form
             },
             complete: function(response) {
-				console.log(response);
-				console.log(response.responseText);
-//				debugger;
 				window.onbeforeunload = null;
                 if ($.isNumeric(response.responseText)) {
                     window.location.href = "/task/edit/" + response.responseText;
