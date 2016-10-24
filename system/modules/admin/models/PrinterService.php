@@ -9,12 +9,16 @@ class PrinterService extends DbService {
      * @return <Printer>
      */
     public function getPrinter($printer_id) {
-        return $this->getObject("printer", $printer_id);
+        return $this->getObject("Printer", $printer_id);
     }
     
     public function getPrinters() {
-        return $this->getObjects("printer");
+        return $this->getObjects("Printer");
     }
+	
+	public function getPrinterByName($printer_name) {
+		return $this->getObject('Printer', ['name' => $printer_name]);
+	}
     
     /**
      * Printjob sends a file to printer based on config rules
@@ -63,7 +67,7 @@ class PrinterService extends DbService {
             $response = shell_exec($command . " 2>&1");
             if (!empty($response)){
                 $this->w->Log->info("Shell exec repsonse: {$response}");
-                echo $response;
+//                echo $response;
             }
             
             return $response;
