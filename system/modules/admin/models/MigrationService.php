@@ -317,6 +317,7 @@ MIGRATION;
 
 							// Run migration UP
 							$migration_class = new $migration['classname'](1);
+                                                        $migration_class->setWeb($this->w);
 							$migration_class->setAdapter($mysql_adapter);
 							$migration_class->down();
 
