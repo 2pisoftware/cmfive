@@ -1,8 +1,6 @@
 <?php
 
-use \Zend\Mail\Storage as Zend_Mail_Storage;
 use \Zend\Mail\Message as Zend_Mail_Message;
-//use \Zend\Mail\Storage\Imap as Zend_Mail_Storage_Imap;
 
 //
 // The purpose of this class is to expose protocol
@@ -32,6 +30,9 @@ class EmailChannelOption extends DbObject {
     public $post_read_action; // delete, mark as archived, move to folder, apply tag, forward to email
     static public $_select_read_action = array("Archive", "Move to Folder", "Apply Tag", "Forward to", "Delete");
     public $post_read_parameter; // stores extra data, eg. tag name, folder name, forward email, etc.
+
+	public $verify_peer;
+	public $allow_self_signed;
 
     public function __construct(Web $w) {
         parent::__construct($w);
@@ -166,10 +167,23 @@ class EmailChannelOption extends DbObject {
 
         try {
             // Open email connection
-            $mail = new Zend_Mail_Storage_Imap(array('host' => $this->server,
+			$options = null;
+			if (!is_null($this->verify_peer)) {
+				$options = [
+					'ssl' => ['verify_peer' => $this->verify_peer ? true : false]
+				];
+				
+				if (!is_null($this->allow_self_signed)) {
+					$options['ssl']['allow_self_signed'] = $this->allow_self_signed ? true : false;
+				}
+			}
+			
+			$mail = new Zend_Mail_Storage_Imap(array('host' => $this->server,
                 'user' => $this->s_username,
                 'password' => $this->s_password,
-                'ssl' => ($this->use_auth == 1 ? "SSL" : false)));
+                'ssl' => ($this->use_auth == 1 ? "SSL" : false), 
+				'options' => $options
+			));
             return $mail;
         } catch (Exception $e) {
             $this->Log->error("Error connecting to mail server: " . $e->getMessage());
