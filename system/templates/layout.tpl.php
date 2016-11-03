@@ -30,7 +30,7 @@
         $w->enqueueScript(array("name" => "jquery.tablesorter.pager.js", "uri" => "/system/templates/js/tablesorter/addons/pager/jquery.tablesorter.pager.js", "weight" => 980));
         $w->enqueueScript(array("name" => "jquery.colorbox-min.js", "uri" => "/system/templates/js/colorbox/colorbox/jquery.colorbox-min.js", "weight" => 970));
         $w->enqueueScript(array("name" => "jquery-ui-1.10.4.custom.min.js", "uri" => "/system/templates/js/jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.min.js", "weight" => 960));
-//        $w->enqueueScript(array("name" => "jquery-ui-1.8.13.custom.min.js", "uri" => "/system/templates/js/jquery-ui-new/js/jquery-ui-1.8.13.custom.min.js", "weight" => 960));
+
         $w->enqueueScript(array("name" => "pickadate.js", "uri" => "/system/templates/js/pickadate.js-3.5.2/lib/compressed/picker.js", "weight" => 955));
         $w->enqueueScript(array("name" => "pickadate.date.js", "uri" => "/system/templates/js/pickadate.js-3.5.2/lib/compressed/picker.date.js", "weight" => 954));
         $w->enqueueScript(array("name" => "pickadate.time.js", "uri" => "/system/templates/js/pickadate.js-3.5.2/lib/compressed/picker.time.js", "weight" => 953));
@@ -322,11 +322,12 @@
         <script>
             $(document).foundation({
                 reveal : {
-                    animation_speed: 150,
-                    animation: 'fade'
-                },
+                    animation_speed: <?php echo defaultVal(Config::get('core_template.foundation.reveal.animation_speed'), 150); ?>,
+                    animation: '<?php echo defaultVal(Config::get('core_template.foundation.reveal.animation'), 'fade'); ?>',
+					close_on_background_click: <?php echo defaultVal(Config::get('core_template.foundation.reveal.close_on_background_click'), 'true'); // Must be string value in PHP ?>
+				},
 				accordion: {
-					multi_expand: true,
+					multi_expand: <?php echo defaultVal(Config::get('core_template.foundation.accordion.multi_expand'), 'true'); ?>,
 				}
 			});
             

@@ -59,9 +59,6 @@ function edit_GET($w) {
                     ->setValue(!empty($taskgroup) ? $taskgroup->id : null)
                     ->setTitle(!empty($taskgroup) ? $taskgroup->getSelectOptionTitle(): null)
                     ->setRequired('required'),
-//				!empty($p["id"]) ?
-//                        array("Task Group", "text", "-task_group_id_text", $taskgroup->title) :
-//                        array("Task Group", "autocomplete", "task_group_id", !empty($task->task_group_id) ? $task->task_group_id : $taskgroup_id, $taskgroups),
                 (new Select([
 					"id|name" => "task_type"
 				]))->setLabel("Task Type <small>Required</small>")
@@ -69,10 +66,6 @@ function edit_GET($w) {
                     ->setOptions($tasktypes)
                     ->setSelectedOption(!empty($p["id"]) ? $task->task_type : sizeof($tasktypes) === 1 ? $tasktypes[0] : null)
                     ->setRequired('required')
-//                !empty($p["id"]) ?
-//                        array("Task Type", "select", "-task_type", $task->task_type, $tasktypes) :
-//                        //array("Task Type", "select", "task_type", $task->task_type, $tasktypes)
-//                        array("Task Type", "select", "task_type", (sizeof($tasktypes) === 1) ? $tasktypes[0] : null, $tasktypes)
             ),
             array(
                 array("Task Title", "text", "title", $task->title),
@@ -93,10 +86,7 @@ function edit_GET($w) {
         	!empty($p['id']) ? [["Task Group ID", "hidden", "task_group_id", $task->task_group_id]] : null
         )
     );
-    
-//	if (!empty($p['id'])) {
-//		$form['Edit task [' . $task->id . ']'][5][] = array("Task Group ID", "hidden", "task_group_id", $task->task_group_id);
-//	}
+
 
     if (empty($p['id'])) {
     	History::add("New Task");
@@ -111,53 +101,7 @@ function edit_GET($w) {
     
     $w->ctx("task", $task);
     $w->ctx("form", Html::multiColForm($form, $w->localUrl("/task/edit/{$task->id}"), "POST", "Save", "edit_form", "prompt", null, "_self", true, Task::$_validation));
-   
-    //////////////////////////
-    // Build time log table //
-    //////////////////////////
-
-//    $timelog = $task->getTimeLog();
-//    $total_seconds = 0;
-//    
-//    $table_header = array("Assignee", "Start", "Period (hours)", "Comment","Actions");
-//    $table_data = array();
-//    if (!empty($timelog)) {
-//        // for each entry display, calculate period and display total time on task
-//        foreach ($timelog as $log) {
-//            // get time difference, start to end
-//            $seconds = $log->dt_end - $log->dt_start;
-//            $period = $w->Task->getFormatPeriod($seconds);
-//			$comment = $w->Comment->getComment($log->comment_id);
-//			$comment = !empty($comment) ? $comment->comment : "";
-//            $table_row = array(
-//                $w->Task->getUserById($log->user_id),
-//                formatDateTime($log->dt_start),
-//                $period,
-//            	!empty($comment) ? $w->Comment->renderComment($comment) : "",
-//            );
-//            
-//            // Build list of buttons
-//            $buttons = '';
-//            if ($log->is_suspect == "0") {
-//                $total_seconds += $seconds;
-//                $buttons .= Html::box($w->localUrl("/task/addtime/".$task->id."/".$log->id)," Edit ",true);
-//            }
-//
-//            if ($w->Task->getIsOwner($task->task_group_id, $w->Auth->user()->id)) {
-//                $buttons .= Html::b($w->localUrl("/task/suspecttime/".$task->id."/".$log->id), ((empty($log->is_suspect) || $log->is_suspect == "0") ? "Review" : "Accept"));
-//            }
-//            
-//            $buttons .= Html::b($w->localUrl("/task/deletetime/".$task->id."/".$log->id), "Delete", "Are you sure you wish to DELETE this Time Log Entry?");
-//            
-//            $table_row[] = $buttons;
-//            
-//            $table_data[] = $table_row;
-//        }
-//        $table_data[] = array("<b>Total</b>", "","<b>".$w->Task->getFormatPeriod($total_seconds)."</b>","","");
-//    }
-//    // display the task time log
-//    $w->ctx("timelog",Html::table($table_data, null, "tablesorter", $table_header));
-    
+ 
     ///////////////////
     // Notifications //
     ///////////////////

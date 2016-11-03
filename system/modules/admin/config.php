@@ -9,7 +9,7 @@ Config::set('admin', array(
     'hooks' => array('core_dbobject','core_web'),
     'printing' => array(
         'command' => array(
-            'unix' => 'lpr $filename',
+            'unix' => 'lpr -P $printername $filename',
             // 'windows' => 'C:\Users\adam\Desktop\SumatraPDF-2.4\SumatraPDF.exe -print-to $printername $filename'
         )
     ),

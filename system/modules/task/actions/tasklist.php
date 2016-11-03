@@ -19,9 +19,9 @@ function tasklist_ALL(Web $w) {
         $is_closed = $w->sessionOrRequest("task__is-closed", 0);
         $dt_from = $w->sessionOrRequest('task__dt-from');
         $dt_to = $w->sessionOrRequest('task__dt-to');
-		$filter_urgent = $w->sessionOrRequest('task__filter-urgent');
+		$filter_urgent = $w->sessionOrRequest('task__filter-urgent', false);
     }
-    
+	
 	// First get the taskgroup
 	$taskgroup = null;
     if (!empty($task_group_id)) {
@@ -89,13 +89,19 @@ function tasklist_ALL(Web $w) {
 	// Filter in or out closed tasks based on given is_closed filter parameter
 	if (!empty($task_objects) && empty($reset)) {
 		$task_objects = array_filter($task_objects, function($task) use ($is_closed, $filter_urgent) {
-			if (!is_null($filter_urgent)) {
-				return $task->isUrgent();
+			if (!is_null($filter_urgent) && $filter_urgent == '1') {
+				if (is_null($is_closed) || $is_closed === '') {
+					return $task->isUrgent();
+				} else {
+					return $task->isUrgent() && ($is_closed == '0' ? !$task->getisTaskClosed() : $task->getisTaskClosed());
+				}
 			}
+			
 			if (is_null($is_closed) || $is_closed === '') {
 				return true;
 			}
-			return ($is_closed == 0 ? !$task->getisTaskClosed() : $task->getisTaskClosed());
+			
+			return ($is_closed == '0' ? !$task->getisTaskClosed() : $task->getisTaskClosed());
 		});
 	}
 	
@@ -118,7 +124,7 @@ function tasklist_ALL(Web $w) {
 			"title"		=> !empty($task_group_id) ? $taskgroup->getSelectOptionTitle() : null
 		])), // array("Task Group", "select", "task__task-group-id", !empty($task_group_id) ? $task_group_id : null, $taskgroup_data["taskgroups"]),
         array("Task Type", "select", "task__type", !empty($task_type) ? $task_type : null, $taskgroup_data["types"]),
-        array("Task Priority", "select", "task__priority", !empty($task_priority) ? $task_priority : null, $taskgroup_data["priorities"]),
+        array("Task Priority", "select", "task__priority", !empty($filter_urgent) ? "Urgent" : !empty($task_priority) ? $task_priority : null, $taskgroup_data["priorities"]),
         array("Task Status", "select", "task__status", !empty($task_status) ? $task_status : null, $taskgroup_data["statuses"]),
         (new \Html\Form\Select([
 			"label"		=> "Closed",

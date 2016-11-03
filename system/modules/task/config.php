@@ -16,6 +16,9 @@ Config::set('task', array(
     ),
     'ical' => array(
         'send' => false
+    ),
+    'timelog' => array(
+        'Task'
     )
 ));
 

@@ -20,7 +20,7 @@ class Autocomplete extends \Html\Form\FormElement {
 	public $required;
 	public $source;
 	public $value;
-        public $readonly;
+	public $readonly;
 	
 	public static $_excludeFromOutput = [
 		"id", "name", "required", "value", "minlength", "class", "style",
