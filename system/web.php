@@ -357,7 +357,7 @@ class Web {
         //check config for 'gc_maxlifetime' for the session
         $gc_maxlifetime = Config::get('system.gc_maxlifetime');
         //Checks include is greater than 1 hour (3600 sec) is less than 1 month (2628000 sec)         
-        if (!empty($gc_maxlifetime) && is_numeric($gc_maxlifetime) && $gc_maxlifetime > 3600 && $gc_maxlifetime < 2628000) {
+        if (!empty($gc_maxlifetime) && is_numeric($gc_maxlifetime) && $gc_maxlifetime >= 3600 && $gc_maxlifetime <= 2628000) {
             ini_set('session.gc_maxlifetime', $gc_maxlifetime);            
         }
         
