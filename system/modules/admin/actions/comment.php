@@ -56,42 +56,43 @@ EOF;
         ]
     ];
     
-    
-    //call hook for notification select
-    $get_recipients = $w->callHook('comment', 'get_notification_recipients_' . $top_table_name,['object_id'=>$top_id]);
-    //add checkboxes to the form for each notification recipient 
-    if (!empty($get_recipients)) {
-        $unique_recipients = [];
-        foreach($get_recipients as $recipients) {
-            foreach ($recipients as $user_id => $is_notify) {
-                if(!array_key_exists($user_id, $unique_recipients)){
-                    $unique_recipients[$user_id] = $is_notify;
-                } else {
-                    if ($is_notify != $unique_recipients[$user_id]) {
-                        $unique_recipients[$user_id] = 1;
+    if (!$p["comment_id"]) {
+        //call hook for notification select
+        $get_recipients = $w->callHook('comment', 'get_notification_recipients_' . $top_table_name,['object_id'=>$top_id]);
+        //add checkboxes to the form for each notification recipient 
+        if (!empty($get_recipients)) {
+            $unique_recipients = [];
+            foreach($get_recipients as $recipients) {
+                foreach ($recipients as $user_id => $is_notify) {
+                    if(!array_key_exists($user_id, $unique_recipients)){
+                        $unique_recipients[$user_id] = $is_notify;
+                    } else {
+                        if ($is_notify != $unique_recipients[$user_id]) {
+                            $unique_recipients[$user_id] = 1;
+                        }
                     }
                 }
             }
-        }
-        
-        $form["Notifications"] = [
-            [
-                array("", "hidden", "is_notifications", 1)
-            ]
-        ];
-        $parts = array_chunk($unique_recipients, 4, true);
-        
-        foreach ($parts as $key=>$row) {
-            $form['Notifications'][$key+1] = [];
-            foreach ($row as $user_id => $is_notify) {
-                $user = $w->Auth->getUser($user_id);
-                if (!empty($user)) {
-                    if ($user->id == $w->auth->loggedIn()) {
-                        $form['Notifications'][$key+1][] = array($user->getFullName() . '    ', 'checkbox', 'recipient_' . $user->id, 0);
-                    } else {
-                        $form['Notifications'][$key+1][] = array($user->getFullName() . '    ', 'checkbox', 'recipient_' . $user->id, $is_notify);
+
+            $form["Notifications"] = [
+                [
+                    array("", "hidden", "is_notifications", 1)
+                ]
+            ];
+            $parts = array_chunk($unique_recipients, 4, true);
+
+            foreach ($parts as $key=>$row) {
+                $form['Notifications'][$key+1] = [];
+                foreach ($row as $user_id => $is_notify) {
+                    $user = $w->Auth->getUser($user_id);
+                    if (!empty($user)) {
+                        if ($user->id == $w->auth->loggedIn()) {
+                            $form['Notifications'][$key+1][] = array($user->getFullName() . '    ', 'checkbox', 'recipient_' . $user->id, 0);
+                        } else {
+                            $form['Notifications'][$key+1][] = array($user->getFullName() . '    ', 'checkbox', 'recipient_' . $user->id, $is_notify);
+                        }
+
                     }
-                    
                 }
             }
         }

@@ -32,9 +32,9 @@ function listcomments(\Web $w, $params) {
                 $user = $w->Auth->getUser($user_id);
                 if (!empty($user)) {
                     if ($user->id == $w->auth->loggedIn()) {
-                        $recipients_form_html .= '<li><label class="small-12 columns">' . $user->getFullName() . ' <input type="checkbox" name="recipient_' . $user->id . '" value="1" id="recipient_' . $user_id . '" class=""></label></li>';                    
+                        $recipients_form_html .= '<li><label class="small-12 columns">' . addcslashes($user->getFullName(),'\'') . ' <input type="checkbox" name="recipient_' . $user->id . '" value="1" id="recipient_' . $user_id . '" class=""></label></li>';                    
                     } else {
-                        $recipients_form_html .= '<li><label class="small-12 columns">' . $user->getFullName() . ' <input type="checkbox" name="recipient_' . $user->id . '" value="1" ';
+                        $recipients_form_html .= '<li><label class="small-12 columns">' . addcslashes($user->getFullName(),'\'') . ' <input type="checkbox" name="recipient_' . $user->id . '" value="1" ';
                         $recipients_form_html .= $is_notify == 1 ? 'checked="checked"' : ''; 
                         $recipients_form_html .= 'id="recipient_' . $user_id . '" class=""></label></li>';                    
                     }
