@@ -58,7 +58,7 @@ class Config {
      * @param string $key
      * @return Mixed the value
      */
-    public static function get($key) {
+    public static function get($key, $default = null) {
         if(!empty(self::$_config_cache[$key])) {
            return self::$_config_cache[$key];
         }
@@ -73,14 +73,14 @@ class Config {
 				$i++;
 			}
 			if($i !== count($exploded_key)) {
-				self::$_config_cache[$key] = NULL;
+				self::$_config_cache[$key] = null;
 			} else {
 				self::$_config_cache[$key] = &$value;
 			}
             return self::$_config_cache[$key];
         }
-		self::$_config_cache[$key] = NULL;
-        return NULL;
+		self::$_config_cache[$key] = null;
+        return !is_null($default) ? $default : null;
     }
     
     /**
