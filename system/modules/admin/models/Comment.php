@@ -49,6 +49,18 @@ class Comment extends DbObject {
         $str.= "<i>" . formatDateTime($this->dt_created) . "</i>";
         return $str;
     }
+    
+    /*
+     * get object for comment thread
+     * return object
+     */
+    public function getParentObject() {
+        if ($this->obj_table == 'comment') {
+            return $this->w->Comment->getComment($this->obj_id)->getParentObject();
+        } else {
+            return $this->w->Comment->getObject($this->obj_table,$this->obj_id);
+        }
+    }
 
     /*
      * New comments go First !

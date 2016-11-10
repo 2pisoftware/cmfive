@@ -1364,7 +1364,7 @@ function _setPageSize($format, &$orientation) {
 	$this->h=$this->hPt/_MPDFK;
 }
 
-function _getPageFormat($format) {
+function _getPageFormat($format = 'A4') {
 		switch (strtoupper($format)) {
 			case '4A0': {$format = array(4767.87,6740.79); break;}
 			case '2A0': {$format = array(3370.39,4767.87); break;}
@@ -1372,7 +1372,7 @@ function _getPageFormat($format) {
 			case 'A1': {$format = array(1683.78,2383.94); break;}
 			case 'A2': {$format = array(1190.55,1683.78); break;}
 			case 'A3': {$format = array(841.89,1190.55); break;}
-			case 'A4': default: {$format = array(595.28,841.89); break;}
+			case 'A4': {$format = array(595.28,841.89); break;}
 			case 'A5': {$format = array(419.53,595.28); break;}
 			case 'A6': {$format = array(297.64,419.53); break;}
 			case 'A7': {$format = array(209.76,297.64); break;}
