@@ -12,11 +12,20 @@
     </div>
 	
     <div id="timerModal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
-		<div class="row">
+        <form onsubmit="return saveTimer()">
+            <?php if (!empty($tracked_object)): ?>
+                <div class="row-fluid clearfix panel">
+                    <h3>
+                        <?php echo get_class($tracked_object) . " [" . $tracked_object->id . "]" . (!empty($tracked_object) ? ' - ' . $tracked_object->printSearchTitle() : ''); ?>
+                    </h3>
+                </div>
+            <?php endif; ?>
+                <div class="row">
 			<div class="large-12 columns">
 				<h2>Start timer</h2>
 			</div>
 		</div>
+                
 		<div class="row">
 			<div class="large-12 columns">
 				<label>Enter Description
@@ -25,13 +34,27 @@
 			</div>
 		</div>
 		<br/>
-		<div class="row">
+                <div class="row">
 			<div class="large-12 columns">
-				<button class="button" onclick="saveTimer();">Start</button>
-				<button class="button secondary right" onclick="$('#timerModal').foundation('reveal', 'close');">Close</button>
+				<label>Enter Start Time (Optional - Defaults to 'now')
+					<?php echo(new \Html\Form\InputField([
+                            "id|name"		=> "start_time",
+                            "value"			=> !empty($active_log) ? $active_log->getTimeStart() : null,
+                            "pattern"		=> "^(0?[0-9]|1[0-9]|2[0-3]):[0-5][0-9](\s+)?(AM|PM|am|pm)?$",
+                            "placeholder"	=> "12hr format: 11:30pm or 24hr format: 23:30"
+                    ])); ?>
+				</label>
 			</div>
 		</div>
-	</div>
+                <br/>
+		<div class="row">
+			<div class="large-12 columns">
+				<button class="button">Save</button>
+				<button class="button secondary right" type="button" onclick="$('#timerModal').foundation('reveal', 'close');">Close</button>
+			</div>
+		</div>
+        </form>
+    </div>
 	
     <script>    
         var timer = null;
@@ -67,10 +90,19 @@
 
 		function openDescription() {
 			$('#timerModal').foundation('reveal', 'open');
+                        $("#start_time").val("");
 		}
 
         // Start timer function
         function saveTimer() {
+            if ($("#start_time").val() != "") {                
+                var startDate = parseTime($("#start_time").val());                
+                if ((new Date()) <= startDate) {                    
+                    alert('You cannot set the start time in future');
+                    return false;
+                }
+            }
+
             var _object = JSON.parse(<?php echo $w->Timelog->hasTrackingObject() ? json_encode($w->Timelog->getJSTrackingObject()) : ''; ?>);
             if (_object.class && _object.id) {
                 jQuery.ajax("/timelog/ajaxStart/" + _object.class + "/" + _object.id, {
@@ -82,11 +114,11 @@
                     success: function(data) {
                         var object_data = JSON.parse(data);
                         
-                        start_time = (new Date().getTime() / 1000);
+                        start_time = (object_data.hasOwnProperty('start_time') && object_data.start_time !== null) ? object_data.start_time : (new Date().getTime() / 1000);
                         timer = countTime();
                         $("#start_timer").hide();
                         $("#stop_timer").fadeIn();
-                        
+                        $("#start_time").val("");
                         var selector = $('#stop_timer span[data-tooltip]').attr('data-selector');
                         $('#' + selector).html(object_data.object + ': ' + object_data.title);
                         
