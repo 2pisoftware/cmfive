@@ -318,6 +318,22 @@
 						return false;
 					}
 				}
+			<?php else : ?>
+				if ($("#date_start").val() != "" && $("#time_start").val() != '') {                
+	                var moment_start = moment($("#date_start").val() + ' ' + $("#time_start").val(), ['DD/MM/YYYY HH:mm ', 'DD/MM/YYYY hh:mm a']);
+	                if (!moment_start.isValid()) {
+	                	alert('An invalid time format was provided');
+	                	return false;
+	                } else {
+	                	if (moment_start.isAfter(new Date())) {
+	                		alert('Start date/time cannot be in the future');
+	                		return false;
+	                	}
+	                }
+	            } else {
+	            	alert("A start date and time are required");
+	            	return false;
+	            }
 			<?php endif; ?>
 		});
 

@@ -19,9 +19,6 @@
         $w->enqueueStyle(array("name" => "colorbox.css", "uri" => "/system/templates/js/colorbox/colorbox/colorbox.css", "weight" => 950));
         $w->enqueueStyle(array("name" => "jquery.asmselect.css", "uri" => "/system/templates/css/jquery.asmselect.css", "weight" => 940));
         $w->enqueueStyle(array("name" => "foundation-icons.css", "uri" => "/system/templates/font/foundation-icons/foundation-icons.css", "weight" => 930));
-        $w->enqueueStyle(array("name" => "pickadate.classic.css", "uri" => "/system/templates/js/pickadate.js-3.5.2/lib/compressed/themes/classic.css", "weight" => 920));
-        $w->enqueueStyle(array("name" => "pickadate.classic.date.css", "uri" => "/system/templates/js/pickadate.js-3.5.2/lib/compressed/themes/classic.date.css", "weight" => 919));
-        $w->enqueueStyle(array("name" => "pickadate.classic.time.css", "uri" => "/system/templates/js/pickadate.js-3.5.2/lib/compressed/themes/classic.time.css", "weight" => 918));
         $w->enqueueStyle(array("name" => "codemirror.css", "uri" => "/system/templates/js/codemirror-4.4/lib/codemirror.css", "weight" => 900));
         
         $w->enqueueScript(array("name" => "modernizr.js", "uri" => "/system/templates/js/foundation-5.5.0/js/vendor/modernizr.js", "weight" => 1010));
@@ -31,9 +28,6 @@
         $w->enqueueScript(array("name" => "jquery.colorbox-min.js", "uri" => "/system/templates/js/colorbox/colorbox/jquery.colorbox-min.js", "weight" => 970));
         $w->enqueueScript(array("name" => "jquery-ui-1.10.4.custom.min.js", "uri" => "/system/templates/js/jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.min.js", "weight" => 960));
 
-        $w->enqueueScript(array("name" => "pickadate.js", "uri" => "/system/templates/js/pickadate.js-3.5.2/lib/compressed/picker.js", "weight" => 955));
-        $w->enqueueScript(array("name" => "pickadate.date.js", "uri" => "/system/templates/js/pickadate.js-3.5.2/lib/compressed/picker.date.js", "weight" => 954));
-        $w->enqueueScript(array("name" => "pickadate.time.js", "uri" => "/system/templates/js/pickadate.js-3.5.2/lib/compressed/picker.time.js", "weight" => 953));
         $w->enqueueScript(array("name" => "jquery-ui-timepicker-addon.js", "uri" => "/system/templates/js/jquery-ui-timepicker-addon.js", "weight" => 950));
         $w->enqueueScript(array("name" => "livevalidation.js", "uri" => "/system/templates/js/livevalidation.js", "weight" => 940));
         $w->enqueueScript(array("name" => "main.js", "uri" => "/system/templates/js/main.js", "weight" => 995));
@@ -41,6 +35,8 @@
         $w->enqueueScript(array("name" => "boxover.js", "uri" => "/system/templates/js/boxover.js", "weight" => 910));
         $w->enqueueScript(array("name" => "ckeditor.js", "uri" => "/system/templates/js/ckeditor/ckeditor.js", "weight" => 900));
         $w->enqueueScript(array("name" => "Chart.js", "uri" => "/system/templates/js/chart-js/Chart.min.js", "weight" => 890));
+        
+        $w->enqueueScript(array("name" => "moment.js", "uri" => "/system/templates/js/moment.min.js", "weight" => 880));
         
         // Code mirror
         $w->enqueueScript(array("name" => "codemirror.js", "uri" => "/system/templates/js/codemirror-4.4/codemirror-compressed.js", "weight" => 880));
