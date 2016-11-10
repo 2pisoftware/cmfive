@@ -12,15 +12,12 @@
     </div>
 	
     <div id="timerModal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
-        <form onsubmit="saveTimer()">
+        <form onsubmit="return saveTimer()">
             <?php if (!empty($tracked_object)): ?>
                 <div class="row-fluid clearfix panel">
                     <h3>
-                        <?php echo $tracked_object->getDbTableName() . " [" . $tracked_object->id . "]"; ?>
+                        <?php echo get_class($tracked_object) . " [" . $tracked_object->id . "]" . (!empty($tracked_object) ? ' - ' . $tracked_object->printSearchTitle() : ''); ?>
                     </h3>
-                    <p>
-                        <?php echo !empty($tracked_object) ? $tracked_object->printSearchTitle() : ''; ?>
-                    </p>  
                 </div>
             <?php endif; ?>
                 <div class="row">
@@ -41,11 +38,11 @@
 			<div class="large-12 columns">
 				<label>Enter Start Time (Optional - Defaults to 'now')
 					<?php echo(new \Html\Form\InputField([
-                                                "id|name"		=> "start_time",
-                                                "value"			=> !empty($active_log) ? $active_log->getTimeStart() : null,
-                                                "pattern"		=> "^(0?[0-9]|1[0-9]|2[0-3]):[0-5][0-9](\s+)?(AM|PM|am|pm)?$",
-                                                "placeholder"	=> "12hr format: 11:30pm or 24hr format: 23:30"
-                                        ])); ?>
+                            "id|name"		=> "start_time",
+                            "value"			=> !empty($active_log) ? $active_log->getTimeStart() : null,
+                            "pattern"		=> "^(0?[0-9]|1[0-9]|2[0-3]):[0-5][0-9](\s+)?(AM|PM|am|pm)?$",
+                            "placeholder"	=> "12hr format: 11:30pm or 24hr format: 23:30"
+                    ])); ?>
 				</label>
 			</div>
 		</div>
@@ -101,10 +98,11 @@
             if ($("#start_time").val() != "") {                
                 var startDate = parseTime($("#start_time").val());                
                 if ((new Date()) <= startDate) {                    
-                        alert('You cannot set the start time in future');
-                    return;
+                    alert('You cannot set the start time in future');
+                    return false;
                 }
             }
+
             var _object = JSON.parse(<?php echo $w->Timelog->hasTrackingObject() ? json_encode($w->Timelog->getJSTrackingObject()) : ''; ?>);
             if (_object.class && _object.id) {
                 jQuery.ajax("/timelog/ajaxStart/" + _object.class + "/" + _object.id, {
