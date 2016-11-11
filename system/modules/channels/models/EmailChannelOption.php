@@ -1,14 +1,107 @@
 <?php
 
-use \Zend\Mail\Storage as Zend_Mail_Storage;
 use \Zend\Mail\Message as Zend_Mail_Message;
-//use \Zend\Mail\Storage\Imap as Zend_Mail_Storage_Imap;
 
 //
 // The purpose of this class is to expose protocol
 //
 class Zend_Mail_Storage_Imap extends \Zend\Mail\Storage\Imap {
     public $protocol;
+
+    public function __construct($params) {
+        if (is_array($params)) {
+            $params = (object) $params;
+        }
+
+        $this->has['flags'] = true;
+
+        if ($params instanceof Protocol\Imap) {
+            $this->protocol = $params;
+            try {
+                $this->selectFolder('INBOX');
+            } catch (Exception\ExceptionInterface $e) {
+                throw new Exception\RuntimeException('cannot select INBOX, is this a valid transport?', 0, $e);
+            }
+            return;
+        }
+
+        if (!isset($params->user)) {
+            throw new Exception\InvalidArgumentException('need at least user in params');
+        }
+
+        $host     = isset($params->host)     ? $params->host     : 'localhost';
+        $password = isset($params->password) ? $params->password : '';
+        $port     = isset($params->port)     ? $params->port     : null;
+        $ssl      = isset($params->ssl)      ? $params->ssl      : false;
+        $options  = isset($params->options)  ? $params->options  : null;
+
+        $this->protocol = new Zend_Mail_Protocol_Imap();
+        $this->protocol->connect($host, $port, $ssl, $options);
+        if (!$this->protocol->login($params->user, $password)) {
+            throw new Exception\RuntimeException('cannot login, user or password wrong');
+        }
+        $this->selectFolder(isset($params->folder) ? $params->folder : 'INBOX');
+    }
+}
+
+use Zend\Stdlib\ErrorHandler;
+
+class Zend_Mail_Protocol_Imap extends \Zend\Mail\Protocol\Imap { 
+
+    public function connect($host, $port = null, $ssl = false, $options = []) {
+        $isTls = false;
+
+        if ($ssl) {
+            $ssl = strtolower($ssl);
+        }
+
+        switch ($ssl) {
+            case 'ssl':
+                $host = 'ssl://' . $host;
+                if (!$port) {
+                    $port = 993;
+                }
+                break;
+            case 'tls':
+                $isTls = true;
+                // break intentionally omitted
+            default:
+                if (!$port) {
+                    $port = 143;
+                }
+        }
+
+        ErrorHandler::start();
+        
+        // Use stream_context_create instead of fsockopen as it allows us to specify SSL stream options
+        $stream = stream_context_create();
+        if ($ssl !== false && !is_null($options) && is_array($options) && array_key_exists('ssl', $options)) {
+            stream_context_set_option($stream, $options);
+        }
+
+        $this->socket = stream_socket_client($host . ':' . $port, $errno, $errstr, self::TIMEOUT_CONNECTION, STREAM_CLIENT_CONNECT, $stream);
+
+        $error = ErrorHandler::stop();
+        if (!$this->socket) {
+            throw new Exception\RuntimeException(sprintf(
+                'cannot connect to host %s',
+                ($error ? sprintf('; error = %s (errno = %d )', $error->getMessage(), $error->getCode()) : '')
+            ), 0, $error);
+        }
+
+        if (!$this->_assumedNextLine('* OK')) {
+            throw new Exception\RuntimeException('host doesn\'t allow connection');
+        }
+
+        if ($isTls) {
+            $result = $this->requestAndResponse('STARTTLS');
+            $result = $result && stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+            if (!$result) {
+                throw new Exception\RuntimeException('cannot enable TLS');
+            }
+        }
+    }
+
 }
 
 class EmailChannelOption extends DbObject {
@@ -32,6 +125,9 @@ class EmailChannelOption extends DbObject {
     public $post_read_action; // delete, mark as archived, move to folder, apply tag, forward to email
     static public $_select_read_action = array("Archive", "Move to Folder", "Apply Tag", "Forward to", "Delete");
     public $post_read_parameter; // stores extra data, eg. tag name, folder name, forward email, etc.
+
+	public $verify_peer;
+	public $allow_self_signed;
 
     public function __construct(Web $w) {
         parent::__construct($w);
@@ -166,10 +262,23 @@ class EmailChannelOption extends DbObject {
 
         try {
             // Open email connection
-            $mail = new Zend_Mail_Storage_Imap(array('host' => $this->server,
+			$options = null;
+			if (!is_null($this->verify_peer)) {
+				$options = [
+					'ssl' => ['verify_peer' => $this->verify_peer ? true : false]
+				];
+				
+				if (!is_null($this->allow_self_signed)) {
+					$options['ssl']['allow_self_signed'] = $this->allow_self_signed ? true : false;
+				}
+			}
+			
+			$mail = new Zend_Mail_Storage_Imap(array('host' => $this->server,
                 'user' => $this->s_username,
                 'password' => $this->s_password,
-                'ssl' => ($this->use_auth == 1 ? "SSL" : false)));
+                'ssl' => ($this->use_auth == 1 ? "SSL" : false), 
+				'options' => $options
+			));
             return $mail;
         } catch (Exception $e) {
             $this->Log->error("Error connecting to mail server: " . $e->getMessage());

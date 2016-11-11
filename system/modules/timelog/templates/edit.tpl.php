@@ -298,25 +298,43 @@
 				
 		$("#timelog_edit_form").on('submit', function() {
 			// Validate start/finish times
-			if ($("input[name='select_end_method']:checked").val() === 'time') {
-				var startDate = parseTime($("#time_start").val());
-				var endDate = parseTime($("#time_end").val());
-			
-				if (endDate <= startDate) {
-					$("#timelog__end-time-error").show();
-					$("#timelog__end-time-error").parent().addClass('error');
-					return false;
-				}
-			} else {
-				var hours_worked = $("#hours_worked").val();
-				var minutes_worked = $("#minutes_worked").val();
+			<?php if (!$timelog->isRunning()) : ?>
+				if ($("input[name='select_end_method']:checked").val() === 'time') {
+					var startDate = parseTime($("#time_start").val());
+					var endDate = parseTime($("#time_end").val());
 				
-				if ((!hours_worked && !minutes_worked) || (hours_worked <= 0 && minutes_worked <= 0)) {
-					$("#timelog__hours-mins-error").show();
-					$("#timelog__hours-mins-error").parent().addClass('error');
-					return false;
+					if (endDate <= startDate) {
+						$("#timelog__end-time-error").show();
+						$("#timelog__end-time-error").parent().addClass('error');
+						return false;
+					}
+				} else {
+					var hours_worked = $("#hours_worked").val();
+					var minutes_worked = $("#minutes_worked").val();
+					
+					if ((!hours_worked && !minutes_worked) || (hours_worked <= 0 && minutes_worked <= 0)) {
+						$("#timelog__hours-mins-error").show();
+						$("#timelog__hours-mins-error").parent().addClass('error');
+						return false;
+					}
 				}
-			}
+			<?php else : ?>
+				if ($("#date_start").val() != "" && $("#time_start").val() != '') {                
+	                var moment_start = moment($("#date_start").val() + ' ' + $("#time_start").val(), ['DD/MM/YYYY HH:mm ', 'DD/MM/YYYY hh:mm a']);
+	                if (!moment_start.isValid()) {
+	                	alert('An invalid time format was provided');
+	                	return false;
+	                } else {
+	                	if (moment_start.isAfter(new Date())) {
+	                		alert('Start date/time cannot be in the future');
+	                		return false;
+	                	}
+	                }
+	            } else {
+	            	alert("A start date and time are required");
+	            	return false;
+	            }
+			<?php endif; ?>
 		});
 
 		$("#timelogForm").on("submit", function () {
