@@ -35,9 +35,10 @@ class creole_rule {
     var $children = array();
     var $fallback = false;
     
-    function creole_rule($params = array()) {
+    function __construct($params = array()) {
         foreach ($params as $k => $v) {
-            eval('$this->' . $k . ' = $v;');
+            // eval('$this->' . $k . ' = $v;');
+            $this->{$k} = $v;
         }
     }
    
@@ -139,8 +140,8 @@ class creole_rule_default_fallback extends creole_rule {
 }
 
 class creole_rule_image extends creole_rule {
-    function creole_rule_image($params = array()) {
-        parent::creole_rule($params);
+    function __construct($params = array()) {
+        parent::__construct($params);
     }
     
     function build($node, $matches, $options = array()) {
@@ -154,8 +155,8 @@ class creole_rule_image extends creole_rule {
 
 
 class creole_rule_named_uri extends creole_rule {
-    function creole_rule_named_uri($params = array()) {
-        parent::creole_rule($params);
+    function __construct($params = array()) {
+        parent::__construct($params);
     }
     
     function build($node, $matches, $options = array()) {
@@ -168,8 +169,8 @@ class creole_rule_named_uri extends creole_rule {
 }
 
 class creole_rule_unnamed_uri extends creole_rule_named_uri {
-    function creole_rule_unnamed_uri($params = array()) {
-        parent::creole_rule_named_uri($params);
+    function __construct($params = array()) {
+        parent::__construct($params);
     }
     
     function build($node, $matches, $options = array()) {
@@ -178,8 +179,8 @@ class creole_rule_unnamed_uri extends creole_rule_named_uri {
 }
 
 class creole_rule_named_link extends creole_rule {
-    function creole_rule_named_link($params = array()) {
-        parent::creole_rule($params);
+    function __construct($params = array()) {
+        parent::__construct($params);
     }
     
     function format_link($link, $format) {
@@ -220,8 +221,8 @@ class creole_rule_named_link extends creole_rule {
 }
 
 class creole_rule_unnamed_link extends creole_rule_named_link {
-    function creole_rule_unnamed_link($params = array()) {
-        parent::creole_rule_named_link($params);
+    function __construct($params = array()) {
+        parent::__construct($params);
     }
     
     function build($node, $matches, $options = array()) {
@@ -230,8 +231,8 @@ class creole_rule_unnamed_link extends creole_rule_named_link {
 }
 
 class creole_rule_named_interwiki_link extends creole_rule_named_link {
-    function creole_rule_named_interwiki_link($params = array()) {
-        parent::creole_rule_named_link($params);
+    function __construct($params = array()) {
+        parent::__construct($params);
     }
 
     function build($node, $matches, $options = array()) {
@@ -254,8 +255,8 @@ class creole_rule_named_interwiki_link extends creole_rule_named_link {
 }
 
 class creole_rule_unnamed_interwiki_link extends creole_rule_named_interwiki_link {
-    function creole_rule_unnamed_interwiki_link($params = array()) {
-        parent::creole_rule_named_interwiki_link($params);
+    function __construct($params = array()) {
+        parent::__construct($params);
     }
 
     function build($node, $matches, $options = array()) {
@@ -264,8 +265,8 @@ class creole_rule_unnamed_interwiki_link extends creole_rule_named_interwiki_lin
 }
 
 class creole_rule_extension extends creole_rule {
-    function creole_rule_extension($params = array()) {
-        parent::creole_rule($params);
+    function __construct($params = array()) {
+        parent::__construct($params);
     }
     
     function build($node, $matches, $options = array()) {
@@ -283,7 +284,7 @@ class creole_node {
     var $attrs;
     var $content = array();
     
-    function creole_node($tag = false) {
+    function __construct($tag = false) {
         $this->tag = $tag;
     }
     
@@ -322,7 +323,7 @@ class creole {
     var $grammar;
     var $options;
     
-    function creole($options = array()) {
+    function __construct($options = array()) {
         $this->options = $options;
         
         $rx['ext'] = '<<<([^>]*(?:>>?(?!>)[^>]*)*)>>>';
@@ -527,5 +528,3 @@ class creole {
         return $node->as_string();
     }
 }
-
-?>
