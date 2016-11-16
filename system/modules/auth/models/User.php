@@ -26,14 +26,22 @@ class User extends DbObject {
     public $_modifiable;
 	
     public function delete($force = false) {
-        $contact = $this->getContact();
-        if ($contact) {
-            $contact->delete();
+        
+        try {
+            $this->startTransaction();
+            
+            $contact = $this->getContact();
+            if ($contact) {
+                $contact->delete($force);
+            }
+            
+            parent::delete($force);
+            $this->commitTransaction();
+        } catch (Exception $e) {
+            
+            // The error should already be logged
+            $this->rollbackTransaction();
         }
-        $this->is_deleted = 1;
-        $this->is_active = 0;
-        $this->password = "";
-        $this->update();
     }
 
     public function getContact() {
