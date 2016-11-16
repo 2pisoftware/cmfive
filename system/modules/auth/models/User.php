@@ -252,7 +252,10 @@ class User extends DbObject {
      */
     public function removeRole($role) {
         if ($this->hasRole($role)) {
-            $this->_db->delete("user_role")->where("user_id", $this->id)->and("role", $role)->execute();
+            $role = $this->admin->getObject("UserRole",["user_id"=>$this->id,"role"=>$role]);
+            if (!empty($role)) {
+                $role->delete();
+            }
             $this->getRoles(true);
         }
     }
