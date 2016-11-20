@@ -1,14 +1,12 @@
-Options +FollowSymLinks
+<IfModule mod_headers.c>
+   RequestHeader unset Proxy
+</IfModule>
 
-# Add manifest type for cache manifest
-AddType text/cache-manifest .manifest
+Options All -Indexes
 
 # Turn on the RewriteEngine
 RewriteEngine On
-
-#  Rules
-RewriteRule c3 index.php
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule .* index.php
-
+RewriteCond %{REQUEST_URI} !\.(jpg|png|ico|jpeg|gif|css|js)$
+RewriteRule ^(.*)$ /index.php [NC,L,QSA]
