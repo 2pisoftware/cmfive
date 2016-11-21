@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Exception\LogicException;
 
 /**
  * The ProgressBar provides helpers to display progress output.
@@ -26,7 +28,8 @@ class ProgressBar
     private $barChar;
     private $emptyBarChar = '-';
     private $progressChar = '>';
-    private $format = null;
+    private $format;
+    private $internalFormat;
     private $redrawFreq = 1;
 
     /**
@@ -38,10 +41,10 @@ class ProgressBar
     private $startTime;
     private $stepWidth;
     private $percent = 0.0;
-    private $lastMessagesLength = 0;
     private $formatLineCount;
-    private $messages;
+    private $messages = array();
     private $overwrite = true;
+    private $firstRun = true;
 
     private static $formatters;
     private static $formats;
@@ -54,6 +57,10 @@ class ProgressBar
      */
     public function __construct(OutputInterface $output, $max = 0)
     {
+        if ($output instanceof ConsoleOutputInterface) {
+            $output = $output->getErrorOutput();
+        }
+
         $this->output = $output;
         $this->setMaxSteps($max);
 
@@ -61,13 +68,9 @@ class ProgressBar
             // disable overwrite when output does not support ANSI codes.
             $this->overwrite = false;
 
-            if ($this->max > 10) {
-                // set a reasonable redraw frequency so output isn't flooded
-                $this->setRedrawFrequency($max / 10);
-            }
+            // set a reasonable redraw frequency so output isn't flooded
+            $this->setRedrawFrequency($max / 10);
         }
-
-        $this->setFormat($this->determineBestFormat());
 
         $this->startTime = time();
     }
@@ -138,6 +141,16 @@ class ProgressBar
         return isset(self::$formats[$name]) ? self::$formats[$name] : null;
     }
 
+    /**
+     * Associates a text with a named placeholder.
+     *
+     * The text is displayed when the progress bar is rendered but only
+     * when the corresponding placeholder is part of the custom format line
+     * (by wrapping the name with %).
+     *
+     * @param string $message The text to associate with the placeholder
+     * @param string $name    The name of the placeholder
+     */
     public function setMessage($message, $name = 'message')
     {
         $this->messages[$name] = $message;
@@ -305,26 +318,18 @@ class ProgressBar
      */
     public function setFormat($format)
     {
-        // try to use the _nomax variant if available
-        if (!$this->max && null !== self::getFormatDefinition($format.'_nomax')) {
-            $this->format = self::getFormatDefinition($format.'_nomax');
-        } elseif (null !== self::getFormatDefinition($format)) {
-            $this->format = self::getFormatDefinition($format);
-        } else {
-            $this->format = $format;
-        }
-
-        $this->formatLineCount = substr_count($this->format, "\n");
+        $this->format = null;
+        $this->internalFormat = $format;
     }
 
     /**
      * Sets the redraw frequency.
      *
-     * @param int $freq The frequency in steps
+     * @param int|float $freq The frequency in steps
      */
     public function setRedrawFrequency($freq)
     {
-        $this->redrawFreq = (int) $freq;
+        $this->redrawFreq = max((int) $freq, 1);
     }
 
     /**
@@ -350,7 +355,7 @@ class ProgressBar
      *
      * @param int $step Number of steps to advance
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function advance($step = 1)
     {
@@ -364,7 +369,7 @@ class ProgressBar
      *
      * @param int $step The current progress
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function setCurrent($step)
     {
@@ -388,13 +393,13 @@ class ProgressBar
      *
      * @param int $step The current progress
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function setProgress($step)
     {
         $step = (int) $step;
         if ($step < $this->step) {
-            throw new \LogicException('You can\'t regress the progress bar.');
+            throw new LogicException('You can\'t regress the progress bar.');
         }
 
         if ($this->max && $step > $this->max) {
@@ -436,6 +441,10 @@ class ProgressBar
             return;
         }
 
+        if (null === $this->format) {
+            $this->setRealFormat($this->internalFormat ?: $this->determineBestFormat());
+        }
+
         // these 3 variables can be removed in favor of using $this in the closure when support for PHP 5.3 will be dropped.
         $self = $this;
         $output = $this->output;
@@ -470,13 +479,36 @@ class ProgressBar
             return;
         }
 
-        $this->overwrite(str_repeat("\n", $this->formatLineCount));
+        if (null === $this->format) {
+            $this->setRealFormat($this->internalFormat ?: $this->determineBestFormat());
+        }
+
+        $this->overwrite('');
+    }
+
+    /**
+     * Sets the progress bar format.
+     *
+     * @param string $format The format
+     */
+    private function setRealFormat($format)
+    {
+        // try to use the _nomax variant if available
+        if (!$this->max && null !== self::getFormatDefinition($format.'_nomax')) {
+            $this->format = self::getFormatDefinition($format.'_nomax');
+        } elseif (null !== self::getFormatDefinition($format)) {
+            $this->format = self::getFormatDefinition($format);
+        } else {
+            $this->format = $format;
+        }
+
+        $this->formatLineCount = substr_count($this->format, "\n");
     }
 
     /**
      * Sets the progress bar maximal steps.
      *
-     * @param int     The progress bar max steps
+     * @param int $max The progress bar max steps
      */
     private function setMaxSteps($max)
     {
@@ -491,37 +523,26 @@ class ProgressBar
      */
     private function overwrite($message)
     {
-        $lines = explode("\n", $message);
+        if ($this->overwrite) {
+            if (!$this->firstRun) {
+                // Move the cursor to the beginning of the line
+                $this->output->write("\x0D");
 
-        // append whitespace to match the line's length
-        if (null !== $this->lastMessagesLength) {
-            foreach ($lines as $i => $line) {
-                if ($this->lastMessagesLength > Helper::strlenWithoutDecoration($this->output->getFormatter(), $line)) {
-                    $lines[$i] = str_pad($line, $this->lastMessagesLength, "\x20", STR_PAD_RIGHT);
+                // Erase the line
+                $this->output->write("\x1B[2K");
+
+                // Erase previous lines
+                if ($this->formatLineCount > 0) {
+                    $this->output->write(str_repeat("\x1B[1A\x1B[2K", $this->formatLineCount));
                 }
             }
-        }
-
-        if ($this->overwrite) {
-            // move back to the beginning of the progress bar before redrawing it
-            $this->output->write("\x0D");
         } elseif ($this->step > 0) {
-            // move to new line
             $this->output->writeln('');
         }
 
-        if ($this->formatLineCount) {
-            $this->output->write(sprintf("\033[%dA", $this->formatLineCount));
-        }
-        $this->output->write(implode("\n", $lines));
+        $this->firstRun = false;
 
-        $this->lastMessagesLength = 0;
-        foreach ($lines as $line) {
-            $len = Helper::strlenWithoutDecoration($this->output->getFormatter(), $line);
-            if ($len > $this->lastMessagesLength) {
-                $this->lastMessagesLength = $len;
-            }
-        }
+        $this->output->write($message);
     }
 
     private function determineBestFormat()
@@ -557,7 +578,7 @@ class ProgressBar
             },
             'remaining' => function (ProgressBar $bar) {
                 if (!$bar->getMaxSteps()) {
-                    throw new \LogicException('Unable to display the remaining time if the maximum number of steps is not set.');
+                    throw new LogicException('Unable to display the remaining time if the maximum number of steps is not set.');
                 }
 
                 if (!$bar->getProgress()) {
@@ -570,7 +591,7 @@ class ProgressBar
             },
             'estimated' => function (ProgressBar $bar) {
                 if (!$bar->getMaxSteps()) {
-                    throw new \LogicException('Unable to display the estimated time if the maximum number of steps is not set.');
+                    throw new LogicException('Unable to display the estimated time if the maximum number of steps is not set.');
                 }
 
                 if (!$bar->getProgress()) {

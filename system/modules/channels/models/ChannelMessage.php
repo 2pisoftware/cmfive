@@ -4,6 +4,8 @@ class ChannelMessage extends DbObject {
 
     public $channel_id;
     public $message_type;
+    
+    public $__use_auditing = false;
 
     // public $is_processed;
 
@@ -12,16 +14,20 @@ class ChannelMessage extends DbObject {
     }
 
     public function getData() {
+		
         $attachments = $this->w->File->getAttachments($this, $this->id);
+		
         if (!empty($attachments)) {
             foreach($attachments as $attachment) {
                 // return the serialised email object
                 if ($attachment->filename == "email.txt") {
-                    return file_get_contents(FILE_ROOT . $attachment->fullpath);
+                    return $attachment->getContent();
                 }
             }
-            return file_get_contents(FILE_ROOT . $attachments[0]->fullpath);
+			
+            return $attachments[0]->getContent();
         }
+		
         return null;
     }
 

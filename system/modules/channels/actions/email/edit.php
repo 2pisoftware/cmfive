@@ -31,6 +31,10 @@ function edit_GET(Web $w) {
             array("Port", "text", "port", $email_channel->port),
             array("Use Auth?", "checkbox", "use_auth", $email_channel->use_auth)
         ),
+		array(
+			array('Verify Peer', 'checkbox', 'verify_peer', $email_channel->verify_peer == null ? 1 : $email_channel->verify_peer),
+			array('Allow self signed certificates', 'checkbox', 'allow_self_signed', $email_channel->allow_self_signed == null ? 0 : $email_channel->allow_self_signed)
+		),
         array(
             array("Folder", "text", "folder", $email_channel->folder)
         ),
@@ -69,8 +73,11 @@ function edit_POST(Web $w) {
     $channel_object->notify_user_id = !empty($_POST["notify_user_id"]) ? intval($_POST["notify_user_id"]) : NULL;
     $channel_object->insertOrUpdate();
 
+	/* @var $email_channel EmailChannelOption */
     $email_channel = $channel_id ? $w->Channel->getEmailChannel($channel_id) : new EmailChannelOption($w);
     $email_channel->fill($_POST);
+	$email_channel->verify_peer = !empty($_POST['verify_peer']) ? 1 : 0;
+	$email_channel->allow_self_signed = !empty($_POST['allow_self_signed']) ? 1 : 0;
     $email_channel->port = (!empty($_POST['port']) ? intval($_POST['port']) : null);
     $email_channel->channel_id = $channel_object->id;
     $email_channel->insertOrUpdate();

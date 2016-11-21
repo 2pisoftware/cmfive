@@ -36,7 +36,7 @@ class MarkdownDescriptor extends Descriptor
             .'* Name: '.($argument->getName() ?: '<none>')."\n"
             .'* Is required: '.($argument->isRequired() ? 'yes' : 'no')."\n"
             .'* Is array: '.($argument->isArray() ? 'yes' : 'no')."\n"
-            .'* Description: '.preg_replace('/\s*\R\s*/', PHP_EOL.'  ', $argument->getDescription() ?: '<none>')."\n"
+            .'* Description: '.preg_replace('/\s*[\r\n]\s*/', "\n  ", $argument->getDescription() ?: '<none>')."\n"
             .'* Default: `'.str_replace("\n", '', var_export($argument->getDefault(), true)).'`'
         );
     }
@@ -53,7 +53,7 @@ class MarkdownDescriptor extends Descriptor
             .'* Accept value: '.($option->acceptValue() ? 'yes' : 'no')."\n"
             .'* Is value required: '.($option->isValueRequired() ? 'yes' : 'no')."\n"
             .'* Is multiple: '.($option->isArray() ? 'yes' : 'no')."\n"
-            .'* Description: '.preg_replace('/\s*\R\s*/', PHP_EOL.'  ', $option->getDescription() ?: '<none>')."\n"
+            .'* Description: '.preg_replace('/\s*[\r\n]\s*/', "\n  ", $option->getDescription() ?: '<none>')."\n"
             .'* Default: `'.str_replace("\n", '', var_export($option->getDefault(), true)).'`'
         );
     }
@@ -98,7 +98,7 @@ class MarkdownDescriptor extends Descriptor
             .'* Description: '.($command->getDescription() ?: '<none>')."\n"
             .'* Usage:'."\n\n"
             .array_reduce(array_merge(array($command->getSynopsis()), $command->getAliases(), $command->getUsages()), function ($carry, $usage) {
-                return $carry .= '  * `'.$usage.'`'."\n";
+                return $carry.'  * `'.$usage.'`'."\n";
             })
         );
 

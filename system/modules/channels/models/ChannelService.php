@@ -29,6 +29,15 @@ class ChannelService extends DbService {
 	}
 
 	/**
+	 * Returns a non-deleted email channel object
+	 * @return Object emailchannel
+	 */
+	public function getWebChannel($channel_id) {
+		$where = array('is_deleted' => 0, "channel_id" => $channel_id);
+		return $this->getObject('WebChannelOption', $where);
+	}
+
+	/**
 	 * Returns all non-deleted email channel objects
 	 * @return Array<EmailChannelOption> emailchannels
 	 */
@@ -38,6 +47,28 @@ class ChannelService extends DbService {
 	}
 
 	/**
+	 * Returns all non-deleted email channel objects
+	 * @return Array<EmailChannelOption> emailchannels
+	 */
+	public function getWebChannels() {
+		$where = array('is_deleted' => 0);
+		return $this->getObjects('WebChannelOption', $where);
+	}
+
+	/**
+	 * Returns all non-deleted email channel objects
+	 * @return Array<EmailChannelOption> emailchannels
+	 */
+	public function getChildChannel($id) {
+            $child_channel = $this->getEmailChannel($id);
+            if (!isset($child_channel)) {
+                $child_channel = $this->getWebChannel($id);
+            }
+            
+            return $child_channel;
+	}
+
+        /**
 	 * Returns all non-deleted processor objects
 	 * @return Array<ChannelProcessor> processors
 	 */
@@ -92,6 +123,20 @@ class ChannelService extends DbService {
 
 		return $this->getObjects("ChannelMessage", $where, false, true, "dt_created desc");
 	}
+	
+	public function getNewMessages($channel_id, $processor_id) {
+		
+		$query = $this->w->db->get("channel_message")->where("channel_message.channel_id", $channel_id)
+								->leftJoin("channel_message_status on channel_message_status.message_id = channel_message.id")
+								->where("channel_message_status.id IS NULL OR channel_message_status.processor_id != ?", $processor_id)
+								->fetch_all();
+					
+		if (!empty($query)) {
+			return $this->getObjectsFromRows("ChannelMessage", $query);
+		}
+		
+		return null;
+	}
 
 	public function getMessage($id) {
 		return $this->getObject("ChannelMessage", $id);
@@ -110,6 +155,48 @@ class ChannelService extends DbService {
 		$where = array("message_id" => $message_id);
 		return $this->getObjects("ChannelMessageStatus", $where);
 	}
+	
+	public function getNewOrFailedMessages($channel_id, $processor_id) {
+        // Get list of failed messages
+        $failed_messages = $this->_db->get("channel_message")
+                ->leftJoin("channel_message_status on channel_message.id = channel_message_status.message_id")
+                ->where("channel_message_status.is_successful", 0)->fetch_all();
+        if (!empty($failed_messages)) {
+            foreach($failed_messages as $fm) {
+                $failed_ids[] = $fm['id'];
+            }
+        }
+        
+        // Get the message statuses
+        if (!empty($failed_ids)) {
+            $message_statuses = $this->_db->get("channel_message_status")->where("message_id", $failed_ids)->fetch_all();
+            $message_statuses_objects = $this->fillObjects("ChannelMessageStatus", $message_statuses);
+        }
+
+        // Fill objects accordingly
+        $failed_message_objects = array();
+        if (!empty($failed_messages)) {
+            $failed_message_objects = $this->fillObjects("ChannelMessage", $failed_messages);
+            foreach($failed_message_objects as &$fmo) {
+                // Try and find the matching status
+                foreach($message_statuses_objects as $mso) {
+                    if ($mso->message_id == $fmo->id) {
+                        $fmo->messagestatus = $mso;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Get new messages
+        $new_messages = $this->_db->sql("select channel_message.* from channel_message left join channel_message_status on channel_message.id = channel_message_status.message_id where channel_message_status.id IS NULL")->fetch_all();
+        $new_message_objects = array();
+        if (!empty($new_messages)) {
+            $new_message_objects = $this->fillObjects("ChannelMessage", $new_messages);
+        }
+        
+        return (array_merge($new_message_objects, $failed_message_objects));
+    }
 
 	/**
 	 * Channels naivgation function

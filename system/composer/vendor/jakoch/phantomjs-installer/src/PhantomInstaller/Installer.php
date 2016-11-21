@@ -3,7 +3,7 @@
 /*
  * This file is part of the "jakoch/phantomjs-installer" package.
  *
- * Copyright (c) 2013-2014 Jens-André Koch <jakoch@web.de>
+ * Copyright (c) 2013-2015 Jens-André Koch <jakoch@web.de>
  *
  * The content is released under the MIT License. Please view
  * the LICENSE file that was distributed with this source code.
@@ -22,7 +22,9 @@ class Installer
 {
     const PHANTOMJS_NAME = 'PhantomJS';
 
-    const PHANTOMJS_TARGETDIR = './vendor/jakoch/phantomjs';
+    const PHANTOMJS_TARGETDIR = '/jakoch/phantomjs';
+
+    const PHANTOMJS_CHMODE = 0770; // octal !
 
     /**
      * Operating system dependend installation of PhantomJS
@@ -33,33 +35,85 @@ class Installer
 
         $version = self::getVersion($composer);
 
-        $url = self::getURL($version);
+        $config = $composer->getConfig();
 
-        // Create Composer In-Memory Package
+        $binDir = $config->get('bin-dir');
+
+        // the installation folder depends on the vendor-dir (default prefix is './vendor')
+        $targetDir = $config->get('vendor-dir') . self::PHANTOMJS_TARGETDIR;
+
+        $io = $event->getIO();
+
+        /* @var \Composer\Downloader\DownloadManager $downloadManager */
+        $downloadManager = $composer->getDownloadManager();
+
+        // Download the Archive
+
+        if(self::download($io, $downloadManager, $targetDir, $version) === true)
+        {
+            // Copy only the PhantomJS binary from the installation "target dir" to the "bin" folder
+
+            self::copyPhantomJsBinaryToBinFolder($targetDir, $binDir);
+        }
+    }
+
+    public static function download($io, $downloadManager, $targetDir, $version)
+    {
+        $retries = count(self::getPhantomJsVersions());
+
+        while ($retries--)
+        {
+            $package = self::createComposerInMemoryPackage($targetDir, $version);
+
+            try {
+                $downloadManager->download($package, $targetDir, false);
+                return true;
+            } catch (\Exception $e) {
+                if ($e instanceof \Composer\Downloader\TransportException && $e->getStatusCode() === 404) {
+                    $version = self::getLowerVersion($version);
+                    $io->write(PHP_EOL . '<warning>Let\'s retry the download with a lower version number: "'. $version .'".</warning>');
+                }
+            }
+        }
+    }
+
+    public static function createComposerInMemoryPackage($targetDir, $version)
+    {
+        $url = self::getURL($version);
 
         $versionParser = new VersionParser();
         $normVersion = $versionParser->normalize($version);
 
         $package = new Package(self::PHANTOMJS_NAME, $normVersion, $version);
-        $package->setTargetDir(self::PHANTOMJS_TARGETDIR);
+        $package->setTargetDir($targetDir);
         $package->setInstallationSource('dist');
         $package->setDistType(pathinfo($url, PATHINFO_EXTENSION) === 'zip' ? 'zip' : 'tar'); // set zip, tarball
         $package->setDistUrl($url);
 
-        // Download the Archive
+        return $package;
+    }
 
-        //$io = $event->getIO();
-        //$io->write('<info>Fetching PhantomJS v'.$version.'</info>');
+    public static function getPhantomJsVersions()
+    {
+        return array('2.1.1', '2.0.0', '1.9.8', '1.9.7');
+    }
 
-        $downloadManager = $composer->getDownloadManager();
-        $downloadManager->download($package, self::PHANTOMJS_TARGETDIR, false);
+    public static function getLatestPhantomJsVersion()
+    {
+        $versions = self::getPhantomJsVersions();
 
-        // Copy all PhantomJS files to "bin" folder
-        // self::recursiveCopy(self::PHANTOMJS_TARGETDIR, './bin');
+        return $versions[0];
+    }
 
-        // Copy only the PhantomJS binary to the "bin" folder
-
-        self::copyPhantomJsBinaryToBinFolder($composer);
+    public static function getLowerVersion($old_version)
+    {
+        foreach(self::getPhantomJsVersions() as $idx => $version)
+        {
+            // if $old_version is bigger than $version from versions array, return $version
+            if(version_compare($old_version, $version) == 1) {
+                return $version;
+            }
+        }
     }
 
     /**
@@ -84,12 +138,12 @@ class Installer
 
         // version was not found in the local repository, let's take a look at the root package
         if($version == null) {
-            $version = self::getRequiredVersion($composer->getPackage());
+            $version = self::getRequiredVersion($composer->getPackage(), 'jakoch/phantomjs-installer');
         }
 
-        // fallback to a hardcoded version number, if "dev-master" was set
+        // fallback to the hardcoded latest version, if "dev-master" was set
         if ($version === 'dev-master') {
-            return '2.0.0';
+            return self::getLatestPhantomJsVersion();
         }
 
         // grab version from commit-reference, e.g. "dev-master#<commit-ref> as version"
@@ -99,6 +153,11 @@ class Installer
 
         // grab version from a git version tag with a patch level, like "1.9.8-2"
         if(preg_match('/(\d.\d.\d)(?:(?:-\d)?)/i', $version, $matches)) {
+            return $matches[1];
+        }
+
+        // grab version from a Composer patch version tag with a patch level, like "1.9.8-p02"
+        if(preg_match('/(\d.\d.\d)(?:(?:-p\d{2})?)/i', $version, $matches)) {
             return $matches[1];
         }
 
@@ -127,17 +186,16 @@ class Installer
      * Copies the PhantomJs binary to the bin folder.
      * Takes different "folder structure" of the archives and different "binary file names" into account.
      */
-    public static function copyPhantomJsBinaryToBinFolder(Composer $composer)
+    public static function copyPhantomJsBinaryToBinFolder($targetDir, $binDir)
     {
-        $composerBinDir = $composer->getConfig()->get('bin-dir');
-        if (!is_dir($composerBinDir)) {
-            mkdir($composerBinDir);
+        if (!is_dir($binDir)) {
+            mkdir($binDir);
         }
 
         $os = self::getOS();
 
         $sourceName = '/bin/phantomjs';
-        $targetName = $composerBinDir . '/phantomjs';
+        $targetName = $binDir . '/phantomjs';
 
         if ($os === 'windows') {
             // the suffix for binaries on windows is ".exe"
@@ -149,15 +207,69 @@ class Installer
              * For versions up to v1.9.8, the executables resides at the root.
              * From v2.0.0 on, the executable resides in the bin folder.
              */
-            if(is_file(self::PHANTOMJS_TARGETDIR . '/phantomjs.exe')) {
+            if(is_file($targetDir . '/phantomjs.exe')) {
                 $sourceName = str_replace('/bin', '', $sourceName);
             }
+
+            // slash fix (not needed, but looks better on the dropped php file)
+            $targetName = str_replace('/', '\\', $targetName);
         }
 
         if ($os !== 'unknown') {
-            copy(self::PHANTOMJS_TARGETDIR . $sourceName, $targetName);
-            chmod($targetName, 0755);
+            copy($targetDir . $sourceName, $targetName);
+            chmod($targetName, self::PHANTOMJS_CHMODE);
         }
+
+        self::dropClassWithPathToInstalledBinary($targetName);
+    }
+
+    /**
+     * Drop php class with path to installed phantomjs binary for easier usage.
+     *
+     * Usage:
+     *
+     * use PhantomInstaller\PhantomBinary;
+     *
+     * $bin = PhantomInstaller\PhantomBinary::BIN;
+     * $dir = PhantomInstaller\PhantomBinary::DIR;
+     *
+     * $bin = PhantomInstaller\PhantomBinary::getBin();
+     * $dir = PhantomInstaller\PhantomBinary::getDir();
+     *
+     * @param  string $targetDir  path to /vendor/jakoch/phantomjs
+     * @param  string $BinaryPath full path to binary
+     *
+     * @return bool True, if file dropped. False, otherwise.
+     */
+    public static function dropClassWithPathToInstalledBinary($binaryPath)
+    {
+        $code  = "<?php\n";
+        $code .= "\n";
+        $code .= "namespace PhantomInstaller;\n";
+        $code .= "\n";
+        $code .= "class PhantomBinary\n";
+        $code .= "{\n";
+        $code .= "    const BIN = '%binary%';\n";
+        $code .= "    const DIR = '%binary_dir%';\n";
+        $code .= "\n";
+        $code .= "    public static function getBin() {\n";
+        $code .= "        return self::BIN;\n";
+        $code .= "    }\n";
+        $code .= "\n";
+        $code .= "    public static function getDir() {\n";
+        $code .= "        return self::DIR;\n";
+        $code .= "    }\n";
+        $code .= "}\n";
+
+        // binary      = full path to the binary
+        // binary_dir  = the folder the binary resides in
+        $fileContent = str_replace(
+            array('%binary%', '%binary_dir%'),
+            array($binaryPath, dirname($binaryPath)),
+            $code
+        );
+
+        return (bool) file_put_contents(__DIR__ . '/PhantomBinary.php', $fileContent);
     }
 
     /**

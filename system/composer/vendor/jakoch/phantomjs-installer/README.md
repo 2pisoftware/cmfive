@@ -63,3 +63,41 @@ All PhantomJS files reside there, especially the `examples`.
 
 3. **Installation into `/bin` folder**
 The binary is then copied from `./vendor/jakoch/phantomjs` to your composer configured `bin-dir` folder.
+
+4. **Generation of PhantomBinary**
+
+The installer generates a PHP file `PhantomInstaller\\PhantomBinary` and inserts the path to the binary.
+
+## PhantomBinary
+
+To access the binary and its folder easily, the class `PhantomBinary` is created automatically during installation.
+
+The class defines the constants `BIN` and `DIR`:
+  - `BIN` is the full-path to the PhantomJS binary file, e.g. `/your_project/bin/phantomjs`
+  - `DIR` is the folder of the binary, e.g. `/your_project/bin`
+
+Both constants are also accessible via their getter-methods `getBin()` and `getDir()`.
+
+Usage:
+
+    use PhantomInstaller\PhantomBinary;
+
+    // get values with class constants
+
+    $bin = PhantomInstaller\PhantomBinary::BIN;
+    $dir = PhantomInstaller\PhantomBinary::DIR;
+
+    // get values with static functions
+
+    $bin = PhantomInstaller\PhantomBinary::getBin();
+    $dir = PhantomInstaller\PhantomBinary::getDir();
+
+This feature is similar to `location.js` of the [phantomjs module](https://github.com/Medium/phantomjs/blob/master/install.js#L93) for Node.
+
+## Automatic download retrying with version lowering on 404
+
+In case downloading an archive fails with HttpStatusCode 404 (resource not found),
+the downloader will automatically lower the version to the next available version
+and retry. The number of retries is determined by the number of hardcoded PhantomJS
+versions in `getPhantomJSVersions()`. This feature was added, because of the problems
+with v2.0.0 not being available for all platforms (see issue #25).
