@@ -316,20 +316,22 @@ class Attachment extends DbObject {
 		$this->mimetype = $mime_type;
 		$this->update();
 
-		// Generate thumbnail and cache
-		require_once 'phpthumb/ThumbLib.inc.php';
-		$width = $this->w->request("w", FileService::$_thumb_width);
-		$height = $this->w->request("h", FileService::$_thumb_height);
-		$thumb = PhpThumbFactory::create($this->getContent(), [], true);
-		$thumb->adaptiveResize($width, $height);
+        if ($this->isImage()) {
+            // Generate thumbnail and cache
+            require_once 'phpthumb/ThumbLib.inc.php';
+            $width = $this->w->request("w", FileService::$_thumb_width);
+            $height = $this->w->request("h", FileService::$_thumb_height);
+            $thumb = PhpThumbFactory::create($this->getContent(), [], true);
+            $thumb->adaptiveResize($width, $height);
 
-		// Create cached folder
-		if (!is_dir(dirname($this->getThumbnailCachePath()))) {
-			mkdir(dirname($this->getThumbnailCachePath()), 0755, true);
-		}
+            // Create cached folder
+            if (!is_dir(dirname($this->getThumbnailCachePath()))) {
+                mkdir(dirname($this->getThumbnailCachePath()), 0755, true);
+            }
 
-		// Write thumbnail to cache
-		file_put_contents($this->getThumbnailCachePath(), $thumb->getImageAsString());
+            // Write thumbnail to cache
+            file_put_contents($this->getThumbnailCachePath(), $thumb->getImageAsString());
+        }
 	}
 
 	function getSelectOptionTitle() {
