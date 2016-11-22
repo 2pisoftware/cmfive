@@ -271,6 +271,10 @@ class Attachment extends DbObject {
 			return false;
 		}
 
+        $replace_empty = array("..", "'", '"', ",", "\\", "/");
+		$replace_underscore = array(" ", "&", "+", "$", "?", "|", "%", "@", "#", "(", ")", "{", "}", "[", "]", ",", ";", ":");
+		
+        
 		if (!empty($_POST[$requestkey]) && empty($_FILES[$requestkey])) {
 			$filename = str_replace($replace_underscore, "_", str_replace($replace_empty, "", $_POST[$requestkey]));
 		} else {
@@ -302,7 +306,7 @@ class Attachment extends DbObject {
 
 			switch ($this->adapter) {
 				case "local":
-					$mime_type = $this->w->getMimetype(FILE_ROOT . $att->fullpath);
+					$mime_type = $this->w->getMimetype(FILE_ROOT . $this->fullpath);
 				default:
 					$mime_type = $this->w->getMimetypeFromString($content);
 			}
