@@ -38,7 +38,7 @@ class Zend_Mail_Storage_Imap extends \Zend\Mail\Storage\Imap {
         $this->protocol = new Zend_Mail_Protocol_Imap();
         $this->protocol->connect($host, $port, $ssl, $options);
         if (!$this->protocol->login($params->user, $password)) {
-            throw new Exception\RuntimeException('cannot login, user or password wrong');
+            throw new \Zend\Mail\Exception\RuntimeException('cannot login, user or password wrong');
         }
         $this->selectFolder(isset($params->folder) ? $params->folder : 'INBOX');
     }
@@ -90,14 +90,14 @@ class Zend_Mail_Protocol_Imap extends \Zend\Mail\Protocol\Imap {
         }
 
         if (!$this->_assumedNextLine('* OK')) {
-            throw new Exception\RuntimeException('host doesn\'t allow connection');
+            throw new \Zend\Mail\Exception\RuntimeException('host doesn\'t allow connection');
         }
 
         if ($isTls) {
             $result = $this->requestAndResponse('STARTTLS');
             $result = $result && stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
             if (!$result) {
-                throw new Exception\RuntimeException('cannot enable TLS');
+                throw new \Zend\Mail\Exception\RuntimeException('cannot enable TLS');
             }
         }
     }
