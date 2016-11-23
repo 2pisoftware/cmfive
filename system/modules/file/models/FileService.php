@@ -421,8 +421,7 @@ class FileService extends DbService {
                     
 			}
 		}
-        
-		$file->setMetadata(['contentType' => $mime_type]);
+		
 		
 		$att->mimetype = $mime_type;		
 		$att->update();
