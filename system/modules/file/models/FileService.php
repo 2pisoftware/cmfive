@@ -390,7 +390,7 @@ class FileService extends DbService {
 		$att->type_code = $type_code;
 		$att->insert();
 
-		$filesystemPath = "attachments/" . $parentObject->getDbTableName() . '/' . date('Y/m/d') . '/' . $att->id . '/';
+		$filesystemPath = "attachments/" . $parentObject->getDbTableName() . '/' . date('Y/m/d') . '/' . $parentObject->id . '/';
 		$filesystem = $this->getFilesystem($this->getFilePath($filesystemPath));
 		if (empty($filesystem)) {
 			$this->w->Log->setLogger("FILE_SERVICE")->error("Cannot save file, no filesystem returned");
