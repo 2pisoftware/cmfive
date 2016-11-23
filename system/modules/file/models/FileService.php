@@ -408,17 +408,20 @@ class FileService extends DbService {
 			$data = substr($_POST[$requestkey], strpos($_POST[$requestkey], ",") + 1);
 			$mime_type = $mime[1];
 			$content = base64_decode($data);
+            $file->setContent($content);
 		} else {
 			$content = file_get_contents($_FILES[$requestkey]['tmp_name']);
-			
-			switch($this->adapter) {
+			$file->setContent($content);
+			switch($att->adapter) {
 				case "local":
 					$mime_type = $this->w->getMimetype(FILE_ROOT . $att->fullpath);
+                    break;
 				default:
 					$mime_type = $this->w->getMimetypeFromString($content);
+                    
 			}
 		}
-		$file->setContent($content, ['contentType' => $mime_type]);
+		
 		
 		$att->mimetype = $mime_type;		
 		$att->update();
