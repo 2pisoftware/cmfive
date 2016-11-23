@@ -411,7 +411,7 @@ class FileService extends DbService {
 		} else {
 			$content = file_get_contents($_FILES[$requestkey]['tmp_name']);
 			
-			switch($this->adapter) {
+			switch($att->adapter) {
 				case "local":
 					$mime_type = $this->w->getMimetype(FILE_ROOT . $att->fullpath);
                     break;
