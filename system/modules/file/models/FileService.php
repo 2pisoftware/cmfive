@@ -414,8 +414,10 @@ class FileService extends DbService {
 			switch($this->adapter) {
 				case "local":
 					$mime_type = $this->w->getMimetype(FILE_ROOT . $att->fullpath);
+                    break;
 				default:
 					$mime_type = $this->w->getMimetypeFromString($content);
+                    
 			}
 		}
 		$file->setContent($content, ['contentType' => $mime_type]);
