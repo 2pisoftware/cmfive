@@ -101,7 +101,14 @@ function edit_GET($w) {
     
     $w->ctx("task", $task);
     $w->ctx("form", Html::multiColForm($form, $w->localUrl("/task/edit/{$task->id}"), "POST", "Save", "edit_form", "prompt", null, "_self", true, Task::$_validation));
- 
+    
+    $createdDate = '';
+    if (!empty($task->id)) {
+        $creator = $task->_modifiable->getCreator();
+        $createdDate =  formatDate($task->_modifiable->getCreatedDate()) . (!empty($creator) ? ' by <strong>' . @$creator->getFullName() . '</strong>' : '');
+    }
+    $w->ctx('createdDate', $createdDate);
+
     ///////////////////
     // Notifications //
     ///////////////////
@@ -149,6 +156,8 @@ function edit_GET($w) {
 
         $w->ctx("tasknotify", Html::multiColForm($form, $w->localUrl("/task/updateusertasknotify/".$task->id),"POST"));
     }
+    
+    
 }
 
 function edit_POST($w) {
@@ -160,12 +169,14 @@ function edit_POST($w) {
     }
     
     $task->fill($_POST['edit']);
-    $task->rate = $task->rate == 0 ? NULL : $task->rate;
+    
     $task->assignee_id = intval($_POST['edit']['assignee_id']);
     if (empty($task->dt_due)) {
         $task->dt_due = $w->Task->getNextMonth();
     }
     
+    $task->insertOrUpdate(false);
+    $task->rate = $task->rate == 0 ? NULL : $task->rate;
     $task->insertOrUpdate(true);
     
     // Tell the template what the task id is (this post action is being called via ajax)
