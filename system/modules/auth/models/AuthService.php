@@ -160,6 +160,7 @@ class AuthService extends DbService {
 
     function getUsersAndGroups($includeDeleted = false) {
     	$where = array();
+        $where["is_active"] = 1;
     	if (!$includeDeleted) {
     		$where["is_deleted"]=0;
     	}
@@ -169,6 +170,7 @@ class AuthService extends DbService {
     function getUsers($includeDeleted = false) {
         $where = array();
         $where["is_group"]=0;
+        $where['is_active'] = 1;
     	if (!$includeDeleted) {
     		$where["is_deleted"]=0;
     	}

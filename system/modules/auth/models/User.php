@@ -26,14 +26,22 @@ class User extends DbObject {
     public $_modifiable;
 	
     public function delete($force = false) {
-        $contact = $this->getContact();
-        if ($contact) {
-            $contact->delete();
+        
+        try {
+            $this->startTransaction();
+            
+            $contact = $this->getContact();
+            if ($contact) {
+                $contact->delete($force);
+            }
+            
+            parent::delete($force);
+            $this->commitTransaction();
+        } catch (Exception $e) {
+            
+            // The error should already be logged
+            $this->rollbackTransaction();
         }
-        $this->is_deleted = 1;
-        $this->is_active = 0;
-        $this->password = "";
-        $this->update();
     }
 
     public function getContact() {
@@ -244,7 +252,10 @@ class User extends DbObject {
      */
     public function removeRole($role) {
         if ($this->hasRole($role)) {
-            $this->_db->delete("user_role")->where("user_id", $this->id)->and("role", $role)->execute();
+            $role = $this->admin->getObject("UserRole",["user_id"=>$this->id,"role"=>$role]);
+            if (!empty($role)) {
+                $role->delete();
+            }
             $this->getRoles(true);
         }
     }
