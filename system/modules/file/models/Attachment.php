@@ -301,9 +301,10 @@ class Attachment extends DbObject {
 			$data = substr($_POST[$requestkey], strpos($_POST[$requestkey], ",") + 1);
 			$mime_type = $mime[1];
 			$content = base64_decode($data);
+            $file->setContent($content, ['contentType' => $mime_type]);
 		} else {
 			$content = file_get_contents($_FILES[$requestkey]['tmp_name']);
-
+            $file->setContent($content);
 			switch ($this->adapter) {
 				case "local":
 					$mime_type = $this->w->getMimetype(FILE_ROOT . $this->fullpath);
@@ -312,7 +313,7 @@ class Attachment extends DbObject {
 					$mime_type = $this->w->getMimetypeFromString($content);
 			}
 		}
-		$file->setContent($content, ['contentType' => $mime_type]);
+		
 
 		$this->mimetype = $mime_type;
 		$this->update();
