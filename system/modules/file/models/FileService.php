@@ -408,7 +408,7 @@ class FileService extends DbService {
 			$data = substr($_POST[$requestkey], strpos($_POST[$requestkey], ",") + 1);
 			$mime_type = $mime[1];
 			$content = base64_decode($data);
-            $file->setContent($content);
+            $file->setContent($content, ['contentType' => $mime_type]); 
 		} else {
 			$content = file_get_contents($_FILES[$requestkey]['tmp_name']);
 			$file->setContent($content);
