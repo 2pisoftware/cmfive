@@ -129,10 +129,10 @@
 			
 			// Focus first form element when the modal opens
 			$(document).ready(function() {
-				$('.body form:first :input:visible:enabled:first').focus();
+				$('.body form:first :input:visible:enabled:first').not('.no-focus').focus();
 				
 				$(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
-					$('form:visible:first :input:visible:enabled:first', $(this)).focus();
+					$('form:visible:first :input:visible:enabled:first', $(this)).not('.no-focus').focus();
 				});
 			});
         </script>
