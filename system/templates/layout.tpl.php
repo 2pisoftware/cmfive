@@ -48,8 +48,7 @@
             var $ = $ || jQuery;
             $(document).ready(function() {
 				
-				// Focus first field
-				$('form:first *:input[type!=hidden]:first').focus();
+				
 				
                 $("table.tablesorter").tablesorter({dateFormat: "uk", widthFixed: true, widgets: ['zebra']});
                 $(".tab-head").children("a").each(function() {
