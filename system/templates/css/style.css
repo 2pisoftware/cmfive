@@ -198,20 +198,33 @@ table .section {
 .widget_config { padding-left: 40px; }
 .widget_remove { float: right; padding-right: 40px; }
 
-/*.tab-head { margin-top: 20px; }*/
-.tab-head a {
+.tab-head {
+    display: block;
+}
+
+.tab-head > a {
     color: black;
     text-decoration: none;
-    padding: 5px;
+    padding: 5px 10px;
     border: 1px solid #a9a9a9;
-    line-height: 38px;
+    /*line-height: 38px;*/
+    margin-bottom: -1px;
+    margin-right: -1px;
+    display: inline-block;
+    float: left;
 }
+
 .tab-head a.active {
     background: #074e68;
     color: white;
 }
 .tab-head a:hover { background: #6FA9C7; }
-.tab-body { border: 1px solid #a9a9a9; padding: 5px; }
+.tab-body {
+    border: 1px solid #a9a9a9;
+    padding: 5px;
+    display: block;
+    clear: both;
+}
 
 td button {
     margin: 0;
