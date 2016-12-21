@@ -2,7 +2,7 @@
 
 /**
  * This class is responsible for storing and accessing 
- * the configurations for each class with case insensitive keys. 
+ * the configurations for each class with case sensitive keys. 
  *
  * Config getting and setting is done using the dot syntax i.e.
  *     Config::set("admin.topmenu", true);
@@ -37,7 +37,7 @@ class Config {
      * @return null
      */
     public static function set($key, $value) {
-        $exploded_key = explode('.', strtolower($key));
+        $exploded_key = explode('.', $key);
         if (!empty($exploded_key)) {
             $register = &self::$register;
             // Loop through each key
@@ -62,7 +62,7 @@ class Config {
         if(!empty(self::$_config_cache[$key])) {
            return self::$_config_cache[$key];
         }
-        $exploded_key = explode('.', strtolower($key));
+        $exploded_key = explode('.', $key);
         // Copy the register for processing
         $value = &self::$register;
         if (!empty($exploded_key)) {
