@@ -53,7 +53,7 @@ class MailQueue extends DbObject {
        
         $this->w->Mail->sendMail(
             $to_contact->email, 
-            !empty($from_contact) ? $from_contact->email : Config::get('main.company_support_email'),
+            Config::get('main.company_support_email'),
             $batch->subject, 
             $message, 
             null, 

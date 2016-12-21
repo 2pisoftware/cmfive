@@ -48,7 +48,7 @@ class MailBatch extends DbObject {
         $message .= "</p>";
         $this->w->Mail->sendMail(
             $this->w->auth->getUser($this->user_to_notify)->getContact()->email, 
-            !empty($from_contact) ? $from_contact->email : Config::get('main.company_support_email'),
+            Config::get('main.company_support_email'),
             $subject, 
             $message, 
             null, 
