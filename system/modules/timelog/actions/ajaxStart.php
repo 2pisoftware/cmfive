@@ -34,11 +34,11 @@ function ajaxStart_POST(Web $w) {
 			$timelog->setComment($_POST['description']);
 		}
 		
-        echo json_encode([
+        $w->out(json_encode([
             'object'    => $p['class'],
             'title'     => $object->getSelectOptionTitle(),
             'start_time'=>$start_time
-        ]);
+        ]));
 //        $w->Comment->addComment($timelog, $w->request('description'));
     } else {
         $w->Log->debug("object not found");

@@ -12,7 +12,7 @@
     </div>
 	
     <div id="timerModal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
-        <form onsubmit="return saveTimer()">
+        <div>
             <?php if (!empty($tracked_object)): ?>
                 <div class="row-fluid clearfix panel">
                     <h3>
@@ -49,11 +49,11 @@
                 <br/>
 		<div class="row">
 			<div class="large-12 columns">
-				<button class="button">Save</button>
+                <button class="button" onclick="saveTimer()">Save</button>
 				<button class="button secondary right" type="button" onclick="$('#timerModal').foundation('reveal', 'close');">Close</button>
 			</div>
 		</div>
-        </form>
+        </div>
     </div>
 	
     <script>    
