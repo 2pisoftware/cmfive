@@ -20,9 +20,8 @@ function ajaxStart_POST(Web $w) {
     $start_time = null;
     if (!empty($_POST['start_time'])) {
         $start_string = $_POST['start_time'];
-        $time_object = new DateTime(date('d/m/Y',time()) . ' ' . $start_string);
-        //$start_time = $time_object->format('Y-m-d H:i:s');
-        $start_time = strtotime($start_string);
+        $time_object = new DateTime(date('d-m-Y',time()) . ' ' . $start_string);
+        $start_time = $time_object->getTimestamp();
     }
     
     
