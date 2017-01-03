@@ -34,15 +34,15 @@ class AdminInitialMigration extends CmfiveMigration {
 						'id' => false,
 						'primary_key' => 'id'
 					])->addColumn($column)
-					->addColumn('submodule', 'text')
-					->addColumn('message', 'text')
+					->addColumn('submodule', 'text',["null"=>true])
+					->addColumn('message', 'text',["null"=>true])
 					->addColumn('module', 'string', ['limit' => 128])
 					->addColumn('action', 'string', ['limit' => 128])
 					->addColumn('path', 'string', ['limit' => 1024])
 					->addColumn('ip', 'string', ['limit' => 128])
-					->addColumn('db_class', 'string', ['limit' => 128])
-					->addColumn('db_action', 'string', ['limit' => 128])
-					->addColumn('db_id', 'biginteger')
+					->addColumn('db_class', 'string', ['limit' => 128,"null"=>true])
+					->addColumn('db_action', 'string', ['limit' => 128,"null"=>true])
+					->addColumn('db_id', 'biginteger',["null"=>true])
 					->addCmfiveParameters(['dt_modified', 'modifier_id', 'is_deleted'])
 					->create();
 		}
@@ -72,7 +72,7 @@ class AdminInitialMigration extends CmfiveMigration {
 						'id' => false,
 						'primary_key' => 'id'
 					])->addColumn($column)
-					->addColumn('weight', 'integer', ['limit' => 11])
+					->addColumn('weight', 'integer', ['limit' => 11,'null' => true])
 					->addColumn('type', 'string', ['limit' => 255])
 					->addColumn('code', 'string', ['limit' => 255])
 					->addColumn('title', 'string', ['limit' => 255])
@@ -90,7 +90,7 @@ class AdminInitialMigration extends CmfiveMigration {
 					])->addColumn($column)
 					->addColumn('name', 'string', ['limit' => 512])
 					->addColumn('server', 'string', ['limit' => 512])
-					->addColumn('port', 'string', ['limit' => 256])
+					->addColumn('port', 'string', ['limit' => 256,'null' => true])
 					->create();
 		}
 		
@@ -108,8 +108,8 @@ class AdminInitialMigration extends CmfiveMigration {
 					->addColumn('module', 'string', ['limit' => 255, 'null' => true])
 					->addColumn('template_title', 'text')
 					->addColumn('template_body', 'text', ['limit' => \Phinx\Db\Adapter\MysqlAdapter::TEXT_LONG])
-					->addColumn('test_title_json', 'text')
-					->addColumn('test_body_json', 'text')
+					->addColumn('test_title_json', 'text',['null' => true])
+					->addColumn('test_body_json', 'text',['null' => true])
 					->addColumn('is_active', 'boolean', ['default' => 1])
 					->addCmfiveParameters()				
 					->create();
