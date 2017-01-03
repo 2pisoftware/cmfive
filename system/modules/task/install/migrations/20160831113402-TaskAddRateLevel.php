@@ -5,7 +5,7 @@ class TaskAddRateLevel extends CmfiveMigration {
 	public function up() {
 		// UP
             $table = $this->table('task');
-            $table->addDecimalColumn('rate')
+            $table->addDecimalColumn('rate',true)
                     ->save();
                 
 	}

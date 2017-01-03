@@ -29,7 +29,7 @@ class TaskInitialMigration extends CmfiveMigration {
 				->addColumn('dt_planned', 'datetime', ['null' => true])
 				->addColumn('dt_due', 'datetime', ['null' => true])
 				->addColumn('estimate_hours', 'integer', ['null' => true])
-				->addColumn('description', 'text')
+				->addColumn('description', 'text', ['null' => true])
 				->addColumn('latitude', 'string', ['limit' => 20, 'null' => true])
 				->addColumn('longitude', 'string', ['limit' => 20, 'null' => true])
 				->addCmfiveParameters(['dt_created', 'dt_modified', 'creator_id', 'modifier_id'])
@@ -58,12 +58,12 @@ class TaskInitialMigration extends CmfiveMigration {
 				->addColumn('can_assign', 'string', ['limit' => 50])
 				->addColumn('can_view', 'string', ['limit' => 50])
 				->addColumn('can_create', 'string', ['limit' => 50])
-				->addColumn('is_active', 'boolean')
-				->addColumn('description', 'text')
+				->addColumn('is_active', 'boolean',['default' => 1])
+				->addColumn('description', 'text', ['null' => true])
 				->addColumn('task_group_type', 'string', ['limit' => 50])
-				->addColumn('default_assignee_id', 'biginteger')
-				->addColumn('default_priority', 'string', ['limit' => 255])
-				->addColumn('default_task_type', 'string', ['limit' => 255])
+				->addColumn('default_assignee_id', 'biginteger', ['null' => true])
+				->addColumn('default_priority', 'string', ['limit' => 255,'null' => true])
+				->addColumn('default_task_type', 'string', ['limit' => 255,'null' => true])
 				->addCmfiveParameters(['dt_created', 'dt_modified', 'creator_id', 'modifier_id'])
 				->create();
 		}
@@ -77,8 +77,8 @@ class TaskInitialMigration extends CmfiveMigration {
 				->addColumn('task_group_id', 'biginteger')
 				->addColumn('user_id', 'biginteger')
 				->addColumn('role', 'string', ['limit' => 50])
-				->addColumn('priority', 'integer')
-				->addColumn('is_active', 'boolean')
+				->addColumn('priority', 'integer',['default' => 1])
+				->addColumn('is_active', 'boolean',['default' => 1])
 				->create();
 		}
 		
