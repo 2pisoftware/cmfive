@@ -22,7 +22,7 @@ class FileInitialMigration extends CmfiveMigration {
 					->addColumn('filename', 'string', ['limit' => 255])
 					->addColumn('mimetype', 'string', ['limit' => 255, 'null' => true])
 					->addColumn('title', 'string', ['limit' => 255, 'null' => true])
-					->addColumn('description', 'text')
+					->addColumn('description', 'text', ['null' => true])
 					->addColumn('fullpath', 'text')
 					->addColumn('type_code', 'string', ['limit' => 255, 'null' => true])
 					->addCmfiveParameters()
@@ -38,7 +38,7 @@ class FileInitialMigration extends CmfiveMigration {
 						'primary_key' => 'id'
 					])->addColumn($column)
 					->addColumn('table_name', 'string', ['limit' => 255])
-					->addColumn('code', 'string', ['limit' => 255])
+					->addColumn('code', 'string', ['limit' => 255, 'null' => true])
 					->addColumn('title', 'string', ['limit' => 255])
 					->addColumn('is_active', 'boolean', ['default' => 1])
 					->create();

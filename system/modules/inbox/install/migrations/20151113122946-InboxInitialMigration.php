@@ -18,7 +18,7 @@ class InboxInitialMigration extends CmfiveMigration {
 					])->addColumn($column)
 					->addColumn('user_id', 'biginteger')
 					->addColumn('sender_id', 'biginteger', ['null' => true])
-					->addColumn('subject', 'string', ['limit' => 255])
+					->addColumn('subject', 'string', ['limit' => 255,'null' => true])
 					->addColumn('message_id', 'biginteger', ['null' => true])
 					->addColumn('dt_read', 'datetime', ['null' => true])
 					->addColumn('is_new', 'boolean', ['default' => 1])
@@ -39,8 +39,8 @@ class InboxInitialMigration extends CmfiveMigration {
 						'id' => false,
 						'primary_key' => 'id'
 					])->addColumn($column)
-					->addColumn('message', 'text')
-					->addColumn('digest', 'string', ['limit' => 255])
+					->addColumn('message', 'text', ['null' => true])
+					->addColumn('digest', 'string', ['limit' => 255,'null' => true])
 					->create();
 		}
 	}

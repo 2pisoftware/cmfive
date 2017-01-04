@@ -15,7 +15,7 @@ class FormInitialMigration extends CmfiveMigration {
 				'primary_key' => 'id'
 			])->addColumn($column)
 					->addColumn("title", "string", ["limit" => 256])
-					->addColumn("description", "string", ["limit" => 1024])
+					->addColumn("description", "string", ["limit" => 1024,'null' => true])
 					->addCmfiveParameters()
 					->create();
 		}
@@ -27,7 +27,7 @@ class FormInitialMigration extends CmfiveMigration {
 			])->addColumn($column)
 					->addColumn("form_id", "biginteger")
 					->addColumn("name", "string", ["limit" => 256])
-					->addColumn("technical_name", "string", ["limit" => 256])
+					->addColumn("technical_name", "string", ["limit" => 256,'null' => true])
 					->addColumn("interface_class", "string", ["limit" => 256, "null" => true])
 					->addColumn("type", "string", ["limit" => 256])
 					->addColumn("mask", "string", ["limit" => 1024, "null" => true])
