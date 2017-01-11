@@ -264,17 +264,21 @@ class ValidationService
             throw new ErrorException('"' . $str . '" is not a valid URL.', 5, E_WARNING);
         }
         
-        if(empty($matches[1])) // http or https ... if none? assume http
-        {
-            $str = "http://" . $str;
-        }
+        // Cannot assume that a URI given will be either http/https, e.g. the hostname given in the
+        // database setup is on whatever port and external mysql hosts can not be contacted just
+        // by pinging port 80!
+
+        // if(empty($matches[1])) // http or https ... if none? assume http
+        // {
+        //     $str = "http://" . $str;
+        // }
         
-        $code = $this->is_200($str);
-        if($code !== 200)
-        {
-            throw new ErrorException('"' . $str . '" was unreachable.' .
-                                     ($code !== false ? ' Returned code : ' . $code : ''), 8, E_WARNING);
-        }
+        // $code = $this->is_200($str);
+        // if($code !== 200)
+        // {
+        //     throw new ErrorException('"' . $str . '" was unreachable.' .
+        //                              ($code !== false ? ' Returned code : ' . $code : ''), 8, E_WARNING);
+        // }
         
         return $str;
     }

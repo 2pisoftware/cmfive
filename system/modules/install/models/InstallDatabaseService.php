@@ -1,7 +1,7 @@
 
 <?php
 
-class InstallDatabaseService
+class InstallDatabaseService extends DbService
 {
     public $_PDO;
     public $_rootPDO;
