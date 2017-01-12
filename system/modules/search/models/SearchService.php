@@ -94,20 +94,21 @@ class SearchService extends DbService {
 		$str_array = explode(' ', $str);
 
 		// The first word will always be a keyword, so prefix that automatically
-		$str_array[0] = '+' . $str_array[0];
+
+		if (count($str_array) > 1 && $str_array[1] !== "OR") {
+			$str_array[0] = '+' . $str_array[0];
+		}
+
 		if (count($str_array) > 1) {
 			for($i = 1; $i < count($str_array); $i++) {
 				if (strtoupper($str_array[$i]) === "AND") {
 					$str_array[$i + 1] = '+' . $str_array[$i + 1];
 					array_splice($str_array, $i, 1);
-					$i++;
 				} else if (strtoupper($str_array[$i]) === "OR") {
 					array_splice($str_array, $i, 1);
-					$i++;
 				} else if (strtoupper($str_array[$i]) === "NOT") {
 					$str_array[$i + 1] = '-' . $str_array[$i + 1];
 					array_splice($str_array, $i, 1);
-					$i++;
 				} else {
 					$str_array[$i] = '+' . $str_array[$i];
 				}
