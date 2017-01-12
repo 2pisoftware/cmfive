@@ -18,6 +18,34 @@ class FileService extends DbService {
 	public static $_stream_name = "attachment";
 
 	/**
+	 * Returns the max upload file size in bytes
+	 *
+	 * @return int $fileSize;
+	 */
+	public function getMaxFileUploadSize() {
+		$ini_upload_limit = ini_get('upload_max_filesize');
+
+		$units = 'B';
+		if (intval($ini_upload_limit) !== $ini_upload_limit) {
+			$units = substr($ini_upload_limit, -1);
+			$ini_upload_limit = substr($ini_upload_limit, 0, strlen($ini_upload_limit) - 1);
+		}
+
+		$multiplier = 1;
+		switch(strtoupper($units)) {
+			case "G":
+				$multiplier *= 1024;
+			case "M":
+				$multiplier *= 1024;
+			case "K":
+				$multiplier *= 1024;
+				break;
+		}
+
+		return (int) $ini_upload_limit * $multiplier;
+	}
+
+	/**
 	 * Return the path adjusted to the currently active adapter.
 	 *
 	 * @param string file path

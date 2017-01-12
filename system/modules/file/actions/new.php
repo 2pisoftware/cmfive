@@ -17,8 +17,8 @@ function new_GET(Web $w) {
 			[["Description", "textarea", "description", "",null,null,'justtext']]
 		]
 	];
-	
-	$w->out(Html::multiColForm($_form, "/file/new/" . $p['class'] . '/' . $p['class_id'] . "?redirect_url=" . $redirect_url));
+
+	$w->ctx("form", Html::multiColForm($_form, "/file/new/" . $p['class'] . '/' . $p['class_id'] . "?redirect_url=" . $redirect_url, "POST", "Save", 'file_form'));
 }
 
 function new_POST(Web $w) {
@@ -37,9 +37,9 @@ function new_POST(Web $w) {
 	}
 	
 	$result = $w->File->uploadAttachment("file", $object, $_POST['title'], $_POST['description'], !empty($_POST['type_code']) ? $_POST['type_code'] : null);
-        if (empty($result)) {
-            $w->error("No file found for attachment", $redirect_url);
-        } elseif(!empty($_POST['file'])) {
+    if (empty($result)) {
+        $w->error("No file found for attachment", $redirect_url);
+    } elseif(!empty($_POST['file'])) {
 		$w->out(json_encode(array('success'=> 'true', 'key' => $_POST['key'])));
 	} else {
 		$w->msg("File attached", $redirect_url);

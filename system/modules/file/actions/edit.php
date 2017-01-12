@@ -17,13 +17,13 @@ function edit_GET(Web $w) {
 	
 	$_form = [
 		'Edit Attachment' => [
-                        [(new \Html\Form\InputField\File())->setName("file")->setId("file")->setAttribute("capture", "camera")],
+            [(new \Html\Form\InputField\File())->setName("file")->setId("file")->setAttribute("capture", "camera")],
 			[["Title", "text", "title", $attachment->title]],
 			[["Description", "textarea", "description", $attachment->description,null,null,'justtext']]
 		]
 	];
 	
-	$w->out(Html::multiColForm($_form, "/file/edit/" . $attachment->id . "?redirect_url=" . $redirect_url));
+	$w->ctx('form', Html::multiColForm($_form, "/file/edit/" . $attachment->id . "?redirect_url=" . $redirect_url, 'POST', 'Save', 'file_form'));
 }
 
 function edit_POST(Web $w) {
