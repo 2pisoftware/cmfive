@@ -25,8 +25,6 @@ use Symfony\Component\Process\PhpProcess;
  * you need to also implement the getScript() method.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 abstract class Client
 {
@@ -52,8 +50,6 @@ abstract class Client
      * @param array     $server    The server parameters (equivalent of $_SERVER)
      * @param History   $history   A History instance to store the browser history
      * @param CookieJar $cookieJar A CookieJar instance to store the cookies
-     *
-     * @api
      */
     public function __construct(array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
@@ -66,12 +62,20 @@ abstract class Client
      * Sets whether to automatically follow redirects or not.
      *
      * @param bool $followRedirect Whether to follow redirects
-     *
-     * @api
      */
     public function followRedirects($followRedirect = true)
     {
         $this->followRedirects = (bool) $followRedirect;
+    }
+
+    /**
+     * Returns whether client automatically follows redirects or not.
+     *
+     * @return bool
+     */
+    public function isFollowingRedirects()
+    {
+        return $this->followRedirects;
     }
 
     /**
@@ -86,13 +90,21 @@ abstract class Client
     }
 
     /**
+     * Returns the maximum number of requests that crawler can follow.
+     *
+     * @return int
+     */
+    public function getMaxRedirects()
+    {
+        return $this->maxRedirects;
+    }
+
+    /**
      * Sets the insulated flag.
      *
      * @param bool $insulated Whether to insulate the requests or not
      *
      * @throws \RuntimeException When Symfony Process Component is not installed
-     *
-     * @api
      */
     public function insulate($insulated = true)
     {
@@ -107,13 +119,10 @@ abstract class Client
      * Sets server parameters.
      *
      * @param array $server An array of server parameters
-     *
-     * @api
      */
     public function setServerParameters(array $server)
     {
         $this->server = array_merge(array(
-            'HTTP_HOST' => 'localhost',
             'HTTP_USER_AGENT' => 'Symfony2 BrowserKit',
         ), $server);
     }
@@ -139,15 +148,13 @@ abstract class Client
      */
     public function getServerParameter($key, $default = '')
     {
-        return (isset($this->server[$key])) ? $this->server[$key] : $default;
+        return isset($this->server[$key]) ? $this->server[$key] : $default;
     }
 
     /**
      * Returns the History instance.
      *
      * @return History A History instance
-     *
-     * @api
      */
     public function getHistory()
     {
@@ -158,8 +165,6 @@ abstract class Client
      * Returns the CookieJar instance.
      *
      * @return CookieJar A CookieJar instance
-     *
-     * @api
      */
     public function getCookieJar()
     {
@@ -170,8 +175,6 @@ abstract class Client
      * Returns the current Crawler instance.
      *
      * @return Crawler|null A Crawler instance
-     *
-     * @api
      */
     public function getCrawler()
     {
@@ -182,8 +185,6 @@ abstract class Client
      * Returns the current BrowserKit Response instance.
      *
      * @return Response|null A BrowserKit Response instance
-     *
-     * @api
      */
     public function getInternalResponse()
     {
@@ -199,8 +200,6 @@ abstract class Client
      * @return object|null A response instance
      *
      * @see doRequest()
-     *
-     * @api
      */
     public function getResponse()
     {
@@ -211,8 +210,6 @@ abstract class Client
      * Returns the current BrowserKit Request instance.
      *
      * @return Request|null A BrowserKit Request instance
-     *
-     * @api
      */
     public function getInternalRequest()
     {
@@ -228,8 +225,6 @@ abstract class Client
      * @return object|null A Request instance
      *
      * @see doRequest()
-     *
-     * @api
      */
     public function getRequest()
     {
@@ -242,8 +237,6 @@ abstract class Client
      * @param Link $link A Link instance
      *
      * @return Crawler
-     *
-     * @api
      */
     public function click(Link $link)
     {
@@ -261,8 +254,6 @@ abstract class Client
      * @param array $values An array of form field values
      *
      * @return Crawler
-     *
-     * @api
      */
     public function submit(Form $form, array $values = array())
     {
@@ -283,8 +274,6 @@ abstract class Client
      * @param bool   $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      *
      * @return Crawler
-     *
-     * @api
      */
     public function request($method, $uri, array $parameters = array(), array $files = array(), array $server = array(), $content = null, $changeHistory = true)
     {
@@ -296,21 +285,20 @@ abstract class Client
 
         $uri = $this->getAbsoluteUri($uri);
 
-        if (!empty($server['HTTP_HOST'])) {
-            $uri = preg_replace('{^(https?\://)'.preg_quote($this->extractHost($uri)).'}', '${1}'.$server['HTTP_HOST'], $uri);
-        }
+        $server = array_merge($this->server, $server);
 
         if (isset($server['HTTPS'])) {
             $uri = preg_replace('{^'.parse_url($uri, PHP_URL_SCHEME).'}', $server['HTTPS'] ? 'https' : 'http', $uri);
         }
 
-        $server = array_merge($this->server, $server);
-
         if (!$this->history->isEmpty()) {
             $server['HTTP_REFERER'] = $this->history->current()->getUri();
         }
 
-        $server['HTTP_HOST'] = $this->extractHost($uri);
+        if (empty($server['HTTP_HOST'])) {
+            $server['HTTP_HOST'] = $this->extractHost($uri);
+        }
+
         $server['HTTPS'] = 'https' == parse_url($uri, PHP_URL_SCHEME);
 
         $this->internalRequest = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
@@ -357,8 +345,7 @@ abstract class Client
      */
     protected function doRequestInProcess($request)
     {
-        // We set the TMPDIR (for Macs) and TEMP (for Windows), because on these platforms the temp directory changes based on the user.
-        $process = new PhpProcess($this->getScript($request), null, array('TMPDIR' => sys_get_temp_dir(), 'TEMP' => sys_get_temp_dir()));
+        $process = new PhpProcess($this->getScript($request), null, null);
         $process->run();
 
         if (!$process->isSuccessful() || !preg_match('/^O\:\d+\:/', $process->getOutput())) {
@@ -440,8 +427,6 @@ abstract class Client
      * Goes back in the browser history.
      *
      * @return Crawler
-     *
-     * @api
      */
     public function back()
     {
@@ -452,8 +437,6 @@ abstract class Client
      * Goes forward in the browser history.
      *
      * @return Crawler
-     *
-     * @api
      */
     public function forward()
     {
@@ -464,8 +447,6 @@ abstract class Client
      * Reloads the current browser.
      *
      * @return Crawler
-     *
-     * @api
      */
     public function reload()
     {
@@ -478,8 +459,6 @@ abstract class Client
      * @return Crawler
      *
      * @throws \LogicException If request was not a redirect
-     *
-     * @api
      */
     public function followRedirect()
     {
@@ -496,7 +475,7 @@ abstract class Client
         $request = $this->internalRequest;
 
         if (in_array($this->internalResponse->getStatus(), array(302, 303))) {
-            $method = 'get';
+            $method = 'GET';
             $files = array();
             $content = null;
         } else {
@@ -505,7 +484,7 @@ abstract class Client
             $content = $request->getContent();
         }
 
-        if ('get' === strtolower($method)) {
+        if ('GET' === strtoupper($method)) {
             // Don't forward parameters for GET request as it should reach the redirection URI
             $parameters = array();
         } else {
@@ -528,8 +507,6 @@ abstract class Client
      * Restarts the client.
      *
      * It flushes history and all cookies.
-     *
-     * @api
      */
     public function restart()
     {
@@ -565,9 +542,9 @@ abstract class Client
             return parse_url($currentUri, PHP_URL_SCHEME).':'.$uri;
         }
 
-        // anchor?
-        if (!$uri || '#' == $uri[0]) {
-            return preg_replace('/#.*?$/', '', $currentUri).$uri;
+        // anchor or query string parameters?
+        if (!$uri || '#' == $uri[0] || '?' == $uri[0]) {
+            return preg_replace('/[#?].*?$/', '', $currentUri).$uri;
         }
 
         if ('/' !== $uri[0]) {
