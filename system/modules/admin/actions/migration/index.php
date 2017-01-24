@@ -4,7 +4,8 @@ function index_GET(Web $w) {
 
 	$available = $w->Migration->getAvailableMigrations('all');
 	$installed = $w->Migration->getInstalledMigrations('all');
-	
+	$seeds = $w->Migration->getSeedMigrations();
+
 	$batched = [];
 	if (!empty($installed)) {
 		foreach($installed as $module => $install) {
@@ -35,10 +36,14 @@ function index_GET(Web $w) {
 			return strcmp($a, $b);
 		}
 	});
+
+	$seeds = array_filter($seeds, function($available_seeds) {
+		return count($available_seeds) > 0;
+	});
 	
 	$w->ctx('batched', $batched);
 	$w->ctx('not_installed', $not_installed);
 	$w->ctx('installed', $installed);
 	$w->ctx('available', $available);
-	
+	$w->ctx('seeds', $seeds);
 }
