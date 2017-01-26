@@ -4,6 +4,7 @@ defined('DS') || define('DS', DIRECTORY_SEPARATOR);
 defined('MIGRATION_DIRECTORY') || define('MIGRATION_DIRECTORY', 'install' . DS . 'migrations');
 defined('PROJECT_MODULE_DIRECTORY') || define('PROJECT_MODULE_DIRECTORY', 'modules');
 defined('SYSTEM_MODULE_DIRECTORY') || define('SYSTEM_MODULE_DIRECTORY', 'system' . DS . 'modules');
+defined('SEED_MIGRATION_DIRECTORY') || define('SEED_MIGRATION_DIRECTORY', MIGRATION_DIRECTORY . DS . 'seeds');
 
 class MigrationService extends DbService {
 	
@@ -402,5 +403,90 @@ MIGRATION;
 		
 		return false;
 	}
+
+	public function getSeedMigrations() {
+		$availableMigrations = [];
+		
+		// Read all modules directories for any migrations that need to run
+		foreach($this->w->modules() as $module) {
+			$availableMigrations += $this->getSeedMigrationsForModule($module);
+		}
+		
+		return $availableMigrations;
+	}
 	
+	public function getSeedMigrationsForModule($module) {
+		$availableMigrations = [];
+		
+		// Check modules folder
+		$module_path = PROJECT_MODULE_DIRECTORY . DS . $module . DS . SEED_MIGRATION_DIRECTORY;
+		$system_module_path = SYSTEM_MODULE_DIRECTORY . DS . $module . DS . SEED_MIGRATION_DIRECTORY;
+
+		$migration_paths = [$module_path, $system_module_path];
+		if (empty($availableMigrations[$module])) {
+			$availableMigrations[$module] = [];
+		}
+
+		foreach($migration_paths as $migration_path) {
+			if (is_dir(ROOT_PATH . DS . $migration_path)) {
+				foreach(scandir(ROOT_PATH . DS . $migration_path) as $file) {
+					if (!is_dir($file) && $file{0} !== '.') {
+						$classname = explode('.', str_replace('-', '.', $file));
+						if (!empty($classname[0])) {
+							$availableMigrations[$module][$migration_path . DS . $file] = $classname[0];
+						} else {
+							$this->w->Log->error("Migration '" . $file . "' does not conform to naming convention");
+						}
+					}
+				}
+			}
+		}
+
+		return $availableMigrations;
+	}
+
+	public function migrationSeedExists($name) {
+		return $this->w->db->get('migration_seed')->where('name', $name)->count() > 0;
+	}
+
+	public function createMigrationSeed($module, $name) {
+
+		// Check if its a system module
+		$path = SYSTEM_MODULE_DIRECTORY . DS . $module;
+
+		if (!is_dir($path)) {
+			$path = PROJECT_MODULE_DIRECTORY . DS . $module;
+
+			if (!is_dir($path)) {
+				return false;
+			}
+
+		}
+		
+		// Create folder if it doesn't exist
+		if (!is_dir($path . DS . SEED_MIGRATION_DIRECTORY)) {
+			mkdir($path . DS . SEED_MIGRATION_DIRECTORY, 0755, true);
+		}
+
+		$data = <<<MIGRATION
+<?php
+
+class {$name} extends CmfiveSeedMigration {
+
+	public \$name = "{$name}";
+	public \$description = "<Enter description here>";
+
+	public function seed() {
+		
+	}
+
+}
+
+MIGRATION;
+	
+		file_put_contents($_SERVER['DOCUMENT_ROOT'] . DS . $path . DS . SEED_MIGRATION_DIRECTORY . DS . "$name.php", $data);
+		
+		return true;
+	}
+
 }

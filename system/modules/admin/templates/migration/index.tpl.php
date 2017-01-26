@@ -8,6 +8,7 @@
 	<div class="tab-head">
 		<a href="#batch">Batch</a>
 		<a href="#individual">Individual</a>
+		<a href="#seed">Database Seeds</a>
 	</div>
 	<div class="tab-body clearfix">
 		<div id="batch">
@@ -133,6 +134,65 @@
 				</script>
 			<?php else: ?>
 				<h4>There are no migrations on this project</h4>
+			<?php endif; ?>
+		</div>
+		<div id='seed'>
+			<?php echo Html::box('/admin-migration/createseed', 'Create a seed', true); ?>
+			<?php if (!empty($seeds)) : ?>
+				<ul class="tabs" data-tab>
+					<?php foreach($seeds as $module => $available_seeds) : ?>
+						<?php if (count($available_seeds) > 0) : ?>
+							<li class="tab-title <?php echo key($seeds) == $module ? 'active': '' ?>">
+								<a href="#<?php echo $module; ?>"><?php echo ucfirst($module); ?></a>
+							</li>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</ul>
+				<div class="tabs-content">
+					<?php foreach($seeds as $module => $available_seeds) : ?>
+						<div class="content <?php echo key($seeds) == $module ? 'active': '' ?>" id="<?php echo $module; ?>">
+							<table class='small-12 columns'>
+								<thead>
+									<tr>
+										<td>Name</td>
+										<td>Description</td>
+										<td>Status</td>
+										<td>Action</td>
+									</tr>
+								</thead>
+								<tbody>
+									<?php foreach($available_seeds as $seed => $classname) : ?>
+										<?php if (is_file($seed)) {
+											require_once($seed);
+
+											$seed_obj = null;
+											if (class_exists($classname)) {
+												$seed_obj = new $classname($w);
+											}
+										}
+										if (!empty($seed_obj)) : 
+											$migration_exists = $w->Migration->migrationSeedExists($classname); ?>
+											<tr>
+												<td><?php echo $seed_obj->name; ?></td>
+												<td><?php echo $seed_obj->description; ?></td>
+												<td>
+													<?php if ($migration_exists) : ?>
+														<span class='label success'>Installed</span>
+													<?php else: ?>
+														<span class='label secondary'>Not installed</span>
+													<?php endif; ?>
+												</td>
+												<td>
+													<?php echo !$migration_exists ? Html::b('/admin-migration/installseed?url=' . urlencode($seed), 'Install') : ''; ?>
+												</td>
+											</tr>
+										<?php endif; ?>
+									<?php endforeach; ?>
+								</tbody>
+							</table>
+						</div>
+					<?php endforeach; ?>
+				</div>
 			<?php endif; ?>
 		</div>
 	</div>

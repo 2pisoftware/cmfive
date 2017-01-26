@@ -46,8 +46,10 @@
 .limited .tag_list_dialog {
     top: -200px;
 }
-
+//I set this to absolute for positioning the tag box - isaac 
 .limited.tag_list {
+/*    position: relative;*/
+/*position: absolute;*/
 }
 
 /**
@@ -55,7 +57,7 @@
  **/
 .tag_list {
     display: inline;
-    /*position: absolute;*/
+    position: absolute;
     padding: 0px 10px;
     line-height: 5px;
 }
