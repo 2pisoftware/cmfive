@@ -137,16 +137,16 @@ function edit_GET($w) {
             }
 
             if ($w->Task->getIsOwner($task->task_group_id, $w->Auth->user()->id)) {
-                $buttons .= Html::b($w->localUrl("/task/suspecttime/".$task->id."/".$log->id), ((empty($log->is_suspect) || $log->is_suspect == "0") ? "Review" : "Accept"));
+                $buttons .= Html::b($w->localUrl("/task/suspecttime/".$task->id."/".$log->id), ((empty($log->is_suspect) || $log->is_suspect == "0") ? __("Review") : __("Accept")));
             }
             
-            $buttons .= Html::b($w->localUrl("/task/deletetime/".$task->id."/".$log->id), "Delete", "Are you sure you wish to DELETE this Time Log Entry?");
+            $buttons .= Html::b($w->localUrl("/task/deletetime/".$task->id."/".$log->id), __("Delete"), __("Are you sure you wish to DELETE this Time Log Entry?"));
             
             $table_row[] = $buttons;
             
             $table_data[] = $table_row;
         }
-        $table_data[] = array("<b>Total</b>", "","<b>".$w->Task->getFormatPeriod($total_seconds)."</b>","","");
+        $table_data[] = array("<b>".__("Total")."</b>", "","<b>".$w->Task->getFormatPeriod($total_seconds)."</b>","","");
     }
     // display the task time log
     $w->ctx("timelog",Html::table($table_data, null, "tablesorter", $table_header));

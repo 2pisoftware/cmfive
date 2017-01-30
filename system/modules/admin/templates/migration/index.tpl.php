@@ -133,7 +133,7 @@
 					});
 				</script>
 			<?php else: ?>
-				<h4>There are no migrations on this project</h4>
+				<h4><?php _e('There are no migrations on this project'); ?></h4>
 			<?php endif; ?>
 		</div>
 		<div id='seed'>

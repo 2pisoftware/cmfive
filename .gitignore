@@ -4,21 +4,3 @@
 /nbproject
 /config.php
 /system/composer/*
-<<<<<<< e6b3ba672638b129773cb8d00b596f8e720e4ae0
-storage/
-config.old.php
-config.old.*.php
-cache/
-/phpmyadmin
-/codiad
-phpMyAdmin/
-modules/webdav
-modules/wiki
-storage
-config.override.php
-
-=======
-cache/
-phpMyAdmin/
-config.old.*.php
->>>>>>> git ignore cache phpmyadmin and old config files

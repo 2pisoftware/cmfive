@@ -20,7 +20,7 @@ function viewmembergroup_GET(Web $w) {
 	History::add("Task Group: " . $taskgroup->title, null, $taskgroup);
 
 	// set columns headings for display of members
-	$line[] = array("Member","Role","");
+	$line[] = array(__("Member"),__("Role"),"");
 
 	// if their are members, display their full name, role and buttons to edit or delete the member
 	if ($member_group) {

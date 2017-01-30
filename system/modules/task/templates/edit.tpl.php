@@ -9,6 +9,7 @@
 <?php endif; ?>
 <div class="tabs">
     <div class="tab-head">
+             */
         <a href="#details">Task Details</a>
 		<?php if (!empty($task->id)) : ?>
             <a href="#timelog">Time Log <span class='label secondary round cmfive__tab-label cmfive__count-timelog'></span></a>
@@ -34,8 +35,8 @@
                         $tasktypeobject = $task->getTaskTypeObject();
                         echo !empty($tasktypeobject) ? $tasktypeobject->displayExtraButtons($task) : null; 
                     	//echo $w->Tag->getTagButton($task->id,"Task")."&nbsp;";
-                        echo (!empty($task->id) && $task->canDelete($w->Auth->user())) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), "Delete", "Are you sure you want to delete this task?" ) : ''; 
-                        echo (!empty($task->id)) ? Html::b($task->w->localURL('task/duplicatetask/' . $task->id), "Duplicate Task") : '';
+                        echo (!empty($task->id) && $task->canDelete($w->Auth->user())) ? Html::b($task->w->localUrl('/task/delete/' . $task->id), __("Delete"), __("Are you sure you want to delete this task?" )) : ''; 
+                        echo (!empty($task->id)) ? Html::b($task->w->localURL('task/duplicatetask/' . $task->id), __("Duplicate Task")) : '';
                         echo (!empty($task->id) ? $w->partial('listTags',['object' => $task], 'tag') : '');
 					?>
                 </div>
