@@ -123,7 +123,11 @@ class Attachment extends DbObject {
 
 	public function getDocumentEmbedHtml($width = '1024', $height = '724') {
 		if ($this->isDocument() && $this->adapter == 'local') {
-			return Html::embedDocument($this->getViewUrl(), $width, $height);
+            if (stripos($this->filename, '.docx')) {
+                return Html::embedDocument($this->w->localUrl() . 'uploads/attachments/' . $this->parent_table . '/' . date('Y/m/d',$this->dt_created) . '/' . $this->parent_id . '/' . $this->filename, $width, $height);
+            } else {
+                return Html::embedDocument($this->getViewUrl(), $width, $height);
+            }
 		}
 		return Html::a($this->getViewUrl(), $this->title);
 	}
@@ -242,6 +246,7 @@ class Attachment extends DbObject {
 	 * Returns URL to view
 	 */
 	public function getViewUrl() {
+        
 		return "/file/atfile/" . $this->id;
 	}
 
