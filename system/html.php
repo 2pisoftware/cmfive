@@ -1440,7 +1440,7 @@ UPLOAD;
 	public static function embedDocument($link, $width = '1024', $height = '724', $zoom = 'page-width') {
         //echo $link; die;
         if (stripos($link, '.docx')) {
-            return '<iframe src="http://docs.google.com/gview?url=' . $link . '&embedded=true"  width='{$width}' height='{$height}' allowfullscreen webkitallowfullscreen></iframe>';
+            return '<iframe src="http://docs.google.com/gview?url=' . $link . '&embedded=true"  width=' . $width . ' height=' . $height . ' allowfullscreen webkitallowfullscreen></iframe>';
         }
         
 		return "<iframe src='/system/templates/js/viewerjs-0.5.8/ViewerJS/index.html?zoom={$zoom}#../../../../..{$link}' width='{$width}' height='{$height}' allowfullscreen webkitallowfullscreen></iframe>";
