@@ -1439,7 +1439,7 @@ UPLOAD;
 	 */
 	public static function embedDocument($link, $width = '1024', $height = '724', $zoom = 'page-width') {
         //echo $link; die;
-        if (stripos($link, '.docx')) {
+        if (stripos($link, '.docx') || stripos($link, '.doc')) {
             return '<iframe src="http://docs.google.com/gview?url=' . $link . '&embedded=true"  width=' . $width . ' height=' . $height . ' allowfullscreen webkitallowfullscreen></iframe>';
         }
         
