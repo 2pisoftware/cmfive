@@ -94,7 +94,7 @@ class RestService extends SearchableDbObject {
 	private function _saveNew($classname,$record) {
 		$o = new $classname($this->w);
 		$o->fill($record);
-		$o->insert();	
+		$o->insert(true);	
 		$o->id=$this->w->ctx('db_inserts')[$classname][0];
 		http_response_code(201);
 		header('Location: '.$this->w->webroot().'/rest/index/'.$classname.'/id/'.$o->id."/?token=".$this->token);
@@ -114,7 +114,7 @@ class RestService extends SearchableDbObject {
 					// convert json into array and update object
 					//$ar = json_decode($json,true);
 					$o->fill($record);
-					$o->update();
+					$o->update(true);
 					http_response_code(204);
 					//header('Location: '.$this->w->webroot().'/rest/index/'.$classname.'/id/'.$o->id."/?token=".$this->token);
 					return $this->successJson($o->toArray());
