@@ -29,7 +29,7 @@ class DbPDO extends PDO {
 				break;
 			//linux apache2 driver
 			case 'dblib':
-				$port = isset($config['port']) && !empty($config['port']) ? ",".$config['port'] : "";
+				$port = isset($config['port']) && !empty($config['port']) ? ":".$config['port'] : "";
 				$url = "{$config['driver']}:host={$config['hostname']}{$port};dbname={$config['database']}";
 				break;			
 				//mysql
@@ -47,7 +47,7 @@ class DbPDO extends PDO {
         // heap for this var across all instances
         if (empty($this->table_names)){
 			$query = 'show tables';
-			if ($config['driver'] == 'sqlsrv') {
+			if ($config['driver'] == 'sqlsrv' || $config['driver'] == 'dblib')  {
 				$query = 'select TABLE_NAME from INFORMATION_SCHEMA.TABLES';
 			}
 			
@@ -140,7 +140,11 @@ class DbPDO extends PDO {
                 if (is_array($column)){
                     $this->query = $this->query->where($column);
                 } else {
-                    $this->query = $this->query->where($column, $equals);
+                    if (count(func_get_args()) == 2) {
+                        $this->query = $this->query->where($column, $equals);
+                    } else {
+                        $this->query = $this->query->where($column);
+                    }
                 }
             }
         }
