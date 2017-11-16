@@ -59,9 +59,7 @@ class TokenStream
     /**
      * Pushes a token.
      *
-     * @param Token $token
-     *
-     * @return TokenStream
+     * @return $this
      */
     public function push(Token $token)
     {
@@ -73,7 +71,7 @@ class TokenStream
     /**
      * Freezes stream.
      *
-     * @return TokenStream
+     * @return $this
      */
     public function freeze()
     {

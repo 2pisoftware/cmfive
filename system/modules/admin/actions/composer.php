@@ -27,7 +27,12 @@ use Composer\Command\UpdateCommand;
 use Symfony\Component\Console\Output\StreamOutput;
 
 function composer_ALL(Web $w) {
-    echo "<pre>".file_get_contents(STORAGE_PATH . '/log/composer.log') . "</pre>";
+    if (!file_exists(STORAGE_PATH . '/log/composer.log')) {
+        exec("echo '' > " . STORAGE_PATH . '/log/composer.log');
+    } else {
+        echo "<pre>".file_get_contents(STORAGE_PATH . '/log/composer.log') . "</pre>";
+    }
+    
     // Collect dependencies
     $dependencies_array = array();
     foreach($w->modules() as $module) {

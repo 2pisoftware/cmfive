@@ -5,6 +5,8 @@ if (file_exists(__DIR__ . "/composer/vendor/autoload.php")) {
     require "composer/vendor/autoload.php";
 }
 
+defined("DS") || define("DS", DIRECTORY_SEPARATOR);
+
 require_once "html.php";
 require_once "functions.php";
 require_once "classes/CSRF.php";
@@ -85,6 +87,7 @@ class Web {
 		
         $this->loadConfigurationFiles();
         spl_autoload_register(array($this, 'modelLoader'));
+        spl_autoload_register(array($this, 'componentLoader'));
         
         define("WEBROOT", $this->_webroot);
     }
@@ -108,7 +111,30 @@ class Web {
                 }
             }
         }
-        $this->service('log')->debug("Class " . $file . " not found.");
+        
+        // Also autoload the html namespace
+        if (strstr($className, "Html") !== FALSE) {
+            $filePath = explode('\\', $className);
+            $class = array_pop($filePath);
+            $file = 'system' . DS . 'classes' . DS . strtolower(implode("/", $filePath)) . DS . $class . ".php";
+
+            if (file_exists($file)) {
+                require_once $file;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function componentLoader($name) {
+        $directory = 'system' . DS . 'classes' . DS . 'components';
+
+        if (file_exists($directory . DS . $name . '.php')) {
+            require_once $directory . DS . $name . '.php';
+            return true;
+        }
+
         return false;
     }
 
@@ -983,13 +1009,23 @@ class Web {
         if ($module === null) {
             $module = $this->_module;
         }
-        
+
+        // set translations to partial module
+        $oldModule = $this->currentModule();
+        if ($oldModule != $module) {
+            try {
+                $this->setTranslationDomain($module);
+            } catch (Exception $e) {
+                $this->Log->setLogger('I18N')->error($e->getMessage());
+            }
+        }
+
         // Check if the module if active or not
-//        if (!Config::get("{$name}.active") && $name !== "main") {
-//            // Do we want to do something else?
-//            return NULL;
-//        }
-        
+        //        if (!Config::get("{$name}.active") && $name !== "main") {
+        //            // Do we want to do something else?
+        //            return NULL;
+        //        }
+
         // save current output buffer
         $oldbuf = $this->_buffer;
         $this->_buffer = null;
@@ -999,7 +1035,7 @@ class Web {
         $this->_context = array();
 
         // try to find the partial action and execute
-        
+
         // getModuleDir can return path with trailing '/' but we dont want that
         $moduleDir = $this->getModuleDir($module);
         if ($moduleDir[strlen($moduleDir) - 1] === '/') {
@@ -1008,12 +1044,40 @@ class Web {
         $partial_action_file = implode("/", array($moduleDir, $this->_partialsdir, "actions", $name . ".php"));
 
         if (file_exists($partial_action_file)) {
-            require_once($partial_action_file);
 
-            // now execute the action
-            $partial_action = $name . "_" . $method;
-            if (function_exists($partial_action)) {
+            require_once $partial_action_file;
+
+            // Execute the action, accounting for the use of namespaces
+            // Work out the namespace
+            $module_path = Config::get($module . '.path');
+            $namespace = '';
+            if (empty($module_path)) {
+                $namespace = '\System\Modules\\' . ucfirst(strtolower($module)) . '\\';
+            } else {
+                // Path will almost 100% of the time be either 'modules' or 'system/modules'
+                // But we want this in the form '\Modules\\$module' or '\System\\Modules\\$module'
+                $namespace = '\\' . ucwords(strtolower(str_replace('/', '\\', $module_path))) . '\\' . ucfirst(strtolower($module)) . '\\';
+            }
+
+            // The following will call:
+            // 1. \System\Modules\$module\$action_ALL()
+            // 2. \System\Modules\$module\$action()
+            // 3. removeUser_ALL()
+            // 4. removeUser()
+
+            $partial_action = $name . '_' . $method;
+            if (function_exists($namespace . $partial_action)) {
+                $function = $namespace . $partial_action;
+                $function($this, $params);
+            } else if (function_exists($namespace . $name)) {
+                $function = $namespace . $name;
+                $function($this, $params);
+            } else if (function_exists($partial_action)) {
                 $partial_action($this, $params);
+            } else if (function_exists($name)) {
+                $name($this, $params);
+            } else {
+                $this->Log->error("Required partial action not found, expected {$partial_action}");
             }
         } else {
             $this->Log->error("Could not find partial file at: {$partial_action_file}");
@@ -1035,6 +1099,15 @@ class Web {
         // restore output buffer and context
         $this->_buffer = $oldbuf;
         $this->_context = $oldctx;
+
+        // restore translations module
+        if ($oldModule != $module) {
+            try {
+                $this->setTranslationDomain($oldModule);
+            } catch (Exception $e) {
+                $this->Log->setLogger('I18N')->error($e->getMessage());
+            }
+        }
 
         return $currentbuf;
     }
@@ -1261,21 +1334,28 @@ class Web {
      */
     function pathMatch() {
         $match = array();
-        for ($i = 0; $i < func_num_args(); $i++) {
-            $param = func_get_arg($i);
 
-            $val = !empty($this->_paths[$i]) ? urldecode($this->_paths[$i]) : null;
+        $func_num_args = func_num_args();
+        if ($func_num_args > 0) {
+            for ($i = 0; $i < $func_num_args; $i++) {
+                $param = func_get_arg($i);
 
-            if (is_array($param)) {
-                $key = $param[0];
-                if (is_null($val) && isset($param[1])) {
-                    $val = $param[1]; // use default parameter
+                $val = !empty($this->_paths[$i]) ? urldecode($this->_paths[$i]) : null;
+
+                if (is_array($param)) {
+                    $key = $param[0];
+                    if (is_null($val) && isset($param[1])) {
+                        $val = $param[1]; // use default parameter
+                    }
+                } else {
+                    $key = $param;
                 }
-            } else {
-                $key = $param;
+                $this->ctx($key, $val);
+                $match[$key] = $val;
+                $match[$i] = $val;
             }
-            $this->ctx($key, $val);
-            $match[$key] = $val;
+        } else {
+            return $this->_paths;
         }
         return $match;
     }

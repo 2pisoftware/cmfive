@@ -18,7 +18,11 @@ return array(
     'Twig_' => array($vendorDir . '/twig/twig/lib'),
     'Prophecy\\' => array($vendorDir . '/phpspec/prophecy/src'),
     'PhantomInstaller\\' => array($vendorDir . '/jakoch/phantomjs-installer/src'),
+    'Guzzle\\Tests' => array($vendorDir . '/guzzle/guzzle/tests'),
+    'Guzzle' => array($vendorDir . '/guzzle/guzzle/src'),
     'Gaufrette' => array($vendorDir . '/knplabs/gaufrette/src'),
     'Dropbox' => array($vendorDir . '/dropbox-php/dropbox-php/src'),
+    'Doctrine\\Common\\Lexer\\' => array($vendorDir . '/doctrine/lexer/lib'),
     'Codeception' => array($vendorDir . '/codeception/codeception/src'),
+    'Aws' => array($vendorDir . '/aws/aws-sdk-php/src'),
 );

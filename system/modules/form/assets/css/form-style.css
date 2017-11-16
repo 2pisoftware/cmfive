@@ -1,0 +1,33 @@
+.draggable-icon {
+	color: darkgrey;
+	padding: 10px;
+	text-align: center;
+	border: 1px #cdcdcd solid;
+}
+
+.draggable-icon:hover {
+	cursor: pointer;
+	background-color: #efefef;
+	color: black;
+}
+
+.block-link {
+	display: block;
+	white-space: nowrap;
+}
+
+.abbreviated-link {
+	width: 250px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+td .button {
+	display: block;
+	width: 100%;
+}
+
+td button.button + button.button {
+	margin-left: 0px !important;
+}

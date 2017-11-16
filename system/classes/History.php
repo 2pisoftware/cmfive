@@ -1,9 +1,12 @@
 <?php
 
 /**
- * This class is designed to manage page traversal (history) by storing values in the $_SESSION
- * Calling History::add($name) will add that name and a timestamp to an array in session with the
- * current url path as the key
+ * This class is designed to manage page traversal (history) by storing values
+ * in the $_SESSION Calling History::add($name) will add that name and a 
+ * timestamp to an array in session with the current url path as the key. If you
+ * also provide an object as the third parameter, the added history object will
+ * be automatically removed from the breadcrumbs when you delete the
+ * aforementioned object.
  * 
  * NOTE: this means that any GET/POST parameters CANNOT be stored along with the path
  * 
@@ -19,7 +22,7 @@ class History {
      * This function adds a history value to the SESSION
      * @param String $name
      */
-    public static function add($name, Web $w = null) {
+    public static function add($name, Web $w = null, $object = null) {
         // Sanitise the string
         if (!empty($name)) {
             $name = trim(htmlspecialchars(strip_tags($name)));
@@ -36,7 +39,15 @@ class History {
         }
         
         // Store array in SESSION
-        $_SESSION[self::$cookie_key][parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)] = array('name' => $name, 'time' => time());
+		$array = array('name' => $name, 'time' => time());
+		if (!empty($object)) {
+			$array['object_class'] = get_class($object);
+			$array['object_id'] = $object->id;
+		}
+		
+		// Sometimes the slash is on, sometimes its not, which creates multiple
+		// entries for the same place, solution is to strip the end slash
+        $_SESSION[self::$cookie_key][rtrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/')] = $array;
     }
     
     /**
@@ -73,6 +84,34 @@ class History {
         }
     }
     
+	/**
+	 * Will attempt to remove objects that have matching properties from History
+	 * 
+	 * @param type $object
+	 * @return null
+	 */
+	public static function remove($object = null) {
+		// Load cookie storage into array to be manipulated
+        if (empty($_SESSION[self::$cookie_key]) || empty($object) 
+				|| !is_a($object, "DbObject") || !property_exists($object, "id")) {
+            return;
+        }
+        
+        // Get history form cookie and sort
+        $history = $_SESSION[self::$cookie_key];
+		
+		$class = get_class($object);
+		$id = $object->id;
+		
+        foreach($history as $path => $history_entry) {
+			if (array_key_exists("object_class", $history_entry) && array_key_exists("object_id", $history_entry)) {
+				if ($history_entry['object_class'] == $class && $history_entry['object_id'] == $id) {
+					unset($_SESSION[self::$cookie_key][$path]);
+				}
+			}
+		}
+	}
+	
     /**
      * This is a sort function for a History entry
      * 

@@ -3,10 +3,28 @@
  * Static class to generate and check CSRF tokens
  * Based on example found http://www.wikihow.com/Prevent-Cross-Site-Request-Forgery-(CSRF)-Attacks-in-PHP
  */
+class CSRFException extends Exception {
+    
+}
+ 
+ 
 class CSRF {
     private static $token_id_name = "token_id";
     private static $token_value_name = "token_value";
     private static $token_history_name = "csrf_history";
+    
+ 
+    static function getTokenIdName() {
+        return self::$token_id_name;
+    }
+    
+    static function getTokenValueName() {
+        return self::$token_value_name;
+    }
+	
+    static function getTokenHistoryName() {
+        return self::$token_history_name;
+    }
     
     /**
      * Generates new CSRF token_id and store it in the $_SESSION.
@@ -88,7 +106,7 @@ class CSRF {
     }
     
     public static function inHistory() {
-        if (!empty($_SESSION[self::$token_history_name])) {
+		if (!empty($_SESSION[self::$token_history_name])) {
             foreach($_SESSION[self::$token_history_name] as $history_key => $history_value) {
                 if (isset($_POST[$history_key])) {
                     if  ($_POST[$history_key] === $history_value) {
@@ -106,7 +124,7 @@ class CSRF {
      * @param integer $len
      * @return string
      */
-    private static function random($len) {
+    public static function random($len) {
         $cstrong = false;
         $bytes = openssl_random_pseudo_bytes($len, $cstrong);
         while ($cstrong == false) {

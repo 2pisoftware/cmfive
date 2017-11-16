@@ -74,6 +74,9 @@
 class DbObject extends DbService {
 
     public $id;
+    private static $_object_vars = array();
+	private static $_columns = array();
+    private $_class;
 	public $__use_auditing = true;
 	
     /**
@@ -94,6 +97,7 @@ class DbObject extends DbService {
         if (property_exists($this, "_searchable") && !property_exists($this, "_remove_searchable")) {
             $this->_searchable = new AspectSearchable($this);
         }
+        $this->_class = get_class($this);
     }
 
     // public function __clone(){
@@ -276,37 +280,36 @@ class DbObject extends DbService {
             if (!empty($v)) {
                 return $this->d2Time($v);
             }
-        }
+        } 
         return $v;
     }
-
+    
+    function getObjectVars() {
+        if(!empty(self::$_object_vars[$this->_class])) {
+            return self::$_object_vars[$this->_class];
+        }
+        // build cache of filtered object vars
+        self::$_object_vars[$this->_class] = array();
+        foreach(get_object_vars($this) as $k => $v) {
+            // ignore volatile vars and web
+            if('_' !== $k{0} && 'w' !== $k) {
+                self::$_object_vars[$this->_class][] = $k;
+            }
+        }
+        return self::$_object_vars[$this->_class];
+    }
+    
     /**
      * fill this object from an array where the keys correspond to the
      * variable of this object.
      *
      * @param array $row
      */
-    function fill($row, $from_db = false) {
-        foreach (get_object_vars($this) as $k => $v) {
-            if ($k{0} != "_") { // ignore volatile vars
-                $dbk = $k;
-                if ($from_db) {
-                    $dbk = $this->getDbColumnName($k);
-                }
-
-                if (array_key_exists($dbk, $row)) {
-                    $v = $row[$dbk];
-                    $this->$k = $from_db ? $this->readConvert($k, $v) : $v;
-                }
+    function fill($row, $convert = false) {
+        foreach ($this->getObjectVars() as $k) {
+            if (array_key_exists($k, $row)) {
+                $this->$k = ($convert ? $this->readConvert($k, $row[$k]) : $row[$k]);
             }
-        }
-        // May be modifiable data this will only fire if the keys below
-        // aren't defined in the class
-        if (!empty($row["dt_created"]) && empty($this->dt_created)) {
-            $this->dt_created = $this->dt2Time($row["dt_created"]);
-        }
-        if (!empty($row["dt_modified"]) && empty($this->dt_modified)) {
-            $this->dt_modified = $this->dt2Time($row["dt_modified"]);
         }
         if (!empty($row["creator_id"]) && empty($this->creator_id)) {
             $this->creator_id = $row["creator_id"];
@@ -352,10 +355,8 @@ class DbObject extends DbService {
      */
     function toArray() {
         $arr = array();
-        foreach (get_object_vars($this) as $k => $v) {
-            if ($k{0} != "_" && $k != "w") { // ignore volatile vars
-                $arr[$k] = $v;
-            }
+        foreach ($this->getObjectVars() as $k) {
+            $arr[$k] = $this->$k;
         }
         return $arr;
     }
@@ -429,6 +430,29 @@ class DbObject extends DbService {
         }
     }
 
+	/**
+	 * Returns whether or not this object exists in the database
+	 * Base on the id not being null and greater than 0
+	 * 
+	 * @return <bool> exists
+	 */
+	public function exists() {
+		return !is_null($this->id) && intval($this->id) > 0;
+	}
+	
+	/**
+	 * Checks whether or not a given property has changed. It does this by
+	 * looking for the $prop value in the __old array and comparing it against
+	 * the active property.
+	 * 
+	 * @param string $prop
+	 * @return boolean
+	 */
+	public function propertyHasChanged($prop) {
+		return property_exists($this, '__old') && property_exists($this, $prop) && 
+				array_key_exists($prop, $this->__old) && $this->__old[$prop] != $this->$prop;
+	}
+	
     /**
      * Utility function to decide
      * whether to insert or update
@@ -471,10 +495,13 @@ class DbObject extends DbService {
      *
      * @param <type> $table
      * @throws Exception e
+     * @return  boolean|array true or Array of validation errors
      */
     function insert($force_validation = true) {
         try {
             $this->startTransaction();
+            
+            $this->validateBoolianProperties();
 
             if ($force_validation && property_exists($this, "_validation")) {
                 $valid_response = $this->validate();
@@ -493,17 +520,21 @@ class DbObject extends DbService {
             // set some default attributes
             if (!property_exists($this, "_modifiable")) { // $this->_modifiable) {
                 // for backwards compatibility
-                if (in_array("dt_created", $columns))
+                if (in_array("dt_created", $columns)) {
                     $this->dt_created = time();
+				}
 
-                if (in_array("creator_id", $columns) && $this->w->Auth->loggedIn())
+                if (in_array("creator_id", $columns) && $this->w->Auth->loggedIn()) {
                     $this->creator_id = $this->w->Auth->user()->id;
+				}
 
-                if (in_array("dt_modified", $columns))
+                if (in_array("dt_modified", $columns)) {
                     $this->dt_modified = time();
+				}
 
-                if (in_array("modifier_id", $columns) && $this->w->Auth->loggedIn())
+                if (in_array("modifier_id", $columns) && $this->w->Auth->loggedIn()) {
                     $this->modifier_id = $this->w->Auth->user()->id;
+				}
             }
 
             $data = array();
@@ -541,8 +572,7 @@ class DbObject extends DbService {
 
             $this->id = $this->_db->last_insert_id();
 
-            // calling hooks AFTER inserting the object
-            $this->_callHooks("after", "insert");
+            
 
             // call standard aspect methods
 
@@ -553,9 +583,15 @@ class DbObject extends DbService {
                 $this->_versionable->insert();
             }
             if (property_exists($this, "_searchable") && (null !== $this->_searchable)) {
-                $this->_searchable->insert();
+                $this->_searchable->insert(false);
             }
 
+            // calling hooks AFTER inserting the object
+            $this->_callHooks("after", "insert");
+
+            // give related objects the chance to update their index
+            $this->w->callHook("core_dbobject", "indexChange_".get_class($this), $this);
+            
             // store this id in the context for hooks etc.
             $inserts = $this->w->ctx('db_inserts');
             if (!$inserts) {
@@ -583,7 +619,7 @@ class DbObject extends DbService {
      *
      * @param boolean $force_null_values        	
      * @param boolean $force_validation        	
-     * @return true or array("success"=>false,"invalid"=>array()) if validation failed
+     * @return  boolean|array true or Array of validation errors
      */
     function update($force_null_values = false, $force_validation = true) {
         try {
@@ -617,6 +653,9 @@ class DbObject extends DbService {
                     $this->modifier_id = $this->w->Auth->user()->id;
                 }
             }
+            
+            $this->validateBoolianProperties();
+            
             $data = array();
             foreach (get_object_vars($this) as $k => $v) {
                 if ($k {0} != "_" && $k != "w") { // ignore volatile vars
@@ -634,6 +673,7 @@ class DbObject extends DbService {
                     }
                 }
             }
+            
 
             $this->_db->update($t, $data)->where($this->getDbColumnName('id'), $this->id);
             $this->_db->execute();
@@ -649,9 +689,12 @@ class DbObject extends DbService {
                 $this->_versionable->update();
             }
             if (property_exists($this, "_searchable") && (null !== $this->_searchable)) {
-                $this->_searchable->update();
+                $this->_searchable->update(false);
             }
-
+            
+            // give related objects the chance to update their index
+			$this->w->callHook("core_dbobject", "indexChange_".get_class($this), $this);
+			
             // store this id in the context for hooks
             $updates = $this->w->ctx('db_updates');
             if (!$updates) {
@@ -699,6 +742,9 @@ class DbObject extends DbService {
             // calling hooks AFTER deleting the object
             $this->_callHooks("after", "delete");
 
+            // give related objects the chance to update their index
+            $this->w->callHook("core_dbobject", "indexChange_".get_class($this), $this);
+            
             // store this id in the context for listeners
             $deletes = $this->w->ctx('db_deletes');
             if (!$deletes) {
@@ -748,15 +794,18 @@ class DbObject extends DbService {
     }
 
     function getDbTableColumnNames() {
+		if(!empty(self::$_columns[$this->_class])) {
+			return self::$_columns[$this->_class];
+		}
         $rs = $this->_db->_query('SELECT * FROM ' . $this->getDbTableName() . ' LIMIT 0');
         if ($rs !== false) {
-            $columns = array();
             for ($i = 0; $i < $rs->columnCount(); $i++) {
                 $col = $rs->getColumnMeta($i);
-                $columns[] = $col['name'];
+                self::$_columns[$this->_class][] = $col['name'];
             }
-            return $columns; //$this->_db->prepare("DESCRIBE tablename")->execute()->fetchAll(PDO::FETCH_COLUMN);
+            return self::$_columns[$this->_class]; //$this->_db->prepare("DESCRIBE tablename")->execute()->fetchAll(PDO::FETCH_COLUMN);
         }
+		self::$_columns[$this->_class][] = array();
         return array();
     }
 
@@ -790,7 +839,7 @@ class DbObject extends DbService {
     }
 
     function _tn() {
-        return $this->getTableName();
+        return $this->getDbTableName();
     }
 
     function _cn($attr) {
@@ -851,7 +900,7 @@ class DbObject extends DbService {
      * 
      * @return string
      */
-    function getIndexContent() {
+    function getIndexContent($ignoreAdditional = true) {
 
         // -------------- concatenate all object fields ---------------------		
         $str = "";
@@ -866,9 +915,17 @@ class DbObject extends DbService {
             }
         }
 
-        // add custom content to the index
+        // add custom content from the object to the index
         $str .= $this->addToIndex();
 
+        // add content from hooks anywhere in the system
+        if (!$ignoreAdditional) {
+	        $additional = $this->w->callHook("core_dbobject", "add_to_index", $this);
+        }
+        
+        if (!empty($additional)) {
+			$str .= ' '.implode(" ",$additional); 
+        }
 
         // ------------ sanitise string ----------------------------------
         // Remove all xml/html tags
@@ -946,13 +1003,12 @@ class DbObject extends DbService {
         if (property_exists($this, $prop_string)) {
             $prop_detail = new ReflectionProperty($this, $prop_string);
             if ($prop_detail->isStatic()) {
-                // Is this to "hacky"? No, it's cool!
                 return $this::$$prop_string;
             } else {
                 return $this->$prop_string;
             }
         } else if (property_exists($this, $prop_lookup) && $this->$prop_lookup) {
-            return $this->getObjects("Lookup", array("type" => $this->$prop_lookup));
+            return $this->getObjects("Lookup", array("type" => $this->$prop_lookup, "is_deleted" => 0));
         } else if (property_exists($this, $prop_class) && $this->$prop_class) {
             if (property_exists($this, $prop_filter) && $this->$prop_filter) {
                 return $this->getObjects($this->$prop_class, $this->$prop_filter, true);
@@ -1046,7 +1102,7 @@ class DbObject extends DbService {
                         // Case insensitive field check against an array of predefined values
                         if (is_array($rule_array)) {
                             $this->$vr_key = filter_var($this->$vr_key, FILTER_SANITIZE_STRING);
-                            if (!in_array(ucfirst(strtolower($this->$vr_key)), $rule_array)) {
+                            if (!in_array($this->$vr_key, $rule_array)) {
                                 $response["invalid"]["$vr_key"][] = "Invalid value, allowed are " . implode(", ", $rule_array);
                             } else {
                                 $response["valid"][] = $vr_key;
@@ -1115,16 +1171,33 @@ class DbObject extends DbService {
             } else
                 return null;
         } else if (strpos($k, "t_") === 0) {
-            if (!empty($v)) {
+            if (!empty($v) && is_int($v)) {
                 return $this->time2T($v);
             } else
                 return null;
         } else if (strpos($k, "s_") === 0) {
             if (!empty($v)) {
-                return AESencrypt($v, $this->__password);
+                return AESencrypt($v, Config::get('system.password_salt'));
             }
         }
         return $v;
     }
 
+	public function __toString() {
+		return $this->printSearchTitle();
+	}
+    
+    //loops through properties ensuring boolians are either 'true' or 'false'
+    public function validateBoolianProperties() {
+        foreach (get_object_vars($this) as $k => $v) {
+            if ($k {0} != "_" && $k != "w") { // ignore volatile vars
+                if (substr($k, 0, 3) === 'is_') {
+                    //echo $k; echo '<br>';
+                    $this->$k = $v ? 1 : 0;
+                    //echo $this->$k; echo '<br>';
+                }
+            }
+        }
+    }
+	
 }

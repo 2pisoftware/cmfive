@@ -19,18 +19,35 @@ class DbService {
      * @var <type>
      */
     private static $_cache = array(); // used for single objects
-    private static $_cache2 = array();  // used for lists of objects
+    public static $_cache2 = array();  // used for lists of objects
+	public static $_select_cache = array();
 
     /**
      * This variable keeps track of active transactions
      *
      * @var boolean
      */
-    private static $_active_trx = false;
+    public static $_active_trx = false;
 
     public function __get($name) {
         return $this->w->$name;
     }
+    
+    public static function getCache() {
+		return self::$_cache;
+	}
+    public static function getCacheValue($class,$id) {
+		if (array_key_exists($class,self::$_cache) && array_key_exists($id,self::$_cache[$class]))  {
+			return self::$_cache[$class][$id];
+		}
+		return null;
+	}
+    public static function getCacheListValue($class,$key) {
+		if (array_key_exists($class,self::$_cache2) && array_key_exists($key,self::$_cache2[$class]))  {
+			return self::$_cache2[$class][$key];
+		}
+		return null;
+	}
 
     function __construct(Web $w) {
         $this->_db = $w->db;
@@ -71,8 +88,8 @@ class DbService {
         return strtotime(str_replace("/", "-", $d));
     }
 
-    function t2Time($d) {
-        return strtotime(str_replace("/", "-", $d));
+    function t2Time($t) {
+        return strtotime(str_replace("/", "-", $t));
     }
 
     /**
@@ -93,9 +110,11 @@ class DbService {
      * @param <type> $idOrWhere
      * @return <type>
      */
-    function getObject($class, $idOrWhere, $use_cache = true, $order_by = null) {
+    function getObject($class, $idOrWhere, $use_cache = true, $order_by = null, $includeDeleted = false) {
         if (!$idOrWhere || !$class)
             return null;
+
+		if ($order_by !== null) $use_cache=false;
 
         $key = $idOrWhere;
         if (is_array($idOrWhere)) {
@@ -129,16 +148,21 @@ class DbService {
                 $this->w->Log->setLogger(get_class($this))->error("(getObject) The WHERE condition: " . json_encode($idOrWhere) . " has non-associative elements, this has security implications and is not allowed");
                 return null;
             }
+			
+			// Default is deleted checks to 0
+			$columns = $o->getDbTableColumnNames();
+
+			if (!$includeDeleted && (property_exists(get_class($o), "is_deleted") || (in_array("is_deleted", $columns)))) {
+				$this->_db->where('is_deleted', 0);
+			}
         }
-        
+
         if (!empty($order_by)) {
             $this->_db->order_by($order_by);
         }
-
-//        $this->w->Log->setLogger("DB_SERVICE")->debug("(getObject) TABLE: " . $table . " WHERE: " . json_encode($idOrWhere));
-        //$this->w->Log->setLogger("DB_SERVICE")->debug("SQL: " . $this->_db->getSql());
+		
+		$this->buildSelect($o, $table, $class);
         $result = $this->_db->fetch_row();
-//        $this->w->Log->setLogger("DB_SERVICE")->debug("RESULT: " . json_encode($result));
 
         if ($result) {
             $obj = $this->getObjectFromRow($class, $result, true);
@@ -153,7 +177,32 @@ class DbService {
             return null;
         }
     }
-
+	function buildSelect($object, $table, $class) {
+		$this->_db->clearSelect();
+		if(!isset(self::$_select_cache[$class])) {
+			self::$_select_cache[$class] = array();
+		}
+		if(!empty(self::$_select_cache[$class][$table])) {
+			$this->_db->select(self::$_select_cache[$class][$table]);
+			return NULL;
+		}
+        // Move date conversion to SQL.
+        // Automatically converts keys with different database values
+		$parts = array();
+        foreach ($object->getDbTableColumnNames() as $k) {
+            if(0 === strpos($k, 'dt_') || 0 === strpos($k, 'd_')) { //  || 0 === strpos($k, 't_')
+                // This is MySQL specific!
+                $parts[] = "UNIX_TIMESTAMP($table.`".$object->getDbColumnName($k)."`) AS `$k`";
+            } else if($k != $object->getDbColumnName($k)) {
+                $parts[] = "`".$object->getDbColumnName($k)."` as `$k`";
+            } else {
+                $parts[] = $k;
+            }
+        }
+		self::$_select_cache[$class][$table] = implode(',', $parts);
+		$this->_db->select(self::$_select_cache[$class][$table]);
+		return NULL;
+	}
     /**
      *
      * @param String $class
@@ -162,9 +211,14 @@ class DbService {
      * 
      * @return <type>
      */
-    function getObjects($class, $where = null, $cache_list = false, $use_cache = true, $order_by = null) {
+    function getObjects($class, $where = null, $cache_list = false, $use_cache = true, $order_by = null, $offset = null, $limit = null, $includeDeleted = false) {
         if (!$class)
             return null;
+		
+		if ($order_by !== null || $offset !== null || $limit !== null ) {
+			$use_cache=false;
+			$cache_list=false;
+		}
 
         // if using the list cache
         if ($cache_list) {
@@ -199,10 +253,30 @@ class DbService {
         } else if ($where && is_scalar($where)) {
             $this->_db->where($where, false);
         }
+		
+		// Default is deleted checks to 0
+		$columns = $o->getDbTableColumnNames();
+		
+		if (!$includeDeleted && (property_exists(get_class($o), "is_deleted") || (in_array("is_deleted", $columns)))) {
+			$this->_db->where('is_deleted', 0);
+		}
+		
+		// Ordering
         if (!empty($order_by)) {
             $this->_db->order_by($order_by);
         }
-        // echo $this->_db->getSql();
+		
+		// Offset
+		if (!empty($offset) && !empty($limit)) {
+			$this->_db->offset($offset);
+		}
+		
+		// Limit
+		if (!empty($limit)) {
+			$this->_db->limit($limit);
+		}
+
+        $this->buildSelect($o, $table, $class);
         $result = $this->_db->fetch_all();
         if ($result) {
             $objects = $this->getObjectsFromRows($class, $result, true);
@@ -238,7 +312,12 @@ class DbService {
         if (!$row || !$class)
             return null;
         $o = new $class($this->w);
-        $o->fill($row, $from_db);
+		
+		// The second parameter below is the prompt to convert mysql timestamps into unix timestamps
+		// We make this convert in the db query now but there are times when using getObjectFromRow
+		// where you may have made the query yourself (and therefore no UNIX() cast in mysql)
+		// It also happens that the $from_db flag is inversely related to the convert parameter below
+        $o->fill($row, !$from_db);
 		 
         // test implementation for preserving original database values
         if ($from_db == true) {
