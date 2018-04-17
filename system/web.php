@@ -1008,12 +1008,16 @@ class Web {
         $partial_action_file = implode("/", array($moduleDir, $this->_partialsdir, "actions", $name . ".php"));
 
         if (file_exists($partial_action_file)) {
-            require_once($partial_action_file);
 
             // now execute the action
             $partial_action = $name . "_" . $method;
             if (function_exists($partial_action)) {
                 $partial_action($this, $params);
+            } else {
+                require_once($partial_action_file);
+                if (function_exists($partial_action)) {
+                    $partial_action($this, $params);
+                }
             }
         } else {
             $this->Log->error("Could not find partial file at: {$partial_action_file}");
