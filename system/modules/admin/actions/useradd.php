@@ -50,6 +50,7 @@ function useradd_POST(Web &$w) {
 	$user->insert();
 	
 	$user->setPassword($_REQUEST['password']);
+	$user->update();
 
 	$w->ctx("user", $user);
 
